@@ -177,7 +177,7 @@ public class NewReferenceDialog extends javax.swing.JDialog {
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
 
         JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtension()));
+        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
 
         int result = fc.showOpenDialog(this);
 

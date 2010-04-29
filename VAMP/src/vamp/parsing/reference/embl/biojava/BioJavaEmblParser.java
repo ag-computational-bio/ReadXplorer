@@ -33,7 +33,7 @@ import vamp.parsing.reference.Filter.FeatureFilter;
 public class BioJavaEmblParser implements ReferenceParserI {
 
     // Fileextension used by Filechooser to choose files to be parsed by this parser
-    private static String fileExtension = "embl";
+    private static String [] fileExtension = new String[]{"embl"};
     // name of this parser for use in ComboBoxes
     private static String parserName = "BioJava EMBL";
     private static String fileDescription = "EMBL file";
@@ -153,10 +153,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
         return refGenome;
     }
 
-    @Override
-    public String getFileExtension() {
-        return fileExtension;
-    }
+
 
     @Override
     public String getParserName(){
@@ -167,6 +164,12 @@ public class BioJavaEmblParser implements ReferenceParserI {
     public String getInputFileDescription(){
         return fileDescription;
     }
+
+    @Override
+    public String[] getFileExtensions() {
+        return fileExtension;
+    }
+
 
 
 }

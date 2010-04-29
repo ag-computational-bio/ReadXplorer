@@ -39,7 +39,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     private List<String> bases;
     private static int height = 500;
     private TrackConnector trackConnector;
-
+    private PersistantReference refGen;
     private GenomeGapManager gapManager;
     private int lowerBound;
     private int upperBound;
@@ -58,6 +58,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
 
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector){
         super(boundsInfoManager, basePanel, refGen);
+        this.refGen = refGen;
         this.trackConnector = trackConnector;
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
@@ -208,7 +209,12 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     private synchronized void setupData(){
 
         gapManager = new GenomeGapManager(lowerBound, upperBound);
+   
+        try{
         gaps = trackConnector.getExtendedReferenceGapsForIntervallOrderedByMappingID(lowerBound, upperBound);
+        }catch(Exception ex ){
+            System.err.print("trackConnector couldnt initialse gaps" + ex);
+        }
         this.fillGapManager();
         getSequenceBar().setGenomeGapManager(gapManager);
         this.adjustAbsStop();
@@ -372,13 +378,36 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand){
             double value;
             int featureHeight;
-            Color c;
+            Color c = null;
             int y = (isForwardStrand? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-
+            String base = refGen.getSequence().substring(absPos-1, absPos);
+            System.out.println("Base:" + base + absPos);
+            if (absPos != relPos){
+                System.out.println("Diffrent Pos" +"absPos" +absPos+" relPos" + relPos+ base);
+            }
+            
             for(String type : bases){
                 if(type.equals("match")){
                     value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_MATCH;
+                    if(base.equals("a")){
+                     c = ColorProperties.LOGO_A;
+                    }
+                    else if(base.equals("t")){
+                     c = ColorProperties.LOGO_T;
+                    }
+                     else if(base.equals("c")){
+                     c = ColorProperties.LOGO_C;
+                    }
+                     else if(base.equals("g")){
+                     c = ColorProperties.LOGO_G;
+                    }
+                     else if(base.equals("n")){
+                     c = ColorProperties.LOGO_N;
+                    }
+                      else if(base.equals("readgap")){
+                     c = ColorProperties.LOGO_READGAP;
+                    }
+
                 } else if(type.equals("a")){
                     value = logoData.getNumOfAAt(relPos, isForwardStrand);
                     c = ColorProperties.LOGO_A;
@@ -448,7 +477,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
             int gapPosition = gap.getPosition();
             int gapOrder = gap.getOrder();
             gapOrder++;
-
+          
             if(!positionToNum.containsKey(gapPosition)){
                 positionToNum.put(gapPosition, 0);
             }
@@ -476,9 +505,10 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
             relPos += gapManager.getNumOfGapsSmaller(i);
             logoData.setCoverageAt(relPos, cov.getnFwMult(i), true);
             logoData.setCoverageAt(relPos, cov.getnRvMult(i), false);
+
         }
 
-        // store diff information in logo data
+        // store diff information from the refernce genome in logo data
         for(Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext(); ){
             PersistantDiff d = it.next();
             int position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition())+gapManager.getNumOfGapsSmaller(d.getPosition());

@@ -15,7 +15,6 @@ import vamp.parsing.common.ParsedRun;
 import vamp.parsing.common.ParsedTrack;
 import vamp.parsing.mappings.TrackParser;
 import vamp.parsing.mappings.TrackParserI;
-import vamp.parsing.reads.FastaParser;
 import vamp.parsing.reads.RunParserI;
 import vamp.parsing.reference.Filter.FeatureFilter;
 import vamp.parsing.reference.Filter.FilterRuleSource;
@@ -57,8 +56,8 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
 
     private ParsedRun parseRun(RunJob runJob) throws ParsingException{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing run data from source \""+runJob.getFile().getAbsolutePath()+"\"");
+        RunParserI parser = runJob.getParser();
 
-        RunParserI parser = new FastaParser();
         ParsedRun run = parser.parseRun(runJob);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising run data from source \""+runJob.getFile().getAbsolutePath()+"\"");
@@ -149,7 +148,10 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
                     //parsing
                     ParsedRun run = parseRun(r);
                     c.updateImportStatus("\""+r.getFile().getName() + "\" parsed");
-
+                    //returns the reads that couldnt be read by the parser
+                    if(!run.getErrorList().isEmpty()){
+                    c.updateImportStatus("Couldn't load reads: " + run.getErrorList().toString());
+                    }
                     //storing
                     try {
                         storeRun(run, r);

@@ -23,7 +23,7 @@ import vamp.importer.TrackJob;
 public class UniqueJokParser implements MappingParserI{
 
     private static String name = "Unique Reads Jok Output Parser";
-    private static String fileExtension = "out";
+    private static String [] fileExtension = new String[]{"out"};
     private static String fileDescription = "Jok Output";
     private HashMap<Integer, Integer> gapOrderIndex;
 
@@ -209,11 +209,6 @@ public class UniqueJokParser implements MappingParserI{
     }
 
     @Override
-    public String getFileExtension() {
-        return fileExtension;
-    }
-
-    @Override
     public String getInputFileDescription() {
         return fileDescription;
     }
@@ -221,6 +216,11 @@ public class UniqueJokParser implements MappingParserI{
     @Override
     public String getParserName(){
         return name;
+    }
+
+    @Override
+    public String[] getFileExtensions() {
+        return fileExtension;
     }
 
     private class DiffAndGapResult{

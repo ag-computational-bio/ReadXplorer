@@ -42,10 +42,10 @@ public class ImporterController implements ImporterViewListenerI {
         view.startingImport();
 
         List<RunJob> runs = job.getRunJobList();
-        List<ReferenceJob> gens = job.getRefGenJobList();
+        List<ReferenceJob> refgens = job.getRefGenJobList();
         List<TrackJob> tracks = job.getTrackJobList();
 
-        ImportThread i = new ImportThread(this, runs, gens, tracks);
+        ImportThread i = new ImportThread(this, runs, refgens, tracks);
         ApplicationController.getInstance().addRunningTask(i);
 
         i.execute();

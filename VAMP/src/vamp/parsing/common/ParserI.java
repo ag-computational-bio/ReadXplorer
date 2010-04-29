@@ -8,7 +8,7 @@ public interface ParserI {
 
     public String getParserName();
 
-    public String getFileExtension();
+    public String[] getFileExtensions();
 
     public String getInputFileDescription();
 

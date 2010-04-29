@@ -4,6 +4,8 @@ import vamp.parsing.common.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.parsing.common.ParsingException;
@@ -16,7 +18,7 @@ import vamp.importer.RunJob;
 public class FastaParser implements RunParserI {
 
     private static String name = "Fasta Parser";
-    private static String fileExtension = "fas";
+    private static String[] fileExtension = new String[]{"fas", "fasta"};
     private static String fileDescription = "Fasta File";
 
     public FastaParser(){
@@ -24,24 +26,28 @@ public class FastaParser implements RunParserI {
     }
 
     @Override
-    public ParsedRun parseRun(RunJob runJob) throws ParsingException{
-
+    public ParsedRun parseRun(RunJob runJob) throws ParsingException {
         File file = runJob.getFile();
         String description = runJob.getDescription();
 
         ParsedRun run = new ParsedRun(description);
         run.setTimestamp(runJob.getTimestamp());
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Lesen der Read Datei "+file);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Lesen der Read Datei " + file);
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = null;
             String readname = null;
             String sequence = null;
 
-            while((line = br.readLine()) != null){
-                if(line.startsWith(">")){
-                    readname = line.substring(1);
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith(">")) {
+                    if (line.length() >= 100) {
+                        readname = line.substring(1, 100);
+                    } else{
+                        readname = line.substring(1);
+                    }
+                    
                 } else {
                     sequence = line;
                     run.addReadData(sequence, readname);
@@ -59,11 +65,6 @@ public class FastaParser implements RunParserI {
     }
     
     @Override
-    public String getFileExtension(){
-        return fileExtension;
-    }
-
-    @Override
     public String getParserName(){
         return name;
     }
@@ -71,6 +72,11 @@ public class FastaParser implements RunParserI {
     @Override
     public String getInputFileDescription(){
         return fileDescription;
+    }
+
+    @Override
+    public String[] getFileExtensions() {
+        return fileExtension;
     }
 
 }

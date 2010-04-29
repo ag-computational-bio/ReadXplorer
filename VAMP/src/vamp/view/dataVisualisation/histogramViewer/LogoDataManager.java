@@ -115,6 +115,7 @@ public class LogoDataManager {
         return counts[position][row];
     }
 
+    //sets the coverage value for matching base to the refernce genome
     public void setCoverageAt(int position, int value, boolean forwardStrand){
         int row = MATCH;
         if(!forwardStrand){
@@ -125,6 +126,12 @@ public class LogoDataManager {
         counts[position][row] = value;
     }
 
+    //if a base differs from the reference genome
+    /**
+     * 
+     * @param diff
+     * @param position
+     */
     public void addExtendedPersistantDiff(PersistantDiff diff, int position){
         char base = diff.getBase();
         int row = 0;

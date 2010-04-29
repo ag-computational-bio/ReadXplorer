@@ -32,7 +32,7 @@ import vamp.parsing.reference.ReferenceParserI;
  */
 public class BioJavaGenBankParser implements ReferenceParserI{
 
-    private static String fileExtension = "gbk";
+    private static String[] fileExtension = new String[]{"gbk"};
     private static String parserName = "BioJava GenBank";
     private static String fileDescription = "GenBank file";
 
@@ -146,10 +146,6 @@ public class BioJavaGenBankParser implements ReferenceParserI{
         return refGenome;
     }
 
-    @Override
-    public String getFileExtension() {
-        return fileExtension;
-    }
 
     @Override
     public String getParserName(){
@@ -159,6 +155,11 @@ public class BioJavaGenBankParser implements ReferenceParserI{
     @Override
     public String getInputFileDescription(){
         return fileDescription;
+    }
+
+    @Override
+    public String[] getFileExtensions() {
+        return fileExtension;
     }
 
 }

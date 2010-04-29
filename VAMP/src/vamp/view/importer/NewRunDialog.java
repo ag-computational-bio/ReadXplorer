@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import vamp.parsing.common.ParserI;
 import vamp.parsing.reads.FastaParser;
+import vamp.parsing.reads.FastqParser;
 import vamp.parsing.reads.RunParserI;
 
 /**
@@ -22,7 +23,7 @@ public class NewRunDialog extends javax.swing.JDialog {
 
     private File runFile;
     private JobManagerI jobmanager;
-    private RunParserI[] readparser = new RunParserI[]{new FastaParser()};
+    private RunParserI[] readparser = new RunParserI[]{new FastaParser(), new FastqParser()};
     private RunParserI currentParser;
 
     /** Creates new form NewRunDialog */
@@ -149,7 +150,7 @@ public class NewRunDialog extends javax.swing.JDialog {
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
         
         JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtension()));
+        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
 
         int result = fc.showOpenDialog(this);
 
@@ -162,6 +163,8 @@ public class NewRunDialog extends javax.swing.JDialog {
             if(file.canRead()){
                 runFile = file;
                 jTextField1.setText(runFile.getName());
+            }else{
+                System.err.print("NewRunDialog couldnt read file");
             }
         }
 }//GEN-LAST:event_chooseButtonActionPerformed

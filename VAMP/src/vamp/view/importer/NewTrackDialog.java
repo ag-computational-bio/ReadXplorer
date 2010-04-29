@@ -242,7 +242,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
 
         JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtension()));
+        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
 
         int result = fc.showOpenDialog(this);
 

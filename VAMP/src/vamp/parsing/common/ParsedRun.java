@@ -12,6 +12,7 @@ import java.util.Iterator;
 public class ParsedRun {
 
     private HashMap<String, ParsedSequence> sequences;
+    private HashMap<String, String> errorMap;
     private String description;
     private Timestamp timestamp;
     private long id;
@@ -27,6 +28,7 @@ public class ParsedRun {
     public ParsedRun(String description){
         this.description = description;
         sequences = new HashMap<String, ParsedSequence>();
+        errorMap = new HashMap<String, String>();
     }
 
     public String getDescription(){
@@ -44,6 +46,19 @@ public class ParsedRun {
         }
 
         sequences.get(sequence).addRead(readName);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addErrorList(HashMap errorMap){
+        this.errorMap = errorMap;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public HashMap getErrorList(){
+        return errorMap;
     }
 
     @Override

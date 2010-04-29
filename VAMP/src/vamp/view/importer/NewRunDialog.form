@@ -38,16 +38,16 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="parserCombobox" pref="224" max="32767" attributes="0"/>
+                          <Component id="parserCombobox" pref="222" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="jTextField1" pref="174" max="32767" attributes="0"/>
+                              <Component id="jTextField1" pref="154" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="jTextField2" pref="224" max="32767" attributes="0"/>
+                          <Component id="jTextField2" pref="222" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="jSeparator1" alignment="1" pref="317" max="32767" attributes="0"/>
+                  <Component id="jSeparator1" alignment="1" pref="307" max="32767" attributes="0"/>
                   <Component id="addButton" alignment="1" min="-2" pref="53" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -77,7 +77,7 @@
               <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="addButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="15" max="32767" attributes="0"/>
+              <EmptySpace pref="24" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
