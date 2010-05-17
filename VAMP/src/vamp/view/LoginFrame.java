@@ -1,8 +1,16 @@
 package vamp.view;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vamp.GestureListenerI;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 /**
  *
@@ -10,25 +18,48 @@ import java.util.List;
  */
 public class LoginFrame extends javax.swing.JFrame {
 
-
+    private String defaultdatabase;
+    private String defaultuser;
+    private String defaulthostname;
+    Properties properties = new Properties();
     private List<GestureListenerI> gestureListener;
+    private  FileInputStream stream;
 
     /** Creates new form Login */
     public LoginFrame() {
         gestureListener = new ArrayList<GestureListenerI>();
         initComponents();
+       readLoginData();
+
+      
     }
 
-    public void addGestureListener(GestureListenerI listener){
+    public void readLoginData(){
+                try {
+            stream = new FileInputStream("src/vamp/context/vamp.properties");
+            try {
+                properties.load(stream);
+                 stream.close();
+            } catch (IOException ex) {
+                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          setLoginData();
+
+    }
+
+    public void addGestureListener(GestureListenerI listener) {
         gestureListener.add(listener);
     }
 
-    public void removeGestureListener(GestureListenerI listener){
+    public void removeGestureListener(GestureListenerI listener) {
         gestureListener.remove(listener);
     }
 
-    private void alertListenersOfShutdown(){
-        for(GestureListenerI i : gestureListener){
+    private void alertListenersOfShutdown() {
+        for (GestureListenerI i : gestureListener) {
             i.shutDownApplication();
         }
     }
@@ -54,6 +85,7 @@ public class LoginFrame extends javax.swing.JFrame {
         urlField = new javax.swing.JTextField();
         dbTypeLabel = new javax.swing.JLabel();
         dbTypeBox = new javax.swing.JComboBox();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -71,6 +103,12 @@ public class LoginFrame extends javax.swing.JFrame {
         userLabel.setText("User:");
 
         passwordLabel.setText("Passwort:");
+
+        passwordField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordFieldActionPerformed(evt);
+            }
+        });
 
         loginButton.setText("Anmelden");
         loginButton.addActionListener(new java.awt.event.ActionListener() {
@@ -90,30 +128,36 @@ public class LoginFrame extends javax.swing.JFrame {
 
         dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL" }));
 
+        jCheckBox1.setSelected(true);
+        jCheckBox1.setText("Sitzung sichern");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jCheckBox1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(userLabel)
-                            .addComponent(databaseLabel)
-                            .addComponent(passwordLabel)
-                            .addComponent(urlLabel)))
-                    .addComponent(dbTypeLabel)
-                    .addComponent(closeButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(passwordField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                    .addComponent(userField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                    .addComponent(loginButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(dbTypeBox, 0, 205, Short.MAX_VALUE)
-                    .addComponent(urlField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                    .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(userLabel)
+                                    .addComponent(databaseLabel)
+                                    .addComponent(passwordLabel)
+                                    .addComponent(urlLabel)))
+                            .addComponent(dbTypeLabel)
+                            .addComponent(closeButton))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(passwordField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                            .addComponent(userField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                            .addComponent(loginButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(dbTypeBox, 0, 205, Short.MAX_VALUE)
+                            .addComponent(urlField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                            .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -139,7 +183,9 @@ public class LoginFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(passwordLabel))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBox1)
+                .addGap(1, 1, 1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loginButton)
                     .addComponent(closeButton))
@@ -158,21 +204,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
 
-        // get data from form
-        String adapter = dbTypeBox.getSelectedItem().toString();
-        if(adapter.equalsIgnoreCase("mysql")){
-            adapter = "mysql";
-        }
-
-        String hostname = urlField.getText();
-        String database = databaseField.getText();
-        String user = userField.getText();
-        String password = new String(passwordField.getPassword());
-
-        // let all listeners now, they should log in now
-        for(GestureListenerI i : gestureListener){
-            i.login(adapter, hostname, database, user, password);
-        }
+    passwordFieldActionPerformed(evt);
 
 }//GEN-LAST:event_loginButtonActionPerformed
 
@@ -180,7 +212,71 @@ public class LoginFrame extends javax.swing.JFrame {
         alertListenersOfShutdown();
     }//GEN-LAST:event_formWindowClosing
 
+    private void setLoginData() {
+        defaultuser = properties.getProperty("login.user");
+        defaultdatabase = properties.getProperty("login.database");
+        defaulthostname = properties.getProperty("login.hostname");
+        userField.setText(defaultuser);
+        urlField.setText(defaulthostname);
+        databaseField.setText(defaultdatabase);
+    }
+    private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
 
+        String adapter = dbTypeBox.getSelectedItem().toString();
+        if (adapter.equalsIgnoreCase("mysql")) {
+            adapter = "mysql";
+        }
+
+        String hostname = urlField.getText();
+
+        String database = databaseField.getText();
+
+        String user = userField.getText();
+
+        String password = new String(passwordField.getPassword());
+        //if there are new LoginData
+
+           if (jCheckBox1.isSelected()){
+            if (!hostname.equals(defaulthostname)|| !database.equals(defaultdatabase)|| !user.equals(defaultuser)) {
+
+            Properties newproperties = new Properties();
+            newproperties.put("login.hostname", hostname);
+            newproperties.put("login.database", database);
+            newproperties.put("login.user", user);
+
+            System.out.print("differs");
+            File newProperties = new File("src/vamp/context/vamp.properties");
+            try {
+
+                newproperties.store(new FileOutputStream(newProperties), "Login properties");
+            } catch (IOException e) {
+                System.out.println(e + "Couldnt write new login data in vamp.properties");
+            }
+            }
+
+
+        }else{
+             Properties newproperties = new Properties();
+            newproperties.put("login.hostname", "");
+            newproperties.put("login.database", "");
+            newproperties.put("login.user", "");
+
+            System.out.print("differs");
+            File newProperties = new File("src/vamp/context/vamp.properties");
+            try {
+
+                newproperties.store(new FileOutputStream(newProperties), "Login properties");
+            } catch (IOException e) {
+                System.out.println(e + "Couldnt write new login data in vamp.properties");
+            }
+        }
+
+        // let all listeners now, they should log in now
+        for (GestureListenerI i : gestureListener) {
+            i.login(adapter, hostname, database, user, password);
+        }
+           
+    }//GEN-LAST:event_passwordFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
@@ -188,6 +284,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JLabel databaseLabel;
     private javax.swing.JComboBox dbTypeBox;
     private javax.swing.JLabel dbTypeLabel;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JButton loginButton;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
@@ -196,5 +293,4 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JTextField userField;
     private javax.swing.JLabel userLabel;
     // End of variables declaration//GEN-END:variables
-
 }

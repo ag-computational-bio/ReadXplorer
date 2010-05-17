@@ -23,7 +23,7 @@ public class ApplicationController implements GestureListenerI {
     public static String APPNAME = "VAMP";
     
 
-    private ApplicationController(){
+    private ApplicationController() {
         createAndShowLogin();
         runningTasks = new ArrayList<RunningTaskI>();
 
