@@ -1,5 +1,6 @@
 package vamp.view.dataVisualisation.abstractViewer;
 
+import java.awt.Color;
 import vamp.view.dataVisualisation.*;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -113,7 +114,8 @@ public class SequenceBar extends JComponent{
             int logleft = bounds.getLogLeft();
             int logright = bounds.getLogRight();
             for(int i = logleft; i <= logright; i++){
-                drawChar(g, i);
+                 drawChar(g, i);
+                 drawCharReverse(g,i);
             }
         }
 }
@@ -147,6 +149,47 @@ public class SequenceBar extends JComponent{
         g.drawString(base,
                     (float) physX-offset,
                     (float) baseLineY -10);
+
+    }
+
+    /**
+     * draws the rev Strand of the ref Genome
+     * @param g
+     * @param logX
+     */
+        private void drawCharReverse(Graphics2D g, int logX){
+        // logX depents on slider value and cannot be smaller 1
+        // since counting in strings starts with 0, we have to substract 1
+        int basePosition = logX -1;
+
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logX);
+        double physX = bounds.getPhyMiddle();
+        if(gapManager != null && gapManager.hasGapAt(logX)){
+            int numOfGaps = gapManager.getNumOfGapsAt(logX);
+            for(int i = 0; i < numOfGaps; i++){
+                int tmp = (int) (physX + i * bounds.getPhysWidth());
+                String base = "-";
+                int offset = metrics.stringWidth(base) / 2;
+                g.drawString(base,
+                            (float) tmp-offset,
+                            (float) baseLineY +10);
+            }
+            physX += numOfGaps * bounds.getPhysWidth();
+        }
+        String base = refGen.getSequence().substring(basePosition, basePosition+1);
+        if(base.equals("a")){
+            base = "t";
+        }else if (base.equals("t")){
+             base = "a";
+        }else if (base.equals("g")){
+             base = "c";
+        }else if (base.equals("c")){
+             base = "g";
+        }
+        int offset = metrics.stringWidth(base) / 2;
+        g.drawString(base,
+                    (float) physX-offset,
+                    (float) baseLineY +10);
 
     }
     
@@ -288,11 +331,13 @@ public class SequenceBar extends JComponent{
             if(length < 3 ){
                 length = 3;
             }
-            JRegion jreg = new JRegion(length, 10);
+            JRegion jreg = new JRegion(length,10);
+            
+
             if(r.isForwardStrand()){
-                jreg.setBounds(from , baseLineY-jreg.getSize().height+1 ,jreg.getSize().width, jreg.getSize().height);
+                jreg.setBounds(from , baseLineY-jreg.getSize().height-6 ,jreg.getSize().width, jreg.getSize().height);
             } else {
-                jreg.setBounds(from , baseLineY ,jreg.getSize().width, jreg.getSize().height);
+                jreg.setBounds(from , baseLineY +4 ,jreg.getSize().width, jreg.getSize().height);
             }
             this.add(jreg);
         }

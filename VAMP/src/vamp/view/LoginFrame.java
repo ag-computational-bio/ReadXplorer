@@ -243,8 +243,6 @@ public class LoginFrame extends javax.swing.JFrame {
             newproperties.put("login.hostname", hostname);
             newproperties.put("login.database", database);
             newproperties.put("login.user", user);
-
-            System.out.print("differs");
             File newProperties = new File("src/vamp/context/vamp.properties");
             try {
 
@@ -260,8 +258,6 @@ public class LoginFrame extends javax.swing.JFrame {
             newproperties.put("login.hostname", "");
             newproperties.put("login.database", "");
             newproperties.put("login.user", "");
-
-            System.out.print("differs");
             File newProperties = new File("src/vamp/context/vamp.properties");
             try {
 
