@@ -29,7 +29,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="seperator" alignment="0" pref="402" max="32767" attributes="0"/>
+                  <Component id="seperator" alignment="0" pref="392" max="32767" attributes="0"/>
                   <Component id="addButton" alignment="1" min="-2" pref="53" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
@@ -41,15 +41,15 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jComboBox1" pref="265" max="32767" attributes="0"/>
+                          <Component id="jComboBox1" pref="269" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="mappingFileField" pref="215" max="32767" attributes="0"/>
+                              <Component id="mappingFileField" pref="201" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="descriptionField" alignment="0" pref="265" max="32767" attributes="0"/>
-                          <Component id="readBox" alignment="0" pref="265" max="32767" attributes="0"/>
-                          <Component id="refGenBox" alignment="0" pref="265" max="32767" attributes="0"/>
+                          <Component id="descriptionField" alignment="0" pref="269" max="32767" attributes="0"/>
+                          <Component id="readBox" alignment="0" pref="269" max="32767" attributes="0"/>
+                          <Component id="refGenBox" alignment="0" pref="269" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -90,7 +90,7 @@
               <Component id="seperator" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="addButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="15" max="32767" attributes="0"/>
+              <EmptySpace pref="28" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

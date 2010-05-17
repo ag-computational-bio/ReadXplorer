@@ -86,22 +86,22 @@ public class FastqParser implements RunParserI{
                     }else{
                     readname = line.substring(1);
                     }
-                    System.out.println("Name "  + readname);
+                   // System.out.println("Name "  + readname);
                     lineNumber ++;
                 } else if (line.matches("\\w*\\n*\\.*~*") && lineNumber == 2) {
                     sequence = line;
-                    System.out.println("Sequence " + sequence);
+                  //  System.out.println("Sequence " + sequence);
                      lineNumber ++;
                 }else if(line.startsWith("+") && lineNumber == 3){
                   if(line.length()>1 && line.substring(1).equals(readname)){
                       lineNumber++;
-                       System.out.println("optional column: " + line);
+                  //     System.out.println("optional column: " + line);
                   } else if (line.length() ==1 ){
                       lineNumber++;
-                       System.out.println("no optional column");
+                //       System.out.println("no optional column");
                   }
                 }else if(line.matches("\\p{ASCII}*") && lineNumber == 4 && line.length() == sequence.length()){
-                    System.out.println("Quality:" + line);
+                  //  System.out.println("Quality:" + line);
                      run.addReadData(sequence, readname);
                      lineNumber =1;
                 }else{

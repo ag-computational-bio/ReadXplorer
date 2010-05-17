@@ -80,7 +80,7 @@ public class ApplicationController implements GestureListenerI {
             dropLogin();
             createAndShowApp();
         } catch (SQLException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, ex.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
             JOptionPane.showMessageDialog(null, "Could not connect to database!\nPlease check the data!", "Connection error", JOptionPane.ERROR_MESSAGE);
         }
 

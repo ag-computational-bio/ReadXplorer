@@ -381,7 +381,6 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
             Color c = null;
             int y = (isForwardStrand? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
             String base = refGen.getSequence().substring(absPos-1, absPos);
-            System.out.println("Base:" + base + absPos);
             if (absPos != relPos){
                 System.out.println("Diffrent Pos" +"absPos" +absPos+" relPos" + relPos+ base);
             }
@@ -389,6 +388,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
             for(String type : bases){
                 if(type.equals("match")){
                     value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
+                    if(isForwardStrand){
                     if(base.equals("a")){
                      c = ColorProperties.LOGO_A;
                     }
@@ -406,6 +406,26 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
                     }
                       else if(base.equals("readgap")){
                      c = ColorProperties.LOGO_READGAP;
+                    }
+                    }else{
+                     if(base.equals("t")){
+                     c = ColorProperties.LOGO_A;
+                    }
+                    else if(base.equals("a")){
+                     c = ColorProperties.LOGO_T;
+                    }
+                     else if(base.equals("g")){
+                     c = ColorProperties.LOGO_C;
+                    }
+                     else if(base.equals("c")){
+                     c = ColorProperties.LOGO_G;
+                    }
+                     else if(base.equals("n")){
+                     c = ColorProperties.LOGO_N;
+                    }
+                      else if(base.equals("readgap")){
+                     c = ColorProperties.LOGO_READGAP;
+                    }
                     }
 
                 } else if(type.equals("a")){

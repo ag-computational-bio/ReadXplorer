@@ -19,6 +19,7 @@ import vamp.databackend.connector.ProjectConnector;
 import vamp.parsing.common.ParserI;
 import vamp.parsing.mappings.MappingParserI;
 import vamp.parsing.mappings.JokParser;
+import vamp.parsing.mappings.SAMParser;
 
 /**
  *
@@ -32,7 +33,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
     private JobManagerI taskManager;
     private RunJob[] runjobs;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMParser()};
     private MappingParserI currentParser;
 
     /** Creates new form NewTrackDialog */
