@@ -110,7 +110,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="databaseLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Datenbank:"/>
+        <Property name="text" type="java.lang.String" value="Database"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="userLabel">
@@ -120,7 +120,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="passwordLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Passwort:"/>
+        <Property name="text" type="java.lang.String" value="Password:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="databaseField">
@@ -134,7 +134,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="loginButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Anmelden"/>
+        <Property name="text" type="java.lang.String" value="Login in"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loginButtonActionPerformed"/>
@@ -142,7 +142,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="closeButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Beenden"/>
+        <Property name="text" type="java.lang.String" value="Close"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="closeButtonActionPerformed"/>
@@ -152,7 +152,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="dbTypeLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Datenbanktyp:"/>
+        <Property name="text" type="java.lang.String" value="Database type:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="dbTypeBox">
@@ -167,7 +167,7 @@
     <Component class="javax.swing.JCheckBox" name="jCheckBox1">
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
-        <Property name="text" type="java.lang.String" value="Sitzung sichern"/>
+        <Property name="text" type="java.lang.String" value="Save data"/>
       </Properties>
     </Component>
   </SubComponents>

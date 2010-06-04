@@ -1,5 +1,6 @@
 package vamp.view.dataVisualisation.histogramViewer;
 
+import java.awt.event.ActionEvent;
 import vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -11,11 +12,13 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import vamp.ColorProperties;
@@ -27,15 +30,15 @@ import vamp.databackend.dataObjects.PersistantReference;
 import vamp.databackend.connector.TrackConnector;
 import vamp.databackend.dataObjects.PersistantDiff;
 import vamp.view.dataVisualisation.BoundsInfoManager;
+import vamp.view.dataVisualisation.abstractViewer.SequenceBar;
 
 /**
  *
  * @author ddoppmeier
  */
-public class HistogramViewer  extends AbstractViewer implements CoverageThreadListener{
+public class HistogramViewer extends AbstractViewer implements CoverageThreadListener {
 
     private static final long serialVersionUID = 234765253;
-
     private List<String> bases;
     private static int height = 500;
     private TrackConnector trackConnector;
@@ -49,14 +52,14 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     private LogoDataManager logoData;
     private PersistantCoverage cov;
     private boolean dataLoaded;
+    private boolean isColored = false;
     private ZoomLevelExcusePanel zoomExcuse;
-    
     // maximum coverage found in interval, regarding both strands
     private int maxCoverage;
     private List<Integer> scaleValues;
     private double pxPerCoverageUnit;
 
-    public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector){
+    public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
@@ -88,39 +91,41 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         return height;
     }
 
+
+
     @Override
     public void changeToolTipText(int logPos) {
         // do not update if this windows is inactive
-        if(this.isActive() && dataLoaded){
+        if (this.isActive() && dataLoaded) {
             int relPos = logPos;
             StringBuilder sb = new StringBuilder();
             sb.append("<html>");
-            sb.append("<b>Position</b>: "+logPos);
+            sb.append("<b>Position</b>: " + logPos);
 
             // logo data manager has no information about gaps, so we have to shift positions right here
-            if(gapManager != null){
+            if (gapManager != null) {
                 relPos += gapManager.getNumOfGapsSmaller(logPos);
                 // if there is a gap at logPos, logo data manager would provide us with gap information, which we do not wand
-                if(gapManager.hasGapAt(logPos)){
+                if (gapManager.hasGapAt(logPos)) {
                     relPos++;
                 }
             }
 
             int complete = cov.getnFwMult(logPos);
-            if(complete != 0){
+            if (complete != 0) {
                 appendStatsTable(sb, complete, relPos, true, "Forward strand", false);
             }
-    
+
             complete = cov.getnRvMult(logPos);
-            if(complete != 0){
+            if (complete != 0) {
                 appendStatsTable(sb, complete, relPos, false, "Reverse strand", false);
             }
-    
-            if(gapManager != null && gapManager.hasGapAt(logPos)){
+
+            if (gapManager != null && gapManager.hasGapAt(logPos)) {
                 int tmp = logPos + gapManager.getNumOfGapsSmaller(logPos);
                 complete = cov.getnFwMult(logPos);
                 appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
-    
+
                 complete = cov.getnFwMult(logPos);
                 appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
             }
@@ -132,66 +137,64 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         }
     }
 
-    private int getPercentage(int all, int value){
+    private int getPercentage(int all, int value) {
         int percent = (int) (((double) value / all) * 100);
 
 
         return percent;
     }
 
+    private void appendStatsTable(StringBuilder sb, int complete, int relPos, boolean isForwardStrand, String title, boolean isGapStats) {
+        int matches = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
+        int as = logoData.getNumOfAAt(relPos, isForwardStrand);
+        int cs = logoData.getNumOfCAt(relPos, isForwardStrand);
+        int gs = logoData.getNumOfGAt(relPos, isForwardStrand);
+        int ts = logoData.getNumOfTAt(relPos, isForwardStrand);
+        int ns = logoData.getNumOfNAt(relPos, isForwardStrand);
+        int readgaps = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
 
-    private void appendStatsTable(StringBuilder sb, int complete, int relPos, boolean isForwardStrand, String title, boolean isGapStats){
-            int matches = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
-            int as = logoData.getNumOfAAt(relPos, isForwardStrand);
-            int cs = logoData.getNumOfCAt(relPos, isForwardStrand);
-            int gs = logoData.getNumOfGAt(relPos, isForwardStrand);
-            int ts = logoData.getNumOfTAt(relPos, isForwardStrand);
-            int ns = logoData.getNumOfNAt(relPos, isForwardStrand);
-            int readgaps = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
+        if (matches != 0 || as != 0 || cs != 0 || gs != 0 || ts != 0 || ns != 0 || readgaps != 0) {
+            sb.append("<table>");
+            sb.append("<tr><td align=\"left\"><b>" + title + "</b></td></tr>");
 
-            if(matches != 0 || as != 0 || cs != 0 || gs != 0 || ts != 0 || ns != 0 || readgaps != 0){
-                sb.append("<table>");
-                sb.append("<tr><td align=\"left\"><b>"+title+"</b></td></tr>");
-
-                // if this is used to show stats about genome gaps, do not print complete coverage again
-                if(!isGapStats){
-                    sb.append(createTableRow("Compl. cov.", complete));
-                }
-
-                if(matches != 0){
-                    sb.append(createTableRow("Match cov.", matches, getPercentage(complete, matches)));
-                }
-                if(as != 0){
-                    sb.append(createTableRow("A", as, getPercentage(complete, as)));
-                }
-                if(cs != 0){
-                    sb.append(createTableRow("C", cs, getPercentage(complete, cs)));
-                }
-                if(gs != 0){
-                    sb.append(createTableRow("G", gs, getPercentage(complete, gs)));
-                }
-                if(ts != 0){
-                    sb.append(createTableRow("T", ts, getPercentage(complete, ts)));
-                }
-                if(ns != 0){
-                    sb.append(createTableRow("N", ns, getPercentage(complete, ns)));
-                }
-                if(readgaps != 0){
-                    sb.append(createTableRow("Read gap", readgaps, getPercentage(complete, readgaps)));
-                }
-
-                sb.append("</table>");
+            // if this is used to show stats about genome gaps, do not print complete coverage again
+            if (!isGapStats) {
+                sb.append(createTableRow("Compl. cov.", complete));
             }
+
+            if (matches != 0) {
+                sb.append(createTableRow("Match cov.", matches, getPercentage(complete, matches)));
+            }
+            if (as != 0) {
+                sb.append(createTableRow("A", as, getPercentage(complete, as)));
+            }
+            if (cs != 0) {
+                sb.append(createTableRow("C", cs, getPercentage(complete, cs)));
+            }
+            if (gs != 0) {
+                sb.append(createTableRow("G", gs, getPercentage(complete, gs)));
+            }
+            if (ts != 0) {
+                sb.append(createTableRow("T", ts, getPercentage(complete, ts)));
+            }
+            if (ns != 0) {
+                sb.append(createTableRow("N", ns, getPercentage(complete, ns)));
+            }
+            if (readgaps != 0) {
+                sb.append(createTableRow("Read gap", readgaps, getPercentage(complete, readgaps)));
+            }
+
+            sb.append("</table>");
+        }
     }
 
-    private String createTableRow(String label, int value, int percent){
-        return "<tr><td align=\"right\">"+label+":</td><td align=\"right\">"+String.valueOf(value)+"</td><td align=\"right\">~"+percent+"%</td></tr>";
+    private String createTableRow(String label, int value, int percent) {
+        return "<tr><td align=\"right\">" + label + ":</td><td align=\"right\">" + String.valueOf(value) + "</td><td align=\"right\">~" + percent + "%</td></tr>";
     }
 
-    private String createTableRow(String label, int value){
-        return "<tr><td align=\"right\">"+label+":</td><td align=\"right\">"+String.valueOf(value)+"</td><td align=\"right\"></td></tr>";
+    private String createTableRow(String label, int value) {
+        return "<tr><td align=\"right\">" + label + ":</td><td align=\"right\">" + String.valueOf(value) + "</td><td align=\"right\"></td></tr>";
     }
-
 
     @Override
     public synchronized void receiveCoverage(final PersistantCoverage coverage) {
@@ -202,17 +205,17 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
                 cov = coverage;
                 setupData();
                 repaint();
-                }
+            }
         });
     }
 
-    private synchronized void setupData(){
+    private synchronized void setupData() {
 
         gapManager = new GenomeGapManager(lowerBound, upperBound);
-   
-        try{
-        gaps = trackConnector.getExtendedReferenceGapsForIntervallOrderedByMappingID(lowerBound, upperBound);
-        }catch(Exception ex ){
+
+        try {
+            gaps = trackConnector.getExtendedReferenceGapsForIntervallOrderedByMappingID(lowerBound, upperBound);
+        } catch (Exception ex) {
             System.err.print("trackConnector couldnt initialse gaps" + ex);
         }
         this.fillGapManager();
@@ -221,7 +224,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
 
         diffs = trackConnector.getDiffsForIntervall(lowerBound, upperBound);
         this.setUpLogoData();
-        if(logoData.getMaxFoundCoverage() != 0){
+        if (logoData.getMaxFoundCoverage() != 0) {
             this.createLogoBlocks();
             scaleValues = getCoverageScaleLineValues();
         }
@@ -231,35 +234,35 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     }
 
     private void requestData() {
-        if(cov != null && cov.coversBounds(lowerBound, upperBound)){
+        if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
             this.setupData();
         } else {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             trackConnector.addCoverageRequest(new CoverageRequest(lowerBound, upperBound, this));
         }
     }
-    
+
     @Override
     public void boundsChangedHook() {
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
-        this.width = upperBound - lowerBound +1;
+        this.width = upperBound - lowerBound + 1;
         dataLoaded = false;
         this.removeAll();
 
-        if(isInMaxZoomLevel()){
+        if (isInMaxZoomLevel()) {
             this.setInDrawingMode(true);
 
-            if(this.hasLegend()){
+            if (this.hasLegend()) {
                 this.add(this.getLegendLabel());
                 this.add(this.getLegendPanel());
             }
-            if(this.hasSequenceBar()){
+            if (this.hasSequenceBar()) {
                 this.add(this.getSequenceBar());
             }
 
             requestData();
-            
+
         } else {
             this.setInDrawingMode(false);
             gapManager = null;
@@ -268,12 +271,12 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         }
     }
 
-    private List<Integer> getCoverageScaleLineValues(){
+    private List<Integer> getCoverageScaleLineValues() {
 
         int minMargin = 20;
         int step;
 
-        ArrayList<Integer> test=new ArrayList<Integer>();
+        ArrayList<Integer> test = new ArrayList<Integer>();
         test.add(50000);
         test.add(20000);
         test.add(10000);
@@ -292,8 +295,8 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         test.add(1);
 
         step = 1;
-        for(Integer i : test){
-            if(pxPerCoverageUnit * i > minMargin){
+        for (Integer i : test) {
+            if (pxPerCoverageUnit * i > minMargin) {
                 step = i;
             }
         }
@@ -301,11 +304,11 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         return getValues(step);
     }
 
-    private ArrayList<Integer> getValues(int stepsize){
+    private ArrayList<Integer> getValues(int stepsize) {
         ArrayList<Integer> list = new ArrayList<Integer>();
 
         int tmp = stepsize;
-        while(tmp <= maxCoverage){
+        while (tmp <= maxCoverage) {
             list.add(tmp);
             tmp += stepsize;
         }
@@ -313,20 +316,20 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         return list;
     }
 
-    private void placeExcusePanel(JPanel p){
+    private void placeExcusePanel(JPanel p) {
         // has to be checked for null because, this method may be called upon
         // initialization of this object (depending on behaviour of AbstractViewer)
         // BEFORE the panels are initialized!
-        if(p != null){
+        if (p != null) {
             int tmpWidth = p.getPreferredSize().width;
-            int x = this.getSize().width/2 - tmpWidth/2;
-            if(x<0){
+            int x = this.getSize().width / 2 - tmpWidth / 2;
+            if (x < 0) {
                 x = 0;
             }
 
             int tmpHeight = p.getPreferredSize().height;
-            int y = this.getSize().height /2 - tmpHeight / 2;
-            if(y<0){
+            int y = this.getSize().height / 2 - tmpHeight / 2;
+            if (y < 0) {
                 y = 0;
             }
             p.setBounds(x, y, tmpWidth, tmpHeight);
@@ -335,7 +338,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         }
     }
 
-    private void createLogoBlocks(){
+    private void createLogoBlocks() {
         maxCoverage = logoData.getMaxFoundCoverage();
         PaintingAreaInfo info = this.getPaintingAreaInfo();
         // asuming forward and reverse height are equal
@@ -344,7 +347,7 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         pxPerCoverageUnit = (double) availableHeight / maxCoverage;
 
 
-        for(int i = lowerBound; i <= upperBound; i++){
+        for (int i = lowerBound; i <= upperBound; i++) {
             // compute relative position in layout
             int relPos = i + gapManager.getNumOfGapsSmaller(i);
             relPos += gapManager.getNumOfGapsAt(i);
@@ -353,134 +356,130 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
             int x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound();
             x += getPhysBoundariesForLogPos(i).getPhysWidth() * gapManager.getNumOfGapsAt(i);
 
-            this.cycleBases(i, relPos, x, pxPerCoverageUnit, true);
-            this.cycleBases(i, relPos, x, pxPerCoverageUnit, false);
+            this.cycleBases(i, relPos, x, pxPerCoverageUnit, true,isColored);
+            this.cycleBases(i, relPos, x, pxPerCoverageUnit, false, isColored);
 
-
-            if(gapManager.hasGapAt(i)){
-                for(int j = 0; j < gapManager.getNumOfGapsAt(i); j++){
+            SequenceBar seqBar = this.getSequenceBar();
+            if (seqBar != null) {
+                seqBar.paintBaseBackgroundColor(i);
+            }
+            if (gapManager.hasGapAt(i)) {
+                for (int j = 0; j < gapManager.getNumOfGapsAt(i); j++) {
                     relPos = i + gapManager.getNumOfGapsSmaller(i);
                     relPos += j;
 
                     x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound();
                     x += getPhysBoundariesForLogPos(i).getPhysWidth() * j;
 
-                    this.cycleBases(i ,relPos, x, pxPerCoverageUnit, true);
-                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, false);
+                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, true,isColored);
+                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, false,isColored);
 
-                    }
                 }
+            }
 
         }
 
     }
 
-    private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand){
-            double value;
-            int featureHeight;
-            Color c = null;
-            int y = (isForwardStrand? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-            String base = refGen.getSequence().substring(absPos-1, absPos);
-            if (absPos != relPos){
-                System.out.println("Diffrent Pos" +"absPos" +absPos+" relPos" + relPos+ base);
-            }
-            
-            for(String type : bases){
-                if(type.equals("match")){
-                    value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
-                    if(isForwardStrand){
-                    if(base.equals("a")){
-                     c = ColorProperties.LOGO_A;
-                    }
-                    else if(base.equals("t")){
-                     c = ColorProperties.LOGO_T;
-                    }
-                     else if(base.equals("c")){
-                     c = ColorProperties.LOGO_C;
-                    }
-                     else if(base.equals("g")){
-                     c = ColorProperties.LOGO_G;
-                    }
-                     else if(base.equals("n")){
-                     c = ColorProperties.LOGO_N;
-                    }
-                      else if(base.equals("readgap")){
-                     c = ColorProperties.LOGO_READGAP;
-                    }
-                    }else{
-                     if(base.equals("t")){
-                     c = ColorProperties.LOGO_A;
-                    }
-                    else if(base.equals("a")){
-                     c = ColorProperties.LOGO_T;
-                    }
-                     else if(base.equals("g")){
-                     c = ColorProperties.LOGO_C;
-                    }
-                     else if(base.equals("c")){
-                     c = ColorProperties.LOGO_G;
-                    }
-                     else if(base.equals("n")){
-                     c = ColorProperties.LOGO_N;
-                    }
-                      else if(base.equals("readgap")){
-                     c = ColorProperties.LOGO_READGAP;
-                    }
-                    }
+    private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean hasColored) {
+        double value;
+        int featureHeight;
+        Color c = null;
+        int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
+        String base = refGen.getSequence().substring(absPos - 1, absPos);
+        if (absPos != relPos) {
+            System.out.println("Diffrent Pos" + "absPos" + absPos + " relPos" + relPos + base);
+        }
 
-                } else if(type.equals("a")){
-                    value = logoData.getNumOfAAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_A;
-                } else if(type.equals("c")){
-                    value = logoData.getNumOfCAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_C;
-                } else if(type.equals("g")){
-                    value = logoData.getNumOfGAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_G;
-                } else if(type.equals("t")){
-                    value = logoData.getNumOfTAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_T;
-                } else if(type.equals("readgap")){
-                    value = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_READGAP;
-                } else if(type.equals("n")){
-                    value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                    c = ColorProperties.LOGO_N;
+        for (String type : bases) {
+            if (type.equals("match") && hasColored) {
+                value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
+                if (isForwardStrand) {
+                    if (base.equals("a")) {
+                        c = ColorProperties.LOGO_A;
+                    } else if (base.equals("t")) {
+                        c = ColorProperties.LOGO_T;
+                    } else if (base.equals("c")) {
+                        c = ColorProperties.LOGO_C;
+                    } else if (base.equals("g")) {
+                        c = ColorProperties.LOGO_G;
+                    } else if (base.equals("n")) {
+                        c = ColorProperties.LOGO_N;
+                    } else if (base.equals("readgap")) {
+                        c = ColorProperties.LOGO_READGAP;
+                    }
                 } else {
-                    value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base "+type+"!");
-                    c = ColorProperties.LOGO_BASE_UNDEF;
+                    if (base.equals("t")) {
+                        c = ColorProperties.LOGO_A;
+                    } else if (base.equals("a")) {
+                        c = ColorProperties.LOGO_T;
+                    } else if (base.equals("g")) {
+                        c = ColorProperties.LOGO_C;
+                    } else if (base.equals("c")) {
+                        c = ColorProperties.LOGO_G;
+                    } else if (base.equals("n")) {
+                        c = ColorProperties.LOGO_N;
+                    } else if (base.equals("readgap")) {
+                        c = ColorProperties.LOGO_READGAP;
+                    }
                 }
-                featureHeight = (int) (value * heightPerCoverageUnit);
-
-                if(isForwardStrand){
-                    y -= featureHeight;
-                }
-
-                PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
-                BarComponent block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), c);
-                if(isForwardStrand){
-                    block.setBounds(x, y, (int) bounds.getPhysWidth(), featureHeight);
-                } else {
-                    block.setBounds(x,y +1 , (int) bounds.getPhysWidth(), featureHeight);
-                }
-                add(block);
-
-                if(!isForwardStrand){
-                    y += featureHeight;
-                }
+                
+             }else if (type.equals("match")&& !hasColored){
+                c = ColorProperties.LOGO_MATCH;
+                 value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
+            } else if (type.equals("a")) {
+                value = logoData.getNumOfAAt(relPos, isForwardStrand);
+                c = ColorProperties.LOGO_A;
+            } else if (type.equals("c")) {
+                value = logoData.getNumOfCAt(relPos, isForwardStrand);
+                c = ColorProperties.LOGO_C;
+            } else if (type.equals("g")) {
+                value = logoData.getNumOfGAt(relPos, isForwardStrand);
+                c = ColorProperties.LOGO_G;
+            } else if (type.equals("t")) {
+                value = logoData.getNumOfTAt(relPos, isForwardStrand);
+                c = ColorProperties.LOGO_T;
+            } else if (type.equals("readgap")) {
+                value = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
+                c = ColorProperties.LOGO_READGAP;
+            } else if (type.equals("n")) {
+                value = logoData.getNumOfNAt(relPos, isForwardStrand);
+                c = ColorProperties.LOGO_N;
+            } else {
+                value = logoData.getNumOfNAt(relPos, isForwardStrand);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base " + type + "!");
+                c = ColorProperties.LOGO_BASE_UNDEF;
             }
+            featureHeight = (int) (value * heightPerCoverageUnit);
+
+            if (isForwardStrand) {
+                y -= featureHeight;
+            }
+
+            PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
+            BarComponent block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), c);
+            if (isForwardStrand) {
+                block.setBounds(x, y, (int) bounds.getPhysWidth(), featureHeight);
+            } else {
+                block.setBounds(x, y + 1, (int) bounds.getPhysWidth(), featureHeight);
+            }
+            add(block);
+
+            if (!isForwardStrand) {
+                y += featureHeight;
+            }
+        }
     }
 
-    private void adjustAbsStop(){
+    private void adjustAbsStop() {
 
         // count the number of gaps occuring in visible area
-        int tmpWidth = upperBound - lowerBound +1;
+        int tmpWidth = upperBound - lowerBound + 1;
         int gapNo = 0; // count the number of gaps
         int widthCount = 0; // count the number of bases
         int i = 0; // count variable till max width
-        while(widthCount < tmpWidth){
-            int num = gapManager.getNumOfGapsAt(lowerBound+i); // get the number of gaps at current position
+        while (widthCount < tmpWidth) {
+            int num = gapManager.getNumOfGapsAt(lowerBound + i); // get the number of gaps at current position
             widthCount++; // current position needs 1 base space in visual alignment
             widthCount += num; // if gaps occured at current position, they need some space, too
             gapNo += num;
@@ -490,37 +489,35 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         this.getBoundsInfo().correctLogRight(upperBound);
     }
 
-    private void fillGapManager(){
+    private void fillGapManager() {
         HashMap<Integer, Integer> positionToNum = new HashMap<Integer, Integer>();
-        for(Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext(); ){
+        for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
             PersistantReferenceGap gap = it.next();
             int gapPosition = gap.getPosition();
             int gapOrder = gap.getOrder();
             gapOrder++;
-          
-            if(!positionToNum.containsKey(gapPosition)){
+
+            if (!positionToNum.containsKey(gapPosition)) {
                 positionToNum.put(gapPosition, 0);
             }
             int oldValue = positionToNum.get(gapPosition);
-            if(gapOrder > oldValue){
+            if (gapOrder > oldValue) {
                 positionToNum.put(gapPosition, gapOrder);
             }
         }
 
-        for(Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext(); ){
+        for (Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext();) {
             int position = it.next();
             int numOfGaps = positionToNum.get(position);
             gapManager.addNumOfGapsAtPosition(position, numOfGaps);
         }
     }
 
-
-
-    private void setUpLogoData(){
+    private void setUpLogoData() {
         logoData = new LogoDataManager(lowerBound, width);
 
         // store coverage information in logo data
-        for(int i = lowerBound; i <= upperBound; i++){
+        for (int i = lowerBound; i <= upperBound; i++) {
             int relPos = i + gapManager.getNumOfGapsAt(i);
             relPos += gapManager.getNumOfGapsSmaller(i);
             logoData.setCoverageAt(relPos, cov.getnFwMult(i), true);
@@ -529,58 +526,57 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
         }
 
         // store diff information from the refernce genome in logo data
-        for(Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext(); ){
+        for (Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext();) {
             PersistantDiff d = it.next();
-            int position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition())+gapManager.getNumOfGapsSmaller(d.getPosition());
-                logoData.addExtendedPersistantDiff(d, position);
-            }
+            int position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
+            logoData.addExtendedPersistantDiff(d, position);
+        }
 
         // store gap information in logo data
         logoData.addGaps(gaps, gapManager);
     }
 
     @Override
-    protected void paintComponent(Graphics graphics){
+    protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
 
-        if(isInDrawingMode()){
-            if(!dataLoaded){
-                g.fillRect(0, 0, this.getSize().width-1, this.getSize().height-1);
+        if (isInDrawingMode()) {
+            if (!dataLoaded) {
+                g.fillRect(0, 0, this.getSize().width - 1, this.getSize().height - 1);
             }
             g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
             drawBaseLines(g);
 
             PaintingAreaInfo info = getPaintingAreaInfo();
-            for(Integer i : scaleValues ){
+            for (Integer i : scaleValues) {
                 String label = String.valueOf(i);
                 int labelWidth = g.getFontMetrics().stringWidth(label);
                 int fontHeight = g.getFontMetrics().getAscent();
 
-                int y = info.getForwardLow() - (int) (i*pxPerCoverageUnit);
+                int y = info.getForwardLow() - (int) (i * pxPerCoverageUnit);
                 graphics.drawLine(info.getPhyLeft(), y, info.getPhyRight(), y);
-                graphics.drawString(label, info.getPhyLeft()-labelWidth -4 , y+fontHeight/2);
-                graphics.drawString(label, info.getPhyRight() +4 , y+fontHeight/2);
+                graphics.drawString(label, info.getPhyLeft() - labelWidth - 4, y + fontHeight / 2);
+                graphics.drawString(label, info.getPhyRight() + 4, y + fontHeight / 2);
 
-                y = (int) (i*pxPerCoverageUnit) + info.getReverseLow();
+                y = (int) (i * pxPerCoverageUnit) + info.getReverseLow();
                 graphics.drawLine(info.getPhyLeft(), y, info.getPhyRight(), y);
-                graphics.drawString(label, info.getPhyLeft()- labelWidth -4, y+fontHeight/2);
-                graphics.drawString(label, info.getPhyRight() + 4, y+fontHeight/2);
+                graphics.drawString(label, info.getPhyLeft() - labelWidth - 4, y + fontHeight / 2);
+                graphics.drawString(label, info.getPhyRight() + 4, y + fontHeight / 2);
             }
         }
     }
 
-
-    private void drawBaseLines(Graphics2D graphics){
+    private void drawBaseLines(Graphics2D graphics) {
         PaintingAreaInfo info = getPaintingAreaInfo();
         graphics.drawLine(info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow());
         graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
     }
 
     @Override
-    public int transformToLogicalCoord(int physPos){
+    public int transformToLogicalCoord(int physPos) {
         int logPos = super.transformToLogicalCoord(physPos);
-        if(isInDrawingMode()){
+        if (isInDrawingMode()) {
             int gapsSmaller = gapManager.getAccumulatedGapsSmallerThan(logPos);
             logPos -= gapsSmaller;
         }
@@ -589,10 +585,10 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     }
 
     @Override
-    public double transformToPhysicalCoord(int logPos){
+    public double transformToPhysicalCoord(int logPos) {
 
         // if this viewer is operating in detail view mode, adjust logPos
-        if(gapManager != null && isInDrawingMode()){
+        if (gapManager != null && isInDrawingMode()) {
             int gapsSmaller = gapManager.getNumOfGapsSmaller(logPos);
             logPos += gapsSmaller;
         }
@@ -600,15 +596,23 @@ public class HistogramViewer  extends AbstractViewer implements CoverageThreadLi
     }
 
     @Override
-    public int getWidthOfMouseOverlay(int position){
+    public int getWidthOfMouseOverlay(int position) {
         PhysicalBaseBounds mouseAreaLeft = getPhysBoundariesForLogPos(position);
 
         int tmp = (int) mouseAreaLeft.getPhysWidth();
         // if currentPosition is a gap, the following bases to the right marks the same position!
-        if(isInDrawingMode() && gapManager.hasGapAt(position)){
-             tmp = tmp * (gapManager.getNumOfGapsAt(position)+1);
+        if (isInDrawingMode() && gapManager.hasGapAt(position)) {
+            tmp = tmp * (gapManager.getNumOfGapsAt(position) + 1);
         }
         return tmp;
     }
+
+
+
+    public boolean isColored(boolean setColored){
+    isColored = setColored;
+    return isColored;
+    }
+
 
 }

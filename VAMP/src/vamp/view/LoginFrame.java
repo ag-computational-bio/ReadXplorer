@@ -98,11 +98,11 @@ public class LoginFrame extends javax.swing.JFrame {
 
         urlLabel.setText("Server URL:");
 
-        databaseLabel.setText("Datenbank:");
+        databaseLabel.setText("Database");
 
         userLabel.setText("User:");
 
-        passwordLabel.setText("Passwort:");
+        passwordLabel.setText("Password:");
 
         passwordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -110,26 +110,26 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
 
-        loginButton.setText("Anmelden");
+        loginButton.setText("Login in");
         loginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loginButtonActionPerformed(evt);
             }
         });
 
-        closeButton.setText("Beenden");
+        closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 closeButtonActionPerformed(evt);
             }
         });
 
-        dbTypeLabel.setText("Datenbanktyp:");
+        dbTypeLabel.setText("Database type:");
 
         dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL" }));
 
         jCheckBox1.setSelected(true);
-        jCheckBox1.setText("Sitzung sichern");
+        jCheckBox1.setText("Save data");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

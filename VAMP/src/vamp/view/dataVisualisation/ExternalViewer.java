@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.ApplicationController;
 import vamp.databackend.dataObjects.PersistantTrack;
+import vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 
 /**
  *
@@ -58,6 +59,7 @@ public class ExternalViewer extends javax.swing.JFrame {
         switchPanel = new javax.swing.JPanel();
         seqlogoButton = new javax.swing.JButton();
         alignmentButton = new javax.swing.JButton();
+        jCheckBox1 = new javax.swing.JCheckBox();
         viewerPanel = new javax.swing.JPanel();
         cardPanel = new javax.swing.JPanel();
 
@@ -83,6 +85,16 @@ public class ExternalViewer extends javax.swing.JFrame {
             }
         });
 
+        jCheckBox1.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jCheckBox1.setText("Color Histogram");
+        jCheckBox1.setMinimumSize(new java.awt.Dimension(50, 22));
+        jCheckBox1.setPreferredSize(new java.awt.Dimension(100, 22));
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout switchPanelLayout = new javax.swing.GroupLayout(switchPanel);
         switchPanel.setLayout(switchPanelLayout);
         switchPanelLayout.setHorizontalGroup(
@@ -92,7 +104,10 @@ public class ExternalViewer extends javax.swing.JFrame {
                 .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(seqlogoButton)
                     .addComponent(alignmentButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(38, Short.MAX_VALUE))
+            .addGroup(switchPanelLayout.createSequentialGroup()
+                .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                .addGap(24, 24, 24))
         );
         switchPanelLayout.setVerticalGroup(
             switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,7 +116,9 @@ public class ExternalViewer extends javax.swing.JFrame {
                 .addComponent(seqlogoButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton)
-                .addContainerGap(300, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(265, Short.MAX_VALUE))
         );
 
         getContentPane().add(switchPanel, java.awt.BorderLayout.WEST);
@@ -134,10 +151,18 @@ public class ExternalViewer extends javax.swing.JFrame {
         parent.viewerClosed();
     }//GEN-LAST:event_formWindowClosing
 
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+     HistogramViewer vi = (HistogramViewer) logoBasePanel.getViewer();
+     vi.isColored(jCheckBox1.isSelected());
+     vi.boundsChangedHook();
+     vi.repaint();
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton alignmentButton;
     private javax.swing.JPanel cardPanel;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JButton seqlogoButton;
     private javax.swing.JPanel switchPanel;
     private javax.swing.JPanel viewerPanel;

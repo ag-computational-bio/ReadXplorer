@@ -28,14 +28,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.databackend.connector.ReferenceConnector;
-import vamp.databackend.dataObjects.PersistantReference;
 import vamp.importer.TrackJob;
 import vamp.parsing.common.ParsedDiff;
 import vamp.parsing.common.ParsedMapping;
 import vamp.parsing.common.ParsedMappingContainer;
 import vamp.parsing.common.ParsedReferenceGap;
 import vamp.parsing.common.ParsingException;
-import vamp.databackend.dataObjects.PersistantReference;
 import vamp.databackend.connector.ProjectConnector;
 
 /**
@@ -48,7 +46,7 @@ public class SAMParser implements MappingParserI {
     private static String[] fileExtension = new String[]{"sam"};
     private static String fileDescription = "SAM Output";
     private HashMap<Integer, Integer> gapOrderIndex;
-    private ArrayList<String> unmappedReads = new ArrayList<String>() ;
+    private ArrayList<String> unmappedReads = new ArrayList<String>();
     private int errors = 0;
     private HashMap<String, String> mappedRefAndReadPlusGaps = new HashMap<String, String>();
 
@@ -79,16 +77,18 @@ public class SAMParser implements MappingParserI {
         }
 
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"" + trackJob.getFile().getAbsolutePath() + "\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"" + trackJob.getFile().getAbsolutePath() + "\"");
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;
             String line = null;
             while ((line = br.readLine()) != null) {
+
                 lineno++;
                 //parsing the SAM format in following parts
-                if (line.startsWith("read")) {
-                    String[] readSeqLine = line.split(" ");
+                if (!line.startsWith("@")) {
+
+                    String[] readSeqLine = line.split("\\s+");
                     readname = readSeqLine[0];
                     flag = Integer.parseInt(readSeqLine[1]);
                     refName = readSeqLine[2];
@@ -97,101 +97,112 @@ public class SAMParser implements MappingParserI {
                     cigar = readSeqLine[5];
                     //   String inferredInsertSize = readSeqLine[8];
                     readSeqwithoutGaps = readSeqLine[9];
+                 //   System.out.println("rSeq " + readname + "flag " + flag + "refName " + refName + "pos " + position + readSeqwithoutGaps);
+                    //System.out.println("rSeq " + readname );
+                    if (isMappedSequence(flag, position)) {
 
+                        if (refSeqfulllength == null) {
+                            refSeqfulllength = genome.getRefGen().getSequence();
 
-                    if(isMappedSequence(flag, position)){
-                    if (refSeqfulllength == null) {
-                        refSeqfulllength = genome.getRefGen().getSequence();
-                    }
-                    int start = Integer.parseInt(position);
-                    int stop = 0;
-                    if (cigar.contains("D")) {
-                        //need the stop position
-                        stop = countStopPosition(cigar, start, readSeqwithoutGaps.length());
+                        }
+                        int start = Integer.parseInt(position);
+                        int stop = 0;
+                        errors = 0;
+                        if (cigar.contains("D") || cigar.contains("I")) {
+                            //need the stop position
+                            stop = countStopPosition(cigar, start, readSeqwithoutGaps.length());
+
+                        } else {
+
+                            stop = start + readSeqwithoutGaps.length()-1;
+
+                        }
+
+                        //   System.out.println("pos" + start + "-" + stop);
+                        refSeqwithoutgaps = refSeqfulllength.substring(start-1, stop);
+
+                        if (cigar.contains("D") || cigar.contains("I")) {
+                            //fallen gleiche refs raus?
+
+                            refSeq = createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
+                            readSeq = mappedRefAndReadPlusGaps.get(refSeq);
+                        } else {
+
+                            refSeq = refSeqwithoutgaps;
+                            readSeq = readSeqwithoutGaps;
+                        }
+                        byte direction = 0;
+
+                        if (isForwardRead(flag)) {
+                            //is forward
+                            direction = 1;
+
+                        } else {
+                            //is reverse
+                            direction = -1;
+                        }
+                        //check parameters
+                        if (readname == null || readname.equals("")) {
+                            throw new ParsingException("could not read readname in "
+                                    + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                    + "Found read name: " + readname);
+                        }
+
+                        if (start >= stop) {
+                            throw new ParsingException("start bigger than stop in "
+                                    + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                    + "Found start: " + start + ", stop: " + stop);
+                        }
+                        if (direction == 0) {
+                            throw new ParsingException("could not parse direction in "
+                                    + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                    + "Must be 0 oder 1");
+                        }
+                        if (readSeq == null || readSeq.equals("")) {
+                            throw new ParsingException("read sequence could not be parsed in "
+                                    + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                    + "Found: " + readSeq);
+                        }
+                        if (refSeq == null || refSeq.equals("")) {
+                            throw new ParsingException("reference sequence could not be parsed in "
+                                    + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                    + "Found: " + refSeq);
+                        }
+                        if (readSeq.length() != refSeq.length()) {
+                            throw new ParsingException("alignment sequences have different length in "
+                                    + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + "! "
+                                    + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
+                        }
+                        if (errors < 0 || errors > readSeq.length()) {
+                            throw new ParsingException("Error number has invalid value " + errors + ""
+                                    + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                    + "Must be bigger or equal to zero and smaller that alignment length."
+                                    + "readname");
+                        }
+                        if (!readnameToSequenceID.containsKey(readname)) {
+                            throw new ParsingException("Could not find sequence id mapping for read  " + readname + ""
+                                    + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
+                                    + "Please make sure you are referencing the correct read data set!");
+                        }
+
+                        DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start , direction);
+                        List<ParsedDiff> diffs = result.getDiffs();
+                        List<ParsedReferenceGap> gaps = result.getGaps();
+
+                        ParsedMapping mapping = new ParsedMapping(start , stop, direction, diffs, gaps, errors);
+                        int seqID = readnameToSequenceID.get(readname);
+                        mappingContainer.addParsedMapping(mapping, seqID);
+
                     } else {
-                        stop = start + readSeqwithoutGaps.length()-1;
+                        unmappedReads.add(readname);
+                        continue;
                     }
-                    refSeqwithoutgaps = refSeqfulllength.substring(start, stop);
-                    if (cigar.contains("D") || cigar.contains("I")) {
-                        //fallen gleiche refs raus?
-                        refSeq = createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
-                        readSeq = mappedRefAndReadPlusGaps.get(refSeq);
-                    } else {
-                        refSeq = refSeqwithoutgaps;
-                        readSeq = readSeqwithoutGaps;
-                    }
-                    byte direction = 0;
-
-                    if (isForwardRead(flag)) {
-                        //is forward
-                        direction = 1;
-                    } else {
-                        //is reverse
-                        direction = -1;
-                    }
-
-
-
-                    //check parameters
-                    if (readname == null || readname.equals("")) {
-                        throw new ParsingException("could not read readname in "
-                                + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found read name: " + readname);
-                    }
-
-                    if (start >= stop) {
-                        throw new ParsingException("start bigger than stop in "
-                                + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found start: " + start + ", stop: " + stop);
-                    }
-                    if (direction == 0) {
-                        throw new ParsingException("could not parse direction in "
-                                + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Must be 0 oder 1");
-                    }
-                    if (readSeq == null || readSeq.equals("")) {
-                        throw new ParsingException("read sequence could not be parsed in "
-                                + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found: " + readSeq);
-                    }
-                    if (refSeq == null || refSeq.equals("")) {
-                        throw new ParsingException("reference sequence could not be parsed in "
-                                + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found: " + refSeq);
-                    }
-                    if (readSeq.length() != refSeq.length()) {
-                        throw new ParsingException("alignment sequences have different length in "
-                                + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + "! "
-                                + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
-                    }
-                    if (errors < 0 || errors > readSeq.length()) {
-                        throw new ParsingException("Error number has invalid value " + errors + ""
-                                + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Must be bigger or equal to zero and smaller that alignment length."
-                                + "readname");
-                    }
-                    if (!readnameToSequenceID.containsKey(readname)) {
-                        throw new ParsingException("Could not find sequence id mapping for read  " + readname + ""
-                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
-                                + "Please make sure you are referencing the correct read data set!");
-                    }
-
-                    DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
-                    List<ParsedDiff> diffs = result.getDiffs();
-                    List<ParsedReferenceGap> gaps = result.getGaps();
-
-                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
-                    int seqID = readnameToSequenceID.get(readname);
-                    mappingContainer.addParsedMapping(mapping, seqID);
-
-
-                }else{
-                    unmappedReads.add(readname);
+                    continue;
                 }
-                }
+                continue;
             }
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"" + trackJob.getFile().getAbsolutePath() + "\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"" + trackJob.getFile().getAbsolutePath() + "\"");
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -236,16 +247,16 @@ public class SAMParser implements MappingParserI {
     }
 
     private DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
+
         List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
         List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
-
+        errors = 0;
         int absPos;
         gapOrderIndex.clear();
 
         for (int i = 0, basecounter = 0; i < readSeq.length(); i++) {
-            if (readSeq.charAt(i) != refSeq.charAt(i)) {
+            if (readSeq.toLowerCase().charAt(i) != refSeq.toLowerCase().charAt(i)) {
                 errors++;
-
                 absPos = start + basecounter;
                 if (refSeq.charAt(i) == '_') {
                     // store a lower case char, if this is a gap in genome
@@ -277,7 +288,7 @@ public class SAMParser implements MappingParserI {
 
         return new DiffAndGapResult(diffs, gaps);
     }
-    
+
     /**
      * This method tries to convert the cigar string to the mapping again because
      * SAM format has no other mapping information
@@ -286,7 +297,6 @@ public class SAMParser implements MappingParserI {
      * @param readSeq
      * @return the refSeq with gaps in fact of insertions in the reads
      */
-
     public String createMappingOfRefAndRead(String cigar, String refSeq, String readSeq) {
         String newRefSeqwithGaps = null;
         String newreadSeq = null;
@@ -301,17 +311,24 @@ public class SAMParser implements MappingParserI {
             int index = pos;
 
             if (c == 'D' || c == 'I' || c == 'M') {
-                if (index >= 3) {
-                    subSeq2Val = (String) cigar.subSequence(index - 3, index);
-                }
-                if (index >= 2) {
-                    if (!subSeq2Val.matches("[0-9]*")) {
-                        subSeq2Val = (String) cigar.subSequence(index - 2, index);
-                    }
-                } else {
+                if (index == 1) {
                     subSeq2Val = (String) cigar.subSequence(index - 1, index);
                 }
-                //checks wheater we have a number with 2 positions
+                if (index == 2) {
+                    subSeq2Val = (String) cigar.subSequence(index - 2, index);
+                }
+
+                if (index >= 3) {
+                    subSeq2Val = (String) cigar.subSequence(index - 3, index);
+
+                }
+                if (index > 2) {
+                    if (!subSeq2Val.matches("[0-9]*")) {
+                        subSeq2Val = (String) cigar.subSequence(index - 2, index);
+
+                    }
+                }
+
                 if (!subSeq2Val.matches("[0-9]*")) {
                     subSeq2Val = (String) cigar.subSequence(index - 1, index);
 
@@ -328,7 +345,6 @@ public class SAMParser implements MappingParserI {
                         } else {
                             readSeq = readSeq.substring(0, readPos).concat("_");
                         }
-
                         numberofDeletion--;
                         newreadSeq = readSeq;
                     }
@@ -345,14 +361,9 @@ public class SAMParser implements MappingParserI {
                         } else {
                             refSeq = refSeq.substring(0, refpos).concat("_");
                         }
-
                         newRefSeqwithGaps = refSeq;
-
                         numberOfInsertions--;
-
                     }
-
-
                 } else if (c == 'M') {
                     //fuer match/mismatch werden die positionen einfach weiter gesetzt
                     readPos = readPos + Integer.parseInt(subSeq2Val);
@@ -362,12 +373,10 @@ public class SAMParser implements MappingParserI {
                 }
             }
             pos++;
-            System.out.println("ref  " + newRefSeqwithGaps);
-            System.out.println("read " + newreadSeq);
-            mappedRefAndReadPlusGaps.put(newRefSeqwithGaps, newreadSeq);
-
-
         }
+        //  System.out.println("ref  " + newRefSeqwithGaps);
+        //  System.out.println("read " + newreadSeq);
+        mappedRefAndReadPlusGaps.put(newRefSeqwithGaps, newreadSeq);
         return newRefSeqwithGaps;
 
     }
@@ -384,50 +393,61 @@ public class SAMParser implements MappingParserI {
     public int countStopPosition(String cigar, Integer startPosition, Integer readLength) {
         int stopPosition;
         int numberofDeletion = 0;
+        int numberofInsertion = 0;
         String subSeq2Val = null;
         int pos = 0;
-        //List<Integer> countInsertions = new ArrayList<Integer>();
-        //  countInsertions.add(cigar.indexOf("D"));
         for (char c : cigar.toCharArray()) {
             int index = pos;
-            if (c == 'D') {
+            if (c == 'D' || c == 'I') {
+                if (index == 1) {
+                    subSeq2Val = (String) cigar.subSequence(index - 1, index);
+                }
+                if (index == 2) {
+                    subSeq2Val = (String) cigar.subSequence(index - 2, index);
+                }
                 if (index >= 3) {
                     subSeq2Val = (String) cigar.subSequence(index - 3, index);
+
                 }
-                if (index >= 2) {
+                if (index > 2) {
                     if (!subSeq2Val.matches("[0-9]*")) {
                         subSeq2Val = (String) cigar.subSequence(index - 2, index);
                     }
-                } else {
-                    subSeq2Val = (String) cigar.subSequence(index - 1, index);
                 }
                 //checks wheater we have a number with 2 positions
                 if (!subSeq2Val.matches("[0-9]*")) {
                     subSeq2Val = (String) cigar.subSequence(index - 1, index);
                 }
-                numberofDeletion = Integer.parseInt(subSeq2Val) + numberofDeletion;
+                if (c == 'D') {
+                    numberofDeletion = Integer.parseInt(subSeq2Val) + numberofDeletion;
+                } else {
+                    numberofInsertion = Integer.parseInt(subSeq2Val) + numberofInsertion;
+                }
             }
             pos++;
         }
-        stopPosition = startPosition + readLength - 1 + numberofDeletion;
+        stopPosition = startPosition + readLength -1 + numberofDeletion - numberofInsertion;
         return stopPosition;
     }
-    /**
-     * converts the the dezimal number into binary code and checks if 32 if 1 or 0
-     * @param flag contains information w
-     * @return wheater the read is mapped on the ev or fw stream
+
+    /**!!!!!!!!!!!!!!!!!! Attention the papers are not sure which bit stands for the direction
+     * converts the the dezimal number into binary code and checks if ???? 32 or 16????? if 1 or 0
+     * SARUMAN SAM data use the 16 ...
+     * @param flag contains information wheater the read is mapped on the rev or fw stream
+     * @return wheater the read is mapped on the rev or fw stream
      */
-
     public boolean isForwardRead(Integer flag) {
-        boolean isForward;
-        String binaryValue = Integer.toBinaryString(flag);
-        int binaryLength = binaryValue.length();
-        String b = binaryValue.substring(binaryLength - 6, binaryLength - 5);
+        boolean isForward = true;
+        if (flag >= 16) {
+            String binaryValue = Integer.toBinaryString(flag);
+            int binaryLength = binaryValue.length();
+            String b = binaryValue.substring(binaryLength - 5, binaryLength - 4);
 
-        if (b.equals("1")) {
-            isForward = false;
-        } else {
-            isForward = true;
+            if (b.equals("1")) {
+                isForward = false;
+            } else {
+                isForward = true;
+            }
         }
         return isForward;
     }
@@ -438,16 +458,18 @@ public class SAMParser implements MappingParserI {
      * @param startPosition of mapping
      * @return
      */
-    public boolean isMappedSequence(Integer flag , String startPosition){
+    public boolean isMappedSequence(Integer flag, String startPosition) {
         boolean isMapped = true;
-        String binaryValue = Integer.toBinaryString(flag);
-        int binaryLength = binaryValue.length();
-        String b = binaryValue.substring(binaryLength - 3, binaryLength - 2);
+        if (flag >= 4) {
+            String binaryValue = Integer.toBinaryString(flag);
+            int binaryLength = binaryValue.length();
+            String b = binaryValue.substring(binaryLength - 3, binaryLength - 2);
 
-        if (b.equals("1") ||  startPosition.equals("*")) {
-            isMapped = false;
-        } else {
-            isMapped = true;
+            if (b.equals("1") || startPosition.equals("0")) {
+                isMapped = false;
+            } else {
+                isMapped = true;
+            }
         }
         return isMapped;
     }
