@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Properties;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 /**
  *
@@ -21,34 +24,20 @@ public class LoginFrame extends javax.swing.JFrame {
     private String defaultdatabase;
     private String defaultuser;
     private String defaulthostname;
-    Properties properties = new Properties();
     private List<GestureListenerI> gestureListener;
-    private  FileInputStream stream;
+    private InputStream stream = null;
+
+    ;
 
     /** Creates new form Login */
     public LoginFrame() {
         gestureListener = new ArrayList<GestureListenerI>();
         initComponents();
-       readLoginData();
+        setLoginData();
 
-      
-    }
-
-    public void readLoginData(){
-                try {
-            stream = new FileInputStream("src/vamp/context/vamp.properties");
-            try {
-                properties.load(stream);
-                 stream.close();
-            } catch (IOException ex) {
-                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-          setLoginData();
 
     }
+
 
     public void addGestureListener(GestureListenerI listener) {
         gestureListener.add(listener);
@@ -204,7 +193,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
 
-    passwordFieldActionPerformed(evt);
+        passwordFieldActionPerformed(evt);
 
 }//GEN-LAST:event_loginButtonActionPerformed
 
@@ -213,9 +202,10 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void setLoginData() {
-        defaultuser = properties.getProperty("login.user");
-        defaultdatabase = properties.getProperty("login.database");
-        defaulthostname = properties.getProperty("login.hostname");
+        Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+        defaultuser = prefs.get("login.user", null);
+        defaultdatabase = prefs.get("login.database", null);
+        defaulthostname = prefs.get("login.hostname", null);
         userField.setText(defaultuser);
         urlField.setText(defaulthostname);
         databaseField.setText(defaultdatabase);
@@ -236,34 +226,31 @@ public class LoginFrame extends javax.swing.JFrame {
         String password = new String(passwordField.getPassword());
         //if there are new LoginData
 
-           if (jCheckBox1.isSelected()){
+                  if (jCheckBox1.isSelected()){
             if (!hostname.equals(defaulthostname)|| !database.equals(defaultdatabase)|| !user.equals(defaultuser)) {
 
-            Properties newproperties = new Properties();
-            newproperties.put("login.hostname", hostname);
-            newproperties.put("login.database", database);
-            newproperties.put("login.user", user);
-            File newProperties = new File("src/vamp/context/vamp.properties");
-            try {
-
-                newproperties.store(new FileOutputStream(newProperties), "Login properties");
-            } catch (IOException e) {
-                System.out.println(e + "Couldnt write new login data in vamp.properties");
-            }
+            Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+            prefs.put("login.hostname", hostname);
+            prefs.put("login.database", database);
+            prefs.put("login.user", user);
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex) {
+                    Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
 
         }else{
-             Properties newproperties = new Properties();
-            newproperties.put("login.hostname", "");
-            newproperties.put("login.database", "");
-            newproperties.put("login.user", "");
-            File newProperties = new File("src/vamp/context/vamp.properties");
-            try {
 
-                newproperties.store(new FileOutputStream(newProperties), "Login properties");
-            } catch (IOException e) {
-                System.out.println(e + "Couldnt write new login data in vamp.properties");
+            Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+            prefs.put("login.hostname", "");
+            prefs.put("login.database", "");
+            prefs.put("login.user", "");
+            try {
+                prefs.flush();
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -271,9 +258,8 @@ public class LoginFrame extends javax.swing.JFrame {
         for (GestureListenerI i : gestureListener) {
             i.login(adapter, hostname, database, user, password);
         }
-           
-    }//GEN-LAST:event_passwordFieldActionPerformed
 
+    }//GEN-LAST:event_passwordFieldActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
     private javax.swing.JTextField databaseField;
