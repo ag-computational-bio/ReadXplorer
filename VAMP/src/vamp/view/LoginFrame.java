@@ -1,17 +1,10 @@
 package vamp.view;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.GestureListenerI;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -25,9 +18,6 @@ public class LoginFrame extends javax.swing.JFrame {
     private String defaultuser;
     private String defaulthostname;
     private List<GestureListenerI> gestureListener;
-    private InputStream stream = null;
-
-    ;
 
     /** Creates new form Login */
     public LoginFrame() {
