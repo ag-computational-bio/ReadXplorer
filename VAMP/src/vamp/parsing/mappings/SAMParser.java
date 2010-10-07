@@ -100,7 +100,7 @@ public class SAMParser implements MappingParserI {
                  //   System.out.println("rSeq " + readname + "flag " + flag + "refName " + refName + "pos " + position + readSeqwithoutGaps);
                     //System.out.println("rSeq " + readname );
                     if (isMappedSequence(flag, position)) {
-
+                        
                         if (refSeqfulllength == null) {
                             refSeqfulllength = genome.getRefGen().getSequence();
 
@@ -119,7 +119,7 @@ public class SAMParser implements MappingParserI {
                         }
 
                         //   System.out.println("pos" + start + "-" + stop);
-                        refSeqwithoutgaps = refSeqfulllength.substring(start-1, stop);
+                        refSeqwithoutgaps = refSeqfulllength.substring(start, stop+1);
 
                         if (cigar.contains("D") || cigar.contains("I")) {
                             //fallen gleiche refs raus?
@@ -185,11 +185,11 @@ public class SAMParser implements MappingParserI {
                                     + "Please make sure you are referencing the correct read data set!");
                         }
 
-                        DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start , direction);
+                        DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start+1 , direction);
                         List<ParsedDiff> diffs = result.getDiffs();
                         List<ParsedReferenceGap> gaps = result.getGaps();
 
-                        ParsedMapping mapping = new ParsedMapping(start , stop, direction, diffs, gaps, errors);
+                        ParsedMapping mapping = new ParsedMapping(start+1 , stop+1, direction, diffs, gaps, errors);
                         int seqID = readnameToSequenceID.get(readname);
                         mappingContainer.addParsedMapping(mapping, seqID);
 
@@ -506,5 +506,14 @@ public class SAMParser implements MappingParserI {
         public List<ParsedReferenceGap> getGaps() {
             return gaps;
         }
+    }
+
+    public boolean snpHasStretch(String read, int snp){
+        String re = read.substring(snp, snp+6);
+        boolean hasStretch = false;
+        if(re.matches("agtc{3,*}")){
+            hasStretch = true;
+        }
+        return hasStretch;
     }
 }
