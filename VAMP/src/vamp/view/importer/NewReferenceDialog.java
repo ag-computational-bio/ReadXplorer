@@ -3,6 +3,11 @@ package vamp.view.importer;
 import java.awt.Component;
 import vamp.importer.JobManagerI;
 import java.io.File;
+import java.io.FileFilter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
@@ -20,8 +25,7 @@ import vamp.parsing.reference.genbank.biojava.BioJavaGenBankParser;
 public class NewReferenceDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 8362375;
-
-    private File refGenFile;
+    private File refGenFile = null;
     private JobManagerI taskManager;
     private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaEmblParser(), new BioJavaGenBankParser()};
     private ReferenceParserI currentParser;
@@ -31,6 +35,7 @@ public class NewReferenceDialog extends javax.swing.JDialog {
         super(parent, false);
         initComponents();
         this.taskManager = taskmanager;
+       // setPreferences(refGenFile);
         currentParser = availableParsers[0];
     }
 
@@ -163,14 +168,12 @@ public class NewReferenceDialog extends javax.swing.JDialog {
         String description = descriptionField.getText();
         String name = nameField.getText();
 
-        if(refGenFile == null || name.equals("") || description.equals("")){
+        if (refGenFile == null || name.equals("") || description.equals("")) {
             JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
         } else {
             this.setVisible(false);
             taskManager.createRefGenTask(currentParser, refGenFile, description, name);
         }
-
-
 
     }//GEN-LAST:event_addRefGenButtonActionPerformed
 
@@ -178,18 +181,29 @@ public class NewReferenceDialog extends javax.swing.JDialog {
 
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-
+        //  if(getPreferences()!=null){
+        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
+        String path = prefs2.get("RefGenome.Filepath", null);
+        fc.setCurrentDirectory(new File(path));
+        // }
         int result = fc.showOpenDialog(this);
 
         File file = null;
 
-        if(result == 0){
+        if (result == 0) {
             // file chosen
             file = fc.getSelectedFile();
 
-            if(file.canRead()){
+            if (file.canRead()) {
                 refGenFile = file;
+                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialog.class);
+                prefs.put("RefGenome.Filepath", refGenFile.getAbsolutePath());
                 fileField.setText(refGenFile.getAbsolutePath());
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex) {
+                    Logger.getLogger(NewReferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 
@@ -197,9 +211,9 @@ public class NewReferenceDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_fileChooserButtonActionPerformed
 
     private void filetypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filetypeBoxActionPerformed
-        
+
         ReferenceParserI newparser = (ReferenceParserI) filetypeBox.getSelectedItem();
-        if(currentParser != newparser) {
+        if (currentParser != newparser) {
             currentParser = newparser;
             refGenFile = null;
             nameField.setText("");
@@ -208,7 +222,6 @@ public class NewReferenceDialog extends javax.swing.JDialog {
         }
 
     }//GEN-LAST:event_filetypeBoxActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addRefGenButton;
@@ -223,5 +236,4 @@ public class NewReferenceDialog extends javax.swing.JDialog {
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     // End of variables declaration//GEN-END:variables
-
 }

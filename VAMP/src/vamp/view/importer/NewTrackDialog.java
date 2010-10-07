@@ -8,6 +8,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
@@ -17,6 +21,7 @@ import vamp.databackend.dataObjects.PersistantReference;
 import vamp.databackend.dataObjects.PersistentRun;
 import vamp.databackend.connector.ProjectConnector;
 import vamp.parsing.common.ParserI;
+import vamp.parsing.mappings.BAMParser;
 import vamp.parsing.mappings.MappingParserI;
 import vamp.parsing.mappings.JokParser;
 import vamp.parsing.mappings.SAMParser;
@@ -28,12 +33,11 @@ import vamp.parsing.mappings.SAMParser;
 public class NewTrackDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 774275254;
-
     private File mappingFile;
     private JobManagerI taskManager;
     private RunJob[] runjobs;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMParser(), new BAMParser()};
     private MappingParserI currentParser;
 
     /** Creates new form NewTrackDialog */
@@ -54,7 +58,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
 
         // get list of already persistant runs from db and add them to list
         List<PersistentRun> dbRuns = ProjectConnector.getInstance().getRuns();
-        for(Iterator<PersistentRun> it = dbRuns.iterator(); it.hasNext(); ){
+        for (Iterator<PersistentRun> it = dbRuns.iterator(); it.hasNext();) {
             PersistentRun r = it.next();
             // file and parser parameter are not needed, because this runjob
             // is created for linking from track to runID and not for
@@ -67,7 +71,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
 
         // add all runJobs to array (for use in comboboxes for example)
         RunJob[] runs = new RunJob[runlist.size()];
-        for(int i = 0; i < runlist.size(); i++){
+        for (int i = 0; i < runlist.size(); i++) {
             runs[i] = runlist.get(i);
         }
 
@@ -78,7 +82,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
 
         List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-        for(Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext(); ){
+        for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
             PersistantReference r = it.next();
             list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
         }
@@ -86,13 +90,12 @@ public class NewTrackDialog extends javax.swing.JDialog {
         list.addAll(taskManager.getRefGenJobList());
 
         ReferenceJob[] gens = new ReferenceJob[list.size()];
-        for(int i = 0; i< list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             gens[i] = list.get(i);
         }
 
         return gens;
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -232,7 +235,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
         RunJob runJob = (RunJob) readBox.getSelectedItem();
         ReferenceJob refGenJob = (ReferenceJob) refGenBox.getSelectedItem();
 
-        if(mappingFile == null || runJob == null || refGenJob == null || description.equals("")){
+        if (mappingFile == null || runJob == null || refGenJob == null || description.equals("")) {
             JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
         } else {
             this.setVisible(false);
@@ -244,25 +247,34 @@ public class NewTrackDialog extends javax.swing.JDialog {
 
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-
+        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
+        String path = prefs2.get("RefGenome.Filepath", null);
+        fc.setCurrentDirectory(new File(path));
         int result = fc.showOpenDialog(this);
 
         File file = null;
 
-        if(result == 0){
+        if (result == 0) {
             // file chosen
             file = fc.getSelectedFile();
 
-            if(file.canRead()){
+            if (file.canRead()) {
                 mappingFile = file;
                 mappingFileField.setText(mappingFile.getAbsolutePath());
+                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialog.class);
+                prefs.put("RefGenome.Filepath", mappingFile.getAbsolutePath());
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex) {
+                    Logger.getLogger(NewTrackDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }//GEN-LAST:event_chooseButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         MappingParserI newparser = (MappingParserI) jComboBox1.getSelectedItem();
-        if(currentParser != newparser){
+        if (currentParser != newparser) {
             currentParser = newparser;
             mappingFile = null;
             mappingFileField.setText("");
@@ -270,8 +282,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
         }
 
     }//GEN-LAST:event_jComboBox1ActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton chooseButton;
@@ -287,5 +297,4 @@ public class NewTrackDialog extends javax.swing.JDialog {
     private javax.swing.JLabel refGenLabel;
     private javax.swing.JSeparator seperator;
     // End of variables declaration//GEN-END:variables
-
 }

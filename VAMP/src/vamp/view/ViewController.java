@@ -154,7 +154,7 @@ public class ViewController implements vamp.view.dataVisualisation.MousePosition
             c.setCurrentMousePosition(logPos);
         }
     }
-
+    
     @Override
     public void setMouseOverPaintingRequested(boolean requested) {
         for(MousePositionListener c : mousePosListener){

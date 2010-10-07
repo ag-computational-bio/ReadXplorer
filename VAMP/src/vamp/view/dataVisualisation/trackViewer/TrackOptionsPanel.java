@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.databackend.dataObjects.PersistantTrack;
 import vamp.view.dataVisualisation.BoundsInfoManager;
+import vamp.view.dataVisualisation.readPosition.ReadFrame;
 import vamp.view.dataVisualisation.snpDetection.SnpFrame;
 
 /**
@@ -17,6 +18,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 14234624;
     private ExternalViewer externalViewer;
     private SnpFrame snpDetection;
+    private ReadFrame readPanel ;
     private BasePanelFactory basePanelFactory;
     private PersistantTrack track;
     private BoundsInfoManager boundsManager;
@@ -48,6 +50,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
         snpButton = new javax.swing.JButton();
         externalViewerButton = new javax.swing.JButton();
+        readButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
@@ -65,6 +68,13 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             }
         });
 
+        readButton.setText("Find Read");
+        readButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                readButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -73,7 +83,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(externalViewerButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
-                    .addComponent(snpButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))
+                    .addComponent(snpButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                    .addComponent(readButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -82,8 +93,10 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(snpButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(readButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(externalViewerButton)
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -102,6 +115,13 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_snpButtonActionPerformed
 
+    private void readButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readButtonActionPerformed
+       readPanel = new ReadFrame(this, boundsManager, track);
+       readPanel.pack();
+       readButton.setEnabled(false);
+       readPanel.setVisible(true);
+    }//GEN-LAST:event_readButtonActionPerformed
+
 
     public void snpDetectionClosed(){
         if(snpDetection != null){
@@ -112,6 +132,14 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         }
     }
 
+    public void readDetecionClosed(){
+        if(readPanel!= null){
+            readPanel.close();
+            readPanel.setVisible(false);
+            readPanel = null;
+            readButton.setEnabled(true);
+        }
+    }
     public void viewerClosed(){
         // if user is fast enough to double-click the close X before this frame
         // disappears, a null pointer will occur
@@ -125,6 +153,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton externalViewerButton;
+    private javax.swing.JButton readButton;
     private javax.swing.JButton snpButton;
     // End of variables declaration//GEN-END:variables
 

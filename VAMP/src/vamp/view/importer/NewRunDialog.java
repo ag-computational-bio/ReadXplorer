@@ -3,6 +3,7 @@ package vamp.view.importer;
 import java.awt.Component;
 import vamp.importer.JobManagerI;
 import java.io.File;
+import java.util.prefs.Preferences;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
@@ -20,7 +21,6 @@ import vamp.parsing.reads.RunParserI;
 public class NewRunDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 12346123;
-
     private File runFile;
     private JobManagerI jobmanager;
     private RunParserI[] readparser = new RunParserI[]{new FastaParser(), new FastqParser()};
@@ -44,9 +44,9 @@ public class NewRunDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        filefield = new javax.swing.JTextField();
         chooseButton = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
+        descriptionField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         addButton = new javax.swing.JButton();
@@ -59,8 +59,8 @@ public class NewRunDialog extends javax.swing.JDialog {
 
         jLabel1.setText("File:");
 
-        jTextField1.setEditable(false);
-        jTextField1.setText("no file chosen");
+        filefield.setEditable(false);
+        filefield.setText("no file chosen");
 
         chooseButton.setText("open");
         chooseButton.addActionListener(new java.awt.event.ActionListener() {
@@ -112,10 +112,10 @@ public class NewRunDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(parserCombobox, 0, 222, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
+                                .addComponent(filefield, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chooseButton))
-                            .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)))
+                            .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)))
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
                     .addComponent(addButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
@@ -130,12 +130,12 @@ public class NewRunDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filefield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chooseButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -148,22 +148,27 @@ public class NewRunDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
-        
+
+
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-
+        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
+        String path = prefs2.get("RefGenome.Filepath", null);
+        fc.setCurrentDirectory(new File(path));
         int result = fc.showOpenDialog(this);
 
         File file = null;
 
-        if(result == 0){
+        if (result == 0) {
             // file chosen
             file = fc.getSelectedFile();
 
-            if(file.canRead()){
+            if (file.canRead()) {
                 runFile = file;
-                jTextField1.setText(runFile.getName());
-            }else{
+                filefield.setText(runFile.getName());
+                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialog.class);
+                prefs.put("RefGenome.Filepath", runFile.getAbsolutePath());
+            } else {
                 System.err.print("NewRunDialog couldnt read file");
             }
         }
@@ -171,9 +176,9 @@ public class NewRunDialog extends javax.swing.JDialog {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
 
-        String description = jTextField2.getText();
+        String description = descriptionField.getText();
 
-        if(runFile == null || description.equals("") ){
+        if (runFile == null || description.equals("")) {
             JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
         } else {
             jobmanager.createRunTask(currentParser, runFile, description);
@@ -185,27 +190,23 @@ public class NewRunDialog extends javax.swing.JDialog {
 
     private void parserComboboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserComboboxActionPerformed
         RunParserI newparser = (RunParserI) parserCombobox.getSelectedItem();
-        if(currentParser != newparser){
+        if (currentParser != newparser) {
             currentParser = newparser;
             runFile = null;
-            jTextField1.setText("");
-            jTextField2.setText("");
+            filefield.setText("");
+            descriptionField.setText("");
         }
 
     }//GEN-LAST:event_parserComboboxActionPerformed
-
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton chooseButton;
+    private javax.swing.JTextField descriptionField;
+    private javax.swing.JTextField filefield;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JComboBox parserCombobox;
     private javax.swing.JLabel parserLabel;
     // End of variables declaration//GEN-END:variables
-
 }

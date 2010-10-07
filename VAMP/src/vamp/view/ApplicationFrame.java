@@ -59,6 +59,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
         visualPanel = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         projectMenu = new javax.swing.JMenu();
@@ -80,6 +81,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
         });
 
         visualPanel.setLayout(new javax.swing.BoxLayout(visualPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        jScrollPane1.setViewportView(visualPanel);
 
         projectMenu.setText("Project");
 
@@ -153,11 +155,11 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 975, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1473, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 978, Short.MAX_VALUE)
         );
 
         pack();
@@ -208,6 +210,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem closeRefgenItem;
     private javax.swing.JMenuItem importItem;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuItem logoffItem;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openRefgenItem;

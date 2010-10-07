@@ -86,10 +86,11 @@ public class CoverageContainer {
         return coverage.keySet();
     }
 
+    //real coverage
     public int getBestMappingForwardCoverage(int position){
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , true, true);
     }
-
+    //number of unique mappings
     public int getNumberOfBestMapppingsForward(int position){
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , true, false);
     }

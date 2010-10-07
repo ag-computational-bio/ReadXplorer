@@ -34,7 +34,7 @@ public class Model implements ModelInterface, JobManager {
 
     @Override
     public void fetchNecessaryData(){
-
+  
         HashMap<Long, RunJob> indexedRuns = new HashMap<Long, RunJob>();
         HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
 

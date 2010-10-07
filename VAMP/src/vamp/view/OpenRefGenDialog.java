@@ -31,10 +31,10 @@ public class OpenRefGenDialog extends javax.swing.JDialog{
         PersistantReference[] genArray = new PersistantReference[gens.size()];
         for( int i = 0; i< gens.size() ; i++ ){
             genArray[i] = gens.get(i);
-        }
+    }
 
         return genArray;
-    }
+            }
 
     /** This method is called from within the constructor to
      * initialize the form.

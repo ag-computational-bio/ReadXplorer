@@ -1,5 +1,6 @@
 package vamp.view;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.GestureListenerI;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -14,7 +16,8 @@ import java.util.prefs.Preferences;
  */
 public class LoginFrame extends javax.swing.JFrame {
 
-    private String defaultdatabase;
+    private String defaultDatabaseMySQL;
+    private String defaultdatabaseh2;
     private String defaultuser;
     private String defaulthostname;
     private List<GestureListenerI> gestureListener;
@@ -24,10 +27,9 @@ public class LoginFrame extends javax.swing.JFrame {
         gestureListener = new ArrayList<GestureListenerI>();
         initComponents();
         setLoginData();
-
+        dbChooseButton.setVisible(false);
 
     }
-
 
     public void addGestureListener(GestureListenerI listener) {
         gestureListener.add(listener);
@@ -65,6 +67,7 @@ public class LoginFrame extends javax.swing.JFrame {
         dbTypeLabel = new javax.swing.JLabel();
         dbTypeBox = new javax.swing.JComboBox();
         jCheckBox1 = new javax.swing.JCheckBox();
+        dbChooseButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -105,10 +108,22 @@ public class LoginFrame extends javax.swing.JFrame {
 
         dbTypeLabel.setText("Database type:");
 
-        dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL" }));
+        dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL", "h2" }));
+        dbTypeBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dbTypeBoxActionPerformed(evt);
+            }
+        });
 
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("Save data");
+
+        dbChooseButton.setText("Choose");
+        dbChooseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dbChooseButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -136,7 +151,10 @@ public class LoginFrame extends javax.swing.JFrame {
                             .addComponent(loginButton, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(dbTypeBox, 0, 205, Short.MAX_VALUE)
                             .addComponent(urlField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                            .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(dbChooseButton)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -153,8 +171,9 @@ public class LoginFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(databaseLabel)
-                    .addComponent(databaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(databaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dbChooseButton))
+                .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(userLabel)
                     .addComponent(userField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -194,35 +213,51 @@ public class LoginFrame extends javax.swing.JFrame {
     private void setLoginData() {
         Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
         defaultuser = prefs.get("login.user", null);
-        defaultdatabase = prefs.get("login.database", null);
+        defaultDatabaseMySQL = prefs.get("login.database.mysql", null);
         defaulthostname = prefs.get("login.hostname", null);
+        defaultdatabaseh2 = prefs.get("login.database.h2", null);
         userField.setText(defaultuser);
         urlField.setText(defaulthostname);
-        databaseField.setText(defaultdatabase);
+        databaseField.setText(defaultDatabaseMySQL);
     }
     private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
 
         String adapter = dbTypeBox.getSelectedItem().toString();
         if (adapter.equalsIgnoreCase("mysql")) {
             adapter = "mysql";
-        }
 
-        String hostname = urlField.getText();
+            String hostname = urlField.getText();
 
-        String database = databaseField.getText();
+            String database = databaseField.getText();
 
-        String user = userField.getText();
+            String user = userField.getText();
 
-        String password = new String(passwordField.getPassword());
-        //if there are new LoginData
+            String password = new String(passwordField.getPassword());
+            //if there are new LoginData
 
-                  if (jCheckBox1.isSelected()){
-            if (!hostname.equals(defaulthostname)|| !database.equals(defaultdatabase)|| !user.equals(defaultuser)) {
+            if (jCheckBox1.isSelected()) {
+                if (!hostname.equals(defaulthostname) || !database.equals(defaultDatabaseMySQL) || !user.equals(defaultuser)) {
 
-            Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-            prefs.put("login.hostname", hostname);
-            prefs.put("login.database", database);
-            prefs.put("login.user", user);
+                    Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+                    prefs.put("login.hostname", hostname);
+                    prefs.put("login.database.mysql", database);
+                    prefs.put("login.database.h2", database);
+                    prefs.put("login.user", user);
+                    try {
+                        prefs.flush();
+                    } catch (BackingStoreException ex) {
+                        Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+
+            } else {
+
+                Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+                prefs.put("login.hostname", "");
+                prefs.put("login.database.mysql", "");
+                prefs.put("login.database.h2", "");
+                prefs.put("login.user", "");
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex) {
@@ -231,12 +266,43 @@ public class LoginFrame extends javax.swing.JFrame {
             }
 
 
-        }else{
+            // let all listeners now, they should log in now
+            for (GestureListenerI i : gestureListener) {
+                i.login(adapter, hostname, database, user, password);
+            }
+        } else {
+
+        adapter = "h2";
+        
+        String hostname = null;
+
+        String database = databaseField.getText();
+        if(database.endsWith(".h2.db")){
+            database = database.replace(".h2.db", "");
+        }
+
+        String user = null;
+
+        String password =null;
+        //if there are new LoginData
+
+        if (jCheckBox1.isSelected()) {
+            if (!database.equals(defaultdatabaseh2) ) {
+
+                Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+                prefs.put("login.database.h2", database);
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex) {
+                    Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+
+        } else {
 
             Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-            prefs.put("login.hostname", "");
-            prefs.put("login.database", "");
-            prefs.put("login.user", "");
+            prefs.put("login.database.h2", "");
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
@@ -244,16 +310,52 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         }
 
+
         // let all listeners now, they should log in now
         for (GestureListenerI i : gestureListener) {
             i.login(adapter, hostname, database, user, password);
         }
-
+        }
     }//GEN-LAST:event_passwordFieldActionPerformed
+
+    private void dbTypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbTypeBoxActionPerformed
+        String db = dbTypeBox.getSelectedItem().toString();
+        if (db.equalsIgnoreCase("h2")) {
+            userField.setVisible(false);
+            urlField.setVisible(false);
+            passwordField.setVisible(false);
+            userLabel.setVisible(false);
+            passwordLabel.setVisible(false);
+            urlLabel.setVisible(false);
+            dbChooseButton.setVisible(true);
+            databaseField.setText(defaultdatabaseh2);
+        } else {
+            userField.setVisible(true);
+            urlField.setVisible(true);
+            passwordField.setVisible(true);
+            passwordLabel.setVisible(true);
+            urlLabel.setVisible(true);
+            userLabel.setVisible(true);
+            dbChooseButton.setVisible(false);
+        }
+    }//GEN-LAST:event_dbTypeBoxActionPerformed
+
+    private void dbChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbChooseButtonActionPerformed
+        JFileChooser fc = new JFileChooser();
+        int result = fc.showOpenDialog(this);
+        File file = null;
+
+        if (result == 0) {
+            // file chosen
+            file = fc.getSelectedFile();
+            databaseField.setText(file.getAbsolutePath());
+        }
+    }//GEN-LAST:event_dbChooseButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton closeButton;
     private javax.swing.JTextField databaseField;
     private javax.swing.JLabel databaseLabel;
+    private javax.swing.JButton dbChooseButton;
     private javax.swing.JComboBox dbTypeBox;
     private javax.swing.JLabel dbTypeLabel;
     private javax.swing.JCheckBox jCheckBox1;

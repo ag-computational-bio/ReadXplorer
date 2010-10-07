@@ -85,7 +85,7 @@ public class ExternalViewer extends javax.swing.JFrame {
             }
         });
 
-        jCheckBox1.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jCheckBox1.setFont(new java.awt.Font("Dialog", 1, 10));
         jCheckBox1.setText("Color Histogram");
         jCheckBox1.setMinimumSize(new java.awt.Dimension(50, 22));
         jCheckBox1.setPreferredSize(new java.awt.Dimension(100, 22));
@@ -118,21 +118,22 @@ public class ExternalViewer extends javax.swing.JFrame {
                 .addComponent(alignmentButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(265, Short.MAX_VALUE))
+                .addContainerGap(252, Short.MAX_VALUE))
         );
 
         getContentPane().add(switchPanel, java.awt.BorderLayout.WEST);
 
+        viewerPanel.setPreferredSize(new java.awt.Dimension(490, 400));
         viewerPanel.setLayout(new java.awt.BorderLayout());
 
-        cardPanel.setPreferredSize(new java.awt.Dimension(600, 400));
+        cardPanel.setPreferredSize(new java.awt.Dimension(470, 400));
         cardPanel.setLayout(new java.awt.CardLayout());
         viewerPanel.add(cardPanel, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(viewerPanel, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-598)/2, (screenSize.height-403)/2, 598, 403);
+        setBounds((screenSize.width-572)/2, (screenSize.height-390)/2, 572, 390);
     }// </editor-fold>//GEN-END:initComponents
 
     private void seqlogoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seqlogoButtonActionPerformed

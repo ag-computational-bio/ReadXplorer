@@ -1,5 +1,7 @@
 package vamp.view.dataVisualisation.alignmentViewer;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -20,14 +22,14 @@ import vamp.databackend.dataObjects.PersistantReference;
  *
  * @author ddoppmeier
  */
-public class AlignmentViewer  extends AbstractViewer{
+public class AlignmentViewer  extends AbstractViewer {
 
     private static final long serialVersionUID = 234765253;
 
     private static int height = 500;
     private TrackConnector trackConnector;
     private LayoutI layout;
-
+    private PersistantReference refGen;
     private int blockHeight;
     private int layerHeight;
     private MappingExcusePanel mappingExcuse;
@@ -38,10 +40,10 @@ public class AlignmentViewer  extends AbstractViewer{
     private float minSaturationAndBrightness;
     private float maxSaturationAndBrightness;
     private float percentSandBPerCovUnit;
-
-
+    
     public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector){
         super(boundsInfoManager, basePanel, refGen);
+        this.refGen = refGen;
         this.trackConnector = trackConnector;
         setInDrawingMode(false);
         this.showSequenceBar(true);
@@ -261,5 +263,8 @@ public class AlignmentViewer  extends AbstractViewer{
         return width;
     }
 
+    public PersistantReference getRefGen(){
+        return refGen;
+    }
 
 }

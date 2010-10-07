@@ -18,7 +18,7 @@ import vamp.importer.RunJob;
 public class FastaParser implements RunParserI {
 
     private static String name = "Fasta Parser";
-    private static String[] fileExtension = new String[]{"fas", "fasta"};
+    private static String[] fileExtension = new String[]{"fas", "fasta","mfn"};
     private static String fileDescription = "Fasta File";
 
     public FastaParser(){
@@ -32,7 +32,6 @@ public class FastaParser implements RunParserI {
 
         ParsedRun run = new ParsedRun(description);
         run.setTimestamp(runJob.getTimestamp());
-
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Lesen der Read Datei " + file);
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));

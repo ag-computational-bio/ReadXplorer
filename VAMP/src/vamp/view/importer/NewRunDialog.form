@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
@@ -40,11 +40,11 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="parserCombobox" pref="222" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="jTextField1" pref="154" max="32767" attributes="0"/>
+                              <Component id="filefield" pref="154" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="jTextField2" pref="222" max="32767" attributes="0"/>
+                          <Component id="descriptionField" pref="222" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="jSeparator1" alignment="1" pref="307" max="32767" attributes="0"/>
@@ -65,13 +65,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="filefield" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="chooseButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="descriptionField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
@@ -88,7 +88,7 @@
         <Property name="text" type="java.lang.String" value="File:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField1">
+    <Component class="javax.swing.JTextField" name="filefield">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="no file chosen"/>
@@ -102,7 +102,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chooseButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField2">
+    <Component class="javax.swing.JTextField" name="descriptionField">
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>

@@ -39,32 +39,35 @@ public class ProjectConnector {
     private String url;
     private String user;
     private String password;
+    private String adapter;
     private HashMap<Long, TrackConnector> trackConnectors;
     private HashMap<Long, RunConnector> runConnectors;
     private HashMap<Long, ReferenceConnector> refConnectors;
+    private final static int SEQUENCE_BATCH_SIZE = 100000;
+    private final static int READNAME_BATCH_SIZE = 100000;
+    private final static int FEATURE_BATCH_SIZE = 100000;
+    private final static int COVERAGE_BATCH_SIZE = 100000;
+    private final static int MAPPING_BATCH_SIZE = 100000;
+    private final static int DIFF_BATCH_SIZE = 100000;
+    private int coveragePerf = 0;
+    private int coverageBM = 0;
+     private int coverageComplete = 0;
 
-    private final static int SEQUENCE_BATCH_SIZE    = 100000;
-    private final static int READNAME_BATCH_SIZE    = 100000;
-    private final static int FEATURE_BATCH_SIZE     = 100000;
-    private final static int COVERAGE_BATCH_SIZE    = 100000;
-    private final static int MAPPING_BATCH_SIZE     = 100000;
-    private final static int DIFF_BATCH_SIZE        = 100000;
-
-    private ProjectConnector(){
+    private ProjectConnector() {
         trackConnectors = new HashMap<Long, TrackConnector>();
         runConnectors = new HashMap<Long, RunConnector>();
         refConnectors = new HashMap<Long, ReferenceConnector>();
     }
 
-    private void cleanUp(){
+    private void cleanUp() {
         trackConnectors.clear();
         runConnectors.clear();
         refConnectors.clear();
     }
 
-    public static synchronized ProjectConnector getInstance(){
+    public static synchronized ProjectConnector getInstance() {
 
-        if(dbConnector == null){
+        if (dbConnector == null) {
             dbConnector = new ProjectConnector();
         }
         return dbConnector;
@@ -78,7 +81,7 @@ public class ProjectConnector {
             PreparedStatement fetchTracks = con.prepareStatement(SQLStatements.FETCH_TRACKS);
             ResultSet rs = fetchTracks.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 Long id = rs.getLong(FieldNames.TRACK_ID);
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
@@ -94,8 +97,8 @@ public class ProjectConnector {
         return tracks;
     }
 
-    public boolean isConnected(){
-        if(con != null){
+    public boolean isConnected() {
+        if (con != null) {
             try {
                 return con.isValid(0);
             } catch (SQLException ex) {
@@ -106,7 +109,7 @@ public class ProjectConnector {
         }
     }
 
-    public void disconnect(){
+    public void disconnect() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Closing database connection");
         try {
             con.close();
@@ -118,27 +121,77 @@ public class ProjectConnector {
         }
     }
 
-    public void connect(String adapter, String hostname, String database, String user, String password) throws SQLException{
+    public void connect(String adapter, String hostname, String database, String user, String password) throws SQLException {
+        if (adapter.equalsIgnoreCase("mysql")) {
+            this.adapter = adapter;
+            this.url = "jdbc:" + adapter + "://" + hostname + "/" + database;
+            this.user = user;
+            this.password = password;
+            this.connect(url, user, password);
+            this.setupDatabase();
+        } else {
+            this.adapter = adapter;
+            this.url = "jdbc:" + adapter + ":" + database;
+            this.connectH2DataBase(url);
+            this.setupDatabaseH2();
 
-        this.url = "jdbc:"+adapter+"://"+hostname+"/"+database;
-        this.user = user;
-        this.password = password;
+        }
 
-        this.connect(url, user, password);
-        this.setupDatabase();
     }
 
-    private void connect(String url, String user, String password) throws SQLException{
+    private void connect(String url, String user, String password) throws SQLException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to database");
         con = DriverManager.getConnection(url, user, password);
         con.setAutoCommit(true);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to database");
     }
 
-    private void setupDatabase(){
+    private void connectH2DataBase(String url) throws SQLException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to database");
+        con = DriverManager.getConnection(url);
+        con.setAutoCommit(true);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to database");
+    }
+
+    private void setupDatabaseH2() {
 
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Seting up tables and indices if not existant");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Setting up tables and indices if not existant");
+
+            con.setAutoCommit(false);
+            //create tables if not exist yet
+            con.prepareStatement(H2SQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_DIFFS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_DIFF).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_COVERAGE).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_COVERAGE).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_FEATURES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_FEATURES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_MAPPINGS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
+            con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_STATICS).execute();
+            con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
+            con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQUENCE).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_READS).execute();
+            con.prepareStatement(H2SQLStatements.INDEX_READS).executeUpdate();
+
+
+            con.commit();
+            con.setAutoCommit(true);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished creating tables and indices if not existant before");
+
+        } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
+        }
+    }
+
+    private void setupDatabase() {
+
+        try {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Setting up tables and indices if not existant");
 
             con.setAutoCommit(false);
             //create tables if not exist yet
@@ -162,11 +215,11 @@ public class ProjectConnector {
         }
     }
 
-    public void rollbackOnError(String className, Exception ex){
+    public void rollbackOnError(String className, Exception ex) {
 
         Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, "Error occured. Trying to recover", ex);
         try {
-            if(!con.isClosed()){
+            if (!con.isClosed()) {
                 //connection is still open. try rollback
                 con.rollback();
                 Logger.getLogger(ProjectConnector.class.getName()).log(Level.INFO, "Successfully rolled back");
@@ -184,14 +237,14 @@ public class ProjectConnector {
      * Method only for development of database and testing of import functionality.
      * Never use this in productive environment.
      */
-    private void deleteAllTables(){
+    private void deleteAllTables() {
         try {
             con.setAutoCommit(false);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting all database tables");
             ResultSet rs = con.prepareStatement("show tables").executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 String table = rs.getString(1);
-                con.prepareStatement("drop table "+table).executeUpdate();
+                con.prepareStatement("drop table " + table).executeUpdate();
             }
             con.commit();
             con.setAutoCommit(true);
@@ -202,7 +255,7 @@ public class ProjectConnector {
         }
     }
 
-    private void lockRunDomainTables(){
+    private void lockRunDomainTables() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start locking run domain tables");
         try {
             Statement lock = con.createStatement();
@@ -215,7 +268,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done locking run domain tables");
     }
 
-    private void unlockTables(){
+    private void unlockTables() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start unlocking tables");
         try {
             con.setAutoCommit(false);
@@ -230,7 +283,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done unlocking tables");
     }
 
-    private void storeRun(ParsedRun run) throws StorageException{
+    private void storeRun(ParsedRun run) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
 
         try {
@@ -239,7 +292,7 @@ public class ProjectConnector {
 
             long runID = 0;
             ResultSet rs = fetchRunID.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 runID = rs.getLong("LATEST_ID");
             }
 
@@ -262,7 +315,40 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
     }
 
-    private void storeSequences(ParsedRun run){
+    private void storeRunH2(ParsedRun run) throws StorageException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
+
+        try {
+            PreparedStatement insertRun = con.prepareStatement(H2SQLStatements.INSERT_RUN);
+            PreparedStatement fetchRunID = con.prepareStatement(H2SQLStatements.GET_LATEST_RUN_ID);
+
+            long runID = 0;
+            ResultSet rs = fetchRunID.executeQuery();
+            if (rs.next()) {
+                runID = rs.getLong("LATEST_ID");
+            }
+
+            runID++;
+            run.setID(runID);
+
+            insertRun.setLong(1, runID);
+            insertRun.setString(2, run.getDescription());
+            insertRun.setTimestamp(3, run.getTimestamp());
+            insertRun.setInt(4, run.getSequences().size());
+            insertRun.execute();
+
+            insertRun.close();
+            fetchRunID.close();
+
+            con.commit();
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
+    }
+
+    private void storeSequences(ParsedRun run) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing unique sequences");
 
         try {
@@ -271,7 +357,7 @@ public class ProjectConnector {
 
             long seqID = 0;
             ResultSet rs = latestSeqID.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 seqID = rs.getLong("LATEST_ID");
             }
 
@@ -279,7 +365,7 @@ public class ProjectConnector {
             Collection<ParsedSequence> sequences = run.getSequences();
             int batchCounter = 1;
 
-            for(Iterator<ParsedSequence> it = sequences.iterator(); it.hasNext(); batchCounter++){
+            for (Iterator<ParsedSequence> it = sequences.iterator(); it.hasNext(); batchCounter++) {
                 ParsedSequence seq = it.next();
                 seqID++;
                 seq.setID(seqID);
@@ -287,9 +373,9 @@ public class ProjectConnector {
                 insertSequence.setLong(2, run.getID());
                 insertSequence.addBatch();
 
-                if(batchCounter == SEQUENCE_BATCH_SIZE){
+                if (batchCounter == SEQUENCE_BATCH_SIZE) {
                     insertSequence.executeBatch();
-                    batchCounter =1;
+                    batchCounter = 1;
                 }
             }
 
@@ -306,7 +392,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing unique sequences");
     }
 
-    private void storeReads(ParsedRun run){
+    private void storeReads(ParsedRun run) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing readnames");
         try {
             PreparedStatement insertRead = con.prepareStatement(SQLStatements.INSERT_READ);
@@ -314,21 +400,21 @@ public class ProjectConnector {
 
             ResultSet rs = getLatestID.executeQuery();
             long readID = 0;
-            if(rs.next()){
+            if (rs.next()) {
                 readID = rs.getLong("LATEST_ID");
             }
 
             int batchCounter = 1;
-            for(Iterator<ParsedSequence> seqIt = run.getSequences().iterator(); seqIt.hasNext(); ){
+            for (Iterator<ParsedSequence> seqIt = run.getSequences().iterator(); seqIt.hasNext();) {
                 ParsedSequence seq = seqIt.next();
-                for(Iterator<String> readIt = seq.getReads().iterator(); readIt.hasNext(); batchCounter++){
+                for (Iterator<String> readIt = seq.getReads().iterator(); readIt.hasNext(); batchCounter++) {
                     readID++;
                     insertRead.setLong(1, readID);
                     insertRead.setString(2, readIt.next());
                     insertRead.setLong(3, seq.getID());
                     insertRead.addBatch();
 
-                    if(batchCounter == READNAME_BATCH_SIZE){
+                    if (batchCounter == READNAME_BATCH_SIZE) {
                         batchCounter = 1;
                         insertRead.executeBatch();
                     }
@@ -349,33 +435,52 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing readnames");
     }
 
-    public long addRun(ParsedRun run) throws StorageException{
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \""+run.getDescription()+"\"");
+    public long addRun(ParsedRun run) throws StorageException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"" + run.getDescription() + "\"");
 
-        try {
-            con.setAutoCommit(false);
-            this.lockRunDomainTables();
-            this.disableRunIndices();
+        if (adapter.equalsIgnoreCase("mysql")) {
+            try {
+                con.setAutoCommit(false);
+                this.lockRunDomainTables();
+                this.disableRunIndices();
 
-            storeRun(run);
-            storeSequences(run);
-            storeReads(run);
+                storeRun(run);
+                storeSequences(run);
+                storeReads(run);
 
-            this.enableRunIndices();
-            this.unlockTables();
-            con.setAutoCommit(true);
+                this.enableRunIndices();
+                this.unlockTables();
+                con.setAutoCommit(true);
 
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-            throw new StorageException(ex);
-        } catch (Exception ex){
-            throw new StorageException(ex);
+            } catch (SQLException ex) {
+                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+                throw new StorageException(ex);
+            } catch (Exception ex) {
+                throw new StorageException(ex);
+            }
+        } else {
+            try {
+                con.setAutoCommit(false);
+
+                storeRunH2(run);
+                storeSequences(run);
+                storeReads(run);
+
+                con.setAutoCommit(true);
+
+            } catch (SQLException ex) {
+                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+                throw new StorageException(ex);
+            } catch (Exception ex) {
+                throw new StorageException(ex);
+            }
+
         }
 
         return run.getID();
     }
 
-    private void disableRunIndices(){
+    private void disableRunIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start disabling run domain indexing");
         try {
 
@@ -400,7 +505,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "disabled run data domain indexing");
     }
 
-    private void enableRunIndices(){
+    private void enableRunIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling run data domain indexing");
         try {
 
@@ -425,7 +530,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "enabled run data domain indexing");
     }
 
-    private void disableReferenceIndices(){
+    private void disableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start disabling reference data domain indexing...");
         try {
             PreparedStatement disableSeq = con.prepareStatement(SQLStatements.DISABLE_REFERENCE_INDICES);
@@ -444,7 +549,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done disabling reference data domain indexing");
     }
 
-    private void enableReferenceIndices(){
+    private void enableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling reference data domain indexing...");
         try {
             PreparedStatement enableSeq = con.prepareStatement(SQLStatements.ENABLE_REFERENCE_INDICES);
@@ -463,7 +568,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done enabling reference data domain indexing");
     }
 
-    private void storeGenome(ParsedReference reference){
+    private void storeGenome(ParsedReference reference) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing reference sequence data...");
         try {
             PreparedStatement getLatestID = con.prepareStatement(SQLStatements.GET_LATEST_REFERENCE_ID);
@@ -472,7 +577,7 @@ public class ProjectConnector {
             // get the latest id assigned for a reference
             ResultSet rs = getLatestID.executeQuery();
             long id = 0;
-            if(rs.next()){
+            if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
             id++;
@@ -500,7 +605,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting reference sequence data");
     }
 
-    private void storeFeatures(ParsedReference reference){
+    private void storeFeatures(ParsedReference reference) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting features...");
         try {
             PreparedStatement latestId = con.prepareStatement(SQLStatements.GET_LATEST_FEATURE_ID);
@@ -508,13 +613,13 @@ public class ProjectConnector {
 
             long id = 0;
             ResultSet rs = latestId.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
             id++;
 
             int batchCounter = 1;
-            for(Iterator<ParsedFeature> it = reference.getFeatures().iterator(); it.hasNext(); id++, batchCounter++){
+            for (Iterator<ParsedFeature> it = reference.getFeatures().iterator(); it.hasNext(); id++, batchCounter++) {
                 ParsedFeature f = it.next();
                 insertFeature.setLong(1, id);
                 insertFeature.setLong(2, reference.getID());
@@ -527,7 +632,7 @@ public class ProjectConnector {
                 insertFeature.setInt(9, f.getStrand());
                 insertFeature.addBatch();
 
-                if(batchCounter == FEATURE_BATCH_SIZE){
+                if (batchCounter == FEATURE_BATCH_SIZE) {
                     batchCounter = 1;
                     insertFeature.executeBatch();
                 }
@@ -545,7 +650,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting features");
     }
 
-    private void lockReferenceDomainIndices(){
+    private void lockReferenceDomainIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start locking reference domain tables...");
         try {
             PreparedStatement lock = con.prepareStatement(SQLStatements.LOCK_TABLE_REFERENCE_DOMAIN);
@@ -558,29 +663,42 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done locking reference domain tables");
     }
 
-    public long addRefGenome(ParsedReference reference) throws StorageException{
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing reference sequence  \""+reference.getName()+"\"");
-        try {
-            con.setAutoCommit(false);
-            this.lockReferenceDomainIndices();
-            this.disableReferenceIndices();
+    public long addRefGenome(ParsedReference reference) throws StorageException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing reference sequence  \"" + reference.getName() + "\"");
 
-            this.storeGenome(reference);
-            this.storeFeatures(reference);
+        if (adapter.equalsIgnoreCase("mysql")) {
 
-            this.enableReferenceIndices();
-            this.unlockTables();
-            con.setAutoCommit(true);
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            try {
+                con.setAutoCommit(false);
+                this.lockReferenceDomainIndices();
+                this.disableReferenceIndices();
+
+                this.storeGenome(reference);
+                this.storeFeatures(reference);
+
+                this.enableReferenceIndices();
+                this.unlockTables();
+                con.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            }
+        } else {
+            try {
+
+                con.setAutoCommit(false);
+                this.storeGenome(reference);
+                this.storeFeatures(reference);
+                con.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            }
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \""+reference.getName()+"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"" + reference.getName() + "\"");
         return reference.getID();
     }
 
-
-    private void storeCoverage(ParsedTrack track){
+    private void storeCoverage(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing coverage information...");
         try {
             PreparedStatement insertCoverage = con.prepareStatement(SQLStatements.INSERT_COVERAGE);
@@ -589,7 +707,7 @@ public class ProjectConnector {
             // get the latest used coverage id
             long id = 0;
             ResultSet rs = latestID.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
             id++;
@@ -597,8 +715,17 @@ public class ProjectConnector {
             // insert coverage for track
             int batchCounter = 1;
             CoverageContainer cov = track.getCoverageContainer();
-            for(Iterator<Integer> covsIt = cov.getCoveredPositions().iterator(); covsIt.hasNext(); id++, batchCounter++){
+            for (Iterator<Integer> covsIt = cov.getCoveredPositions().iterator(); covsIt.hasNext(); id++, batchCounter++) {
                 int pos = covsIt.next();
+                if(cov.getZeroErrorMappingsForwardCoverage(pos)+ cov.getZeroErrorMappingsReverseCoverage(pos)!= 0){
+                coveragePerf ++;
+                }
+                if(cov.getBestMappingForwardCoverage(pos)+ cov.getBestMappingReverseCoverage(pos)!= 0){
+                     coverageBM ++ ;
+                }
+                if(cov.getNErrorMappingsReverseCoverage(pos)+ cov.getNErrorMappingsForwardCoverage(pos)!= 0){
+                  coverageComplete++;
+                }
                 insertCoverage.setLong(1, id);
                 insertCoverage.setLong(2, track.getID());
                 insertCoverage.setInt(3, pos);
@@ -616,11 +743,12 @@ public class ProjectConnector {
                 insertCoverage.setInt(15, cov.getNumberOfNErrorMappingsReverse(pos));
                 insertCoverage.addBatch();
 
-                if(batchCounter == COVERAGE_BATCH_SIZE){
+                if (batchCounter == COVERAGE_BATCH_SIZE) {
                     batchCounter = 0;
                     insertCoverage.executeBatch();
                 }
             }
+           //System.out.println("perf " + coveragePerf + "covBM "+ coverageBM + "covCompl "+ coverageComplete);
 
             insertCoverage.executeBatch();
 
@@ -634,7 +762,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
     }
 
-    private void storeTrack(ParsedTrack track, long refGenID, long runID){
+    private void storeTrack(ParsedTrack track, long refGenID, long runID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
         try {
             PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
@@ -643,7 +771,7 @@ public class ProjectConnector {
             // get latest id for track
             long id = 0;
             ResultSet rs = latestID.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
             id++;
@@ -659,7 +787,7 @@ public class ProjectConnector {
 
             insertTrack.close();
             latestID.close();
-            
+
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
@@ -667,7 +795,93 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
 
-    private void storeMappings(ParsedTrack track){
+
+    private void storeTrackH2(ParsedTrack track, long refGenID, long runID) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
+        
+        try {
+            PreparedStatement insertTrack = con.prepareStatement(H2SQLStatements.INSERT_TRACK);
+            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_TRACK_ID);
+
+            // get latest id for track
+            long id = 0;
+            ResultSet rs = latestID.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("LATEST_ID");
+            }
+            id++;
+            track.setID(id);
+
+            // store track in table
+            insertTrack.setLong(1, id);
+            insertTrack.setLong(2, refGenID);
+            insertTrack.setString(3, track.getDescription());
+            insertTrack.setTimestamp(4, track.getTimestamp());
+            insertTrack.setLong(5, runID);
+            insertTrack.execute();
+
+            insertTrack.close();
+            latestID.close();
+
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
+    }
+
+        private void storeStatics(ParsedTrack track) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
+        int mappings = 0;
+        int perfectmappings = 0;
+        int bmmappings = 0;
+        int mappedSeq = 0;
+        try {
+            HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
+            mappings = mappingInfos.get(1);
+            perfectmappings = mappingInfos.get(2);
+            bmmappings = mappingInfos.get(3);
+            mappedSeq = mappingInfos.get(4);
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the list");
+        }
+        try {
+            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
+            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATICS_ID);
+
+            // get latest id for track
+            long id = 0;
+            ResultSet rs = latestID.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("LATEST_ID");
+            }
+            id++;
+
+            // store track in table
+            insertStatics.setLong(1, id);
+            insertStatics.setLong(2, track.getID());
+            insertStatics.setInt(3, mappings);
+            insertStatics.setInt(4, perfectmappings);
+            insertStatics.setInt(5, bmmappings);
+            insertStatics.setInt(6, mappedSeq);
+            insertStatics.setInt(7,coveragePerf);
+            insertStatics.setInt(8,coverageBM);
+            insertStatics.setInt(9,coverageComplete);
+            insertStatics.execute();
+
+            insertStatics.close();
+            latestID.close();
+
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
+    }
+
+
+
+    private void storeMappings(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing mapping data...");
         try {
             PreparedStatement insertMapping = con.prepareStatement(SQLStatements.INSERT_MAPPING);
@@ -676,7 +890,7 @@ public class ProjectConnector {
             // get the latest assigned mapping id
             long mappingID = 0;
             ResultSet rs = latestID.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 mappingID = rs.getLong("LATEST_ID");
             }
             mappingID++;
@@ -684,11 +898,11 @@ public class ProjectConnector {
             // start storing the mappings
             int batchCounter = 1;
             Iterator<Integer> sequenceIDIterator = track.getParsedMappingContainer().getMappedSequenceIDs().iterator();
-            while(sequenceIDIterator.hasNext()){
+            while (sequenceIDIterator.hasNext()) {
                 int sequenceID = sequenceIDIterator.next();
                 List<ParsedMapping> c = track.getParsedMappingContainer().getParsedMappingGroupBySeqID(sequenceID).getMappings();
                 Iterator<ParsedMapping> mappingsIt = c.iterator();
-                while(mappingsIt.hasNext()){
+                while (mappingsIt.hasNext()) {
                     ParsedMapping m = mappingsIt.next();
                     m.setID(mappingID);
 
@@ -703,7 +917,7 @@ public class ProjectConnector {
                     insertMapping.setLong(9, track.getID());
                     insertMapping.addBatch();
 
-                    if(batchCounter == MAPPING_BATCH_SIZE){
+                    if (batchCounter == MAPPING_BATCH_SIZE) {
                         insertMapping.executeBatch();
                         batchCounter = 0;
                     }
@@ -722,7 +936,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing mapping data");
     }
 
-    private void storeDiffs(ParsedTrack track){
+    private void storeDiffs(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting diff data...");
 
         try {
@@ -733,7 +947,7 @@ public class ProjectConnector {
             // get the latest diff id used
             long diffID = 0;
             ResultSet rs = latestID.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 diffID = rs.getLong("LATEST_ID");
             }
             diffID++;
@@ -745,17 +959,17 @@ public class ProjectConnector {
             // insert data
             int batchCounter = 0;
             Iterator<Integer> sequenceIDIterator = track.getParsedMappingContainer().getMappedSequenceIDs().iterator();
-            while(sequenceIDIterator.hasNext()){
+            while (sequenceIDIterator.hasNext()) {
                 int sequenceID = sequenceIDIterator.next();
                 List<ParsedMapping> c = track.getParsedMappingContainer().getParsedMappingGroupBySeqID(sequenceID).getMappings();
                 Iterator<ParsedMapping> mappingsIt = c.iterator();
 
                 // iterate mappings
-                while(mappingsIt.hasNext()){
+                while (mappingsIt.hasNext()) {
                     ParsedMapping m = mappingsIt.next();
 
                     // iterate diffs (non-gap variation)
-                    for(Iterator<ParsedDiff> diffsIt = m.getDiffs().iterator(); diffsIt.hasNext(); ){
+                    for (Iterator<ParsedDiff> diffsIt = m.getDiffs().iterator(); diffsIt.hasNext();) {
                         batchCounter++;
 
                         ParsedDiff d = diffsIt.next();
@@ -767,14 +981,14 @@ public class ProjectConnector {
 
                         insertDiff.addBatch();
 
-                        if(batchCounter == DIFF_BATCH_SIZE){
+                        if (batchCounter == DIFF_BATCH_SIZE) {
                             insertDiff.executeBatch();
                             batchCounter = 0;
                         }
                     }
 
                     // iterate gaps
-                    for(Iterator<ParsedReferenceGap> gapIt = m.getGenomeGaps().iterator(); gapIt.hasNext(); ){
+                    for (Iterator<ParsedReferenceGap> gapIt = m.getGenomeGaps().iterator(); gapIt.hasNext();) {
                         batchCounter++;
 
                         ParsedReferenceGap g = gapIt.next();
@@ -787,7 +1001,7 @@ public class ProjectConnector {
 
                         insertGap.addBatch();
 
-                        if(batchCounter == DIFF_BATCH_SIZE){
+                        if (batchCounter == DIFF_BATCH_SIZE) {
                             insertGap.executeBatch();
                             batchCounter = 0;
                         }
@@ -809,7 +1023,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting diff data");
     }
 
-    private void lockTrackDomainTables(){
+    private void lockTrackDomainTables() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start locking track domain tables...");
         try {
             PreparedStatement lock = con.prepareStatement(SQLStatements.LOCK_TABLE_TRACK_DOMAIN);
@@ -821,27 +1035,36 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done locking track domain tables");
     }
 
-    public Long addTrack(ParsedTrack track, long runID, long refGenID) throws StorageException{
+    public Long addTrack(ParsedTrack track, long runID, long refGenID) throws StorageException {
+
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
+        if (adapter.equalsIgnoreCase("mysql")) {
 
-        this.lockTrackDomainTables();
-        this.disableTrackDomainIndices();
+            this.lockTrackDomainTables();
+            this.disableTrackDomainIndices();
 
-        this.storeTrack(track, refGenID, runID);
-        this.storeCoverage(track);
-        this.storeMappings(track);
-        this.storeDiffs(track);
+            this.storeTrack(track, refGenID, runID);
+            this.storeCoverage(track);
+            this.storeMappings(track);
+            this.storeDiffs(track);
 
-        this.enableTrackDomainIndices();
-        this.unlockTables();
+            this.enableTrackDomainIndices();
+            this.unlockTables();
+        } else {
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \""+track.getDescription()+"\" has been stored successfully");
+            this.storeTrackH2(track, refGenID, runID);
+            this.storeCoverage(track);
+            this.storeStatics(track);
+            this.storeMappings(track);
+            this.storeDiffs(track);
+        }
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"" + track.getDescription() + "\" has been stored successfully");
 
         return track.getID();
     }
 
-    private void disableTrackDomainIndices(){
+    private void disableTrackDomainIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "started disabling track data domain indices");
 
         try {
@@ -868,7 +1091,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished disabling track data domain indices");
     }
 
-    private void enableTrackDomainIndices(){
+    private void enableTrackDomainIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "started enabling track data domain indices");
         try {
 
@@ -894,17 +1117,17 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished enabling track data domain indices");
     }
 
-    public ReferenceConnector getRefGenomeConnector(long refGenID){
+    public ReferenceConnector getRefGenomeConnector(long refGenID) {
         // only return new object, if no suitable connector was created before
-        if(!refConnectors.containsKey(refGenID)){
+        if (!refConnectors.containsKey(refGenID)) {
             refConnectors.put(refGenID, new ReferenceConnector(refGenID));
         }
         return refConnectors.get(refGenID);
     }
 
-    public RunConnector getRunConnector(long runID){
+    public RunConnector getRunConnector(long runID) {
         // only return new object, if no suitable connector was created before
-        if(!runConnectors.containsKey(runID)){
+        if (!runConnectors.containsKey(runID)) {
             runConnectors.put(runID, new RunConnector(runID));
         }
         return runConnectors.get(runID);
@@ -912,26 +1135,26 @@ public class ProjectConnector {
 
     public TrackConnector getTrackConnector(long trackID) {
         // only return new object, if no suitable connector was created before
-        if(!trackConnectors.containsKey(trackID)){
+        if (!trackConnectors.containsKey(trackID)) {
             trackConnectors.put(trackID, new TrackConnector(trackID));
         }
         return trackConnectors.get(trackID);
     }
 
-    public Connection getConnection(){
+    public Connection getConnection() {
         return con;
     }
 
-    public List<PersistentRun> getRuns(){
+    public List<PersistentRun> getRuns() {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading run data from database");
         ArrayList<PersistentRun> runs = new ArrayList<PersistentRun>();
-        
+
         try {
             PreparedStatement fetchRuns = con.prepareStatement(SQLStatements.FETCH_RUNS);
             ResultSet rs = fetchRuns.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 int id = rs.getInt(FieldNames.RUN_ID);
                 String description = rs.getString(FieldNames.RUN_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.RUN_TIMESTAMP);
@@ -945,7 +1168,7 @@ public class ProjectConnector {
         return runs;
     }
 
-    public List<PersistantReference> getGenomes(){
+    public List<PersistantReference> getGenomes() {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
         ArrayList<PersistantReference> refGens = new ArrayList<PersistantReference>();
@@ -956,7 +1179,7 @@ public class ProjectConnector {
             fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES);
 
             ResultSet rs = fetch.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 long id = rs.getLong(FieldNames.REF_GEN_ID);
                 String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
                 String name = rs.getString(FieldNames.REF_GEN_NAME);
@@ -976,7 +1199,7 @@ public class ProjectConnector {
     }
 
     public void deleteTrack(long trackID) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \""+trackID+"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \"" + trackID + "\"");
         try {
             con.setAutoCommit(false);
 
@@ -1002,17 +1225,17 @@ public class ProjectConnector {
             deleteTrack.close();
 
             con.setAutoCommit(true);
-            
+
         } catch (SQLException ex) {
             throw new StorageException(ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \""+trackID+"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"" + trackID + "\"");
     }
 
     public void deleteRun(long runID) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of run with id \""+runID+"\"");
-        try{
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of run with id \"" + runID + "\"");
+        try {
             con.setAutoCommit(false);
 
             PreparedStatement deleteReads = con.prepareStatement(SQLStatements.DELETE_READS_FROM_RUN);
@@ -1031,18 +1254,18 @@ public class ProjectConnector {
             deleteReads.close();
             deleteSeqs.close();
             deleteRun.close();
-            
+
             con.setAutoCommit(true);
 
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new StorageException(ex);
         }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \""+runID+"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \"" + runID + "\"");
     }
 
-    public void deleteGenome(long refGenID) throws StorageException{
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \""+refGenID+"\"");
-        try{
+    public void deleteGenome(long refGenID) throws StorageException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \"" + refGenID + "\"");
+        try {
             con.setAutoCommit(false);
 
             PreparedStatement deleteFeatures = con.prepareStatement(SQLStatements.DELETE_FEATURES_FROM_GENOME);
@@ -1060,24 +1283,24 @@ public class ProjectConnector {
 
             con.setAutoCommit(true);
 
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new StorageException(ex);
         }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \""+refGenID+"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"" + refGenID + "\"");
     }
 
-    public List<String> getReadNamesForSequenceID(int id){
+    public List<String> getReadNamesForSequenceID(int id) {
         List<String> names = new ArrayList<String>();
-        
+
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_READNAMES_FOR_SEQUENCE);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_READNAMES_FOR_SEQUENCE_ID);
             fetch.setInt(1, id);
 
             ResultSet rs = fetch.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 names.add(rs.getString(FieldNames.READ_NAME));
             }
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1085,7 +1308,4 @@ public class ProjectConnector {
 
         return names;
     }
-
-
-
 }

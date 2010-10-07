@@ -54,7 +54,11 @@
                           <Component id="loginButton" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="dbTypeBox" alignment="0" pref="205" max="32767" attributes="0"/>
                           <Component id="urlField" alignment="0" pref="205" max="32767" attributes="1"/>
-                          <Component id="databaseField" pref="205" max="32767" attributes="1"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="databaseField" pref="122" max="32767" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="dbChooseButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
               </Group>
@@ -75,12 +79,13 @@
                   <Component id="urlField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="urlLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="databaseLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="databaseField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="dbChooseButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="userLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="userField" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -158,17 +163,29 @@
     <Component class="javax.swing.JComboBox" name="dbTypeBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="1">
+          <StringArray count="2">
             <StringItem index="0" value="MySQL"/>
+            <StringItem index="1" value="h2"/>
           </StringArray>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dbTypeBoxActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="jCheckBox1">
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Save data"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="dbChooseButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Choose"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dbChooseButtonActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

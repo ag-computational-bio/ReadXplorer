@@ -4,19 +4,19 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author ddoppmeier
  */
 public class ParsedRun {
-
-    private HashMap<String, ParsedSequence> sequences;
+    
+    ConcurrentHashMap<String, ParsedSequence> sequences;
     private HashMap<String, String> errorMap;
     private String description;
     private Timestamp timestamp;
     private long id;
-
     public Timestamp getTimestamp() {
         return timestamp;
     }
@@ -27,7 +27,7 @@ public class ParsedRun {
 
     public ParsedRun(String description){
         this.description = description;
-        sequences = new HashMap<String, ParsedSequence>();
+        sequences = new ConcurrentHashMap<String, ParsedSequence>();
         errorMap = new HashMap<String, String>();
     }
 
@@ -38,8 +38,8 @@ public class ParsedRun {
     public Collection<ParsedSequence> getSequences(){
         return sequences.values();
     }
-
-    public void addReadData(String sequence, String readName){
+//Parsed Sequence contains the names of the reads with the same sequence
+    public void addReadData(String sequence, String readName) throws OutOfMemoryError{
 
         if(!sequences.containsKey(sequence)){
             sequences.put(sequence, new ParsedSequence());

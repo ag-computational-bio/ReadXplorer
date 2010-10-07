@@ -1,6 +1,8 @@
 package vamp.view.dataVisualisation.abstractViewer;
 
-import java.awt.Color;
+//import edu.umd.cs.piccolo.PCanvas;
+//import edu.umd.cs.piccolo.nodes.PText;
+//import edu.umd.cs.piccolox.swing.PCacheCanvas;
 import vamp.view.dataVisualisation.*;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -11,6 +13,7 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.JTextField;
 import vamp.ColorProperties;
 import vamp.databackend.dataObjects.PersistantReference;
 
@@ -53,7 +56,7 @@ public class SequenceBar extends JComponent {
         halfMarkingWidth = markingWidth / 2;
         regionsToHighlight = new ArrayList<Region>();
         codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
-
+        
     }
 
     public void setGenomeGapManager(GenomeGapManager gapManager) {
@@ -63,6 +66,8 @@ public class SequenceBar extends JComponent {
     public void boundsChanged() {
         adjustMarkingIntervall();
         findCodons();
+       // setCurrentSequence(calculateSequence());
+//        setSequence(calculateSequence());
     }
 
     @Override
@@ -92,7 +97,7 @@ public class SequenceBar extends JComponent {
             }
             temp += halfMarkingWidth;
         }
-    }
+        }
 
     /**
      * Draw a line in the middle of the area including markings for position and
@@ -249,7 +254,7 @@ public class SequenceBar extends JComponent {
     }
 
     /**
-     * Adjust the with that is used for marking bases to the current size
+     * Adjust the width that is used for marking bases to the current size
      */
     private void adjustMarkingIntervall() {
 
@@ -377,6 +382,60 @@ public class SequenceBar extends JComponent {
         }
 
     }
+
+    // for sequence copying
+ /*   public String calculateSequence(){
+         String sequence ="";
+         String base;
+            int logleft = parentViewer.getBoundsInfo().getLogLeft();
+            int logright = parentViewer.getBoundsInfo().getLogRight();
+          
+            for (int i = logleft; i <= logright; i++) {
+            int basePosition =i-1 ;
+           //  System.out.println("logleft" + logleft + "logright" + logright+ "baseposition " + basePosition);
+        if (gapManager != null && gapManager.hasGapAt(i)) {
+            int numOfGaps = gapManager.getNumOfGapsAt(i);
+            for (int j = 0; j < numOfGaps; j++) {
+               
+                 base = "- ";
+              sequence = sequence.concat(base);
+            }
+        }
+        base = refGen.getSequence().substring(basePosition, basePosition + 1) +"";
+       sequence = sequence.concat(base);
+            }
+       //    System.out.println("seqbar seq" + sequence);
+         return sequence;
+    }
+
+    public void setCurrentSequence(String sequence){
+        JTextField j = new JTextField(sequence);
+        j.selectAll();
+        j.copy();
+    }
+    public void setSequence(String sequence){
+
+        String s ="g";
+        PText pt = new PText(s);
+        pt.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 9));
+        PMarkableText p = new PMarkableText(sequence);
+        p.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 9));
+        p.setPickable(true);
+        p.addInputEventListener(new PTextSelectionEventHandler(pt.getWidth()));
+        PCanvas pc = new PCanvas();
+        pc.setZoomEventHandler(null);
+
+        pc.setPanEventHandler(null);
+        pc.setEnabled(true);
+        pc.setVisible(true);
+        // System.out.println("seqbar seqlength" + sequence.length());
+        pc.setBounds(40, 10,  550,15);
+        pc.getLayer().addChild(p);
+        this.add(pc);
+       // fe.add(pc);
+      //  this.pack();
+      // this.setVisible(true);
+    }*/
 
     public String reverseBase(String base){
         String revBase;

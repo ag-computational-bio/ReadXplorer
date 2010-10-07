@@ -24,7 +24,6 @@ public class ParsedMapping {
         this.direction = direction;
         this.diffs = diffs;
         this.gaps = gaps;
-        this.diffs = diffs;
         this.errors = errors;
         bestMapping = false;
         count = 1;

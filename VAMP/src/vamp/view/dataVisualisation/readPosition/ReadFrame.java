@@ -1,64 +1,91 @@
-package vamp.view.dataVisualisation.snpDetection;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ *   This file is part of ProSE.
+ *   Copyright (C) 2007-2010 CeBiTec, Bielefeld University
+ * 
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ * 
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ * 
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * ReadFrame.java
+ *
+ * Created on 15.09.2010, 11:32:37
+ */
+package vamp.view.dataVisualisation.readPosition;
 
 import java.awt.CardLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
-import vamp.ApplicationController;
-import vamp.databackend.dataObjects.PersistantTrack;
 import vamp.databackend.connector.ProjectConnector;
 import vamp.databackend.connector.TrackConnector;
+import vamp.databackend.dataObjects.PersistantTrack;
 import vamp.view.dataVisualisation.BoundsInfoManager;
+import vamp.view.dataVisualisation.alignmentViewer.BlockComponent;
 import vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 
 /**
  *
- * @author ddoppmeier
+ * @author jstraube
  */
-public class SnpFrame extends javax.swing.JFrame {
+public class ReadFrame extends javax.swing.JFrame {
 
-    private static final long serialVersionUID = 24962346;
     private BoundsInfoManager boundsManager;
     private TrackOptionsPanel parent;
     private CardLayout cards;
     private PersistantTrack track;
-    private List<Snp> snps = new ArrayList<Snp>();
-    /** Creates new form SnpFrame */
-    public SnpFrame() {
+    private BlockComponent block ;
+    /** Creates new form ReadFrame */
+    public ReadFrame() {
         initComponents();
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use standard constructor!");
     }
 
-    public SnpFrame(final TrackOptionsPanel parent, BoundsInfoManager boundsManager, PersistantTrack track){
+    public ReadFrame(final TrackOptionsPanel parent, BoundsInfoManager boundsManager, PersistantTrack track) {
         initComponents();
         this.parent = parent;
         this.boundsManager = boundsManager;
         this.track = track;
         cards = (CardLayout) jPanel1.getLayout();
         this.addWindowListener(new WindowListener() {
+
             @Override
             public void windowOpened(WindowEvent e) {
             }
+
             @Override
             public void windowClosing(WindowEvent e) {
-                SnpFrame.this.parent.snpDetectionClosed();
+                ReadFrame.this.parent.readDetecionClosed();
             }
+
             @Override
             public void windowClosed(WindowEvent e) {
             }
+
             @Override
             public void windowIconified(WindowEvent e) {
             }
+
             @Override
             public void windowDeiconified(WindowEvent e) {
             }
+
             @Override
             public void windowActivated(WindowEvent e) {
             }
+
             @Override
             public void windowDeactivated(WindowEvent e) {
             }
@@ -75,76 +102,74 @@ public class SnpFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        setupPanel1 = new vamp.view.dataVisualisation.snpDetection.SetupPanel(this);
-        results1 = new vamp.view.dataVisualisation.snpDetection.Results(this);
+        readSearch1 = new vamp.view.dataVisualisation.readPosition.ReadSearch(this);
+        results1 = new vamp.view.dataVisualisation.readPosition.ReadResults(this);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle(ApplicationController.APPNAME+" SNP Detection");
+        setTitle("Read detection");
 
         jPanel1.setLayout(new java.awt.CardLayout());
-        jPanel1.add(setupPanel1, "setup");
-        jPanel1.add(results1, "results");
+        jPanel1.add(readSearch1, "searchCard");
+        jPanel1.add(results1, "resultcard");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 299, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
+    public void close() {
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private vamp.view.dataVisualisation.snpDetection.Results results1;
-    private vamp.view.dataVisualisation.snpDetection.SetupPanel setupPanel1;
+    private vamp.view.dataVisualisation.readPosition.ReadSearch readSearch1;
+    private vamp.view.dataVisualisation.readPosition.ReadResults results1;
     // End of variables declaration//GEN-END:variables
 
-    public void close() {
-
-    }
-
-    public void showPosition(int position){
+    public void showPosition(int position) {
         boundsManager.navigatorBarUpdated(position);
     }
 
-    private void detectionDone(){
+    private void detectionDone() {
         results1.showProgressBar(false);
         results1.searchDone();
     }
 
-    public void findSnps(final int num, final int percent) {
-        cards.show(jPanel1, "results");
 
+    public void findReads(final String read) {
+        cards.show(jPanel1, "resultcard");
         SwingWorker t = new SwingWorker() {
 
             @Override
-            protected Object doInBackground()  {
+            protected Object doInBackground() {
                 TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track.getId());
-                 snps = con.findSNPs(percent, num);
-                for(Snp s : snps){
-                    results1.addSnp(s);
+                List<Read> reads = con.findReads(read);
+                for (Read r : reads) {
+                    results1.addRead(r);
                 }
                 return null;
             }
 
             @Override
-            protected void done(){
-                SnpFrame.this.detectionDone();
+            protected void done() {
+                ReadFrame.this.detectionDone();
             }
         };
         t.execute();
         results1.showProgressBar(true);
     }
-
-    public ArrayList<Snp> getSNPs(){
-        return (ArrayList<Snp>) snps;
-    }
-
 }
