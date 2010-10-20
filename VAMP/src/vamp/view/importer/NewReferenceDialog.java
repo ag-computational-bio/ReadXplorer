@@ -181,11 +181,11 @@ public class NewReferenceDialog extends javax.swing.JDialog {
 
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-        //  if(getPreferences()!=null){
         Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
         String path = prefs2.get("RefGenome.Filepath", null);
+        if(path!=null){
         fc.setCurrentDirectory(new File(path));
-        // }
+        }
         int result = fc.showOpenDialog(this);
 
         File file = null;
@@ -204,6 +204,8 @@ public class NewReferenceDialog extends javax.swing.JDialog {
                 } catch (BackingStoreException ex) {
                     Logger.getLogger(NewReferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                System.err.print("NewReferenceDialog couldnt read file");
             }
         }
 
