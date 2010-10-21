@@ -71,11 +71,9 @@ public class NewExportDialog extends java.awt.Dialog {
 
         directoryLabel.setText("Directory:");
 
-        directoryField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                directoryFieldActionPerformed(evt);
-            }
-        });
+        directoryField.setText("e.g. /directory/targetDirectory/");
+        directoryField.setToolTipText("e.g. /directory/targetDirectory/");
+        directoryField.setAutoscrolls(false);
 
         exportButton.setText("Export");
         exportButton.setActionCommand("export_excel");
@@ -119,6 +117,9 @@ public class NewExportDialog extends java.awt.Dialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        directoryField.getAccessibleContext().setAccessibleName("");
+        directoryField.getAccessibleContext().setAccessibleDescription("");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -127,10 +128,6 @@ public class NewExportDialog extends java.awt.Dialog {
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
-
-    private void directoryFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_directoryFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_directoryFieldActionPerformed
 
             private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
                 if (nameField.getText().equals("") || directoryField.getText().equals("")) {
