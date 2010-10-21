@@ -388,7 +388,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
         String base = refGen.getSequence().substring(absPos - 1, absPos);
         if (absPos != relPos) {
-            System.out.println("Diffrent Pos" + "absPos" + absPos + " relPos" + relPos + base);
         }
 
         for (String type : bases) {
