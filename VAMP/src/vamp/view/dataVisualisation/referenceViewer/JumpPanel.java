@@ -1,5 +1,6 @@
 package vamp.view.dataVisualisation.referenceViewer;
 
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -115,6 +116,8 @@ public class JumpPanel extends javax.swing.JPanel {
         if (f != null) {
             jumpPosition = f.getStart();
             jTextField1.setText(String.valueOf(jumpPosition));
+            this.jumpButtonActionPerformed(null);
+
         }
 }//GEN-LAST:event_jumpListValueChanged
 
