@@ -21,6 +21,10 @@ public class LoginFrame extends javax.swing.JFrame {
     private String defaultuser;
     private String defaulthostname;
     private List<GestureListenerI> gestureListener;
+    private static String LOGIN_DATABASE_MYSQL = "login.database.mysql";
+    private static String LOGIN_USER = "login.user";
+    private static String LOGIN_HOSTNAME = "login.hostname";
+    private static String LOGIN_DATABASE_H2= "login.database.h2";
 
     /** Creates new form Login */
     public LoginFrame() {
@@ -92,7 +96,7 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
 
-        loginButton.setText("Login in");
+        loginButton.setText("Login");
         loginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loginButtonActionPerformed(evt);
@@ -212,13 +216,14 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private void setLoginData() {
         Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-        defaultuser = prefs.get("login.user", null);
-        defaultDatabaseMySQL = prefs.get("login.database.mysql", null);
-        defaulthostname = prefs.get("login.hostname", null);
-        defaultdatabaseh2 = prefs.get("login.database.h2", null);
+        defaultuser = prefs.get(LOGIN_USER , null);
+        defaultDatabaseMySQL = prefs.get(LOGIN_DATABASE_MYSQL, null);
+        defaulthostname = prefs.get(LOGIN_HOSTNAME, null);
+        defaultdatabaseh2 = prefs.get(LOGIN_DATABASE_H2, null);
         userField.setText(defaultuser);
         urlField.setText(defaulthostname);
         databaseField.setText(defaultDatabaseMySQL);
+
     }
     private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
 
@@ -239,10 +244,9 @@ public class LoginFrame extends javax.swing.JFrame {
                 if (!hostname.equals(defaulthostname) || !database.equals(defaultDatabaseMySQL) || !user.equals(defaultuser)) {
 
                     Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-                    prefs.put("login.hostname", hostname);
-                    prefs.put("login.database.mysql", database);
-                    prefs.put("login.database.h2", database);
-                    prefs.put("login.user", user);
+                    prefs.put(LOGIN_HOSTNAME, hostname);
+                    prefs.put(LOGIN_DATABASE_MYSQL, database);
+                    prefs.put(LOGIN_USER , user);
                     try {
                         prefs.flush();
                     } catch (BackingStoreException ex) {
@@ -254,10 +258,9 @@ public class LoginFrame extends javax.swing.JFrame {
             } else {
 
                 Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-                prefs.put("login.hostname", "");
-                prefs.put("login.database.mysql", "");
-                prefs.put("login.database.h2", "");
-                prefs.put("login.user", "");
+                prefs.put(LOGIN_HOSTNAME, "");
+                prefs.put(LOGIN_DATABASE_MYSQL, "");
+                prefs.put(LOGIN_USER , "");
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex) {
@@ -272,25 +275,37 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         } else {
 
-        adapter = "h2";
-        
-        String hostname = null;
+            adapter = "h2";
 
-        String database = databaseField.getText();
-        if(database.endsWith(".h2.db")){
-            database = database.replace(".h2.db", "");
-        }
+            String hostname = null;
 
-        String user = null;
+            String database = databaseField.getText();
+            if (database.endsWith(".h2.db")) {
+                database = database.replace(".h2.db", "");
+            }
 
-        String password =null;
-        //if there are new LoginData
+            String user = null;
 
-        if (jCheckBox1.isSelected()) {
-            if (!database.equals(defaultdatabaseh2) ) {
+            String password = null;
+            //if there are new LoginData
+
+            if (jCheckBox1.isSelected()) {
+                if (!database.equals(defaultdatabaseh2)) {
+
+                    Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
+                    prefs.put(LOGIN_DATABASE_H2, database);
+                    try {
+                        prefs.flush();
+                    } catch (BackingStoreException ex) {
+                        Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+
+            } else {
 
                 Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-                prefs.put("login.database.h2", database);
+                prefs.put(LOGIN_DATABASE_H2, "");
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex) {
@@ -299,22 +314,10 @@ public class LoginFrame extends javax.swing.JFrame {
             }
 
 
-        } else {
-
-            Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
-            prefs.put("login.database.h2", "");
-            try {
-                prefs.flush();
-            } catch (BackingStoreException ex) {
-                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+            // let all listeners now, they should log in now
+            for (GestureListenerI i : gestureListener) {
+                i.login(adapter, hostname, database, user, password);
             }
-        }
-
-
-        // let all listeners now, they should log in now
-        for (GestureListenerI i : gestureListener) {
-            i.login(adapter, hostname, database, user, password);
-        }
         }
     }//GEN-LAST:event_passwordFieldActionPerformed
 
@@ -337,12 +340,27 @@ public class LoginFrame extends javax.swing.JFrame {
             urlLabel.setVisible(true);
             userLabel.setVisible(true);
             dbChooseButton.setVisible(false);
+            databaseField.setText(defaultDatabaseMySQL);
         }
     }//GEN-LAST:event_dbTypeBoxActionPerformed
 
     private void dbChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbChooseButtonActionPerformed
         JFileChooser fc = new JFileChooser();
         int result = fc.showOpenDialog(this);
+
+        Preferences prefs2 = Preferences.userNodeForPackage(LoginFrame.class);
+        String db = dbTypeBox.getSelectedItem().toString();
+        if (db.equalsIgnoreCase("h2")) {
+            String path = prefs2.get(LOGIN_DATABASE_H2, null);
+            if (path != null) {
+                fc.setCurrentDirectory(new File(path));
+            }
+        } else {
+            String path = prefs2.get(LOGIN_DATABASE_MYSQL, null);
+            if (path != null) {
+                fc.setCurrentDirectory(new File(path));
+            }
+        }
         File file = null;
 
         if (result == 0) {
