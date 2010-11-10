@@ -11,7 +11,10 @@ import vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import vamp.view.dataVisualisation.basePanel.BasePanel;
 import vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -21,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import vamp.ColorProperties;
 import vamp.databackend.CoverageRequest;
@@ -40,6 +44,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     private TrackConnector trackCon;
     private PersistantCoverage cov;
     private boolean covLoaded;
+    private boolean colorChanges;
     private static int height = 300;
     private TrackInfoPanel trackInfo;
 
@@ -86,7 +91,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHints(hints);
 
-        if(covLoaded){
+        if(covLoaded || colorChanges){
             // fill and draw all coverage pathes
             Color bmC = ColorProperties.BEST_MATCH;
             Color zC = ColorProperties.PERFECT_MATCH;
@@ -231,6 +236,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     public synchronized void receiveCoverage(PersistantCoverage coverage){
         this.cov = coverage;
         trackInfo.setCoverage(cov, getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+        trackInfo.setTrackViewer(this);
         this.createCoveragePaths();
         covLoaded = true;
         this.repaint();
@@ -433,5 +439,13 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         }
 
         return label;
+    }
+
+    
+    public void colorChanges() {
+        colorChanges = true;
+       
+        repaint();
+
     }
 }
