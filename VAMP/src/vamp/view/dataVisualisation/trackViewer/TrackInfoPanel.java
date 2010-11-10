@@ -14,10 +14,12 @@ public class TrackInfoPanel extends AbstractInfoPanel {
     private static final long serialVersionUID = 72348356;
     private PersistantCoverage cov;
     private boolean mouseOverWanted;
+    private TrackViewer trackView;
 
     /** Creates new form TrackInfoPanel */
     public TrackInfoPanel() {
         initComponents();
+        //colorOptionPanel1 = new ColorOptionPanel(this);
     }
 
     /** This method is called from within the constructor to
@@ -29,24 +31,28 @@ public class TrackInfoPanel extends AbstractInfoPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        colorOptionTab = new javax.swing.JTabbedPane();
         coverageInfoPanel1 = new vamp.view.dataVisualisation.trackViewer.CoverageInfoPanel();
+        colorOptionPanel1 = new vamp.view.dataVisualisation.trackViewer.ColorOptionPanel(this);
 
         setMinimumSize(new java.awt.Dimension(237, 250));
         setPreferredSize(new java.awt.Dimension(237, 250));
 
         coverageInfoPanel1.setToolTipText("");
-        jTabbedPane1.addTab("Current position", coverageInfoPanel1);
+        colorOptionTab.addTab("Current position", coverageInfoPanel1);
+        coverageInfoPanel1.getAccessibleContext().setAccessibleParent(null);
+
+        colorOptionTab.addTab("Color option", colorOptionPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+            .addComponent(colorOptionTab, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+            .addComponent(colorOptionTab, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -129,13 +135,22 @@ public class TrackInfoPanel extends AbstractInfoPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vamp.view.dataVisualisation.trackViewer.ColorOptionPanel colorOptionPanel1;
+    private javax.swing.JTabbedPane colorOptionTab;
     private vamp.view.dataVisualisation.trackViewer.CoverageInfoPanel coverageInfoPanel1;
-    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void close() {
         cov = null;
+    }
+
+    public void setTrackViewer(TrackViewer view){
+        this.trackView = view;
+    }
+
+    public void colorChanges(){
+        trackView.colorChanges();
     }
 
 }
