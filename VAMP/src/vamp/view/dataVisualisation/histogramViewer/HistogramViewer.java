@@ -1,6 +1,5 @@
 package vamp.view.dataVisualisation.histogramViewer;
 
-import java.awt.event.ActionEvent;
 import vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -12,13 +11,11 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import vamp.ColorProperties;
