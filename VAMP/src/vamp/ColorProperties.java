@@ -7,11 +7,17 @@ import java.awt.Color;
  * @author ddoppmeier
  */
 public class ColorProperties {
-
     // track panel specific colors
     public static Color BEST_MATCH = new Color(244, 225, 49);
     public static Color N_ERROR_COLOR = new Color(180, 41, 36);
     public static Color PERFECT_MATCH = new Color(38, 180, 36);
+
+    public void setColorProperties(Color pM, Color bM, Color nError ){
+    BEST_MATCH = bM;
+    N_ERROR_COLOR = nError;
+    PERFECT_MATCH = pM;
+    }
+
     // global colors
     public static Color TRACKPANEL_SCALE_LINES = new Color(153, 153, 153);
     public static Color TRACKPANEL_MIDDLE_LINE = new Color(25, 25, 25);
@@ -34,7 +40,7 @@ public class ColorProperties {
     public static Color TRNA = new Color(8, 207, 178);
     public static Color UNDEF_FEATURE = new Color(0, 255, 77);
     // seq logo viewer specific colors
-    public static Color LOGO_MATCH = PERFECT_MATCH;
+    public static Color LOGO_MATCH = Color.GREEN;
     public static Color LOGO_A = new Color(22, 0, 255);
     public static Color LOGO_C = new Color(176, 4, 0);
     public static Color LOGO_G = new Color(37, 201, 213);
