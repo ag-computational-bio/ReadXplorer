@@ -52,6 +52,11 @@ public class JumpPanel extends javax.swing.JPanel {
 
         jumpPositionLabel.setText("Position:");
 
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 jTextField1KeyTyped(evt);
@@ -130,6 +135,10 @@ public class JumpPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, "Please enter a valid position!", "Invalid Position", JOptionPane.ERROR_MESSAGE);
         }
 }//GEN-LAST:event_jumpButtonActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        jumpButtonActionPerformed(evt);
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     private boolean isValidInput(String s){
         try {
