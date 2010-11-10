@@ -39,6 +39,7 @@ public class SnpFrame extends javax.swing.JFrame {
         this.boundsManager = boundsManager;
         this.track = track;
         cards = (CardLayout) jPanel1.getLayout();
+        this.setTitle(track.getDescription());
         this.addWindowListener(new WindowListener() {
             @Override
             public void windowOpened(WindowEvent e) {
