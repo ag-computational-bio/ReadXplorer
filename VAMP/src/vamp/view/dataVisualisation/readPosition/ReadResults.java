@@ -94,6 +94,9 @@ public class ReadResults extends javax.swing.JPanel implements ListSelectionList
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable readname;
     // End of variables declaration//GEN-END:variables
+    /*
+     * the progressBar runs while the search is done
+     */
     public void showProgressBar(boolean b) {
         if(b){
             jProgressBar1.setVisible(true);
@@ -108,6 +111,10 @@ public class ReadResults extends javax.swing.JPanel implements ListSelectionList
         readname.setEnabled(true);
     }
 
+    /*
+     * when a read position is selected the viewer has to be updated
+     * to this position
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         DefaultListSelectionModel model = (DefaultListSelectionModel) readname.getSelectionModel();
@@ -117,6 +124,9 @@ public class ReadResults extends javax.swing.JPanel implements ListSelectionList
         parent.showPosition(position);
     }
 
+    /*
+     * adds the read Data to the table model
+     */
     void addRead(Read r) {
         DefaultTableModel model = (DefaultTableModel) readname.getModel();
         Object[] rowData = new Object[5];

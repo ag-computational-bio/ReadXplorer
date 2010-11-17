@@ -120,17 +120,28 @@ public class ReadFrame extends javax.swing.JFrame {
     private vamp.view.dataVisualisation.readPosition.ReadSearch readSearch1;
     private vamp.view.dataVisualisation.readPosition.ReadResults results1;
     // End of variables declaration//GEN-END:variables
-
+/*
+ * the method showPosition is called when a read position is selected
+ * the viewer will update their view to this position
+ */
     public void showPosition(int position) {
         boundsManager.navigatorBarUpdated(position);
     }
 
+    /*
+     * the methode detectionDone is called when all data from
+     * the database is loaded
+     */
     private void detectionDone() {
         results1.showProgressBar(false);
         results1.searchDone();
     }
 
-
+/*
+ * this Method is called to detect all reads
+ * with the common readnames it should run in
+ * background so that man can work with the viewer
+ */
     public void findReads(final String read) {
         cards.show(jPanel1, "resultcard");
         SwingWorker t = new SwingWorker() {
