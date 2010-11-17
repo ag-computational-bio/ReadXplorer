@@ -27,7 +27,7 @@ public class H2SQLStatements {
             FieldNames.DIFF_CHAR+ " VARCHAR (1) NOT NULL, "+
             FieldNames.DIFF_POSITION+" BIGINT UNSIGNED NOT NULL, "+
             FieldNames.DIFF_TYPE+" TINYINT UNSIGNED NOT NULL, " +
-            FieldNames.DIFF_ORDER+" TINYINT UNSIGNED " +
+            FieldNames.DIFF_ORDER+" BIGINT UNSIGNED " +
             ") ";
 //in h2 you can ask if the index exists in mysql this did not work
     public final static String INDEX_DIFF =
@@ -64,8 +64,8 @@ public class H2SQLStatements {
             FieldNames.FEATURE_TYPE+" TINYINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_START+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_STOP+" BIGINT UNSIGNED NOT NULL, " +
-            FieldNames.FEATURE_LOCUS+" VARCHAR (100), " +
-            FieldNames.FEATURE_PRODUCT+" VARCHAR (200), " +
+            FieldNames.FEATURE_LOCUS+" VARCHAR (1000), " +
+            FieldNames.FEATURE_PRODUCT+" VARCHAR (2000), " +
             FieldNames.FEATURE_ECNUM+" VARCHAR (20), " +
             FieldNames.FEATURE_STRAND+" TINYINT NOT NULL " +
             ") ";
@@ -82,10 +82,15 @@ public class H2SQLStatements {
             FieldNames.MAPPING_START+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_STOP+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_DIRECTION+" TINYINT NOT NULL, " +
-            FieldNames.MAPPING_COUNT+" SMALLINT UNSIGNED NOT NULL, " +
-            FieldNames.MAPPING_NUM_OF_ERRORS+" TINYINT UNSIGNED NOT NULL, " +
+            FieldNames.MAPPING_COUNT+" BIGINT UNSIGNED NOT NULL, " +
+            FieldNames.MAPPING_NUM_OF_ERRORS+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_BEST_MAPPING+" TINYINT UNSIGNED NOT NULL " +
             ") ";
+
+     public final static String UPDATE_MAPPINGS_DATATYPE =
+            "ALTER TABLE "+FieldNames.TABLE_MAPPINGS+" " +
+            " ALTER COLUMN " +
+            FieldNames.MAPPING_COUNT+" BIGINT UNSIGNED NOT NULL " ;
 
         public final static String INDEX_MAPPINGS =
              "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON "+FieldNames.TABLE_MAPPINGS+" "
@@ -124,8 +129,10 @@ public class H2SQLStatements {
             FieldNames.RUN_ID+" BIGINT PRIMARY KEY, " +
             FieldNames.RUN_DESCRIPTION+" VARCHAR (100) NOT NULL, " +
             FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL, "+
-            FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+" BIGINT UNSIGNED NOT NULL"+
+            FieldNames.RUN_NUMBER_OF_READS+" BIGINT UNSIGNED, "+
+            FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+" BIGINT UNSIGNED "+
             ")";
+
 
     public final static String SETUP_SEQUENCE =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_SEQUENCE+" " +
@@ -269,9 +276,18 @@ public class H2SQLStatements {
             FieldNames.RUN_ID+", "+
             FieldNames.RUN_DESCRIPTION+", " +
             FieldNames.RUN_TIMESTAMP+", " +
+            FieldNames.RUN_NUMBER_OF_READS+", " +
             FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+" " +
             ") " +
-            "VALUES (?,?,?,?)";
+            "VALUES (?,?,?,?,?)";
+
+        public final static String UPDATE_RUN_VALUES =
+            "UPDATE "+FieldNames.TABLE_RUN+" " +
+            "SET " +
+            FieldNames.RUN_NUMBER_OF_READS+" = ?, " +
+            FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+"  = ?" +
+            "WHERE " +
+                FieldNames.RUN_ID+" = ? " ;
 
     public final static String INSERT_SEQUENCE =
             "INSERT INTO "+FieldNames.TABLE_SEQUENCE+" " +
@@ -363,6 +379,13 @@ public class H2SQLStatements {
                 FieldNames.TABLE_REF_GEN+" " +
             "WHERE "+
                 FieldNames.REF_GEN_ID+" = ?";
+
+    
+      public final static String ADD_COLUMN_TO_TABLE_RUN =
+            "ALTER TABLE "+
+                FieldNames.TABLE_RUN+" " +
+            "ADD "+
+                FieldNames.RUN_NUMBER_OF_READS+" BIGINT UNSIGNED";
 
 
     // statements to fetch data from database
@@ -473,7 +496,7 @@ public class H2SQLStatements {
                 FieldNames.TRACK_REFGEN+" = ? ";
 
 
-    public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
+public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT " +
                 "M."+FieldNames.MAPPING_ID+", "+
                 "M."+FieldNames.MAPPING_BEST_MAPPING+", "+
@@ -508,7 +531,18 @@ public class H2SQLStatements {
                     FieldNames.MAPPING_START+" <= ? " +
                 ") AS M " +
             "LEFT JOIN " +
-                FieldNames.TABLE_DIFF+" AS D " +
+               "("
+               + "SELECT "+
+               FieldNames.DIFF_CHAR+", "+
+               FieldNames.DIFF_ORDER+", "+
+               FieldNames.DIFF_POSITION+", "+
+               FieldNames.DIFF_TYPE+", "+
+               FieldNames.DIFF_MAPPING_ID+" "+
+               "FROM "+
+                FieldNames.TABLE_DIFF+" " +
+               "WHERE " +
+               FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "+
+                ") AS D " +
             "on " +
                 "M."+FieldNames.MAPPING_ID+" = D."+FieldNames.DIFF_MAPPING_ID;
 
@@ -554,7 +588,7 @@ public class H2SQLStatements {
                 "D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" and " +
                 "M."+FieldNames.MAPPING_TRACK+" = ?";
 
-    public final static String FETCH_NUM_OF_READS_FOR_RUN =
+    public final static String FETCH_NUM_OF_READS_FOR_RUN_CALCULATE =
             "SELECT " +
                 "COUNT(R."+FieldNames.READ_ID+") as NUM " +
             "FROM "+
@@ -564,9 +598,17 @@ public class H2SQLStatements {
                 "S."+FieldNames.SEQUENCE_RUN+" = ? and " +
                 "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
 
+        public final static String FETCH_NUM_OF_READS_FOR_RUN =
+            "SELECT " +
+                FieldNames.RUN_NUMBER_OF_READS+" as NUM " +
+            "FROM "+
+                FieldNames.TABLE_RUN+
+            " WHERE "+
+               FieldNames.RUN_ID+" = ?" ;
+
     public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN =
             "SELECT " +
-                FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ +" as NUM " +
+                 "R."+FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ +" as NUM " +
             "FROM "+
                 FieldNames.TABLE_RUN+" as R " +
             "WHERE "+
@@ -608,7 +650,8 @@ public class H2SQLStatements {
                 "S."+FieldNames.STATICS_TRACK+" = ?";
 
          public final static String FETCH_COMPLETE_COVERAGE_OF_GENOME =
-            "SELECT " +FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME+" as COVERED "+
+            "SELECT " +
+            FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME+" as COVERED "+
             " FROM "+
                 FieldNames.TABLE_STATICS+" as S " +
             "WHERE "+
@@ -640,7 +683,7 @@ public class H2SQLStatements {
 
 
 
-    public final static String FETCH_SNP_DATA_FOR_TRACK =
+    public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVALL =
             "SELECT A."+FieldNames.DIFF_POSITION+", " +
                     "A."+FieldNames.DIFF_CHAR+", " +
                     "A."+FieldNames.MAPPING_DIRECTION+", " +

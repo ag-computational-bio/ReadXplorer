@@ -3,7 +3,7 @@ package vamp.parsing.mappings;
 import vamp.parsing.common.*;
 import java.util.HashMap;
 import vamp.parsing.common.ParsingException;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -11,6 +11,8 @@ import vamp.importer.TrackJob;
  */
 public interface MappingParserI extends ParserI {
 
-    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException;
+    public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException;
+
+    public ParsedRun parseInputForReadData(TrackJobs trackJob)throws ParsingException;
 
 }

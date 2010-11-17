@@ -92,7 +92,7 @@ public class FieldNames {
     public final static String RUN_DESCRIPTION = "DESCRIPTION";
     public final static String RUN_TIMESTAMP = "CREATIONTIME";
     public final static String RUN_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
-
+    public final static String RUN_NUMBER_OF_READS = "NUMBER_OF_READS";
     // read table fields
     public final static String READ_ID = "ID";
     public final static String READ_NAME = "NAME";

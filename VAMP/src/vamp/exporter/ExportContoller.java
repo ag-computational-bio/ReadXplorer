@@ -22,21 +22,15 @@ package vamp.exporter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.spi.DirectoryManager;
 import vamp.view.dataVisualisation.snpDetection.Snp;
-import javax.swing.SwingWorker;
+
 /**
  *
  * @author jstraube
@@ -110,19 +104,8 @@ public class ExportContoller implements ActionListener {
         /* start exporter */
         if (exporter != null) {
             if (exporter.readyToExport()) {
-
-               
                 try {
-                   
-                 File tempDir = new File(System.getProperty("java.io.tmpdir"));
-   
                      exportFile = exporter.writeFile(tempFile, filename);
-
-                    // FileWriter f = new FileWriter(exportFile);
-                  //    BufferedWriter writter = new BufferedWriter(f);
-
-                   //   writter.write(cbuf, off, len);
-
 
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(this.getClass().getName()).log(Level.WARNING, " Export failed!");
@@ -153,17 +136,6 @@ public class ExportContoller implements ActionListener {
     public int getSize() {
         return (int) exportFile.length();
     }
-
-    public void writeFile(FileWriter fileWriter)
-            throws IOException {
-        byte[] content = new byte[(int) exportFile.length()];
-        FileInputStream inputStream = new FileInputStream(
-                exportFile);
-        final int bytesRead = inputStream.read(content);
-        inputStream.close();
-        fileWriter.write("");
-    }
-
     public void setSnpData(List<Snp> snps){
     this.snps = snps;
     }

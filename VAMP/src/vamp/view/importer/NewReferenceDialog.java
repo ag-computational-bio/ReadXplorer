@@ -16,6 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import vamp.parsing.common.ParserI;
 import vamp.parsing.reference.ReferenceParserI;
 import vamp.parsing.reference.embl.biojava.BioJavaEmblParser;
+import vamp.parsing.reference.fasta.FastaReferenceParser;
 import vamp.parsing.reference.genbank.biojava.BioJavaGenBankParser;
 
 /**
@@ -27,7 +28,7 @@ public class NewReferenceDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 8362375;
     private File refGenFile = null;
     private JobManagerI taskManager;
-    private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaEmblParser(), new BioJavaGenBankParser()};
+    private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaEmblParser(), new BioJavaGenBankParser(), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
     /** Creates new form NewReferenceGenomeDialog */

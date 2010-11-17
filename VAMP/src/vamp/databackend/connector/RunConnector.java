@@ -55,6 +55,25 @@ public class RunConnector {
         int num = 0;
 
         try {
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_READS_FOR_RUN);
+            fetch.setLong(1, runID);
+
+            ResultSet rs = fetch.executeQuery();
+            if(rs.next()){
+                num = rs.getInt("NUM");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+        public int getNumberOfReadsCalculate(){
+        int num = 0;
+
+        try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_RUN);
             fetch.setLong(1, runID);
 
@@ -73,6 +92,24 @@ public class RunConnector {
     public int getNumberOfUniqueSequences(){
         int num = 0;
         try {
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN);
+            fetch.setLong(1, runID);
+
+            ResultSet rs = fetch.executeQuery();
+            if(rs.next()){
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+
+    public int getNumberOfUniqueSequencesCalculate(){
+        int num = 0;
+        try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN);
             fetch.setLong(1, runID);
 
@@ -85,6 +122,20 @@ public class RunConnector {
         }
 
         return num;
+    }
+
+    public void updateTableRun(int numOfReads, int numOfUniqueSeq){
+      try {
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_RUN_VALUES);
+
+            fetch.setInt(1, numOfReads);
+            fetch.setInt(1, numOfUniqueSeq);
+            fetch.setLong(3, runID);
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
 }

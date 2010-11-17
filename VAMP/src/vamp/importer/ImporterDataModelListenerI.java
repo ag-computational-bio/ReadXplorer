@@ -6,13 +6,11 @@ package vamp.importer;
  */
 public interface ImporterDataModelListenerI {
 
-    public void runJobAdded(RunJob runJob);
 
-    public void runJobRemoved(RunJob runJob);
 
-    public void trackJobAdded(TrackJob trackJob);
+    public void trackJobAddedRun(TrackJobs trackJob);
 
-    public void trackJobRemoved(TrackJob trackJob);
+    public void trackJobRemovedRun(TrackJobs trackJob);
 
     public void refGenJobAdded(ReferenceJob refGenJob);
 

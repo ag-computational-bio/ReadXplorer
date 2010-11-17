@@ -81,7 +81,9 @@ public class TrackConnector {
             fetch.setLong(1, trackID);
             fetch.setInt(2, from);
             fetch.setInt(3, to);
-
+            fetch.setInt(4, from);
+            fetch.setInt(5, to);
+            
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 // mapping data
@@ -211,6 +213,26 @@ public class TrackConnector {
         return num;
     }
 
+        public int getNumOfMappedSequencesCalculate() {
+        int num = 0;
+        PreparedStatement fetch;
+        try {
+
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE);
+
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
     public int getNumOfUniqueBmMappings() {
 
         int numOfBmMappings = 0;
@@ -236,6 +258,29 @@ public class TrackConnector {
         return numOfBmMappings;
     }
 
+        public int getNumOfUniqueBmMappingsCalculate() {
+
+        int numOfBmMappings = 0;
+        PreparedStatement fetch;
+        try {
+
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE);
+
+            fetch.setLong(1, trackID);
+
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                numOfBmMappings = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return numOfBmMappings;
+    }
+
+
     public int getNumOfUniqueMappings() {
         int num = 0;
         PreparedStatement fetch;
@@ -258,6 +303,63 @@ public class TrackConnector {
         return num;
     }
 
+        public int getNumOfUniqueMappingsCalculate() {
+        int num = 0;
+        PreparedStatement fetch;
+        try {
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE);
+                fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+        public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete){
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
+        try {
+            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
+            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATICS_ID);
+
+            // get latest id for track
+            long id = 0;
+            ResultSet rs = latestID.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("LATEST_ID");
+            }
+            id++;
+            int covPerf = (int) (coveragePerf / 100 * genomeSize);
+             int covBM = (int) (coverageBM / 100 * genomeSize);
+              int covComplete = (int) (coverageComplete/ 100 * genomeSize);
+            // store track in table
+            insertStatics.setLong(1, id);
+            insertStatics.setLong(2, trackID);
+            insertStatics.setInt(3, mappings);
+            insertStatics.setInt(4, perfectMappings);
+            insertStatics.setInt(5, bmMappings);
+            insertStatics.setInt(6, mappedSeq);
+            insertStatics.setInt(7,covPerf);
+            insertStatics.setInt(8,covBM);
+            insertStatics.setInt(9,covComplete);
+            insertStatics.execute();
+
+            insertStatics.close();
+            latestID.close();
+
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
+
+        }
+
     public int getNumOfPerfectUniqueMappings() {
         int num = 0;
         PreparedStatement fetch;
@@ -268,6 +370,26 @@ public class TrackConnector {
             } else {
                 fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK);
             }
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+        public int getNumOfPerfectUniqueMappingsCalculate() {
+        int num = 0;
+        PreparedStatement fetch;
+
+        try {
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE);
+
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -432,28 +554,44 @@ public class TrackConnector {
         return reads;
     }
 
+    /*
+     * this methods searches for SNPs in the whole genome
+     * to prevent that there is a big join between the table diff and mapping
+     * we make some small mapping
+     * we take 50 entrys of the diff table and 400 (200 from the left and 200 from the right)
+     * from the table mapping we have to do this so that we dont miss any mapping that have a diff in this 50 positions
+     */
     public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
         ArrayList<Snp> snps = new ArrayList<Snp>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
-        int from = 1;
-        int to = 100000;
+        int fromDiff = 1;
+        int toDiff = 50;
+        int fromMapping = 1;
+        int toMapping = 200;
         try {
-            while (genomeSize > from) {
-                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK);
+            while (genomeSize > fromDiff) {
+            //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
+                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVALL);
                 fetch.setLong(1, trackID);
-                fetch.setLong(2, from);
-                fetch.setLong(3, to);
-                fetch.setLong(4, from);
-                fetch.setLong(5, to);
-                fetch.setLong(6, trackID);
+                 fetch.setLong(2, fromMapping);
+                fetch.setLong(3, toMapping);
+                fetch.setLong(4, fromDiff);
+                fetch.setLong(5, toDiff);
+               fetch.setLong(6, trackID);
 
-                from = from + 300000;
-                to = to + 300000;
-                if (to > genomeSize) {
-                    to = genomeSize;
+                fromDiff = fromDiff + 50;
+                toDiff = toDiff + 50;
+                if (toDiff > genomeSize) {
+                    toDiff = genomeSize;
                 }
 
-
+                if(fromDiff >200){
+                    fromMapping = fromDiff -200;
+                }
+                toMapping = toDiff + 200;
+                 if (toMapping > genomeSize) {
+                    toMapping = genomeSize;
+                }
                 ResultSet rs = fetch.executeQuery();
 
                 while (rs.next()) {
@@ -473,7 +611,7 @@ public class TrackConnector {
                     addValues(covData, direction, cov, replicates, position, base, isGenomeGap);
 
                 }
-            }
+          }
 
             snps.addAll(filterSnps(covData, percentageThreshold, absThreshold));
 
@@ -522,7 +660,7 @@ public class TrackConnector {
         PreparedStatement fetch;
         try {
             if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK);
+                fetch = con.prepareStatement(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
             } else {
                 fetch = con.prepareStatement(H2SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
             }
@@ -541,6 +679,28 @@ public class TrackConnector {
         return percentage;
 
     }
+ public double getPercentRefGenPerfectCoveredCalculate() {
+        double percentage = 0;
+        double absValue = 0;
+        PreparedStatement fetch;
+        try {   
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK);
+
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                absValue = rs.getInt("COVERED");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        percentage = absValue / genomeSize * 100;
+        return percentage;
+
+    }
+
 
     public double getPercentRefGenBmCovered() {
         double percentage = 0;
@@ -548,7 +708,7 @@ public class TrackConnector {
         PreparedStatement fetch;
         try {
             if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK);
+                fetch = con.prepareStatement(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME);
             } else {
                 fetch = con.prepareStatement(H2SQLStatements.FETCH_BM_COVERAGE_OF_GENOME);
             }
@@ -566,13 +726,34 @@ public class TrackConnector {
         return percentage;
     }
 
+        public double getPercentRefGenBmCoveredCalculate() {
+        double percentage = 0;
+        double absValue = 0;
+        PreparedStatement fetch;
+        try {
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK);
+
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                absValue = rs.getInt("COVERED");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        percentage = absValue / genomeSize * 100;
+        return percentage;
+    }
+
     public double getPercentRefGenNErrorCovered() {
         double percentage = 0;
         double absValue = 0;
         PreparedStatement fetch;
         try {
             if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_COVERED_POSITIONS);
+                fetch = con.prepareStatement(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
             } else {
                 fetch = con.prepareStatement(H2SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME);
             }
@@ -590,5 +771,26 @@ public class TrackConnector {
         return percentage;
     }
 
+        public double getPercentRefGenNErrorCoveredCalculate() {
+        double percentage = 0;
+        double absValue = 0;
+        PreparedStatement fetch;
+        try {
+
+          fetch = con.prepareStatement(SQLStatements.FETCH_NUM_COVERED_POSITIONS);
+
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                absValue = rs.getInt("COVERED");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        percentage = absValue / genomeSize * 100;
+        return percentage;
+    }
 
 }

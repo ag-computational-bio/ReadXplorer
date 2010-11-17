@@ -1,12 +1,12 @@
 package vamp.view.importer;
 
-import vamp.importer.TrackJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -14,7 +14,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener{
 
-    private List<TrackJob> tracks;
+    private List<TrackJobs> tracks;
     private ImportSetupCard parent;
     public final static long serialVersionUID = 774292377;
 
@@ -28,26 +28,25 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         this.init();
     }
 
-    public TrackJob getSelectedItem() {
+    public TrackJobs getSelectedItem() {
         return tracks.get(jTable1.getSelectedRow());
     }
 
     private void init(){
-        tracks = new ArrayList<TrackJob>();
+        tracks = new ArrayList<TrackJobs>();
         initComponents();
     }
 
-    public void add(TrackJob trackJob){
+    public void add(TrackJobs trackJob){
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.addRow(new Object[]{
             trackJob.getFile().getName(),
             trackJob.getDescription(),
-            trackJob.getRunJob().getDescription(),
             trackJob.getRefGen().getDescription()});
         tracks.add(trackJob);
     }
 
-    public void remove(TrackJob trackJob){
+    public void remove(TrackJobs trackJob){
         int index = tracks.indexOf(trackJob);
         tracks.remove(trackJob);
 

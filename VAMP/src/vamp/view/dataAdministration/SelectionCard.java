@@ -1,8 +1,7 @@
 package vamp.view.dataAdministration;
 
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -25,19 +24,15 @@ public class SelectionCard extends javax.swing.JPanel {
         refGenView1.deselectRefGen(refGen);
     }
 
-    void deselectRun(RunJob runJob) {
-        runView1.deselectRun(runJob);
-    }
+
+
 
     void refGenJobAdded(ReferenceJob refGenJob) {
         refGenView1.refGenJobAdded(refGenJob);
     }
 
-    void runJobAdded(RunJob runJob) {
-        runView1.runJobAdded(runJob);
-    }
 
-    void trackJobAdded(TrackJob trackJob) {
+    void trackJobAdded(TrackJobs trackJob) {
         mappingView1.trackJobAdded(trackJob);
     }
 
@@ -54,14 +49,11 @@ public class SelectionCard extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         refGenView1 = new vamp.view.dataAdministration.ReferenceView();
         refGenView1.setDataAdminPanel(this);
-        runView1 = new vamp.view.dataAdministration.RunView();
-        runView1.setDataAdminPanel(this);
         mappingView1 = new vamp.view.dataAdministration.TrackView();
         mappingView1.setDataAdminPanel(this);
         jButton1 = new javax.swing.JButton();
 
         jTabbedPane1.addTab("References", refGenView1);
-        jTabbedPane1.addTab("Runs", runView1);
         jTabbedPane1.addTab("Tracks", mappingView1);
 
         jButton1.setText("Next");
@@ -79,7 +71,7 @@ public class SelectionCard extends javax.swing.JPanel {
                 .addContainerGap(395, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addContainerGap())
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,7 +93,6 @@ public class SelectionCard extends javax.swing.JPanel {
     private javax.swing.JTabbedPane jTabbedPane1;
     private vamp.view.dataAdministration.TrackView mappingView1;
     private vamp.view.dataAdministration.ReferenceView refGenView1;
-    private vamp.view.dataAdministration.RunView runView1;
     // End of variables declaration//GEN-END:variables
 
     public void removeRefGenJob(ReferenceJob refGenJob){
@@ -112,19 +103,11 @@ public class SelectionCard extends javax.swing.JPanel {
         view.unRemoveRefGenJob(refGenJob);
     }
 
-    public void removeRunJob(RunJob runJob){
-        view.removeRunJob(runJob);
-    }
-
-    public void unRemoveRunJob(RunJob runJob){
-        view.unRemoveRunJob(runJob);
-    }
-
-    public void removeTrackJob(TrackJob trackJob){
+    public void removeTrackJob(TrackJobs trackJob){
         view.removeTrackJob(trackJob);
     }
 
-    public void unRemoveTrackJob(TrackJob trackJob){
+    public void unRemoveTrackJob(TrackJobs trackJob){
         view.unRemoveTrackJob(trackJob);
     }
 }

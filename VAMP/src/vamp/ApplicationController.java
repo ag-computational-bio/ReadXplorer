@@ -20,7 +20,7 @@ public class ApplicationController implements GestureListenerI {
     private List<RunningTaskI> runningTasks;
     private ViewController viewController;
     private static ApplicationController appCon;
-    public static String APPNAME = "VAMP Version 1.1";
+    public static String APPNAME = "VAMP Version 1.2";
     
 
     private ApplicationController() {

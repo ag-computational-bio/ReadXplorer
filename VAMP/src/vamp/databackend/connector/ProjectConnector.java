@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.parsing.common.ParsedRun;
-import vamp.parsing.common.ParsedSequence;
+import vamp.parsing.common.ParsedReadname;
 import vamp.parsing.common.ParsedReference;
 import vamp.parsing.common.CoverageContainer;
 import vamp.parsing.common.ParsedDiff;
@@ -131,7 +131,7 @@ public class ProjectConnector {
             this.setupDatabase();
         } else {
             this.adapter = adapter;
-            this.url = "jdbc:" + adapter + ":" + database;
+            this.url = "jdbc:" + adapter + ":" + database+";MULTI_THREADED=TRUE";
             this.connectH2DataBase(url);
             this.setupDatabaseH2();
 
@@ -202,6 +202,7 @@ public class ProjectConnector {
             con.prepareStatement(SQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(SQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(SQLStatements.SETUP_RUN).execute();
+            con.prepareStatement(SQLStatements.SETUP_STATICS).execute();
             con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();
             con.prepareStatement(SQLStatements.SETUP_READS).execute();
 
@@ -334,7 +335,8 @@ public class ProjectConnector {
             insertRun.setLong(1, runID);
             insertRun.setString(2, run.getDescription());
             insertRun.setTimestamp(3, run.getTimestamp());
-            insertRun.setInt(4, run.getSequences().size());
+            insertRun.setInt(4, run.getSizeofReadCollection());
+            insertRun.setInt(5, run.getSequences().size());
             insertRun.execute();
 
             insertRun.close();
@@ -362,20 +364,20 @@ public class ProjectConnector {
             }
 
             // store sequences
-            Collection<ParsedSequence> sequences = run.getSequences();
+            Collection<ParsedReadname> reads = run.getReads();
             int batchCounter = 1;
 
-            for (Iterator<ParsedSequence> it = sequences.iterator(); it.hasNext(); batchCounter++) {
-                ParsedSequence seq = it.next();
+            for (Iterator<ParsedReadname> it = reads.iterator(); it.hasNext(); batchCounter++) {
+                ParsedReadname read = it.next();
                 seqID++;
-                seq.setID(seqID);
+                read.setID(seqID);
                 insertSequence.setLong(1, seqID);
                 insertSequence.setLong(2, run.getID());
                 insertSequence.addBatch();
 
                 if (batchCounter == SEQUENCE_BATCH_SIZE) {
                     insertSequence.executeBatch();
-                    batchCounter = 1;
+                   batchCounter = 1;
                 }
             }
 
@@ -403,19 +405,19 @@ public class ProjectConnector {
             if (rs.next()) {
                 readID = rs.getLong("LATEST_ID");
             }
-
+            
             int batchCounter = 1;
-            for (Iterator<ParsedSequence> seqIt = run.getSequences().iterator(); seqIt.hasNext();) {
-                ParsedSequence seq = seqIt.next();
-                for (Iterator<String> readIt = seq.getReads().iterator(); readIt.hasNext(); batchCounter++) {
+            for (Iterator<ParsedReadname> readMapIt = run.getReads().iterator(); readMapIt.hasNext();) {
+                ParsedReadname readMap = readMapIt.next();
+                for (Iterator<String> readIt = readMap.getReads().iterator(); readIt.hasNext(); batchCounter++) {
                     readID++;
                     insertRead.setLong(1, readID);
                     insertRead.setString(2, readIt.next());
-                    insertRead.setLong(3, seq.getID());
+                    insertRead.setLong(3, readMap.getID());
                     insertRead.addBatch();
 
                     if (batchCounter == READNAME_BATCH_SIZE) {
-                        batchCounter = 1;
+                          batchCounter = 1;
                         insertRead.executeBatch();
                     }
                 }
@@ -436,18 +438,17 @@ public class ProjectConnector {
     }
 
     public long addRun(ParsedRun run) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"" + run.getDescription() + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"" + run.getDescription() + "to " + adapter);
 
         if (adapter.equalsIgnoreCase("mysql")) {
             try {
                 con.setAutoCommit(false);
                 this.lockRunDomainTables();
                 this.disableRunIndices();
-
                 storeRun(run);
                 storeSequences(run);
                 storeReads(run);
-
+                run.deleteMap();
                 this.enableRunIndices();
                 this.unlockTables();
                 con.setAutoCommit(true);
@@ -461,11 +462,10 @@ public class ProjectConnector {
         } else {
             try {
                 con.setAutoCommit(false);
-
                 storeRunH2(run);
                 storeSequences(run);
                 storeReads(run);
-
+                run.deleteMap();
                 con.setAutoCommit(true);
 
             } catch (SQLException ex) {
@@ -721,7 +721,7 @@ public class ProjectConnector {
                 coveragePerf ++;
                 }
                 if(cov.getBestMappingForwardCoverage(pos)+ cov.getBestMappingReverseCoverage(pos)!= 0){
-                     coverageBM ++ ;
+                  coverageBM ++ ;
                 }
                 if(cov.getNErrorMappingsReverseCoverage(pos)+ cov.getNErrorMappingsForwardCoverage(pos)!= 0){
                   coverageComplete++;
@@ -915,6 +915,7 @@ public class ProjectConnector {
                     insertMapping.setInt(7, m.getErrors());
                     insertMapping.setInt(8, sequenceID);
                     insertMapping.setLong(9, track.getID());
+
                     insertMapping.addBatch();
 
                     if (batchCounter == MAPPING_BATCH_SIZE) {
@@ -930,6 +931,7 @@ public class ProjectConnector {
             insertMapping.executeBatch();
 
         } catch (SQLException ex) {
+
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
@@ -1006,6 +1008,7 @@ public class ProjectConnector {
                             batchCounter = 0;
                         }
                     }
+                    mappingsIt.remove();
                 }
             }
 
@@ -1046,6 +1049,7 @@ public class ProjectConnector {
 
             this.storeTrack(track, refGenID, runID);
             this.storeCoverage(track);
+            this.storeStatics(track);
             this.storeMappings(track);
             this.storeDiffs(track);
 
@@ -1193,7 +1197,7 @@ public class ProjectConnector {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), e);
         }
 
-
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
 
         return refGens;
     }

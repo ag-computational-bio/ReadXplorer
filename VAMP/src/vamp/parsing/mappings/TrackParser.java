@@ -1,9 +1,12 @@
 package vamp.parsing.mappings;
 
 import java.util.HashMap;
-import vamp.importer.TrackJob;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vamp.importer.TrackJobs;
 import vamp.parsing.common.CoverageContainer;
 import vamp.parsing.common.ParsedMappingContainer;
+import vamp.parsing.common.ParsedRun;
 import vamp.parsing.common.ParsedTrack;
 import vamp.parsing.common.ParsingException;
 
@@ -14,7 +17,7 @@ import vamp.parsing.common.ParsingException;
 public class TrackParser implements TrackParserI {
 
     @Override
-    public ParsedTrack parseMappings(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException {
+    public ParsedTrack parseMappings(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException {
 
         // parse mapping files and store them in appropriate source objects
         MappingParserI mappingp = trackJob.getParser();
@@ -31,6 +34,15 @@ public class TrackParser implements TrackParserI {
         track.setTimestamp(trackJob.getTimestamp());
 
         return track;
+    }
+
+    @Override
+    public ParsedRun parseMappingforReadData(TrackJobs trackJob) throws ParsingException {
+
+        MappingParserI mappingp = trackJob.getParser();
+        ParsedRun run= mappingp.parseInputForReadData(trackJob);
+        return run;
+
     }
 
 }

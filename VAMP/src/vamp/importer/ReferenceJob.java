@@ -18,7 +18,7 @@ public class ReferenceJob {
     private ReferenceParserI parser;
     private String description;
     private Timestamp timestamp;
-    private List<TrackJob> tracks;
+    private List<TrackJobs> trackswithoutRunjob;
 
     public ReferenceJob(Long id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp){
         this.id = id;
@@ -27,29 +27,34 @@ public class ReferenceJob {
         this.parser = parser;
         this.description = description;
         this.timestamp = timestamp;
-        tracks = new ArrayList<TrackJob>();
+   
+        trackswithoutRunjob = new ArrayList<TrackJobs>();
     }
 
-    public void registerTrack(TrackJob t){
-        tracks.add(t);
+
+    public void registerTrackWithoutRunJob(TrackJobs t){
+        trackswithoutRunjob.add(t);
     }
 
-    public void unregisterTrack(TrackJob t){
-        while(tracks.contains(t)){
-            tracks.remove(t);
+
+        public void unregisterTrackwithoutRunJob(TrackJobs t){
+        while(trackswithoutRunjob.contains(t)){
+            trackswithoutRunjob.remove(t);
         }
     }
     
-    public boolean hasRegisteredTracks(){
-        if(tracks.size() > 0 ){
+
+        public boolean hasRegisteredTrackswithoutrRunJob(){
+        if(trackswithoutRunjob.size() > 0 ){
             return true;
         } else {
             return false;
         }
     }
 
-    public List<TrackJob> getDependentTracks(){
-        return tracks;
+
+        public List<TrackJobs> getDependentTrackswithoutRunjob(){
+        return trackswithoutRunjob;
     }
 
     public String getName(){

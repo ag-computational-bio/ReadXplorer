@@ -5,7 +5,7 @@ import java.util.List;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -15,20 +15,20 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
 
     private static final long serialVersionUID = 762498252;
 
-    private List<TrackJob> jobs;
+    private List<TrackJobs> jobs;
     private SelectionCard adminPanel;
 
     /** Creates new form MappingView */
     public TrackView() {
         initComponents();
-        jobs = new ArrayList<TrackJob>();
+        jobs = new ArrayList<TrackJobs>();
     }
 
     public void setDataAdminPanel(SelectionCard adminPanel){
         this.adminPanel = adminPanel;
     }
 
-    void trackJobAdded(TrackJob trackJob) {
+    void trackJobAdded(TrackJobs trackJob) {
         jobs.add(trackJob);
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.addRow(new Object[]{false, trackJob.getDescription(), trackJob.getTimestamp()});
@@ -98,7 +98,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
         int column = e.getColumn();
 
         if(row >= 0 && column >= 0){
-            TrackJob r = jobs.get(row);
+            TrackJobs r = jobs.get(row);
             DefaultTableModel model = (DefaultTableModel) e.getSource();
             boolean selected = (Boolean) model.getValueAt(row, column);
 

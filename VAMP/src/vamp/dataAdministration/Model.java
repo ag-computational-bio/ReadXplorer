@@ -9,8 +9,7 @@ import vamp.databackend.dataObjects.PersistantTrack;
 import vamp.databackend.dataObjects.PersistentRun;
 import vamp.databackend.connector.ProjectConnector;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -19,35 +18,25 @@ import vamp.importer.TrackJob;
 public class Model implements ModelInterface, JobManager {
 
     private List<ModelListenerI> listeners;
-    private List<RunJob> runsToDelete;
-    private List<TrackJob> tracksToDelete;
+    private List<TrackJobs> tracksToDelete;
     private List<ReferenceJob> genomesToDelete;
 
 
 
     public Model(){
         listeners = new ArrayList<ModelListenerI>();
-        runsToDelete = new ArrayList<RunJob>();
-        tracksToDelete = new ArrayList<TrackJob>();
+        tracksToDelete = new ArrayList<TrackJobs>();
         genomesToDelete = new ArrayList<ReferenceJob>();
     }
 
     @Override
     public void fetchNecessaryData(){
   
-        HashMap<Long, RunJob> indexedRuns = new HashMap<Long, RunJob>();
+      
         HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
-
+        
         List<PersistentRun> dbRuns = ProjectConnector.getInstance().getRuns();
-        for(Iterator<PersistentRun> it = dbRuns.iterator(); it.hasNext() ;){
-            PersistentRun dbRun = it.next();
-            // File and parser parameter meaningles in this context
-            RunJob r = new RunJob(dbRun.getId(), null, dbRun.getDescription(), null, dbRun.getTimestamp());
-            indexedRuns.put(r.getID(), r);
-            for(ModelListenerI l : listeners){
-                l.runJobAdded(r);
-            }
-        }
+
         
 
         List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
@@ -66,15 +55,13 @@ public class Model implements ModelInterface, JobManager {
             PersistantTrack dbTrack = it.next();
 
             // File and parser, refgenjob, runjob parameters meaningles in this context
-            TrackJob t = new TrackJob(dbTrack.getId(), null, dbTrack.getDescription(),
-                    indexedRuns.get(dbTrack.getRunID()), indexedGens.get(dbTrack.getRefGenID()),
+            TrackJobs t = new TrackJobs(dbTrack.getId(), null, dbTrack.getDescription(),
+                    indexedGens.get(dbTrack.getRefGenID()),
                     null, dbTrack.getTimestamp());
 
             // register dependent tracks at genome and run
             ReferenceJob gen = indexedGens.get(dbTrack.getRefGenID());
-            gen.registerTrack(t);
-            RunJob run = indexedRuns.get(dbTrack.getRunID());
-            run.registerTrack(t);
+            gen.registerTrackWithoutRunJob(t);
 
             for(ModelListenerI l : listeners){
                 l.trackJobsAdded(t);
@@ -105,57 +92,36 @@ public class Model implements ModelInterface, JobManager {
         }
     }
 
-    @Override
-    public void removeRunJob(RunJob runJob) {
-        runsToDelete.add(runJob);
-    }
 
-    @Override
-    public void unRemoveRunJob(RunJob runJob) {
-        if(runsToDelete.contains(runJob)){
-            runsToDelete.remove(runJob);
-        }
-    }
-
-    @Override
-    public void removeTrackJob(TrackJob trackJob) {
-        tracksToDelete.add(trackJob);
-
-        // unregister dependencies
-        trackJob.getRefGen().unregisterTrack(trackJob);
-        trackJob.getRunJob().unregisterTrack(trackJob);
-    }
-
-    @Override
-    public void unRemoveTrackJob(TrackJob trackJob) {
-        if(tracksToDelete.contains(trackJob)){
-            tracksToDelete.remove(trackJob);
-
-            // re-register dependencies
-            trackJob.getRefGen().registerTrack(trackJob);
-            for(ModelListenerI l : listeners){
-                l.deselectRefGen(trackJob.getRefGen());
-            }
-            trackJob.getRunJob().registerTrack(trackJob);
-            for(ModelListenerI l : listeners){
-                l.deselectRun(trackJob.getRunJob());
-            }
-        }
-    }
-
-    @Override
-    public List<TrackJob> getScheduledTrackJobs() {
-        return tracksToDelete;
-    }
-
-    @Override
-    public List<RunJob> getScheduledRunJobs() {
-        return runsToDelete;
-    }
 
     @Override
     public List<ReferenceJob> getScheduledRefGenJobs() {
         return genomesToDelete;
+    }
+    @Override
+    public void removeTrackJobRun(TrackJobs trackJob) {
+                tracksToDelete.add(trackJob);
+
+        // unregister dependencies
+        trackJob.getRefGen().unregisterTrackwithoutRunJob(trackJob);
+    }
+
+    @Override
+    public void unRemoveTrackJobRun(TrackJobs trackJob) {
+               if(tracksToDelete.contains(trackJob)){
+            tracksToDelete.remove(trackJob);
+
+            // re-register dependencies
+            trackJob.getRefGen().registerTrackWithoutRunJob(trackJob);
+            for(ModelListenerI l : listeners){
+                l.deselectRefGen(trackJob.getRefGen());
+            }
+        }
+    }
+
+    @Override
+    public List<TrackJobs> getScheduledTrackJobsRun() {
+         return tracksToDelete;
     }
     
 }

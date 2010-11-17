@@ -11,8 +11,7 @@ import vamp.RunningTaskI;
 import vamp.databackend.connector.StorageException;
 import vamp.databackend.connector.ProjectConnector;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -22,20 +21,18 @@ public class DeletionThread extends SwingWorker implements RunningTaskI{
 
     private DataAdminController c;
     private List<ReferenceJob> gens;
-    private List<TrackJob> tracks;
-    private List<RunJob> runs;
+    private List<TrackJobs> tracks;
     private Set<ReferenceJob> invalidGens;
-    private Set<RunJob> invalidRuns;
 
 
-    public DeletionThread(DataAdminController c, List<RunJob> runs, List<ReferenceJob> gens, List<TrackJob> tracks){
+
+    public DeletionThread(DataAdminController c, List<ReferenceJob> gens, List<TrackJobs> tracks){
         super();
         this.c = c;
-        this.runs = runs;
         this.gens = gens;
         this.tracks = tracks;
         invalidGens = new HashSet<ReferenceJob>();
-        invalidRuns = new HashSet<RunJob>();
+ 
     }
 
     @Override
@@ -45,8 +42,8 @@ public class DeletionThread extends SwingWorker implements RunningTaskI{
 
         if(!tracks.isEmpty()){
             c.updateDataAdminStatus("Starting deletion of tracks:");
-            for(Iterator<TrackJob> it = tracks.iterator(); it.hasNext(); ){
-                TrackJob t = it.next();
+            for(Iterator<TrackJobs> it = tracks.iterator(); it.hasNext(); ){
+                TrackJobs t = it.next();
                 try {
                     ProjectConnector.getInstance().deleteTrack(t.getID());
                     c.updateDataAdminStatus("Completed deletion of\""+t.getDescription()+"\"");
@@ -54,28 +51,9 @@ public class DeletionThread extends SwingWorker implements RunningTaskI{
                 } catch (StorageException ex) {
                     c.updateDataAdminStatus("Deletion of \""+t.getDescription()+"\" failed");
                     // if this track fails, do not delete runs and genomes that are referenced by this track
-                    invalidRuns.add(t.getRunJob());
+                  //  invalidRuns.add(t.getRunJob());
                     invalidGens.add(t.getRefGen());
                     Logger.getLogger(DeletionThread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            c.updateDataAdminStatus("");
-        }
-
-        if(!runs.isEmpty()){
-            c.updateDataAdminStatus("Starting deletion of runs:");
-            for(Iterator<RunJob> it = runs.iterator(); it.hasNext(); ){
-                RunJob r = it.next();
-                if(invalidRuns.contains(r)){
-                    c.updateDataAdminStatus("Because of a failure during earlier deletion of a track, that references this dataset, \""+r.getDescription()+"\" could not be deleted");
-                } else {
-                    try {
-                        ProjectConnector.getInstance().deleteRun(r.getID());
-                        c.updateDataAdminStatus("Completed deletion of\""+r.getDescription()+"\"");
-                    } catch (StorageException ex) {
-                        c.updateDataAdminStatus("Deletion of \""+r.getDescription()+"\" failed");
-                        Logger.getLogger(DeletionThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
                 }
             }
             c.updateDataAdminStatus("");

@@ -111,7 +111,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
             if(selected){
                 // check if it is allowed to be deleted
-                if(r.getDependentTracks().isEmpty()){
+                if(r.getDependentTrackswithoutRunjob().isEmpty()){
                     adminPanel.removeRefGenJob(r);
                 } else {
                     JOptionPane.showMessageDialog(this, "Cannot mark reference for deletion,\nas long as it is referenced by a track.\nResolve dependencies first!", "Unresolved Dependencies", JOptionPane.ERROR_MESSAGE);

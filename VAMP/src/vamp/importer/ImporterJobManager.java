@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import vamp.parsing.mappings.MappingParserI;
-import vamp.parsing.reads.RunParserI;
 import vamp.parsing.reference.ReferenceParserI;
 
 /**
@@ -16,15 +15,16 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
 
     private List<ImporterDataModelListenerI> listeners;
 
-    private List<TrackJob> trackJobs;
+
+    private List<TrackJobs> trackJobsrun;
     private List<ReferenceJob> refGenJobs;
-    private List<RunJob> runJobs;
 
     public ImporterJobManager(){
         listeners = new ArrayList<ImporterDataModelListenerI>();
-        trackJobs = new ArrayList<TrackJob>();
+ 
+        trackJobsrun = new ArrayList<TrackJobs>();
         refGenJobs = new ArrayList<ReferenceJob>();
-        runJobs = new ArrayList<RunJob>();
+
     }
 
 
@@ -48,32 +48,17 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
         }
     }
 
-    @Override
-    public void removeRunTask(RunJob runJob) {
-
-        runJobs.remove(runJob);
-        for(ImporterDataModelListenerI l : listeners){
-            l.runJobRemoved(runJob);
-        }
-        
-    }
 
     @Override
-    public void removeTrackTask(TrackJob trackJob) {
-        trackJobs.remove(trackJob);
-
-        // unregister from associated runs
-        for(RunJob r : runJobs){
-            r.unregisterTrack(trackJob);
-        }
-
+    public void removeTrackTask(TrackJobs trackJob) {
+        trackJobsrun.remove(trackJob);
         // unregister from associated genomes
         for(ReferenceJob r : refGenJobs){
-            r.unregisterTrack(trackJob);
+            r.unregisterTrackwithoutRunJob(trackJob);
         }
 
         for(ImporterDataModelListenerI l : listeners){
-            l.trackJobRemoved(trackJob);
+            l.trackJobRemovedRun(trackJob);
         }
     }
 
@@ -87,43 +72,25 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
         }
     }
 
-    @Override
-    public void createRunTask(RunParserI parser, File readFile, String description) {
-        // since this is for new runs (to be imported) id cannot be assigned.
-        // even if set, it would ne ignored
-        RunJob r = new RunJob(null, readFile, description, parser, new Timestamp(System.currentTimeMillis()));
-        runJobs.add(r);
-        for(ImporterDataModelListenerI l : listeners){
-            l.runJobAdded(r);
-        }
-    }
 
-    @Override
-    public void createTrackTask(MappingParserI parser, File mappingFile, String description, RunJob runJob, ReferenceJob refGenJob) {
-        TrackJob t = new TrackJob(null, mappingFile, description, runJob, refGenJob, parser, new Timestamp(System.currentTimeMillis()));
-        runJob.registerTrack(t);
-        refGenJob.registerTrack(t);
-
-        trackJobs.add(t);
-        for(ImporterDataModelListenerI l : listeners){
-            l.trackJobAdded(t);
-        }
-    }
-
-    @Override
-    public List<RunJob> getRunJobList(){
-        return runJobs;
-    }
-    
     @Override
     public List<ReferenceJob> getRefGenJobList(){
         return refGenJobs;
     }
     
     @Override
-    public List<TrackJob> getTrackJobList(){
-        return trackJobs;
+    public List<TrackJobs> getTrackJobListRun(){
+        return trackJobsrun;
     }
 
+    @Override
+    public void createTrackTaskWithoutRunJob(MappingParserI parser, File mappingFile, String description, ReferenceJob refGenJob) {
+        TrackJobs t2 = new TrackJobs(null, mappingFile, description, refGenJob, parser, new Timestamp(System.currentTimeMillis()));
+         refGenJob.registerTrackWithoutRunJob(t2);
+                 trackJobsrun.add(t2);
+        for(ImporterDataModelListenerI l : listeners){
+            l.trackJobAddedRun(t2);
+        }
+    }
 
 }

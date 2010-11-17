@@ -9,8 +9,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import vamp.ApplicationController;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -32,7 +31,7 @@ public class View extends javax.swing.JFrame implements ViewI, ModelListenerI {
 
     public void showOverviewCard() {
         CardLayout c = (CardLayout) jPanel1.getLayout();
-        overviewCard1.showGenereateOverview(jobManager.getScheduledRefGenJobs(), jobManager.getScheduledRunJobs(), jobManager.getScheduledTrackJobs());
+        overviewCard1.showGenereateOverview(jobManager.getScheduledRefGenJobs(),  jobManager.getScheduledTrackJobsRun());
         c.show(jPanel1, "overview");
     }
 
@@ -157,13 +156,9 @@ public class View extends javax.swing.JFrame implements ViewI, ModelListenerI {
         dataAdminPanel1.refGenJobAdded(refGenJob);
     }
 
-    @Override
-    public void runJobAdded(RunJob runJob) {
-        dataAdminPanel1.runJobAdded(runJob);
-    }
 
     @Override
-    public void trackJobsAdded(TrackJob trackJob) {
+    public void trackJobsAdded(TrackJobs trackJob) {
         dataAdminPanel1.trackJobAdded(trackJob);
     }
 
@@ -176,20 +171,14 @@ public class View extends javax.swing.JFrame implements ViewI, ModelListenerI {
         jobManager.unRemoveRefGenJob(refGenJob);
     }
 
-    public void removeRunJob(RunJob runJob){
-        jobManager.removeRunJob(runJob);
+
+
+    public void removeTrackJob(TrackJobs trackJob){
+        jobManager.removeTrackJobRun(trackJob);
     }
 
-    public void unRemoveRunJob(RunJob runJob){
-        jobManager.unRemoveRunJob(runJob);
-    }
-
-    public void removeTrackJob(TrackJob trackJob){
-        jobManager.removeTrackJob(trackJob);
-    }
-
-    public void unRemoveTrackJob(TrackJob trackJob){
-        jobManager.unRemoveTrackJob(trackJob);
+    public void unRemoveTrackJob(TrackJobs trackJob){
+        jobManager.unRemoveTrackJobRun(trackJob);
     }
 
     @Override
@@ -197,10 +186,6 @@ public class View extends javax.swing.JFrame implements ViewI, ModelListenerI {
         dataAdminPanel1.deselectRefGen(refGen);
     }
 
-    @Override
-    public void deselectRun(RunJob runJob) {
-        dataAdminPanel1.deselectRun(runJob);
-    }
 
     @Override
     public void startingDeletion() {

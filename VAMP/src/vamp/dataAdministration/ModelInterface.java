@@ -2,8 +2,7 @@ package vamp.dataAdministration;
 
 import java.util.List;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -17,9 +16,8 @@ public interface ModelInterface {
 
     public void fetchNecessaryData();
 
-    public List<TrackJob> getScheduledTrackJobs();
+    public List<TrackJobs> getScheduledTrackJobsRun();
 
-    public List<RunJob> getScheduledRunJobs();
 
     public List<ReferenceJob> getScheduledRefGenJobs();
 

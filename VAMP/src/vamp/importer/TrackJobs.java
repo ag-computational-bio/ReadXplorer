@@ -1,3 +1,4 @@
+
 package vamp.importer;
 
 import java.io.File;
@@ -6,26 +7,24 @@ import vamp.parsing.mappings.MappingParserI;
 
 /**
  *
- * @author ddoppmeier
+ * @author jstraube
  */
-public class TrackJob {
-    
+public class TrackJobs {
+
     private File file;
     private String description;
-    private RunJob runJob;
-    private ReferenceJob refGen;
     private Timestamp timestamp;
     private MappingParserI parser;
     private Long trackID;
+    private ReferenceJob refGen;
 
-    public TrackJob(Long trackID, File file, String description, RunJob runJob, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp){
+    public TrackJobs(Long trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp){
         this.trackID = trackID;
         this.file = file;
         this.description = description;
-        this.runJob = runJob;
-        this.refGen = refGen;
         this.timestamp = timestamp;
         this.parser = parser;
+        this.refGen = refGen;
     }
 
     public MappingParserI getParser(){
@@ -36,17 +35,17 @@ public class TrackJob {
         return description;
     }
 
+        public ReferenceJob getRefGen() {
+        return refGen;
+    }
     public File getFile() {
         return file;
     }
 
-    public ReferenceJob getRefGen() {
-        return refGen;
+    public void setRefGen(ReferenceJob refGen) {
+        this.refGen = refGen;
     }
 
-    public RunJob getRunJob() {
-        return runJob;
-    }
 
     public Timestamp getTimestamp(){
         return timestamp;
@@ -64,6 +63,5 @@ public class TrackJob {
     public void setPersistant(Long trackID) {
         this.trackID = trackID;
     }
-
 
 }

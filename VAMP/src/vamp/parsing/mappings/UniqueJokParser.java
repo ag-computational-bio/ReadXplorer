@@ -1,5 +1,6 @@
 package vamp.parsing.mappings;
 
+import vamp.importer.TrackJobs;
 import vamp.parsing.common.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.parsing.common.ParsingException;
-import vamp.importer.TrackJob;
 
 /**
  * This class is a slightly different version of the JokParser. In contrast to
@@ -33,7 +33,7 @@ public class UniqueJokParser implements MappingParserI{
 
 
     @Override
-    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException{
+    public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException{
 
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
 
@@ -47,7 +47,7 @@ public class UniqueJokParser implements MappingParserI{
                 lineno++;
 
                 // tokenize input line
-                String[] tokens = line.split("\\t", 8);
+                String[] tokens = line.split("\\s", 8);
 
                 // cast tokens
                 String readname = tokens[0];
@@ -221,6 +221,43 @@ public class UniqueJokParser implements MappingParserI{
     @Override
     public String[] getFileExtensions() {
         return fileExtension;
+    }
+
+
+    @Override
+    public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
+                ParsedRun run = new ParsedRun(fileDescription);
+        try {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \""+trackJob.getFile().getAbsolutePath()+"\"");
+            BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
+
+            int lineno = 0;
+            String line = null;
+
+            while ((line = br.readLine()) != null) {
+                lineno++;
+                // tokenize input line
+                String[] tokens = line.split("\\t", 8);
+
+                // cast tokens
+                String readname = tokens[0];
+                String readSeq = tokens[4];
+                String editReadSeq = readSeq;
+                if(editReadSeq.contains("_")){
+                    editReadSeq = editReadSeq.replaceAll("_", "");
+                }
+                editReadSeq = editReadSeq.toLowerCase();
+                run.addReadData(editReadSeq, readname);
+            }
+            br.close();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \""+trackJob.getFile().getAbsolutePath()+"\"");
+
+        } catch (IOException ex){
+            throw new ParsingException(ex);
+        }
+        run.setTimestamp(trackJob.getTimestamp());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed");
+        return run;
     }
 
     private class DiffAndGapResult{

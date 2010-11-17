@@ -35,7 +35,6 @@
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="refGenLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="readLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="mappingFileLabel" min="-2" max="-2" attributes="0"/>
                           <Component id="descriptionLabel" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -48,7 +47,6 @@
                               <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="descriptionField" alignment="0" pref="269" max="32767" attributes="0"/>
-                          <Component id="readBox" alignment="0" pref="269" max="32767" attributes="0"/>
                           <Component id="refGenBox" alignment="0" pref="269" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -76,12 +74,7 @@
                   <Component id="descriptionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="descriptionField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="readLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="readBox" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="refGenLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="refGenBox" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -90,7 +83,7 @@
               <Component id="seperator" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="addButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="28" max="32767" attributes="0"/>
+              <EmptySpace pref="37" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -118,21 +111,6 @@
     <Component class="javax.swing.JLabel" name="descriptionLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Description:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JComboBox" name="readBox">
-      <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="0"/>
-        </Property>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox(runjobs)"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.swing.JLabel" name="readLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Read data:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="descriptionField">

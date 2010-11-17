@@ -127,6 +127,8 @@ public class BioJavaGenBankParser implements ReferenceParserI{
                         type = FeatureType.MI_RNA;
                     } else if(parsedType.equalsIgnoreCase("gene")){
                         type = FeatureType.GENE;
+                        } else if(parsedType.equalsIgnoreCase("mRNA")){
+                        type = FeatureType.M_RNA;
                     } else {
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown feature "+parsedType);
                     }

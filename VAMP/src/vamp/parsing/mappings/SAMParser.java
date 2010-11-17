@@ -28,11 +28,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vamp.databackend.connector.ReferenceConnector;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 import vamp.parsing.common.ParsedDiff;
 import vamp.parsing.common.ParsedMapping;
 import vamp.parsing.common.ParsedMappingContainer;
 import vamp.parsing.common.ParsedReferenceGap;
+import vamp.parsing.common.ParsedRun;
 import vamp.parsing.common.ParsingException;
 import vamp.databackend.connector.ProjectConnector;
 
@@ -43,7 +44,7 @@ import vamp.databackend.connector.ProjectConnector;
 public class SAMParser implements MappingParserI {
 
     private static String name = "SAM Parser";
-    private static String[] fileExtension = new String[]{"sam"};
+    private static String[] fileExtension = new String[]{"sam","SAM","Sam"};
     private static String fileDescription = "SAM Output";
     private HashMap<Integer, Integer> gapOrderIndex;
     private ArrayList<String> unmappedReads = new ArrayList<String>();
@@ -55,7 +56,7 @@ public class SAMParser implements MappingParserI {
     }
 
     @Override
-    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException {
+    public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException {
         String readname = null;
         String position = null;
         String refName = null;
@@ -96,7 +97,7 @@ public class SAMParser implements MappingParserI {
                     //  String mappingQuality = readSeqLine[4];
                     cigar = readSeqLine[5];
                     //   String inferredInsertSize = readSeqLine[8];
-                    readSeqwithoutGaps = readSeqLine[9];
+                    readSeqwithoutGaps = readSeqLine[9].toLowerCase();
                  //   System.out.println("rSeq " + readname + "flag " + flag + "refName " + refName + "pos " + position + readSeqwithoutGaps);
                     //System.out.println("rSeq " + readname );
                     if (isMappedSequence(flag, position)) {
@@ -113,21 +114,19 @@ public class SAMParser implements MappingParserI {
                             stop = countStopPosition(cigar, start, readSeqwithoutGaps.length());
 
                         } else {
-
                             stop = start + readSeqwithoutGaps.length()-1;
-
                         }
 
                         //   System.out.println("pos" + start + "-" + stop);
-                        refSeqwithoutgaps = refSeqfulllength.substring(start, stop+1);
+                          //saruman starts genome at 0 other algorithms like bwa start genome at 1
+                       // refSeqwithoutgaps = refSeqfulllength.substring(start, stop+1).toLowerCase();
+                        refSeqwithoutgaps = refSeqfulllength.substring(start-1, stop).toLowerCase();
 
                         if (cigar.contains("D") || cigar.contains("I")) {
                             //fallen gleiche refs raus?
-
                             refSeq = createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
                             readSeq = mappedRefAndReadPlusGaps.get(refSeq);
                         } else {
-
                             refSeq = refSeqwithoutgaps;
                             readSeq = readSeqwithoutGaps;
                         }
@@ -184,12 +183,15 @@ public class SAMParser implements MappingParserI {
                                     + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
                                     + "Please make sure you are referencing the correct read data set!");
                         }
-
-                        DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start+1 , direction);
+                        //saruman starts genome at 0 other algorithms like bwa start genome at 1
+                        // DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start+1 , direction);
+                        DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start , direction);
                         List<ParsedDiff> diffs = result.getDiffs();
                         List<ParsedReferenceGap> gaps = result.getGaps();
+                        //saruman starts genome at 0 other algorithms like bwa start genome at 1
+                       // ParsedMapping mapping = new ParsedMapping(start+1 , stop+1, direction, diffs, gaps, errors);
 
-                        ParsedMapping mapping = new ParsedMapping(start+1 , stop+1, direction, diffs, gaps, errors);
+                        ParsedMapping mapping = new ParsedMapping(start , stop, direction, diffs, gaps, errors);
                         int seqID = readnameToSequenceID.get(readname);
                         mappingContainer.addParsedMapping(mapping, seqID);
 
@@ -306,7 +308,7 @@ public class SAMParser implements MappingParserI {
         int numberofDeletion = 0;
         int pos = 0;
         int readPos = 0;
-
+        mappedRefAndReadPlusGaps = new HashMap<String, String>();
         for (char c : cigar.toCharArray()) {
             int index = pos;
 
@@ -347,6 +349,7 @@ public class SAMParser implements MappingParserI {
                         }
                         numberofDeletion--;
                         newreadSeq = readSeq;
+                      //  Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Case Deletion"+ "read " + readSeq + "ref  " +refSeq);
                     }
 
                 } else if (c == 'I') {
@@ -362,6 +365,7 @@ public class SAMParser implements MappingParserI {
                             refSeq = refSeq.substring(0, refpos).concat("_");
                         }
                         newRefSeqwithGaps = refSeq;
+                       
                         numberOfInsertions--;
                     }
                 } else if (c == 'M') {
@@ -375,7 +379,7 @@ public class SAMParser implements MappingParserI {
             pos++;
         }
         //  System.out.println("ref  " + newRefSeqwithGaps);
-        //  System.out.println("read " + newreadSeq);
+       //  System.out.println("read " + newreadSeq);
         mappedRefAndReadPlusGaps.put(newRefSeqwithGaps, newreadSeq);
         return newRefSeqwithGaps;
 
@@ -489,6 +493,45 @@ public class SAMParser implements MappingParserI {
         return fileExtension;
     }
 
+    @Override
+    public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
+       String readname = null;
+       String position = null;
+        int flag = 0;
+
+        String readSeqwithoutGaps = null;
+        ParsedRun run = new ParsedRun(fileDescription);
+        try {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing run from file \"" + trackJob.getFile().getAbsolutePath() + "\"");
+            BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
+
+            int lineno = 0;
+            String line = null;
+            while ((line = br.readLine()) != null) {
+
+                lineno++;
+                //parsing the SAM format in following parts
+                if (!line.startsWith("@")) {
+
+                    String[] readSeqLine = line.split("\\s+");
+                    readname = readSeqLine[0];
+                    flag = Integer.parseInt(readSeqLine[1]);
+                    position = readSeqLine[3];
+                    readSeqwithoutGaps = readSeqLine[9].toLowerCase();
+                    if (isMappedSequence(flag, position)) {
+                        run.addReadData(readSeqwithoutGaps, readname);
+                    }
+                }
+            }
+                            } catch (IOException ex) {
+            throw new ParsingException(ex);
+        }
+        run.setTimestamp(trackJob.getTimestamp());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Read data successfully parsed");
+        return run;
+
+    }
+
     private class DiffAndGapResult {
 
         private List<ParsedDiff> diffs;
@@ -508,12 +551,48 @@ public class SAMParser implements MappingParserI {
         }
     }
 
-    public boolean snpHasStretch(String read, int snp){
-        String re = read.substring(snp, snp+6);
-        boolean hasStretch = false;
-        if(re.matches("agtc{3,*}")){
-            hasStretch = true;
+        public boolean snpHasStretch(String genome, int snp) {
+          String beforeSNP = genome.substring(0,1);
+
+          if(snp==1){
+              beforeSNP = genome.substring(snp-1,snp);
+          }
+          if(snp==2){
+              beforeSNP = genome.substring(snp-2,snp);
+          }
+          if(snp==3){
+              beforeSNP = genome.substring(snp-3,snp);
+          }
+            if(snp >=4){
+           beforeSNP = genome.substring(snp-4,snp);
+            }
+          System.out.println("before" + beforeSNP);
+            String afterSNP = genome.substring(snp,snp+4);
+            System.out.println("afterSnp:" +afterSNP);
+            boolean hasStretch = false;
+            if (beforeSNP.matches("[atgc]{4,8}") || afterSNP.matches("[atgc]{4,8}")) {
+                hasStretch = true;
+            }
+            if(beforeSNP.matches("[atgc]{1,8}") && afterSNP.matches("[atgc]{3,8}")){
+                System.out.println("1-3"+hasStretch);
+            }
+            if(beforeSNP.matches("[atgc]{3,8}") ){
+                String charBefore = beforeSNP.substring(beforeSNP.length()-1, beforeSNP.length());
+                System.out.println("charbefore " + charBefore);
+                String charAfter = afterSNP.substring(0, 1);
+                String regex = charBefore.concat("{1}");
+                if(charAfter.matches(regex)){
+                System.out.println("3-1"+hasStretch);
+                }
+            }
+            if(afterSNP.matches("[atgc]{3,8}") ){
+                String charBefore = beforeSNP.substring(beforeSNP.length()-1, beforeSNP.length());
+                String regex = afterSNP.substring(0, 1).concat("{1}");
+                if(charBefore.matches(regex)){
+                System.out.println("3-1"+hasStretch +" " + regex);
+                }
+            }
+            System.out.println(hasStretch);
+            return hasStretch;
         }
-        return hasStretch;
-    }
 }

@@ -189,7 +189,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     }
 
     private void showDataAdminItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showDataAdminItemActionPerformed
-        viewController.newAdminDialog();
+        //viewController.newAdminDialog();
     }//GEN-LAST:event_showDataAdminItemActionPerformed
 
     private void openRefgenItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openRefgenItemActionPerformed

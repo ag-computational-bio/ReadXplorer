@@ -3,7 +3,6 @@ package vamp.view.importer;
 import java.awt.Component;
 import vamp.importer.JobManagerI;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,7 +34,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
     private JobManagerI taskManager;
-    private RunJob[] runjobs;
     private ReferenceJob[] refGenJobs;
     private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMParser(), new BAMParser()};
     private MappingParserI currentParser;
@@ -44,39 +42,13 @@ public class NewTrackDialog extends javax.swing.JDialog {
     public NewTrackDialog(java.awt.Frame parent, JobManagerI taskManager) {
         super(parent, true);
         this.taskManager = taskManager;
-        this.runjobs = this.getRunJobs();
+      //  this.runjobs = this.getRunJobs();
         this.refGenJobs = this.getRefGenJobs();
         initComponents();
         // choose the default parser. first entry is shown in combobox by default
         currentParser = parsers[0];
     }
 
-    private RunJob[] getRunJobs() {
-
-        // create list to collect run jobs. including new runs and already persistant runs
-        List<RunJob> runlist = new ArrayList<RunJob>();
-
-        // get list of already persistant runs from db and add them to list
-        List<PersistentRun> dbRuns = ProjectConnector.getInstance().getRuns();
-        for (Iterator<PersistentRun> it = dbRuns.iterator(); it.hasNext();) {
-            PersistentRun r = it.next();
-            // file and parser parameter are not needed, because this runjob
-            // is created for linking from track to runID and not for
-            // storing of reads itself (they are already persistent)
-            runlist.add(new RunJob(r.getId(), null, r.getDescription(), null, r.getTimestamp()));
-        }
-
-        // add new runs (to be imported) to the list
-        runlist.addAll(taskManager.getRunJobList());
-
-        // add all runJobs to array (for use in comboboxes for example)
-        RunJob[] runs = new RunJob[runlist.size()];
-        for (int i = 0; i < runlist.size(); i++) {
-            runs[i] = runlist.get(i);
-        }
-
-        return runs;
-    }
 
     private ReferenceJob[] getRefGenJobs() {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
@@ -110,8 +82,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
         mappingFileField = new javax.swing.JTextField();
         chooseButton = new javax.swing.JButton();
         descriptionLabel = new javax.swing.JLabel();
-        readBox = new javax.swing.JComboBox(runjobs);
-        readLabel = new javax.swing.JLabel();
         descriptionField = new javax.swing.JTextField();
         refGenLabel = new javax.swing.JLabel();
         refGenBox = new javax.swing.JComboBox(refGenJobs);
@@ -136,8 +106,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
         });
 
         descriptionLabel.setText("Description:");
-
-        readLabel.setText("Read data:");
 
         refGenLabel.setText("Reference genome:");
 
@@ -179,7 +147,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel1)
                             .addComponent(refGenLabel)
-                            .addComponent(readLabel)
                             .addComponent(mappingFileLabel)
                             .addComponent(descriptionLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -190,7 +157,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chooseButton))
                             .addComponent(descriptionField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
-                            .addComponent(readBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 269, Short.MAX_VALUE)
                             .addComponent(refGenBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 269, Short.MAX_VALUE))))
                 .addContainerGap())
         );
@@ -210,11 +176,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionLabel)
                     .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(readLabel)
-                    .addComponent(readBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refGenLabel)
                     .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -222,7 +184,7 @@ public class NewTrackDialog extends javax.swing.JDialog {
                 .addComponent(seperator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(addButton)
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -232,14 +194,14 @@ public class NewTrackDialog extends javax.swing.JDialog {
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
 
         String description = descriptionField.getText();
-        RunJob runJob = (RunJob) readBox.getSelectedItem();
+      //  RunJob runJob = (RunJob) readBox.getSelectedItem();
         ReferenceJob refGenJob = (ReferenceJob) refGenBox.getSelectedItem();
 
-        if (mappingFile == null || runJob == null || refGenJob == null || description.equals("")) {
+        if (mappingFile == null || refGenJob == null || description.equals("")) {
             JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
         } else {
             this.setVisible(false);
-            taskManager.createTrackTask(currentParser, mappingFile, description, runJob, refGenJob);
+            taskManager.createTrackTaskWithoutRunJob(currentParser, mappingFile, description, refGenJob);
         }
 }//GEN-LAST:event_addButtonActionPerformed
 
@@ -248,8 +210,11 @@ public class NewTrackDialog extends javax.swing.JDialog {
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
         Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
+
         String path = prefs2.get("RefGenome.Filepath", null);
+        if(path!=null){
         fc.setCurrentDirectory(new File(path));
+        }
         int result = fc.showOpenDialog(this);
 
         File file = null;
@@ -268,6 +233,8 @@ public class NewTrackDialog extends javax.swing.JDialog {
                 } catch (BackingStoreException ex) {
                     Logger.getLogger(NewTrackDialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                System.err.print("NewTrackDialog couldnt read file");
             }
         }
     }//GEN-LAST:event_chooseButtonActionPerformed
@@ -291,8 +258,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField mappingFileField;
     private javax.swing.JLabel mappingFileLabel;
-    private javax.swing.JComboBox readBox;
-    private javax.swing.JLabel readLabel;
     private javax.swing.JComboBox refGenBox;
     private javax.swing.JLabel refGenLabel;
     private javax.swing.JSeparator seperator;

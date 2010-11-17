@@ -2,8 +2,7 @@ package vamp.view.importer;
 
 import java.awt.Component;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -32,23 +31,16 @@ public class ImportSetupCard extends javax.swing.JPanel {
         refGenJobView1.remove(refGenJob);
     }
 
-    void runJobAdded(RunJob runJob) {
-        runJobView1.add(runJob);
-    }
-
-    void runJobRemoved(RunJob runJob) {
-        runJobView1.remove(runJob);
-    }
 
     void setRemoveButtonEnabled(boolean b) {
         removeJob.setEnabled(b);
     }
 
-    void trackJobAdded(TrackJob trackJob) {
+    void trackJobAdded(TrackJobs trackJob) {
         trackJobView1.add(trackJob);
     }
 
-    void trackJobRemoved(TrackJob trackJob) {
+    void trackJobRemoved(TrackJobs trackJob) {
         trackJobView1.remove(trackJob);
     }
 
@@ -63,7 +55,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         refGenJobView1 = new vamp.view.importer.RefJobView(this);
-        runJobView1 = new vamp.view.importer.RunJobView(this);
         trackJobView1 = new vamp.view.importer.TrackJobView(this);
         newJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
@@ -74,7 +65,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
             }
         });
         jTabbedPane1.addTab("References", refGenJobView1);
-        jTabbedPane1.addTab("Runs", runJobView1);
         jTabbedPane1.addTab("Tracks", trackJobView1);
 
         newJob.setText("Add");
@@ -96,7 +86,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(283, Short.MAX_VALUE)
                 .addComponent(removeJob)
@@ -121,8 +111,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
         if(c == null){
         } else if(c instanceof RefJobView) {
             view.showNewRefGenDialog();
-        } else if(c instanceof RunJobView){
-            view.showNewRunDialog();
         } else if(c instanceof TrackJobView){
             view.showNewTrackDialog();
         }
@@ -133,8 +121,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         if(c == null){
         } else if(c instanceof RefJobView) {
             view.removeRefGenJob(refGenJobView1.getSelectedItem());
-        } else if(c instanceof RunJobView){
-            view.removeRunJob(runJobView1.getSelectedItem());
+      
         } else if(c instanceof TrackJobView){
             view.removeTrackJob(trackJobView1.getSelectedItem());
         }
@@ -148,14 +135,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
             if(refGenJobView1.IsRowSelected()){
                 isSelected = true;
             }
-        } else if(c instanceof RunJobView){
-            if(runJobView1.IsRowSelected()){
-                isSelected = true;
-            }
-        } else if(c instanceof TrackJobView){
-            if(runJobView1.IsRowSelected()){
-                isSelected = true;
-            }
         }
 
         if(isSelected){
@@ -163,7 +142,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
         } else{
             setRemoveButtonEnabled(false);
         }
-        
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
 
@@ -172,7 +150,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
     private javax.swing.JButton newJob;
     private vamp.view.importer.RefJobView refGenJobView1;
     private javax.swing.JButton removeJob;
-    private vamp.view.importer.RunJobView runJobView1;
     private vamp.view.importer.TrackJobView trackJobView1;
     // End of variables declaration//GEN-END:variables
 

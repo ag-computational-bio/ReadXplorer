@@ -12,8 +12,8 @@ public interface ImporterDataModelI {
 
     public List<ReferenceJob> getRefGenJobList();
 
-    public List<RunJob> getRunJobList();
 
-    public List<TrackJob> getTrackJobList();
+    public List<TrackJobs> getTrackJobListRun();
+
 
 }

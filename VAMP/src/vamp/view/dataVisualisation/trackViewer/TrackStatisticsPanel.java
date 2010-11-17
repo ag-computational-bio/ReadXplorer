@@ -218,16 +218,54 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
             @Override
             public void run() {
                 RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId());
-                int numOfReads = runC.getNumberOfReads();
+
                 int numUniqueReads = runC.getNumberOfUniqueSequences();
+                if(numUniqueReads == 0 ){
+                numUniqueReads = runC.getNumberOfUniqueSequencesCalculate();
+                
+                }
+                int numOfReads = runC.getNumberOfReads();
+                if(numOfReads == 0 ){
+                numOfReads = runC.getNumberOfReadsCalculate();
+                runC.updateTableRun(numOfReads, numUniqueReads);
+                }
+
+
                 int numOfMappedUniqueReads = trackCon.getNumOfMappedSequences();
+                
+                if(numOfMappedUniqueReads == 0){
+                    numOfMappedUniqueReads = trackCon.getNumOfMappedSequencesCalculate();
+                }
                 int numOfNonMappedUniqueReads = numUniqueReads - numOfMappedUniqueReads;
+
                 int numOfMappings = trackCon.getNumOfUniqueMappings();
+                if(numOfMappings == 0){
+                   numOfMappings = trackCon.getNumOfUniqueMappingsCalculate();
+                }
                 int numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappings();
+                if(numOfPerfectMappings == 0){
+                    numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();
+                }
+
                 int numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappings();
+                if(numOfBestMatchMappings == 0){
+                    numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappingsCalculate();
+                }
+
                 double percentagePerfectCovered = trackCon.getPercentRefGenPerfectCovered();
+                if(percentagePerfectCovered ==0){
+                    percentagePerfectCovered = trackCon.getPercentRefGenPerfectCoveredCalculate();
+                }
                 double percentageBMCovered = trackCon.getPercentRefGenBmCovered();
+                if(percentageBMCovered == 0){
+                    percentageBMCovered = trackCon.getPercentRefGenBmCoveredCalculate();
+                }
                 double percentageNErrorCovered = trackCon.getPercentRefGenNErrorCovered();
+                     if(percentageNErrorCovered ==0){
+                  percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
+                  trackCon.setStatics(numOfMappings, numOfPerfectMappings, numOfBestMatchMappings, numOfMappedUniqueReads, percentagePerfectCovered, percentageBMCovered, percentageNErrorCovered);
+                }
+
                 String perfectCov = String.format("%.2f%%", percentagePerfectCovered);
                 String bmCov = String.format("%.2f%%", percentageBMCovered);
                 String nErrorCov = String.format("%.2f%%", percentageNErrorCovered);
@@ -247,6 +285,8 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 bmPercentage.setText(bmCov);
                 nerrorPercentage.setText(nErrorCov);
                 statsFinished();
+
+
             }
         }){
         };

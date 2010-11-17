@@ -9,8 +9,7 @@ import vamp.importer.ImporterDataModelListenerI;
 import vamp.importer.ImporterViewListenerI;
 import vamp.importer.JobManagerI;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -135,7 +134,7 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
 
             if(cardIndex == 1){
                 //overview card is shown
-                importOverviewCard1.showOverview(jobManager.getRefGenJobList(), jobManager.getRunJobList(), jobManager.getTrackJobList());
+                importOverviewCard1.showOverview(jobManager.getRefGenJobList(), jobManager.getTrackJobListRun());
             } else if(cardIndex == 2){
                 //import progress card is shown
                 for(ImporterViewListenerI l : importerViewListener){
@@ -222,10 +221,6 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
         new NewReferenceDialog(this, jobManager).setVisible(true);
     }
 
-    public void showNewRunDialog(){
-        new NewRunDialog(this, jobManager).setVisible(true);
-    }
-
     public void showNewTrackDialog(){
         new NewTrackDialog(this, jobManager).setVisible(true);
     }
@@ -242,23 +237,16 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
     private vamp.view.importer.ImportSetupCard setupImportCard1;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void runJobAdded(RunJob runJob) {
-        setupImportCard1.runJobAdded(runJob);
-    }
+
+
 
     @Override
-    public void runJobRemoved(RunJob runJob) {
-        setupImportCard1.runJobRemoved(runJob);
-    }
-
-    @Override
-    public void trackJobAdded(TrackJob trackJob) {
+    public void trackJobAddedRun(TrackJobs trackJob) {
         setupImportCard1.trackJobAdded(trackJob);
     }
 
     @Override
-    public void trackJobRemoved(TrackJob trackJob) {
+    public void trackJobRemovedRun(TrackJobs trackJob) {
         setupImportCard1.trackJobRemoved(trackJob);
     }
 
@@ -272,20 +260,13 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
         setupImportCard1.refGenJobRemoved(refGenJob);
     }
 
-    public void removeTrackJob(TrackJob trackJob){
+    public void removeTrackJob(TrackJobs trackJob){
         jobManager.removeTrackTask(trackJob);
     }
 
-    public void removeRunJob(RunJob runJob){
-        if(runJob.hasRegisteredTracks()){
-            JOptionPane.showMessageDialog(this, "Connot mark selected object for deletion. Please resolve dependencies first!", "Unresolved dependencies", JOptionPane.ERROR_MESSAGE);
-        } else {
-            jobManager.removeRunTask(runJob);
-        }
-    }
 
     public void removeRefGenJob(ReferenceJob refGenJob){
-        if (refGenJob.hasRegisteredTracks()) {
+        if (refGenJob.hasRegisteredTrackswithoutrRunJob()) {
             JOptionPane.showMessageDialog(this, "Connot mark selected object for deletion. Please resolve dependencies first!", "Unresolved dependencies", JOptionPane.ERROR_MESSAGE);
         } else {
             jobManager.removeRefGenTask(refGenJob);

@@ -3,8 +3,7 @@ package vamp.view.importer;
 import java.util.Iterator;
 import java.util.List;
 import vamp.importer.ReferenceJob;
-import vamp.importer.RunJob;
-import vamp.importer.TrackJob;
+import vamp.importer.TrackJobs;
 
 /**
  *
@@ -19,7 +18,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    void showOverview(List<ReferenceJob> refGenJobList, List<RunJob> runJobList, List<TrackJob> trackJobList) {
+    void showOverview(List<ReferenceJob> refGenJobList, List<TrackJobs> trackJobList) {
 
         jTextArea1.setText("");
 
@@ -34,20 +33,11 @@ public class ImportOverviewCard extends javax.swing.JPanel {
             jTextArea1.append("\n");
         }
 
-        if(!runJobList.isEmpty()){
-            jTextArea1.append("Runs:\n");
-            for(Iterator<RunJob> it = runJobList.iterator(); it.hasNext(); ){
-                RunJob r = it.next();
-                jTextArea1.append(r.getFile().getAbsolutePath()+"\n");
-                jTextArea1.append("\t"+r.getDescription()+"\n");
-            }
-            jTextArea1.append("\n");
-        }
 
         if(!trackJobList.isEmpty()){
             jTextArea1.append("Tracks:\n");
-            for(Iterator<TrackJob> it = trackJobList.iterator(); it.hasNext(); ){
-                TrackJob r = it.next();
+            for(Iterator<TrackJobs> it = trackJobList.iterator(); it.hasNext(); ){
+                TrackJobs r = it.next();
                 jTextArea1.append(r.getFile().getAbsolutePath()+"\n");
                 jTextArea1.append("\t"+r.getDescription()+"\n");
             }
