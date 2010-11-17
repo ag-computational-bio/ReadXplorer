@@ -37,6 +37,7 @@ public class JokParser implements MappingParserI{
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \""+trackJob.getFile().getAbsolutePath()+"\"");
+
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;

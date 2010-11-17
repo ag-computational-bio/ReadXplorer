@@ -1,8 +1,6 @@
 package vamp.parsing.mappings;
 
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import vamp.importer.TrackJobs;
 import vamp.parsing.common.CoverageContainer;
 import vamp.parsing.common.ParsedMappingContainer;

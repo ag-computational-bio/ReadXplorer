@@ -1,22 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- *   This file is part of ProSE.
- *   Copyright (C) 2007-2010 CeBiTec, Bielefeld University
- * 
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- * 
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- * 
- *   You should have received a copy of the GNU General Public License
- *   along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package vamp.parsing.reference.fasta;
 
 import java.io.BufferedReader;
@@ -33,12 +14,23 @@ import vamp.parsing.reference.ReferenceParserI;
  *
  * @author jstraube
  */
+
+/*
+ * The FastaReferenceParser can parse the reference genome from a fasta file
+ * attention there are no features in this file just the sequence
+ */
 public class FastaReferenceParser implements ReferenceParserI {
 
     private static String parsername = "Fasta Reference Parser";
     private static String[] fileExtension = new String[]{"fas", "fasta"};
     private static String fileDescription = "Fasta File";
 
+    /*
+     * parses the containing sequences to one long sequence
+     * but its much faster to delete all linebreaks first!
+     * @return returns the object parsedReference with the name, describtion
+        and the sequence from the reference genome
+     */
     @Override
     public ParsedReference parseReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         ParsedReference refGenome = new ParsedReference();
@@ -70,6 +62,9 @@ public class FastaReferenceParser implements ReferenceParserI {
 
     }
 
+    /*
+     * get the name of the used parser
+     */
     @Override
     public String getParserName() {
         return parsername;
