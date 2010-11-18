@@ -1,6 +1,8 @@
 package vamp.parsing.common;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -8,20 +10,18 @@ import java.util.ArrayList;
  */
 public class ParsedReadname {
 
-    private ArrayList<String> reads;
+    private HashSet<String> reads;
     private long id;
     public int numOfReads;
     public ParsedReadname(){
-        reads = new ArrayList<String>();
+        reads = new HashSet<String>();
     }
 
     public void addRead(String readname){
-        if(!reads.contains(readname)){
         reads.add(readname);
-        }
     }
 
-    public ArrayList<String> getReads(){
+    public HashSet<String> getReads(){
         return reads;
     }
 
