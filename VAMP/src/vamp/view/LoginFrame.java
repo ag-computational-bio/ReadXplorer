@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -366,6 +368,13 @@ public class LoginFrame extends javax.swing.JFrame {
         if (result == 0) {
             // file chosen
             file = fc.getSelectedFile();
+            if(!file.exists()){
+                JOptionPane.showMessageDialog(this,
+                        "The Database "+file.getAbsolutePath()+"\nyou have choosen does not exsist."
+                        + "\nWhen you login this database\n will be created automatically!",
+                        "Database not exist",
+                        JOptionPane.WARNING_MESSAGE);
+            }
             databaseField.setText(file.getAbsolutePath());
         }
     }//GEN-LAST:event_dbChooseButtonActionPerformed

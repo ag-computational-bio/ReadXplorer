@@ -131,7 +131,7 @@ public class ProjectConnector {
             this.setupDatabase();
         } else {
             this.adapter = adapter;
-            this.url = "jdbc:" + adapter + ":" + database+";MULTI_THREADED=TRUE";
+            this.url = "jdbc:" + adapter + ":" + database+";MULTI_THREADED=1";
             this.connectH2DataBase(url);
             this.setupDatabaseH2();
 
@@ -1062,6 +1062,8 @@ public class ProjectConnector {
             this.storeStatics(track);
             this.storeMappings(track);
             this.storeDiffs(track);
+            track.clear();
+
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"" + track.getDescription() + "\" has been stored successfully");
 

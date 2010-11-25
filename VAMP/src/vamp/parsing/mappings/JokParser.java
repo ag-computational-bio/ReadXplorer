@@ -20,7 +20,7 @@ import vamp.parsing.common.ParsingException;
 public class JokParser implements MappingParserI{
 
     private static String name = "Jok Output Parser";
-    private static String[] fileExtension = new String []{"out", "Jok", "jok"};
+    private static String[] fileExtension = new String []{"out", "Jok", "jok", "JOK"};
     private static String fileDescription = "Jok Output";
     private HashMap<Integer, Integer> gapOrderIndex;
 

@@ -153,4 +153,8 @@ public class CoverageContainer {
         return cov[baseIDX];
     }
 
+    public void clear(){
+        coverage.clear();
+    }
+
 }

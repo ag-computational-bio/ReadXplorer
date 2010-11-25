@@ -1,4 +1,3 @@
-
 package vamp.parsing.mappings;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import vamp.parsing.common.ParsedRun;
 public class BAMParser implements MappingParserI {
 
     private static String name = "BAM Parser";
-    private static String[] fileExtension = new String[]{"bam"};
+    private static String[] fileExtension = new String[]{"bam, BAM, Bam"};
     private static String fileDescription = "BAM Output";
     private HashMap<Integer, Integer> gapOrderIndex;
     private HashSet<String> unmappedReads = new HashSet<String>();
@@ -41,7 +40,7 @@ public class BAMParser implements MappingParserI {
     @Override
     public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException {
         String readname = null;
-        int position = 0;
+        
         String refName = null;
         String refSeq = null;
         String readSeq = null;
@@ -58,7 +57,7 @@ public class BAMParser implements MappingParserI {
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Coudnt get the ref genome\"" + trackJob.getFile().getAbsolutePath() + "\"" + ex);
         }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"" + trackJob.getFile().getAbsolutePath() +"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"" + trackJob.getFile().getAbsolutePath() + "\"");
 
 
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());
@@ -94,20 +93,21 @@ public class BAMParser implements MappingParserI {
                 errors = 0;
 
                 if (cigar.contains("D") || cigar.contains("I")) {
-                            //need the stop position
-                            stop = countStopPosition(cigar, start, readSeqwithoutGaps.length());
+                    //need the stop position
+                    stop = countStopPosition(cigar, start, readSeqwithoutGaps.length());
 
-                        } else {
+                } else {
 
-                            stop = start + readSeqwithoutGaps.length()-1;
+                    stop = start + readSeqwithoutGaps.length() - 1;
 
-                        }
-                refSeqwithoutgaps = refSeqfulllength.substring(start-1, stop ).toLowerCase();
+                }
+                refSeqwithoutgaps = refSeqfulllength.substring(start - 1, stop).toLowerCase();
 
                 if (cigar.contains("D") || cigar.contains("I")) {
 
                     refSeq = createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
                     readSeq = mappedRefAndReadPlusGaps.get(refSeq);
+                    mappedRefAndReadPlusGaps.clear();
                 } else {
                     refSeq = refSeqwithoutgaps;
                     readSeq = readSeqwithoutGaps;
@@ -156,12 +156,12 @@ public class BAMParser implements MappingParserI {
                             + "Please make sure you are referencing the correct read data set!");
                 }
 
-                DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start , direction);
+                DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
                 List<ParsedDiff> diffs = result.getDiffs();
                 List<ParsedReferenceGap> gaps = result.getGaps();
 
                 //   System.out.println("error" + errors);
-                ParsedMapping mapping = new ParsedMapping(start , stop , direction, diffs, gaps, errors);
+                ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                 int seqID = readnameToSequenceID.get(readname);
                 mappingContainer.addParsedMapping(mapping, seqID);
                 if (!itor.hasNext()) {
@@ -174,7 +174,7 @@ public class BAMParser implements MappingParserI {
             }
             continue;
         }
-        
+
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"" + trackJob.getFile().getAbsolutePath() + "\"");
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
@@ -315,7 +315,7 @@ public class BAMParser implements MappingParserI {
                         }
                         numberofDeletion--;
                         newreadSeq = readSeq;
-                     //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
+                        //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
                     }
 
                 } else if (c == 'I') {
@@ -332,7 +332,7 @@ public class BAMParser implements MappingParserI {
                         }
                         newRefSeqwithGaps = refSeq;
                         numberOfInsertions--;
-                      //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
+                        //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                     }
                 } else if (c == 'M') {
                     //for match/mismatch thr positions just move forward
@@ -459,7 +459,7 @@ public class BAMParser implements MappingParserI {
 
     @Override
     public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
-               int flag = 0;
+        int flag = 0;
         String readSeqwithoutGaps = null;
         String readname = null;
         ParsedRun run = new ParsedRun("descrp");

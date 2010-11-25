@@ -81,4 +81,8 @@ public class ParsedMappingContainer {
     return mappingInfos;
 }
 
+
+    public void clear(){
+        mappings.clear();
+    }
 }
