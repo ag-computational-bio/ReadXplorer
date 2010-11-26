@@ -36,7 +36,6 @@ public class ExtendedSlider extends JSlider implements SynchronousNavigator{
         });
     }
 
-
     public void addAdjustmentPanelListener(AdjustmentPanelListenerI listener){
         listeners.add(listener);
         listener.zoomLevelUpdated(current);
@@ -54,7 +53,6 @@ public class ExtendedSlider extends JSlider implements SynchronousNavigator{
     public void setCurrentZoomValue(int value) {
         current = value;
         this.setValue(current);
-
     }
 
     private void updateListeners(){

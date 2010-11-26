@@ -1,13 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
+import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AbstractInfoPanel;
-import vamp.view.dataVisualisation.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.DefaultListModel;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
 
 /**
  *
@@ -301,7 +301,6 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
     private javax.swing.JTextField typeText;
     // End of variables declaration//GEN-END:variables
 
-
     public void setIntervall(int from, int to){
         intervalFromField.setText(String.valueOf(from));
         intervalToField.setText(String.valueOf(to));
@@ -318,7 +317,6 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
         strandText.setText(strand);
         typeText.setText(FeatureType.getTypeString(f.getType()));
     }
-
 
     public void showFeatureStatisticsForIntervall(Map<Integer, Integer> featureStats) {
         statisticsList.removeAll();

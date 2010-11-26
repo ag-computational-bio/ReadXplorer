@@ -1,12 +1,12 @@
 package de.cebitec.vamp.view.dataAdministration;
 
+import de.cebitec.vamp.importer.ReferenceJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import de.cebitec.vamp.importer.ReferenceJob;
 
 /**
  *
@@ -100,7 +100,6 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
     @Override
     public void tableChanged(TableModelEvent e) {
-
         int row = e.getFirstRow();
         int column = e.getColumn();
 
@@ -121,6 +120,5 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
                 adminPanel.unRemoveRefGenJob(r);
             }
         }
-
     }
 }

@@ -1,24 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- *   This file is part of ProSE.
- *   Copyright (C) 2007-2010 CeBiTec, Bielefeld University
- * 
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- * 
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- * 
- *   You should have received a copy of the GNU General Public License
- *   along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package de.cebitec.vamp.exporter;
 
+import de.cebitec.vamp.view.dataVisualisation.snpDetection.Snp;
 import jxl.write.Label;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,7 +18,6 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import de.cebitec.vamp.view.dataVisualisation.snpDetection.Snp;
 
 /**
  *
@@ -59,8 +40,7 @@ public class ExcelExporter implements ExporterI {
     public File writeFile(File tempDir, String name) throws FileNotFoundException, IOException {
         File tempFile = File.createTempFile(name, ".xls", tempDir);
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write Excel file..." + tempFile.getAbsolutePath());
-
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write Excel file...{0}", tempFile.getAbsolutePath());
 
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale(new Locale("en", "EN"));
@@ -80,7 +60,7 @@ public class ExcelExporter implements ExporterI {
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
         } catch (WriteException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error writing file" + ex.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error writing file{0}", ex.getMessage());
         }
 
         return tempFile;
@@ -107,7 +87,6 @@ public class ExcelExporter implements ExporterI {
             Number number = new Number(column, row, value, integerFormat);
             sheet.addCell(number);
         }
-
     }
 
     public void fillSheet(WritableSheet sheet, List<Snp> snps) throws WriteException {

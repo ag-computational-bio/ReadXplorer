@@ -1,8 +1,9 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
-//import edu.umd.cs.piccolo.PCanvas;
-//import edu.umd.cs.piccolo.nodes.PText;
-//import edu.umd.cs.piccolox.swing.PCacheCanvas;
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
+import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -12,10 +13,6 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
-import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 
 /**
  *
@@ -66,8 +63,6 @@ public class SequenceBar extends JComponent {
     public void boundsChanged() {
         adjustMarkingIntervall();
         findCodons();
-       // setCurrentSequence(calculateSequence());
-//        setSequence(calculateSequence());
     }
 
     @Override
@@ -153,7 +148,6 @@ public class SequenceBar extends JComponent {
         g.drawString(base,
                 (float) physX - offset,
                 (float) baseLineY - 10);
-
     }
 
     /**
@@ -186,7 +180,6 @@ public class SequenceBar extends JComponent {
         g.drawString(revBase,
                 (float) physX - offset,
                 (float) baseLineY + 10);
-
     }
 
     /**
@@ -257,7 +250,6 @@ public class SequenceBar extends JComponent {
      * Adjust the width that is used for marking bases to the current size
      */
     private void adjustMarkingIntervall() {
-
         if (parentViewer.isInMaxZoomLevel()) {
             printSeq = true;
         } else {
@@ -369,7 +361,6 @@ public class SequenceBar extends JComponent {
 
         String base = refGen.getSequence().substring(basePosition, basePosition + 1);
         
-        
         if(base != null && metrics != null){
         int offset = metrics.stringWidth(base) / 2;
         BaseBackground b = new BaseBackground(12, 12, base);
@@ -380,62 +371,7 @@ public class SequenceBar extends JComponent {
         this.add(brev);
             }
         }
-
     }
-
-    // for sequence copying
- /*   public String calculateSequence(){
-         String sequence ="";
-         String base;
-            int logleft = parentViewer.getBoundsInfo().getLogLeft();
-            int logright = parentViewer.getBoundsInfo().getLogRight();
-          
-            for (int i = logleft; i <= logright; i++) {
-            int basePosition =i-1 ;
-           //  System.out.println("logleft" + logleft + "logright" + logright+ "baseposition " + basePosition);
-        if (gapManager != null && gapManager.hasGapAt(i)) {
-            int numOfGaps = gapManager.getNumOfGapsAt(i);
-            for (int j = 0; j < numOfGaps; j++) {
-               
-                 base = "- ";
-              sequence = sequence.concat(base);
-            }
-        }
-        base = refGen.getSequence().substring(basePosition, basePosition + 1) +"";
-       sequence = sequence.concat(base);
-            }
-       //    System.out.println("seqbar seq" + sequence);
-         return sequence;
-    }
-
-    public void setCurrentSequence(String sequence){
-        JTextField j = new JTextField(sequence);
-        j.selectAll();
-        j.copy();
-    }
-    public void setSequence(String sequence){
-
-        String s ="g";
-        PText pt = new PText(s);
-        pt.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 9));
-        PMarkableText p = new PMarkableText(sequence);
-        p.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 9));
-        p.setPickable(true);
-        p.addInputEventListener(new PTextSelectionEventHandler(pt.getWidth()));
-        PCanvas pc = new PCanvas();
-        pc.setZoomEventHandler(null);
-
-        pc.setPanEventHandler(null);
-        pc.setEnabled(true);
-        pc.setVisible(true);
-        // System.out.println("seqbar seqlength" + sequence.length());
-        pc.setBounds(40, 10,  550,15);
-        pc.getLayer().addChild(p);
-        this.add(pc);
-       // fe.add(pc);
-      //  this.pack();
-      // this.setVisible(true);
-    }*/
 
     public String reverseBase(String base){
         String revBase;
@@ -456,4 +392,5 @@ public class SequenceBar extends JComponent {
     }
         return revBase;
     }
+
 }

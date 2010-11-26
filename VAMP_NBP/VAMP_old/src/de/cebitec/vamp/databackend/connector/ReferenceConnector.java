@@ -31,7 +31,7 @@ public class ReferenceConnector {
 
     public PersistantReference getRefGen(){
         PersistantReference gen = null;
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \""+refGenID+"\" from database");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
             fetch.setLong(1, refGenID);
@@ -104,6 +104,5 @@ public class ReferenceConnector {
 
         return list;
     }
-
 
 }

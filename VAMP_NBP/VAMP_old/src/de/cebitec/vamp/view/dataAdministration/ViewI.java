@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataAdministration;
 
-import de.cebitec.vamp.dataAdministration.ViewListenerI;
 import de.cebitec.vamp.dataAdministration.JobManager;
+import de.cebitec.vamp.dataAdministration.ViewListenerI;
 
 /**
  *

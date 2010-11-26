@@ -1,15 +1,15 @@
 package de.cebitec.vamp.dataAdministration;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.databackend.dataObjects.PersistentRun;
+import de.cebitec.vamp.importer.ReferenceJob;
+import de.cebitec.vamp.importer.TrackJobs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.databackend.dataObjects.PersistentRun;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.importer.ReferenceJob;
-import de.cebitec.vamp.importer.TrackJobs;
 
 /**
  *
@@ -21,8 +21,6 @@ public class Model implements ModelInterface, JobManager {
     private List<TrackJobs> tracksToDelete;
     private List<ReferenceJob> genomesToDelete;
 
-
-
     public Model(){
         listeners = new ArrayList<ModelListenerI>();
         tracksToDelete = new ArrayList<TrackJobs>();
@@ -31,13 +29,9 @@ public class Model implements ModelInterface, JobManager {
 
     @Override
     public void fetchNecessaryData(){
-  
-      
         HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
         
         List<PersistentRun> dbRuns = ProjectConnector.getInstance().getRuns();
-
-        
 
         List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
         for(Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext(); ){
@@ -67,7 +61,6 @@ public class Model implements ModelInterface, JobManager {
                 l.trackJobsAdded(t);
             }
         }
-
     }
 
     @Override
@@ -92,15 +85,13 @@ public class Model implements ModelInterface, JobManager {
         }
     }
 
-
-
     @Override
     public List<ReferenceJob> getScheduledRefGenJobs() {
         return genomesToDelete;
     }
     @Override
     public void removeTrackJobRun(TrackJobs trackJob) {
-                tracksToDelete.add(trackJob);
+        tracksToDelete.add(trackJob);
 
         // unregister dependencies
         trackJob.getRefGen().unregisterTrackwithoutRunJob(trackJob);
@@ -108,7 +99,7 @@ public class Model implements ModelInterface, JobManager {
 
     @Override
     public void unRemoveTrackJobRun(TrackJobs trackJob) {
-               if(tracksToDelete.contains(trackJob)){
+        if(tracksToDelete.contains(trackJob)){
             tracksToDelete.remove(trackJob);
 
             // re-register dependencies

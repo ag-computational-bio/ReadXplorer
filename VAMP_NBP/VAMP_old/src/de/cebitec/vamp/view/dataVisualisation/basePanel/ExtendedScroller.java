@@ -19,7 +19,6 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
     private int currentValue;
     private List<AdjustmentPanelListenerI> listeners;
 
-
     public ExtendedScroller(int min, int max, int init){
         super(JSlider.HORIZONTAL, init, 0, min, max);
         this.setBlockIncrement(1000);
@@ -40,8 +39,7 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
         });
     }
 
-
-        /**
+    /**
      *
      * @param listener register this listener to be notified of changes
      */
@@ -50,10 +48,10 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
         listener.navigatorBarUpdated(currentValue);
     }
 
-        /**
+    /**
      *
      * @param listener remove the listener, so it is not updated anymore on
-     * accuring changes
+     * occurring changes
      */
     public void removeAdjustmentListener(AdjustmentPanelListenerI listener){
         if(listeners.contains(listener)){
@@ -77,6 +75,5 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
     public void setCurrentZoomValue(int value) {
         
     }
-
 
 }

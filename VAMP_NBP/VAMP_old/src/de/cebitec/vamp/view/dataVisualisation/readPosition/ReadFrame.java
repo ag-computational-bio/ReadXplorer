@@ -1,4 +1,3 @@
-
 /*
  * ReadFrame.java
  *
@@ -6,23 +5,25 @@
  */
 package de.cebitec.vamp.view.dataVisualisation.readPosition;
 
-import java.awt.CardLayout;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.util.List;
-import javax.swing.SwingWorker;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockComponent;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
+import java.awt.CardLayout;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.List;
+import javax.swing.SwingWorker;
 
 /**
  *
  * @author jstraube
  */
 public class ReadFrame extends javax.swing.JFrame {
+
+    private static final long serialVersionUID = 1L;
 
     private BoundsInfoManager boundsManager;
     private TrackOptionsPanel parent;
@@ -120,10 +121,11 @@ public class ReadFrame extends javax.swing.JFrame {
     private de.cebitec.vamp.view.dataVisualisation.readPosition.ReadSearch readSearch1;
     private de.cebitec.vamp.view.dataVisualisation.readPosition.ReadResults results1;
     // End of variables declaration//GEN-END:variables
-/*
- * the method showPosition is called when a read position is selected
- * the viewer will update their view to this position
- */
+
+    /*
+     * the method showPosition is called when a read position is selected
+     * the viewer will update their view to this position
+     */
     public void showPosition(int position) {
         boundsManager.navigatorBarUpdated(position);
     }
@@ -137,11 +139,11 @@ public class ReadFrame extends javax.swing.JFrame {
         results1.searchDone();
     }
 
-/*
- * this Method is called to detect all reads
- * with the common readnames it should run in
- * background so that man can work with the viewer
- */
+    /*
+     * this Method is called to detect all reads
+     * with the common readnames it should run in
+     * background so that man can work with the viewer
+     */
     public void findReads(final String read) {
         cards.show(jPanel1, "resultcard");
         SwingWorker t = new SwingWorker() {
@@ -164,4 +166,5 @@ public class ReadFrame extends javax.swing.JFrame {
         t.execute();
         results1.showProgressBar(true);
     }
+    
 }

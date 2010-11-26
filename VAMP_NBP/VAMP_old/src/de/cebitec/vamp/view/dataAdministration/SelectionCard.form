@@ -40,7 +40,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="vamp.view.dataAdministration.ReferenceView" name="refGenView1">
+        <Component class="de.cebitec.vamp.view.dataAdministration.ReferenceView" name="refGenView1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="refGenView1.setDataAdminPanel(this);"/>
           </AuxValues>
@@ -52,7 +52,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="vamp.view.dataAdministration.TrackView" name="mappingView1">
+        <Component class="de.cebitec.vamp.view.dataAdministration.TrackView" name="mappingView1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="mappingView1.setDataAdminPanel(this);"/>
           </AuxValues>

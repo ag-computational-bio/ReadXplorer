@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import javax.swing.JMenuItem;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import javax.swing.JMenuItem;
 
 /**
  *

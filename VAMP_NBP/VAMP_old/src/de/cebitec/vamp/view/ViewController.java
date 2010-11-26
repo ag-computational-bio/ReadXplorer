@@ -1,22 +1,22 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import de.cebitec.vamp.GestureListenerI;
 import de.cebitec.vamp.RunningTaskI;
 import de.cebitec.vamp.dataAdministration.DataAdminController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.importer.ImporterController;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
-import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
+import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *

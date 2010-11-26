@@ -39,9 +39,9 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignCardLayout"/>
       <SubComponents>
-        <Component class="vamp.view.dataVisualisation.snpDetection.SetupPanel" name="setupPanel1">
+        <Component class="de.cebitec.vamp.view.dataVisualisation.snpDetection.SetupPanel" name="setupPanel1">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vamp.view.dataVisualisation.snpDetection.SetupPanel(this)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.view.dataVisualisation.snpDetection.SetupPanel(this)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
@@ -49,9 +49,9 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="vamp.view.dataVisualisation.snpDetection.Results" name="results1">
+        <Component class="de.cebitec.vamp.view.dataVisualisation.snpDetection.Results" name="results1">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vamp.view.dataVisualisation.snpDetection.Results(this)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.view.dataVisualisation.snpDetection.Results(this)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">

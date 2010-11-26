@@ -43,9 +43,9 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="vamp.view.dataVisualisation.referenceViewer.JumpPanel" name="jumpPanel1">
+    <Component class="de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel" name="jumpPanel1">
     </Component>
-    <Component class="vamp.view.dataVisualisation.referenceViewer.CodonSelector" name="codonSelector1">
+    <Component class="de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector" name="codonSelector1">
     </Component>
   </SubComponents>
 </Form>

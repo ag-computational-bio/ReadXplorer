@@ -1,15 +1,15 @@
 package de.cebitec.vamp.view.importer;
 
-import java.awt.CardLayout;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JOptionPane;
 import de.cebitec.vamp.ApplicationController;
 import de.cebitec.vamp.importer.ImporterDataModelListenerI;
 import de.cebitec.vamp.importer.ImporterViewListenerI;
 import de.cebitec.vamp.importer.JobManagerI;
 import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.importer.TrackJobs;
+import java.awt.CardLayout;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -142,14 +142,12 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
                     l.startImport();
                 }
             }
-
         // import done
         } else if (cardIndex == 3){
             for(ImporterViewListenerI l : importerViewListener){
                 l.cancelImport();
             }
         }
-
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void previousButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousButtonActionPerformed
@@ -159,7 +157,6 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
             c.show(cardPanel, cardnames[cardIndex]);
             setButtonStatus(cardIndex);
         }
-
     }//GEN-LAST:event_previousButtonActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -184,9 +181,7 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
             previousButton.setEnabled(false);
             nextButton.setText("Close");
         }
-
     }
-
 
     @Override
     public void addImporterViewListener(ImporterViewListenerI listener) {
@@ -225,7 +220,6 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
         new NewTrackDialog(this, jobManager).setVisible(true);
     }
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cardPanel;
     private javax.swing.JPanel contentpane;
@@ -236,9 +230,6 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
     private javax.swing.JProgressBar progressBar;
     private de.cebitec.vamp.view.importer.ImportSetupCard setupImportCard1;
     // End of variables declaration//GEN-END:variables
-
-
-
 
     @Override
     public void trackJobAddedRun(TrackJobs trackJob) {
@@ -263,7 +254,6 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
     public void removeTrackJob(TrackJobs trackJob){
         jobManager.removeTrackTask(trackJob);
     }
-
 
     public void removeRefGenJob(ReferenceJob refGenJob){
         if (refGenJob.hasRegisteredTrackswithoutrRunJob()) {

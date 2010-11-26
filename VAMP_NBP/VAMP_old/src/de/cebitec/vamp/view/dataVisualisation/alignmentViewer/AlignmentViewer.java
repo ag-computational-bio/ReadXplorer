@@ -1,21 +1,21 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.MappingExcusePanel;
+import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.swing.JPanel;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.view.dataVisualisation.MappingExcusePanel;
-import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
 
 /**
  *
@@ -65,7 +65,6 @@ public class AlignmentViewer  extends AbstractViewer {
 
     }
 
-
     @Override
     public void boundsChangedHook() {
 
@@ -78,9 +77,7 @@ public class AlignmentViewer  extends AbstractViewer {
         this.setupComponents();
     }
 
-
     private void setupComponents(){
-
         this.removeAll();
 
         if(isInMaxZoomLevel()){
@@ -107,8 +104,6 @@ public class AlignmentViewer  extends AbstractViewer {
         } else {
             this.placeExcusePanel(zoomExceuse);
         }
-
-
     }
 
     private void placeExcusePanel(JPanel p){

@@ -1,16 +1,15 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import java.awt.event.ActionEvent;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 
 /**
  *
@@ -122,12 +121,10 @@ public class JumpPanel extends javax.swing.JPanel {
             jumpPosition = f.getStart();
             jTextField1.setText(String.valueOf(jumpPosition));
             this.jumpButtonActionPerformed(null);
-
         }
 }//GEN-LAST:event_jumpListValueChanged
 
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
-
         if(isValidInput(jTextField1.getText())){
             jumpPosition = Integer.parseInt(jTextField1.getText());
             boundsManager.navigatorBarUpdated(jumpPosition);
@@ -161,7 +158,6 @@ public class JumpPanel extends javax.swing.JPanel {
     private javax.swing.JList jumpList;
     private javax.swing.JLabel jumpPositionLabel;
     // End of variables declaration//GEN-END:variables
-
 
     public void setReferenceGenome(PersistantReference refGen) {
         this.refGen = refGen;

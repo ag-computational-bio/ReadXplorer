@@ -1,13 +1,6 @@
 package de.cebitec.vamp.parsing.mappings;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.importer.TrackJobs;
 import de.cebitec.vamp.parsing.common.ParsedDiff;
@@ -16,7 +9,14 @@ import de.cebitec.vamp.parsing.common.ParsedMappingContainer;
 import de.cebitec.vamp.parsing.common.ParsedReferenceGap;
 import de.cebitec.vamp.parsing.common.ParsedRun;
 import de.cebitec.vamp.parsing.common.ParsingException;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,11 +55,11 @@ public class SAMParser implements MappingParserI {
             Long id = trackJob.getRefGen().getID();
             genome = ProjectConnector.getInstance().getRefGenomeConnector(id);
         } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Coudnt get the ref genome\"" + trackJob.getFile().getAbsolutePath() + "\"" + ex);
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Coudnt get the ref genome\"{0}\"{1}", new Object[]{trackJob.getFile().getAbsolutePath(), ex});
         }
 
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"" + trackJob.getFile().getAbsolutePath() + "\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;
@@ -122,7 +122,7 @@ public class SAMParser implements MappingParserI {
                             direction = -1;
                         }
                         //check parameters
-                        if (readname == null || readname.equals("")) {
+                        if (readname == null || readname.isEmpty()) {
                             throw new ParsingException("could not read readname in "
                                     + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                     + "Found read name: " + readname);
@@ -138,12 +138,12 @@ public class SAMParser implements MappingParserI {
                                     + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                     + "Must be 0 oder 1");
                         }
-                        if (readSeq == null || readSeq.equals("")) {
+                        if (readSeq == null || readSeq.isEmpty()) {
                             throw new ParsingException("read sequence could not be parsed in "
                                     + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                     + "Found: " + readSeq);
                         }
-                        if (refSeq == null || refSeq.equals("")) {
+                        if (refSeq == null || refSeq.isEmpty()) {
                             throw new ParsingException("reference sequence could not be parsed in "
                                     + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                     + "Found: " + refSeq);
@@ -185,7 +185,7 @@ public class SAMParser implements MappingParserI {
                 continue;
             }
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"" + trackJob.getFile().getAbsolutePath() + "\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -223,7 +223,7 @@ public class SAMParser implements MappingParserI {
         } else if (base == '_') {
             rev = '_';
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char " + base + "!");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char {0}!", base);
         }
 
         return rev;
@@ -483,7 +483,7 @@ public class SAMParser implements MappingParserI {
         String readSeqwithoutGaps = null;
         ParsedRun run = new ParsedRun(fileDescription);
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing run from file \"" + trackJob.getFile().getAbsolutePath() + "\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing run from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;

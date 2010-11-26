@@ -9,6 +9,8 @@ import javax.swing.JPanel;
  */
 public abstract class AbstractInfoPanel extends JPanel implements MousePositionListener{
     
+    private static final long serialVersionUID = 1L;
+    
     public abstract void close();
 
 

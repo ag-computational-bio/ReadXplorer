@@ -1,12 +1,12 @@
 package de.cebitec.vamp.view.importer;
 
+import de.cebitec.vamp.importer.TrackJobs;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import de.cebitec.vamp.importer.TrackJobs;
 
 /**
  *
@@ -127,6 +127,5 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         ListSelectionModel model = jTable1.getSelectionModel();
         return !model.isSelectionEmpty();
     }
-
 
 }

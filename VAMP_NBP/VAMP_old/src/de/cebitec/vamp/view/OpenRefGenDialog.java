@@ -1,8 +1,8 @@
 package de.cebitec.vamp.view;
 
-import java.util.List;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import java.util.List;
 
 /**
  *
@@ -31,10 +31,10 @@ public class OpenRefGenDialog extends javax.swing.JDialog{
         PersistantReference[] genArray = new PersistantReference[gens.size()];
         for( int i = 0; i< gens.size() ; i++ ){
             genArray[i] = gens.get(i);
-    }
+        }
 
         return genArray;
-            }
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -108,14 +108,11 @@ public class OpenRefGenDialog extends javax.swing.JDialog{
         }
     }//GEN-LAST:event_refGenListValueChanged
 
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton openButton;
     private javax.swing.JList refGenList;
     // End of variables declaration//GEN-END:variables
-
 
     public boolean refgenWasSelected(){
         return approved;

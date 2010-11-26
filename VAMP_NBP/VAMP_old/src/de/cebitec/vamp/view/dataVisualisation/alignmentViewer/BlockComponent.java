@@ -1,8 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
-import java.awt.event.ActionEvent;
-import javax.swing.event.PopupMenuEvent;
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
+import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -10,7 +15,6 @@ import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -19,13 +23,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.event.PopupMenuListener;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
-import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 
 /**
  *
@@ -53,7 +50,6 @@ public class BlockComponent extends JComponent implements ActionListener {
     private Point mousePoint = new Point();
 
     public BlockComponent(BlockI b, final AlignmentViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
-
         this.b = b;
         this.height = height;
         this.parentViewer = parentViewer;
@@ -172,7 +168,6 @@ public class BlockComponent extends JComponent implements ActionListener {
         p.add(copyName);
         p.add(copySequence);
         p.add(exit);
-
     }
 
     private void appendReadnames(PersistantMapping mapping, StringBuilder sb) {
@@ -210,10 +205,10 @@ public class BlockComponent extends JComponent implements ActionListener {
             }
             StringBuilder tmp = new StringBuilder();
             for (PersistantReferenceGap g : mapping.getGenomeGapsAtPosition(pos)) {
-                tmp.append(g.getBase() + ", ");
+                tmp.append(g.getBase()).append(", ");
             }
-            tmp.deleteCharAt(tmp.toString().lastIndexOf(","));
-            tmp.append(" at " + pos);
+            tmp.deleteCharAt(tmp.toString().lastIndexOf(','));
+            tmp.append(" at ").append(pos);
             String value = tmp.toString();
             sb.append(createTableRow(key, value));
         }
@@ -327,7 +322,7 @@ public class BlockComponent extends JComponent implements ActionListener {
         } else if (type == Brick.MATCH) {
             label = "";
         } else if (type == Brick.UNDEF) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type " + type);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
             return "@";
         } else if (type == Brick.GENOME_GAP_A) {
             return "A";
@@ -376,7 +371,7 @@ public class BlockComponent extends JComponent implements ActionListener {
         } else if (type == Brick.READGAP) {
             c = ColorProperties.ALIGNMENT_BASE_READGAP;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type of brick " + b.getType());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type of brick {0}", b.getType());
             c = ColorProperties.ALIGNMENT_BASE_UNDEF;
         }
 
@@ -410,4 +405,5 @@ public class BlockComponent extends JComponent implements ActionListener {
             p.setVisible(false);
         }
     }
+    
 }

@@ -1,5 +1,3 @@
-
-
 /*
  * ColorOptionPanel.java
  *
@@ -8,15 +6,18 @@
 
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
+import de.cebitec.vamp.ColorProperties;
 import java.awt.Color;
 import javax.swing.JCheckBox;
-import de.cebitec.vamp.ColorProperties;
 
 /**
  *
  * @author jstraube
  */
 public class ColorOptionPanel extends javax.swing.JPanel{
+
+    private static final long serialVersionUID = 1L;
+
     public Color choosenColor ;
     private TrackInfoPanel parent;
     /** Creates new form ColorOptionPanel */
@@ -29,7 +30,6 @@ public class ColorOptionPanel extends javax.swing.JPanel{
 
         initComponents();
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -239,10 +239,10 @@ public class ColorOptionPanel extends javax.swing.JPanel{
     private void changeColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeColorButtonActionPerformed
         setColor();
         if(parent != null){
-        parent.colorChanges();
+            parent.colorChanges();
         } else{
-        parent = new TrackInfoPanel();
-        parent.colorChanges();
+            parent = new TrackInfoPanel();
+            parent.colorChanges();
         }
     }//GEN-LAST:event_changeColorButtonActionPerformed
 
@@ -277,12 +277,13 @@ public class ColorOptionPanel extends javax.swing.JPanel{
     public Color getUnqiueColor() {
         return unqiueColorPanel.getBackground();
     }
-public void setColor(){
-  ColorProperties c = new ColorProperties();
-  if(uniqueColorationCheckBox.isSelected()){
-     c.setColorProperties(getUnqiueColor(),getUnqiueColor() ,getUnqiueColor());
-  }else{
-    c.setColorProperties(getPerfectMatchColor(),getBestMatchColor() ,getCommonMatchColor());
-    }
+
+    public void setColor() {
+        ColorProperties c = new ColorProperties();
+        if (uniqueColorationCheckBox.isSelected()) {
+            c.setColorProperties(getUnqiueColor(), getUnqiueColor(), getUnqiueColor());
+        } else {
+            c.setColorProperties(getPerfectMatchColor(), getBestMatchColor(), getCommonMatchColor());
+        }
     }
 }

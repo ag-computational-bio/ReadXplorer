@@ -1,9 +1,9 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
+import de.cebitec.vamp.ColorProperties;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JComponent;
-import de.cebitec.vamp.ColorProperties;
 
 /**
  *
@@ -24,7 +24,6 @@ public class BarComponent extends JComponent {
         this.color = color;
     }
 
-
     @Override
     public void paintComponent(Graphics graphics){
         graphics.setColor(color);
@@ -33,6 +32,5 @@ public class BarComponent extends JComponent {
         graphics.setColor(ColorProperties.BLOCK_BORDER);
         graphics.drawRect(0, 0, width-1, height-1);
     }
-
 
 }

@@ -1,8 +1,8 @@
 package de.cebitec.vamp.dataAdministration;
 
-import java.util.List;
 import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.importer.TrackJobs;
+import java.util.List;
 
 /**
  *
@@ -17,7 +17,6 @@ public interface ModelInterface {
     public void fetchNecessaryData();
 
     public List<TrackJobs> getScheduledTrackJobsRun();
-
 
     public List<ReferenceJob> getScheduledRefGenJobs();
 

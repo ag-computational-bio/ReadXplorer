@@ -1,16 +1,26 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.ViewController;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewerInfoPanel;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
+import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceNavigator;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackNavigatorPanel;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewerInfoPanel;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackInfoPanel;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackNavigatorPanel;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Color;
 import java.awt.Component;
-import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
@@ -20,16 +30,6 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.ViewController;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
-import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
-import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 
 /**
  *
@@ -177,6 +177,7 @@ public class BasePanelFactory {
     }
 
     private class ColorPanel extends JPanel{
+        private static final long serialVersionUID = 1L;
         @Override
         public void paintComponent(Graphics g){
             super.paintComponent(g);

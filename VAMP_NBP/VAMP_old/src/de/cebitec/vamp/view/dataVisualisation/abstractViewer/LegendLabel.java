@@ -1,12 +1,12 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.vamp.ColorProperties;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import de.cebitec.vamp.ColorProperties;
 
 /**
  *
@@ -24,8 +24,8 @@ public class LegendLabel extends JLabel {
         super("Legend");
         this.parent = parent;
         isShowingLabel = false;
-        expandIcon = new ImageIcon(this.getClass().getClassLoader().getResource("vamp/resources/expandIcon.png"));
-        collapseIcon = new ImageIcon(this.getClass().getClassLoader().getResource("vamp/resources/collapseIcon.png"));
+        expandIcon = new ImageIcon(this.getClass().getClassLoader().getResource("de/cebitec/vamp/resources/expandIcon.png"));
+        collapseIcon = new ImageIcon(this.getClass().getClassLoader().getResource("de/cebitec/vamp/resources/collapseIcon.png"));
         this.setIcon(expandIcon);
 
         this.addMouseListener(new MouseListener() {

@@ -1,9 +1,8 @@
-
 package de.cebitec.vamp.importer;
 
+import de.cebitec.vamp.parsing.mappings.MappingParserI;
 import java.io.File;
 import java.sql.Timestamp;
-import de.cebitec.vamp.parsing.mappings.MappingParserI;
 
 /**
  *
@@ -45,7 +44,6 @@ public class TrackJobs {
     public void setRefGen(ReferenceJob refGen) {
         this.refGen = refGen;
     }
-
 
     public Timestamp getTimestamp(){
         return timestamp;

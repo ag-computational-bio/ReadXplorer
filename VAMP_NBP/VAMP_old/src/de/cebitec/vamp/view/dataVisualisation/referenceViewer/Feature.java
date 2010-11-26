@@ -1,5 +1,8 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -12,9 +15,6 @@ import java.awt.event.MouseMotionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
 
 /**
  *
@@ -173,7 +173,7 @@ public class Feature extends JComponent{
         } else if(f.getType() == FeatureType.UNDEFINED){
             c = ColorProperties.UNDEF_FEATURE;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for feature "+f.getType());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for feature {0}", f.getType());
             c = ColorProperties.UNDEF_FEATURE;
         }
 

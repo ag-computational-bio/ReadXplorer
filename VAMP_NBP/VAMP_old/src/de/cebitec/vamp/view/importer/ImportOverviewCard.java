@@ -1,9 +1,9 @@
 package de.cebitec.vamp.view.importer;
 
-import java.util.Iterator;
-import java.util.List;
 import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.importer.TrackJobs;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *

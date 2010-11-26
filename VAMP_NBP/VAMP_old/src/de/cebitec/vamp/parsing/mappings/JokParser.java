@@ -1,12 +1,12 @@
 package de.cebitec.vamp.parsing.mappings;
 
-
 import de.cebitec.vamp.importer.TrackJobs;
 import de.cebitec.vamp.parsing.common.ParsedDiff;
 import de.cebitec.vamp.parsing.common.ParsedMapping;
 import de.cebitec.vamp.parsing.common.ParsedMappingContainer;
 import de.cebitec.vamp.parsing.common.ParsedReferenceGap;
 import de.cebitec.vamp.parsing.common.ParsedRun;
+import de.cebitec.vamp.parsing.common.ParsingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.parsing.common.ParsingException;
 
 /**
  *
@@ -32,15 +31,13 @@ public class JokParser implements MappingParserI{
         gapOrderIndex = new HashMap<Integer, Integer>();
     }
 
-
     @Override
     public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException{
-
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
       //  ParsedRun run = new ParsedRun("");
 
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
 
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
@@ -68,9 +65,9 @@ public class JokParser implements MappingParserI{
                 String refSeq = tokens[5];
                 int errors = Integer.parseInt(tokens[6]);
 
-                if(stop>2 && readSeq != null && !readSeq.equals("")){
+                if(stop>2 && readSeq != null && !readSeq.isEmpty()){
                 // check tokens
-                if(readname == null || readname.equals("")){
+                if(readname == null || readname.isEmpty()){
                     throw new ParsingException("could not read readname in " +
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". " +
                             "Found read name: "+readname);
@@ -85,12 +82,12 @@ public class JokParser implements MappingParserI{
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". "+
                             "Must be >> oder <<");
                 }
-                if(readSeq == null || readSeq.equals("")){
+                if(readSeq == null || readSeq.isEmpty()){
                     throw new ParsingException("read sequence could not be parsed in " +
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". " +
                             "Found: "+readSeq + tokens.length);
                 }
-                if(refSeq == null || refSeq.equals("")){
+                if(refSeq == null || refSeq.isEmpty()){
                     throw new ParsingException("reference sequence could not be parsed in " +
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". " +
                                 "Found: "+refSeq);
@@ -120,11 +117,11 @@ public class JokParser implements MappingParserI{
                 int seqID = readnameToSequenceID.get(readname);
                 mappingContainer.addParsedMapping(mapping, seqID);
             }else{
-                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mappings without Reads:\""+lineno+"\"");   
+                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mappings without Reads:\"{0}\"", lineno);
             }
             }
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (IOException ex){
             throw new ParsingException(ex);
@@ -162,7 +159,7 @@ public class JokParser implements MappingParserI{
         } else if(base == '_'){
             rev = '_';
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char "+base+"!Sequence: " + readSeq);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char {0}!Sequence: {1}", new Object[]{base, readSeq});
         }
 
         return rev;
@@ -229,7 +226,7 @@ public class JokParser implements MappingParserI{
         
         ParsedRun run = new ParsedRun(fileDescription);
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
             int no = 0;
             int lineno = 0;
@@ -244,7 +241,7 @@ public class JokParser implements MappingParserI{
                 String refSeq = tokens[5];
                 int stop = Integer.parseInt(tokens[2]);
                 String readSeq = tokens[4];
-                if(stop>2 && readSeq != null && !readSeq.equals("")&& refSeq != null && !refSeq.equals("")){
+                if(stop>2 && readSeq != null && !readSeq.isEmpty()&& refSeq != null && !refSeq.isEmpty()){
                 String editReadSeq = readSeq;
                 if(editReadSeq.contains("_")){
                     editReadSeq = editReadSeq.replaceAll("_", "");
@@ -253,13 +250,13 @@ public class JokParser implements MappingParserI{
                 run.addReadData(editReadSeq, readname);
                 if(lineno == 2000000){
                     no += lineno;
-                  Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Parsed reads:"+no);
+                  Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Parsed reads:{0}", no);
                   lineno = 0;
                 }
                 }
             }
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (IOException ex){
             throw new ParsingException(ex);
@@ -286,8 +283,6 @@ public class JokParser implements MappingParserI{
         public List<ParsedReferenceGap> getGaps() {
             return gaps;
         }
-
-
 
     }
 

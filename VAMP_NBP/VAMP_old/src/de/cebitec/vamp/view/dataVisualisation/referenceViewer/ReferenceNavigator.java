@@ -1,10 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AbstractInfoPanel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -61,9 +61,6 @@ public class ReferenceNavigator extends AbstractInfoPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector codonSelector1;
     private de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel jumpPanel1;
@@ -83,6 +80,5 @@ public class ReferenceNavigator extends AbstractInfoPanel {
     public void setMouseOverPaintingRequested(boolean requested) {
 
     }
-
 
 }

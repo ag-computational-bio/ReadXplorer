@@ -1,13 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.ExternalViewer;
+import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.readPosition.ReadFrame;
 import de.cebitec.vamp.view.dataVisualisation.snpDetection.SnpFrame;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -112,7 +112,6 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         snpDetection.pack();
         snpButton.setEnabled(false);
         snpDetection.setVisible(true);
-
     }//GEN-LAST:event_snpButtonActionPerformed
 
     private void readButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readButtonActionPerformed
@@ -121,7 +120,6 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
        readButton.setEnabled(false);
        readPanel.setVisible(true);
     }//GEN-LAST:event_readButtonActionPerformed
-
 
     public void snpDetectionClosed(){
         if(snpDetection != null){
@@ -140,6 +138,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             readButton.setEnabled(true);
         }
     }
+    
     public void viewerClosed(){
         // if user is fast enough to double-click the close X before this frame
         // disappears, a null pointer will occur

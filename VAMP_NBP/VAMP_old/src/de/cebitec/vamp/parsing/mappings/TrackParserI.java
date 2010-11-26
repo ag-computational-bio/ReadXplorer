@@ -1,10 +1,10 @@
 package de.cebitec.vamp.parsing.mappings;
 
-import java.util.HashMap;
-import de.cebitec.vamp.parsing.common.ParsingException;
 import de.cebitec.vamp.importer.TrackJobs;
 import de.cebitec.vamp.parsing.common.ParsedRun;
 import de.cebitec.vamp.parsing.common.ParsedTrack;
+import de.cebitec.vamp.parsing.common.ParsingException;
+import java.util.HashMap;
 
 /**
  *

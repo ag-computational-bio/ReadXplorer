@@ -1,8 +1,20 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.CoverageRequest;
+import de.cebitec.vamp.databackend.CoverageThreadListener;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,18 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.CoverageRequest;
-import de.cebitec.vamp.databackend.CoverageThreadListener;
-import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
-import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
 
 /**
  *
@@ -89,8 +89,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         return height;
     }
 
-
-
     @Override
     public void changeToolTipText(int logPos) {
         // do not update if this windows is inactive
@@ -98,7 +96,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             int relPos = logPos;
             StringBuilder sb = new StringBuilder();
             sb.append("<html>");
-            sb.append("<b>Position</b>: " + logPos);
+            sb.append("<b>Position</b>: ").append(logPos);
 
             // logo data manager has no information about gaps, so we have to shift positions right here
             if (gapManager != null) {
@@ -138,7 +136,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
     private int getPercentage(int all, int value) {
         int percent = (int) (((double) value / all) * 100);
 
-
         return percent;
     }
 
@@ -153,7 +150,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
 
         if (matches != 0 || as != 0 || cs != 0 || gs != 0 || ts != 0 || ns != 0 || readgaps != 0) {
             sb.append("<table>");
-            sb.append("<tr><td align=\"left\"><b>" + title + "</b></td></tr>");
+            sb.append("<tr><td align=\"left\"><b>").append(title).append("</b></td></tr>");
 
             // if this is used to show stats about genome gaps, do not print complete coverage again
             if (!isGapStats) {
@@ -208,7 +205,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
     }
 
     private synchronized void setupData() {
-
         gapManager = new GenomeGapManager(lowerBound, upperBound);
 
         try {
@@ -228,7 +224,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         }
         dataLoaded = true;
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-
     }
 
     private void requestData() {
@@ -270,7 +265,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
     }
 
     private List<Integer> getCoverageScaleLineValues() {
-
         int minMargin = 20;
         int step;
 
@@ -371,12 +365,9 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
 
                     this.cycleBases(i, relPos, x, pxPerCoverageUnit, true,isColored);
                     this.cycleBases(i, relPos, x, pxPerCoverageUnit, false,isColored);
-
                 }
             }
-
         }
-
     }
 
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean hasColored) {
@@ -444,7 +435,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
                 c = ColorProperties.LOGO_N;
             } else {
                 value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base " + type + "!");
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base {0}!", type);
                 c = ColorProperties.LOGO_BASE_UNDEF;
             }
             featureHeight = (int) (value * heightPerCoverageUnit);
@@ -469,7 +460,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
     }
 
     private void adjustAbsStop() {
-
         // count the number of gaps occuring in visible area
         int tmpWidth = upperBound - lowerBound + 1;
         int gapNo = 0; // count the number of gaps
@@ -578,7 +568,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             logPos -= gapsSmaller;
         }
         return logPos;
-
     }
 
     @Override
@@ -604,12 +593,9 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         return tmp;
     }
 
-
-
     public boolean isColored(boolean setColored){
     isColored = setColored;
     return isColored;
     }
-
 
 }

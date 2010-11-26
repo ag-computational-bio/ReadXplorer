@@ -1,14 +1,14 @@
 package de.cebitec.vamp;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.view.LoginFrame;
+import de.cebitec.vamp.view.ViewController;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.LoginFrame;
-import de.cebitec.vamp.view.ViewController;
 
 /**
  *

@@ -1,10 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 
 /**
  *
@@ -82,7 +82,6 @@ public class Layout implements LayoutI {
             } else {
                 reverseBlockContainer.addBlock(block);
             }
-
         }
     }    
 
@@ -104,7 +103,6 @@ public class Layout implements LayoutI {
             block = blocks.getNextByPositionAndRemove(block.getAbsStop()+1);
         }
     }
-
 
     @Override
     public Iterator<LayerI> getForwardIterator(){

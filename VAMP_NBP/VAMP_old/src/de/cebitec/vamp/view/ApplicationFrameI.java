@@ -26,6 +26,4 @@ public interface ApplicationFrameI {
 
     public void closeTrackPanel(BasePanel trackPanel, TrackItem trackMenuItem);
 
-
-
 }

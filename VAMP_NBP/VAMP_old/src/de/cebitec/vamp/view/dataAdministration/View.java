@@ -1,15 +1,15 @@
 package de.cebitec.vamp.view.dataAdministration;
 
-import de.cebitec.vamp.dataAdministration.ViewListenerI;
-import de.cebitec.vamp.dataAdministration.ModelListenerI;
+import de.cebitec.vamp.ApplicationController;
 import de.cebitec.vamp.dataAdministration.JobManager;
+import de.cebitec.vamp.dataAdministration.ModelListenerI;
+import de.cebitec.vamp.dataAdministration.ViewListenerI;
+import de.cebitec.vamp.importer.ReferenceJob;
+import de.cebitec.vamp.importer.TrackJobs;
 import java.awt.CardLayout;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-import de.cebitec.vamp.ApplicationController;
-import de.cebitec.vamp.importer.ReferenceJob;
-import de.cebitec.vamp.importer.TrackJobs;
 
 /**
  *

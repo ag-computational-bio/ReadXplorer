@@ -1,11 +1,11 @@
 package de.cebitec.vamp.importer;
 
+import de.cebitec.vamp.parsing.mappings.MappingParserI;
+import de.cebitec.vamp.parsing.reference.ReferenceParserI;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import de.cebitec.vamp.parsing.mappings.MappingParserI;
-import de.cebitec.vamp.parsing.reference.ReferenceParserI;
 
 /**
  *
@@ -15,7 +15,6 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
 
     private List<ImporterDataModelListenerI> listeners;
 
-
     private List<TrackJobs> trackJobsrun;
     private List<ReferenceJob> refGenJobs;
 
@@ -24,9 +23,7 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
  
         trackJobsrun = new ArrayList<TrackJobs>();
         refGenJobs = new ArrayList<ReferenceJob>();
-
     }
-
 
     @Override
     public void addTaskListener(ImporterDataModelListenerI listener) {
@@ -38,7 +35,6 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
         listeners.remove(listener);
     }
 
-
     @Override
     public void removeRefGenTask(ReferenceJob refGenJob) {
         refGenJobs.remove(refGenJob);
@@ -47,7 +43,6 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
             l.refGenJobRemoved(refGenJob);
         }
     }
-
 
     @Override
     public void removeTrackTask(TrackJobs trackJob) {
@@ -62,7 +57,6 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
         }
     }
 
-
     @Override
     public void createRefGenTask(ReferenceParserI parser, File refGenFile, String description, String name) {
         ReferenceJob r = new ReferenceJob(null,refGenFile, parser, description, name, new Timestamp(System.currentTimeMillis()));
@@ -71,7 +65,6 @@ public class ImporterJobManager implements JobManagerI, ImporterDataModelI {
             i.refGenJobAdded(r);
         }
     }
-
 
     @Override
     public List<ReferenceJob> getRefGenJobList(){

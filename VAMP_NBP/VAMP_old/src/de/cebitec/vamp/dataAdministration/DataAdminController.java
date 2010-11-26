@@ -59,5 +59,4 @@ public class DataAdminController implements ViewListenerI {
         view.updateDeletionStatus(message);
     }
 
-
 }

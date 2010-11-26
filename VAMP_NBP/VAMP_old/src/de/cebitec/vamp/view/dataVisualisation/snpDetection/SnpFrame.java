@@ -1,5 +1,11 @@
 package de.cebitec.vamp.view.dataVisualisation.snpDetection;
 
+import de.cebitec.vamp.ApplicationController;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 import java.awt.CardLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -8,12 +14,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
-import de.cebitec.vamp.ApplicationController;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 
 /**
  *

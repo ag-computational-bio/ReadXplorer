@@ -1,11 +1,11 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.RunConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -285,8 +285,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 bmPercentage.setText(bmCov);
                 nerrorPercentage.setText(nErrorCov);
                 statsFinished();
-
-
             }
         }){
         };
@@ -310,6 +308,5 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     public void close() {
         trackCon = null;
     }
-
 
 }

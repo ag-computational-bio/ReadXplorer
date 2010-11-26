@@ -1,8 +1,8 @@
 package de.cebitec.vamp.view.importer;
 
-import java.awt.Component;
 import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.importer.TrackJobs;
+import java.awt.Component;
 
 /**
  *
@@ -30,7 +30,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
     void refGenJobRemoved(ReferenceJob refGenJob) {
         refGenJobView1.remove(refGenJob);
     }
-
 
     void setRemoveButtonEnabled(boolean b) {
         removeJob.setEnabled(b);
@@ -128,7 +127,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
     }//GEN-LAST:event_removeJobActionPerformed
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
-
         Component c = jTabbedPane1.getSelectedComponent();
         boolean isSelected = false;
         if(c instanceof RefJobView){

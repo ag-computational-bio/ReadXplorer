@@ -1,17 +1,16 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AdjustmentPanelListenerI;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 
 /**
  *
  * @author ddoppmeier
  */
 public class BoundsInfoManager implements AdjustmentPanelListenerI {
-
 
     private int currentPosition;
     private int zoomfactor;

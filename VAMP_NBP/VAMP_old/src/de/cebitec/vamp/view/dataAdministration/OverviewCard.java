@@ -1,15 +1,16 @@
 package de.cebitec.vamp.view.dataAdministration;
 
-import java.util.Iterator;
-import java.util.List;
 import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.importer.TrackJobs;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
  * @author ddoppmeier
  */
 public class OverviewCard extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     private View view;
 
@@ -110,7 +111,6 @@ public class OverviewCard extends javax.swing.JPanel {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         view.showSelectionCard();
     }//GEN-LAST:event_jButton2ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

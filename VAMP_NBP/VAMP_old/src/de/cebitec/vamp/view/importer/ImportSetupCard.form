@@ -48,9 +48,9 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="vamp.view.importer.RefJobView" name="refGenJobView1">
+        <Component class="de.cebitec.vamp.view.importer.RefJobView" name="refGenJobView1">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vamp.view.importer.RefJobView(this)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.view.importer.RefJobView(this)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -60,9 +60,9 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="vamp.view.importer.TrackJobView" name="trackJobView1">
+        <Component class="de.cebitec.vamp.view.importer.TrackJobView" name="trackJobView1">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vamp.view.importer.TrackJobView(this)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.view.importer.TrackJobView(this)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">

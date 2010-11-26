@@ -1,14 +1,13 @@
 package de.cebitec.vamp.view;
 
+import de.cebitec.vamp.GestureListenerI;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.GestureListenerI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -17,6 +16,7 @@ import javax.swing.JOptionPane;
  * @author ddoppmeier
  */
 public class LoginFrame extends javax.swing.JFrame {
+    private static final long serialVersionUID = 1L;
 
     private String defaultDatabaseMySQL;
     private String defaultdatabaseh2;
@@ -34,7 +34,6 @@ public class LoginFrame extends javax.swing.JFrame {
         initComponents();
         setLoginData();
         dbChooseButton.setVisible(false);
-
     }
 
     public void addGestureListener(GestureListenerI listener) {
@@ -225,7 +224,6 @@ public class LoginFrame extends javax.swing.JFrame {
         userField.setText(defaultuser);
         urlField.setText(defaulthostname);
         databaseField.setText(defaultDatabaseMySQL);
-
     }
     private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
 
@@ -256,7 +254,6 @@ public class LoginFrame extends javax.swing.JFrame {
                     }
                 }
 
-
             } else {
 
                 Preferences prefs = Preferences.userNodeForPackage(LoginFrame.class);
@@ -269,7 +266,6 @@ public class LoginFrame extends javax.swing.JFrame {
                     Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
 
             // let all listeners now, they should log in now
             for (GestureListenerI i : gestureListener) {
@@ -302,7 +298,6 @@ public class LoginFrame extends javax.swing.JFrame {
                         Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-
 
             } else {
 

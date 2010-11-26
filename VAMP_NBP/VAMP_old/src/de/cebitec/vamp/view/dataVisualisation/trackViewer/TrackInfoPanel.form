@@ -38,7 +38,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="vamp.view.dataVisualisation.trackViewer.CoverageInfoPanel" name="coverageInfoPanel1">
+        <Component class="de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoPanel" name="coverageInfoPanel1">
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
@@ -50,9 +50,9 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="vamp.view.dataVisualisation.trackViewer.ColorOptionPanel" name="colorOptionPanel1">
+        <Component class="de.cebitec.vamp.view.dataVisualisation.trackViewer.ColorOptionPanel" name="colorOptionPanel1">
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vamp.view.dataVisualisation.trackViewer.ColorOptionPanel(this)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.view.dataVisualisation.trackViewer.ColorOptionPanel(this)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">

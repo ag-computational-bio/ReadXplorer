@@ -1,15 +1,17 @@
 package de.cebitec.vamp.parsing.reference.embl.biojava;
 
-import de.cebitec.vamp.parsing.reference.ReferenceParserI;
+import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.parsing.common.ParsedFeature;
 import de.cebitec.vamp.parsing.common.ParsedReference;
+import de.cebitec.vamp.parsing.common.ParsingException;
+import de.cebitec.vamp.parsing.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
+import de.cebitec.vamp.parsing.reference.ReferenceParserI;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.parsing.common.ParsingException;
-import de.cebitec.vamp.importer.ReferenceJob;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -23,8 +25,6 @@ import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
 import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
-import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
-import de.cebitec.vamp.parsing.reference.Filter.FeatureFilter;
 
 /**
  *
@@ -48,7 +48,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
         ParsedReference refGenome = new ParsedReference();
         refGenome.setFeatureFilter(filter);
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \""+refGenJob.getFile()+"\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
         try {
             
             BufferedReader in = new BufferedReader(new FileReader(refGenJob.getFile()));
@@ -137,7 +137,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
                     } else if(parsedType.equalsIgnoreCase("mRNA")){
                         type = FeatureType.M_RNA;
                     } else {
-                        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Found unknown feature "+parsedType);
+                        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Found unknown feature {0}", parsedType);
                     }
 
                     refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber));
@@ -155,8 +155,6 @@ public class BioJavaEmblParser implements ReferenceParserI {
         return refGenome;
     }
 
-
-
     @Override
     public String getParserName(){
         return parserName;
@@ -171,7 +169,5 @@ public class BioJavaEmblParser implements ReferenceParserI {
     public String[] getFileExtensions() {
         return fileExtension;
     }
-
-
 
 }

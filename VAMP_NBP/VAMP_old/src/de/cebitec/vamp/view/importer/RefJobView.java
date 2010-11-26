@@ -37,7 +37,6 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
         jobs = new ArrayList<ReferenceJob>();
     }
 
-
     public void add(ReferenceJob refGenJob) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.addRow(new Object[]{refGenJob.getFile().getName()});
@@ -55,7 +54,6 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
         ListSelectionModel model = jTable1.getSelectionModel();
         return !model.isSelectionEmpty();
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -125,6 +123,5 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
             parent.setRemoveButtonEnabled(true);
         }
     }
-
 
 }

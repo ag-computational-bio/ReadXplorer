@@ -1,10 +1,10 @@
 package de.cebitec.vamp.importer;
 
-import java.util.List;
 import de.cebitec.vamp.ApplicationController;
 import de.cebitec.vamp.RunningTaskI;
 import de.cebitec.vamp.view.importer.ImporterViewFrame;
 import de.cebitec.vamp.view.importer.ImporterViewI;
+import java.util.List;
 
 /**
  *
@@ -19,9 +19,7 @@ public class ImporterController implements ImporterViewListenerI {
 
     }
 
-
     public void setupNewImport(){
-
         // concrete type of objects has to be created first,
         // because it is used and interpreted as two differen interfaces
         ImporterViewFrame v = new ImporterViewFrame();
@@ -49,8 +47,6 @@ public class ImporterController implements ImporterViewListenerI {
 
         i.execute();
     }
-
-
 
     @Override
     public void cancelImport(){

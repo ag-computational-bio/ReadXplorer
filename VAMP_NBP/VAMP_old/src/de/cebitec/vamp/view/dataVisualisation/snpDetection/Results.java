@@ -3,11 +3,9 @@ package de.cebitec.vamp.view.dataVisualisation.snpDetection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JFileChooser;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import de.cebitec.vamp.exporter.ExportContoller;
 
 /**
  *
@@ -119,11 +117,7 @@ public class Results extends javax.swing.JPanel implements ListSelectionListener
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-
        new NewExportDialog(parent, true).setVisible(true);
-       
-
-
     }//GEN-LAST:event_exportButtonActionPerformed
 
 

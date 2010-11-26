@@ -59,7 +59,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignCardLayout"/>
       <SubComponents>
-        <Component class="vamp.view.dataAdministration.SelectionCard" name="dataAdminPanel1">
+        <Component class="de.cebitec.vamp.view.dataAdministration.SelectionCard" name="dataAdminPanel1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="dataAdminPanel1.setView(this);"/>
           </AuxValues>
@@ -69,7 +69,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="vamp.view.dataAdministration.OverviewCard" name="overviewCard1">
+        <Component class="de.cebitec.vamp.view.dataAdministration.OverviewCard" name="overviewCard1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="overviewCard1.setDataAdminView(this);"/>
           </AuxValues>
@@ -79,7 +79,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="vamp.view.dataAdministration.ProgressCard" name="progressCard1">
+        <Component class="de.cebitec.vamp.view.dataAdministration.ProgressCard" name="progressCard1">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="progressCard1.setDataAdminView(this);"/>
           </AuxValues>

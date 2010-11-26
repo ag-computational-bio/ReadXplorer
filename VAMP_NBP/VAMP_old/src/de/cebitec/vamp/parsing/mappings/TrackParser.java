@@ -1,12 +1,12 @@
 package de.cebitec.vamp.parsing.mappings;
 
-import java.util.HashMap;
 import de.cebitec.vamp.importer.TrackJobs;
 import de.cebitec.vamp.parsing.common.CoverageContainer;
 import de.cebitec.vamp.parsing.common.ParsedMappingContainer;
 import de.cebitec.vamp.parsing.common.ParsedRun;
 import de.cebitec.vamp.parsing.common.ParsedTrack;
 import de.cebitec.vamp.parsing.common.ParsingException;
+import java.util.HashMap;
 
 /**
  *
@@ -16,7 +16,6 @@ public class TrackParser implements TrackParserI {
 
     @Override
     public ParsedTrack parseMappings(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException {
-
         // parse mapping files and store them in appropriate source objects
         MappingParserI mappingp = trackJob.getParser();
         ParsedMappingContainer mappings = mappingp.parseInput(trackJob, readnameToSequenceID);
@@ -36,11 +35,9 @@ public class TrackParser implements TrackParserI {
 
     @Override
     public ParsedRun parseMappingforReadData(TrackJobs trackJob) throws ParsingException {
-
         MappingParserI mappingp = trackJob.getParser();
         ParsedRun run= mappingp.parseInputForReadData(trackJob);
         return run;
-
     }
 
 }

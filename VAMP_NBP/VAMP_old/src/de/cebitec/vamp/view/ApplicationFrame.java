@@ -1,16 +1,16 @@
 package de.cebitec.vamp.view;
 
+import de.cebitec.vamp.ApplicationController;
+import de.cebitec.vamp.RunningTaskI;
+import de.cebitec.vamp.dataAdministration.DeletionThread;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.importer.ImportThread;
+import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.ApplicationController;
-import de.cebitec.vamp.RunningTaskI;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.importer.ImportThread;
-import de.cebitec.vamp.dataAdministration.DeletionThread;
-import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 
 /**
  *
@@ -22,7 +22,6 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
 
     private ViewController viewController;
 
-
     /** Creates new form ApplicationFrame */
     public ApplicationFrame() {
         initComponents();
@@ -32,7 +31,6 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     public void setViewController(ViewController viewController){
         this.viewController = viewController;
     }
-
 
     @Override
     public void blockControlsByRunningTask(RunningTaskI runningTask){
@@ -48,7 +46,6 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "blocking controlls for unknown runningtask!");
         }
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -230,8 +227,6 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
         shutdownItem.setEnabled(true);
     }
 
-
-
     @Override
     public void showRefGenPanel(BasePanel genome){
         visualPanel.add(genome);
@@ -256,8 +251,6 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
         visualPanel.updateUI();
 
     }
-
-
 
     @Override
     public void showTrackPanel(BasePanel trackPanel, TrackItem trackMenuItem) {

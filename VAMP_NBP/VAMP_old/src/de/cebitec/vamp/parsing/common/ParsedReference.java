@@ -1,7 +1,7 @@
 package de.cebitec.vamp.parsing.common;
 
-import java.sql.Timestamp;
 import de.cebitec.vamp.parsing.reference.Filter.FeatureFilter;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 

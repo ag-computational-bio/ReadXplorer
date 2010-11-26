@@ -1,8 +1,15 @@
 package de.cebitec.vamp.view.importer;
 
-import java.awt.Component;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.importer.JobManagerI;
 import de.cebitec.vamp.importer.ReferenceJob;
+import de.cebitec.vamp.parsing.common.ParserI;
+import de.cebitec.vamp.parsing.mappings.BAMParser;
+import de.cebitec.vamp.parsing.mappings.JokParser;
+import de.cebitec.vamp.parsing.mappings.MappingParserI;
+import de.cebitec.vamp.parsing.mappings.SAMParser;
+import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,14 +23,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistentRun;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.parsing.common.ParserI;
-import de.cebitec.vamp.parsing.mappings.BAMParser;
-import de.cebitec.vamp.parsing.mappings.MappingParserI;
-import de.cebitec.vamp.parsing.mappings.JokParser;
-import de.cebitec.vamp.parsing.mappings.SAMParser;
 
 /**
  *
@@ -48,7 +47,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
         // choose the default parser. first entry is shown in combobox by default
         currentParser = parsers[0];
     }
-
 
     private ReferenceJob[] getRefGenJobs() {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
@@ -192,12 +190,11 @@ public class NewTrackDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-
         String description = descriptionField.getText();
       //  RunJob runJob = (RunJob) readBox.getSelectedItem();
         ReferenceJob refGenJob = (ReferenceJob) refGenBox.getSelectedItem();
 
-        if (mappingFile == null || refGenJob == null || description.equals("")) {
+        if (mappingFile == null || refGenJob == null || description.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
         } else {
             this.setVisible(false);
@@ -206,7 +203,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_addButtonActionPerformed
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
-
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
         Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
@@ -247,7 +243,6 @@ public class NewTrackDialog extends javax.swing.JDialog {
             mappingFileField.setText("");
             descriptionField.setText("");
         }
-
     }//GEN-LAST:event_jComboBox1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;

@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
-import java.util.Iterator;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import java.util.Iterator;
 
 /**
  *

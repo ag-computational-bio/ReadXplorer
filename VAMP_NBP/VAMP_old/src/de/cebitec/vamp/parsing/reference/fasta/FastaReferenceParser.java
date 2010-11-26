@@ -1,14 +1,14 @@
 package de.cebitec.vamp.parsing.reference.fasta;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import de.cebitec.vamp.importer.ReferenceJob;
 import de.cebitec.vamp.parsing.common.ParsedReference;
 import de.cebitec.vamp.parsing.common.ParsingException;
 import de.cebitec.vamp.parsing.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parsing.reference.ReferenceParserI;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +35,7 @@ public class FastaReferenceParser implements ReferenceParserI {
     public ParsedReference parseReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         ParsedReference refGenome = new ParsedReference();
         String sequence = "";
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"" + referenceJob.getFile() + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile());
         try {
 
             BufferedReader in = new BufferedReader(new FileReader(referenceJob.getFile()));
@@ -57,7 +57,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             throw new ParsingException(ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished reading file  \"" + referenceJob.getFile() + "\"" + "genome length:" + sequence.length());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished reading file  \"{0}" + "\"" + "genome length:" + "{1}", new Object[]{referenceJob.getFile(), sequence.length()});
         return refGenome;
 
     }

@@ -1,12 +1,12 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 
 /**
  *
@@ -190,7 +190,7 @@ public class GenomeGapManager {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("genome gap manager:\n");
-        sb.append("lowerbound: "+lowerBound+", upperbound: "+upperBound+"\n");
+        sb.append("lowerbound: ").append(lowerBound).append(", upperbound: ").append(upperBound).append("\n");
 
         if(!accCalced){
             this.computeAccumulatedGaps();
@@ -201,22 +201,22 @@ public class GenomeGapManager {
 
         for(int i = lowerBound; i < max; i++ ){
             int position = i;
-            sb.append(String.valueOf(position)+"\t");
+            sb.append(String.valueOf(position)).append("\t");
 
             if(maxNumGapsPerOriginalPosition.containsKey(position)){
-                sb.append(maxNumGapsPerOriginalPosition.get(position)+"\t");
+                sb.append(maxNumGapsPerOriginalPosition.get(position)).append("\t");
             } else {
                 sb.append("#\t");
             }
 
             if(addedGapsOriginalPosition.containsKey(position)){
-                sb.append(addedGapsOriginalPosition.get(position)+"\t");
+                sb.append(addedGapsOriginalPosition.get(position)).append("\t");
             } else {
                 sb.append("#\t");
             }
 
             if(addedGapsAccumulatedPositions.containsKey(position)){
-                sb.append(addedGapsAccumulatedPositions.get(position)+"\n");
+                sb.append(addedGapsAccumulatedPositions.get(position)).append("\n");
             } else {
                 sb.append("#\n");
             }

@@ -5,7 +5,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 /**
- * A Panel to controll zoomlevel and the currently shown positions of listeners
+ * A Panel to control zoom-level and the currently shown positions of listeners
  * @author ddoppmeier
  */
 public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
@@ -46,13 +46,12 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
         if(slider != null){
             slider.addAdjustmentPanelListener(listener);
         }
-
     }
 
     /**
      *
      * @param listener remove the listener, so it is not updated anymore on
-     * accuring changes
+     * occurring changes
      */
     public void removeAdjustmentListener(AdjustmentPanelListenerI listener){
         if(scrollbar != null){

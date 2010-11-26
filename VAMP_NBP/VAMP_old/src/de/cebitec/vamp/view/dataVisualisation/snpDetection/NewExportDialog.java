@@ -1,41 +1,20 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- *   This file is part of ProSE.
- *   Copyright (C) 2007-2010 CeBiTec, Bielefeld University
- * 
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- * 
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- * 
- *   You should have received a copy of the GNU General Public License
- *   along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
  * NewExportDialog.java
  *
  * Created on 05.10.2010, 13:44:17
  */
 package de.cebitec.vamp.view.dataVisualisation.snpDetection;
 
-import java.io.File;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import de.cebitec.vamp.exporter.ExportContoller;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author jstraube
  */
 public class NewExportDialog extends java.awt.Dialog {
+
+    private static final long serialVersionUID = 1L;
 
     private SnpFrame parent;
 
@@ -130,7 +109,7 @@ public class NewExportDialog extends java.awt.Dialog {
     }//GEN-LAST:event_closeDialog
 
             private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-                if (nameField.getText().equals("") || directoryField.getText().equals("")) {
+                if (nameField.getText().isEmpty() || directoryField.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
                 } else {
                     this.setVisible(false);
@@ -148,10 +127,12 @@ public class NewExportDialog extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 NewExportDialog dialog = new NewExportDialog(new java.awt.Frame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }

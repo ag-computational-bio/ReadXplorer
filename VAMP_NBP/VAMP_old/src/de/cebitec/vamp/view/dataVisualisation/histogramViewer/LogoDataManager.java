@@ -1,12 +1,12 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
-import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 
 /**
  *
@@ -148,7 +148,7 @@ public class LogoDataManager {
         } else if(base == '_'){
             row = READGAP;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base "+base);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
         }
 
         int column = MATCH;
@@ -165,19 +165,18 @@ public class LogoDataManager {
 
         // decrease match coverage
         counts[position][column] = counts[position][column] - count;
-
     }
 
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("width: "+width+", height: "+HEIGHT+"\n");
+        sb.append("width: ").append(width).append(", height: ").append(HEIGHT).append("\n");
 
         for(int i = 0; i < width; i++){
             int pos = absStart + i;
-            sb.append("pos: "+pos+"\t");
+            sb.append("pos: ").append(pos).append("\t");
             for(int j = 0; j < HEIGHT; j++){
-                sb.append(counts[i][j]+"\t");
+                sb.append(counts[i][j]).append("\t");
             }
             sb.append("\n");
         }
@@ -186,7 +185,6 @@ public class LogoDataManager {
     }
 
     void addGaps(Collection<PersistantReferenceGap> gaps, GenomeGapManager gapManager) {
-    
         for(Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext(); ){
             PersistantReferenceGap gap = it.next();
             char base = gap.getBase();
@@ -203,7 +201,6 @@ public class LogoDataManager {
             }
             shiftedPos -= absStart;
 
-
             int row = 0;
             if(base == 'A'){
                 row = A;
@@ -216,7 +213,7 @@ public class LogoDataManager {
             } else if(base == 'N'){
                 row = N;
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base "+base);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
             }
 
             if(!gap.isForwardStrand()){
@@ -224,10 +221,7 @@ public class LogoDataManager {
             }
 
             counts[shiftedPos][row] = counts[shiftedPos][row] + count;
-
         }
-
-
     }
 
     public int getMaxFoundCoverage() {

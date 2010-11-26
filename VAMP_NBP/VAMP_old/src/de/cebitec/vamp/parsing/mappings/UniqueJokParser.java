@@ -6,6 +6,7 @@ import de.cebitec.vamp.parsing.common.ParsedMapping;
 import de.cebitec.vamp.parsing.common.ParsedMappingContainer;
 import de.cebitec.vamp.parsing.common.ParsedReferenceGap;
 import de.cebitec.vamp.parsing.common.ParsedRun;
+import de.cebitec.vamp.parsing.common.ParsingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.parsing.common.ParsingException;
 
 /**
  * This class is a slightly different version of the JokParser. In contrast to
@@ -35,14 +35,12 @@ public class UniqueJokParser implements MappingParserI{
         gapOrderIndex = new HashMap<Integer, Integer>();
     }
 
-
     @Override
     public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID) throws ParsingException{
-
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
 
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;
@@ -70,7 +68,7 @@ public class UniqueJokParser implements MappingParserI{
                 int errors = Integer.parseInt(tokens[6]);
 
                 // check tokens
-                if(readname == null || readname.equals("")){
+                if(readname == null || readname.isEmpty()){
                     throw new ParsingException("could not read readname in " +
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". " +
                             "Found read name: "+readname);
@@ -89,12 +87,12 @@ public class UniqueJokParser implements MappingParserI{
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". "+
                             "Must be >> oder <<");
                 }
-                if(readSeq == null || readSeq.equals("")){
+                if(readSeq == null || readSeq.isEmpty()){
                     throw new ParsingException("read sequence could not be parsed in " +
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". " +
                             "Found: "+readSeq);
                 }
-                if(refSeq == null || refSeq.equals("")){
+                if(refSeq == null || refSeq.isEmpty()){
                     throw new ParsingException("reference sequence could not be parsed in " +
                             ""+trackJob.getFile().getAbsolutePath()+" line "+lineno+". " +
                             "Found: "+refSeq);
@@ -127,7 +125,7 @@ public class UniqueJokParser implements MappingParserI{
                 mappingContainer.addParsedMapping(mapping, seqID);
             }
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (IOException ex){
             throw new ParsingException(ex);
@@ -136,7 +134,6 @@ public class UniqueJokParser implements MappingParserI{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
     }
-
 
     private int getOrderForGap(int gapPos){
         if(!gapOrderIndex.containsKey(gapPos)){
@@ -165,7 +162,7 @@ public class UniqueJokParser implements MappingParserI{
         } else if(base == '_'){
             rev = '_';
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char "+base+"!");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char {0}!", base);
         }
 
         return rev;
@@ -227,12 +224,11 @@ public class UniqueJokParser implements MappingParserI{
         return fileExtension;
     }
 
-
     @Override
     public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
                 ParsedRun run = new ParsedRun(fileDescription);
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;
@@ -254,7 +250,7 @@ public class UniqueJokParser implements MappingParserI{
                 run.addReadData(editReadSeq, readname);
             }
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \""+trackJob.getFile().getAbsolutePath()+"\"");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (IOException ex){
             throw new ParsingException(ex);

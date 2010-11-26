@@ -1,19 +1,19 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 
 /**
  *
@@ -52,7 +52,6 @@ public class ReferenceViewer extends AbstractViewer {
         currentlySelectedFeature.setSelected(true);
     }
 
-
     @Override
     public int getMaximalHeight() {
         return height;
@@ -79,7 +78,6 @@ public class ReferenceViewer extends AbstractViewer {
 
         featureStats.clear();
 
-        
         List<PersistantFeature> features = refGenC.getFeaturesForRegion(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
         for(PersistantFeature f : features){
             addFeatureComponent(f);
@@ -94,7 +92,6 @@ public class ReferenceViewer extends AbstractViewer {
         }
         featureStats.put(type, featureStats.get(type)+1);
     }
-
 
     private void addFeatureComponent(PersistantFeature f){
         int frame = determineFrame(f);
@@ -134,7 +131,6 @@ public class ReferenceViewer extends AbstractViewer {
     }
 
     private int determineYFromFrame(int frame){
-
         int result = 0;
         int offset = Math.abs(frame) * FRAMEHEIGHT;
 
@@ -145,7 +141,6 @@ public class ReferenceViewer extends AbstractViewer {
             result = this.getPaintingAreaInfo().getForwardLow();
             result -= offset;
         }
-
         return result;
     }
 
@@ -163,8 +158,6 @@ public class ReferenceViewer extends AbstractViewer {
         }
         return frame;
     }
-
-
 
     @Override
     protected void paintComponent(Graphics graphics){
@@ -186,8 +179,6 @@ public class ReferenceViewer extends AbstractViewer {
     }
 
     private void drawSingleScaleLine(Graphics2D g, int yCord, String label){
-
-
         int labelHeight = g.getFontMetrics().getMaxAscent();
         int labelWidth = g.getFontMetrics().stringWidth(label);
 
@@ -212,7 +203,6 @@ public class ReferenceViewer extends AbstractViewer {
         if(i<=x2){
             g.drawLine(i, yCord, x2, yCord);
         }
-
     }
 
     public void setGenomeViewerInfoPanel(ReferenceViewerInfoPanel info) {

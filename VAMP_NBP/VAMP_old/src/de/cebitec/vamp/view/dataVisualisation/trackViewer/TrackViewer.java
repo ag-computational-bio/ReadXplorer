@@ -1,15 +1,16 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
-import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.CoverageRequest;
+import de.cebitec.vamp.databackend.CoverageThreadListener;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
+import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -22,12 +23,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.CoverageRequest;
-import de.cebitec.vamp.databackend.CoverageThreadListener;
-import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
 
 /**
  * Display the coverage for a sequenced track related to a reference genome
@@ -125,7 +120,6 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         // draw black middle line
         g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
         drawBaseLines(g);
-        
     }
 
     private void drawBaseLines(Graphics2D graphics){
@@ -261,7 +255,6 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             JPanel legend = this.getLegendPanel();
             this.add(legend);
         }
-
     }
 
     private void createCoveragePaths(){
@@ -291,7 +284,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
             StringBuilder sb = new StringBuilder();
             sb.append("<html>");
-            sb.append("<b>Position</b>: "+logPos);
+            sb.append("<b>Position</b>: ").append(logPos);
             sb.append("<br>");
             sb.append("<table>");
             sb.append("<tr><td align=\"left\"><b>Forward strand</b></td></tr>");
@@ -312,13 +305,11 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         } else {
             this.setToolTipText(null);
         }
-
     }
 
     private String createTableRow(String label, int value){
         return "<tr><td align=\"right\">"+label+":</td><td align=\"left\">"+String.valueOf(value)+"</td></tr>";
     }
-
 
     public void setTrackInfoPanel(TrackInfoPanel info) {
         this.trackInfo = info;
@@ -378,13 +369,10 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         } else {
             scaleLineStep = 20000;
         }
-
     }
 
     private void createLines(int step, Graphics2D g){
-
         PaintingAreaInfo info = this.getPaintingAreaInfo();
-
 
         int tmp = step;
         int physY = getCoverageYValue(step);
@@ -416,7 +404,6 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             g.drawString(label, labelRight, reverseY + labelHeight/2);
             g.drawString(label, labelRight, forwardY + labelHeight/2);
         }
-
     }
 
     private String getLabel(int logPos, int step){
@@ -437,11 +424,10 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         return label;
     }
 
-    
     public void colorChanges() {
         colorChanges = true;
        
         repaint();
-
     }
+    
 }

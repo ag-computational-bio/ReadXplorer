@@ -1,8 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.LogicalBoundsListener;
+import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.event.MouseEvent;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -11,11 +16,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import de.cebitec.vamp.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
-import de.cebitec.vamp.view.dataVisualisation.LogicalBoundsListener;
-import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 
 /**
  * AbstractViewer ist a superclass for displaying genome related information.
@@ -28,6 +28,7 @@ import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
  */
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener{
 
+    private static final long serialVersionUID = 1L;
 
     // logical coordinates for genome interval
     private BoundsInfo bounds;
@@ -127,7 +128,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     private void adjustPaintingAreaInfo(){
-
         paintingAreaInfo.setForwardHigh(verticalMargin);
         paintingAreaInfo.setReverseHigh(this.getSize().height-1 -verticalMargin);
         paintingAreaInfo.setPhyLeft(horizontalMargin);
@@ -287,8 +287,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             boundsChangedHook();
             repaint();
         }
-        
-        
     }
 
     @Override
@@ -346,7 +344,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         g.fillRect((int)coords.getLeftPhysBound(), info.getForwardHigh(), width, info.getCompleteHeight());
     }
 
-
     protected int getWidthOfMouseOverlay(int position){
         PhysicalBaseBounds mouseArea = getPhysBoundariesForLogPos(position);
         return (int) (mouseArea.getPhysWidth() >= 3 ? mouseArea.getPhysWidth() : 3);
@@ -365,7 +362,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
     
-
     @Override
     public void setMouseOverPaintingRequested(boolean requested){
         // repaint whole viewer if mouse curser was painted before, but none is not wanted
@@ -378,7 +374,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
-
     /**
      * This method defines a hook, that is called every time when the logical
      * positions change. Content of this method is executed after updating the
@@ -387,7 +382,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     public abstract void boundsChangedHook();
 
-
     /**
      *
      * @return the current bounds values
@@ -395,7 +389,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public BoundsInfo getBoundsInfo(){
         return bounds;
     }
-
 
     /**
      * @return the current dimension of this panel
@@ -490,6 +483,5 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public BoundsInfoManager getBoundsInformationManager(){
         return boundsManager;
     }
-
 
   }

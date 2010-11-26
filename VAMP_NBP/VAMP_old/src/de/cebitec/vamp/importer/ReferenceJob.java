@@ -1,10 +1,10 @@
 package de.cebitec.vamp.importer;
 
+import de.cebitec.vamp.parsing.reference.ReferenceParserI;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import de.cebitec.vamp.parsing.reference.ReferenceParserI;
 
 /**
  *
@@ -31,29 +31,25 @@ public class ReferenceJob {
         trackswithoutRunjob = new ArrayList<TrackJobs>();
     }
 
-
     public void registerTrackWithoutRunJob(TrackJobs t){
         trackswithoutRunjob.add(t);
     }
 
-
-        public void unregisterTrackwithoutRunJob(TrackJobs t){
-        while(trackswithoutRunjob.contains(t)){
+    public void unregisterTrackwithoutRunJob(TrackJobs t) {
+        while (trackswithoutRunjob.contains(t)) {
             trackswithoutRunjob.remove(t);
         }
     }
-    
 
-        public boolean hasRegisteredTrackswithoutrRunJob(){
-        if(trackswithoutRunjob.size() > 0 ){
+    public boolean hasRegisteredTrackswithoutrRunJob() {
+        if (trackswithoutRunjob.size() > 0) {
             return true;
         } else {
             return false;
         }
     }
 
-
-        public List<TrackJobs> getDependentTrackswithoutRunjob(){
+    public List<TrackJobs> getDependentTrackswithoutRunjob() {
         return trackswithoutRunjob;
     }
 
@@ -101,6 +97,5 @@ public class ReferenceJob {
             return "new: "+name+" "+timestamp;
         }
     }
-    
 
 }

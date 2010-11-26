@@ -1,12 +1,12 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
-import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 
 /**
  *
@@ -72,8 +72,6 @@ public class Block implements BlockI{
             bricks.add(new Brick(type));
     }
 
-
-
     private int determineDiffType(char c){
         int type;
         if       (c == 'A' ){
@@ -90,7 +88,7 @@ public class Block implements BlockI{
             type = Brick.READGAP;
         } else {
             type = Brick.UNDEF;
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type "+c);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", c);
         }
         return type;
     }
@@ -109,7 +107,7 @@ public class Block implements BlockI{
             type = Brick.GENOME_GAP_N;
         } else {
             type = Brick.UNDEF;
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type "+c);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", c);
         }
         return type;
     }

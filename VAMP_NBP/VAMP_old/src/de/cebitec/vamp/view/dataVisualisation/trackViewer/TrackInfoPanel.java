@@ -1,9 +1,9 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AbstractInfoPanel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 
 /**
  *
@@ -90,10 +90,7 @@ public class TrackInfoPanel extends AbstractInfoPanel {
         this.cov = cov;
     }
 
-
-
     private int getIntervalCoverage(PersistantCoverage cov, boolean isForwardStrand, int covType, int from, int to){
-
         int sum = 0;
 
         if(isForwardStrand){
@@ -132,7 +129,6 @@ public class TrackInfoPanel extends AbstractInfoPanel {
 
         return sum;
     }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cebitec.vamp.view.dataVisualisation.trackViewer.ColorOptionPanel colorOptionPanel1;

@@ -6,6 +6,15 @@ import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.PersistentRun;
+import de.cebitec.vamp.parsing.common.CoverageContainer;
+import de.cebitec.vamp.parsing.common.ParsedDiff;
+import de.cebitec.vamp.parsing.common.ParsedFeature;
+import de.cebitec.vamp.parsing.common.ParsedMapping;
+import de.cebitec.vamp.parsing.common.ParsedReadname;
+import de.cebitec.vamp.parsing.common.ParsedReference;
+import de.cebitec.vamp.parsing.common.ParsedReferenceGap;
+import de.cebitec.vamp.parsing.common.ParsedRun;
+import de.cebitec.vamp.parsing.common.ParsedTrack;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,15 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.parsing.common.ParsedRun;
-import de.cebitec.vamp.parsing.common.ParsedReadname;
-import de.cebitec.vamp.parsing.common.ParsedReference;
-import de.cebitec.vamp.parsing.common.CoverageContainer;
-import de.cebitec.vamp.parsing.common.ParsedDiff;
-import de.cebitec.vamp.parsing.common.ParsedFeature;
-import de.cebitec.vamp.parsing.common.ParsedReferenceGap;
-import de.cebitec.vamp.parsing.common.ParsedMapping;
-import de.cebitec.vamp.parsing.common.ParsedTrack;
 
 /**
  *
@@ -440,7 +440,7 @@ public class ProjectConnector {
     }
 
     public long addRun(ParsedRun run) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"" + run.getDescription() + "to " + adapter);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"{0}to {1}", new Object[]{run.getDescription(), adapter});
 
         if (adapter.equalsIgnoreCase("mysql")) {
             try {
@@ -666,7 +666,7 @@ public class ProjectConnector {
     }
 
     public long addRefGenome(ParsedReference reference) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing reference sequence  \"" + reference.getName() + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName());
 
         if (adapter.equalsIgnoreCase("mysql")) {
 
@@ -696,7 +696,7 @@ public class ProjectConnector {
             }
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"" + reference.getName() + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName());
         return reference.getID();
     }
 
@@ -1067,7 +1067,7 @@ public class ProjectConnector {
             track.clear();
 
         }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"" + track.getDescription() + "\" has been stored successfully");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
 
         return track.getID();
     }
@@ -1207,7 +1207,7 @@ public class ProjectConnector {
     }
 
     public void deleteTrack(long trackID) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \"" + trackID + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \"{0}\"", trackID);
         try {
             con.setAutoCommit(false);
 
@@ -1238,11 +1238,11 @@ public class ProjectConnector {
             throw new StorageException(ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"" + trackID + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"{0}\"", trackID);
     }
 
     public void deleteRun(long runID) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of run with id \"" + runID + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of run with id \"{0}\"", runID);
         try {
             con.setAutoCommit(false);
 
@@ -1268,11 +1268,11 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             throw new StorageException(ex);
         }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \"" + runID + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \"{0}\"", runID);
     }
 
     public void deleteGenome(long refGenID) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \"" + refGenID + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID);
         try {
             con.setAutoCommit(false);
 
@@ -1294,7 +1294,7 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             throw new StorageException(ex);
         }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"" + refGenID + "\"");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
 
     public List<String> getReadNamesForSequenceID(int id) {

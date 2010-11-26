@@ -8,6 +8,8 @@ import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.view.dataVisualisation.readPosition.Read;
+import de.cebitec.vamp.view.dataVisualisation.snpDetection.Snp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.view.dataVisualisation.readPosition.Read;
-import de.cebitec.vamp.view.dataVisualisation.snpDetection.Snp;
 
 /**
  *
@@ -125,7 +125,7 @@ public class TrackConnector {
                         PersistantReferenceGap g = new PersistantReferenceGap(position, base, gapOrder, isForwardStrand, count);
                         mappings.get(m.getId()).addGenomeGap(g);
                     } else {
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown type for diff in database " + type);
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown type for diff in database {0}", type);
                     }
                 }
             }
@@ -425,7 +425,7 @@ public class TrackConnector {
         } else if (base == '_') {
             return base;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown char " + base + " for base");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown char {0} for base", base);
             return ' ';
         }
     }
@@ -458,7 +458,7 @@ public class TrackConnector {
             } else if (base == '_') {
                 values[_COV] = values[_COV] + count;
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown diff base " + base);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown diff base {0}", base);
             }
 
         } else {
@@ -473,7 +473,7 @@ public class TrackConnector {
             } else if (base == 'N') {
                 values[N_GAP] = values[N_GAP] + count;
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown genome gap base " + base);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown genome gap base {0}", base);
             }
         }
 

@@ -1,5 +1,10 @@
 package de.cebitec.vamp.dataAdministration;
 
+import de.cebitec.vamp.RunningTaskI;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.StorageException;
+import de.cebitec.vamp.importer.ReferenceJob;
+import de.cebitec.vamp.importer.TrackJobs;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -7,11 +12,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
-import de.cebitec.vamp.RunningTaskI;
-import de.cebitec.vamp.databackend.connector.StorageException;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.importer.ReferenceJob;
-import de.cebitec.vamp.importer.TrackJobs;
 
 /**
  *

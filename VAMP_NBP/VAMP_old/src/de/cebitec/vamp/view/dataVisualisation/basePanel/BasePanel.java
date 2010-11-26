@@ -1,5 +1,8 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
+import de.cebitec.vamp.view.ViewController;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -7,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.ViewController;
-import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 
 /**
  *

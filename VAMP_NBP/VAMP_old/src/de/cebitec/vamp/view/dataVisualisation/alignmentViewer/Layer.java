@@ -43,7 +43,6 @@ public class Layer implements LayerI{
             this.fillWithGaps(from, absStop, sb);
         }
         return sb.toString();
-
     }
 
     private void fillWithGaps(int from, int to, StringBuilder sb){

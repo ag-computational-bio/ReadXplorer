@@ -1,4 +1,3 @@
-
 /*
  * ReadSearch.java
  *
@@ -14,6 +13,7 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockComponent;
  * @author jstraube
  */
 public class ReadSearch extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
      private ReadFrame parent;
      private BlockComponent blockComponent;
     /** Creates new form ReadSearch */
@@ -90,7 +90,6 @@ public class ReadSearch extends javax.swing.JPanel {
         parent.findReads(read);
 }//GEN-LAST:event_searchButtonActionPerformed
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -98,6 +97,5 @@ public class ReadSearch extends javax.swing.JPanel {
     private javax.swing.JTextField readNameField;
     private javax.swing.JButton searchButton;
     // End of variables declaration//GEN-END:variables
-
 
 }

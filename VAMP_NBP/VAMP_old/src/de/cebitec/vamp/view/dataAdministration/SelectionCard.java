@@ -8,6 +8,8 @@ import de.cebitec.vamp.importer.TrackJobs;
  * @author ddoppmeier
  */
 public class SelectionCard extends javax.swing.JPanel {
+    
+    private static final long serialVersionUID = 1L;
 
     private View view;
 
@@ -24,18 +26,13 @@ public class SelectionCard extends javax.swing.JPanel {
         refGenView1.deselectRefGen(refGen);
     }
 
-
-
-
     void refGenJobAdded(ReferenceJob refGenJob) {
         refGenView1.refGenJobAdded(refGenJob);
     }
 
-
     void trackJobAdded(TrackJobs trackJob) {
         mappingView1.trackJobAdded(trackJob);
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.

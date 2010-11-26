@@ -1,14 +1,14 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
+import de.cebitec.vamp.ApplicationController;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
+import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 import java.awt.CardLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import de.cebitec.vamp.ApplicationController;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 
 /**
  *

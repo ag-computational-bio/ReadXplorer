@@ -1,9 +1,13 @@
 package de.cebitec.vamp.view.importer;
 
-import java.awt.Component;
 import de.cebitec.vamp.importer.JobManagerI;
+import de.cebitec.vamp.parsing.common.ParserI;
+import de.cebitec.vamp.parsing.reference.ReferenceParserI;
+import de.cebitec.vamp.parsing.reference.embl.biojava.BioJavaEmblParser;
+import de.cebitec.vamp.parsing.reference.fasta.FastaReferenceParser;
+import de.cebitec.vamp.parsing.reference.genbank.biojava.BioJavaGenBankParser;
+import java.awt.Component;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -13,11 +17,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import de.cebitec.vamp.parsing.common.ParserI;
-import de.cebitec.vamp.parsing.reference.ReferenceParserI;
-import de.cebitec.vamp.parsing.reference.embl.biojava.BioJavaEmblParser;
-import de.cebitec.vamp.parsing.reference.fasta.FastaReferenceParser;
-import de.cebitec.vamp.parsing.reference.genbank.biojava.BioJavaGenBankParser;
 
 /**
  *
@@ -165,21 +164,18 @@ public class NewReferenceDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addRefGenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRefGenButtonActionPerformed
-
         String description = descriptionField.getText();
         String name = nameField.getText();
 
-        if (refGenFile == null || name.equals("") || description.equals("")) {
+        if (refGenFile == null || name.isEmpty() || description.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
         } else {
             this.setVisible(false);
             taskManager.createRefGenTask(currentParser, refGenFile, description, name);
         }
-
     }//GEN-LAST:event_addRefGenButtonActionPerformed
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
         Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
@@ -209,12 +205,9 @@ public class NewReferenceDialog extends javax.swing.JDialog {
                 System.err.print("NewReferenceDialog couldnt read file");
             }
         }
-
-
     }//GEN-LAST:event_fileChooserButtonActionPerformed
 
     private void filetypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filetypeBoxActionPerformed
-
         ReferenceParserI newparser = (ReferenceParserI) filetypeBox.getSelectedItem();
         if (currentParser != newparser) {
             currentParser = newparser;
@@ -223,7 +216,6 @@ public class NewReferenceDialog extends javax.swing.JDialog {
             fileField.setText("");
             descriptionField.setText("");
         }
-
     }//GEN-LAST:event_filetypeBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
