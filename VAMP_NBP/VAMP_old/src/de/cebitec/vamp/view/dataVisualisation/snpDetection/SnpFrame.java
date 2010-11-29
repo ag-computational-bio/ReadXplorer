@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.snpDetection;
 
+import de.cebitec.vamp.objects.Snp;
 import de.cebitec.vamp.ApplicationController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;

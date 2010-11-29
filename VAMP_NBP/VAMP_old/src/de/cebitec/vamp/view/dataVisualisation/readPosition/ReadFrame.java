@@ -5,6 +5,7 @@
  */
 package de.cebitec.vamp.view.dataVisualisation.readPosition;
 
+import de.cebitec.vamp.objects.Read;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;

@@ -8,6 +8,7 @@
 
 package de.cebitec.vamp.view.dataVisualisation.readPosition;
 
+import de.cebitec.vamp.objects.Read;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;

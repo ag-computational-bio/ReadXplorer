@@ -1,17 +1,19 @@
 package de.cebitec.vamp.importer;
 
+import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.RunningTaskI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
-import de.cebitec.vamp.parsing.common.ParsedReference;
-import de.cebitec.vamp.parsing.common.ParsedRun;
-import de.cebitec.vamp.parsing.common.ParsedTrack;
-import de.cebitec.vamp.parsing.common.ParsingException;
-import de.cebitec.vamp.parsing.mappings.TrackParser;
-import de.cebitec.vamp.parsing.mappings.TrackParserI;
-import de.cebitec.vamp.parsing.reference.Filter.FeatureFilter;
-import de.cebitec.vamp.parsing.reference.Filter.FilterRuleSource;
-import de.cebitec.vamp.parsing.reference.ReferenceParserI;
+import de.cebitec.vamp.parser.common.ParsedReference;
+import de.cebitec.vamp.parser.common.ParsedRun;
+import de.cebitec.vamp.parser.common.ParsedTrack;
+import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.mappings.TrackParser;
+import de.cebitec.vamp.parser.mappings.TrackParserI;
+import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
+import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -76,8 +78,19 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing track data from source \"{0}trackjobID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
 
         HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID()).getReadnameToSeqIDMapping();
+        
+        // XXX does this work for all import methods???
+        // TODO somehow get the information if sequenceString is neccessary
+        String sequenceString = null;
+        try {
+            Long id = trackJob.getRefGen().getID();
+            sequenceString = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGen().getSequence();
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Could not get the ref genome\"{0}\"{1}", new Object[]{trackJob.getFile().getAbsolutePath(), ex});
+        }
+
         TrackParserI parser = new TrackParser();
-        ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap);
+        ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap, sequenceString);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
         return track;

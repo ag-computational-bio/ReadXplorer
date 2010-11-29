@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.snpDetection;
 
+import de.cebitec.vamp.objects.Snp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;

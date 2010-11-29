@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataAdministration;
 
-import de.cebitec.vamp.importer.ReferenceJob;
+import de.cebitec.vamp.parser.ReferenceJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;

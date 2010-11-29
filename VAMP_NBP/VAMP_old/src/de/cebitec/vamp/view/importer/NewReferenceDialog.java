@@ -1,11 +1,11 @@
 package de.cebitec.vamp.view.importer;
 
 import de.cebitec.vamp.importer.JobManagerI;
-import de.cebitec.vamp.parsing.common.ParserI;
-import de.cebitec.vamp.parsing.reference.ReferenceParserI;
-import de.cebitec.vamp.parsing.reference.embl.biojava.BioJavaEmblParser;
-import de.cebitec.vamp.parsing.reference.fasta.FastaReferenceParser;
-import de.cebitec.vamp.parsing.reference.genbank.biojava.BioJavaGenBankParser;
+import de.cebitec.vamp.parser.common.ParserI;
+import de.cebitec.vamp.parser.reference.ReferenceParserI;
+import de.cebitec.vamp.parser.reference.embl.biojava.BioJavaEmblParser;
+import de.cebitec.vamp.parser.reference.fasta.FastaReferenceParser;
+import de.cebitec.vamp.parser.reference.genbank.biojava.BioJavaGenBankParser;
 import java.awt.Component;
 import java.io.File;
 import java.util.logging.Level;

@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataAdministration;
 
-import de.cebitec.vamp.importer.TrackJobs;
+import de.cebitec.vamp.parser.TrackJobs;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;

@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.importer;
 
-import de.cebitec.vamp.importer.ReferenceJob;
-import de.cebitec.vamp.importer.TrackJobs;
+import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.TrackJobs;
 import java.awt.Component;
 
 /**

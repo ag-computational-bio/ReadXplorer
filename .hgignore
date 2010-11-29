@@ -1,0 +1,7 @@
+/build$
+/private/private.xml$
+\.orig$
+\.orig\..*$
+\.chg\..*$
+\.rej$
+\.conflict\~$

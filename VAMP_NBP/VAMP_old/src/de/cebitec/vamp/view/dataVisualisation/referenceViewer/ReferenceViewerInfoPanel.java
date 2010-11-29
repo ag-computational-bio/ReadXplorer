@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.parsing.reference.Filter.FeatureType;
+import de.cebitec.vamp.parser.reference.Filter.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AbstractInfoPanel;
 import java.util.Iterator;
