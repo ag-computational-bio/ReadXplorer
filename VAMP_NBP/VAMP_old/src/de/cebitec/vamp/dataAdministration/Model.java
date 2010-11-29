@@ -1,5 +1,6 @@
 package de.cebitec.vamp.dataAdministration;
 
+import de.cebitec.vamp.parser.JobManager;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;

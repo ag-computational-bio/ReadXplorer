@@ -1,11 +1,13 @@
-package de.cebitec.vamp.view;
+package de.cebitec.vamp.controller;
 
-import de.cebitec.vamp.GestureListenerI;
-import de.cebitec.vamp.RunningTaskI;
-import de.cebitec.vamp.dataAdministration.DataAdminController;
+import de.cebitec.vamp.dataAdministration.GestureListenerI;
+import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.importer.ImporterController;
+import de.cebitec.vamp.view.ApplicationFrame;
+import de.cebitec.vamp.view.ApplicationFrameI;
+import de.cebitec.vamp.view.OpenRefGenDialog;
+import de.cebitec.vamp.view.OpenTrackDialog;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;

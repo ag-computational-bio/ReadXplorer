@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;

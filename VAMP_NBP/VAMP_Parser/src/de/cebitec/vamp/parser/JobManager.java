@@ -1,4 +1,4 @@
-package de.cebitec.vamp.dataAdministration;
+package de.cebitec.vamp.parser;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;

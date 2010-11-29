@@ -1,10 +1,11 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.vamp.ApplicationController;
-import de.cebitec.vamp.RunningTaskI;
+import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.controller.ApplicationController;
+import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.dataAdministration.DeletionThread;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.importer.ImportThread;
+import de.cebitec.vamp.dataAdministration.ImportThread;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 import java.awt.event.ActionEvent;

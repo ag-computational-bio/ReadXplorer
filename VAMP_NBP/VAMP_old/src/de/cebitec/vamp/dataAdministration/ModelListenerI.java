@@ -11,9 +11,7 @@ public interface ModelListenerI {
 
     public void deselectRefGen(ReferenceJob refGen);
 
-
     public void refGenJobAdded(ReferenceJob refGenJob);
-
 
     public void trackJobsAdded(TrackJobs trackJob);
 }

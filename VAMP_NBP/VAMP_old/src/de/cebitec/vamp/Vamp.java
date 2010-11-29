@@ -1,5 +1,6 @@
 package de.cebitec.vamp;
 
+import de.cebitec.vamp.controller.ApplicationController;
 import javax.swing.SwingUtilities;
 
 /**

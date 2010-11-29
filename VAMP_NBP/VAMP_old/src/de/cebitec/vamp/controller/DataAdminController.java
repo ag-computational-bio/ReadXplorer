@@ -1,7 +1,10 @@
-package de.cebitec.vamp.dataAdministration;
+package de.cebitec.vamp.controller;
 
-import de.cebitec.vamp.ApplicationController;
-import de.cebitec.vamp.RunningTaskI;
+import de.cebitec.vamp.dataAdministration.RunningTaskI;
+import de.cebitec.vamp.dataAdministration.DeletionThread;
+import de.cebitec.vamp.dataAdministration.Model;
+import de.cebitec.vamp.dataAdministration.ModelInterface;
+import de.cebitec.vamp.dataAdministration.ViewListenerI;
 import de.cebitec.vamp.view.dataAdministration.View;
 import de.cebitec.vamp.view.dataAdministration.ViewI;
 

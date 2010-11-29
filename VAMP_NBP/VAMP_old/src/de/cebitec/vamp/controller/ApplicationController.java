@@ -1,8 +1,9 @@
-package de.cebitec.vamp;
+package de.cebitec.vamp.controller;
 
+import de.cebitec.vamp.dataAdministration.GestureListenerI;
+import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.view.LoginFrame;
-import de.cebitec.vamp.view.ViewController;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;

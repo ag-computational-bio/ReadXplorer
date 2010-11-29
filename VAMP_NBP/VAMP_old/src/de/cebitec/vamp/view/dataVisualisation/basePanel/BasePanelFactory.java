@@ -1,11 +1,11 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.view.ViewController;
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;

@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.vamp.RunningTaskI;
+import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 

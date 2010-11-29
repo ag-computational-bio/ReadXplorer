@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JComponent;

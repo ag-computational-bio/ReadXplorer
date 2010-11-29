@@ -6,7 +6,7 @@
 
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import java.awt.Color;
 import javax.swing.JCheckBox;
 

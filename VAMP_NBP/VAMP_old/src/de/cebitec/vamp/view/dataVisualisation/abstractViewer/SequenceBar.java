@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;

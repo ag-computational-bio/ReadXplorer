@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;

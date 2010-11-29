@@ -1,6 +1,6 @@
 package de.cebitec.vamp.dataAdministration;
 
-import de.cebitec.vamp.RunningTaskI;
+import de.cebitec.vamp.controller.DataAdminController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
 import de.cebitec.vamp.parser.ReferenceJob;

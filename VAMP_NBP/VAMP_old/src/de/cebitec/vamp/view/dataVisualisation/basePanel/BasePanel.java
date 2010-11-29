@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
-import de.cebitec.vamp.view.ViewController;
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;

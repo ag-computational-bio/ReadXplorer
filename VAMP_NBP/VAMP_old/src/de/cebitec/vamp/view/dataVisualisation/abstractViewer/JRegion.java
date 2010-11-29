@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.vamp.ColorProperties;
+import de.cebitec.vamp.util.ColorProperties;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JComponent;

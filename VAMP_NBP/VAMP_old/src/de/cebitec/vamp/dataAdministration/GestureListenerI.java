@@ -1,4 +1,4 @@
-package de.cebitec.vamp;
+package de.cebitec.vamp.dataAdministration;
 
 /**
  *
@@ -6,13 +6,10 @@ package de.cebitec.vamp;
  */
 public interface GestureListenerI {
 
-
     public void shutDownApplication();
 
     public void logOff();
 
     public void login(String adapter, String hostname, String database, String user, String password);
-
-
 
 }

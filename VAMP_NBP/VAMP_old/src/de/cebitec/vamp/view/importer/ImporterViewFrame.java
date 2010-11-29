@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.importer;
 
-import de.cebitec.vamp.ApplicationController;
+import de.cebitec.vamp.controller.ApplicationController;
 import de.cebitec.vamp.importer.ImporterDataModelListenerI;
 import de.cebitec.vamp.importer.ImporterViewListenerI;
 import de.cebitec.vamp.importer.JobManagerI;

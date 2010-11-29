@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.vamp.ApplicationController;
+import de.cebitec.vamp.controller.ApplicationController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;

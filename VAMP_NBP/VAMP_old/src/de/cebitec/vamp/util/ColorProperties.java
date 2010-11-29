@@ -1,4 +1,4 @@
-package de.cebitec.vamp;
+package de.cebitec.vamp.util;
 
 import java.awt.Color;
 
