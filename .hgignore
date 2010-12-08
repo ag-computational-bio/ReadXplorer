@@ -1,5 +1,6 @@
 /build$
 /private/private.xml$
+/nbproject/private/
 \.orig$
 \.orig\..*$
 \.chg\..*$

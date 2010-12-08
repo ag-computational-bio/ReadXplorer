@@ -16,6 +16,7 @@
         <folder name="Window">
             <file name="OpenLibraryViewerWindowAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-OpenVampAction.instance"/>
+                <attr name="position" intvalue="0"/>
             </file>
         </folder>
     </folder>

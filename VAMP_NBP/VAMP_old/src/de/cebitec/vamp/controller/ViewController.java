@@ -4,7 +4,6 @@ import de.cebitec.vamp.dataAdministration.GestureListenerI;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.view.ApplicationFrame;
 import de.cebitec.vamp.view.ApplicationFrameI;
 import de.cebitec.vamp.view.OpenRefGenDialog;
 import de.cebitec.vamp.view.OpenTrackDialog;
@@ -13,12 +12,12 @@ import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.openide.windows.WindowManager;
 
 /**
  *
@@ -26,7 +25,7 @@ import java.util.Map;
  */
 public class ViewController implements de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
-    private ApplicationFrameI appFrame;
+//    private ApplicationFrameI appFrame;
     private List<GestureListenerI> gestureListeners;
     private List<MousePositionListener> mousePosListener;
     private BoundsInfoManager boundsManager;
@@ -38,8 +37,8 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     private Map<PersistantTrack, TrackItem> trackToItem;
 
     public ViewController(){
-        appFrame = new ApplicationFrame();
-        appFrame.setViewController(this);
+//        appFrame = new ApplicationFrame();
+//        appFrame.setViewController(this);
         mousePosListener = new ArrayList<MousePositionListener>();
 
         gestureListeners = new ArrayList<GestureListenerI>();
@@ -52,7 +51,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public void showApplicationFrame(boolean show){
-        appFrame.setVisible(show);
+//        appFrame.setVisible(show);
     }
 
     public void newImportDialog(){
@@ -64,9 +63,9 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public void blockControlsByRunningTasks(List<RunningTaskI> tasks) {
-        appFrame.releaseButtons();
+//        appFrame.releaseButtons();
         for(RunningTaskI r : tasks){
-            appFrame.blockControlsByRunningTask(r);
+//            appFrame.blockControlsByRunningTask(r);
         }
     }
 
@@ -83,7 +82,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public void openRefGen(){
-        OpenRefGenDialog d = new OpenRefGenDialog((Frame) appFrame, true);
+        OpenRefGenDialog d = new OpenRefGenDialog(WindowManager.getDefault().getMainWindow(), true);
         d.setVisible(true);
 
         if(d.refgenWasSelected()){
@@ -91,7 +90,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
             boundsManager = new BoundsInfoManager(currentRefGen);
             basePanelFac = new BasePanelFactory(boundsManager, this);
             genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
-            appFrame.showRefGenPanel(genomeViewer);
+            getApp().showRefGenPanel(genomeViewer);
         }
     }
 
@@ -110,7 +109,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         // unregister from listeners and remove
         genomeViewer.close();
         mousePosListener.remove(genomeViewer);
-        appFrame.removeRefGenPanel(genomeViewer);
+        getApp().removeRefGenPanel(genomeViewer);
         genomeViewer = null;
         currentRefGen = null;
         basePanelFac = null;
@@ -119,7 +118,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public void openTrack() {
-        OpenTrackDialog d = new OpenTrackDialog((Frame) appFrame, true, currentRefGen);
+        OpenTrackDialog d = new OpenTrackDialog(WindowManager.getDefault().getMainWindow(), true, currentRefGen);
         d.setVisible(true);
 
         if(d.wasTrackSelected()){
@@ -134,7 +133,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
             trackToPanel.put(t, tp);
 
             // show the panel and the track
-            appFrame.showTrackPanel(tp, trackItem);
+            getApp().showTrackPanel(tp, trackItem);
         }
     }
 
@@ -142,7 +141,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         BasePanel trackPanel = trackToPanel.get(track);
         TrackItem trackItem = trackToItem.get(track);
 
-        appFrame.closeTrackPanel(trackPanel, trackItem);
+        getApp().closeTrackPanel(trackPanel, trackItem);
         trackPanel.close();
         mousePosListener.remove(trackPanel);
 
@@ -182,5 +181,8 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         }
     }
 
+    private ApplicationFrameI getApp(){
+        return (ApplicationFrameI) WindowManager.getDefault().findTopComponent("AppPanelTopComponent");
+    }
 
 }

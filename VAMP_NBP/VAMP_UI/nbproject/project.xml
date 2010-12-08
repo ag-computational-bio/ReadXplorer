@@ -3,9 +3,33 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>de.cebitec.vamp</code-name-base>
+            <code-name-base>de.cebitec.vamp.view</code-name-base>
             <suite-component/>
             <module-dependencies>
+                <dependency>
+                    <code-name-base>de.cebitec.centrallookup</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>de.cebitec.vamp</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>de.cebitec.vamp.cookies</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
                 <dependency>
                     <code-name-base>de.cebitec.vamp.databackend</code-name-base>
                     <build-prerequisite/>
@@ -15,43 +39,36 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.exporter</code-name-base>
+                    <code-name-base>org.netbeans.modules.settings</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>1.0</specification-version>
+                        <release-version>1</release-version>
+                        <specification-version>1.26.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.importer</code-name-base>
+                    <code-name-base>org.openide.awt</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>1.0</specification-version>
+                        <specification-version>7.23.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.libs</code-name-base>
+                    <code-name-base>org.openide.dialogs</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>1.0</specification-version>
+                        <specification-version>7.15.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.objects</code-name-base>
+                    <code-name-base>org.openide.nodes</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>de.cebitec.vamp.parser</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
+                        <specification-version>7.16.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -79,24 +96,7 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages>
-                <package>de.cebitec.vamp</package>
-                <package>de.cebitec.vamp.controller</package>
-                <package>de.cebitec.vamp.dataAdministration</package>
-                <package>de.cebitec.vamp.util</package>
-                <package>de.cebitec.vamp.view</package>
-                <package>de.cebitec.vamp.view.dataAdministration</package>
-                <package>de.cebitec.vamp.view.dataVisualisation</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.abstractViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.alignmentViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.basePanel</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.histogramViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.readPosition</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.referenceViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.snpDetection</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.trackViewer</package>
-                <package>de.cebitec.vamp.view.importer</package>
-            </public-packages>
+            <public-packages/>
         </data>
     </configuration>
 </project>
