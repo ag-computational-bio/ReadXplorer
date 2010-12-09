@@ -2,11 +2,13 @@ package vamp.parsing.common;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -14,12 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ParsedRun {
     
-    ConcurrentHashMap<String, ParsedReadname> sequences;
+    HashMap<String, ParsedReadname> sequences;
     private HashMap<String, String> errorMap;
     private String description;
     private Timestamp timestamp;
     private long id;
-    private int readCollectionSize=0;
+    HashSet<String> s = new HashSet<String>();
     public Timestamp getTimestamp() {
         return timestamp;
     }
@@ -30,7 +32,7 @@ public class ParsedRun {
 
     public ParsedRun(String description){
         this.description = description;
-        sequences = new ConcurrentHashMap<String, ParsedReadname>();
+        sequences = new HashMap<String, ParsedReadname>();
         errorMap = new HashMap<String, String>();
     }
 
@@ -48,24 +50,14 @@ public class ParsedRun {
         return sequences.keySet();
     }
 
-    public int getSizeofReadCollection(){
-        Iterator it = getSequences().iterator();
-        while(it.hasNext()){
-          readCollectionSize =readCollectionSize +  sequences.get(it.next()).getNumOfReads();
-
-        }
-        return readCollectionSize;
-    }
 
 
     
-//ParsedReadname contains the names of the reads with the same sequence
+   //ParsedReadname contains the names of the reads with the same sequence
     public void addReadData(String sequence, String readName) throws OutOfMemoryError{
-
         if(!sequences.containsKey(sequence)){
             sequences.put(sequence, new ParsedReadname());
             }
-
         sequences.get(sequence).addRead(readName);
     }
 
@@ -105,4 +97,4 @@ public class ParsedRun {
         sequences.clear();
     }
 
-}
+    }

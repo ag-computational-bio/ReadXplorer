@@ -76,7 +76,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
     private ParsedTrack parseTrack(TrackJobs trackJob) throws ParsingException{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing track data from source \""+trackJob.getFile().getAbsolutePath()+"trackjobID" +trackJob.getID()+"\"");
 
-        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID()).getReadnameToSeqIDMapping();
+        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID(),trackJob.getID()).getReadnameToSeqIDMapping();
         TrackParserI parser = new TrackParser();
         ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap);
 

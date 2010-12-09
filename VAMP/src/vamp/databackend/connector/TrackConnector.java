@@ -321,7 +321,7 @@ public class TrackConnector {
         return num;
     }
 
-        public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete){
+        public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete,int numOfReads, int numOfUniqueSeq){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
             PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
@@ -347,6 +347,8 @@ public class TrackConnector {
             insertStatics.setInt(7,covPerf);
             insertStatics.setInt(8,covBM);
             insertStatics.setInt(9,covComplete);
+            insertStatics.setInt(10,covBM);
+            insertStatics.setInt(11,covComplete);
             insertStatics.execute();
 
             insertStatics.close();
@@ -405,6 +407,10 @@ public class TrackConnector {
 
     public long getRunId() {
         return runID;
+    }
+
+    public long getTrackID(){
+        return trackID;
     }
 
     private Character revCompl(char base) {

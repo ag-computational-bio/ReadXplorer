@@ -53,6 +53,6 @@ public class ParsedTrack {
     mappings.clear();
     coverageContainer.clear();
     }
-   
+
 
 }

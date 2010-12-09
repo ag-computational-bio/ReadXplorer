@@ -217,17 +217,18 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
             @Override
             public void run() {
-                RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId());
+                RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId(),trackCon.getTrackID());
 
                 int numUniqueReads = runC.getNumberOfUniqueSequences();
                 if(numUniqueReads == 0 ){
                 numUniqueReads = runC.getNumberOfUniqueSequencesCalculate();
-                
+
                 }
                 int numOfReads = runC.getNumberOfReads();
                 if(numOfReads == 0 ){
                 numOfReads = runC.getNumberOfReadsCalculate();
-                runC.updateTableRun(numOfReads, numUniqueReads);
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating static information");
+                runC.updateTableStatics(numOfReads, numUniqueReads);
                 }
 
 
@@ -263,7 +264,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 double percentageNErrorCovered = trackCon.getPercentRefGenNErrorCovered();
                      if(percentageNErrorCovered ==0){
                   percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
-                  trackCon.setStatics(numOfMappings, numOfPerfectMappings, numOfBestMatchMappings, numOfMappedUniqueReads, percentagePerfectCovered, percentageBMCovered, percentageNErrorCovered);
+                  trackCon.setStatics(numOfMappings, numOfPerfectMappings, numOfBestMatchMappings, numOfMappedUniqueReads, percentagePerfectCovered, percentageBMCovered, percentageNErrorCovered,numOfReads, numUniqueReads);
                 }
 
                 String perfectCov = String.format("%.2f%%", percentagePerfectCovered);

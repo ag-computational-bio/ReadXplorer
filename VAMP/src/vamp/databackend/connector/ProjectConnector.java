@@ -171,7 +171,13 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_STATICS).execute();
+            con.prepareStatement(H2SQLStatements.SETUP_STATICS).executeUpdate();
+            try{
+            con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS).execute();
+            con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ).execute();
+            }catch(Exception ex){
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Tables already exsist");
+            }
             con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
             con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_SEQUENCE).executeUpdate();
@@ -335,8 +341,6 @@ public class ProjectConnector {
             insertRun.setLong(1, runID);
             insertRun.setString(2, run.getDescription());
             insertRun.setTimestamp(3, run.getTimestamp());
-            insertRun.setInt(4, run.getSizeofReadCollection());
-            insertRun.setInt(5, run.getSequences().size());
             insertRun.execute();
 
             insertRun.close();
@@ -699,6 +703,9 @@ public class ProjectConnector {
     }
 
     private void storeCoverage(ParsedTrack track) {
+         coveragePerf = 0 ;
+         coverageBM = 0;
+         coverageComplete=0;
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing coverage information...");
         try {
             PreparedStatement insertCoverage = con.prepareStatement(SQLStatements.INSERT_COVERAGE);
@@ -836,12 +843,16 @@ public class ProjectConnector {
         int perfectmappings = 0;
         int bmmappings = 0;
         int mappedSeq = 0;
+        int noOfReads= 0;
+        int noOfUniqueSeq = 0;
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
             mappings = mappingInfos.get(1);
             perfectmappings = mappingInfos.get(2);
             bmmappings = mappingInfos.get(3);
             mappedSeq = mappingInfos.get(4);
+            noOfReads =  mappingInfos.get(5);
+            noOfUniqueSeq =  mappingInfos.get(6);
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the list");
         }
@@ -867,6 +878,8 @@ public class ProjectConnector {
             insertStatics.setInt(7,coveragePerf);
             insertStatics.setInt(8,coverageBM);
             insertStatics.setInt(9,coverageComplete);
+            insertStatics.setInt(10,noOfReads);
+            insertStatics.setInt(11,noOfUniqueSeq);
             insertStatics.execute();
 
             insertStatics.close();
@@ -1131,10 +1144,10 @@ public class ProjectConnector {
         return refConnectors.get(refGenID);
     }
 
-    public RunConnector getRunConnector(long runID) {
+    public RunConnector getRunConnector(long runID,long trackID) {
         // only return new object, if no suitable connector was created before
         if (!runConnectors.containsKey(runID)) {
-            runConnectors.put(runID, new RunConnector(runID));
+            runConnectors.put(runID, new RunConnector(runID,trackID));
         }
         return runConnectors.get(runID);
     }
