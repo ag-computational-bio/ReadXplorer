@@ -35,7 +35,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
         this.c = c;
         this.tracksRun = tracksRun;
         this.gens = gens;
-        
+
         validTracksRun = new HashMap<TrackJobs, Boolean>();
     }
 
@@ -46,7 +46,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
         FeatureFilter filter = new FeatureFilter();
         filter.addBlacklistRule(new FilterRuleSource());
         ParsedReference refGenome =  parser.parseReference(refGenJob, filter);
-        
+
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing reference genome from source \""+refGenJob.getFile().getAbsolutePath()+"\"");
         return refGenome;
 
@@ -76,7 +76,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
     private ParsedTrack parseTrack(TrackJobs trackJob) throws ParsingException{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing track data from source \""+trackJob.getFile().getAbsolutePath()+"trackjobID" +trackJob.getID()+"\"");
 
-        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID()).getReadnameToSeqIDMapping();
+        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID(),trackJob.getID()).getReadnameToSeqIDMapping();
         TrackParserI parser = new TrackParser();
         ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap);
 
@@ -164,7 +164,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
 
 
 
-  
+
 
     private void processRefGenJobs(){
         if(!gens.isEmpty()){
@@ -290,7 +290,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
     @Override
     protected Object doInBackground() {
 
-        
+
         processRefGenJobs();
        // processRunJobs();
         processTrackRUNJobs();

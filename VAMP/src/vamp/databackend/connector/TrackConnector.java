@@ -83,7 +83,7 @@ public class TrackConnector {
             fetch.setInt(3, to);
             fetch.setInt(4, from);
             fetch.setInt(5, to);
-            
+
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 // mapping data
@@ -137,7 +137,7 @@ public class TrackConnector {
     }
 
     public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) {
-        
+
         ArrayList<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_IN_TRACK_FOR_INTERVAL);
@@ -160,12 +160,12 @@ public class TrackConnector {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        
+
         return diffs;
     }
 
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to) {
-   
+
         Collection<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
         try {
             PreparedStatement fetchGaps = con.prepareStatement(SQLStatements.FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL);
@@ -321,7 +321,7 @@ public class TrackConnector {
         return num;
     }
 
-        public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete){
+        public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete,int numOfReads, int numOfUniqueSeq){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
             PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
@@ -347,6 +347,8 @@ public class TrackConnector {
             insertStatics.setInt(7,covPerf);
             insertStatics.setInt(8,covBM);
             insertStatics.setInt(9,covComplete);
+            insertStatics.setInt(10,covBM);
+            insertStatics.setInt(11,covComplete);
             insertStatics.execute();
 
             insertStatics.close();
@@ -405,6 +407,10 @@ public class TrackConnector {
 
     public long getRunId() {
         return runID;
+    }
+
+    public long getTrackID(){
+        return trackID;
     }
 
     private Character revCompl(char base) {
@@ -683,7 +689,7 @@ public class TrackConnector {
         double percentage = 0;
         double absValue = 0;
         PreparedStatement fetch;
-        try {   
+        try {
                 fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK);
 
             fetch.setLong(1, trackID);
@@ -721,7 +727,7 @@ public class TrackConnector {
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-      
+
         percentage = absValue / genomeSize * 100;
         return percentage;
     }

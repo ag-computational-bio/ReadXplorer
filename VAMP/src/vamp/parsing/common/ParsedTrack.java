@@ -48,6 +48,11 @@ public class ParsedTrack {
     public void setID(long id){
         this.id = id;
     }
-   
+
+    public void clear(){
+    mappings.clear();
+    coverageContainer.clear();
+    }
+
 
 }
