@@ -3,19 +3,26 @@ package de.cebitec.vamp.view;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.cookies.CloseRefGenCookie;
+import de.cebitec.vamp.cookies.CloseTrackCookie;
+import de.cebitec.vamp.cookies.OpenRefGenCookie;
+import de.cebitec.vamp.cookies.OpenTrackCookie;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 //import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.cookies.ViewCookie;
+import org.openide.cookies.CloseCookie;
+import org.openide.nodes.Node;
+import org.openide.nodes.Node.Cookie;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -42,23 +49,14 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         putClientProperty(TopComponent.PROP_DRAGGING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
 
-//        CentralLookup.getDefault().add(new ViewCookie() {
-//
-//            @Override
-//            public void view() {
-//                CentralLookup.getDefault().lookup(ViewController.class).openRefGen();
-//                CentralLookup.getDefault().remove(this);
-//            }
-//        });
-        content.add(new ViewCookie() {
+    }
 
-            @Override
-            public void view() {
-                CentralLookup.getDefault().lookup(ViewController.class).openRefGen();
-                content.remove(this);
-            }
-        });
-        associateLookup(new AbstractLookup(content));
+    private void removeAllCookies(){
+        Collection<? extends Cookie> allCookies = getLookup().lookupAll(Cookie.class);
+
+        for (Cookie cookie : allCookies) {
+            content.remove(cookie);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -126,17 +124,25 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
     @Override
     public int getPersistenceType() {
-        return TopComponent.PERSISTENCE_ONLY_OPENED;
+        return TopComponent.PERSISTENCE_NEVER;
     }
 
     @Override
     public void componentOpened() {
-        
+        content.add(new OpenRefGenCookie() {
+
+            @Override
+            public void open() {
+                CentralLookup.getDefault().lookup(ViewController.class).openRefGen();
+                content.remove(this);
+            }
+        });
+        associateLookup(new AbstractLookup(content));
     }
 
     @Override
     public void componentClosed() {
-        
+        // TODO remove all cookies? or is this done automatically?
     }
 
     void writeProperties(java.util.Properties p) {
@@ -201,6 +207,13 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
                 return true;
             }
         });
+        content.add(new OpenTrackCookie() {
+
+            @Override
+            public void open() {
+                CentralLookup.getDefault().lookup(ViewController.class).openTrack();
+            }
+        });
     }
 
     @Override
@@ -213,11 +226,14 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.remove(genomeViewer);
 
         visualPanel.updateUI();
+
+        // remove all cookies
+        removeAllCookies();
         
-        content.add(new ViewCookie() {
+        content.add(new OpenRefGenCookie() {
 
             @Override
-            public void view() {
+            public void open() {
                 CentralLookup.getDefault().lookup(ViewController.class).openRefGen();
                 content.remove(this);
             }
@@ -225,7 +241,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     }
 
     @Override
-    public void showTrackPanel(BasePanel trackPanel, TrackItem trackMenuItem) {
+    public void showTrackPanel(BasePanel trackPanel, final TrackItem trackMenuItem) {
         // create a new menu item for this track
         trackMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -242,6 +258,21 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // add the trackPanel
         visualPanel.add(trackPanel);
         visualPanel.updateUI();
+
+        content.add(new CloseTrackCookie() {
+
+            @Override
+            public boolean close() {
+                CentralLookup.getDefault().lookup(ViewController.class).closeTrack(trackMenuItem.getTrack());
+                content.remove(this);
+                return true;
+            }
+
+            @Override
+            public String getTrackName() {
+                return trackMenuItem.getTrack().getDescription();
+            }
+        });
     }
 
     @Override
