@@ -80,22 +80,11 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>de.cebitec.vamp</package>
                 <package>de.cebitec.vamp.controller</package>
                 <package>de.cebitec.vamp.dataAdministration</package>
-                <package>de.cebitec.vamp.util</package>
                 <package>de.cebitec.vamp.view</package>
-                <package>de.cebitec.vamp.view.dataAdministration</package>
-                <package>de.cebitec.vamp.view.dataVisualisation</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.abstractViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.alignmentViewer</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.basePanel</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.histogramViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.readPosition</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.referenceViewer</package>
-                <package>de.cebitec.vamp.view.dataVisualisation.snpDetection</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.trackViewer</package>
-                <package>de.cebitec.vamp.view.importer</package>
             </public-packages>
         </data>
     </configuration>

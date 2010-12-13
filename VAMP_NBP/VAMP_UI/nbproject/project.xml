@@ -23,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.cookies</code-name-base>
+                    <code-name-base>de.cebitec.vamp.databackend</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -31,7 +31,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.databackend</code-name-base>
+                    <code-name-base>de.cebitec.vamp.ui.visualisation</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

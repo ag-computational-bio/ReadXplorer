@@ -1,14 +1,11 @@
-package de.cebitec.vamp.view.actions;
+package de.cebitec.vamp.ui.visualisation.actions;
 
-import de.cebitec.vamp.cookies.CloseTrackCookie;
-import java.awt.Color;
-import java.awt.Component;
+import de.cebitec.vamp.ui.visualisation.cookies.CloseTrackCookie;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.JMenuItem;
-import org.openide.util.HelpCtx;
-import org.openide.util.actions.CallableSystemAction;
 
-public final class CloseTrackAction extends CallableSystemAction {
+public final class CloseTrackAction implements ActionListener {
 
     private final List<CloseTrackCookie> context;
 
@@ -16,6 +13,13 @@ public final class CloseTrackAction extends CallableSystemAction {
         this.context = context;
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        for (CloseTrackCookie closeCookie : context) {
+            closeCookie.close();
+        }
+    }
+/* methods from CallableSystemAction, but since a variable name did not work it is commented out until this works...
     @Override
     public JMenuItem getMenuPresenter() {
         JMenuItem item = super.getMenuPresenter();
@@ -56,5 +60,5 @@ public final class CloseTrackAction extends CallableSystemAction {
     @Override
     protected boolean asynchronous() {
         return false;
-    }
+    }*/
 }

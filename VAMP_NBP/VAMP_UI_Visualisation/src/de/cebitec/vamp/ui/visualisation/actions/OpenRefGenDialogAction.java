@@ -1,6 +1,6 @@
-package de.cebitec.vamp.view.actions;
+package de.cebitec.vamp.ui.visualisation.actions;
 
-import de.cebitec.vamp.cookies.OpenRefGenCookie;
+import de.cebitec.vamp.ui.visualisation.cookies.OpenRefGenCookie;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 

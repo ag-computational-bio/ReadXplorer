@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.vamp.ui.visualisation
+OpenIDE-Module-Layer: de/cebitec/vamp/ui/visualisation/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/ui/visualisation/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

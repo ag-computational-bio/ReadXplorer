@@ -1,4 +1,4 @@
-package de.cebitec.vamp.cookies;
+package de.cebitec.vamp.ui.visualisation.cookies;
 
 import org.openide.cookies.OpenCookie;
 

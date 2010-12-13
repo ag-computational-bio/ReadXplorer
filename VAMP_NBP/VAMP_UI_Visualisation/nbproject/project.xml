@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>de.cebitec.vamp.cookies</code-name-base>
+            <code-name-base>de.cebitec.vamp.ui.visualisation</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -40,7 +40,7 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>de.cebitec.vamp.cookies</package>
+                <package>de.cebitec.vamp.ui.visualisation.cookies</package>
             </public-packages>
         </data>
     </configuration>

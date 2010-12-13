@@ -2,12 +2,12 @@ package de.cebitec.vamp.view;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.cookies.CloseRefGenCookie;
-import de.cebitec.vamp.cookies.CloseTrackCookie;
-import de.cebitec.vamp.cookies.OpenRefGenCookie;
-import de.cebitec.vamp.cookies.OpenTrackCookie;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.ui.visualisation.cookies.CloseRefGenCookie;
+import de.cebitec.vamp.ui.visualisation.cookies.CloseTrackCookie;
+import de.cebitec.vamp.ui.visualisation.cookies.OpenRefGenCookie;
+import de.cebitec.vamp.ui.visualisation.cookies.OpenTrackCookie;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 import java.awt.event.ActionEvent;
@@ -19,10 +19,7 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 //import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.cookies.CloseCookie;
-import org.openide.nodes.Node;
 import org.openide.nodes.Node.Cookie;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -45,7 +42,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
         setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-        putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.FALSE);
+        putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_DRAGGING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
 
