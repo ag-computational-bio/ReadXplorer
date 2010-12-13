@@ -1,10 +1,9 @@
-package de.cebitec.vamp.dataAdministration;
+package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
-import de.cebitec.vamp.controller.ImporterController;
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
@@ -25,7 +24,7 @@ import javax.swing.SwingWorker;
  *
  * @author ddoppmeier
  */
-public class ImportThread extends SwingWorker implements RunningTaskI{
+public class ImportThread extends SwingWorker{
 
     private ImporterController c;
     private List<ReferenceJob> gens;
@@ -296,7 +295,7 @@ public class ImportThread extends SwingWorker implements RunningTaskI{
     protected void done(){
         super.done();
         c.updateImportStatus("Finished");
-        c.importDone(this);
+        c.importDone();
     }
 
 }

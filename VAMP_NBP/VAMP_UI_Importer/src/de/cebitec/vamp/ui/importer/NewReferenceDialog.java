@@ -1,4 +1,4 @@
-package de.cebitec.vamp.view.importer;
+package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.importer.JobManagerI;
 import de.cebitec.vamp.parser.common.ParserI;

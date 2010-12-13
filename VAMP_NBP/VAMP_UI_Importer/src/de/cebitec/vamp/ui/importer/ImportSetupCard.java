@@ -1,4 +1,4 @@
-package de.cebitec.vamp.view.importer;
+package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
@@ -53,8 +53,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        refGenJobView1 = new de.cebitec.vamp.view.importer.RefJobView(this);
-        trackJobView1 = new de.cebitec.vamp.view.importer.TrackJobView(this);
+        refGenJobView1 = new de.cebitec.vamp.ui.importer.RefJobView(this);
+        trackJobView1 = new de.cebitec.vamp.ui.importer.TrackJobView(this);
         newJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
@@ -146,9 +146,9 @@ public class ImportSetupCard extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton newJob;
-    private de.cebitec.vamp.view.importer.RefJobView refGenJobView1;
+    private de.cebitec.vamp.ui.importer.RefJobView refGenJobView1;
     private javax.swing.JButton removeJob;
-    private de.cebitec.vamp.view.importer.TrackJobView trackJobView1;
+    private de.cebitec.vamp.ui.importer.TrackJobView trackJobView1;
     // End of variables declaration//GEN-END:variables
 
 }

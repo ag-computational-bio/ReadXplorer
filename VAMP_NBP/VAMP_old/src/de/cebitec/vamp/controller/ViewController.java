@@ -4,6 +4,8 @@ import de.cebitec.vamp.dataAdministration.GestureListenerI;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.ui.importer.ImporterController;
+import de.cebitec.vamp.ui.importer.LoginCookie;
 import de.cebitec.vamp.view.ApplicationFrameI;
 import de.cebitec.vamp.view.OpenRefGenDialog;
 import de.cebitec.vamp.view.OpenTrackDialog;
@@ -23,7 +25,7 @@ import org.openide.windows.WindowManager;
  *
  * @author ddoppmeier
  */
-public class ViewController implements de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
+public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
 //    private ApplicationFrameI appFrame;
     private List<GestureListenerI> gestureListeners;
@@ -54,11 +56,13 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 //        appFrame.setVisible(show);
     }
 
-    public void newImportDialog(){
+    @Override
+    public void openImporterDialog(){
         new ImporterController().setupNewImport();
     }
 
-    public void newAdminDialog(){
+    @Override
+    public void openDataAdminDialog(){
         new DataAdminController().showDataAdministration();
     }
 
@@ -81,6 +85,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         }
     }
 
+    @Override
     public void openRefGen(){
         OpenRefGenDialog d = new OpenRefGenDialog(WindowManager.getDefault().getMainWindow(), true);
         d.setVisible(true);
@@ -94,6 +99,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         }
     }
 
+    @Override
     public void closeRefGen() {
 
         // remove all tracks that are still open
@@ -117,6 +123,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
     }
 
+    @Override
     public void openTrack() {
         OpenTrackDialog d = new OpenTrackDialog(WindowManager.getDefault().getMainWindow(), true, currentRefGen);
         d.setVisible(true);

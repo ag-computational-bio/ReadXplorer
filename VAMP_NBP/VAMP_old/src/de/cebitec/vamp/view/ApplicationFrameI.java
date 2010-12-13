@@ -1,6 +1,5 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
@@ -11,7 +10,7 @@ import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
  */
 public interface ApplicationFrameI {
 
-    public void setViewController(ViewController viewController);
+//    public void setViewController(ViewController viewController);
 
     public void releaseButtons();
 

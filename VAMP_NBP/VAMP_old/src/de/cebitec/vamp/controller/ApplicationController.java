@@ -1,5 +1,6 @@
 package de.cebitec.vamp.controller;
 
+//import de.cebitec.vamp.view.ViewController;
 import de.cebitec.vamp.dataAdministration.GestureListenerI;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -19,7 +20,7 @@ public class ApplicationController implements GestureListenerI {
 
     private LoginFrame login;
     private List<RunningTaskI> runningTasks;
-    private ViewController viewController;
+//    private ViewController viewController;
     private static ApplicationController appCon;
     public static String APPNAME = "VAMP Version 1.2";
     
@@ -49,7 +50,7 @@ public class ApplicationController implements GestureListenerI {
     }
 
     private void updateViewButtons(){
-        viewController.blockControlsByRunningTasks(runningTasks);
+//        viewController.blockControlsByRunningTasks(runningTasks);
     }
 
     private void createAndShowLogin(){
@@ -64,14 +65,14 @@ public class ApplicationController implements GestureListenerI {
     }
 
     private void createAndShowApp(){
-        viewController = new ViewController();
-        viewController.addGestureListener(this);
-        viewController.showApplicationFrame(true);
+//        viewController = new ViewController();
+//        viewController.addGestureListener(this);
+//        viewController.showApplicationFrame(true);
     }
 
     private void dropApp(){
-        viewController.showApplicationFrame(false);
-        viewController = null;
+//        viewController.showApplicationFrame(false);
+//        viewController = null;
     }
 
     @Override

@@ -1,6 +1,6 @@
-package de.cebitec.vamp.view.importer;
+package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.ReferenceJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;
@@ -12,46 +12,47 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author ddoppmeier
  */
-public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener{
+public class RefJobView extends javax.swing.JPanel implements ListSelectionListener{
 
-    private List<TrackJobs> tracks;
+    private List<ReferenceJob> jobs;
     private ImportSetupCard parent;
-    public final static long serialVersionUID = 774292377;
+    static final long serialVersionUID = 1231231;
 
     /** Creates new form TaskViewerTemplate */
-    public TrackJobView() {
+    public RefJobView() {
         this.init();
     }
 
-    public TrackJobView(ImportSetupCard parent){
+    public RefJobView(ImportSetupCard parent) {
         this.parent = parent;
         this.init();
     }
 
-    public TrackJobs getSelectedItem() {
-        return tracks.get(jTable1.getSelectedRow());
+    public ReferenceJob getSelectedItem() {
+        return jobs.get(jTable1.getSelectedRow());
     }
 
     private void init(){
-        tracks = new ArrayList<TrackJobs>();
         initComponents();
+        jobs = new ArrayList<ReferenceJob>();
     }
 
-    public void add(TrackJobs trackJob){
+    public void add(ReferenceJob refGenJob) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addRow(new Object[]{
-            trackJob.getFile().getName(),
-            trackJob.getDescription(),
-            trackJob.getRefGen().getDescription()});
-        tracks.add(trackJob);
+        model.addRow(new Object[]{refGenJob.getFile().getName()});
+        jobs.add(refGenJob);
     }
 
-    public void remove(TrackJobs trackJob){
-        int index = tracks.indexOf(trackJob);
-        tracks.remove(trackJob);
-
+    public void remove(ReferenceJob refGenJob){
+        int row = jobs.lastIndexOf(refGenJob);
+        jobs.remove(refGenJob);
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.removeRow(index);
+        model.removeRow(row);
+    }
+
+    public boolean IsRowSelected(){
+        ListSelectionModel model = jTable1.getSelectionModel();
+        return !model.isSelectionEmpty();
     }
 
     /** This method is called from within the constructor to
@@ -67,21 +68,20 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         jTable1 = new javax.swing.JTable();
         jTable1.getSelectionModel().addListSelectionListener(this);
 
-        setPreferredSize(new java.awt.Dimension(400, 300));
-
+        jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "File", "Description", "Run", "Reference"
+                "File"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -93,6 +93,7 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
             }
         });
         jTable1.setFillsViewportHeight(true);
+        jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -103,7 +104,7 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -121,11 +122,6 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         } else {
             parent.setRemoveButtonEnabled(true);
         }
-    }
-
-    public boolean IsRowSelected(){
-        ListSelectionModel model = jTable1.getSelectionModel();
-        return !model.isSelectionEmpty();
     }
 
 }

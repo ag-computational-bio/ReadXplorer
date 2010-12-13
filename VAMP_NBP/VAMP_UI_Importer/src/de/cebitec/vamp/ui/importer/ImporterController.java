@@ -1,14 +1,9 @@
-package de.cebitec.vamp.controller;
+package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.dataAdministration.RunningTaskI;
-import de.cebitec.vamp.dataAdministration.ImportThread;
 import de.cebitec.vamp.importer.ImporterDataModelI;
 import de.cebitec.vamp.importer.ImporterJobManager;
-import de.cebitec.vamp.importer.ImporterViewListenerI;
-import de.cebitec.vamp.view.importer.ImporterViewFrame;
-import de.cebitec.vamp.view.importer.ImporterViewI;
 import java.util.List;
 
 /**
@@ -48,7 +43,7 @@ public class ImporterController implements ImporterViewListenerI {
         List<ReferenceJob> refgens = job.getRefGenJobList();
         List<TrackJobs> tracksRun = job.getTrackJobListRun();
         ImportThread i = new ImportThread(this, refgens, tracksRun);
-        ApplicationController.getInstance().addRunningTask(i);
+//        ApplicationController.getInstance().addRunningTask(i);
 
         i.execute();
     }
@@ -60,9 +55,9 @@ public class ImporterController implements ImporterViewListenerI {
         job = null;
     }
 
-    public void importDone(RunningTaskI runningTask) {
+    public void importDone() {
         view.importFinished();
-        ApplicationController.getInstance().removeRunningTask(runningTask);
+//        ApplicationController.getInstance().removeRunningTask(runningTask);
     }
 
     public void updateImportStatus(String string) {

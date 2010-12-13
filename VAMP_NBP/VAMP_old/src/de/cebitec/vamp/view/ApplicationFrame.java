@@ -1,17 +1,13 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.controller.ApplicationController;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
-import de.cebitec.vamp.dataAdministration.DeletionThread;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.dataAdministration.ImportThread;
+//import de.cebitec.vamp.ui.importer.ImportThread;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -21,21 +17,21 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
 
     public static final long serialVersionUID = 994787234;
 
-    private ViewController viewController;
+//    private ViewController viewController;
 
     /** Creates new form ApplicationFrame */
     public ApplicationFrame() {
         initComponents();
     }
 
-    @Override
-    public void setViewController(ViewController viewController){
-        this.viewController = viewController;
-    }
+//    @Override
+//    public void setViewController(ViewController viewController){
+//        this.viewController = viewController;
+//    }
 
     @Override
     public void blockControlsByRunningTask(RunningTaskI runningTask){
-        if(runningTask instanceof ImportThread){
+ /*       if(runningTask instanceof ImportThread){
             importItem.setEnabled(false);
             logoffItem.setEnabled(false);
             shutdownItem.setEnabled(false);
@@ -45,7 +41,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
             shutdownItem.setEnabled(false);
         } else {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "blocking controlls for unknown runningtask!");
-        }
+        }*/
     }
 
     /** This method is called from within the constructor to
@@ -167,11 +163,11 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     }// </editor-fold>//GEN-END:initComponents
 
     private void importItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importItemActionPerformed
-        viewController.newImportDialog();
+//        viewController.openImporterDialog();
     }//GEN-LAST:event_importItemActionPerformed
 
     private void logoffItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoffItemActionPerformed
-        viewController.logoff();
+//        viewController.logoff();
 }//GEN-LAST:event_logoffItemActionPerformed
 
     private void shutdownItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shutdownItemActionPerformed
@@ -183,7 +179,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     }//GEN-LAST:event_formWindowClosing
 
     private void alertListenersOfShutdown(){
-        viewController.shutDownApplication();
+//        viewController.shutDownApplication();
     }
 
     private void showDataAdminItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showDataAdminItemActionPerformed
@@ -191,15 +187,15 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
     }//GEN-LAST:event_showDataAdminItemActionPerformed
 
     private void openRefgenItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openRefgenItemActionPerformed
-        viewController.openRefGen();
+//        viewController.openRefGen();
 }//GEN-LAST:event_openRefgenItemActionPerformed
 
     private void closeRefgenItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeRefgenItemActionPerformed
-        viewController.closeRefGen();
+//        viewController.closeRefGen();
 }//GEN-LAST:event_closeRefgenItemActionPerformed
 
     private void openTrackItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTrackItemActionPerformed
-        viewController.openTrack();
+//        viewController.openTrack();
     }//GEN-LAST:event_openTrackItemActionPerformed
 
 
@@ -261,7 +257,7 @@ public class ApplicationFrame extends javax.swing.JFrame implements ApplicationF
             public void actionPerformed(ActionEvent e) {
                 TrackItem t = (TrackItem) e.getSource();
                 PersistantTrack track = t.getTrack();
-                viewController.closeTrack(track);
+//                viewController.closeTrack(track);
             }
         });
 

@@ -3,25 +3,9 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>de.cebitec.vamp.view</code-name-base>
+            <code-name-base>de.cebitec.vamp.ui.importer</code-name-base>
             <suite-component/>
             <module-dependencies>
-                <dependency>
-                    <code-name-base>de.cebitec.centrallookup</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>de.cebitec.vamp</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
                 <dependency>
                     <code-name-base>de.cebitec.vamp.databackend</code-name-base>
                     <build-prerequisite/>
@@ -31,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.ui.importer</code-name-base>
+                    <code-name-base>de.cebitec.vamp.importer</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -39,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.ui.visualisation</code-name-base>
+                    <code-name-base>de.cebitec.vamp.objects</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -47,12 +31,11 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.settings</code-name-base>
+                    <code-name-base>de.cebitec.vamp.parser</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.26.1</specification-version>
+                        <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -61,14 +44,6 @@
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>7.23.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.dialogs</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.15.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -87,24 +62,10 @@
                         <specification-version>8.6.1</specification-version>
                     </run-dependency>
                 </dependency>
-                <dependency>
-                    <code-name-base>org.openide.util.lookup</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>8.3.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.windows</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.33.1</specification-version>
-                    </run-dependency>
-                </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>de.cebitec.vamp.ui.importer</package>
+            </public-packages>
         </data>
     </configuration>
 </project>

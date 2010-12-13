@@ -8,8 +8,6 @@
             <module-dependencies/>
             <public-packages>
                 <package>de.cebitec.vamp.objects</package>
-                <package>de.cebitec.vamp.objects.filter</package>
-                <package>de.cebitec.vamp.objects.parser</package>
             </public-packages>
         </data>
     </configuration>

@@ -80,9 +80,9 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignCardLayout"/>
           <SubComponents>
-            <Component class="de.cebitec.vamp.view.importer.ImportSetupCard" name="setupImportCard1">
+            <Component class="de.cebitec.vamp.ui.importer.ImportSetupCard" name="setupImportCard1">
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.view.importer.ImportSetupCard(this)"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.ui.importer.ImportSetupCard(this)"/>
               </AuxValues>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
@@ -90,14 +90,14 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="de.cebitec.vamp.view.importer.ImportOverviewCard" name="importOverviewCard1">
+            <Component class="de.cebitec.vamp.ui.importer.ImportOverviewCard" name="importOverviewCard1">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
                   <CardConstraints cardName="overview"/>
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="de.cebitec.vamp.view.importer.ImportProgressCard" name="importProgressCard1">
+            <Component class="de.cebitec.vamp.ui.importer.ImportProgressCard" name="importProgressCard1">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
                   <CardConstraints cardName="progress"/>

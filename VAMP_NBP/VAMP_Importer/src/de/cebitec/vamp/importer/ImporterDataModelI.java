@@ -14,8 +14,6 @@ public interface ImporterDataModelI {
 
     public List<ReferenceJob> getRefGenJobList();
 
-
     public List<TrackJobs> getTrackJobListRun();
-
 
 }

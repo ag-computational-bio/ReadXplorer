@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.cookies.CloseRefGenCookie;
@@ -139,7 +139,8 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
     @Override
     public void componentClosed() {
-        // TODO remove all cookies? or is this done automatically?
+        // remove all cookies or is this done automatically?
+        removeAllCookies();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -168,11 +169,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     }
 
     // ===================== AppFrameI stuff ============================== //
-
-    @Override
-    public void setViewController(ViewController viewController) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public void releaseButtons() {

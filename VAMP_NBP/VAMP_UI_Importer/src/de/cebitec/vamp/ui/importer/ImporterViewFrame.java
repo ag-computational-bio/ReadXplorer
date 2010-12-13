@@ -1,8 +1,6 @@
-package de.cebitec.vamp.view.importer;
+package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.controller.ApplicationController;
 import de.cebitec.vamp.importer.ImporterDataModelListenerI;
-import de.cebitec.vamp.importer.ImporterViewListenerI;
 import de.cebitec.vamp.importer.JobManagerI;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
@@ -26,7 +24,7 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
 
     /** Creates new form ImporterViewFrame */
     public ImporterViewFrame() {
-        super(ApplicationController.APPNAME+ " Importer");
+//        super(ApplicationController.APPNAME+ " Importer");
         importerViewListener = new ArrayList<ImporterViewListenerI>();
         initComponents();
         cardIndex = 0;
@@ -44,9 +42,9 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
 
         contentpane = new javax.swing.JPanel();
         cardPanel = new javax.swing.JPanel();
-        setupImportCard1 = new de.cebitec.vamp.view.importer.ImportSetupCard(this);
-        importOverviewCard1 = new de.cebitec.vamp.view.importer.ImportOverviewCard();
-        importProgressCard1 = new de.cebitec.vamp.view.importer.ImportProgressCard();
+        setupImportCard1 = new de.cebitec.vamp.ui.importer.ImportSetupCard(this);
+        importOverviewCard1 = new de.cebitec.vamp.ui.importer.ImportOverviewCard();
+        importProgressCard1 = new de.cebitec.vamp.ui.importer.ImportProgressCard();
         progressBar = new javax.swing.JProgressBar();
         progressBar.setVisible(false);
         nextButton = new javax.swing.JButton();
@@ -223,12 +221,12 @@ public class ImporterViewFrame extends javax.swing.JFrame implements ImporterVie
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel cardPanel;
     private javax.swing.JPanel contentpane;
-    private de.cebitec.vamp.view.importer.ImportOverviewCard importOverviewCard1;
-    private de.cebitec.vamp.view.importer.ImportProgressCard importProgressCard1;
+    private de.cebitec.vamp.ui.importer.ImportOverviewCard importOverviewCard1;
+    private de.cebitec.vamp.ui.importer.ImportProgressCard importProgressCard1;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton previousButton;
     private javax.swing.JProgressBar progressBar;
-    private de.cebitec.vamp.view.importer.ImportSetupCard setupImportCard1;
+    private de.cebitec.vamp.ui.importer.ImportSetupCard setupImportCard1;
     // End of variables declaration//GEN-END:variables
 
     @Override
