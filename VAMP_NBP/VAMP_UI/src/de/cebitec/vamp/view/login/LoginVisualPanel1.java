@@ -60,13 +60,19 @@ public final class LoginVisualPanel1 extends JPanel {
             user = userField.getText();
             password = new String(passwordField.getPassword());
         }
-        else{
+        else if (adapter.equalsIgnoreCase("h2")){
             hostname = null;
             database = databaseField.getText();
             if (database.endsWith(".h2.db")) { database = database.replace(".h2.db", ""); }
             user = null;
             password = null;
         }
+        else /* <editor-fold defaultstate="collapsed" desc="should not reach here">*/{
+            hostname = null;
+            database = null;
+            user = null;
+            password = null;
+        }// </editor-fold>
 
         loginData.put("adapter", adapter);
         loginData.put("hostname", hostname);
@@ -74,7 +80,48 @@ public final class LoginVisualPanel1 extends JPanel {
         loginData.put("user", user);
         loginData.put("password", password);
 
+        // save login data if desired
+        saveLoginData(loginData);
+
         return loginData;
+    }
+
+    private void saveLoginData(Map<String, String> loginData){
+        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
+        String adapter = loginData.get("adapter");
+
+        if (saveDataCheckBox.isSelected()) {
+            if (adapter.equalsIgnoreCase("mysql")){
+                prefs.put(LOGIN_HOSTNAME, loginData.get("hostname"));
+                prefs.put(LOGIN_USER, loginData.get("user"));
+                prefs.put(LOGIN_DATABASE_MYSQL, loginData.get("database"));
+            }
+            else if (adapter.equalsIgnoreCase("h2")){
+                prefs.put(LOGIN_DATABASE_H2, loginData.get("database"));
+            }
+            else{
+                // should not reach here
+            }
+        }
+        else {
+            if (adapter.equalsIgnoreCase("mysql")){
+                prefs.put(LOGIN_HOSTNAME, "");
+                prefs.put(LOGIN_DATABASE_MYSQL, "");
+                prefs.put(LOGIN_USER, "");
+            }
+            else if (adapter.equalsIgnoreCase("h2")){
+                prefs.put(LOGIN_DATABASE_H2, "");
+            }
+            else{
+                // should not reach here
+            }
+        }
+        
+        try {
+            prefs.flush();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(LoginVisualPanel1.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -95,7 +142,7 @@ public final class LoginVisualPanel1 extends JPanel {
         urlField = new javax.swing.JTextField();
         dbTypeLabel = new javax.swing.JLabel();
         dbTypeBox = new javax.swing.JComboBox();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        saveDataCheckBox = new javax.swing.JCheckBox();
         dbChooseButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(urlLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.urlLabel.text")); // NOI18N
@@ -106,12 +153,6 @@ public final class LoginVisualPanel1 extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(passwordLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.passwordLabel.text")); // NOI18N
 
-        passwordField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                passwordFieldActionPerformed(evt);
-            }
-        });
-
         org.openide.awt.Mnemonics.setLocalizedText(dbTypeLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.dbTypeLabel.text")); // NOI18N
 
         dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL", "h2" }));
@@ -121,8 +162,8 @@ public final class LoginVisualPanel1 extends JPanel {
             }
         });
 
-        jCheckBox1.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.jCheckBox1.text")); // NOI18N
+        saveDataCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(saveDataCheckBox, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.saveDataCheckBox.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(dbChooseButton, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.dbChooseButton.text")); // NOI18N
         dbChooseButton.addActionListener(new java.awt.event.ActionListener() {
@@ -135,11 +176,10 @@ public final class LoginVisualPanel1 extends JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jCheckBox1)
+                    .addComponent(saveDataCheckBox)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -164,7 +204,6 @@ public final class LoginVisualPanel1 extends JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 197, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -188,88 +227,10 @@ public final class LoginVisualPanel1 extends JPanel {
                     .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(passwordLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox1)
+                .addComponent(saveDataCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void passwordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordFieldActionPerformed
-        String adapter = dbTypeBox.getSelectedItem().toString();
-        if (adapter.equalsIgnoreCase("mysql")) {
-            adapter = "mysql";
-
-            String hostname = urlField.getText();
-            String database = databaseField.getText();
-            String user = userField.getText();
-            String password = new String(passwordField.getPassword());
-            //if there are new LoginData
-
-            if (jCheckBox1.isSelected()) {
-                if (!hostname.equals(defaulthostname) || !database.equals(defaultDatabaseMySQL) || !user.equals(defaultuser)) {
-                    Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
-                    prefs.put(LOGIN_HOSTNAME, hostname);
-                    prefs.put(LOGIN_DATABASE_MYSQL, database);
-                    prefs.put(LOGIN_USER , user);
-                    try {
-                        prefs.flush();
-                    } catch (BackingStoreException ex) {
-                        Logger.getLogger(LoginVisualPanel1.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            } else {
-                Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
-                prefs.put(LOGIN_HOSTNAME, "");
-                prefs.put(LOGIN_DATABASE_MYSQL, "");
-                prefs.put(LOGIN_USER , "");
-                try {
-                    prefs.flush();
-                } catch (BackingStoreException ex) {
-                    Logger.getLogger(LoginVisualPanel1.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-            // let all listeners now, they should log in now
-//            for (GestureListenerI i : gestureListener) {
-//                i.login(adapter, hostname, database, user, password);
-//            }
-        } else {
-            adapter = "h2";
-
-            String hostname = null;
-            String database = databaseField.getText();
-            if (database.endsWith(".h2.db")) {
-                database = database.replace(".h2.db", "");
-            }
-            String user = null;
-            String password = null;
-            //if there are new LoginData
-
-            if (jCheckBox1.isSelected()) {
-                if (!database.equals(defaultdatabaseh2)) {
-                    Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
-                    prefs.put(LOGIN_DATABASE_H2, database);
-                    try {
-                        prefs.flush();
-                    } catch (BackingStoreException ex) {
-                        Logger.getLogger(LoginVisualPanel1.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            } else {
-                Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
-                prefs.put(LOGIN_DATABASE_H2, "");
-                try {
-                    prefs.flush();
-                } catch (BackingStoreException ex) {
-                    Logger.getLogger(LoginVisualPanel1.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-            // let all listeners now, they should log in now
-            //            for (GestureListenerI i : gestureListener) {
-            //                i.login(adapter, hostname, database, user, password);
-            //            }
-        }
-}//GEN-LAST:event_passwordFieldActionPerformed
 
     private void dbTypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbTypeBoxActionPerformed
         String db = dbTypeBox.getSelectedItem().toString();
@@ -333,9 +294,9 @@ public final class LoginVisualPanel1 extends JPanel {
     private javax.swing.JButton dbChooseButton;
     private javax.swing.JComboBox dbTypeBox;
     private javax.swing.JLabel dbTypeLabel;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;
+    private javax.swing.JCheckBox saveDataCheckBox;
     private javax.swing.JTextField urlField;
     private javax.swing.JLabel urlLabel;
     private javax.swing.JTextField userField;
