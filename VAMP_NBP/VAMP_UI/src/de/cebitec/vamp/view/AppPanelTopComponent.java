@@ -2,7 +2,6 @@ package de.cebitec.vamp.view;
 
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.cookies.CloseRefGenCookie;
 import de.cebitec.vamp.ui.visualisation.cookies.CloseTrackCookie;
@@ -175,10 +174,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public void blockControlsByRunningTask(RunningTaskI runninTask) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-    }
+//    @Override
+//    public void blockControlsByRunningTask(RunningTaskI runninTask) {
+//         throw new UnsupportedOperationException("Not supported yet.");
+//    }
 
     @Override
     public void showRefGenPanel(BasePanel refGenPanel) {

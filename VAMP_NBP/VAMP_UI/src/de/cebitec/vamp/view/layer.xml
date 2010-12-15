@@ -28,6 +28,12 @@
         <folder name="GoTo_hidden"/>
         <folder name="View_hidden"/>
     </folder>
+    <folder name="Toolbars">
+        <folder name="File_hidden"/>
+        <folder name="Clipboard_hidden"/>
+        <folder name="UndoRedo_hidden"/>
+        <folder name="Memory_hidden"/>
+    </folder>
     <folder name="Windows2">
         <folder name="Components">
             <file name="AppPanelTopComponent.settings" url="AppPanelTopComponentSettings.xml"/>

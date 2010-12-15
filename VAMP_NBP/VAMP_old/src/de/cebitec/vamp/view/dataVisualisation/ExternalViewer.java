@@ -1,6 +1,5 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.vamp.controller.ApplicationController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
@@ -64,7 +63,7 @@ public class ExternalViewer extends javax.swing.JFrame {
         cardPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle(ApplicationController.APPNAME+" Detailviewer");
+        setTitle("Detailviewer");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -104,7 +103,7 @@ public class ExternalViewer extends javax.swing.JFrame {
                 .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(seqlogoButton)
                     .addComponent(alignmentButton))
-                .addContainerGap(38, Short.MAX_VALUE))
+                .addContainerGap(51, Short.MAX_VALUE))
             .addGroup(switchPanelLayout.createSequentialGroup()
                 .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
                 .addGap(24, 24, 24))

@@ -28,7 +28,8 @@
         </folder>
     </folder>
     <folder name="Toolbars">
-        <folder name="UndoRedo">
+        <folder name="Management">
+            <attr name="position" intvalue="400"/>
             <file name="de-cebitec-vamp-ui-importer-actions-ImportDialogAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-ui-importer-actions-ImportDialogAction.instance"/>
                 <attr name="position" intvalue="0"/>

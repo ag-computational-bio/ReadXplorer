@@ -1,7 +1,7 @@
 package de.cebitec.vamp.controller;
 
-import de.cebitec.vamp.dataAdministration.GestureListenerI;
-import de.cebitec.vamp.dataAdministration.RunningTaskI;
+import de.cebitec.vamp.ui.dataAdministration.model.DataAdminController;
+//import de.cebitec.vamp.ui.dataAdministration.model.GestureListenerI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.importer.ImporterController;
@@ -28,7 +28,7 @@ import org.openide.windows.WindowManager;
 public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
 //    private ApplicationFrameI appFrame;
-    private List<GestureListenerI> gestureListeners;
+//    private List<GestureListenerI> gestureListeners;
     private List<MousePositionListener> mousePosListener;
     private BoundsInfoManager boundsManager;
     private BasePanelFactory basePanelFac;
@@ -43,14 +43,14 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 //        appFrame.setViewController(this);
         mousePosListener = new ArrayList<MousePositionListener>();
 
-        gestureListeners = new ArrayList<GestureListenerI>();
+//        gestureListeners = new ArrayList<GestureListenerI>();
         trackToPanel = new HashMap<PersistantTrack, BasePanel>();
         trackToItem = new HashMap<PersistantTrack, TrackItem>();
     }
 
-    public void addGestureListener(GestureListenerI gestureListener){
-        gestureListeners.add(gestureListener);
-    }
+//    public void addGestureListener(GestureListenerI gestureListener){
+//        gestureListeners.add(gestureListener);
+//    }
 
     public void showApplicationFrame(boolean show){
 //        appFrame.setVisible(show);
@@ -66,24 +66,24 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
         new DataAdminController().showDataAdministration();
     }
 
-    public void blockControlsByRunningTasks(List<RunningTaskI> tasks) {
+//    public void blockControlsByRunningTasks(List<RunningTaskI> tasks) {
 //        appFrame.releaseButtons();
-        for(RunningTaskI r : tasks){
+//        for(RunningTaskI r : tasks){
 //            appFrame.blockControlsByRunningTask(r);
-        }
-    }
+//        }
+//    }
 
-    public void logoff() {
-        for(GestureListenerI l : gestureListeners){
-            l.logOff();
-        }
-    }
+//    public void logoff() {
+//        for(GestureListenerI l : gestureListeners){
+//            l.logOff();
+//        }
+//    }
 
-    public void shutDownApplication() {
-        for(GestureListenerI l : gestureListeners){
-            l.shutDownApplication();
-        }
-    }
+//    public void shutDownApplication() {
+//        for(GestureListenerI l : gestureListeners){
+//            l.shutDownApplication();
+//        }
+//    }
 
     @Override
     public void openRefGen(){

@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view;
 
-import de.cebitec.vamp.dataAdministration.GestureListenerI;
+import de.cebitec.vamp.ui.dataAdministration.model.GestureListenerI;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;

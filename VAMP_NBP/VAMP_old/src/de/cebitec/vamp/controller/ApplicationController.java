@@ -1,13 +1,13 @@
 package de.cebitec.vamp.controller;
 
 //import de.cebitec.vamp.view.ViewController;
-import de.cebitec.vamp.dataAdministration.GestureListenerI;
-import de.cebitec.vamp.dataAdministration.RunningTaskI;
+//import de.cebitec.vamp.ui.dataAdministration.model.GestureListenerI;
+//import de.cebitec.vamp.dataAdministration.RunningTaskI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.view.LoginFrame;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -16,10 +16,10 @@ import javax.swing.JOptionPane;
  *
  * @author ddoppmeier
  */
-public class ApplicationController implements GestureListenerI {
+public class ApplicationController /*implements GestureListenerI*/ {
 
     private LoginFrame login;
-    private List<RunningTaskI> runningTasks;
+//    private List<RunningTaskI> runningTasks;
 //    private ViewController viewController;
     private static ApplicationController appCon;
     public static String APPNAME = "VAMP Version 1.2";
@@ -27,7 +27,7 @@ public class ApplicationController implements GestureListenerI {
 
     private ApplicationController() {
         createAndShowLogin();
-        runningTasks = new ArrayList<RunningTaskI>();
+//        runningTasks = new ArrayList<RunningTaskI>();
 
     }
 
@@ -39,15 +39,15 @@ public class ApplicationController implements GestureListenerI {
         return appCon;
     }
 
-    public void addRunningTask(RunningTaskI runningTask){
-        runningTasks.add(runningTask);
-        updateViewButtons();
-    }
+//    public void addRunningTask(RunningTaskI runningTask){
+//        runningTasks.add(runningTask);
+//        updateViewButtons();
+//    }
 
-    public void removeRunningTask(RunningTaskI runningTask){
-        runningTasks.remove(runningTask);
-        updateViewButtons();
-    }
+//    public void removeRunningTask(RunningTaskI runningTask){
+//        runningTasks.remove(runningTask);
+//        updateViewButtons();
+//    }
 
     private void updateViewButtons(){
 //        viewController.blockControlsByRunningTasks(runningTasks);
@@ -55,7 +55,7 @@ public class ApplicationController implements GestureListenerI {
 
     private void createAndShowLogin(){
         login = new LoginFrame();
-        login.addGestureListener(this);
+//        login.addGestureListener(this);
         login.setVisible(true);
     }
 
@@ -75,7 +75,7 @@ public class ApplicationController implements GestureListenerI {
 //        viewController = null;
     }
 
-    @Override
+//    @Override
     public void login(String adapter, String hostname, String database, String user, String password) {
         try {
             ProjectConnector.getInstance().connect(adapter, hostname, database, user, password);
@@ -89,7 +89,7 @@ public class ApplicationController implements GestureListenerI {
             
     }
 
-    @Override
+//    @Override
     public void logOff() {
         if(ProjectConnector.getInstance().isConnected()){
             ProjectConnector.getInstance().disconnect();
@@ -99,13 +99,13 @@ public class ApplicationController implements GestureListenerI {
 
     }
 
-    @Override
+//    @Override
     public void shutDownApplication() {
 
-        if(!runningTasks.isEmpty()){
-            JOptionPane.showMessageDialog(null, "The programm cannot be stopped, as long as there are running jobs!", "Work in progress", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+//        if(!runningTasks.isEmpty()){
+//            JOptionPane.showMessageDialog(null, "The programm cannot be stopped, as long as there are running jobs!", "Work in progress", JOptionPane.ERROR_MESSAGE);
+//            return;
+//        }
 
         if(ProjectConnector.getInstance().isConnected()){
             ProjectConnector.getInstance().disconnect();

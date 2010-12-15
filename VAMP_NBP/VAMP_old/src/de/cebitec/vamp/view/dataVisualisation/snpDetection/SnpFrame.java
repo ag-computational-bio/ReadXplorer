@@ -1,7 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.snpDetection;
 
 import de.cebitec.vamp.objects.Snp;
-import de.cebitec.vamp.controller.ApplicationController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -81,7 +80,7 @@ public class SnpFrame extends javax.swing.JFrame {
         results1 = new de.cebitec.vamp.view.dataVisualisation.snpDetection.Results(this);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle(ApplicationController.APPNAME+" SNP Detection");
+        setTitle("SNP Detection");
 
         jPanel1.setLayout(new java.awt.CardLayout());
         jPanel1.add(setupPanel1, "setup");

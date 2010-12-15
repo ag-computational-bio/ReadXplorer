@@ -1,6 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: de.cebitec.vamp
-OpenIDE-Module-Layer: de/cebitec/vamp/layer.xml
 OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
 

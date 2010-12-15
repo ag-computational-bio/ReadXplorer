@@ -75,7 +75,8 @@
         </folder>
     </folder>
     <folder name="Toolbars">
-        <folder name="File">
+        <folder name="Visualisation">
+            <attr name="position" intvalue="150"/>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.instance"/>
                 <attr name="position" intvalue="350"/>
