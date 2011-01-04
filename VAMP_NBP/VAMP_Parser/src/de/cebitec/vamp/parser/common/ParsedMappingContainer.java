@@ -5,13 +5,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author ddoppmeier
  */
 public class ParsedMappingContainer {
-
+    int noOfMappings = 0;
+    private int numberOfUniqueSeq ;
+    private int numberOfReads;
     private HashMap<Integer, ParsedMappingGroup> mappings;
 
     public ParsedMappingContainer(){
@@ -19,6 +23,7 @@ public class ParsedMappingContainer {
     }
 
     public void addParsedMapping(ParsedMapping mapping, int sequenceID){
+        noOfMappings++;
         if(!mappings.containsKey(sequenceID)){
             mappings.put(sequenceID, new ParsedMappingGroup());
         }
@@ -49,7 +54,9 @@ public class ParsedMappingContainer {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
         int numberOfBM = 0;
         int numberOfPerfect = 0;
-        int numberOfMappedSeq = mappings.keySet().size();
+        //is the number of unique Mapped Sequences
+        int numberOfMappedSeq = mappings.size();
+        //the number of created Mappings by the mapper
         int numberOfMappings = 0;
 
         Collection<ParsedMappingGroup> groups = mappings.values();
@@ -62,13 +69,12 @@ public class ParsedMappingContainer {
             Iterator maps = mappingList.iterator();
             while (maps.hasNext()) {
                 ParsedMapping m = (ParsedMapping) maps.next();
-
                 if(m.isBestMapping() == true) {
                     numberOfBM++;
                     if(m.getErrors() == 0){
                          numberOfPerfect++;
                     }
-                  
+
                 }
 
             }
@@ -78,7 +84,9 @@ public class ParsedMappingContainer {
          mappingInfos.put(2, numberOfPerfect);
          mappingInfos.put(3, numberOfBM);
          mappingInfos.put(4, numberOfMappedSeq);
-         
+         mappingInfos.put(5, numberOfReads);
+         mappingInfos.put(6, numberOfUniqueSeq);
+      
     return mappingInfos;
 }
 
@@ -86,4 +94,16 @@ public class ParsedMappingContainer {
     public void clear(){
         mappings.clear();
     }
+
+    public void setNumberOfReads(int numberOfReads) {
+        this.numberOfReads = numberOfReads;
+    }
+
+    public void setNumberOfUniqueSeq(int numberOfUniqueSeq) {
+        this.numberOfUniqueSeq = numberOfUniqueSeq;
+    }
+
+
+    
+
 }

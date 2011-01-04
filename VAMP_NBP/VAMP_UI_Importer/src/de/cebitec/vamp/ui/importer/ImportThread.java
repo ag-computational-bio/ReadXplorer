@@ -76,7 +76,7 @@ public class ImportThread extends SwingWorker{
     private ParsedTrack parseTrack(TrackJobs trackJob) throws ParsingException{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing track data from source \"{0}trackjobID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
 
-        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID()).getReadnameToSeqIDMapping();
+        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID(),trackJob.getID()).getReadnameToSeqIDMapping();
         
         // XXX does this work for all import methods???
         // TODO somehow get the information if sequenceString is neccessary

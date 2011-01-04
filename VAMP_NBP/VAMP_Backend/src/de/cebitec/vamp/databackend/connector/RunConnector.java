@@ -17,10 +17,13 @@ import java.util.logging.Logger;
 public class RunConnector {
 
     private long runID;
+    private long trackID;
+
     private Connection con;
 
-    RunConnector(long runID){
+    RunConnector(long runID,long trackID){
         this.runID = runID;
+        this.trackID = trackID;
         con = ProjectConnector.getInstance().getConnection();
     }
 
@@ -56,8 +59,8 @@ public class RunConnector {
         int num = 0;
 
         try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_READS_FOR_RUN);
-            fetch.setLong(1, runID);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
             if(rs.next()){
@@ -93,8 +96,8 @@ public class RunConnector {
     public int getNumberOfUniqueSequences(){
         int num = 0;
         try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN);
-            fetch.setLong(1, runID);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK);
+            fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
             if(rs.next()){
@@ -125,14 +128,16 @@ public class RunConnector {
         return num;
     }
 
-    public void updateTableRun(int numOfReads, int numOfUniqueSeq){
+    public void updateTableStatics(int numOfReads, int numOfUniqueSeq){
       try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_RUN_VALUES);
-
+          con.setAutoCommit(false);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_STATIC_VALUES);
             fetch.setInt(1, numOfReads);
-            fetch.setInt(1, numOfUniqueSeq);
-            fetch.setLong(3, runID);
-            
+            fetch.setInt(2, numOfUniqueSeq);
+            fetch.setLong(3, trackID);
+            fetch.execute();
+            con.commit();
+            con.setAutoCommit(true);
         } catch (SQLException ex) {
             Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -128,9 +128,7 @@ public class H2SQLStatements {
             "( " +
             FieldNames.RUN_ID+" BIGINT PRIMARY KEY, " +
             FieldNames.RUN_DESCRIPTION+" VARCHAR (100) NOT NULL, " +
-            FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL, "+
-            FieldNames.RUN_NUMBER_OF_READS+" BIGINT UNSIGNED, "+
-            FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+" BIGINT UNSIGNED "+
+            FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL "+
             ")";
 
 
@@ -205,9 +203,12 @@ public class H2SQLStatements {
             FieldNames.STATICS_NUMBER_OF_MAPPED_SEQ+ ", "+
             FieldNames.STATICS_PERFECT_COVERAGE_OF_GENOME+", " +
             FieldNames.STATICS_BM_COVERAGE_OF_GENOME+", " +
-            FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME+" " +
+            FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME+", " +
+            FieldNames.STATICS_NUMBER_OF_READS+", " +
+            FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+" " +
+
             ") " +
-            "VALUES (?,?,?,?,?,?,?,?,?)";
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
 
     public final static String INSERT_MAPPING =
@@ -275,19 +276,17 @@ public class H2SQLStatements {
             "( " +
             FieldNames.RUN_ID+", "+
             FieldNames.RUN_DESCRIPTION+", " +
-            FieldNames.RUN_TIMESTAMP+", " +
-            FieldNames.RUN_NUMBER_OF_READS+", " +
-            FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+" " +
+            FieldNames.RUN_TIMESTAMP+" " +
             ") " +
-            "VALUES (?,?,?,?,?)";
+            "VALUES (?,?,?)";
 
-        public final static String UPDATE_RUN_VALUES =
-            "UPDATE "+FieldNames.TABLE_RUN+" " +
+        public final static String UPDATE_STATIC_VALUES =
+            "UPDATE "+FieldNames.TABLE_STATICS+" " +
             "SET " +
-            FieldNames.RUN_NUMBER_OF_READS+" = ?, " +
-            FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ+"  = ?" +
+            FieldNames.STATICS_NUMBER_OF_READS+" = ? , " +
+            FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+"  = ?" +
             "WHERE " +
-                FieldNames.RUN_ID+" = ? " ;
+                FieldNames.TRACK_ID+" = ? " ;
 
     public final static String INSERT_SEQUENCE =
             "INSERT INTO "+FieldNames.TABLE_SEQUENCE+" " +
@@ -380,13 +379,17 @@ public class H2SQLStatements {
             "WHERE "+
                 FieldNames.REF_GEN_ID+" = ?";
 
-    
-      public final static String ADD_COLUMN_TO_TABLE_RUN =
+      public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS =
             "ALTER TABLE "+
-                FieldNames.TABLE_RUN+" " +
-            "ADD "+
-                FieldNames.RUN_NUMBER_OF_READS+" BIGINT UNSIGNED";
+                FieldNames.TABLE_STATICS+" " +
+            "ADD COLUMN "+
+                FieldNames.STATICS_NUMBER_OF_READS+" BIGINT UNSIGNED " ;
 
+          public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ =
+            "ALTER TABLE "+
+                FieldNames.TABLE_STATICS+" " +
+            "ADD COLUMN "+
+                FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+" BIGINT UNSIGNED  ";
 
     // statements to fetch data from database
 
@@ -598,21 +601,21 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                 "S."+FieldNames.SEQUENCE_RUN+" = ? and " +
                 "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
 
-        public final static String FETCH_NUM_OF_READS_FOR_RUN =
+        public final static String FETCH_NUM_OF_READS_FOR_TRACK =
             "SELECT " +
-                FieldNames.RUN_NUMBER_OF_READS+" as NUM " +
+               "S."+ FieldNames.STATICS_NUMBER_OF_READS+" as NUM " +
             "FROM "+
-                FieldNames.TABLE_RUN+
+                FieldNames.TABLE_STATICS+" as S " +
             " WHERE "+
-               FieldNames.RUN_ID+" = ?" ;
+              "S."+ FieldNames.TRACK_ID+" = ?" ;
 
-    public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN =
+    public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK =
             "SELECT " +
-                 "R."+FieldNames.RUN_NUMBER_OF_UNIQUE_SEQ +" as NUM " +
+                 "S."+FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ +" as NUM " +
             "FROM "+
-                FieldNames.TABLE_RUN+" as R " +
+                FieldNames.TABLE_STATICS+" as S " +
             "WHERE "+
-                "R."+FieldNames.RUN_ID+" = ?" ;
+                "S."+FieldNames.TRACK_ID+" = ?" ;
 
 
 
