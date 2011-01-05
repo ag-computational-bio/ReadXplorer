@@ -45,6 +45,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         putClientProperty(TopComponent.PROP_DRAGGING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
 
+        associateLookup(new AbstractLookup(content));
     }
 
     private void removeAllCookies(){
@@ -133,12 +134,14 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
                 content.remove(this);
             }
         });
-        associateLookup(new AbstractLookup(content));
     }
 
     @Override
     public void componentClosed() {
-        // remove all cookies or is this done automatically?
+        // remove all viewers
+        visualPanel.removeAll();
+
+        // remove all cookies
         removeAllCookies();
     }
 

@@ -39,7 +39,7 @@ public final class LoginWizardAction extends CallableSystemAction{
             try {
                 ProjectConnector.getInstance().connect((String) loginProps.get("adapter"), (String) loginProps.get("hostname"), (String) loginProps.get("database"), (String) loginProps.get("user"), (String) loginProps.get("password"));
                 // TODO get rid of ViewController
-                ViewController con = new ViewController();
+                ViewController con = ViewController.getInstance();
                 CentralLookup.getDefault().add(con);
                 WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
             } catch (SQLException ex) {
