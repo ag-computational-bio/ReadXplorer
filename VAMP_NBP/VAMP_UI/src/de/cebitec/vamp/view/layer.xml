@@ -3,6 +3,12 @@
 <filesystem>
     <folder name="Actions">
         <folder name="File">
+            <file name="de-cebitec-vamp-view-ExitVampAction.instance">
+                <attr name="delegate" newvalue="de.cebitec.vamp.view.ExitVampAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.view.Bundle#CTL_ExitVampAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
             <file name="de-cebitec-vamp-view-login-LogoutAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.view.login.Bundle#CTL_LogoutAction"/>
@@ -35,6 +41,10 @@
                 <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-view-login-LoginWizardAction.instance"/>
                 <attr name="position" intvalue="0"/>
             </file>
+            <file name="de-cebitec-vamp-view-ExitVampAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-view-ExitVampAction.instance"/>
+                <attr name="position" intvalue="2800"/>
+            </file>
             <file name="de-cebitec-vamp-view-login-LogoutAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-view-login-LogoutAction.instance"/>
                 <attr name="position" intvalue="700"/>
@@ -46,6 +56,7 @@
             <file name="org-netbeans-modules-print-action-PageSetupAction.shadow_hidden"/>
             <file name="org-netbeans-modules-print-action-PrintAction.shadow_hidden"/>
             <file name="Separator4.instance_hidden"/>
+            <file name="org-netbeans-core-actions-SystemExit.shadow_hidden"/>
         </folder>
         <folder name="Edit_hidden"/>
         <folder name="GoTo_hidden"/>
