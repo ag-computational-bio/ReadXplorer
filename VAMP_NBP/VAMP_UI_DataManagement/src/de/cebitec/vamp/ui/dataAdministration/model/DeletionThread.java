@@ -17,7 +17,7 @@ import javax.swing.SwingWorker;
  *
  * @author ddoppmeier
  */
-public class DeletionThread extends SwingWorker{
+public class DeletionThread extends SwingWorker<Object, Object>{
 
     private DataAdminController c;
     private List<ReferenceJob> gens;

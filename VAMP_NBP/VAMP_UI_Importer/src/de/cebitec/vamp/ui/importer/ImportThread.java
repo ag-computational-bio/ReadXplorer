@@ -25,7 +25,7 @@ import javax.swing.SwingWorker;
  *
  * @author ddoppmeier
  */
-public class ImportThread extends SwingWorker{
+public class ImportThread extends SwingWorker<Object, Object>{
 
     private ImporterController c;
     private List<ReferenceJob> gens;
