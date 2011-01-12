@@ -2,10 +2,16 @@ package de.cebitec.vamp.view;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.modules.ModuleInstall;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  * Manages a module's lifecycle.
@@ -18,6 +24,9 @@ public class Installer extends ModuleInstall {
 
     @Override
     public void restored() {
+        // redirect systemouts to internal netbeans plattform outputwindow
+        redirectSystemStreams();
+        
         //The TopComponent we're interested in isn't immediately available.
         //This method allows us to delay start of our procedure until later.
 /*        WindowManager.getDefault().invokeWhenUIReady(new Runnable()
@@ -74,4 +83,29 @@ public class Installer extends ModuleInstall {
             return super.closing();
         }
     }
+    
+    private void redirectSystemStreams() {
+        OutputStream out = new OutputStream() {
+
+             InputOutput io = IOProvider.getDefault().getIO("Output", true);
+
+            @Override
+            public void write(int i) throws IOException {
+                io.getOut().println(i);
+            }
+
+            @Override
+            public void write(byte[] bytes) throws IOException {
+                io.getOut().println(new String(bytes));
+            }
+
+            @Override
+            public void write(byte[] bytes, int off, int len) throws IOException {
+                io.getOut().println(new String(bytes, off, len));
+            }
+        };
+        System.setOut(new PrintStream(out, true));
+        System.setErr(new PrintStream(out, true));
+    }
+
 }
