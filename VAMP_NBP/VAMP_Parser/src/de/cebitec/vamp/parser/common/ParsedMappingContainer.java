@@ -37,18 +37,7 @@ public class ParsedMappingContainer {
     public ParsedMappingGroup getParsedMappingGroupBySeqID(int sequenceID){
         return mappings.get(sequenceID);
     }
-
-    public int getNumberOfContainedMappings(){
-        Collection<ParsedMappingGroup> groups = mappings.values();
-        Iterator<ParsedMappingGroup> it = groups.iterator();
-        int sum = 0;
-        while(it.hasNext()){
-            ParsedMappingGroup p = it.next();
-            sum += p.getMappings().size();
-        }
-        return sum;
-    }
-
+    
     @SuppressWarnings("unchecked")
     public HashMap<Integer,Integer> getMappingInformations() {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
@@ -64,21 +53,18 @@ public class ParsedMappingContainer {
 
         while (it.hasNext()) {
             ParsedMappingGroup p = it.next();
-            numberOfMappings += p.getMappings().size();
             List<ParsedMapping> mappingList = p.getMappings();
             Iterator maps = mappingList.iterator();
             while (maps.hasNext()) {
                 ParsedMapping m = (ParsedMapping) maps.next();
                 if(m.isBestMapping() == true) {
-                    numberOfBM++;
+                        numberOfBM++;
                     if(m.getErrors() == 0){
                          numberOfPerfect++;
                     }
-
                 }
-
+                numberOfMappings += m.getCount();
             }
-
     }
          mappingInfos.put(1, numberOfMappings);
          mappingInfos.put(2, numberOfPerfect);

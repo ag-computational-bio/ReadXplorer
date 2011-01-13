@@ -178,7 +178,7 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS).execute();
             con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ).execute();
             }catch(Exception ex){
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Tables already exsist");
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Columns already exist");
             }
             con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
             con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
@@ -372,8 +372,9 @@ public class ProjectConnector {
             // store sequences
             Collection<ParsedReadname> reads = run.getReads();
             int batchCounter = 1;
-
-            for (Iterator<ParsedReadname> it = reads.iterator(); it.hasNext(); batchCounter++) {
+            Iterator<ParsedReadname> it = reads.iterator();
+            while( it.hasNext()) {
+                batchCounter++;
                 ParsedReadname read = it.next();
                 seqID++;
                 read.setID(seqID);
@@ -385,6 +386,7 @@ public class ProjectConnector {
                     insertSequence.executeBatch();
                    batchCounter = 1;
                 }
+              //  it.remove();
             }
 
             insertSequence.executeBatch();
@@ -413,9 +415,12 @@ public class ProjectConnector {
             }
             
             int batchCounter = 1;
-            for (Iterator<ParsedReadname> readMapIt = run.getReads().iterator(); readMapIt.hasNext();) {
+            Iterator<ParsedReadname> readMapIt = run.getReads().iterator();
+            while (readMapIt.hasNext()) {
                 ParsedReadname readMap = readMapIt.next();
-                for (Iterator<String> readIt = readMap.getReads().iterator(); readIt.hasNext(); batchCounter++) {
+                Iterator<String> readIt = readMap.getReads().iterator();
+                while( readIt.hasNext()) {
+                    batchCounter++;
                     readID++;
                     insertRead.setLong(1, readID);
                     insertRead.setString(2, readIt.next());
@@ -426,11 +431,12 @@ public class ProjectConnector {
                           batchCounter = 1;
                         insertRead.executeBatch();
                     }
+                   // readIt.remove();
                 }
+              //  readMapIt.remove();
             }
 
             insertRead.executeBatch();
-
             con.commit();
             insertRead.close();
             getLatestID.close();
@@ -438,8 +444,6 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing readnames");
     }
 
@@ -625,7 +629,9 @@ public class ProjectConnector {
             id++;
 
             int batchCounter = 1;
-            for (Iterator<ParsedFeature> it = reference.getFeatures().iterator(); it.hasNext(); id++, batchCounter++) {
+            Iterator<ParsedFeature> it = reference.getFeatures().iterator();
+            while (it.hasNext()) {
+                batchCounter++;
                 ParsedFeature f = it.next();
                 insertFeature.setLong(1, id);
                 insertFeature.setLong(2, reference.getID());
@@ -637,11 +643,12 @@ public class ProjectConnector {
                 insertFeature.setString(8, f.getEcNumber());
                 insertFeature.setInt(9, f.getStrand());
                 insertFeature.addBatch();
-
+                id++;
                 if (batchCounter == FEATURE_BATCH_SIZE) {
                     batchCounter = 1;
                     insertFeature.executeBatch();
                 }
+              //  it.remove();
             }
 
             insertFeature.executeBatch();
@@ -724,7 +731,10 @@ public class ProjectConnector {
             // insert coverage for track
             int batchCounter = 1;
             CoverageContainer cov = track.getCoverageContainer();
-            for (Iterator<Integer> covsIt = cov.getCoveredPositions().iterator(); covsIt.hasNext(); id++, batchCounter++) {
+            Iterator<Integer> covsIt = cov.getCoveredPositions().iterator();
+            while (covsIt.hasNext()) {
+                id++;
+                batchCounter++;
                 int pos = covsIt.next();
                 if(cov.getZeroErrorMappingsForwardCoverage(pos)+ cov.getZeroErrorMappingsReverseCoverage(pos)!= 0){
                 coveragePerf ++;
@@ -940,7 +950,9 @@ public class ProjectConnector {
 
                     mappingID++;
                     batchCounter++;
+  
                 }
+
             }
 
             insertMapping.executeBatch();
@@ -986,7 +998,9 @@ public class ProjectConnector {
                     ParsedMapping m = mappingsIt.next();
 
                     // iterate diffs (non-gap variation)
-                    for (Iterator<ParsedDiff> diffsIt = m.getDiffs().iterator(); diffsIt.hasNext();) {
+                    Iterator<ParsedDiff> diffsIt = m.getDiffs().iterator();
+                    while(diffsIt.hasNext()) {
+
                         batchCounter++;
 
                         ParsedDiff d = diffsIt.next();
@@ -1005,7 +1019,8 @@ public class ProjectConnector {
                     }
 
                     // iterate gaps
-                    for (Iterator<ParsedReferenceGap> gapIt = m.getGenomeGaps().iterator(); gapIt.hasNext();) {
+                    Iterator<ParsedReferenceGap> gapIt = m.getGenomeGaps().iterator();
+                    while( gapIt.hasNext()) {
                         batchCounter++;
 
                         ParsedReferenceGap g = gapIt.next();
@@ -1023,10 +1038,9 @@ public class ProjectConnector {
                             batchCounter = 0;
                         }
                     }
-                    mappingsIt.remove();
                 }
             }
-
+            
             insertDiff.executeBatch();
             insertGap.executeBatch();
 

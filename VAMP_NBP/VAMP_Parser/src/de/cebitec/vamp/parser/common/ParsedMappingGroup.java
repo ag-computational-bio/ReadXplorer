@@ -36,13 +36,15 @@ public class ParsedMappingGroup {
     }
 
     private void tagBestMatches(){
-        for(Iterator<ParsedMapping> it = mappings.iterator(); it.hasNext();){
+        Iterator<ParsedMapping> it = mappings.iterator();
+        while(it.hasNext()){
             ParsedMapping m = it.next();
             if(m.getErrors() == minError){
                 m.setIsBestmapping(true);
             } else {
                 m.setIsBestmapping(false);
             }
+            // it.remove();
         }
         bestMappingTagged = true;
     }

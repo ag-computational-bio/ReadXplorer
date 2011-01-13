@@ -351,8 +351,8 @@ public class TrackConnector {
             insertStatics.setInt(7,covPerf);
             insertStatics.setInt(8,covBM);
             insertStatics.setInt(9,covComplete);
-            insertStatics.setInt(10,covBM);
-            insertStatics.setInt(11,covComplete);
+            insertStatics.setInt(10,numOfReads);
+            insertStatics.setInt(11,numOfUniqueSeq);
             insertStatics.execute();
 
             insertStatics.close();

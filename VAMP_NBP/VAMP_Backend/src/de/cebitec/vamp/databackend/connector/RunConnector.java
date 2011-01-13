@@ -130,7 +130,7 @@ public class RunConnector {
 
     public void updateTableStatics(int numOfReads, int numOfUniqueSeq){
       try {
-          con.setAutoCommit(false);
+            con.setAutoCommit(false);
             PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_STATIC_VALUES);
             fetch.setInt(1, numOfReads);
             fetch.setInt(2, numOfUniqueSeq);

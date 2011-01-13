@@ -6,7 +6,7 @@
             <file name="de-cebitec-vamp-ui-importer-actions-ImportDialogAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.importer.actions.Bundle#CTL_ImportDialogAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/importer/import.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/importer/import24.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.importer.actions.ImportDialogAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
