@@ -6,7 +6,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseRegGenAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/dnaClose24.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/flower.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.CloseRegGenAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -16,7 +16,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseTrackAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/trackClose24.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/flower.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.CloseTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -26,7 +26,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenRefGenDialogAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/dna.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/flower.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.OpenRefGenDialogAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -36,7 +36,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenTrackAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/track24.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/flower.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.OpenTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>

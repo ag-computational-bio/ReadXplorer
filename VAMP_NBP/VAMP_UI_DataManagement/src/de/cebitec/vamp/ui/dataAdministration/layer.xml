@@ -6,7 +6,7 @@
             <file name="de-cebitec-vamp-ui-dataAdministration-actions-OpenDataAdminDialog.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.dataAdministration.actions.Bundle#CTL_OpenDataAdminDialog"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/dataAdministration/dbManage24.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/dataAdministration/flower.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.dataAdministration.actions.OpenDataAdminDialog"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
