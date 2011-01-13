@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -91,17 +90,17 @@ public class Installer extends ModuleInstall {
 
             @Override
             public void write(int i) throws IOException {
-                io.getOut().println(i);
+                io.getOut().print(i);
             }
 
             @Override
             public void write(byte[] bytes) throws IOException {
-                io.getOut().println(new String(bytes));
+                io.getOut().print(new String(bytes));
             }
 
             @Override
             public void write(byte[] bytes, int off, int len) throws IOException {
-                io.getOut().println(new String(bytes, off, len));
+                io.getOut().print(new String(bytes, off, len));
             }
         };
         System.setOut(new PrintStream(out, true));
