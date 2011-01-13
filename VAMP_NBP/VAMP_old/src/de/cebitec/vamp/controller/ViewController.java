@@ -27,6 +27,7 @@ import org.openide.windows.WindowManager;
  */
 public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
+    private static ViewController instance;
 //    private ApplicationFrameI appFrame;
 //    private List<GestureListenerI> gestureListeners;
     private List<MousePositionListener> mousePosListener;
@@ -38,7 +39,7 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
     private Map<PersistantTrack, BasePanel> trackToPanel;
     private Map<PersistantTrack, TrackItem> trackToItem;
 
-    public ViewController(){
+    private ViewController(){
 //        appFrame = new ApplicationFrame();
 //        appFrame.setViewController(this);
         mousePosListener = new ArrayList<MousePositionListener>();
@@ -46,6 +47,13 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 //        gestureListeners = new ArrayList<GestureListenerI>();
         trackToPanel = new HashMap<PersistantTrack, BasePanel>();
         trackToItem = new HashMap<PersistantTrack, TrackItem>();
+    }
+
+    public static ViewController getInstance(){
+        if (instance == null){
+            instance = new ViewController();
+        }
+        return instance;
     }
 
 //    public void addGestureListener(GestureListenerI gestureListener){

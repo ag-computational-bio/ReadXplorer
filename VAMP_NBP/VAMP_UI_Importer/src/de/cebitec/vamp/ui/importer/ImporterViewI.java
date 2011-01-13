@@ -1,6 +1,5 @@
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.ui.importer.ImporterViewListenerI;
 import de.cebitec.vamp.importer.JobManagerI;
 
 /**

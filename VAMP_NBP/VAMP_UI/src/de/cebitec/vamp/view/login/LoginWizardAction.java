@@ -10,6 +10,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
@@ -26,6 +27,18 @@ public final class LoginWizardAction extends CallableSystemAction{
 
     @Override
     public void performAction() {
+        CentralLookup cl = CentralLookup.getDefault();
+        // check if user is already logged in
+        Boolean loggedIn = cl.lookup(ViewController.class) != null ? Boolean.TRUE : Boolean.FALSE;
+
+        if (loggedIn){
+            NotifyDescriptor nd = new NotifyDescriptor.Message("You are already logged into a VAMP database. If you log into another database your current connection will be closed.", NotifyDescriptor.INFORMATION_MESSAGE);
+            DialogDisplayer.getDefault().notify(nd);
+            // TODO find a way to do an automatic logout below
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please log out first.", NotifyDescriptor.WARNING_MESSAGE));
+            return;
+        }
+
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
@@ -35,12 +48,19 @@ public final class LoginWizardAction extends CallableSystemAction{
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
+            // log out before logging into another database
+//            if (loggedIn){
+//                LogoutAction logoutAction = Utilities.actionsGlobalContext().lookup(LogoutAction.class);
+//                LogoutAction logoutAction = Lookups.forPath("Actions/File/").lookup(LogoutAction.class);
+//                logoutAction.actionPerformed(null);
+//            }
+            
             Map<String, Object> loginProps = wizardDescriptor.getProperties();
             try {
                 ProjectConnector.getInstance().connect((String) loginProps.get("adapter"), (String) loginProps.get("hostname"), (String) loginProps.get("database"), (String) loginProps.get("user"), (String) loginProps.get("password"));
                 // TODO get rid of ViewController
-                ViewController con = new ViewController();
-                CentralLookup.getDefault().add(con);
+                ViewController con = ViewController.getInstance();
+                cl.add(con);
                 WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
             } catch (SQLException ex) {
                 Exceptions.printStackTrace(ex);
@@ -68,8 +88,7 @@ public final class LoginWizardAction extends CallableSystemAction{
                 if (c instanceof JComponent) { // assume Swing components
                     JComponent jc = (JComponent) c;
                     // Sets step number of a component
-                    // TODO if using org.openide.dialogs >= 7.8, can use WizardDescriptor.PROP_*:
-                    jc.putClientProperty("WizardPanel_contentSelectedIndex", new Integer(i));
+                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(i));
                     // Sets steps names for a panel
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
                     // Turn on subtitle creation on each step

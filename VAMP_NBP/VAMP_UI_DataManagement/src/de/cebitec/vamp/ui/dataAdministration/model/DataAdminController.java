@@ -2,10 +2,6 @@ package de.cebitec.vamp.ui.dataAdministration.model;
 
 import de.cebitec.vamp.ui.dataAdministration.View;
 import de.cebitec.vamp.ui.dataAdministration.ViewI;
-import de.cebitec.vamp.ui.dataAdministration.model.DeletionThread;
-import de.cebitec.vamp.ui.dataAdministration.model.Model;
-import de.cebitec.vamp.ui.dataAdministration.model.ModelInterface;
-import de.cebitec.vamp.ui.dataAdministration.model.ViewListenerI;
 
 /**
  *

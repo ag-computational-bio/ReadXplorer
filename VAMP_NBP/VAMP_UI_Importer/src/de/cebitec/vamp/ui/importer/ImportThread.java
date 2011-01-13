@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -24,7 +25,7 @@ import javax.swing.SwingWorker;
  *
  * @author ddoppmeier
  */
-public class ImportThread extends SwingWorker{
+public class ImportThread extends SwingWorker<Object, Object>{
 
     private ImporterController c;
     private List<ReferenceJob> gens;
@@ -281,6 +282,8 @@ public class ImportThread extends SwingWorker{
 
     @Override
     protected Object doInBackground() {
+        CentralLookup.getDefault().add(this);
+
         processRefGenJobs();
        // processRunJobs();
         processTrackRUNJobs();
@@ -296,6 +299,8 @@ public class ImportThread extends SwingWorker{
         super.done();
         c.updateImportStatus("Finished");
         c.importDone();
+
+        CentralLookup.getDefault().remove(this);
     }
 
 }

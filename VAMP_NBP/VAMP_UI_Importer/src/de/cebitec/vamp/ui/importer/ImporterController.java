@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class ImporterController implements ImporterViewListenerI {
 
-    ImporterViewI view;
-    ImporterDataModelI job;
+    private ImporterViewI view;
+    private ImporterDataModelI job;
 
     public ImporterController(){
 
