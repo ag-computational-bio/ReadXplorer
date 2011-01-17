@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
@@ -29,7 +29,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jTabbedPane1" alignment="0" pref="280" max="32767" attributes="0"/>
+          <Component id="jTabbedPane1" alignment="0" pref="247" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -60,7 +60,7 @@
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane1" pref="210" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" pref="209" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -78,14 +78,14 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="intervalToField" alignment="0" pref="121" max="32767" attributes="0"/>
-                                  <Component id="intervalFromField" alignment="0" pref="121" max="32767" attributes="0"/>
-                                  <Component id="currentPosField" alignment="0" pref="121" max="32767" attributes="0"/>
+                                  <Component id="intervalToField" alignment="0" pref="129" max="32767" attributes="0"/>
+                                  <Component id="intervalFromField" alignment="0" pref="129" max="32767" attributes="0"/>
+                                  <Component id="currentPosField" alignment="0" pref="129" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jSeparator1" pref="210" max="32767" attributes="0"/>
+                              <Component id="jSeparator1" pref="209" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
@@ -119,7 +119,7 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="81" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="92" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -215,13 +215,13 @@
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="typeText" alignment="1" pref="123" max="32767" attributes="0"/>
-                          <Component id="locusField" pref="123" max="32767" attributes="2"/>
-                          <Component id="startField" pref="123" max="32767" attributes="2"/>
-                          <Component id="stopField" pref="123" max="32767" attributes="2"/>
-                          <Component id="ecNumField" pref="123" max="32767" attributes="2"/>
-                          <Component id="productText" alignment="1" pref="123" max="32767" attributes="0"/>
-                          <Component id="strandText" alignment="0" pref="123" max="32767" attributes="0"/>
+                          <Component id="typeText" alignment="1" pref="132" max="32767" attributes="0"/>
+                          <Component id="locusField" pref="132" max="32767" attributes="2"/>
+                          <Component id="startField" pref="132" max="32767" attributes="2"/>
+                          <Component id="stopField" pref="132" max="32767" attributes="2"/>
+                          <Component id="ecNumField" pref="132" max="32767" attributes="2"/>
+                          <Component id="productText" alignment="1" pref="132" max="32767" attributes="0"/>
+                          <Component id="strandText" alignment="0" pref="132" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -265,7 +265,7 @@
                           <Component id="strandText" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="50" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -354,6 +354,46 @@
                 <Property name="text" type="java.lang.String" value="Start:"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="toolTabbedPane">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Tools">
+                <Property name="tabTitle" type="java.lang.String" value="Tools"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="49" max="-2" attributes="0"/>
+                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="55" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="192" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JButton" name="jButton1">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Reference Editor"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

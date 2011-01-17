@@ -39,6 +39,7 @@ public class ReferenceViewer extends AbstractViewer {
         this.refGen = refGen;
         this.showSequenceBar(true);
         this.labelMargin = 3;
+       
     }
     
     public void setSelectedFeature(Feature feature){
@@ -207,6 +208,7 @@ public class ReferenceViewer extends AbstractViewer {
 
     public void setGenomeViewerInfoPanel(ReferenceViewerInfoPanel info) {
         infoPanel = info;
+        infoPanel.setReference(this.refGen);
     }
 
     public void showFeatureDetails(PersistantFeature f) {

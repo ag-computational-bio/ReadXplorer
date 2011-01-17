@@ -23,7 +23,7 @@
             <file name="de-cebitec-vamp-view-login-LoginWizardAction.instance">
                 <attr name="delegate" newvalue="de.cebitec.vamp.view.login.LoginWizardAction"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.view.login.Bundle#CTL_LoginWizardAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/login/flower.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/login.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>

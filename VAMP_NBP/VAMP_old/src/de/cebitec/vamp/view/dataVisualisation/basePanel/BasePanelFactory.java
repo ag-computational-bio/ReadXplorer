@@ -148,7 +148,8 @@ public class BasePanelFactory {
     private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider){
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
-        AdjustmentPanel controll = new AdjustmentPanel(1, refGen.getSequence().length(), bounds.getCurrentLogPos(), bounds.getZoomValue(),  hasScrollbar, hasSlider);
+        AdjustmentPanel controll = new AdjustmentPanel(1, refGen.getSequence().length(),
+                bounds.getCurrentLogPos(), bounds.getZoomValue(),  hasScrollbar, hasSlider);
         controll.addAdjustmentListener(boundsManager);
         boundsManager.addSynchronousNavigator(controll);
         return controll;
