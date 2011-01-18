@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -27,16 +31,20 @@ import javax.swing.SwingWorker;
  */
 public class ImportThread extends SwingWorker<Object, Object>{
 
-    private ImporterController c;
+    private InputOutput io;
     private List<ReferenceJob> gens;
     private List<TrackJobs> tracksRun;
     private HashMap<TrackJobs, Boolean> validTracksRun;
+    private ProgressHandle ph;
+    private int workunits;
 
-    public ImportThread(ImporterController c, List<ReferenceJob> gens, List<TrackJobs> tracksRun){
+    public ImportThread(List<ReferenceJob> gens, List<TrackJobs> tracksRun){
         super();
-        this.c = c;
+        this.io = IOProvider.getDefault().getIO("Import running...", true);
         this.tracksRun = tracksRun;
         this.gens = gens;
+        this.ph = ProgressHandleFactory.createHandle("Import");
+        this.workunits = gens.size() +  2 * tracksRun.size();
         
         validTracksRun = new HashMap<TrackJobs, Boolean>();
     }
@@ -165,23 +173,24 @@ public class ImportThread extends SwingWorker<Object, Object>{
 
     private void processRefGenJobs(){
         if(!gens.isEmpty()){
-            c.updateImportStatus("Starting import of references:");
+            io.getOut().println("Starting import of references:");
 
             for(Iterator<ReferenceJob> it = gens.iterator(); it.hasNext(); ){
                 ReferenceJob r = it.next();
+                workunits++;
 
                 try {
                     // parsing
                     ParsedReference refGen = parseRefGen(r);
-                    c.updateImportStatus("\""+r.getName() + "\" parsed");
+                    io.getOut().println("\""+r.getName() + "\" parsed");
 
                     // storing
                     try {
                         storeRefGen(refGen, r);
-                        c.updateImportStatus("\""+r.getName() + "\" stored");
+                        io.getOut().println("\""+r.getName() + "\" stored");
                     } catch (StorageException ex) {
                         // if something went wrong, mark all dependent track jobs
-                        c.updateImportStatus("\""+r.getName() + "\" failed!");
+                        io.getOut().println("\""+r.getName() + "\" failed!");
                         if(r.hasRegisteredTrackswithoutrRunJob()){
                             setValidTracksRun(r.getDependentTrackswithoutRunjob(), false);
                         }
@@ -193,7 +202,7 @@ public class ImportThread extends SwingWorker<Object, Object>{
 
                 } catch (ParsingException ex) {
                     // if something went wrong, mark all dependent track jobs
-                    c.updateImportStatus("\""+r.getName() + "\" failed!");
+                    io.getOut().println("\""+r.getName() + "\" failed!");
                     if(r.hasRegisteredTrackswithoutrRunJob()){
                         setValidTracksRun(r.getDependentTrackswithoutRunjob(), false);
                     }
@@ -203,16 +212,17 @@ public class ImportThread extends SwingWorker<Object, Object>{
                 it.remove();
             }
 
-            c.updateImportStatus("");
+            io.getOut().println("");
         }
     }
 
 
     private void processTrackRUNJobs(){
         if(!tracksRun.isEmpty()){
-            c.updateImportStatus("Starting import of reads of tracks:");
+            io.getOut().println("Starting import of reads of tracks:");
             for(Iterator<TrackJobs> it = tracksRun.iterator(); it.hasNext(); ){
                 TrackJobs t = it.next();
+                workunits++;
 
                 // only import this track if no problems occured with dependencies
                 if(isValidTrackwithoutRun(t)){
@@ -220,28 +230,28 @@ public class ImportThread extends SwingWorker<Object, Object>{
 
                         //parsing
                         ParsedRun run = parseRunfromTrack(t);
-                        c.updateImportStatus("\""+t.getFile().getName() + "\" parsed");
+                        io.getOut().println("\""+t.getFile().getName() + "\" parsed");
                     //returns the reads that couldnt be read by the parser
                     if(!run.getErrorList().isEmpty() || run.getSequences().isEmpty()){
-                    c.updateImportStatus("Couldn't load reads: " + run.getErrorList().toString());
+                    io.getOut().println("Couldn't load reads: " + run.getErrorList().toString());
                     }
                     //storing
                     try {
                         storeRunFromTrackData(run, t);
-                        c.updateImportStatus("\""+t.getFile().getName() + "\" stored");
+                        io.getOut().println("\""+t.getFile().getName() + "\" stored");
                     } catch (StorageException ex) {
                         // if something went wrong, mark all dependent track jobs
-                        c.updateImportStatus("\""+t.getFile().getName()+"\" failed!");
+                        io.getOut().println("\""+t.getFile().getName()+"\" failed!");
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
                     }
 
             } catch (ParsingException ex) {
                         // something went wrong
-                        c.updateImportStatus("\""+t.getFile().getName() + "\" failed");
+                        io.getOut().println("\""+t.getFile().getName() + "\" failed");
                         Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
-                    c.updateImportStatus("\""+t.getFile().getName()+" has not been processed, bocause of previous errors in data that this file depends on!");
+                    io.getOut().println("\""+t.getFile().getName()+" has not been processed, bocause of previous errors in data that this file depends on!");
                 }
             }
         }
@@ -249,29 +259,30 @@ public class ImportThread extends SwingWorker<Object, Object>{
 
     private void processTrackJobs(){
         if(!tracksRun.isEmpty()){
-            c.updateImportStatus("Starting import of tracks:");
+            io.getOut().println("Starting import of tracks:");
             for(Iterator<TrackJobs> it = tracksRun.iterator(); it.hasNext(); ){
                 TrackJobs t = it.next();
+                workunits++;
 
                 // only import this track if no problems occured with dependencies
                     try {
 
                         //parsing
                         ParsedTrack track = parseTrack(t);
-                        c.updateImportStatus("\""+t.getFile().getName() + "\" parsed");
+                        io.getOut().println("\""+t.getFile().getName() + "\" parsed");
 
                         //storing
                         try {
                             storeTrack(track, t);
-                            c.updateImportStatus("\""+t.getFile().getName() + "\" stored");
+                            io.getOut().println("\""+t.getFile().getName() + "\" stored");
                         } catch (StorageException ex) {
                         // something went wrong
-                            c.updateImportStatus("\""+t.getFile().getName() + "\" failed");
+                            io.getOut().println("\""+t.getFile().getName() + "\" failed");
                             Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } catch (ParsingException ex) {
                         // something went wrong
-                        c.updateImportStatus("\""+t.getFile().getName() + "\" failed");
+                        io.getOut().println("\""+t.getFile().getName() + "\" failed");
                         Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
@@ -283,11 +294,18 @@ public class ImportThread extends SwingWorker<Object, Object>{
     @Override
     protected Object doInBackground() {
         CentralLookup.getDefault().add(this);
+        io.select();
 
+        ph.start(workunits);
+        workunits = 0;
+
+        ph.progress("processing reference jobs...", workunits);
         processRefGenJobs();
-       // processRunJobs();
+
+        ph.progress("processing reads of tracks", workunits);
         processTrackRUNJobs();
         // track jobs have to be imported last, because they may depend upon previously imported genomes, runs
+        ph.progress("processing track jobs", workunits);
         processTrackJobs();
         validTracksRun.clear();
 
@@ -297,8 +315,9 @@ public class ImportThread extends SwingWorker<Object, Object>{
     @Override
     protected void done(){
         super.done();
-        c.updateImportStatus("Finished");
-        c.importDone();
+        io.getOut().println("Finished");
+        io.getOut().close();
+        ph.finish();
 
         CentralLookup.getDefault().remove(this);
     }

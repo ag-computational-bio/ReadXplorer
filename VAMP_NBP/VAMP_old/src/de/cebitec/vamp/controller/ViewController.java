@@ -4,7 +4,6 @@ import de.cebitec.vamp.ui.dataAdministration.model.DataAdminController;
 //import de.cebitec.vamp.ui.dataAdministration.model.GestureListenerI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.ui.importer.ImporterController;
 import de.cebitec.vamp.ui.importer.LoginCookie;
 import de.cebitec.vamp.view.ApplicationFrameI;
 import de.cebitec.vamp.view.OpenRefGenDialog;
@@ -65,11 +64,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
     }
 
     @Override
-    public void openImporterDialog(){
-        new ImporterController().setupNewImport();
-    }
-
-    @Override
     public void openDataAdminDialog(){
         new DataAdminController().showDataAdministration();
     }
@@ -93,7 +87,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 //        }
 //    }
 
-    @Override
     public void openRefGen(){
         OpenRefGenDialog d = new OpenRefGenDialog(WindowManager.getDefault().getMainWindow(), true);
         d.setVisible(true);
@@ -107,7 +100,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
         }
     }
 
-    @Override
     public void closeRefGen() {
 
         // remove all tracks that are still open
@@ -131,7 +123,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 
     }
 
-    @Override
     public void openTrack() {
         OpenTrackDialog d = new OpenTrackDialog(WindowManager.getDefault().getMainWindow(), true, currentRefGen);
         d.setVisible(true);

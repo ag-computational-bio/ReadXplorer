@@ -24,7 +24,7 @@ public class Installer extends ModuleInstall {
     @Override
     public void restored() {
         // redirect systemouts to internal netbeans plattform outputwindow
-        redirectSystemStreams();
+//        redirectSystemStreams();
         
         //The TopComponent we're interested in isn't immediately available.
         //This method allows us to delay start of our procedure until later.

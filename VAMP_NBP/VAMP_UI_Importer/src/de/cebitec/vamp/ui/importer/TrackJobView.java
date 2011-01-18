@@ -15,26 +15,20 @@ import javax.swing.table.DefaultTableModel;
 public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener{
 
     private List<TrackJobs> tracks;
-    private ImportSetupCard parent;
     public final static long serialVersionUID = 774292377;
+    private boolean hasJobs;
+
+    public static final String PROP_HAS_JOBS = "hasJobs";
+    public static final String PROP_JOB_SELECTED = "jobSelected";
 
     /** Creates new form TaskViewerTemplate */
     public TrackJobView() {
-        this.init();
-    }
-
-    public TrackJobView(ImportSetupCard parent){
-        this.parent = parent;
-        this.init();
+        tracks = new ArrayList<TrackJobs>();
+        initComponents();
     }
 
     public TrackJobs getSelectedItem() {
         return tracks.get(jTable1.getSelectedRow());
-    }
-
-    private void init(){
-        tracks = new ArrayList<TrackJobs>();
-        initComponents();
     }
 
     public void add(TrackJobs trackJob){
@@ -44,6 +38,11 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
             trackJob.getDescription(),
             trackJob.getRefGen().getDescription()});
         tracks.add(trackJob);
+
+        if (!hasJobs){
+            hasJobs = true;
+            firePropertyChange(PROP_HAS_JOBS, null, hasJobs);
+        }
     }
 
     public void remove(TrackJobs trackJob){
@@ -52,6 +51,15 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
 
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.removeRow(index);
+
+        if (tracks.isEmpty()){
+            hasJobs = false;
+            firePropertyChange(PROP_HAS_JOBS, null, hasJobs);
+        }
+    }
+
+    public List<TrackJobs> getJobs(){
+        return tracks;
     }
 
     /** This method is called from within the constructor to
@@ -117,9 +125,9 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
     public void valueChanged(ListSelectionEvent e) {
         ListSelectionModel model = (ListSelectionModel) e.getSource();
         if(model.isSelectionEmpty()){
-            parent.setRemoveButtonEnabled(false);
+            firePropertyChange(PROP_JOB_SELECTED, null, Boolean.FALSE);
         } else {
-            parent.setRemoveButtonEnabled(true);
+            firePropertyChange(PROP_JOB_SELECTED, null, Boolean.TRUE);
         }
     }
 

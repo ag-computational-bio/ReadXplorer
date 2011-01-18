@@ -4,6 +4,7 @@ import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import java.util.Iterator;
 import java.util.List;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -18,7 +19,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    void showOverview(List<ReferenceJob> refGenJobList, List<TrackJobs> trackJobList) {
+    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJobs> trackJobList) {
 
         jTextArea1.setText("");
 
@@ -42,6 +43,11 @@ public class ImportOverviewCard extends javax.swing.JPanel {
                 jTextArea1.append("\t"+r.getDescription()+"\n");
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return NbBundle.getMessage(ImportOverviewCard.class, "CTL_ImportOverviewCard.name");
     }
 
     /** This method is called from within the constructor to

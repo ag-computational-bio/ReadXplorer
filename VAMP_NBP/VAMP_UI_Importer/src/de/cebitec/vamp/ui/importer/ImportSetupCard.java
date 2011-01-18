@@ -2,7 +2,17 @@ package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
+import java.awt.Dialog;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.sql.Timestamp;
+import java.util.List;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -11,24 +21,58 @@ import java.awt.Component;
 public class ImportSetupCard extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 127732323;
-    private ImporterViewFrame view;
+
+    private boolean canImport;
 
     /** Creates new form SetupImportCard */
     public ImportSetupCard() {
         initComponents();
-    }
+        refJobView1.addPropertyChangeListener(RefJobView.PROP_JOB_SELECTED, new PropertyChangeListener() {
 
-    public ImportSetupCard(ImporterViewFrame view){
-        initComponents();
-        this.view = view;
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((Boolean) evt.getNewValue()){
+                    removeJob.setEnabled(true);
+                }
+                else {
+                    removeJob.setEnabled(false);
+                }
+            }
+        });
+        refJobView1.addPropertyChangeListener(RefJobView.PROP_HAS_JOBS, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                setCanImport((Boolean) evt.getNewValue());
+            }
+        });
+        trackJobView1.addPropertyChangeListener(TrackJobView.PROP_JOB_SELECTED, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((Boolean) evt.getNewValue()){
+                    removeJob.setEnabled(true);
+                }
+                else{
+                    removeJob.setEnabled(false);
+                }
+            }
+        });
+        trackJobView1.addPropertyChangeListener(RefJobView.PROP_HAS_JOBS, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                setCanImport((Boolean) evt.getNewValue());
+            }
+        });
     }
 
     void refGenJobAdded(ReferenceJob refGenJob) {
-        refGenJobView1.add(refGenJob);
+        refJobView1.add(refGenJob);
     }
 
     void refGenJobRemoved(ReferenceJob refGenJob) {
-        refGenJobView1.remove(refGenJob);
+        refJobView1.remove(refGenJob);
     }
 
     void setRemoveButtonEnabled(boolean b) {
@@ -43,6 +87,24 @@ public class ImportSetupCard extends javax.swing.JPanel {
         trackJobView1.remove(trackJob);
     }
 
+    public void setCanImport(boolean canOrcannot){
+        canImport = canOrcannot;
+        firePropertyChange(ImportWizardAction.PROP_CAN_IMPORT, null, canImport);
+    }
+
+    public List<ReferenceJob> getRefJobList(){
+        return refJobView1.getJobs();
+    }
+
+    public List<TrackJobs> getTrackJobList(){
+        return trackJobView1.getJobs();
+    }
+
+    @Override
+    public String getName() {
+        return NbBundle.getMessage(ImportSetupCard.class, "CTL_ImportSetupCard.name");
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -53,8 +115,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        refGenJobView1 = new de.cebitec.vamp.ui.importer.RefJobView(this);
-        trackJobView1 = new de.cebitec.vamp.ui.importer.TrackJobView(this);
+        refJobView1 = new de.cebitec.vamp.ui.importer.RefJobView();
+        trackJobView1 = new de.cebitec.vamp.ui.importer.TrackJobView();
         newJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
@@ -63,7 +125,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 jTabbedPane1StateChanged(evt);
             }
         });
-        jTabbedPane1.addTab("References", refGenJobView1);
+        jTabbedPane1.addTab("References", refJobView1);
         jTabbedPane1.addTab("Tracks", trackJobView1);
 
         newJob.setText("Add");
@@ -87,7 +149,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(283, Short.MAX_VALUE)
+                .addContainerGap(304, Short.MAX_VALUE)
                 .addComponent(removeJob)
                 .addGap(7, 7, 7)
                 .addComponent(newJob)
@@ -109,9 +171,35 @@ public class ImportSetupCard extends javax.swing.JPanel {
         Component c = jTabbedPane1.getSelectedComponent();
         if(c == null){
         } else if(c instanceof RefJobView) {
-            view.showNewRefGenDialog();
+            NewReferenceDialogPanel nrdp = new NewReferenceDialogPanel();
+            DialogDescriptor refGenDialog = new DialogDescriptor(nrdp, "Reference Dialog", true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
+            Dialog diaDisp = DialogDisplayer.getDefault().createDialog(refGenDialog);
+            diaDisp.setVisible(true);
+
+            while(refGenDialog.getValue() == DialogDescriptor.OK_OPTION && !nrdp.isRequiredInfoSet()){
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please fill out the complete form!", NotifyDescriptor.INFORMATION_MESSAGE));
+                diaDisp.setVisible(true);
+            }
+            if (refGenDialog.getValue() == DialogDescriptor.OK_OPTION && nrdp.isRequiredInfoSet()){
+                refJobView1.add(new ReferenceJob(null, nrdp.getReferenceFile(), nrdp.getParser(), nrdp.getDescription(), nrdp.getReferenceName(), new Timestamp(System.currentTimeMillis())));
+            }
         } else if(c instanceof TrackJobView){
-            view.showNewTrackDialog();
+            NewTrackDialogPanel ntdp = new NewTrackDialogPanel();
+            ntdp.setReferenceJobs(refJobView1.getJobs());
+            DialogDescriptor trackDialog = new DialogDescriptor(ntdp, "Track Dialog", true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
+            Dialog dialog = DialogDisplayer.getDefault().createDialog(trackDialog);
+            dialog.setVisible(true);
+
+            while(trackDialog.getValue() == DialogDescriptor.OK_OPTION && !ntdp.isRequiredInfoSet()){
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please fill out the complete form!", NotifyDescriptor.INFORMATION_MESSAGE));
+                dialog.setVisible(true);
+            }
+            if (trackDialog.getValue() == DialogDescriptor.OK_OPTION && ntdp.isRequiredInfoSet()){
+                ReferenceJob refJob = ntdp.getReferenceJob();
+                TrackJobs trackJob = new TrackJobs(null, ntdp.gettMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
+                refJob.registerTrackWithoutRunJob(trackJob);
+                trackJobView1.add(trackJob);
+            }
         }
 }//GEN-LAST:event_newJobActionPerformed
 
@@ -119,10 +207,16 @@ public class ImportSetupCard extends javax.swing.JPanel {
         Component c = jTabbedPane1.getSelectedComponent();
         if(c == null){
         } else if(c instanceof RefJobView) {
-            view.removeRefGenJob(refGenJobView1.getSelectedItem());
-      
+            ReferenceJob job = refJobView1.getSelectedItem();
+            if (job.hasRegisteredTrackswithoutrRunJob()){
+                NotifyDescriptor nd = new NotifyDescriptor.Message("Cannot mark selected object for deletion. Please resolve dependencies first!", NotifyDescriptor.WARNING_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+            }
+            else{
+                refJobView1.remove(job);
+            }
         } else if(c instanceof TrackJobView){
-            view.removeTrackJob(trackJobView1.getSelectedItem());
+            trackJobView1.remove(trackJobView1.getSelectedItem());
         }
     }//GEN-LAST:event_removeJobActionPerformed
 
@@ -130,7 +224,12 @@ public class ImportSetupCard extends javax.swing.JPanel {
         Component c = jTabbedPane1.getSelectedComponent();
         boolean isSelected = false;
         if(c instanceof RefJobView){
-            if(refGenJobView1.IsRowSelected()){
+            if(refJobView1.IsRowSelected()){
+                isSelected = true;
+            }
+        }
+        else if (c instanceof TrackJobView){
+            if (trackJobView1.IsRowSelected()){
                 isSelected = true;
             }
         }
@@ -146,7 +245,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton newJob;
-    private de.cebitec.vamp.ui.importer.RefJobView refGenJobView1;
+    private de.cebitec.vamp.ui.importer.RefJobView refJobView1;
     private javax.swing.JButton removeJob;
     private de.cebitec.vamp.ui.importer.TrackJobView trackJobView1;
     // End of variables declaration//GEN-END:variables

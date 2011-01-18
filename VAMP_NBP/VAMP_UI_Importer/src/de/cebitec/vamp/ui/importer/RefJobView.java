@@ -14,33 +14,33 @@ import javax.swing.table.DefaultTableModel;
  */
 public class RefJobView extends javax.swing.JPanel implements ListSelectionListener{
 
+    private static final long serialVersionUID = 1231231;
+
     private List<ReferenceJob> jobs;
-    private ImportSetupCard parent;
-    static final long serialVersionUID = 1231231;
+    private boolean hasJobs;
+
+    public static final String PROP_HAS_JOBS = "hasJobs";
+    public static final String PROP_JOB_SELECTED = "jobSelected";
 
     /** Creates new form TaskViewerTemplate */
     public RefJobView() {
-        this.init();
-    }
-
-    public RefJobView(ImportSetupCard parent) {
-        this.parent = parent;
-        this.init();
+        initComponents();
+        this.jobs = new ArrayList<ReferenceJob>();
     }
 
     public ReferenceJob getSelectedItem() {
         return jobs.get(jTable1.getSelectedRow());
     }
 
-    private void init(){
-        initComponents();
-        jobs = new ArrayList<ReferenceJob>();
-    }
-
     public void add(ReferenceJob refGenJob) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addRow(new Object[]{refGenJob.getFile().getName()});
+        model.addRow(new Object[]{refGenJob.getName()});//.getFile().getName()});
         jobs.add(refGenJob);
+
+        if (!hasJobs){
+            hasJobs = true;
+            firePropertyChange(PROP_HAS_JOBS, null, hasJobs);
+        }
     }
 
     public void remove(ReferenceJob refGenJob){
@@ -48,11 +48,24 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
         jobs.remove(refGenJob);
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.removeRow(row);
+
+        if (jobs.isEmpty()){
+            hasJobs = false;
+            firePropertyChange(PROP_HAS_JOBS, null, hasJobs);
+        }
     }
 
     public boolean IsRowSelected(){
         ListSelectionModel model = jTable1.getSelectionModel();
         return !model.isSelectionEmpty();
+    }
+
+    public boolean hasImportJobs(){
+        return !jobs.isEmpty();
+    }
+
+    public List<ReferenceJob> getJobs(){
+        return jobs;
     }
 
     /** This method is called from within the constructor to
@@ -118,9 +131,9 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
     public void valueChanged(ListSelectionEvent e) {
         ListSelectionModel model = (ListSelectionModel) e.getSource();
         if(model.isSelectionEmpty()){
-            parent.setRemoveButtonEnabled(false);
+            firePropertyChange(PROP_JOB_SELECTED, null, Boolean.FALSE);
         } else {
-            parent.setRemoveButtonEnabled(true);
+            firePropertyChange(PROP_JOB_SELECTED, null, Boolean.TRUE);
         }
     }
 
