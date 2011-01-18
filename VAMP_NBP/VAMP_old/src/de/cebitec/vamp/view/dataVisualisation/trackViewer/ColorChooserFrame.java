@@ -6,6 +6,7 @@
 
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 /**
@@ -13,14 +14,11 @@ import javax.swing.JPanel;
  * @author jstraube
  */
 public class ColorChooserFrame extends javax.swing.JFrame {
-
-        public ColorOptionPanel cop ;
-    public JPanel currentPanel;
+    public JButton currentButton;
     /** Creates new form ColorChooserFrame */
-    public ColorChooserFrame(ColorOptionPanel op, JPanel selectedPanel){
+    public ColorChooserFrame( JButton selectedButton){
         initComponents();
-        this.cop = op;
-        this.currentPanel = selectedPanel;
+        this.currentButton = selectedButton;
         this.setVisible(true);
     }
     /** This method is called from within the constructor to
@@ -84,7 +82,7 @@ public class ColorChooserFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void colorChooserButtionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorChooserButtionActionPerformed
-        currentPanel.setBackground(jColorChooser1.getColor());
+        currentButton.setBackground(jColorChooser1.getColor());
     }//GEN-LAST:event_colorChooserButtionActionPerformed
 
     private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed

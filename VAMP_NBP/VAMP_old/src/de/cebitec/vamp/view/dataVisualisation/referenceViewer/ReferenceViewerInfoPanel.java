@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.reference.Filter.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AbstractInfoPanel;
@@ -16,7 +17,7 @@ import javax.swing.DefaultListModel;
 public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements MousePositionListener {
 
     private static final long serialVersionUID = 246312994;
-
+    private PersistantReference reference;
     private boolean showCurrentPosition;
 
     /** Creates new form GenomeViewerInfoPanel */
@@ -61,6 +62,8 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
         locusLabel = new javax.swing.JLabel();
         startField = new javax.swing.JTextField();
         startLabel = new javax.swing.JLabel();
+        toolTabbedPane = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(238, 181));
         setPreferredSize(new java.awt.Dimension(238, 181));
@@ -149,7 +152,7 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -253,10 +256,36 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(strandText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addContainerGap(50, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Feature", jPanel2);
+
+        jButton1.setText("Reference Editor");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout toolTabbedPaneLayout = new javax.swing.GroupLayout(toolTabbedPane);
+        toolTabbedPane.setLayout(toolTabbedPaneLayout);
+        toolTabbedPaneLayout.setHorizontalGroup(
+            toolTabbedPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(toolTabbedPaneLayout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addComponent(jButton1)
+                .addContainerGap(55, Short.MAX_VALUE))
+        );
+        toolTabbedPaneLayout.setVerticalGroup(
+            toolTabbedPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(toolTabbedPaneLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jButton1)
+                .addContainerGap(192, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Tools", toolTabbedPane);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -266,9 +295,13 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+      ReferenceEditor refEditor =  new ReferenceEditor(getReference());
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -276,6 +309,7 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
     private javax.swing.JTextField ecNumField;
     private javax.swing.JTextField intervalFromField;
     private javax.swing.JTextField intervalToField;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -297,6 +331,7 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
     private javax.swing.JTextField stopField;
     private javax.swing.JLabel stopLabel;
     private javax.swing.JTextField strandText;
+    private javax.swing.JPanel toolTabbedPane;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JTextField typeText;
     // End of variables declaration//GEN-END:variables
@@ -352,5 +387,15 @@ public class ReferenceViewerInfoPanel extends AbstractInfoPanel implements Mouse
     public void close() {
 
     }
+
+    public PersistantReference getReference() {
+        return reference;
+    }
+
+    public void setReference(PersistantReference reference) {
+        this.reference = reference;
+    }
+
+    
 
 }

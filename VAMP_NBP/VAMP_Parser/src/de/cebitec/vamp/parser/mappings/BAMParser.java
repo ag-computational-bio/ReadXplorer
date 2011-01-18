@@ -28,7 +28,6 @@ public class BAMParser implements MappingParserI {
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam"};
     private static String fileDescription = "BAM Output";
     private HashMap<Integer, Integer> gapOrderIndex;
-    private HashSet<String> unmappedReads = new HashSet<String>();
     private int errors = 0;
     private HashMap<String, String> mappedRefAndReadPlusGaps = new HashMap<String, String>();
 
@@ -38,15 +37,17 @@ public class BAMParser implements MappingParserI {
 
     @Override
     public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
+        int flag = 0;
+        int lineno = 0;
         String readname = null;
         String refName = null;
         String refSeq = null;
         String readSeq = null;
-        int flag = 0;
         String readSeqwithoutGaps = null;
         String cigar = null;
         String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
+
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -55,10 +56,9 @@ public class BAMParser implements MappingParserI {
 
         SAMRecordIterator itor = sam.iterator();
 
-        int lineno = 0;
+        
 
         while (itor.hasNext()) {
-
             SAMRecord first = itor.next();
             flag = first.getFlags();
 
@@ -71,7 +71,6 @@ public class BAMParser implements MappingParserI {
                 if (isForwardStrand == true) {
                     direction = -1;
                 }
-
                 readname = first.getReadName();
                 refName = first.getReferenceName();
                 cigar = first.getCigarString();
@@ -79,7 +78,6 @@ public class BAMParser implements MappingParserI {
                 //   System.out.println("rSeq " + readname + "flag " + flag + "refName " + refName + "read " + readSeqwithoutGaps);
                 if (refSeqfulllength == null) {
                     refSeqfulllength = sequenceString;
-
                 }
                 errors = 0;
 
@@ -166,7 +164,7 @@ public class BAMParser implements MappingParserI {
             int i = (Integer) it.next();
             s.add(i);
         }
-        it.remove();
+       // it.remove();
 
         int noOfReads = readnameToSequenceID.keySet().size();
         int noOfUniqueSeq = s.size();
@@ -179,7 +177,7 @@ public class BAMParser implements MappingParserI {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
     }
-    //this method save which gap is the first if we have more than ine gap
+    //this method save which gap is the first if we have more than one gap
     private int getOrderForGap(int gapPos) {
         if (!gapOrderIndex.containsKey(gapPos)) {
             gapOrderIndex.put(gapPos, 0);
@@ -345,8 +343,10 @@ public class BAMParser implements MappingParserI {
                     newreadSeq = readSeq;
                 } else if (c == 'S') {
                     if (index > 3) {
+                        //soft clipping of the last bases
                         newreadSeq = newreadSeq.substring(0, readSeq.length()-Integer.parseInt(subSeq2Val));
                     } else {
+                          //soft clipping of the first bases
                         readPos = readPos + Integer.parseInt(subSeq2Val);
                         softclipped = Integer.parseInt(subSeq2Val);
                     }
@@ -468,29 +468,31 @@ public class BAMParser implements MappingParserI {
     }
 
     @Override
-    public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
-        int flag = 0;
+    public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {    
         String readSeqwithoutGaps = null;
-        String readname = null;
         ParsedRun run = new ParsedRun("descrp");
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from file \"{0}\"", trackJob.getFile().getAbsolutePath());
-
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());
-
         SAMRecordIterator itor = sam.iterator();
         while (itor.hasNext()) {
             SAMRecord first = itor.next();
-            flag = first.getFlags();
+            int flag = first.getFlags();
             int start = first.getAlignmentStart();
-            readname = first.getReadName();
+            String readname = first.getReadName();
             if (isMappedSequence(flag, start)) {
                 readSeqwithoutGaps = first.getReadString();
                 String editReadSeq = readSeqwithoutGaps.toLowerCase();
                 run.addReadData(editReadSeq, readname);
             }
         }
+         itor = null;
         run.setTimestamp(trackJob.getTimestamp());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from file \"{0}\"", trackJob.getFile().getAbsolutePath());
+        if(run == null){
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "run is empty", trackJob.getFile().getAbsolutePath());
+        }else{
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "run is not empty", trackJob.getFile().getAbsolutePath());
+        }
         return run;
     }
 

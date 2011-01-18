@@ -9,6 +9,12 @@ package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 import de.cebitec.vamp.util.ColorProperties;
 import java.awt.Color;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.util.HelpCtx;
 
 /**
  *
@@ -41,14 +47,14 @@ public class ColorOptionPanel extends javax.swing.JPanel{
     private void initComponents() {
 
         uniqueColorationCheckBox = new javax.swing.JCheckBox();
-        unqiueColorPanel = new javax.swing.JPanel();
         perfectMatchLabel = new javax.swing.JLabel();
-        perfectMatchColorPanel = new javax.swing.JPanel();
         bestMatchLabel = new javax.swing.JLabel();
-        bestMatchColorPanel = new javax.swing.JPanel();
         commonMatchLabel = new javax.swing.JLabel();
-        commonMatchColorPanel = new javax.swing.JPanel();
         changeColorButton = new javax.swing.JButton();
+        commonMatchButton = new javax.swing.JButton();
+        bestMatchButton = new javax.swing.JButton();
+        perfectMatchButton = new javax.swing.JButton();
+        uniqueColButton = new javax.swing.JButton();
 
         setMaximumSize(new java.awt.Dimension(221, 122));
         setPreferredSize(new java.awt.Dimension(221, 122));
@@ -60,101 +66,48 @@ public class ColorOptionPanel extends javax.swing.JPanel{
             }
         });
 
-        unqiueColorPanel.setBackground(new java.awt.Color(51, 51, 255));
-        unqiueColorPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        unqiueColorPanel.setMaximumSize(new java.awt.Dimension(30, 35));
-        unqiueColorPanel.setPreferredSize(new java.awt.Dimension(30, 35));
-        unqiueColorPanel.setRequestFocusEnabled(false);
-        unqiueColorPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                unqiueColorPanelMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout unqiueColorPanelLayout = new javax.swing.GroupLayout(unqiueColorPanel);
-        unqiueColorPanel.setLayout(unqiueColorPanelLayout);
-        unqiueColorPanelLayout.setHorizontalGroup(
-            unqiueColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 79, Short.MAX_VALUE)
-        );
-        unqiueColorPanelLayout.setVerticalGroup(
-            unqiueColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 20, Short.MAX_VALUE)
-        );
-
         perfectMatchLabel.setText("Perfect match");
-
-        perfectMatchColorPanel.setBackground(new java.awt.Color(51, 204, 0));
-        perfectMatchColorPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        perfectMatchColorPanel.setMaximumSize(new java.awt.Dimension(30, 35));
-        perfectMatchColorPanel.setPreferredSize(new java.awt.Dimension(30, 35));
-        perfectMatchColorPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                perfectMatchColorPanelMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout perfectMatchColorPanelLayout = new javax.swing.GroupLayout(perfectMatchColorPanel);
-        perfectMatchColorPanel.setLayout(perfectMatchColorPanelLayout);
-        perfectMatchColorPanelLayout.setHorizontalGroup(
-            perfectMatchColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 79, Short.MAX_VALUE)
-        );
-        perfectMatchColorPanelLayout.setVerticalGroup(
-            perfectMatchColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 23, Short.MAX_VALUE)
-        );
 
         bestMatchLabel.setText("Best match");
 
-        bestMatchColorPanel.setBackground(new java.awt.Color(255, 255, 0));
-        bestMatchColorPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        bestMatchColorPanel.setMaximumSize(new java.awt.Dimension(30, 35));
-        bestMatchColorPanel.setPreferredSize(new java.awt.Dimension(30, 35));
-        bestMatchColorPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                bestMatchColorPanelMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout bestMatchColorPanelLayout = new javax.swing.GroupLayout(bestMatchColorPanel);
-        bestMatchColorPanel.setLayout(bestMatchColorPanelLayout);
-        bestMatchColorPanelLayout.setHorizontalGroup(
-            bestMatchColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 79, Short.MAX_VALUE)
-        );
-        bestMatchColorPanelLayout.setVerticalGroup(
-            bestMatchColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
-        );
-
         commonMatchLabel.setText("Common match");
-
-        commonMatchColorPanel.setBackground(new java.awt.Color(255, 51, 51));
-        commonMatchColorPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        commonMatchColorPanel.setMaximumSize(new java.awt.Dimension(30, 35));
-        commonMatchColorPanel.setPreferredSize(new java.awt.Dimension(30, 35));
-        commonMatchColorPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                commonMatchColorPanelMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout commonMatchColorPanelLayout = new javax.swing.GroupLayout(commonMatchColorPanel);
-        commonMatchColorPanel.setLayout(commonMatchColorPanelLayout);
-        commonMatchColorPanelLayout.setHorizontalGroup(
-            commonMatchColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 79, Short.MAX_VALUE)
-        );
-        commonMatchColorPanelLayout.setVerticalGroup(
-            commonMatchColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
-        );
 
         changeColorButton.setText("Change color");
         changeColorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeColorButtonActionPerformed(evt);
+            }
+        });
+
+        commonMatchButton.setBackground(new java.awt.Color(255, 51, 0));
+        commonMatchButton.setToolTipText("Klick to change the color!");
+        commonMatchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                commonMatchButtonActionPerformed(evt);
+            }
+        });
+
+        bestMatchButton.setBackground(new java.awt.Color(255, 255, 0));
+        bestMatchButton.setToolTipText("Klick to change the color!");
+        bestMatchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bestMatchButtonActionPerformed(evt);
+            }
+        });
+
+        perfectMatchButton.setBackground(new java.awt.Color(0, 204, 0));
+        perfectMatchButton.setToolTipText("Klick to change the color!");
+        perfectMatchButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                perfectMatchButtonActionPerformed(evt);
+            }
+        });
+
+        uniqueColButton.setBackground(new java.awt.Color(51, 51, 255));
+        uniqueColButton.setToolTipText("Klick to change the color!");
+        uniqueColButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uniqueColButtonActionPerformed(evt);
             }
         });
 
@@ -166,21 +119,21 @@ public class ColorOptionPanel extends javax.swing.JPanel{
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(bestMatchLabel))
                             .addComponent(uniqueColorationCheckBox)
                             .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(commonMatchLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(perfectMatchLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))))
+                                    .addComponent(perfectMatchLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(bestMatchLabel)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(perfectMatchColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-                            .addComponent(bestMatchColorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-                            .addComponent(unqiueColorPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-                            .addComponent(commonMatchColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)))
+                            .addComponent(commonMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                            .addComponent(bestMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                            .addComponent(perfectMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                            .addComponent(uniqueColButton, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(59, 59, 59)
                         .addComponent(changeColorButton)))
@@ -189,15 +142,15 @@ public class ColorOptionPanel extends javax.swing.JPanel{
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(unqiueColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(uniqueColButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(perfectMatchColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(perfectMatchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bestMatchColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(bestMatchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(uniqueColorationCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
@@ -205,10 +158,10 @@ public class ColorOptionPanel extends javax.swing.JPanel{
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(bestMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(commonMatchColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(commonMatchLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(commonMatchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
                 .addComponent(changeColorButton)
                 .addGap(33, 33, 33))
         );
@@ -220,22 +173,6 @@ public class ColorOptionPanel extends javax.swing.JPanel{
         //ColorChooserPanel cp = new ColorChooserPanel(this, unqiueColorPanel);
     }//GEN-LAST:event_uniqueColorationCheckBoxActionPerformed
 
-    private void unqiueColorPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_unqiueColorPanelMouseClicked
-        ColorChooserFrame cp = new ColorChooserFrame(this,unqiueColorPanel);
-    }//GEN-LAST:event_unqiueColorPanelMouseClicked
-
-    private void commonMatchColorPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_commonMatchColorPanelMouseClicked
-       ColorChooserFrame cp = new ColorChooserFrame(this,commonMatchColorPanel);
-    }//GEN-LAST:event_commonMatchColorPanelMouseClicked
-
-    private void bestMatchColorPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bestMatchColorPanelMouseClicked
-       ColorChooserFrame cp = new ColorChooserFrame(this, bestMatchColorPanel);
-    }//GEN-LAST:event_bestMatchColorPanelMouseClicked
-
-    private void perfectMatchColorPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_perfectMatchColorPanelMouseClicked
-       ColorChooserFrame cp = new ColorChooserFrame(this, perfectMatchColorPanel);
-    }//GEN-LAST:event_perfectMatchColorPanelMouseClicked
-
     private void changeColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeColorButtonActionPerformed
         setColor();
         if(parent != null){
@@ -246,28 +183,65 @@ public class ColorOptionPanel extends javax.swing.JPanel{
         }
     }//GEN-LAST:event_changeColorButtonActionPerformed
 
+    private void commonMatchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commonMatchButtonActionPerformed
+        JColorChooser colChooser = new JColorChooser();
+        DialogDescriptor d =  new DialogDescriptor(colChooser,"Choose a color");
+        DialogDisplayer.getDefault().createDialog(d).setVisible(true);
+        if(d.getValue().equals(DialogDescriptor.OK_OPTION)){
+        commonMatchButton.setBackground(colChooser.getColor());
+        }
+    }//GEN-LAST:event_commonMatchButtonActionPerformed
+
+    private void bestMatchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bestMatchButtonActionPerformed
+    
+        JColorChooser colChooser = new JColorChooser();
+        DialogDescriptor d =  new DialogDescriptor(colChooser,"Choose a color");
+        DialogDisplayer.getDefault().createDialog(d).setVisible(true);
+        if(d.getValue().equals(DialogDescriptor.OK_OPTION)){
+        bestMatchButton.setBackground(colChooser.getColor());
+        }
+    }//GEN-LAST:event_bestMatchButtonActionPerformed
+
+    private void uniqueColButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uniqueColButtonActionPerformed
+        JColorChooser colChooser = new JColorChooser();
+        DialogDescriptor d =  new DialogDescriptor(colChooser,"Choose a color");
+        DialogDisplayer.getDefault().createDialog(d).setVisible(true);
+        if(d.getValue().equals(DialogDescriptor.OK_OPTION)){
+       uniqueColButton.setBackground(colChooser.getColor());
+        }
+    }//GEN-LAST:event_uniqueColButtonActionPerformed
+
+    private void perfectMatchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_perfectMatchButtonActionPerformed
+               JColorChooser colChooser = new JColorChooser();
+        DialogDescriptor d =  new DialogDescriptor(colChooser,"Choose a color");
+        DialogDisplayer.getDefault().createDialog(d).setVisible(true);
+        if(d.getValue().equals(DialogDescriptor.OK_OPTION)){
+        perfectMatchButton.setBackground(colChooser.getColor());
+        }
+    }//GEN-LAST:event_perfectMatchButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel bestMatchColorPanel;
+    private javax.swing.JButton bestMatchButton;
     private javax.swing.JLabel bestMatchLabel;
     private javax.swing.JButton changeColorButton;
-    private javax.swing.JPanel commonMatchColorPanel;
+    private javax.swing.JButton commonMatchButton;
     private javax.swing.JLabel commonMatchLabel;
-    private javax.swing.JPanel perfectMatchColorPanel;
+    private javax.swing.JButton perfectMatchButton;
     private javax.swing.JLabel perfectMatchLabel;
+    private javax.swing.JButton uniqueColButton;
     private javax.swing.JCheckBox uniqueColorationCheckBox;
-    private javax.swing.JPanel unqiueColorPanel;
     // End of variables declaration//GEN-END:variables
 
     public Color getBestMatchColor() {
-        return bestMatchColorPanel.getBackground();
+        return bestMatchButton.getBackground();
     }
 
     public Color getCommonMatchColor() {
-        return commonMatchColorPanel.getBackground();
+        return commonMatchButton.getBackground();
     }
 
     public Color getPerfectMatchColor() {
-        return perfectMatchColorPanel.getBackground();
+        return perfectMatchButton.getBackground();
     }
 
     public JCheckBox getUniqueColorationCheckBox() {
@@ -275,7 +249,7 @@ public class ColorOptionPanel extends javax.swing.JPanel{
     }
 
     public Color getUnqiueColor() {
-        return unqiueColorPanel.getBackground();
+        return uniqueColButton.getBackground();
     }
 
     public void setColor() {

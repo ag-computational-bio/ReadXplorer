@@ -35,11 +35,12 @@ public class CoverageContainer {
         // add all mappings to their mapping groups
         while(sequenceIDIt.hasNext()){
             ParsedMappingGroup g = mappings.getParsedMappingGroupBySeqID(sequenceIDIt.next());
-            for(Iterator<ParsedMapping> mappingIt = g.getMappings().iterator(); mappingIt.hasNext(); ){
+            Iterator<ParsedMapping> mappingIt = g.getMappings().iterator();
+            while(mappingIt.hasNext()){
                 this.addMapping(mappingIt.next());
+                //mappingIt.remove();
             }
         }
-
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished computing the coverage");
     }
 
