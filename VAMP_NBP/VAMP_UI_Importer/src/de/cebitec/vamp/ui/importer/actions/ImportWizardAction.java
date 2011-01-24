@@ -1,10 +1,10 @@
 package de.cebitec.vamp.ui.importer.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.ui.importer.ImportThread;
-import de.cebitec.vamp.ui.importer.LoginCookie;
 import de.cebitec.vamp.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.vamp.ui.importer.ImportWizardOverviewPanel;
 import java.awt.Component;
@@ -21,14 +21,14 @@ import org.openide.util.RequestProcessor;
 
 public final class ImportWizardAction implements ActionListener {
 
-    private final LoginCookie context;
+    private final ViewController context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
     public static final String PROP_CAN_IMPORT = "canImport";
     public static final String PROP_REFJOBLIST = "referenceJob";
     public static final String PROP_TRACKJOBLIST = "trackJobList";
 
-    public ImportWizardAction(LoginCookie context) {
+    public ImportWizardAction(ViewController context) {
         this.context = context;
     }
 
@@ -77,7 +77,6 @@ public final class ImportWizardAction implements ActionListener {
                 if (c instanceof JComponent) { // assume Swing components
                     JComponent jc = (JComponent) c;
                     // Sets step number of a component
-                    // TODO if using org.openide.dialogs >= 7.8, can use WizardDescriptor.PROP_*:
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(i));
                     // Sets steps names for a panel
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);

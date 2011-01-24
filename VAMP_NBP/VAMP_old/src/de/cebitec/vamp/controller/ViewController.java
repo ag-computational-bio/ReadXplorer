@@ -1,10 +1,8 @@
 package de.cebitec.vamp.controller;
 
-import de.cebitec.vamp.ui.dataAdministration.model.DataAdminController;
 //import de.cebitec.vamp.ui.dataAdministration.model.GestureListenerI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.ui.importer.LoginCookie;
 import de.cebitec.vamp.view.ApplicationFrameI;
 import de.cebitec.vamp.view.OpenRefGenDialog;
 import de.cebitec.vamp.view.OpenTrackDialog;
@@ -24,7 +22,7 @@ import org.openide.windows.WindowManager;
  *
  * @author ddoppmeier
  */
-public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
+public class ViewController implements de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
     private static ViewController instance;
 //    private ApplicationFrameI appFrame;
@@ -61,11 +59,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 
     public void showApplicationFrame(boolean show){
 //        appFrame.setVisible(show);
-    }
-
-    @Override
-    public void openDataAdminDialog(){
-        new DataAdminController().showDataAdministration();
     }
 
 //    public void blockControlsByRunningTasks(List<RunningTaskI> tasks) {

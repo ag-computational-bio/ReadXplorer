@@ -3,10 +3,11 @@ package de.cebitec.vamp.ui.dataAdministration;
 import de.cebitec.vamp.parser.ReferenceJob;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 /**
  *
@@ -16,23 +17,60 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
     private static final long serialVersionUID = 72465263;
     private List<ReferenceJob> jobs;
-    private SelectionCard adminPanel;
+    private List<ReferenceJob> jobs2del;
+    private Boolean hasCheckedJobs;
 
     /** Creates new form RefGenView */
     public ReferenceView() {
         initComponents();
         jobs = new ArrayList<ReferenceJob>();
-
     }
 
-    public void setDataAdminPanel(SelectionCard adminPanel){
-        this.adminPanel = adminPanel;
+    public void setReferenceJobs(List<ReferenceJob> refJobs){
+        this.jobs = refJobs;
+        clearTableRows();
+
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        for (ReferenceJob referenceJob : refJobs) {
+            model.addRow(new Object[]{false, referenceJob.getName(), referenceJob.getDescription(), referenceJob.getTimestamp()});
+        }
+    }
+
+    public List<ReferenceJob> getJobs2del(){
+        jobs2del = new ArrayList<ReferenceJob>();
+
+        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
+            if ((Boolean) jTable1.getValueAt(row, 0)){
+                jobs2del.add(jobs.get(row));
+            }
+        }
+        return jobs2del;
+    }
+
+    private void clearTableRows(){
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        while (model.getRowCount() > 0){
+            model.removeRow(model.getRowCount()-1);
+        }
+    }
+
+    private void checkColumnSelection() {
+        List<Boolean> selection = new ArrayList<Boolean>();
+
+        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
+            selection.add((Boolean) jTable1.getValueAt(row, 0));
+        }
+
+        hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
+        firePropertyChange("hasCheckedJobs", null, hasCheckedJobs);
     }
 
     void deselectRefGen(ReferenceJob refGen) {
         int row = jobs.indexOf(refGen);
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setValueAt(false, row, 0);
+
+        checkColumnSelection();
     }
 
     void refGenJobAdded(ReferenceJob refGenJob) {
@@ -110,15 +148,14 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
             if(selected){
                 // check if it is allowed to be deleted
-                if(r.getDependentTrackswithoutRunjob().isEmpty()){
-                    adminPanel.removeRefGenJob(r);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Cannot mark reference for deletion,\nas long as it is referenced by a track.\nResolve dependencies first!", "Unresolved Dependencies", JOptionPane.ERROR_MESSAGE);
+                if(!r.getDependentTrackswithoutRunjob().isEmpty()){
+                    NotifyDescriptor note = new NotifyDescriptor.Message("Cannot mark reference for deletion,\nas long as it is referenced by a track.\nResolve dependencies first!", NotifyDescriptor.ERROR_MESSAGE);
+                    DialogDisplayer.getDefault().notify(note);
+
                     model.setValueAt(false, row, column);
                 }
-            } else {
-                adminPanel.unRemoveRefGenJob(r);
             }
         }
+        checkColumnSelection();
     }
 }

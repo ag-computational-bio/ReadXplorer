@@ -16,7 +16,8 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     private static final long serialVersionUID = 762498252;
 
     private List<TrackJobs> jobs;
-    private SelectionCard adminPanel;
+    private List<TrackJobs> jobs2del;
+    private Boolean hasCheckedJobs;
 
     /** Creates new form MappingView */
     public TrackView() {
@@ -24,14 +25,43 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
         jobs = new ArrayList<TrackJobs>();
     }
 
-    public void setDataAdminPanel(SelectionCard adminPanel){
-        this.adminPanel = adminPanel;
+    public void setTrackJobs(List<TrackJobs> trackJobs){
+        this.jobs = trackJobs;
+        clearTableRows();
+
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        for (TrackJobs trackJob : trackJobs) {
+            model.addRow(new Object[]{false, trackJob.getDescription(), trackJob.getTimestamp()});
+        }
     }
 
-    void trackJobAdded(TrackJobs trackJob) {
-        jobs.add(trackJob);
+    public List<TrackJobs> getJobs2Del(){
+        jobs2del = new ArrayList<TrackJobs>();
+
+        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
+            if ((Boolean) jTable1.getValueAt(row, 0)){
+                jobs2del.add(jobs.get(row));
+            }
+        }
+        return jobs2del;
+    }
+
+    private void clearTableRows(){
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addRow(new Object[]{false, trackJob.getDescription(), trackJob.getTimestamp()});
+        while (model.getRowCount() > 0){
+            model.removeRow(model.getRowCount()-1);
+        }
+    }
+
+    private void checkColumnSelection() {
+        List<Boolean> selection = new ArrayList<Boolean>();
+
+        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
+            selection.add((Boolean) jTable1.getValueAt(row, 0));
+        }
+
+        hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
+        firePropertyChange("hasCheckedJobs", null, hasCheckedJobs);
     }
 
     /** This method is called from within the constructor to
@@ -93,21 +123,25 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
 
     @Override
     public void tableChanged(TableModelEvent e) {
-
         int row = e.getFirstRow();
         int column = e.getColumn();
 
-        if(row >= 0 && column >= 0){
-            TrackJobs r = jobs.get(row);
+        if (row >= 0 && column >= 0) {
+            TrackJobs trackJob = jobs.get(row);
             DefaultTableModel model = (DefaultTableModel) e.getSource();
             boolean selected = (Boolean) model.getValueAt(row, column);
 
-            if(selected){
-                adminPanel.removeTrackJob(r);
+            if (selected) {
+                // unregister dependencies
+                trackJob.getRefGen().unregisterTrackwithoutRunJob(trackJob);
             } else {
-                adminPanel.unRemoveTrackJob(r);
+                // re-register dependencies
+                trackJob.getRefGen().registerTrackWithoutRunJob(trackJob);
+                // deselect refgen
+                firePropertyChange("deselect", null, trackJob.getRefGen());
             }
         }
+        checkColumnSelection();
     }
 
 }

@@ -1,6 +1,5 @@
 package de.cebitec.vamp.ui.dataAdministration.model;
 
-import de.cebitec.vamp.ui.dataAdministration.View;
 import de.cebitec.vamp.ui.dataAdministration.ViewI;
 
 /**
@@ -17,14 +16,14 @@ public class DataAdminController implements ViewListenerI {
         // setup model and view
         Model m = new Model();
         model = m;
-        View v = new View();
-        view = v;
+//        View v = new View();
+//        view = v;
 
         // register listeners for view and model
         view.addDataAdminViewListenerI(this);
         view.addDataAdminJobManager(m);
 
-        model.addListener(v);
+        model.addListener((ModelListenerI) view);
         model.fetchNecessaryData();
         
         // show the view

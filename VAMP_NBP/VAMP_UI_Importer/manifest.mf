@@ -3,4 +3,3 @@ OpenIDE-Module: de.cebitec.vamp.ui.importer
 OpenIDE-Module-Layer: de/cebitec/vamp/ui/importer/layer.xml
 OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/ui/importer/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
-

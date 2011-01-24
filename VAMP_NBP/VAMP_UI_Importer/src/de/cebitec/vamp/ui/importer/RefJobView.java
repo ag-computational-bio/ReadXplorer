@@ -34,7 +34,7 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
 
     public void add(ReferenceJob refGenJob) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addRow(new Object[]{refGenJob.getName()});//.getFile().getName()});
+        model.addRow(new Object[]{refGenJob.getFile().getName()});
         jobs.add(refGenJob);
 
         if (!hasJobs){

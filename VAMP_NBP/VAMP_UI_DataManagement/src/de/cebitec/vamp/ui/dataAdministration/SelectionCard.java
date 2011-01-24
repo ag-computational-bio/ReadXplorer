@@ -2,6 +2,9 @@ package de.cebitec.vamp.ui.dataAdministration;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.List;
 
 /**
  *
@@ -11,27 +14,41 @@ public class SelectionCard extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
 
-    private View view;
-
     /** Creates new form DataAdminPanel */
     public SelectionCard() {
         initComponents();
+        refGenView.addPropertyChangeListener("hasCheckedJobs", getHasCheckedJobsListener());
+        mappingView.addPropertyChangeListener("hasCheckedJobs", getHasCheckedJobsListener());
+        mappingView.addPropertyChangeListener("deselect", new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refGenView.deselectRefGen((ReferenceJob) evt.getNewValue());
+            }
+        });
     }
 
-    public void setView(View view){
-        this.view = view;
+    public void setSelectableJobs(List<ReferenceJob> refJobs, List<TrackJobs> trackJobs){
+        refGenView.setReferenceJobs(refJobs);
+        mappingView.setTrackJobs(trackJobs);
     }
 
-    void deselectRefGen(ReferenceJob refGen) {
-        refGenView1.deselectRefGen(refGen);
+    public List<ReferenceJob> getRef2DelJobs(){
+        return refGenView.getJobs2del();
     }
 
-    void refGenJobAdded(ReferenceJob refGenJob) {
-        refGenView1.refGenJobAdded(refGenJob);
+    public List<TrackJobs> getTrack2DelJobs(){
+        return mappingView.getJobs2Del();
     }
 
-    void trackJobAdded(TrackJobs trackJob) {
-        mappingView1.trackJobAdded(trackJob);
+    private PropertyChangeListener getHasCheckedJobsListener(){
+        return new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+            }
+        };
     }
 
     /** This method is called from within the constructor to
@@ -44,67 +61,29 @@ public class SelectionCard extends javax.swing.JPanel {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        refGenView1 = new de.cebitec.vamp.ui.dataAdministration.ReferenceView();
-        refGenView1.setDataAdminPanel(this);
-        mappingView1 = new de.cebitec.vamp.ui.dataAdministration.TrackView();
-        mappingView1.setDataAdminPanel(this);
-        jButton1 = new javax.swing.JButton();
+        refGenView = new de.cebitec.vamp.ui.dataAdministration.ReferenceView();
+        mappingView = new de.cebitec.vamp.ui.dataAdministration.TrackView();
 
-        jTabbedPane1.addTab("References", refGenView1);
-        jTabbedPane1.addTab("Tracks", mappingView1);
-
-        jButton1.setText("Next");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        jTabbedPane1.addTab("References", refGenView);
+        jTabbedPane1.addTab("Tracks", mappingView);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(395, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addContainerGap())
             .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addContainerGap())
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        view.showOverviewCard();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private de.cebitec.vamp.ui.dataAdministration.TrackView mappingView1;
-    private de.cebitec.vamp.ui.dataAdministration.ReferenceView refGenView1;
+    private de.cebitec.vamp.ui.dataAdministration.TrackView mappingView;
+    private de.cebitec.vamp.ui.dataAdministration.ReferenceView refGenView;
     // End of variables declaration//GEN-END:variables
 
-    public void removeRefGenJob(ReferenceJob refGenJob){
-        view.removeRefGenJob(refGenJob);
-    }
-
-    public void unRemoveRefGenJob(ReferenceJob refGenJob){
-        view.unRemoveRefGenJob(refGenJob);
-    }
-
-    public void removeTrackJob(TrackJobs trackJob){
-        view.removeTrackJob(trackJob);
-    }
-
-    public void unRemoveTrackJob(TrackJobs trackJob){
-        view.unRemoveTrackJob(trackJob);
-    }
 }

@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author ddoppmeier
  */
-public class ReferenceJob {
+public class ReferenceJob implements Job{
 
     private Long id;
     private String name;
@@ -53,10 +53,12 @@ public class ReferenceJob {
         return trackswithoutRunjob;
     }
 
+    @Override
     public String getName(){
         return name;
     }
 
+    @Override
     public File getFile() {
         return file;
     }
@@ -65,10 +67,12 @@ public class ReferenceJob {
         return parser;
     }
 
+    @Override
     public String getDescription(){
         return description;
     }
 
+    @Override
     public Timestamp getTimestamp(){
         return timestamp;
     }
@@ -85,7 +89,8 @@ public class ReferenceJob {
         this.id = id;
     }
 
-    public long getID(){
+    @Override
+    public Long getID(){
         return id;
     }
 
