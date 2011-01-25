@@ -36,6 +36,7 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         model.addRow(new Object[]{
             trackJob.getFile().getName(),
             trackJob.getDescription(),
+            "do not know",
             trackJob.getRefGen().getDescription()});
         tracks.add(trackJob);
 

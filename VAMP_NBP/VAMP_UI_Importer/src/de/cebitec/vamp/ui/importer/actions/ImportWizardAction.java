@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
@@ -35,9 +36,11 @@ public final class ImportWizardAction implements ActionListener {
     @Override
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent ev) {
-        if (CentralLookup.getDefault().lookup(ImportThread.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message("An import is still being processed. Starting multiple imports is not recommended.", NotifyDescriptor.WARNING_MESSAGE);
+        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
+            NotifyDescriptor nd = new NotifyDescriptor.Message("A background task is still being processed. Starting multiple tasks can damage the database is not permitted.", NotifyDescriptor.WARNING_MESSAGE);
+//            NotifyDescriptor nd = new NotifyDescriptor.Message("An import is still being processed. Starting multiple imports is not recommended.", NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
+            return;
         }
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()

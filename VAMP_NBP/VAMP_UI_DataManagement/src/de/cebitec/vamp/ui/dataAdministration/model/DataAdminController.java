@@ -41,7 +41,7 @@ public class DataAdminController implements ViewListenerI {
     @Override
     public void startDeletion() {
         view.startingDeletion();
-        DeletionThread t = new DeletionThread(this, model.getScheduledRefGenJobs(), model.getScheduledTrackJobsRun());
+        DeletionThread t = new DeletionThread(model.getScheduledRefGenJobs(), model.getScheduledTrackJobsRun());
 
 //        ApplicationController.getInstance().addRunningTask(t);
         t.execute();

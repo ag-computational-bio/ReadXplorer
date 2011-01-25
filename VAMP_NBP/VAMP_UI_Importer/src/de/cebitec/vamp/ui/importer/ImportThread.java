@@ -14,6 +14,7 @@ import de.cebitec.vamp.parser.mappings.TrackParserI;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.Exceptions;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
@@ -40,7 +42,7 @@ public class ImportThread extends SwingWorker<Object, Object>{
 
     public ImportThread(List<ReferenceJob> gens, List<TrackJobs> tracksRun){
         super();
-        this.io = IOProvider.getDefault().getIO("Import running...", true);
+        this.io = IOProvider.getDefault().getIO("Import", false);
         this.tracksRun = tracksRun;
         this.gens = gens;
         this.ph = ProgressHandleFactory.createHandle("Import");
@@ -294,6 +296,11 @@ public class ImportThread extends SwingWorker<Object, Object>{
     @Override
     protected Object doInBackground() {
         CentralLookup.getDefault().add(this);
+        try {
+            io.getOut().reset();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         io.select();
 
         ph.start(workunits);

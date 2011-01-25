@@ -2,31 +2,38 @@ package de.cebitec.vamp.ui.dataAdministration.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.ui.dataAdministration.model.DeletionThread;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
+import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
+import org.openide.util.RequestProcessor;
 
-public final class OpenDataAdminDialog implements ActionListener {
+public final class DataAdminWizardAction implements ActionListener {
 
     private final ViewController context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
-    public OpenDataAdminDialog(ViewController context) {
+    public DataAdminWizardAction(ViewController context) {
         this.context = context;
     }
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        if (CentralLookup.getDefault().lookup(DeletionThread.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message("An admin task is still being processed. Starting multiple tasks is not recommended.", NotifyDescriptor.WARNING_MESSAGE);
+        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
+            NotifyDescriptor nd = new NotifyDescriptor.Message("A background task is still being processed. Starting multiple tasks can damage the database is not permitted.", NotifyDescriptor.WARNING_MESSAGE);
+//            NotifyDescriptor nd = new NotifyDescriptor.Message("An admin task is still being processed. Starting multiple tasks is not recommended.", NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
+            return;
         }
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -37,7 +44,12 @@ public final class OpenDataAdminDialog implements ActionListener {
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            // do something
+            List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty("refdel");
+            List<TrackJobs> tracks2del = (List<TrackJobs>) wizardDescriptor.getProperty("trackdel");
+
+            DeletionThread dt = new DeletionThread(refs2del, tracks2del);
+            RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
+            rp.post(dt);
         }
     }
 
