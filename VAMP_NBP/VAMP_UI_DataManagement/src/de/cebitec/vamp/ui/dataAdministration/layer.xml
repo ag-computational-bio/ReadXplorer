@@ -5,7 +5,7 @@
         <folder name="File">
             <file name="de-cebitec-vamp-ui-dataAdministration-actions-DataAdminWizardAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.dataAdministration.actions.Bundle#CTL_OpenDataAdminDialog"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.dataAdministration.actions.Bundle#CTL_DataAdminWizardAction"/>
                 <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/dataAdministration/manage.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>

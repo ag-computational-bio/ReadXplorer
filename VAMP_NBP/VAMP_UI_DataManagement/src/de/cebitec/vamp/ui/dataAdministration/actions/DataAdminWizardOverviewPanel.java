@@ -57,8 +57,8 @@ public class DataAdminWizardOverviewPanel implements WizardDescriptor.Panel<Wiza
     @Override
     @SuppressWarnings("unchecked")
     public void readSettings(WizardDescriptor settings) {
-        List<ReferenceJob> ref2del = (List<ReferenceJob>) settings.getProperty("refdel");
-        List<TrackJobs> track2del = (List<TrackJobs>) settings.getProperty("trackdel");
+        List<ReferenceJob> ref2del = (List<ReferenceJob>) settings.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
+        List<TrackJobs> track2del = (List<TrackJobs>) settings.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
 
         component.showGenereateOverview(ref2del, track2del);
     }

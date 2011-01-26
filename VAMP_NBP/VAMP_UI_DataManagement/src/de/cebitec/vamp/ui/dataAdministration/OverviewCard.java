@@ -4,6 +4,7 @@ import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import java.util.Iterator;
 import java.util.List;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -43,7 +44,7 @@ public class OverviewCard extends javax.swing.JPanel {
 
     @Override
     public String getName() {
-        return "Check choice";
+        return NbBundle.getMessage(this.getClass(), "CTL_OverviewCard.name");
     }
 
     /** This method is called from within the constructor to

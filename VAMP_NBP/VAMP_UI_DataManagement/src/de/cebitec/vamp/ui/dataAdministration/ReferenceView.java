@@ -8,6 +8,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -62,7 +63,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
         }
 
         hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
-        firePropertyChange("hasCheckedJobs", null, hasCheckedJobs);
+        firePropertyChange(SelectionCard.PROP_HAS_CHECKED_JOBS, null, hasCheckedJobs);
     }
 
     void deselectRefGen(ReferenceJob refGen) {
@@ -149,7 +150,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
             if(selected){
                 // check if it is allowed to be deleted
                 if(!r.getDependentTrackswithoutRunjob().isEmpty()){
-                    NotifyDescriptor note = new NotifyDescriptor.Message("Cannot mark reference for deletion,\nas long as it is referenced by a track.\nResolve dependencies first!", NotifyDescriptor.ERROR_MESSAGE);
+                    NotifyDescriptor note = new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_ReferenceView.error.reference"), NotifyDescriptor.ERROR_MESSAGE);
                     DialogDisplayer.getDefault().notify(note);
 
                     model.setValueAt(false, row, column);

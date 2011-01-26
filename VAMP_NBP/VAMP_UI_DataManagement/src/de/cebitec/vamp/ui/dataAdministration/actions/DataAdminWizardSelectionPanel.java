@@ -20,10 +20,9 @@ import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
-import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class DataAdminWizardSelectionPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class DataAdminWizardSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -56,13 +55,6 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Validatin
     @Override
     public boolean isValid() {
         return isValid;
-    }
-
-    @Override
-    public void validate() throws WizardValidationException {
-        if (!isValid){
-            throw new WizardValidationException(component, "nothing to delete", null);
-        }
     }
 
     @Override
@@ -146,7 +138,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Validatin
 
         component.setSelectableJobs(refJobs, trackJobs);
 
-        component.addPropertyChangeListener("hasCheckedJobs", new PropertyChangeListener() {
+        component.addPropertyChangeListener(SelectionCard.PROP_HAS_CHECKED_JOBS, new PropertyChangeListener() {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -158,7 +150,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Validatin
 
     @Override
     public void storeSettings(WizardDescriptor settings) {
-        settings.putProperty("refdel", component.getRef2DelJobs());
-        settings.putProperty("trackdel", component.getTrack2DelJobs());
+        settings.putProperty(DataAdminWizardAction.PROP_REFS2DEL, component.getRef2DelJobs());
+        settings.putProperty(DataAdminWizardAction.PROP_TRACK2DEL, component.getTrack2DelJobs());
     }
 }

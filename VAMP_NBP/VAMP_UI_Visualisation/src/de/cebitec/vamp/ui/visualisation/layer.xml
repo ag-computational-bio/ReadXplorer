@@ -5,7 +5,7 @@
         <folder name="Visualisation">
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRefGenAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseRegGenAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseRefGenAction"/>
                 <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/refClose.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.CloseRefGenAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>

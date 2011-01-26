@@ -8,8 +8,10 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 public final class LoginVisualPanel1 extends JPanel {
 
@@ -34,7 +36,7 @@ public final class LoginVisualPanel1 extends JPanel {
 
     @Override
     public String getName() {
-        return "Project Login";
+        return NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel.name");
     }
     
     private void setLoginData() {
@@ -278,11 +280,8 @@ public final class LoginVisualPanel1 extends JPanel {
             // file chosen
             file = fc.getSelectedFile();
             if(!file.exists()){
-                JOptionPane.showMessageDialog(this,
-                        "The Database "+file.getAbsolutePath()+"\nyou have choosen does not exsist."
-                        + "\nWhen you login this database\n will be created automatically!",
-                        "Database not exist",
-                        JOptionPane.WARNING_MESSAGE);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel1.class, "MSG_LoginVisualPanel.warning.database", file.getAbsolutePath()), NotifyDescriptor.WARNING_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
             }
             databaseField.setText(file.getAbsolutePath());
         }

@@ -4,7 +4,7 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
-import de.cebitec.vamp.ui.dataAdministration.model.DeletionThread;
+import de.cebitec.vamp.ui.dataAdministration.DeletionThread;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
@@ -16,6 +16,7 @@ import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
 public final class DataAdminWizardAction implements ActionListener {
@@ -23,29 +24,32 @@ public final class DataAdminWizardAction implements ActionListener {
     private final ViewController context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
+    public static final String PROP_REFS2DEL = "refdel";
+    public static final String PROP_TRACK2DEL = "trackdel";
+
     public DataAdminWizardAction(ViewController context) {
         this.context = context;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent ev) {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message("A background task is still being processed. Starting multiple tasks can damage the database is not permitted.", NotifyDescriptor.WARNING_MESSAGE);
-//            NotifyDescriptor nd = new NotifyDescriptor.Message("An admin task is still being processed. Starting multiple tasks is not recommended.", NotifyDescriptor.WARNING_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             return;
         }
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle("Your wizard dialog title here");
+        wizardDescriptor.setTitle(NbBundle.getMessage(this.getClass(), "TTL_DataAdminWizardAction.title"));
         Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
         dialog.setVisible(true);
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty("refdel");
-            List<TrackJobs> tracks2del = (List<TrackJobs>) wizardDescriptor.getProperty("trackdel");
+            List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
+            List<TrackJobs> tracks2del = (List<TrackJobs>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
 
             DeletionThread dt = new DeletionThread(refs2del, tracks2del);
             RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
@@ -57,6 +61,7 @@ public final class DataAdminWizardAction implements ActionListener {
      * Initialize panels representing individual wizard's steps and sets
      * various properties for them influencing wizard appearance.
      */
+    @SuppressWarnings("unchecked")
     private WizardDescriptor.Panel<WizardDescriptor>[] getPanels() {
         if (panels == null) {
             panels = new WizardDescriptor.Panel[]{

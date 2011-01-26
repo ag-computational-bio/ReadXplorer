@@ -14,6 +14,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 import org.openide.util.actions.CallableSystemAction;
 import org.openide.windows.WindowManager;
 
@@ -32,7 +33,7 @@ public final class LoginWizardAction extends CallableSystemAction{
         Boolean loggedIn = cl.lookup(ViewController.class) != null ? Boolean.TRUE : Boolean.FALSE;
 
         if (loggedIn){
-            NotifyDescriptor nd = new NotifyDescriptor.Message("You are already logged into a VAMP database. If you log into another database your current connection will be closed.", NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             // TODO find a way to do an automatic logout below
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please log out first.", NotifyDescriptor.WARNING_MESSAGE));
@@ -42,7 +43,7 @@ public final class LoginWizardAction extends CallableSystemAction{
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle("Project Login");
+        wizardDescriptor.setTitle(NbBundle.getMessage(LoginWizardAction.class, "TTL_LoginWizardAction"));
         Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
         dialog.setVisible(true);
         dialog.toFront();

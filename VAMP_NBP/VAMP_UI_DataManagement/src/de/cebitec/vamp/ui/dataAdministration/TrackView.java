@@ -19,6 +19,8 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     private List<TrackJobs> jobs2del;
     private Boolean hasCheckedJobs;
 
+    public static final String PROP_DESELECT = "deselect";
+
     /** Creates new form MappingView */
     public TrackView() {
         initComponents();
@@ -61,7 +63,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
         }
 
         hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
-        firePropertyChange("hasCheckedJobs", null, hasCheckedJobs);
+        firePropertyChange(SelectionCard.PROP_HAS_CHECKED_JOBS, null, hasCheckedJobs);
     }
 
     /** This method is called from within the constructor to
@@ -138,7 +140,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
                 // re-register dependencies
                 trackJob.getRefGen().registerTrackWithoutRunJob(trackJob);
                 // deselect refgen
-                firePropertyChange("deselect", null, trackJob.getRefGen());
+                firePropertyChange(PROP_DESELECT, null, trackJob.getRefGen());
             }
         }
         checkColumnSelection();

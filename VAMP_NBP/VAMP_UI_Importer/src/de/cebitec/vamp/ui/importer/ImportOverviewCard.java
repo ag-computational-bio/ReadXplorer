@@ -24,7 +24,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         jTextArea1.setText("");
 
         if(!refGenJobList.isEmpty()){
-            jTextArea1.append("References:\n");
+            jTextArea1.append(NbBundle.getMessage(this.getClass(), "MSG_ImportOverviewCard.text.references") + ":\n");
             for(Iterator<ReferenceJob> it = refGenJobList.iterator(); it.hasNext(); ){
                 ReferenceJob r = it.next();
                 jTextArea1.append(r.getFile().getAbsolutePath()+"\n");
@@ -36,7 +36,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
 
 
         if(!trackJobList.isEmpty()){
-            jTextArea1.append("Tracks:\n");
+            jTextArea1.append(NbBundle.getMessage(this.getClass(), "MSG_ImportOverviewCard.text.tracks") + ":\n");
             for(Iterator<TrackJobs> it = trackJobList.iterator(); it.hasNext(); ){
                 TrackJobs r = it.next();
                 jTextArea1.append(r.getFile().getAbsolutePath()+"\n");

@@ -5,6 +5,7 @@ import de.cebitec.vamp.parser.TrackJobs;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -14,12 +15,14 @@ public class SelectionCard extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
 
+    public static final String PROP_HAS_CHECKED_JOBS = "hasCheckedJobs";
+
     /** Creates new form DataAdminPanel */
     public SelectionCard() {
         initComponents();
-        refGenView.addPropertyChangeListener("hasCheckedJobs", getHasCheckedJobsListener());
-        mappingView.addPropertyChangeListener("hasCheckedJobs", getHasCheckedJobsListener());
-        mappingView.addPropertyChangeListener("deselect", new PropertyChangeListener() {
+        refGenView.addPropertyChangeListener(PROP_HAS_CHECKED_JOBS, getHasCheckedJobsListener());
+        mappingView.addPropertyChangeListener(PROP_HAS_CHECKED_JOBS, getHasCheckedJobsListener());
+        mappingView.addPropertyChangeListener(TrackView.PROP_DESELECT, new PropertyChangeListener() {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -53,7 +56,7 @@ public class SelectionCard extends javax.swing.JPanel {
 
     @Override
     public String getName() {
-        return "Setup ";
+        return NbBundle.getMessage(this.getClass(), "CTL_SelectionCard.name");
     }
 
     /** This method is called from within the constructor to

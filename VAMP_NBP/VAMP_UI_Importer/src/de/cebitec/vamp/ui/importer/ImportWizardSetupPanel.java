@@ -10,10 +10,9 @@ import java.util.Set;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
-import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class ImportWizardSetupPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -41,13 +40,6 @@ public class ImportWizardSetupPanel implements WizardDescriptor.ValidatingPanel<
         return HelpCtx.DEFAULT_HELP;
         // If you have context help:
         // return new HelpCtx(SampleWizardPanel1.class);
-    }
-
-    @Override
-    public void validate() throws WizardValidationException {
-        if (!isValid){
-            throw new WizardValidationException(component, "nothing to import", null);
-        }
     }
 
     @Override

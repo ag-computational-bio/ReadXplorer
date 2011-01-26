@@ -172,12 +172,12 @@ public class ImportSetupCard extends javax.swing.JPanel {
         if(c == null){
         } else if(c instanceof RefJobView) {
             NewReferenceDialogPanel nrdp = new NewReferenceDialogPanel();
-            DialogDescriptor refGenDialog = new DialogDescriptor(nrdp, "Reference Dialog", true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
+            DialogDescriptor refGenDialog = new DialogDescriptor(nrdp, NbBundle.getMessage(this.getClass(), "TTL_ImportSetupCard.dialog.title.reference"), true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
             Dialog diaDisp = DialogDisplayer.getDefault().createDialog(refGenDialog);
             diaDisp.setVisible(true);
 
             while(refGenDialog.getValue() == DialogDescriptor.OK_OPTION && !nrdp.isRequiredInfoSet()){
-                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please fill out the complete form!", NotifyDescriptor.INFORMATION_MESSAGE));
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_ImportSetupCard.dialog.fillout"), NotifyDescriptor.INFORMATION_MESSAGE));
                 diaDisp.setVisible(true);
             }
             if (refGenDialog.getValue() == DialogDescriptor.OK_OPTION && nrdp.isRequiredInfoSet()){
@@ -186,12 +186,12 @@ public class ImportSetupCard extends javax.swing.JPanel {
         } else if(c instanceof TrackJobView){
             NewTrackDialogPanel ntdp = new NewTrackDialogPanel();
             ntdp.setReferenceJobs(refJobView1.getJobs());
-            DialogDescriptor trackDialog = new DialogDescriptor(ntdp, "Track Dialog", true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
+            DialogDescriptor trackDialog = new DialogDescriptor(ntdp, NbBundle.getMessage(this.getClass(), "TTL_ImportSetupCard.dialog.title.track"), true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
             Dialog dialog = DialogDisplayer.getDefault().createDialog(trackDialog);
             dialog.setVisible(true);
 
             while(trackDialog.getValue() == DialogDescriptor.OK_OPTION && !ntdp.isRequiredInfoSet()){
-                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please fill out the complete form!", NotifyDescriptor.INFORMATION_MESSAGE));
+                DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_ImportSetupCard.dialog.fillout"), NotifyDescriptor.INFORMATION_MESSAGE));
                 dialog.setVisible(true);
             }
             if (trackDialog.getValue() == DialogDescriptor.OK_OPTION && ntdp.isRequiredInfoSet()){
@@ -209,7 +209,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         } else if(c instanceof RefJobView) {
             ReferenceJob job = refJobView1.getSelectedItem();
             if (job.hasRegisteredTrackswithoutrRunJob()){
-                NotifyDescriptor nd = new NotifyDescriptor.Message("Cannot mark selected object for deletion. Please resolve dependencies first!", NotifyDescriptor.WARNING_MESSAGE);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_ImportSetupCard.dialog.problem.dependency"), NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);
             }
             else{
