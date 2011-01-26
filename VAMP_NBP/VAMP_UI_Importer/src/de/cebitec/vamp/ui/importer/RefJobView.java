@@ -19,9 +19,6 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
     private List<ReferenceJob> jobs;
     private boolean hasJobs;
 
-    public static final String PROP_HAS_JOBS = "hasJobs";
-    public static final String PROP_JOB_SELECTED = "jobSelected";
-
     /** Creates new form TaskViewerTemplate */
     public RefJobView() {
         initComponents();
@@ -29,34 +26,34 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
     }
 
     public ReferenceJob getSelectedItem() {
-        return jobs.get(jTable1.getSelectedRow());
+        return jobs.get(refTable.getSelectedRow());
     }
 
     public void add(ReferenceJob refGenJob) {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addRow(new Object[]{refGenJob.getFile().getName()});
+        DefaultTableModel model = (DefaultTableModel) refTable.getModel();
+        model.addRow(new Object[]{refGenJob.getName(), refGenJob.getFile().getName(), refGenJob.getDescription()});
         jobs.add(refGenJob);
 
         if (!hasJobs){
             hasJobs = true;
-            firePropertyChange(PROP_HAS_JOBS, null, hasJobs);
+            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
         }
     }
 
     public void remove(ReferenceJob refGenJob){
         int row = jobs.lastIndexOf(refGenJob);
         jobs.remove(refGenJob);
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) refTable.getModel();
         model.removeRow(row);
 
         if (jobs.isEmpty()){
             hasJobs = false;
-            firePropertyChange(PROP_HAS_JOBS, null, hasJobs);
+            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
         }
     }
 
     public boolean IsRowSelected(){
-        ListSelectionModel model = jTable1.getSelectionModel();
+        ListSelectionModel model = refTable.getSelectionModel();
         return !model.isSelectionEmpty();
     }
 
@@ -78,23 +75,23 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTable1.getSelectionModel().addListSelectionListener(this);
+        refTable = new javax.swing.JTable();
+        refTable.getSelectionModel().addListSelectionListener(this);
 
-        jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        refTable.setAutoCreateRowSorter(true);
+        refTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "File"
+                "Name", "File", "Description"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -105,9 +102,12 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setFillsViewportHeight(true);
-        jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane1.setViewportView(jTable1);
+        refTable.setFillsViewportHeight(true);
+        refTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(refTable);
+        refTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.name")); // NOI18N
+        refTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.file")); // NOI18N
+        refTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.description")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -124,16 +124,16 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable refTable;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         ListSelectionModel model = (ListSelectionModel) e.getSource();
         if(model.isSelectionEmpty()){
-            firePropertyChange(PROP_JOB_SELECTED, null, Boolean.FALSE);
+            firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.FALSE);
         } else {
-            firePropertyChange(PROP_JOB_SELECTED, null, Boolean.TRUE);
+            firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.TRUE);
         }
     }
 

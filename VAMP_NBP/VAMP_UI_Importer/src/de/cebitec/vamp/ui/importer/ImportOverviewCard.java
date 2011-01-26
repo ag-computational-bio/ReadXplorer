@@ -20,27 +20,26 @@ public class ImportOverviewCard extends javax.swing.JPanel {
     }
 
     public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJobs> trackJobList) {
-
-        jTextArea1.setText("");
+        overviewTextArea.setText("");
 
         if(!refGenJobList.isEmpty()){
-            jTextArea1.append(NbBundle.getMessage(this.getClass(), "MSG_ImportOverviewCard.text.references") + ":\n");
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.references") + ":\n");
             for(Iterator<ReferenceJob> it = refGenJobList.iterator(); it.hasNext(); ){
                 ReferenceJob r = it.next();
-                jTextArea1.append(r.getFile().getAbsolutePath()+"\n");
-                jTextArea1.append("\t"+r.getName()+"\n");
-                jTextArea1.append("\t"+r.getDescription()+"\n");
+                overviewTextArea.append(r.getFile().getAbsolutePath()+"\n");
+                overviewTextArea.append("\t"+r.getName()+"\n");
+                overviewTextArea.append("\t"+r.getDescription()+"\n");
             }
-            jTextArea1.append("\n");
+            overviewTextArea.append("\n");
         }
 
 
         if(!trackJobList.isEmpty()){
-            jTextArea1.append(NbBundle.getMessage(this.getClass(), "MSG_ImportOverviewCard.text.tracks") + ":\n");
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.tracks") + ":\n");
             for(Iterator<TrackJobs> it = trackJobList.iterator(); it.hasNext(); ){
                 TrackJobs r = it.next();
-                jTextArea1.append(r.getFile().getAbsolutePath()+"\n");
-                jTextArea1.append("\t"+r.getDescription()+"\n");
+                overviewTextArea.append(r.getFile().getAbsolutePath()+"\n");
+                overviewTextArea.append("\t"+r.getDescription()+"\n");
             }
         }
     }
@@ -60,11 +59,11 @@ public class ImportOverviewCard extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        overviewTextArea = new javax.swing.JTextArea();
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        overviewTextArea.setColumns(20);
+        overviewTextArea.setRows(5);
+        jScrollPane1.setViewportView(overviewTextArea);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -81,7 +80,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea overviewTextArea;
     // End of variables declaration//GEN-END:variables
 
 }

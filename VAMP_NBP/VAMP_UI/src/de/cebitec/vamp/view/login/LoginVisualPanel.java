@@ -13,7 +13,7 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
-public final class LoginVisualPanel1 extends JPanel {
+public final class LoginVisualPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,8 +26,8 @@ public final class LoginVisualPanel1 extends JPanel {
     private static String LOGIN_HOSTNAME = "login.hostname";
     private static String LOGIN_DATABASE_H2= "login.database.h2";
 
-    /** Creates new form LoginVisualPanel1 */
-    public LoginVisualPanel1() {
+    /** Creates new form LoginVisualPanel */
+    public LoginVisualPanel() {
         initComponents();
 
         setLoginData();
@@ -36,11 +36,11 @@ public final class LoginVisualPanel1 extends JPanel {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel.name");
+        return NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.name");
     }
     
     private void setLoginData() {
-        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
+        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel.class);
         defaultuser = prefs.get(LOGIN_USER , null);
         defaultDatabaseMySQL = prefs.get(LOGIN_DATABASE_MYSQL, null);
         defaulthostname = prefs.get(LOGIN_HOSTNAME, null);
@@ -76,11 +76,11 @@ public final class LoginVisualPanel1 extends JPanel {
             password = null;
         }// </editor-fold>
 
-        loginData.put("adapter", adapter);
-        loginData.put("hostname", hostname);
-        loginData.put("database", database);
-        loginData.put("user", user);
-        loginData.put("password", password);
+        loginData.put(LoginWizardPanel.PROP_ADAPTER, adapter);
+        loginData.put(LoginWizardPanel.PROP_HOST, hostname);
+        loginData.put(LoginWizardPanel.PROP_DATABASE, database);
+        loginData.put(LoginWizardPanel.PROP_USER, user);
+        loginData.put(LoginWizardPanel.PROP_PASSWORD, password);
 
         // save login data if desired
         saveLoginData(loginData);
@@ -89,17 +89,17 @@ public final class LoginVisualPanel1 extends JPanel {
     }
 
     private void saveLoginData(Map<String, String> loginData){
-        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel1.class);
-        String adapter = loginData.get("adapter");
+        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel.class);
+        String adapter = loginData.get(LoginWizardPanel.PROP_ADAPTER);
 
         if (saveDataCheckBox.isSelected()) {
             if (adapter.equalsIgnoreCase("mysql")){
-                prefs.put(LOGIN_HOSTNAME, loginData.get("hostname"));
-                prefs.put(LOGIN_USER, loginData.get("user"));
-                prefs.put(LOGIN_DATABASE_MYSQL, loginData.get("database"));
+                prefs.put(LOGIN_HOSTNAME, loginData.get(LoginWizardPanel.PROP_HOST));
+                prefs.put(LOGIN_USER, loginData.get(LoginWizardPanel.PROP_USER));
+                prefs.put(LOGIN_DATABASE_MYSQL, loginData.get(LoginWizardPanel.PROP_DATABASE));
             }
             else if (adapter.equalsIgnoreCase("h2")){
-                prefs.put(LOGIN_DATABASE_H2, loginData.get("database"));
+                prefs.put(LOGIN_DATABASE_H2, loginData.get(LoginWizardPanel.PROP_DATABASE));
             }
             else{
                 // should not reach here
@@ -122,7 +122,7 @@ public final class LoginVisualPanel1 extends JPanel {
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            Logger.getLogger(LoginVisualPanel1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoginVisualPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -147,15 +147,15 @@ public final class LoginVisualPanel1 extends JPanel {
         saveDataCheckBox = new javax.swing.JCheckBox();
         dbChooseButton = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(urlLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.urlLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(urlLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.urlLabel.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(databaseLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.databaseLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(databaseLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.databaseLabel.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(userLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.userLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(userLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.userLabel.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(passwordLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.passwordLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(passwordLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.passwordLabel.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(dbTypeLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.dbTypeLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(dbTypeLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.dbTypeLabel.text")); // NOI18N
 
         dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL", "h2" }));
         dbTypeBox.addActionListener(new java.awt.event.ActionListener() {
@@ -165,9 +165,9 @@ public final class LoginVisualPanel1 extends JPanel {
         });
 
         saveDataCheckBox.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(saveDataCheckBox, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.saveDataCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveDataCheckBox, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.saveDataCheckBox.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(dbChooseButton, org.openide.util.NbBundle.getMessage(LoginVisualPanel1.class, "LoginVisualPanel1.dbChooseButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(dbChooseButton, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.dbChooseButton.text")); // NOI18N
         dbChooseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dbChooseButtonActionPerformed(evt);
@@ -261,7 +261,7 @@ public final class LoginVisualPanel1 extends JPanel {
         JFileChooser fc = new JFileChooser();
         int result = fc.showOpenDialog(this);
 
-        Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel1.class);
+        Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel.class);
         String db = dbTypeBox.getSelectedItem().toString();
         if (db.equalsIgnoreCase("h2")) {
             String path = prefs2.get(LOGIN_DATABASE_H2, null);
@@ -280,7 +280,7 @@ public final class LoginVisualPanel1 extends JPanel {
             // file chosen
             file = fc.getSelectedFile();
             if(!file.exists()){
-                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel1.class, "MSG_LoginVisualPanel.warning.database", file.getAbsolutePath()), NotifyDescriptor.WARNING_MESSAGE);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", file.getAbsolutePath()), NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);
             }
             databaseField.setText(file.getAbsolutePath());

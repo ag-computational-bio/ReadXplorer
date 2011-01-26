@@ -5,6 +5,8 @@ import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
@@ -13,21 +15,19 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
-import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.openide.util.actions.CallableSystemAction;
 import org.openide.windows.WindowManager;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can copy-paste the code below wherever you need.
-public final class LoginWizardAction extends CallableSystemAction{
+public final class LoginWizardAction implements ActionListener{
 
     private static final long serialVersionUID = 1L;
 
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
     @Override
-    public void performAction() {
+    public void actionPerformed(ActionEvent e) {
         CentralLookup cl = CentralLookup.getDefault();
         // check if user is already logged in
         Boolean loggedIn = cl.lookup(ViewController.class) != null ? Boolean.TRUE : Boolean.FALSE;
@@ -58,7 +58,7 @@ public final class LoginWizardAction extends CallableSystemAction{
             
             Map<String, Object> loginProps = wizardDescriptor.getProperties();
             try {
-                ProjectConnector.getInstance().connect((String) loginProps.get("adapter"), (String) loginProps.get("hostname"), (String) loginProps.get("database"), (String) loginProps.get("user"), (String) loginProps.get("password"));
+                ProjectConnector.getInstance().connect((String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), (String) loginProps.get(LoginWizardPanel.PROP_HOST), (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), (String) loginProps.get(LoginWizardPanel.PROP_USER), (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
                 // TODO get rid of ViewController
                 ViewController con = ViewController.getInstance();
                 cl.add(con);
@@ -77,7 +77,7 @@ public final class LoginWizardAction extends CallableSystemAction{
     private WizardDescriptor.Panel<WizardDescriptor>[] getPanels() {
         if (panels == null) {
             panels = new WizardDescriptor.Panel[]{
-                        new LoginWizardPanel1()
+                        new LoginWizardPanel()
                     };
             String[] steps = new String[panels.length];
             for (int i = 0; i < panels.length; i++) {
@@ -102,26 +102,6 @@ public final class LoginWizardAction extends CallableSystemAction{
             }
         }
         return panels;
-    }
-
-    @Override
-    public String getName() {
-        return "Login";
-    }
-
-    @Override
-    public String iconResource() {
-        return "de/cebitec/vamp/resources/flower.png";
-    }
-
-    @Override
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
-    }
-
-    @Override
-    protected boolean asynchronous() {
-        return false;
     }
 
 }

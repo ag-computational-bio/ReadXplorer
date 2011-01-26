@@ -33,7 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author jwinneba
  */
-public class NewTrackDialogPanel extends javax.swing.JPanel {
+public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDialog {
 
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
@@ -49,6 +49,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel {
         currentParser = parsers[0];
     }
 
+    @Override
     public boolean isRequiredInfoSet(){
         if (mappingFile == null || refGenBox.getSelectedItem() == null || descriptionField.getText().isEmpty()){
             return false;

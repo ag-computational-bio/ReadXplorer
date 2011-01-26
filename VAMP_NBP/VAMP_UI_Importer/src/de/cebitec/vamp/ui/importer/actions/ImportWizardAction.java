@@ -38,14 +38,14 @@ public final class ImportWizardAction implements ActionListener {
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent ev) {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ImportWizardAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             return;
         }
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(this.getClass(), "TTL_ImportWizardTitle"));
+        wizardDescriptor.setTitle(NbBundle.getMessage(ImportWizardAction.class, "TTL_ImportWizardTitle"));
         Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
         dialog.setVisible(true);
         dialog.toFront();
