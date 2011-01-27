@@ -20,31 +20,31 @@ public class OverviewCard extends javax.swing.JPanel {
     }
 
     public void showGenereateOverview(List<ReferenceJob> scheduledRefGenJobs, List<TrackJobs> scheduledTrackJobs) {
-        jTextArea1.setText("");
+        overviewTextArea.setText("");
 
         if(!scheduledRefGenJobs.isEmpty()){
-            jTextArea1.append("References:\n");
+            overviewTextArea.append("References:\n");
             for(Iterator<ReferenceJob> it = scheduledRefGenJobs.iterator(); it.hasNext() ;){
                 ReferenceJob r = it.next();
-                jTextArea1.append(r.getName()+"\n");
-                jTextArea1.append("\t"+r.getDescription()+"\n");
+                overviewTextArea.append(r.getName()+"\n");
+                overviewTextArea.append("\t"+r.getDescription()+"\n");
             }
-            jTextArea1.append("\n");
+            overviewTextArea.append("\n");
         }
 
         if(!scheduledTrackJobs.isEmpty()){
-            jTextArea1.append("Tracks:\n");
+            overviewTextArea.append("Tracks:\n");
             for(Iterator<TrackJobs> it = scheduledTrackJobs.iterator(); it.hasNext(); ){
                 TrackJobs r = it.next();
-                jTextArea1.append(r.getDescription()+"\n");
+                overviewTextArea.append(r.getDescription()+"\n");
             }
-            jTextArea1.append("\n");
+            overviewTextArea.append("\n");
         }
     }
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(this.getClass(), "CTL_OverviewCard.name");
+        return NbBundle.getMessage(OverviewCard.class, "CTL_OverviewCard.name");
     }
 
     /** This method is called from within the constructor to
@@ -57,11 +57,11 @@ public class OverviewCard extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        overviewTextArea = new javax.swing.JTextArea();
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        overviewTextArea.setColumns(20);
+        overviewTextArea.setRows(5);
+        jScrollPane1.setViewportView(overviewTextArea);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -77,7 +77,7 @@ public class OverviewCard extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea overviewTextArea;
     // End of variables declaration//GEN-END:variables
 
 }

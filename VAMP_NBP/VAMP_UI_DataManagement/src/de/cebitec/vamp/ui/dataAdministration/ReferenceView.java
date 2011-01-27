@@ -31,7 +31,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
         this.jobs = refJobs;
         clearTableRows();
 
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         for (ReferenceJob referenceJob : refJobs) {
             model.addRow(new Object[]{false, referenceJob.getName(), referenceJob.getDescription(), referenceJob.getTimestamp()});
         }
@@ -40,8 +40,8 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     public List<ReferenceJob> getJobs2del(){
         jobs2del = new ArrayList<ReferenceJob>();
 
-        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
-            if ((Boolean) jTable1.getValueAt(row, 0)){
+        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
+            if ((Boolean) jobTable.getValueAt(row, 0)){
                 jobs2del.add(jobs.get(row));
             }
         }
@@ -49,7 +49,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     }
 
     private void clearTableRows(){
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         while (model.getRowCount() > 0){
             model.removeRow(model.getRowCount()-1);
         }
@@ -58,8 +58,8 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     private void checkColumnSelection() {
         List<Boolean> selection = new ArrayList<Boolean>();
 
-        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
-            selection.add((Boolean) jTable1.getValueAt(row, 0));
+        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
+            selection.add((Boolean) jobTable.getValueAt(row, 0));
         }
 
         hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
@@ -68,7 +68,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
     void deselectRefGen(ReferenceJob refGen) {
         int row = jobs.indexOf(refGen);
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         model.setValueAt(false, row, 0);
 
         checkColumnSelection();
@@ -76,7 +76,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
     void refGenJobAdded(ReferenceJob refGenJob) {
         jobs.add(refGenJob);
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         model.addRow(new Object[]{false, refGenJob.getName(), refGenJob.getDescription(), refGenJob.getTimestamp()});
     }
 
@@ -90,9 +90,9 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jobTable = new javax.swing.JTable();
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jobTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -115,9 +115,13 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setFillsViewportHeight(true);
-        jScrollPane1.setViewportView(jTable1);
-        jTable1.getModel().addTableModelListener(this);
+        jobTable.setFillsViewportHeight(true);
+        jScrollPane1.setViewportView(jobTable);
+        jobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ReferenceView.class, "JobTable.delete")); // NOI18N
+        jobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ReferenceView.class, "JobTable.name")); // NOI18N
+        jobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ReferenceView.class, "JobTable.description")); // NOI18N
+        jobTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ReferenceView.class, "JobTable.date")); // NOI18N
+        jobTable.getModel().addTableModelListener(this);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -134,7 +138,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jobTable;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -150,7 +154,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
             if(selected){
                 // check if it is allowed to be deleted
                 if(!r.getDependentTrackswithoutRunjob().isEmpty()){
-                    NotifyDescriptor note = new NotifyDescriptor.Message(NbBundle.getMessage(this.getClass(), "MSG_ReferenceView.error.reference"), NotifyDescriptor.ERROR_MESSAGE);
+                    NotifyDescriptor note = new NotifyDescriptor.Message(NbBundle.getMessage(ReferenceView.class, "MSG_ReferenceView.error.reference"), NotifyDescriptor.ERROR_MESSAGE);
                     DialogDisplayer.getDefault().notify(note);
 
                     model.setValueAt(false, row, column);

@@ -1,8 +1,8 @@
-package de.cebitec.vamp.ui.dataAdministration.actions;
+package de.cebitec.vamp.ui.dataAdministration;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
-import de.cebitec.vamp.ui.dataAdministration.OverviewCard;
+import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.event.ChangeListener;

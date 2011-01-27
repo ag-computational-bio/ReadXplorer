@@ -31,7 +31,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
         this.jobs = trackJobs;
         clearTableRows();
 
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         for (TrackJobs trackJob : trackJobs) {
             model.addRow(new Object[]{false, trackJob.getDescription(), trackJob.getTimestamp()});
         }
@@ -40,8 +40,8 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     public List<TrackJobs> getJobs2Del(){
         jobs2del = new ArrayList<TrackJobs>();
 
-        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
-            if ((Boolean) jTable1.getValueAt(row, 0)){
+        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
+            if ((Boolean) jobTable.getValueAt(row, 0)){
                 jobs2del.add(jobs.get(row));
             }
         }
@@ -49,7 +49,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     }
 
     private void clearTableRows(){
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
         while (model.getRowCount() > 0){
             model.removeRow(model.getRowCount()-1);
         }
@@ -58,8 +58,8 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     private void checkColumnSelection() {
         List<Boolean> selection = new ArrayList<Boolean>();
 
-        for (int row = 0; row <= jTable1.getRowCount()-1; row++) {
-            selection.add((Boolean) jTable1.getValueAt(row, 0));
+        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
+            selection.add((Boolean) jobTable.getValueAt(row, 0));
         }
 
         hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
@@ -76,9 +76,9 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jobTable = new javax.swing.JTable();
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jobTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -101,9 +101,12 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setFillsViewportHeight(true);
-        jScrollPane1.setViewportView(jTable1);
-        jTable1.getModel().addTableModelListener(this);
+        jobTable.setFillsViewportHeight(true);
+        jScrollPane1.setViewportView(jobTable);
+        jobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.delete")); // NOI18N
+        jobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.description")); // NOI18N
+        jobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.date")); // NOI18N
+        jobTable.getModel().addTableModelListener(this);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -120,7 +123,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jobTable;
     // End of variables declaration//GEN-END:variables
 
     @Override

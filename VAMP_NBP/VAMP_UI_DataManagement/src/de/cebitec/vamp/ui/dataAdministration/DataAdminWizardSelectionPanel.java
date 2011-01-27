@@ -1,4 +1,4 @@
-package de.cebitec.vamp.ui.dataAdministration.actions;
+package de.cebitec.vamp.ui.dataAdministration;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
@@ -6,7 +6,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.parser.Job;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
-import de.cebitec.vamp.ui.dataAdministration.SelectionCard;
+import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

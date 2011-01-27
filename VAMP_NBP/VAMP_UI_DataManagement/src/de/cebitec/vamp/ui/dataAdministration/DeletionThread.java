@@ -39,8 +39,8 @@ public class DeletionThread extends SwingWorker<Object, Object>{
         this.tracks = tracks;
         invalidGens = new HashSet<ReferenceJob>();
 
-        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(this.getClass(), "DeletionThread.ouptut.name"), false);
-        this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.progress.name"));
+        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(DeletionThread.class, "DeletionThread.ouptut.name"), false);
+        this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.progress.name"));
         this.workunits = this.gens.size() + this.tracks.size();
     }
 
@@ -57,20 +57,20 @@ public class DeletionThread extends SwingWorker<Object, Object>{
         ph.start(workunits);
         workunits = 0;
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of data");
+        Logger.getLogger(DeletionThread.class.getName()).log(Level.INFO, "Starting deletion of data");
 
         if(!tracks.isEmpty()){
-            io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.start.track") + ":");
-            ph.progress(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.progress.track"), workunits);
+            io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.start.track") + ":");
+            ph.progress(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.progress.track"), workunits);
             for(Iterator<TrackJobs> it = tracks.iterator(); it.hasNext(); ){
                 TrackJobs t = it.next();
                 ph.progress(++workunits);
                 try {
                     ProjectConnector.getInstance().deleteTrack(t.getID());
-                    io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.completed.before") + " \"" + t.getDescription() + "\" " + NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.completed.after"));
+                    io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.completed.before") + " \"" + t.getDescription() + "\" " + NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.completed.after"));
 
                 } catch (StorageException ex) {
-                    io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.failed.before") + " \"" + t.getDescription() + "\" " + NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.failed.after"));
+                    io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.failed.before") + " \"" + t.getDescription() + "\" " + NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.failed.after"));
                     // if this track fails, do not delete runs and genomes that are referenced by this track
                   //  invalidRuns.add(t.getRunJob());
                     invalidGens.add(t.getRefGen());
@@ -81,19 +81,19 @@ public class DeletionThread extends SwingWorker<Object, Object>{
         }
 
         if(!gens.isEmpty()){
-            io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.start.ref") + ":");
-            ph.progress(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.progress.ref"), workunits);
+            io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.start.ref") + ":");
+            ph.progress(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.progress.ref"), workunits);
             for(Iterator<ReferenceJob> it = gens.iterator(); it.hasNext(); ){
                 ReferenceJob r = it.next();
                 ph.progress(++workunits);
                 if(invalidGens.contains(r)){
-                    io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.error.before") + " \"" + r.getDescription() + "\" " + NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.error.after"));
+                    io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.error.before") + " \"" + r.getDescription() + "\" " + NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.error.after"));
                 } else {
                     try {
                         ProjectConnector.getInstance().deleteGenome(r.getID());
-                        io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.completed.before") + " \"" + r.getDescription() + "\" " + NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.completed.after"));
+                        io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.completed.before") + " \"" + r.getDescription() + "\" " + NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.completed.after"));
                     } catch (StorageException ex) {
-                        io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.failed.before") + " \"" + r.getDescription() + "\" " + NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.failed.after"));
+                        io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.failed.before") + " \"" + r.getDescription() + "\" " + NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.failed.after"));
                         Logger.getLogger(DeletionThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -101,7 +101,7 @@ public class DeletionThread extends SwingWorker<Object, Object>{
             io.getOut().println("");
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Completed Deletion of Data");
+        Logger.getLogger(DeletionThread.class.getName()).log(Level.INFO, "Completed Deletion of Data");
 
         return null;
     }
@@ -109,7 +109,7 @@ public class DeletionThread extends SwingWorker<Object, Object>{
     @Override
     protected void done(){
         super.done();
-        io.getOut().println(NbBundle.getMessage(this.getClass(), "MSG_DeletionThread.deletion.finished"));
+        io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.finished"));
         io.getOut().close();
         ph.finish();
 

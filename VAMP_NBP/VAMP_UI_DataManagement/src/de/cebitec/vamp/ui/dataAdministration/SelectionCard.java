@@ -56,7 +56,7 @@ public class SelectionCard extends javax.swing.JPanel {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(this.getClass(), "CTL_SelectionCard.name");
+        return NbBundle.getMessage(SelectionCard.class, "CTL_SelectionCard.name");
     }
 
     /** This method is called from within the constructor to
