@@ -3,7 +3,7 @@ package de.cebitec.vamp.ui.dataAdministration.actions;
 import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardSelectionPanel;
 import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardOverviewPanel;
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.api.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.ui.dataAdministration.DeletionThread;
@@ -23,13 +23,13 @@ import org.openide.util.RequestProcessor;
 
 public final class DataAdminWizardAction implements ActionListener {
 
-    private final ViewController context;
+    private final LoginCookie context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
     public static final String PROP_REFS2DEL = "refdel";
     public static final String PROP_TRACK2DEL = "trackdel";
 
-    public DataAdminWizardAction(ViewController context) {
+    public DataAdminWizardAction(LoginCookie context) {
         this.context = context;
     }
 

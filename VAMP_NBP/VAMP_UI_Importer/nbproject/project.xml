@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp</code-name-base>
+                    <code-name-base>de.cebitec.vamp.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -24,14 +24,6 @@
                 </dependency>
                 <dependency>
                     <code-name-base>de.cebitec.vamp.databackend</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>de.cebitec.vamp.importer</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

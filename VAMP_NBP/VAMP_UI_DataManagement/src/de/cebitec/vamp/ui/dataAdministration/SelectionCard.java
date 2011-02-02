@@ -49,7 +49,12 @@ public class SelectionCard extends javax.swing.JPanel {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+                if (refGenView.getJobs2del().isEmpty() && mappingView.getJobs2Del().isEmpty()){
+                    firePropertyChange(evt.getPropertyName(), null, Boolean.FALSE);
+                }
+                else{
+                    firePropertyChange(evt.getPropertyName(), null, Boolean.TRUE);
+                }
             }
         };
     }

@@ -1228,8 +1228,6 @@ public class ProjectConnector {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), e);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
-
         return refGens;
     }
 

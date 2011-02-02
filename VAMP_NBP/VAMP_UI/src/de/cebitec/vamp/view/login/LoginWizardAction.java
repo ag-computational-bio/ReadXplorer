@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.login;
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.vamp.api.LoginCookie;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.awt.Component;
@@ -59,9 +60,13 @@ public final class LoginWizardAction implements ActionListener{
             Map<String, Object> loginProps = wizardDescriptor.getProperties();
             try {
                 ProjectConnector.getInstance().connect((String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), (String) loginProps.get(LoginWizardPanel.PROP_HOST), (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), (String) loginProps.get(LoginWizardPanel.PROP_USER), (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
-                // TODO get rid of ViewController
-                ViewController con = ViewController.getInstance();
-                cl.add(con);
+                cl.add(new LoginCookie() {
+
+                    @Override
+                    public boolean isLoggedIn() {
+                        return true;
+                    }
+                });
                 WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
             } catch (SQLException ex) {
                 Exceptions.printStackTrace(ex);

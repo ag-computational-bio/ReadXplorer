@@ -11,7 +11,7 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.controller.ViewController"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.LoginCookie"/>
             </file>
         </folder>
     </folder>

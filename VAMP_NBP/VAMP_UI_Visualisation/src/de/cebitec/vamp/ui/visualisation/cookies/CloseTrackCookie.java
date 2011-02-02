@@ -8,6 +8,4 @@ import org.openide.cookies.CloseCookie;
  */
 public interface CloseTrackCookie extends CloseCookie{
 
-    public String getTrackName();
-
 }

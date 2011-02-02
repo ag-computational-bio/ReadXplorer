@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.api.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.ui.importer.ImportThread;
@@ -23,14 +23,14 @@ import org.openide.util.RequestProcessor;
 
 public final class ImportWizardAction implements ActionListener {
 
-    private final ViewController context;
+    private final LoginCookie context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
     public static final String PROP_CAN_IMPORT = "canImport";
     public static final String PROP_REFJOBLIST = "referenceJob";
     public static final String PROP_TRACKJOBLIST = "trackJobList";
 
-    public ImportWizardAction(ViewController context) {
+    public ImportWizardAction(LoginCookie context) {
         this.context = context;
     }
 

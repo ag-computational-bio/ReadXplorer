@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.vamp.api
+OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/api/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

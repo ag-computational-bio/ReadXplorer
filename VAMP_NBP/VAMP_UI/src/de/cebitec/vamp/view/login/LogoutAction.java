@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.login;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.api.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -13,9 +13,9 @@ import org.openide.windows.WindowManager;
 
 public final class LogoutAction implements ActionListener {
 
-    private final ViewController context;
+    private final LoginCookie context;
 
-    public LogoutAction(ViewController context) {
+    public LogoutAction(LoginCookie context) {
         this.context = context;
     }
 
