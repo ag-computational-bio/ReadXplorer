@@ -1,8 +1,7 @@
 package de.cebitec.vamp.view.login;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.LoginCookie;
-import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -17,7 +16,6 @@ import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.windows.WindowManager;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can copy-paste the code below wherever you need.
@@ -31,7 +29,7 @@ public final class LoginWizardAction implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         CentralLookup cl = CentralLookup.getDefault();
         // check if user is already logged in
-        Boolean loggedIn = cl.lookup(ViewController.class) != null ? Boolean.TRUE : Boolean.FALSE;
+        Boolean loggedIn = cl.lookup(LoginCookie.class) != null ? Boolean.TRUE : Boolean.FALSE;
 
         if (loggedIn){
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
@@ -67,7 +65,6 @@ public final class LoginWizardAction implements ActionListener{
                         return true;
                     }
                 });
-                WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
             } catch (SQLException ex) {
                 Exceptions.printStackTrace(ex);
             }

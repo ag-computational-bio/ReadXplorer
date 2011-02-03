@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.actions;
 
-import de.cebitec.vamp.ui.visualisation.cookies.CloseRefGenCookie;
+import de.cebitec.vamp.api.cookies.CloseRefGenCookie;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 

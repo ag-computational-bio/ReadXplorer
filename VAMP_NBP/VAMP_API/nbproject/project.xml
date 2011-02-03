@@ -8,6 +8,7 @@
             <module-dependencies/>
             <public-packages>
                 <package>de.cebitec.vamp.api</package>
+                <package>de.cebitec.vamp.api.cookies</package>
             </public-packages>
         </data>
     </configuration>

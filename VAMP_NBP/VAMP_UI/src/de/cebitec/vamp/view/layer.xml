@@ -3,6 +3,13 @@
 <filesystem>
     <folder name="Actions">
         <folder name="File">
+            <file name="de-cebitec-vamp-view-login-LoginWizardAction.instance">
+                <attr name="delegate" newvalue="de.cebitec.vamp.view.login.LoginWizardAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.view.login.Bundle#CTL_LoginWizardAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/login/login.png"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+            </file>
             <file name="de-cebitec-vamp-view-login-LogoutAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.view.login.Bundle#CTL_LogoutAction"/>
@@ -11,28 +18,14 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.api.LoginCookie"/>
-            </file>
-        </folder>
-        <folder name="Window">
-            <file name="de-cebitec-vamp-view-AppPanelAction.instance">
-                <attr name="component" methodvalue="de.cebitec.vamp.view.AppPanelTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.view.Bundle#CTL_AppPanelAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
-            </file>
-            <file name="de-cebitec-vamp-view-login-LoginWizardAction.instance">
-                <attr name="delegate" newvalue="de.cebitec.vamp.view.login.LoginWizardAction"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.view.login.Bundle#CTL_LoginWizardAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/login/login.png"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.LoginCookie"/>
             </file>
         </folder>
     </folder>
     <folder name="Menu">
         <folder name="File">
-            <file name="OpenLibraryViewerWindowAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-view-login-LoginWizardAction.instance"/>
+            <file name="de-cebitec-vamp-view-login-LoginWizardAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-view-login-LoginWizardAction.instance"/>
                 <attr name="position" intvalue="0"/>
             </file>
             <file name="de-cebitec-vamp-view-login-LogoutAction.shadow">
@@ -56,15 +49,5 @@
         <folder name="Clipboard_hidden"/>
         <folder name="UndoRedo_hidden"/>
         <folder name="Memory_hidden"/>
-    </folder>
-    <folder name="Windows2">
-        <folder name="Components">
-            <file name="AppPanelTopComponent.settings" url="AppPanelTopComponentSettings.xml"/>
-        </folder>
-        <folder name="Modes">
-            <folder name="editor">
-                <file name="AppPanelTopComponent.wstcref" url="AppPanelTopComponentWstcref.xml"/>
-            </folder>
-        </folder>
     </folder>
 </filesystem>

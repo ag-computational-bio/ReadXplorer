@@ -1,6 +1,5 @@
 package de.cebitec.vamp.controller;
 
-import de.cebitec.vamp.view.dialogPanels.OpenRefGenPanel;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.api.ApplicationFrameI;
@@ -8,7 +7,7 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackItem;
+import de.cebitec.vamp.view.dialogPanels.OpenRefGenPanel;
 import de.cebitec.vamp.view.dialogPanels.OpenTrackPanel;
 import java.awt.Dialog;
 import java.util.ArrayList;
@@ -16,11 +15,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import org.openide.windows.WindowManager;
 
 /**
+ * Controls the view for one <code>ApplicationFrameI</code>
  *
  * @author ddoppmeier
  */
@@ -34,36 +34,15 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     private PersistantReference currentRefGen;
     private BasePanel genomeViewer;
     private Map<PersistantTrack, BasePanel> trackToPanel;
-    private Map<PersistantTrack, TrackItem> trackToItem;
 
-    private ViewController(){
+    private ApplicationFrameI app;
+
+    public ViewController(ApplicationFrameI app){
+        this.app = app;
+
         mousePosListener = new ArrayList<MousePositionListener>();
 
         trackToPanel = new HashMap<PersistantTrack, BasePanel>();
-        trackToItem = new HashMap<PersistantTrack, TrackItem>();
-    }
-
-    public ViewController(PersistantReference reference){
-        mousePosListener = new ArrayList<MousePositionListener>();
-
-        trackToPanel = new HashMap<PersistantTrack, BasePanel>();
-        trackToItem = new HashMap<PersistantTrack, TrackItem>();
-
-        currentRefGen = reference;
-        boundsManager = new BoundsInfoManager(currentRefGen);
-        basePanelFac = new BasePanelFactory(boundsManager, this);
-        genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
-
-        // TODO go on here, need a non sinlgeton topcomponent
-        WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
-        getApp().showRefGenPanel(genomeViewer);
-    }
-
-    public static ViewController getInstance(){
-        if (instance == null){
-            instance = new ViewController();
-        }
-        return instance;
     }
 
     public void openRefGen(){
@@ -77,8 +56,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
             boundsManager = new BoundsInfoManager(currentRefGen);
             basePanelFac = new BasePanelFactory(boundsManager, this);
             genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
-            
-            WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
+
             getApp().showRefGenPanel(genomeViewer);
         }
     }
@@ -86,7 +64,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     public void closeRefGen() {
         // remove all tracks that are still open
         List<PersistantTrack> tracks = new ArrayList<PersistantTrack>();
-        for(PersistantTrack t : trackToItem.keySet()){
+        for(PersistantTrack t : trackToPanel.keySet()){
             tracks.add(t);
         }
         for(Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext(); ){
@@ -107,7 +85,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
     public void openTrack() {
         OpenTrackPanel otp = new OpenTrackPanel(currentRefGen.getId());
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Reference");
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Track");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
@@ -116,26 +94,37 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
             // create basepanel 
             BasePanel tp = basePanelFac.getTrackBasePanel(t);
-
-            // create a menuItem to close this track
-            TrackItem trackItem = new TrackItem(t);
-            trackToItem.put(t, trackItem);
             trackToPanel.put(t, tp);
 
             // show the panel and the track
-            getApp().showTrackPanel(tp, trackItem);
+            getApp().showTrackPanel(tp);
         }
     }
 
-    public void closeTrack(PersistantTrack track) {
-        BasePanel trackPanel = trackToPanel.get(track);
-        TrackItem trackItem = trackToItem.get(track);
+    /**
+     * Replacement for <code>closeTrack</code> so the application does not need
+     * to know <code>PersistantTrack</code> or <code>BasePanel</code>
+     *
+     * @param track
+     */
+    public void closeTrackPanel(JPanel track) {
+        BasePanel trackPanel = (BasePanel) track;
 
         getApp().closeTrackPanel(trackPanel);
         trackPanel.close();
         mousePosListener.remove(trackPanel);
 
-        trackToItem.remove(track);
+        trackToPanel.values().remove((BasePanel) track);
+    }
+
+    @Deprecated
+    public void closeTrack(PersistantTrack track) {
+        BasePanel trackPanel = trackToPanel.get(track);
+
+        getApp().closeTrackPanel(trackPanel);
+        trackPanel.close();
+        mousePosListener.remove(trackPanel);
+
         trackToPanel.remove(track);
     }
 
@@ -161,6 +150,14 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         return currentRefGen;
     }
 
+    public boolean hasRefGen(){
+        return currentRefGen != null ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    public String getDisplayName(){
+        return currentRefGen.getName() + ": " + currentRefGen.getDescription();
+    }
+
     public void addMousePositionListener(MousePositionListener listener){
         mousePosListener.add(listener);
     }
@@ -172,7 +169,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     private ApplicationFrameI getApp(){
-        return (ApplicationFrameI) WindowManager.getDefault().findTopComponent("AppPanelTopComponent");
+        return app;
     }
 
 }

@@ -1,6 +1,5 @@
 package de.cebitec.vamp.api;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 /**
@@ -13,7 +12,7 @@ public interface ApplicationFrameI {
 
     public void removeRefGenPanel(JPanel genomeViewer);
 
-    public void showTrackPanel(JPanel trackPanel, JMenuItem trackMenuItem);
+    public void showTrackPanel(JPanel trackPanel);
 
     public void closeTrackPanel(JPanel trackPanel);
 

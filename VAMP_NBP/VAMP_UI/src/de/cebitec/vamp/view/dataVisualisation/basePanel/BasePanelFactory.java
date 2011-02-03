@@ -71,7 +71,7 @@ public class BasePanelFactory {
         b.setViewer(genomeViewer);
         b.setLeftInfoPanel(navigator);
         b.setAdjustmentPanel(this.createAdjustmentPanel(true, true));
-        b.setTitlePanel(this.getTitlePanel(refGen.getName()));
+//        b.setTitlePanel(this.getTitlePanel(refGen.getName()));
 
         return b;
     }
@@ -79,6 +79,7 @@ public class BasePanelFactory {
     public BasePanel getTrackBasePanel(PersistantTrack track){
         
         BasePanel b = new BasePanel(boundsManager, viewController);
+        b.setName(track.getDescription());
         viewController.addMousePositionListener(b);
         
         // create track viewer

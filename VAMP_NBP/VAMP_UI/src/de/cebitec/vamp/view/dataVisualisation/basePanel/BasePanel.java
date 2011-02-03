@@ -1,6 +1,5 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
-import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -23,12 +22,12 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private AbstractInfoPanel rightPanel;
     private AbstractInfoPanel leftPanel;
     private BoundsInfoManager boundsManager;
-    private ViewController viewController;
+    private MousePositionListener viewController;
     private List<MousePositionListener> currentMousePosListeners;
     private JPanel centerPanel;
     private AdjustmentPanel adjustmentPanel;
 
-    public BasePanel(BoundsInfoManager boundsManager, ViewController viewController){
+    public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
         super();
         this.setLayout(new BorderLayout());
         centerPanel = new JPanel(new BorderLayout());

@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.LoginCookie;
+import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.ui.importer.ImportThread;

@@ -3,7 +3,7 @@ package de.cebitec.vamp.ui.dataAdministration.actions;
 import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardSelectionPanel;
 import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardOverviewPanel;
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.LoginCookie;
+import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJobs;
 import de.cebitec.vamp.ui.dataAdministration.DeletionThread;

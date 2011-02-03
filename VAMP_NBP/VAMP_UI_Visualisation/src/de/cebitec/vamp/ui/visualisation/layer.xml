@@ -11,7 +11,7 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.ui.visualisation.cookies.CloseRefGenCookie"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.CloseRefGenCookie"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
@@ -21,7 +21,7 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.ui.visualisation.cookies.CloseTrackCookie"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.CloseTrackCookie"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
@@ -31,7 +31,17 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.ui.visualisation.cookies.OpenRefGenCookie"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.OpenRefGenCookie"/>
+            </file>
+            <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenViewerAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenRefGenViewerAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/refOpen.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.OpenRefGenViewerAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.LoginCookie"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
@@ -41,8 +51,18 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.ui.visualisation.cookies.OpenTrackCookie"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.OpenTrackCookie"/>
             </file>
+        </folder>
+        <folder name="Window">
+            <file name="de-cebitec-vamp-ui-visualisation-AppPanelAction.instance">
+                <attr name="component" methodvalue="de.cebitec.vamp.ui.visualisation.AppPanelTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.Bundle#CTL_AppPanelAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file><!--
+            <file name="de-cebitec-vamp-ui-visualisation-actions-TrackCloseSelectionAction.instance">
+                <attr name="position" intvalue="230"/>
+            </file>-->
         </folder>
     </folder>
     <folder name="Menu">
@@ -63,16 +83,27 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.instance"/>
                 <attr name="position" intvalue="500"/>
-            </file>
+            </file><!--
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.instance"/>
                 <attr name="position" intvalue="100"/>
+            </file>-->
+            <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
+                <attr name="position" intvalue="101"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
-        </folder>
+        </folder><!--
+        <folder name="Window">
+            <file name="de-cebitec-vamp-ui-visualisation-actions-TrackCloseSelectionAction.shadow">
+                <attr name="position" intvalue="230"/>
+                <attr name="originalFile"
+                stringvalue="Actions/Window/de-cebitec-vamp-ui-visualisation-actions-TrackCloseSelectionAction.instance"/>
+            </file>
+        </folder>-->
     </folder>
     <folder name="Toolbars">
         <folder name="Visualisation">
@@ -84,15 +115,29 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.instance"/>
                 <attr name="position" intvalue="387"/>
-            </file>
+            </file><!--
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.instance"/>
                 <attr name="position" intvalue="300"/>
+            </file>-->
+            <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
+                <attr name="position" intvalue="301"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.instance"/>
                 <attr name="position" intvalue="375"/>
             </file>
+        </folder>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="AppPanelTopComponent.settings" url="AppPanelTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="editor">
+                <file name="AppPanelTopComponent.wstcref" url="AppPanelTopComponentWstcref.xml"/>
+            </folder>
         </folder>
     </folder>
 </filesystem>

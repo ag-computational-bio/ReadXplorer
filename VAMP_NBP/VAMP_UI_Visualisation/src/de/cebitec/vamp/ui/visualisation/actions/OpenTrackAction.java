@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.actions;
 
-import de.cebitec.vamp.ui.visualisation.cookies.OpenTrackCookie;
+import de.cebitec.vamp.api.cookies.OpenTrackCookie;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.List;
