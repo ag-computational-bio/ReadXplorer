@@ -64,12 +64,12 @@ public class BasePanelFactory {
         genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend());
 
         // create navigator
-        AbstractInfoPanel navigator = new ReferenceNavigator(refGen, boundsManager, genomeViewer);
+//        AbstractInfoPanel navigator = new ReferenceNavigator(refGen, boundsManager, genomeViewer);
 
         // add panels to basepanel
         b.setRightInfoPanel(info);
         b.setViewer(genomeViewer);
-        b.setLeftInfoPanel(navigator);
+//        b.setLeftInfoPanel(navigator);
         b.setAdjustmentPanel(this.createAdjustmentPanel(true, true));
 //        b.setTitlePanel(this.getTitlePanel(refGen.getName()));
 
@@ -85,6 +85,7 @@ public class BasePanelFactory {
         // create track viewer
         TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track.getId());
         TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc);
+        trackV.setName(track.getDescription());
 
         // create and set up legend
         trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
@@ -94,14 +95,14 @@ public class BasePanelFactory {
         trackV.setTrackInfoPanel(info);
 
         // create navi panel
-        TrackNavigatorPanel navi = new TrackNavigatorPanel(tc, this, track, boundsManager);
+//        TrackNavigatorPanel navi = new TrackNavigatorPanel(tc, this, track, boundsManager);
 
         // create zoom slider
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         // add panels to basepanel
         b.setRightInfoPanel(info);
-        b.setLeftInfoPanel(navi);
+//        b.setLeftInfoPanel(navi);
         b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 

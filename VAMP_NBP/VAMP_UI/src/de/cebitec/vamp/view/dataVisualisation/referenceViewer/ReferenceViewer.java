@@ -22,7 +22,7 @@ import java.util.Map;
 public class ReferenceViewer extends AbstractViewer {
 
     private final static long serialVersionUID = 7964236;
-    private static int height = 180;
+    private static int height = 250;
     private static int FRAMEHEIGHT = 20;
     private PersistantReference refGen;
     private ReferenceViewerInfoPanel infoPanel;

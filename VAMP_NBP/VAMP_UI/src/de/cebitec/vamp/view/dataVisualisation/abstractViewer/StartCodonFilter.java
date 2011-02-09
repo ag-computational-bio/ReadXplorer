@@ -116,4 +116,16 @@ public class StartCodonFilter implements RegionFilterI {
         this.ttgSelected = ttgSelected;
     }
 
+    public boolean isAtgSelected() {
+        return atgSelected;
+    }
+
+    public boolean isGtgSelected() {
+        return gtgSelected;
+    }
+
+    public boolean isTtgSelected() {
+        return ttgSelected;
+    }
+
 }

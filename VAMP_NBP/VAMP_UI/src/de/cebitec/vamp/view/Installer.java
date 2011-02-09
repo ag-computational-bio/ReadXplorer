@@ -11,6 +11,8 @@ import org.openide.NotifyDescriptor;
 import org.openide.modules.ModuleInstall;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * Manages a module's lifecycle.
@@ -75,6 +77,12 @@ public class Installer extends ModuleInstall {
             return Boolean.FALSE;
         }
         else {
+            // TODO call LogoutAcion instead
+
+            // close remaining windows
+            for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){
+                    tc.close();
+            }
             // log out before exitting
             ProjectConnector pc = ProjectConnector.getInstance();
             if (pc.isConnected()) pc.disconnect();

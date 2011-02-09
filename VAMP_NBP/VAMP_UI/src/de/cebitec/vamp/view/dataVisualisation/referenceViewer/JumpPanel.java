@@ -48,6 +48,7 @@ public class JumpPanel extends javax.swing.JPanel {
         jumpButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Navigation"));
+        setPreferredSize(new java.awt.Dimension(190, 500));
 
         jumpPositionLabel.setText("Position:");
 

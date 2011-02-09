@@ -346,6 +346,18 @@ public class SequenceBar extends JComponent {
         this.repaint();
     }
 
+    public boolean isATGCodonShown(){
+        return codonFilter.isAtgSelected();
+    }
+
+    public boolean isGTGCodonShown(){
+        return codonFilter.isGtgSelected();
+    }
+
+    public boolean isTTGCodonShown(){
+        return codonFilter.isTtgSelected();
+    }
+
     public void paintBaseBackgroundColor(int logX) {
         int basePosition = 0;
         if (logX > 0) {

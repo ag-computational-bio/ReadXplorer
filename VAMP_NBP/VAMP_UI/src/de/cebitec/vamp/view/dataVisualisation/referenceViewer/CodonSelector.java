@@ -17,6 +17,17 @@ public class CodonSelector extends javax.swing.JPanel {
 
     public void setGenomeViewer(ReferenceViewer viewer){
         this.viewer = viewer;
+        checkBoxes();
+    }
+
+    /**
+     * Used to check for boxes that are checked when a new viewer was selected.
+     *
+     */
+    private void checkBoxes(){
+        atgCheckbox.setSelected(viewer.getSequenceBar().isATGCodonShown());
+        gtgCheckbox.setSelected(viewer.getSequenceBar().isGTGCodonShown());
+        ttgCheckbox.setSelected(viewer.getSequenceBar().isTTGCodonShown());
     }
 
     /** This method is called from within the constructor to

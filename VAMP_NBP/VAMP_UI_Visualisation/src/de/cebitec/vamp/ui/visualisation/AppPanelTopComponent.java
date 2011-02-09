@@ -5,6 +5,9 @@ import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.api.cookies.CloseRefGenCookie;
 import de.cebitec.vamp.api.cookies.CloseTrackCookie;
 import de.cebitec.vamp.api.cookies.OpenTrackCookie;
+import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.lang.ref.Reference;
@@ -147,6 +150,18 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
         // remove all cookies
         clearLookup();
+
+        // if last Viewer close Navigator
+        boolean lastViewer = true;
+        // XXX this is not working everytime, but how can there be opened tc's when you cannot see them in the GUI???
+        for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){
+            if (tc instanceof ApplicationFrameI && !tc.equals(this)){
+                System.out.println("Not last");
+                lastViewer = false;
+                break;
+            }
+        }
+        if (lastViewer) WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -181,6 +196,11 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.add(refGenPanel);
         visualPanel.updateUI();
 
+        // put the panels ReferenceViewer in lookup so it can be accessed
+        BasePanel bp = (BasePanel) refGenPanel;
+        ReferenceViewer rv = (ReferenceViewer) bp.getViewer();
+        content.add(rv);
+
         content.add(new CloseRefGenCookie() {
 
             @Override
@@ -210,6 +230,16 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.add(trackPanel);
         visualPanel.updateUI();
 
+        // search for opened tracks, if there are none open the track statistics window
+        if (getLookup().lookupAll(TrackViewer.class).isEmpty()){
+            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
+        }
+
+        // put the panel's TrackViewer in lookup so it can be accessed
+        BasePanel bp = (BasePanel) trackPanel;
+        TrackViewer tv = (TrackViewer) bp.getViewer();
+        content.add(tv);
+
         CloseTrackCookie closeTrackCookie = new CloseTrackCookie() {
 
             @Override
@@ -233,6 +263,16 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     public void closeTrackPanel(JPanel trackPanel) {
         visualPanel.remove(trackPanel);
         visualPanel.updateUI();
+
+        // remove the panel's TrackViewer from lookup
+        BasePanel bp = (BasePanel) trackPanel;
+        TrackViewer tv = (TrackViewer) bp.getViewer();
+        content.remove(tv);
+
+        // if this was the last trackPanel close the track statistics window
+        if (getLookup().lookupAll(TrackViewer.class).isEmpty()){
+            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
+        }
     }
 
     // ==================== Experimental track closing stuff ==================== //

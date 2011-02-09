@@ -138,6 +138,11 @@
             </module-dependencies>
             <public-packages>
                 <package>de.cebitec.vamp.controller</package>
+                <package>de.cebitec.vamp.view.dataVisualisation</package>
+                <package>de.cebitec.vamp.view.dataVisualisation.abstractViewer</package>
+                <package>de.cebitec.vamp.view.dataVisualisation.basePanel</package>
+                <package>de.cebitec.vamp.view.dataVisualisation.referenceViewer</package>
+                <package>de.cebitec.vamp.view.dataVisualisation.trackViewer</package>
             </public-packages>
         </data>
     </configuration>

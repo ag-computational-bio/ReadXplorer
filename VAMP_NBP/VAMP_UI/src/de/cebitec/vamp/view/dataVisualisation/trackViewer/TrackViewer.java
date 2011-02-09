@@ -429,5 +429,9 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
        
         repaint();
     }
+
+    public TrackConnector getTrackCon() {
+        return trackCon;
+    }
     
 }
