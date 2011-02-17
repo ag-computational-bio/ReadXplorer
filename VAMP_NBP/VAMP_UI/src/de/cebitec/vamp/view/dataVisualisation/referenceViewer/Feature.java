@@ -2,7 +2,7 @@ package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.parser.reference.Filter.FeatureType;
+import de.cebitec.vamp.objects.FeatureType;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

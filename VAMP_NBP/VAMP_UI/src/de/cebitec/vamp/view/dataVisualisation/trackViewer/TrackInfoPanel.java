@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  *
  * @author ddoppmeier
  */
-public class TrackInfoPanel extends AbstractInfoPanel {
+public class TrackInfoPanel extends AbstractInfoPanel implements CoverageInfoI{
 
     private static final long serialVersionUID = 72348356;
     private PersistantCoverage cov;
@@ -86,8 +86,14 @@ public class TrackInfoPanel extends AbstractInfoPanel {
         }
     }
 
-    public void setCoverage(PersistantCoverage cov, int leftBound, int rightBound){
+    @Override
+    public void setCoverage(PersistantCoverage cov){
         this.cov = cov;
+    }
+
+    @Override
+    public PersistantCoverage getCoverage() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private int getIntervalCoverage(PersistantCoverage cov, boolean isForwardStrand, int covType, int from, int to){

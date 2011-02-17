@@ -161,7 +161,12 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
                 break;
             }
         }
-        if (lastViewer) WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
+        if (lastViewer){
+            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
+            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
+            WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").close();
+            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
+        }
     }
 
     void writeProperties(java.util.Properties p) {
@@ -195,6 +200,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     public void showRefGenPanel(JPanel refGenPanel) {
         visualPanel.add(refGenPanel);
         visualPanel.updateUI();
+
+        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
+        WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
+        WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").open();
 
         // put the panels ReferenceViewer in lookup so it can be accessed
         BasePanel bp = (BasePanel) refGenPanel;

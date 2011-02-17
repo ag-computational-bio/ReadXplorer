@@ -30,6 +30,10 @@ public class ReferenceViewer extends AbstractViewer {
     private Feature currentlySelectedFeature;
     private int labelMargin;
     private ReferenceConnector refGenC;
+
+//    public final static String PROP_INTERVALL_CHANGED = "intervall changed";
+    public final static String PROP_FEATURE_STATISTICS_CHANGED = "feats changed";
+    public final static String PROP_FEATURE_SELECTED = "feat selected";
     
 
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen){
@@ -43,7 +47,9 @@ public class ReferenceViewer extends AbstractViewer {
     }
     
     public void setSelectedFeature(Feature feature){
-        this.showFeatureDetails(feature.getPersistantFeature());
+//        this.showFeatureDetails(feature.getPersistantFeature());
+        firePropertyChange(PROP_FEATURE_SELECTED, currentlySelectedFeature, feature);
+        
         // if there was a feature selected before, de-select it
         if(currentlySelectedFeature != null ){
             currentlySelectedFeature.setSelected(false);
@@ -60,11 +66,10 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public void boundsChangedHook() {
+        // TODO compute this outside of EDT if too timeconsuming
         createFeatures();
-        if(infoPanel != null){
-            infoPanel.setIntervall(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
-            infoPanel.showFeatureStatisticsForIntervall(featureStats);
-        }
+
+//        firePropertyChange(PROP_INTERVALL_CHANGED, null, getBoundsInfo());
     }
 
     private void createFeatures(){
@@ -84,6 +89,8 @@ public class ReferenceViewer extends AbstractViewer {
             addFeatureComponent(f);
             registerFeatureInStats(f);
         }
+
+        firePropertyChange(PROP_FEATURE_STATISTICS_CHANGED, null, featureStats);
     }
 
     private void registerFeatureInStats(PersistantFeature f){
@@ -211,7 +218,7 @@ public class ReferenceViewer extends AbstractViewer {
         infoPanel.setReference(this.refGen);
     }
 
-    public void showFeatureDetails(PersistantFeature f) {
+    private void showFeatureDetails(PersistantFeature f) {
         infoPanel.showFeatureDetails(f);
     }
 
@@ -222,6 +229,14 @@ public class ReferenceViewer extends AbstractViewer {
         } else {
             this.setToolTipText("");
         }
+    }
+
+    public Map<Integer, Integer> getFeatureStats() {
+        return featureStats;
+    }
+
+    public Feature getCurrentlySelectedFeature() {
+        return currentlySelectedFeature;
     }
 
 }

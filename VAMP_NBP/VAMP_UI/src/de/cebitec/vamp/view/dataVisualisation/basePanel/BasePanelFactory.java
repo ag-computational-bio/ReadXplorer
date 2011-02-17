@@ -15,6 +15,7 @@ import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceNavigator;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewerInfoPanel;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackInfoPanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackNavigatorPanel;
@@ -54,11 +55,11 @@ public class BasePanelFactory {
         viewController.addMousePositionListener((MousePositionListener) b);
 
         // create info panel
-        ReferenceViewerInfoPanel info = new ReferenceViewerInfoPanel();
+//        ReferenceViewerInfoPanel info = new ReferenceViewerInfoPanel();
 
         // create viewer
         ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGen);
-        genomeViewer.setGenomeViewerInfoPanel(info);
+//        genomeViewer.setGenomeViewerInfoPanel(info);
 
         // show a color legend
         genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend());
@@ -67,7 +68,7 @@ public class BasePanelFactory {
 //        AbstractInfoPanel navigator = new ReferenceNavigator(refGen, boundsManager, genomeViewer);
 
         // add panels to basepanel
-        b.setRightInfoPanel(info);
+//        b.setRightInfoPanel(info);
         b.setViewer(genomeViewer);
 //        b.setLeftInfoPanel(navigator);
         b.setAdjustmentPanel(this.createAdjustmentPanel(true, true));
@@ -91,8 +92,10 @@ public class BasePanelFactory {
         trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
         
         // create info panel
-        TrackInfoPanel info = new TrackInfoPanel();
-        trackV.setTrackInfoPanel(info);
+//        TrackInfoPanel info = new TrackInfoPanel();
+//        trackV.setTrackInfoPanel(info);
+        CoverageInfoLabel cil = new CoverageInfoLabel();
+        trackV.setTrackInfoPanel(cil);
 
         // create navi panel
 //        TrackNavigatorPanel navi = new TrackNavigatorPanel(tc, this, track, boundsManager);
@@ -101,7 +104,8 @@ public class BasePanelFactory {
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         // add panels to basepanel
-        b.setRightInfoPanel(info);
+        b.setTopInfoPanel(cil);
+//        b.setRightInfoPanel(info);
 //        b.setLeftInfoPanel(navi);
         b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));

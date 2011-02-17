@@ -2,6 +2,8 @@ package de.cebitec.vamp.ui.visualisation.track;
 
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
@@ -108,6 +110,15 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
             for (TrackViewer trackViewer : result.allInstances()) {
                 trackStatisticsPanel1.setTrackConnector(trackViewer.getTrackCon());
                 trackStatisticsPanel1.setTrackName(trackViewer.getName());
+
+                // XXX is not working
+                trackViewer.addPropertyChangeListener(TrackViewer.PROP_TRACK_ENTERED, new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        trackStatisticsPanel1.setName((String) evt.getNewValue());
+                    }
+                });
             }
         }
     }

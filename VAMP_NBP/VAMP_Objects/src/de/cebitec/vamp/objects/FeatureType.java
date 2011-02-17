@@ -1,4 +1,4 @@
-package de.cebitec.vamp.parser.reference.Filter;
+package de.cebitec.vamp.objects;
 
 import java.util.HashMap;
 

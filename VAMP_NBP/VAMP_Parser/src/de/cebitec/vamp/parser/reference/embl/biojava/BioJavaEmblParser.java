@@ -5,7 +5,7 @@ import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.reference.Filter.FeatureType;
+import de.cebitec.vamp.objects.FeatureType;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import java.io.BufferedReader;
 import java.io.FileReader;

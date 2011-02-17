@@ -4,6 +4,7 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private List<MousePositionListener> currentMousePosListeners;
     private JPanel centerPanel;
     private AdjustmentPanel adjustmentPanel;
+    private Component topPanel;
 
     public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
         super();
@@ -67,7 +69,6 @@ public class BasePanel extends JPanel implements MousePositionListener {
             this.remove(rightPanel);
             currentMousePosListeners.remove(rightPanel);
             rightPanel = null;
-
         }
 
         if(leftPanel != null){
@@ -99,6 +100,13 @@ public class BasePanel extends JPanel implements MousePositionListener {
     public void setAdjustmentPanel(AdjustmentPanel adjustmentPanel){
         this.adjustmentPanel = adjustmentPanel;
         centerPanel.add(adjustmentPanel, BorderLayout.NORTH);
+        this.updateSize();
+    }
+
+    public void setTopInfoPanel(MousePositionListener infoPanel){
+        this.topPanel = (Component) infoPanel;
+        centerPanel.add(topPanel, BorderLayout.NORTH);
+        currentMousePosListeners.add(infoPanel);
         this.updateSize();
     }
 

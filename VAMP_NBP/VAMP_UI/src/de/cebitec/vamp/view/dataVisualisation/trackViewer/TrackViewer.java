@@ -16,6 +16,8 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ import javax.swing.JPanel;
  * Display the coverage for a sequenced track related to a reference genome
  * @author ddoppmeier
  */
-public class TrackViewer extends AbstractViewer implements CoverageThreadListener{
+public class TrackViewer extends AbstractViewer implements CoverageThreadListener, MouseListener{
 
     private static final long serialVersionUID = 572406471;
 
@@ -37,7 +39,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     private boolean covLoaded;
     private boolean colorChanges;
     private static int height = 300;
-    private TrackInfoPanel trackInfo;
+    private CoverageInfoI trackInfo;
 
     private double scaleFactor;
     private int scaleLineStep;
@@ -50,6 +52,9 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     private GeneralPath zRv;
     private GeneralPath nFw;
     private GeneralPath nRv;
+
+    public static final String PROP_TRACK_CLICKED = "track clicked";
+    public static final String PROP_TRACK_ENTERED = "track entered";
 
 
     /**
@@ -225,8 +230,8 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public synchronized void receiveCoverage(PersistantCoverage coverage){
         this.cov = coverage;
-        trackInfo.setCoverage(cov, getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
-        trackInfo.setTrackViewer(this);
+        trackInfo.setCoverage(cov);
+//        trackInfo.setTrackViewer(this);
         this.createCoveragePaths();
         covLoaded = true;
         this.repaint();
@@ -241,7 +246,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             requestCoverage();
         } else {
             // coverage already loaded
-            trackInfo.setCoverage(cov, getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+            trackInfo.setCoverage(cov);
             this.createCoveragePaths();
             covLoaded = true;
         }
@@ -311,7 +316,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         return "<tr><td align=\"right\">"+label+":</td><td align=\"left\">"+String.valueOf(value)+"</td></tr>";
     }
 
-    public void setTrackInfoPanel(TrackInfoPanel info) {
+    public void setTrackInfoPanel(CoverageInfoI info) {
         this.trackInfo = info;
     }
 
@@ -432,6 +437,38 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     public TrackConnector getTrackCon() {
         return trackCon;
+    }
+
+    // why aren't those events fired???
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        firePropertyChange(PROP_TRACK_CLICKED, null, getName());
+        System.out.println("blub");
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        // do nothing
+        System.out.println("blub");
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        // do nothing
+        System.out.println("blub");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        firePropertyChange(PROP_TRACK_ENTERED, null, getName());
+        System.out.println("blub");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        // do nothing
+        System.out.println("blub");
     }
     
 }
