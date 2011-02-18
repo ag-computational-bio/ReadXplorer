@@ -2,8 +2,8 @@ package de.cebitec.vamp.ui.visualisation.track;
 
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
@@ -111,13 +111,24 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
                 trackStatisticsPanel1.setTrackConnector(trackViewer.getTrackCon());
                 trackStatisticsPanel1.setTrackName(trackViewer.getName());
 
-                // XXX is not working
-                trackViewer.addPropertyChangeListener(TrackViewer.PROP_TRACK_ENTERED, new PropertyChangeListener() {
+                trackViewer.addMouseListener(new MouseListener() {
 
                     @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        trackStatisticsPanel1.setName((String) evt.getNewValue());
+                    public void mouseClicked(MouseEvent e) {
+                        trackStatisticsPanel1.setTrackName(((TrackViewer) e.getSource()).getName());
                     }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {}
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {}
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {}
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {}
                 });
             }
         }
@@ -132,7 +143,7 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings
     }
 
     Object readProperties(java.util.Properties p) {
@@ -145,7 +156,7 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
 
     @Override

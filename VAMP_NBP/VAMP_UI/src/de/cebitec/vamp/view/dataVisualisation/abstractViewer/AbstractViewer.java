@@ -62,6 +62,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private JPanel legend;
     private boolean hasLegend;
 
+    public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
+    public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
+
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference){
         super();
         setLayout(null);
@@ -295,6 +298,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         currentLogMousePos = newPos;
         if(oldLogMousePos != currentLogMousePos){
             repaintMousePosition(oldLogMousePos, currentLogMousePos);
+            firePropertyChange(PROP_MOUSEPOSITION_CHANGED, oldLogMousePos, currentLogMousePos);
         }
 
         if(newPos >= this.getBoundsInfo().getLogLeft() && newPos <= this.getBoundsInfo().getLogRight()){
@@ -372,6 +376,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         if(!printMouseOver){
             currentLogMousePos = 0;
         }
+        firePropertyChange(PROP_MOUSEOVER_REQUESTED, null, requested);
     }
 
     /**

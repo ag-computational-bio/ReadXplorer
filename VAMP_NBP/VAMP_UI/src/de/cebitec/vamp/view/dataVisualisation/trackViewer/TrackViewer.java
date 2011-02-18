@@ -16,8 +16,6 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.HashMap;
@@ -30,7 +28,7 @@ import javax.swing.JPanel;
  * Display the coverage for a sequenced track related to a reference genome
  * @author ddoppmeier
  */
-public class TrackViewer extends AbstractViewer implements CoverageThreadListener, MouseListener{
+public class TrackViewer extends AbstractViewer implements CoverageThreadListener{
 
     private static final long serialVersionUID = 572406471;
 
@@ -437,38 +435,6 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     public TrackConnector getTrackCon() {
         return trackCon;
-    }
-
-    // why aren't those events fired???
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        firePropertyChange(PROP_TRACK_CLICKED, null, getName());
-        System.out.println("blub");
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        // do nothing
-        System.out.println("blub");
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        // do nothing
-        System.out.println("blub");
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        firePropertyChange(PROP_TRACK_ENTERED, null, getName());
-        System.out.println("blub");
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        // do nothing
-        System.out.println("blub");
     }
     
 }

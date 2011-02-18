@@ -29,7 +29,7 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
 
     private static ReferenceIntervalTopComponent instance;
     private Result<ReferenceViewer> result;
-    private boolean showCurrentPosition;
+    private boolean showCurrentPosition = true;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "ReferenceIntervalTopComponent";
@@ -217,7 +217,7 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
             BoundsInfo boundsInfo = referenceViewer.getBoundsInfo();
             setIntervall(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
 
-            // register listener so every change occurs
+            // register listeners so every change occurs
             referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_STATISTICS_CHANGED, new PropertyChangeListener() {
 
                 @Override
@@ -229,6 +229,20 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
                     // update intervall
                     BoundsInfo boundsInfo = ((ReferenceViewer) evt.getSource()).getBoundsInfo();
                     setIntervall(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
+                }
+            });
+            referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_MOUSEPOSITION_CHANGED, new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    setCurrentMousePosition((Integer) evt.getNewValue());
+                }
+            });
+            referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_MOUSEOVER_REQUESTED, new PropertyChangeListener() {
+
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    setMouseOverPaintingRequested((Boolean) evt.getNewValue());
                 }
             });
         }
