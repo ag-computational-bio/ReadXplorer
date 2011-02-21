@@ -133,7 +133,8 @@ public class ProjectConnector {
             this.setupDatabase();
         } else {
             this.adapter = adapter;
-            this.url = "jdbc:" + adapter + ":" + database+";MULTI_THREADED=1";
+            this.url = "jdbc:" + adapter + ":" + database+";FILE_LOCK=SERIALIZED;MULTI_THREADED=1";
+
             this.connectH2DataBase(url);
             this.setupDatabaseH2();
 
@@ -1174,6 +1175,15 @@ public class ProjectConnector {
             trackConnectors.put(trackID, new TrackConnector(trackID));
         }
         return trackConnectors.get(trackID);
+    }
+
+        public TrackConnector getTrackConnector(long trackID,long trackID2) {
+        // only return new object, if no suitable connector was created before
+            trackConnectors.put(trackID+trackID2+100, new TrackConnector(trackID,trackID2));
+        if (!trackConnectors.containsKey(trackID)) {
+            
+        }
+        return trackConnectors.get(trackID+trackID2+100);
     }
 
     public Connection getConnection() {

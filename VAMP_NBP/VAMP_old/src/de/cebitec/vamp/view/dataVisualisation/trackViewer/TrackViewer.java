@@ -35,6 +35,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     private TrackConnector trackCon;
     private PersistantCoverage cov;
     private boolean covLoaded;
+    private boolean twoTracks;
     private boolean colorChanges;
     private static int height = 300;
     private TrackInfoPanel trackInfo;
@@ -73,7 +74,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     }
 
     @Override
-    public void paintComponent(Graphics graphics){
+    public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
 
@@ -81,36 +82,69 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         Map<Object, Object> hints = new HashMap<Object, Object>();
         hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHints(hints);
+        
+        if (covLoaded || colorChanges ) {
+            if (!twoTracks) {
+              
+                // fill and draw all coverage pathes
+                Color bmC = ColorProperties.BEST_MATCH;
+                Color zC = ColorProperties.PERFECT_MATCH;
+                Color nC = ColorProperties.N_ERROR_COLOR;
 
-        if(covLoaded || colorChanges){
-            // fill and draw all coverage pathes
-            Color bmC = ColorProperties.BEST_MATCH;
-            Color zC = ColorProperties.PERFECT_MATCH;
-            Color nC = ColorProperties.N_ERROR_COLOR;
+                // n error mappings
+                g.setColor(nC);
+                g.fill(nFw);
+                g.draw(nFw);
+                g.fill(nRv);
+                g.draw(nRv);
 
-            // n error mappings
-            g.setColor(nC);
-            g.fill(nFw);
-            g.draw(nFw);
-            g.fill(nRv);
-            g.draw(nRv);
+                // best match mappings
+                g.setColor(bmC);
+                g.fill(bmFw);
+                g.draw(bmFw);
+                g.fill(bmRv);
+                g.draw(bmRv);
 
-            // best match mappings
-            g.setColor(bmC);
-            g.fill(bmFw);
-            g.draw(bmFw);
-            g.fill(bmRv);
-            g.draw(bmRv);
+                // zero error mappings
+                g.setColor(zC);
+                g.fill(zFw);
+                g.draw(zFw);
+                g.fill(zRv);
+                g.draw(zRv);
+            } else {
+                // fill and draw all coverage pathes
+                
+                Color complete = Color.BLUE;
+                
+                //Orange
+                Color track1 =  new Color(255,117,48);
+                Color track2 = Color.cyan;
 
-            // zero error mappings
-            g.setColor(zC);
-            g.fill(zFw);
-            g.draw(zFw);
-            g.fill(zRv);
-            g.draw(zRv);
+                // n error mappings
+                g.setColor(track1);
+                g.fill(nFw);
+                g.draw(nFw);
+                g.fill(nRv);
+                g.draw(nRv);
+
+                // best match mappings
+                g.setColor(track2);
+                g.fill(bmFw);
+                g.draw(bmFw);
+                g.fill(bmRv);
+                g.draw(bmRv);
+
+                // zero error mappings
+                g.setColor(complete);
+                g.fill(zFw);
+                g.draw(zFw);
+                g.fill(zRv);
+                g.draw(zRv);
+            
+            }
 
         } else {
-            g.fillRect(0, 0, this.getWidth()-1, this.getHeight()-1);
+            g.fillRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
         }
 
         // draw scales
@@ -130,8 +164,9 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     private int getCoverageValue(boolean isForwardStrand, int covType, int absPos){
         int value = 0;
-
-        if(isForwardStrand){
+        twoTracks = cov.isTwoTracks();
+       
+        if(isForwardStrand && !twoTracks){
             if(covType == PersistantCoverage.PERFECT){
                 value = cov.getzFwMult(absPos);
             } else if(covType == PersistantCoverage.BM){
@@ -141,7 +176,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
             }
-        } else {
+        } else if(!isForwardStrand && !twoTracks) {
             if(covType == PersistantCoverage.PERFECT){
                 value = cov.getzRvMult(absPos);
             } else if(covType == PersistantCoverage.BM){
@@ -153,8 +188,32 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             }
         }
 
+        else if (isForwardStrand && twoTracks) {
+            if(covType == PersistantCoverage.DIFF){
+                value = cov.getnFwMult(absPos);
+            } else if(covType == PersistantCoverage.TRACK2){
+                value = cov.getNFwMultTrack2(absPos);
+            } else if(covType == PersistantCoverage.TRACK1){
+                value = cov.getNFwMultTrack1(absPos);
+            } else {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
+            }
+        } else {
+            if(covType == PersistantCoverage.DIFF){
+                value = cov.getnRvMult(absPos);
+            } else if(covType == PersistantCoverage.TRACK2){
+                value = cov.getNRvMultTrack2(absPos);
+            } else if(covType == PersistantCoverage.TRACK1){
+                value = cov.getNRvMultTrack1(absPos);
+            } else {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
+            }
+        }
+
         return value;
     }
+
+
     /**
      * Create a GeneralPath that represents the coverage
      * @param orientation if -1, coverage is drawn from buttom to top, if 1 otherwise
@@ -227,7 +286,11 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         this.cov = coverage;
         trackInfo.setCoverage(cov, getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
         trackInfo.setTrackViewer(this);
+        if(cov.isTwoTracks()){
+        this.createCoveragePathsDiffOfTwoTracks();
+        }else{
         this.createCoveragePaths();
+        }
         covLoaded = true;
         this.repaint();
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -235,20 +298,24 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     @Override
     public void boundsChangedHook() {
-        if(cov == null){
+        if (cov == null) {
             requestCoverage();
-        } else if(!cov.coversBounds(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight())){
+        } else if (!cov.coversBounds(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight())) {
             requestCoverage();
         } else {
             // coverage already loaded
             trackInfo.setCoverage(cov, getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
-            this.createCoveragePaths();
+            if (cov.isTwoTracks()) {
+                this.createCoveragePathsDiffOfTwoTracks();
+            } else {
+                this.createCoveragePaths();
+            }
             covLoaded = true;
         }
 
         computeScaleStep();
 
-        if(this.hasLegend()){
+        if (this.hasLegend()) {
             LegendLabel label = this.getLegendLabel();
             this.add(label);
 
@@ -265,6 +332,14 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         nFw = getCoveragePath(true, PersistantCoverage.NERROR);
         nRv = getCoveragePath(false, PersistantCoverage.NERROR);
     }
+    private void createCoveragePathsDiffOfTwoTracks(){
+        nFw = getCoveragePath(true, PersistantCoverage.TRACK1);
+        nRv = getCoveragePath(false, PersistantCoverage.TRACK1);
+        bmFw = getCoveragePath(true, PersistantCoverage.TRACK2);
+        bmRv = getCoveragePath(false, PersistantCoverage.TRACK2);
+        zFw = getCoveragePath(true, PersistantCoverage.DIFF);
+        zRv = getCoveragePath(false, PersistantCoverage.DIFF);
+    }
 
     @Override
     public int getMaximalHeight() {
@@ -274,6 +349,47 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public void changeToolTipText(int logPos) {
         if(covLoaded){
+        twoTracks = cov.isTwoTracks();
+        }
+        if(covLoaded && twoTracks){
+
+            int nFwVal = cov.getnFwMult(logPos);
+            int nRvVal = cov.getnRvMult(logPos);
+            //track 1 info
+            int nFwValTrack1 = cov.getNFwMultTrack1(logPos);
+            int nRvValTrack1 = cov.getNRvMultTrack1(logPos);
+            //track 2 info
+            int nFwValTrack2 = cov.getNFwMultTrack2(logPos);
+            int nRvValTrack2 = cov.getNRvMultTrack2(logPos);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("<html>");
+            sb.append("<b>Position</b>: ").append(logPos);
+            sb.append("<br>");
+            sb.append("<table>");
+            sb.append("<tr><td align=\"left\"><b>Difference(Blue):</b></td></tr>");
+            sb.append(createTableRow("Forward cov.", nFwVal));
+             sb.append(createTableRow("Reverse cov.", nRvVal));
+            sb.append("</table>");
+
+            sb.append("<table>");
+            sb.append("<tr><td align=\"left\"><b>Track 1(Orange):</b></td></tr>");
+
+            sb.append(createTableRow("Forward cov.", nFwValTrack1));
+            sb.append(createTableRow("Reverse cov.", nRvValTrack1));
+            sb.append("</table>");
+
+            sb.append("<table>");
+            sb.append("<tr><td align=\"left\"><b>Track 2(Cyan):</b></td></tr>");
+
+            sb.append(createTableRow("Forward cov.", nFwValTrack2));
+            sb.append(createTableRow("Reverse cov.", nRvValTrack2));
+            sb.append("</table>");
+            sb.append("</html>");
+
+            this.setToolTipText(sb.toString());
+
+        } else if(covLoaded && !twoTracks){
 
             int zFwVal = cov.getzFwMult(logPos);
             int zRvVal = cov.getzRvMult(logPos);
@@ -426,7 +542,6 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     public void colorChanges() {
         colorChanges = true;
-       
         repaint();
     }
     

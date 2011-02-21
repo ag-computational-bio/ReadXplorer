@@ -57,6 +57,22 @@ public class FieldNames {
     public final static String COVERAGE_N_RV_MULT =     "COMPLETE_REVERSE_REDUNDANT";
     public final static String COVERAGE_N_RV_NUM =      "COMPLETE_REVERSE_NON_REDUNDANT";
 
+    public final static String COVERAGE_N_FW_MULT_TRACK_1 =     "COMPLETE_FORWARD_REDUNDANT_TRACK_1";
+    public final static String COVERAGE_N_FW_NUM_TRACK_1 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_1";
+    public final static String COVERAGE_N_RV_MULT_TRACK_1 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_1";
+    public final static String COVERAGE_N_RV_NUM_TRACK_1 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_1";
+
+    public final static String COVERAGE_N_FW_MULT_TRACK_2 =     "COMPLETE_FORWARD_REDUNDANT_TRACK_2";
+    public final static String COVERAGE_N_FW_NUM_TRACK_2 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_2";
+    public final static String COVERAGE_N_RV_MULT_TRACK_2 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_2";
+    public final static String COVERAGE_N_RV_NUM_TRACK_2 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_2";
+    public final static String COVERAGE_N_MULT=     "COMPLETE_REDUNDANT_TRACK";
+    public final static String COVERAGE_N_FW_MULT_TRACK_DIFF =     "COMPLETE_FORWARD_REDUNDANT_TRACK_DIFF";
+    public final static String COVERAGE_N_FW_NUM_TRACK_DIFF =      "COMPLETE_FORWARD_NON_REDUNDANT_DIFF";
+    public final static String COVERAGE_N_RV_MULT_TRACK_DIFF =     "COMPLETE_REVERSE_REDUNDANT__DIFF";
+    public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
+
+    
     // feature table fields
     public final static String FEATURE_ID = "ID";
     public final static String FEATURE_REFGEN = "REFERENCE_ID";

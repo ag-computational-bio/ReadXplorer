@@ -4,7 +4,11 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.Diff;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,10 +20,19 @@ public class OpenTrackDialog extends javax.swing.JDialog {
     private PersistantTrack selectedTrack;
     private ReferenceConnector refGenConnector;
     private boolean trackWasSelected;
+    private TrackOptionsPanel op ;
+    //private Diff diff = null;
 
     /** Creates new form OpenTrackDialog */
     public OpenTrackDialog(java.awt.Frame parent, boolean modal, PersistantReference refGen) {
         super(parent, modal);
+        refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
+        initComponents();
+        trackWasSelected = false;
+    }
+
+        public OpenTrackDialog(TrackOptionsPanel op, PersistantReference refGen) {
+        this.op= op;
         refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
         initComponents();
         trackWasSelected = false;
@@ -96,6 +109,10 @@ public class OpenTrackDialog extends javax.swing.JDialog {
         this.setVisible(false);
         if(selectedTrack != null){
             trackWasSelected = true;
+        }
+        if(op!= null){
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "OPen"+ selectedTrack);
+            op.secondTrackSelected();
         }
     }//GEN-LAST:event_openButtonActionPerformed
 

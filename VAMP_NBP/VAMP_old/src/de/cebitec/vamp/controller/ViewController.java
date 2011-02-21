@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.windows.WindowManager;
 
 /**
@@ -140,7 +142,7 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
             PersistantTrack t = d.getSelectedTrack();
 
             // create basepanel 
-            BasePanel tp = basePanelFac.getTrackBasePanel(t);
+            BasePanel tp = basePanelFac.getTrackBasePanel(t,currentRefGen);
 
             // create a menuItem to close this track
             TrackItem trackItem = new TrackItem(t);
@@ -150,6 +152,32 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
             // show the panel and the track
             getApp().showTrackPanel(tp, trackItem);
         }
+
+    }
+
+
+
+    public void openTrack2(BasePanel tp,PersistantTrack t,PersistantTrack t2) {
+
+        PersistantTrack newTrack = new PersistantTrack((t.getId()+t2.getId())+100, (t.getDescription()+"-"+t2.getDescription()), t.getTimestamp(),t.getRefGenID(),t.getRunID()+t2.getRunID());
+      // OpenTrackDialog d = new OpenTrackDialog(WindowManager.getDefault().getMainWindow(), true, currentRefGen);
+    //    d.setVisible(true);
+
+      //  if(d.wasTrackSelected()){
+        //    PersistantTrack t = d.getSelectedTrack();
+
+            // create basepanel
+          //  BasePanel tp = basePanelFac.getTrackBasePanel2(t,currentRefGen);
+          Logger.getLogger(this.getClass().getName()).log(Level.INFO, "2trackid" + newTrack.getId());
+            // create a menuItem to close this track
+            TrackItem trackItem = new TrackItem(newTrack);
+            trackToItem.put(newTrack, trackItem);
+            trackToPanel.put(newTrack, tp);
+
+            // show the panel and the track
+            getApp().showTrackPanel(tp, trackItem);
+    //    }
+
     }
 
     public void closeTrack(PersistantTrack track) {

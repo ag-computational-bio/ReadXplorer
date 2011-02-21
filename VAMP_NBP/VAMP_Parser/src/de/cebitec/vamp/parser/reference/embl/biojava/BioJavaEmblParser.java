@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
@@ -61,14 +62,14 @@ public class BioJavaEmblParser implements ReferenceParserI {
 
             // take only the first sequence from file, if exists
             if(it.hasNext()){
-
+                
                 RichSequence s = it.nextRichSequence();
 
                 refGenome.setDescription(refGenJob.getDescription());
                 refGenome.setName(refGenJob.getName());
                 refGenome.setTimestamp(refGenJob.getTimestamp());
                 refGenome.setSequence(s.seqString());
-
+                
                 // iterate through all features
                 Iterator<Feature> featIt = s.getFeatureSet().iterator();
                 while(featIt.hasNext()){
@@ -86,7 +87,22 @@ public class BioJavaEmblParser implements ReferenceParserI {
                     parsedType = f.getType();
                     start = f.getLocation().getMin();
                     stop = f.getLocation().getMax();
-
+                    Iterator i = f.getLocation().blockIterator();
+                    while(i.hasNext()){
+                      
+                      String pos  = i.next().toString();
+                      /*for eukaryotic organism its important to see the single cds
+                      for looking for introns
+                      if we choose min and max we get the first pos of the first cds
+                       of one gen and the last position of the last cds and we cant
+                       see exon intron structure*/
+                      if(pos.contains("..")){
+                      String[]p = pos.split("\\..");
+                      start = Integer.parseInt(p[0]);
+                      stop = Integer.parseInt(p[1]);
+                      
+                        }
+                    
                     if(RichLocation.Tools.enrich(f.getLocation()).getStrand().toString().equals("-")){
                         strand = -1;
                     } else if (RichLocation.Tools.enrich(f.getLocation()).getStrand().toString().equals("+")){
@@ -99,10 +115,12 @@ public class BioJavaEmblParser implements ReferenceParserI {
                         Note n = iter.next();
                         String name = n.getTerm().getName();
                         String value = n.getValue();
-
+                         
                         if(name.equals("locus_tag")){
                             locusTag = value;
                         } else if(name.equalsIgnoreCase("locus")){
+                          locusTag = value;
+                        } else if(name.equalsIgnoreCase("name")){
                           locusTag = value;
                         } else if(name.equals("product")){
                             product = value;
@@ -142,6 +160,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
 
                     refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber));
 
+                }
                 }
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
             } else {
