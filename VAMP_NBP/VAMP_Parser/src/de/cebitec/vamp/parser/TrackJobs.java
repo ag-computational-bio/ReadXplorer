@@ -8,7 +8,7 @@ import java.sql.Timestamp;
  *
  * @author jstraube
  */
-public class TrackJobs {
+public class TrackJobs implements Job{
 
     private File file;
     private String description;
@@ -30,6 +30,7 @@ public class TrackJobs {
         return parser;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
@@ -37,6 +38,7 @@ public class TrackJobs {
         public ReferenceJob getRefGen() {
         return refGen;
     }
+    @Override
     public File getFile() {
         return file;
     }
@@ -45,12 +47,19 @@ public class TrackJobs {
         this.refGen = refGen;
     }
 
+    @Override
     public Timestamp getTimestamp(){
         return timestamp;
     }
 
+    @Override
     public Long getID(){
         return trackID;
+    }
+
+    @Override
+    public String getName() {
+        return getDescription();
     }
 
     @Override

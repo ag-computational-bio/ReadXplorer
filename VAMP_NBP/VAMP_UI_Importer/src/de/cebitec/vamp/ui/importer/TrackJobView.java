@@ -15,43 +15,49 @@ import javax.swing.table.DefaultTableModel;
 public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener{
 
     private List<TrackJobs> tracks;
-    private ImportSetupCard parent;
     public final static long serialVersionUID = 774292377;
+    private boolean hasJobs;
 
     /** Creates new form TaskViewerTemplate */
     public TrackJobView() {
-        this.init();
-    }
-
-    public TrackJobView(ImportSetupCard parent){
-        this.parent = parent;
-        this.init();
-    }
-
-    public TrackJobs getSelectedItem() {
-        return tracks.get(jTable1.getSelectedRow());
-    }
-
-    private void init(){
         tracks = new ArrayList<TrackJobs>();
         initComponents();
     }
 
+    public TrackJobs getSelectedItem() {
+        return tracks.get(trackTable.getSelectedRow());
+    }
+
     public void add(TrackJobs trackJob){
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) trackTable.getModel();
         model.addRow(new Object[]{
             trackJob.getFile().getName(),
             trackJob.getDescription(),
+            "do not know",
             trackJob.getRefGen().getDescription()});
         tracks.add(trackJob);
+
+        if (!hasJobs){
+            hasJobs = true;
+            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
+        }
     }
 
     public void remove(TrackJobs trackJob){
         int index = tracks.indexOf(trackJob);
         tracks.remove(trackJob);
 
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) trackTable.getModel();
         model.removeRow(index);
+
+        if (tracks.isEmpty()){
+            hasJobs = false;
+            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
+        }
+    }
+
+    public List<TrackJobs> getJobs(){
+        return tracks;
     }
 
     /** This method is called from within the constructor to
@@ -64,12 +70,12 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTable1.getSelectionModel().addListSelectionListener(this);
+        trackTable = new javax.swing.JTable();
+        trackTable.getSelectionModel().addListSelectionListener(this);
 
         setPreferredSize(new java.awt.Dimension(400, 300));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        trackTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -92,8 +98,12 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setFillsViewportHeight(true);
-        jScrollPane1.setViewportView(jTable1);
+        trackTable.setFillsViewportHeight(true);
+        jScrollPane1.setViewportView(trackTable);
+        trackTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.file")); // NOI18N
+        trackTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.description")); // NOI18N
+        trackTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.run")); // NOI18N
+        trackTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.reference")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -110,21 +120,21 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable trackTable;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         ListSelectionModel model = (ListSelectionModel) e.getSource();
         if(model.isSelectionEmpty()){
-            parent.setRemoveButtonEnabled(false);
+            firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.FALSE);
         } else {
-            parent.setRemoveButtonEnabled(true);
+            firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.TRUE);
         }
     }
 
     public boolean IsRowSelected(){
-        ListSelectionModel model = jTable1.getSelectionModel();
+        ListSelectionModel model = trackTable.getSelectionModel();
         return !model.isSelectionEmpty();
     }
 

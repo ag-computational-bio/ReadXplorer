@@ -1,6 +1,11 @@
+/*
+ * NewReferenceDialogPanel.java
+ *
+ * Created on 12.01.2011, 12:14:37
+ */
+
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.importer.JobManagerI;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import de.cebitec.vamp.parser.reference.embl.biojava.BioJavaEmblParser;
@@ -15,28 +20,49 @@ import java.util.prefs.Preferences;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
- * @author ddoppmeier
+ * @author jwinneba
  */
-public class NewReferenceDialog extends javax.swing.JDialog {
-
+public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJobDialog {
+    
     private static final long serialVersionUID = 8362375;
     private File refGenFile = null;
-    private JobManagerI taskManager;
     private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaEmblParser(), new BioJavaGenBankParser(), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
-    /** Creates new form NewReferenceGenomeDialog */
-    public NewReferenceDialog(java.awt.Frame parent, JobManagerI taskmanager) {
-        super(parent, false);
+    /** Creates new form NewReferenceDialogPanel */
+    public NewReferenceDialogPanel() {
         initComponents();
-        this.taskManager = taskmanager;
-       // setPreferences(refGenFile);
         currentParser = availableParsers[0];
+    }
+
+    @Override
+    public boolean isRequiredInfoSet(){
+        if (refGenFile == null || nameField.getText().isEmpty() || descriptionField.getText().isEmpty()){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    public File getReferenceFile(){
+        return refGenFile;
+    }
+
+    public ReferenceParserI getParser(){
+        return currentParser;
+    }
+
+    public String getDescription(){
+        return descriptionField.getText();
+    }
+
+    public String getReferenceName(){
+        return nameField.getText();
     }
 
     /** This method is called from within the constructor to
@@ -53,16 +79,10 @@ public class NewReferenceDialog extends javax.swing.JDialog {
         fileLabel = new javax.swing.JLabel();
         fileField = new javax.swing.JTextField();
         fileChooserButton = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JSeparator();
-        addRefGenButton = new javax.swing.JButton();
         descriptionLabel = new javax.swing.JLabel();
         descriptionField = new javax.swing.JTextField();
         nameLabel = new javax.swing.JLabel();
         nameField = new javax.swing.JTextField();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Add reference");
-        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         filetypeBox.setRenderer(new DefaultListCellRenderer(){
             @Override
@@ -81,55 +101,44 @@ public class NewReferenceDialog extends javax.swing.JDialog {
             }
         });
 
-        filetypeLabel.setText("Filetype:");
+        filetypeLabel.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.filetypeLabel.text")); // NOI18N
 
-        fileLabel.setText("File:");
+        fileLabel.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileLabel.text")); // NOI18N
 
         fileField.setEditable(false);
-        fileField.setText("no file chosen");
+        fileField.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileField.text")); // NOI18N
 
-        fileChooserButton.setText("Open");
+        fileChooserButton.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileChooserButton.text")); // NOI18N
         fileChooserButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fileChooserButtonActionPerformed(evt);
             }
         });
 
-        addRefGenButton.setText("OK");
-        addRefGenButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addRefGenButtonActionPerformed(evt);
-            }
-        });
+        descriptionLabel.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.descriptionLabel.text")); // NOI18N
 
-        descriptionLabel.setText("Description:");
+        nameLabel.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.nameLabel.text")); // NOI18N
 
-        nameLabel.setText("Name:");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(filetypeLabel)
+                    .addComponent(fileLabel)
+                    .addComponent(descriptionLabel)
+                    .addComponent(nameLabel))
+                .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(filetypeLabel)
-                            .addComponent(fileLabel)
-                            .addComponent(descriptionLabel)
-                            .addComponent(nameLabel))
-                        .addGap(12, 12, 12)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(fileField, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-                                .addGap(22, 22, 22)
-                                .addComponent(fileChooserButton))
-                            .addComponent(filetypeBox, 0, 260, Short.MAX_VALUE)
-                            .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
-                            .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)))
-                    .addComponent(addRefGenButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(fileField, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
+                        .addGap(22, 22, 22)
+                        .addComponent(fileChooserButton))
+                    .addComponent(filetypeBox, 0, 274, Short.MAX_VALUE)
+                    .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -152,36 +161,28 @@ public class NewReferenceDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(descriptionLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(addRefGenButton)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-374)/2, (screenSize.height-226)/2, 374, 226);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void addRefGenButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRefGenButtonActionPerformed
-        String description = descriptionField.getText();
-        String name = nameField.getText();
-
-        if (refGenFile == null || name.isEmpty() || description.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill out the complete form!", "Missing information", JOptionPane.ERROR_MESSAGE);
-        } else {
-            this.setVisible(false);
-            taskManager.createRefGenTask(currentParser, refGenFile, description, name);
+    private void filetypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filetypeBoxActionPerformed
+        ReferenceParserI newparser = (ReferenceParserI) filetypeBox.getSelectedItem();
+        if (currentParser != newparser) {
+            currentParser = newparser;
+            refGenFile = null;
+            nameField.setText("");
+            fileField.setText("");
+            descriptionField.setText("");
         }
-    }//GEN-LAST:event_addRefGenButtonActionPerformed
+}//GEN-LAST:event_filetypeBoxActionPerformed
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialog.class);
+        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
         String path = prefs2.get("RefGenome.Filepath", null);
         if(path!=null){
-        fc.setCurrentDirectory(new File(path));
+            fc.setCurrentDirectory(new File(path));
         }
         int result = fc.showOpenDialog(this);
 
@@ -193,33 +194,22 @@ public class NewReferenceDialog extends javax.swing.JDialog {
 
             if (file.canRead()) {
                 refGenFile = file;
-                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialog.class);
+                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
                 prefs.put("RefGenome.Filepath", refGenFile.getAbsolutePath());
                 fileField.setText(refGenFile.getAbsolutePath());
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex) {
-                    Logger.getLogger(NewReferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NewReferenceDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                System.err.print("NewReferenceDialog couldnt read file");
+                System.err.print("NewReferenceDialog couldnt read file"); // TODO get rid of System.err.print
             }
         }
-    }//GEN-LAST:event_fileChooserButtonActionPerformed
+}//GEN-LAST:event_fileChooserButtonActionPerformed
 
-    private void filetypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filetypeBoxActionPerformed
-        ReferenceParserI newparser = (ReferenceParserI) filetypeBox.getSelectedItem();
-        if (currentParser != newparser) {
-            currentParser = newparser;
-            refGenFile = null;
-            nameField.setText("");
-            fileField.setText("");
-            descriptionField.setText("");
-        }
-    }//GEN-LAST:event_filetypeBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addRefGenButton;
     private javax.swing.JTextField descriptionField;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JButton fileChooserButton;
@@ -227,8 +217,8 @@ public class NewReferenceDialog extends javax.swing.JDialog {
     private javax.swing.JLabel fileLabel;
     private javax.swing.JComboBox filetypeBox;
     private javax.swing.JLabel filetypeLabel;
-    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     // End of variables declaration//GEN-END:variables
+
 }

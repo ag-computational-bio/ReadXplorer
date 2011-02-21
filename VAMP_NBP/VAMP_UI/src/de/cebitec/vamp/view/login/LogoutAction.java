@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 public final class LogoutAction implements ActionListener {
@@ -21,7 +22,7 @@ public final class LogoutAction implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ev) {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message("<html>VAMP is performing a non-interruptible task on the database.</br>You may not logout until it has finished.</html>", NotifyDescriptor.WARNING_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LogoutAction.class, "MSG_LogoutAction.warning.busy"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             return;
         }

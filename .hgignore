@@ -1,4 +1,5 @@
 /build$
+/dist$
 /private/private.xml$
 /nbproject/private/
 \.orig$

@@ -3,11 +3,11 @@
 <filesystem>
     <folder name="Actions">
         <folder name="Visualisation">
-            <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.instance">
+            <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRefGenAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseRegGenAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/dna24c.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.CloseRegGenAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseRefGenAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/refClose.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.CloseRefGenAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
@@ -16,7 +16,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_CloseTrackAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/24trackclo.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/trackClose.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.CloseTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -26,7 +26,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenRefGenDialogAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/dna.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/refOpen.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.OpenRefGenDialogAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -36,7 +36,7 @@
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenTrackAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/view/track.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/visualisation/trackOpen.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.vamp.ui.visualisation.actions.OpenTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -53,7 +53,7 @@
                 <attr name="position" intvalue="300"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseRefGenAction.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction-separatorAfter.instance">
@@ -78,7 +78,7 @@
         <folder name="Visualisation">
             <attr name="position" intvalue="150"/>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseRefGenAction.instance"/>
                 <attr name="position" intvalue="350"/>
             </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction.shadow">

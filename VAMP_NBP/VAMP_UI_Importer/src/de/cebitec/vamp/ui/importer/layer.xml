@@ -3,15 +3,15 @@
 <filesystem>
     <folder name="Actions">
         <folder name="File">
-            <file name="de-cebitec-vamp-ui-importer-actions-ImportDialogAction.instance">
+            <file name="de-cebitec-vamp-ui-importer-actions-ImportWizardAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.importer.actions.Bundle#CTL_ImportDialogAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/importer/import24.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.vamp.ui.importer.actions.ImportDialogAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.importer.actions.Bundle#CTL_ImportWizardAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/ui/importer/import.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.ui.importer.actions.ImportWizardAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.ui.importer.LoginCookie"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.controller.ViewController"/>
             </file>
         </folder>
     </folder>
@@ -22,7 +22,7 @@
                 <attr name="position" intvalue="1475"/>
             </file>
             <file name="de-cebitec-vamp-ui-importer-actions-ImportDialogAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-ui-importer-actions-ImportDialogAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-ui-importer-actions-ImportWizardAction.instance"/>
                 <attr name="position" intvalue="1450"/>
             </file>
         </folder>
@@ -31,7 +31,7 @@
         <folder name="Management">
             <attr name="position" intvalue="400"/>
             <file name="de-cebitec-vamp-ui-importer-actions-ImportDialogAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-ui-importer-actions-ImportDialogAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-vamp-ui-importer-actions-ImportWizardAction.instance"/>
                 <attr name="position" intvalue="0"/>
             </file>
         </folder>

@@ -1,71 +1,61 @@
-package de.cebitec.vamp.view.login;
+package de.cebitec.vamp.ui.dataAdministration.actions;
 
+import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardSelectionPanel;
+import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardOverviewPanel;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.ui.dataAdministration.DeletionThread;
 import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
+import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
-import java.util.Map;
+import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.windows.WindowManager;
+import org.openide.util.RequestProcessor;
 
-// An example action demonstrating how the wizard could be called from within
-// your code. You can copy-paste the code below wherever you need.
-public final class LoginWizardAction implements ActionListener{
+public final class DataAdminWizardAction implements ActionListener {
 
-    private static final long serialVersionUID = 1L;
-
+    private final ViewController context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        CentralLookup cl = CentralLookup.getDefault();
-        // check if user is already logged in
-        Boolean loggedIn = cl.lookup(ViewController.class) != null ? Boolean.TRUE : Boolean.FALSE;
+    public static final String PROP_REFS2DEL = "refdel";
+    public static final String PROP_TRACK2DEL = "trackdel";
 
-        if (loggedIn){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
+    public DataAdminWizardAction(ViewController context) {
+        this.context = context;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void actionPerformed(ActionEvent ev) {
+        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(DataAdminWizardAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
-            // TODO find a way to do an automatic logout below
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please log out first.", NotifyDescriptor.WARNING_MESSAGE));
             return;
         }
-
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(LoginWizardAction.class, "TTL_LoginWizardAction"));
+        wizardDescriptor.setTitle(NbBundle.getMessage(DataAdminWizardAction.class, "TTL_DataAdminWizardAction.title"));
         Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
         dialog.setVisible(true);
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            // log out before logging into another database
-//            if (loggedIn){
-//                LogoutAction logoutAction = Utilities.actionsGlobalContext().lookup(LogoutAction.class);
-//                LogoutAction logoutAction = Lookups.forPath("Actions/File/").lookup(LogoutAction.class);
-//                logoutAction.actionPerformed(null);
-//            }
-            
-            Map<String, Object> loginProps = wizardDescriptor.getProperties();
-            try {
-                ProjectConnector.getInstance().connect((String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), (String) loginProps.get(LoginWizardPanel.PROP_HOST), (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), (String) loginProps.get(LoginWizardPanel.PROP_USER), (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
-                // TODO get rid of ViewController
-                ViewController con = ViewController.getInstance();
-                cl.add(con);
-                WindowManager.getDefault().findTopComponent("AppPanelTopComponent").open();
-            } catch (SQLException ex) {
-                Exceptions.printStackTrace(ex);
-            }
+            List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
+            List<TrackJobs> tracks2del = (List<TrackJobs>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
+
+            DeletionThread dt = new DeletionThread(refs2del, tracks2del);
+            RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
+            rp.post(dt);
         }
     }
 
@@ -77,7 +67,8 @@ public final class LoginWizardAction implements ActionListener{
     private WizardDescriptor.Panel<WizardDescriptor>[] getPanels() {
         if (panels == null) {
             panels = new WizardDescriptor.Panel[]{
-                        new LoginWizardPanel()
+                        new DataAdminWizardSelectionPanel(),
+                        new DataAdminWizardOverviewPanel()
                     };
             String[] steps = new String[panels.length];
             for (int i = 0; i < panels.length; i++) {
@@ -95,7 +86,7 @@ public final class LoginWizardAction implements ActionListener{
                     // Turn on subtitle creation on each step
                     jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, Boolean.TRUE);
                     // Show steps on the left side with the image on the background
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.FALSE);
+                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.TRUE);
                     // Turn on numbering of all steps
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, Boolean.TRUE);
                 }
@@ -103,5 +94,4 @@ public final class LoginWizardAction implements ActionListener{
         }
         return panels;
     }
-
 }

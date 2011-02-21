@@ -1,11 +1,8 @@
 package de.cebitec.vamp.controller;
 
-import de.cebitec.vamp.ui.dataAdministration.model.DataAdminController;
 //import de.cebitec.vamp.ui.dataAdministration.model.GestureListenerI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.ui.importer.ImporterController;
-import de.cebitec.vamp.ui.importer.LoginCookie;
 import de.cebitec.vamp.view.ApplicationFrameI;
 import de.cebitec.vamp.view.OpenRefGenDialog;
 import de.cebitec.vamp.view.OpenTrackDialog;
@@ -27,7 +24,7 @@ import org.openide.windows.WindowManager;
  *
  * @author ddoppmeier
  */
-public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
+public class ViewController implements de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
     private static ViewController instance;
 //    private ApplicationFrameI appFrame;
@@ -66,16 +63,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 //        appFrame.setVisible(show);
     }
 
-    @Override
-    public void openImporterDialog(){
-        new ImporterController().setupNewImport();
-    }
-
-    @Override
-    public void openDataAdminDialog(){
-        new DataAdminController().showDataAdministration();
-    }
-
 //    public void blockControlsByRunningTasks(List<RunningTaskI> tasks) {
 //        appFrame.releaseButtons();
 //        for(RunningTaskI r : tasks){
@@ -95,7 +82,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 //        }
 //    }
 
-    @Override
     public void openRefGen(){
         OpenRefGenDialog d = new OpenRefGenDialog(WindowManager.getDefault().getMainWindow(), true);
         d.setVisible(true);
@@ -109,7 +95,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
         }
     }
 
-    @Override
     public void closeRefGen() {
 
         // remove all tracks that are still open
@@ -133,7 +118,6 @@ public class ViewController implements LoginCookie, de.cebitec.vamp.view.dataVis
 
     }
 
-    @Override
     public void openTrack() {
         OpenTrackDialog d = new OpenTrackDialog(WindowManager.getDefault().getMainWindow(), true, currentRefGen);
         d.setVisible(true);
