@@ -450,12 +450,8 @@ public class SQLStatements {
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
             "SELECT "+
                 FieldNames.COVERAGE_POSITION+", "+
-
                 FieldNames.COVERAGE_N_FW_MULT+", " +
-                FieldNames.COVERAGE_N_FW_NUM+", " +
-                FieldNames.COVERAGE_N_RV_MULT+", " +
-                FieldNames.COVERAGE_N_RV_NUM+" " +
-
+                FieldNames.COVERAGE_N_RV_MULT+" " +
             "FROM " +
                 FieldNames.TABLE_COVERAGE+" " +
             "WHERE "+

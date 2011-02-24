@@ -30,7 +30,7 @@ public class CoverageThread extends Thread{
     public CoverageThread(long trackID){
         super();
         this.trackID = trackID;
-     //   trackID2 = 0;
+        trackID2 = 0;
         this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();
         con = ProjectConnector.getInstance().getConnection();
         currentCov = new PersistantCoverage(0, 0);
@@ -90,6 +90,7 @@ public class CoverageThread extends Thread{
         int to = calcCenterRight(request);
 
         PersistantCoverage cov = new PersistantCoverage(from, to);
+        cov.setTwoTracks(false);
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
             fetch.setInt(1, from);
@@ -102,7 +103,7 @@ public class CoverageThread extends Thread{
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
              //   counter++;
                 //best match cov
-                cov.setTwoTracks(false);
+                
                 cov.setBmFwMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
                 cov.setBmFwNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
                 cov.setBmRvMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
@@ -132,6 +133,7 @@ public class CoverageThread extends Thread{
         int to = calcCenterRight(request);
 
         PersistantCoverage cov = new PersistantCoverage(from, to,true);
+        cov.setTwoTracks(true);
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2);
             PreparedStatement fetch2 = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2);
@@ -146,37 +148,30 @@ public class CoverageThread extends Thread{
          //  int counter = 0;
             while(rs2.next()){
                 int pos = rs2.getInt(FieldNames.COVERAGE_POSITION);
-             //   counter++;
-                cov.setTwoTracks(true);
-                cov.setnFwMult(pos, rs2.getInt(FieldNames.COVERAGE_N_FW_MULT));
-                cov.setnFwNum(pos, rs2.getInt(FieldNames.COVERAGE_N_FW_NUM));
-                cov.setnRvMult(pos, rs2.getInt(FieldNames.COVERAGE_N_RV_MULT));
-                cov.setnRvNum(pos, rs2.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                //coverage of Track2
                 cov.setNFwMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_FW_MULT));
                 cov.setNRvMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_RV_MULT));
 
             }
             while(rs.next()){
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-             //   counter++;
-                int nFWMult= cov.getnFwMult(pos);
-                int nFWNum= cov.getnFwNum(pos);
-                int nRvMult= cov.getnRvMult(pos);
-                int nRvNum= cov.getnRvNum(pos);
-                if(nFWMult != 0){
-                cov.setnFwMult(pos, Math.abs(rs.getInt(FieldNames.COVERAGE_N_FW_MULT)-nFWMult));
+             
+                //check if cov of track 2 exists at position
+                int nFwMultTrack2= cov.getNFwMultTrack2(pos);   
+                int nRvMultTrack2= cov.getNRvMultTrack2(pos);    
+                int nFwMultTrack1= rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                int nRvMultTrack1= rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+
+                //we just set coverage of the diff if cov of  track 2 or track 1 exist
+                if(nFwMultTrack1 !=0 && nFwMultTrack2 != 0){
+                cov.setnFwMult(pos, Math.abs(nFwMultTrack1-nFwMultTrack2));
                 }
-                if(nFWNum!=0){
-                cov.setnFwNum(pos, Math.abs(rs.getInt(FieldNames.COVERAGE_N_FW_NUM)-nFWMult));
+                if(nRvMultTrack1 !=0&& nRvMultTrack2!=0){
+                cov.setnRvMult(pos, Math.abs(nRvMultTrack1-nRvMultTrack2));
                 }
-                if(nRvMult!=0){
-                cov.setnRvMult(pos, Math.abs(rs.getInt(FieldNames.COVERAGE_N_RV_MULT)-nRvMult));
-                }
-                if(nRvNum!=0){
-                cov.setnRvNum(pos, Math.abs(rs.getInt(FieldNames.COVERAGE_N_RV_NUM)-nRvNum));
-                }
-                cov.setNFwMultTrack1(pos, rs.getInt(FieldNames.COVERAGE_N_FW_MULT));
-                cov.setNRvMultTrack1(pos, rs.getInt(FieldNames.COVERAGE_N_RV_MULT));
+
+                cov.setNFwMultTrack1(pos, nFwMultTrack1);
+                cov.setNRvMultTrack1(pos, nRvMultTrack1);
 
             }
             fetch2.close();
@@ -205,11 +200,7 @@ public class CoverageThread extends Thread{
                     if(matchesLatestRequestBounds(r)){
                        if(trackID2 != 0){
                         currentCov = this.loadCoverage2(r);
-                        if(currentCov == null){
-                             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "CoveradeThread null");
-                        }
                       }else{
-                     
                         currentCov = this.loadCoverage(r);
                       }
                     } else {

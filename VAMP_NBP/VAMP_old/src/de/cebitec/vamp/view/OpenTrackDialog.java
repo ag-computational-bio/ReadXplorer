@@ -4,7 +4,6 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.Diff;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 import java.util.List;
 import java.util.logging.Level;

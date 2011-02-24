@@ -66,20 +66,14 @@ public class PersistantCoverage {
         this.rightBound = rightBound;
         this.finished = false;
 
-
         nFwMult = new HashMap<Integer, Integer>();
-        nFwNum = new HashMap<Integer, Integer>();
         nRvMult = new HashMap<Integer, Integer>();
-        nRvNum = new HashMap<Integer, Integer>();
-
-
 
         nFwMultTrack1 = new HashMap<Integer, Integer>();
         nFwMultTrack2 = new HashMap<Integer, Integer>();
+
         nRvMultTrack1 = new HashMap<Integer, Integer>();
         nRvMultTrack2 = new HashMap<Integer, Integer>();
-
-
 
     }
 
