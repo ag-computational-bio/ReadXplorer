@@ -49,5 +49,8 @@
         <folder name="Clipboard_hidden"/>
         <folder name="UndoRedo_hidden"/>
         <folder name="Memory_hidden"/>
+        <folder name="Tools">
+            <attr name="position" intvalue="300"/>
+        </folder>
     </folder>
 </filesystem>

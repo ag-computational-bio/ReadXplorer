@@ -22,7 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 /**
  * Display the coverage for a sequenced track related to a reference genome
@@ -51,6 +55,11 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     private GeneralPath nFw;
     private GeneralPath nRv;
 
+    // colors for the pathes
+    private static Color bmC = ColorProperties.BEST_MATCH;
+    private static Color zC = ColorProperties.PERFECT_MATCH;
+    private static Color nC = ColorProperties.N_ERROR_COLOR;
+
     public static final String PROP_TRACK_CLICKED = "track clicked";
     public static final String PROP_TRACK_ENTERED = "track entered";
 
@@ -73,6 +82,53 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         zRv = new GeneralPath();
         nFw = new GeneralPath();
         nRv = new GeneralPath();
+
+        Preferences pref = NbPreferences.forModule(Object.class);
+        boolean uniformColouration = pref.getBoolean("uniformDesired", false);
+        if (uniformColouration){
+            String colourRGB = pref.get("uniformColour", "");
+            if (!colourRGB.isEmpty()){
+                bmC = new Color(Integer.parseInt(colourRGB));
+                nC = new Color(Integer.parseInt(colourRGB));
+                zC = new Color(Integer.parseInt(colourRGB));
+            }
+        }
+        else {
+            String bestColour = pref.get("bestMatchColour", "");
+            String perfectColour = pref.get("perfectMatchColour", "");
+            String commonColour = pref.get("commonMatchColour", "");
+
+            if (!bestColour.isEmpty()) bmC = new Color(Integer.parseInt(bestColour));
+            if (!perfectColour.isEmpty()) zC = new Color(Integer.parseInt(perfectColour));
+            if (!commonColour.isEmpty()) nC = new Color(Integer.parseInt(commonColour));
+        }
+
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                boolean uniformDesired = NbPreferences.forModule(Object.class).getBoolean("uniformDesired", false);
+
+                if (uniformDesired) {
+                    String colourRGB = NbPreferences.forModule(Object.class).get("uniformColour", "");
+                    if (!colourRGB.isEmpty()) {
+                        bmC = new Color(Integer.parseInt(colourRGB));
+                        nC = new Color(Integer.parseInt(colourRGB));
+                        zC = new Color(Integer.parseInt(colourRGB));
+                    }
+                }
+                else {
+                    String bestColour = NbPreferences.forModule(Object.class).get("bestMatchColour", "");
+                    String perfectColour = NbPreferences.forModule(Object.class).get("perfectMatchColour", "");
+                    String commonColour = NbPreferences.forModule(Object.class).get("commonMatchColour", "");
+
+                    if (!bestColour.isEmpty()) bmC = new Color(Integer.parseInt(bestColour));
+                    if (!perfectColour.isEmpty()) zC = new Color(Integer.parseInt(perfectColour));
+                    if (!commonColour.isEmpty()) nC = new Color(Integer.parseInt(commonColour));
+                }
+                
+                repaint();
+            }
+        });
     }
 
     @Override
@@ -87,9 +143,6 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
         if(covLoaded || colorChanges){
             // fill and draw all coverage pathes
-            Color bmC = ColorProperties.BEST_MATCH;
-            Color zC = ColorProperties.PERFECT_MATCH;
-            Color nC = ColorProperties.N_ERROR_COLOR;
 
             // n error mappings
             g.setColor(nC);
@@ -435,6 +488,11 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     public TrackConnector getTrackCon() {
         return trackCon;
+    }
+
+    @Override
+    public String toString(){
+        return getName();
     }
     
 }

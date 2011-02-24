@@ -19,7 +19,7 @@
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>
-    </folder>
+    </folder><!--
     <folder name="Menu">
         <folder name="Window">
             <file name="ReferenceFeatureAction.shadow">
@@ -32,7 +32,7 @@
                 <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-ui-visualisation-reference-ReferenceNavigatorAction.instance"/>
             </file>
         </folder>
-    </folder>
+    </folder>-->
     <folder name="Windows2">
         <folder name="Components">
             <file name="ReferenceFeatureTopComponent.settings" url="ReferenceFeatureTopComponentSettings.xml"/>

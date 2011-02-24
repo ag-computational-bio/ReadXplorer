@@ -67,7 +67,7 @@
     </folder>
     <folder name="Menu">
         <folder name="Visualisation">
-            <attr name="position" intvalue="500"/>
+            <attr name="position" intvalue="250"/>
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="300"/>

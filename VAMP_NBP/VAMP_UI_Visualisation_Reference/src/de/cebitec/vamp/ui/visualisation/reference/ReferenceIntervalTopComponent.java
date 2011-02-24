@@ -27,6 +27,7 @@ import org.openide.util.Utilities;
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceInterval//EN", autostore = false)
 public final class ReferenceIntervalTopComponent extends TopComponent implements LookupListener, MousePositionListener{
 
+    private static final long serialVersionUID = 1L;
     private static ReferenceIntervalTopComponent instance;
     private Result<ReferenceViewer> result;
     private boolean showCurrentPosition = true;
