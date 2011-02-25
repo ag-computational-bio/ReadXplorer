@@ -40,11 +40,14 @@
             <file name="ReferenceNavigatorTopComponent.settings" url="ReferenceNavigatorTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
+            <file name="rightLowerSide.wsmode" url="rightLowerSide.wsmode"/>
             <folder name="explorer">
                 <file name="ReferenceNavigatorTopComponent.wstcref" url="ReferenceNavigatorTopComponentWstcref.xml"/>
             </folder>
             <folder name="properties">
                 <file name="ReferenceFeatureTopComponent.wstcref" url="ReferenceFeatureTopComponentWstcref.xml"/>
+            </folder>
+            <folder name="rightLowerSide">
                 <file name="ReferenceIntervalTopComponent.wstcref" url="ReferenceIntervalTopComponentWstcref.xml"/>
             </folder>
         </folder>

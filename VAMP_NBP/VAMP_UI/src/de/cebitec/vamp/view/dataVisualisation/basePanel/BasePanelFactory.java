@@ -84,7 +84,7 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
         
         // create track viewer
-        TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track.getId());
+        TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track);
         TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc);
         trackV.setName(track.getDescription());
 
@@ -113,12 +113,12 @@ public class BasePanelFactory {
         return b;
     }
 
-    public BasePanel getDetailTrackBasePanel(PersistantTrack track){
+    public BasePanel getDetailTrackBasePanel(TrackConnector connector){
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
         // create a trackviewer
-        TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track.getId());
+//        TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track.getId());
         AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGen, connector);
 
         // create a legend
@@ -126,17 +126,17 @@ public class BasePanelFactory {
 
         b.setViewer(viewer);
         b.setAdjustmentPanel(this.createAdjustmentPanel(true, false));
-        b.setTitlePanel(this.getTitlePanel(track.getDescription()));
+        b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
     }
 
-    public BasePanel getSequenceLogoBasePanel(PersistantTrack track){
+    public BasePanel getSequenceLogoBasePanel(TrackConnector connector){
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
         // create a trackviewer
-        TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track.getId());
+//        TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track.getId());
         HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGen, connector);
 
         // create a legend
@@ -145,7 +145,7 @@ public class BasePanelFactory {
         // add panels to basepanel
         b.setViewer(viewer);
         b.setAdjustmentPanel(this.createAdjustmentPanel(true, false));
-        b.setTitlePanel(this.getTitlePanel(track.getDescription()));
+        b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
 

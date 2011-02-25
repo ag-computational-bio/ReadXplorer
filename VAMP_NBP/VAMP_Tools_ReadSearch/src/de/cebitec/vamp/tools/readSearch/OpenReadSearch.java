@@ -21,9 +21,10 @@ public final class OpenReadSearch implements ActionListener {
     public void actionPerformed(ActionEvent ev) {
         JList jList = new JList(context.toArray());
         DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(jList, "Choose track to analyse!");
+        dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
         DialogDisplayer.getDefault().notify(dd);
 
-        if (dd.getValue().equals(DialogDescriptor.OK_OPTION)){
+        if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !jList.isSelectionEmpty()){
             ReadSearchTopComponent readSearch = (ReadSearchTopComponent) WindowManager.getDefault().findTopComponent("ReadSearchTopComponent");
             readSearch.open();
             readSearch.setTrackViewer((TrackViewer) jList.getSelectedValue());

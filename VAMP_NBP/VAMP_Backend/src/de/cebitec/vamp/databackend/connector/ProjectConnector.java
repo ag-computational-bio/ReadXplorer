@@ -1168,10 +1168,11 @@ public class ProjectConnector {
         return runConnectors.get(runID);
     }
 
-    public TrackConnector getTrackConnector(long trackID) {
+    public TrackConnector getTrackConnector(PersistantTrack track) {
         // only return new object, if no suitable connector was created before
+        long trackID = track.getId();
         if (!trackConnectors.containsKey(trackID)) {
-            trackConnectors.put(trackID, new TrackConnector(trackID));
+            trackConnectors.put(trackID, new TrackConnector(track));
         }
         return trackConnectors.get(trackID);
     }

@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
@@ -34,9 +35,9 @@ public class ExternalViewer extends javax.swing.JFrame {
     public ExternalViewer(BasePanelFactory factory, PersistantTrack track, TrackOptionsPanel parent){
         this.parent = parent;
         initComponents();
-        alignmentBasePanel = factory.getDetailTrackBasePanel(track);
+        alignmentBasePanel = factory.getDetailTrackBasePanel(ProjectConnector.getInstance().getTrackConnector(track));
         alignmentBasePanel.getViewer().setActive(false);
-        logoBasePanel = factory.getSequenceLogoBasePanel(track);
+        logoBasePanel = factory.getSequenceLogoBasePanel(ProjectConnector.getInstance().getTrackConnector(track));
         logoBasePanel.getViewer().setActive(true);
 
         cards = (CardLayout) cardPanel.getLayout();

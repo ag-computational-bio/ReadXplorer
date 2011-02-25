@@ -8,6 +8,7 @@ import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.objects.Read;
 import de.cebitec.vamp.objects.Snp;
 import java.sql.Connection;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
+    private String associatedTrackName;
     private long trackID;
     private long runID;
     private int genomeSize;
@@ -49,8 +51,9 @@ public class TrackConnector {
     private static int T_GAP = 11;
     private static int N_GAP = 12;
 
-    TrackConnector(long trackID) {
-        this.trackID = trackID;
+    TrackConnector(PersistantTrack track) {
+        associatedTrackName = track.getDescription();
+        trackID = track.getId();
         con = ProjectConnector.getInstance().getConnection();
         runID = fetchRunID();
 
@@ -415,6 +418,10 @@ public class TrackConnector {
 
     public long getTrackID(){
         return trackID;
+    }
+
+    public String getAssociatedTrackName() {
+        return associatedTrackName;
     }
 
     private Character revCompl(char base) {

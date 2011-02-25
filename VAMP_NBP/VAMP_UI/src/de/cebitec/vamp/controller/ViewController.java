@@ -172,4 +172,8 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         return app;
     }
 
+    public BasePanelFactory getBasePanelFac() {
+        return basePanelFac;
+    }
+
 }

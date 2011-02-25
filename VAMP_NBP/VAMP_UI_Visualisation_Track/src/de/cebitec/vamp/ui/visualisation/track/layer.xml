@@ -22,7 +22,8 @@
             <file name="TrackStatisticsTopComponent.settings" url="TrackStatisticsTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
-            <folder name="explorer">
+            <file name="statistics.wsmode" url="statistics.wsmode"/>
+            <folder name="statistics">
                 <file name="TrackStatisticsTopComponent.wstcref" url="TrackStatisticsTopComponentWstcref.xml"/>
             </folder>
         </folder>

@@ -151,7 +151,7 @@ public class ReadFrame extends javax.swing.JFrame {
 
             @Override
             protected Object doInBackground() {
-                TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track.getId());
+                TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track);
                 List<Read> reads = con.findReads(read);
                 for (Read r : reads) {
                     results1.addRead(r);

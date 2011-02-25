@@ -127,7 +127,7 @@ public class SnpFrame extends javax.swing.JFrame {
 
             @Override
             protected Object doInBackground()  {
-                TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track.getId());
+                TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track);
                  snps = con.findSNPs(percent, num);
                 for(Snp s : snps){
                     results1.addSnp(s);
