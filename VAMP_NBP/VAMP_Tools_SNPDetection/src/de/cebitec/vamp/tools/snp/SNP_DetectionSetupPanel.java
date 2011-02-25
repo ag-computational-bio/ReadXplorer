@@ -126,9 +126,6 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
                     return snps;
                 }
 
-                @Override
-                protected void done() {
-                }
             }
 
             RequestProcessor rp = new RequestProcessor("SNP Threads", 2);

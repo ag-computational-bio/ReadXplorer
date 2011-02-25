@@ -6,7 +6,7 @@
  * Created on 13.01.2011, 11:38:35
  */
 
-package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
+package de.cebitec.vamp.tools.referenceEditor;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import java.awt.event.ActionEvent;

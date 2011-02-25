@@ -29,6 +29,5 @@ public final class OpenSNPDetection implements ActionListener {
             snpDetection.open();
             snpDetection.setTrackViewer((TrackViewer) jList.getSelectedValue());
         }
-
     }
 }

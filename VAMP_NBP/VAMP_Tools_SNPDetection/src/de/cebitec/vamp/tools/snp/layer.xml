@@ -49,7 +49,7 @@
             <file name="SNP_DetectionTopComponent.settings" url="SNP_DetectionTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
-            <folder name="editor">
+            <folder name="output">
                 <file name="SNP_DetectionTopComponent.wstcref" url="SNP_DetectionTopComponentWstcref.xml"/>
             </folder>
         </folder>
