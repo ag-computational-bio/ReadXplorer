@@ -91,9 +91,10 @@ public final class ReadSearchTopComponent extends TopComponent {
 
     @Override
     public void componentOpened() {
-        readSearchSetup.addPropertyChangeListener("readSearchFinished", new PropertyChangeListener() {
+        readSearchSetup.addPropertyChangeListener(ReadSearchSetup.PROP_SEARCH_FINISHED, new PropertyChangeListener() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
                 readSearchResults.addReads((List<Read>) evt.getNewValue());
                 ((CardLayout) getLayout()).show(instance, "results");
@@ -103,9 +104,7 @@ public final class ReadSearchTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        ((CardLayout) getLayout()).show(instance, "setup");
-        readSearchSetup.setTrackCon(null);
-        readSearchResults.setBoundsInformationManager(null);
+        resetComponent();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -136,5 +135,11 @@ public final class ReadSearchTopComponent extends TopComponent {
     public void setTrackViewer(TrackViewer trackViewer){
         readSearchSetup.setTrackCon(trackViewer.getTrackCon());
         readSearchResults.setBoundsInformationManager(trackViewer.getBoundsInformationManager());
+    }
+
+    public void resetComponent(){
+        ((CardLayout) getLayout()).show(instance, "setup");
+        readSearchSetup.setTrackCon(null);
+        readSearchResults.setBoundsInformationManager(null);
     }
 }

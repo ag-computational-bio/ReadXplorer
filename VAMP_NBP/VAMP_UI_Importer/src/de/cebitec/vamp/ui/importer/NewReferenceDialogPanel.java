@@ -203,7 +203,7 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
                     Logger.getLogger(NewReferenceDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                System.err.print("NewReferenceDialog couldnt read file"); // TODO get rid of System.err.print
+                Logger.getLogger(NewReferenceDialogPanel.class.getName()).log(Level.WARNING, "Could not read file");
             }
         }
 }//GEN-LAST:event_fileChooserButtonActionPerformed

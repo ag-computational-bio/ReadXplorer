@@ -47,9 +47,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
         setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-//        putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
-//        putClientProperty(TopComponent.PROP_DRAGGING_DISABLED, Boolean.TRUE);
-//        putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
 
         associateLookup(new AbstractLookup(content));
     }
@@ -156,7 +153,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // XXX this is not working everytime, but how can there be opened tc's when you cannot see them in the GUI???
         for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){
             if (tc instanceof ApplicationFrameI && !tc.equals(this)){
-                System.out.println("Not last");
                 lastViewer = false;
                 break;
             }

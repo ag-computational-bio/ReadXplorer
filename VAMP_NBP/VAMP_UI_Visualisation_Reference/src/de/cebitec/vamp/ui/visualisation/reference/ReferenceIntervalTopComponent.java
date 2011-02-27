@@ -224,6 +224,7 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     // update visible feature list
+                    @SuppressWarnings("unchecked")
                     Map<Integer, Integer> featureStats = (Map<Integer, Integer>) evt.getNewValue();
                     showFeatureStatisticsForIntervall(featureStats);
 

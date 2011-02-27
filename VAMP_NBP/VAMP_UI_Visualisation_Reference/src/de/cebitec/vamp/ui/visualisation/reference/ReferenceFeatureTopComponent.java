@@ -24,6 +24,7 @@ import org.openide.util.Utilities;
 public final class ReferenceFeatureTopComponent extends TopComponent implements LookupListener{
 
     private static ReferenceFeatureTopComponent instance;
+    private static final long serialVersionUID = 1L;
     private Result<ReferenceViewer> result;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";

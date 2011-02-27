@@ -234,15 +234,6 @@ final class ColoursPanel extends javax.swing.JPanel {
         return uniformColButton.getBackground();
     }
 
-//    public void setColor() {
-//        ColorProperties c = new ColorProperties();
-//        if (uniformColorationCheckBox.isSelected()) {
-//            c.setColorProperties(getUnqiueColor(), getUnqiueColor(), getUnqiueColor());
-//        } else {
-//            c.setColorProperties(getPerfectMatchColor(), getBestMatchColor(), getCommonMatchColor());
-//        }
-//    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bestMatchButton;
     private javax.swing.JLabel bestMatchLabel;

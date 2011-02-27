@@ -49,7 +49,9 @@
         </folder>
         <folder name="Modes">
             <folder name="output">
-                <file name="ReadSearchTopComponent.wstcref" url="ReadSearchTopComponentWstcref.xml"/>
+                <file name="ReadSearchTopComponent.wstcref" url="ReadSearchTopComponentWstcref.xml">
+                    <attr name="position" intvalue="1000"/>
+                </file>
             </folder>
         </folder>
     </folder>

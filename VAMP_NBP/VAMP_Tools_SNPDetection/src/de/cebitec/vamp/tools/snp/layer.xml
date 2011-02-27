@@ -50,7 +50,9 @@
         </folder>
         <folder name="Modes">
             <folder name="output">
-                <file name="SNP_DetectionTopComponent.wstcref" url="SNP_DetectionTopComponentWstcref.xml"/>
+                <file name="SNP_DetectionTopComponent.wstcref" url="SNP_DetectionTopComponentWstcref.xml">
+                    <attr name="position" intvalue="950"/>
+                </file>
             </folder>
         </folder>
     </folder>

@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.JList;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor.Confirmation;
+import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 public final class OpenSNPDetection implements ActionListener {
@@ -20,15 +20,24 @@ public final class OpenSNPDetection implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        JList jList = new JList(context.toArray());
-        Confirmation dd = new DialogDescriptor.Confirmation(jList, "Choose track to analyse!");
-        dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
-        DialogDisplayer.getDefault().notify(dd);
-
-        if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !jList.isSelectionEmpty()){
-            SNP_DetectionTopComponent snpDetection = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
-            snpDetection.open();
-            snpDetection.setTrackViewer((TrackViewer) jList.getSelectedValue());
+        TrackViewer currentTrackViewer = null;
+        if (context.size() > 1){
+            JList trackList = new JList(context.toArray());
+        DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenSNPDetection.class, "TTL_OpenSNPDetection"));
+            dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
+            DialogDisplayer.getDefault().notify(dd);
+            if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()){
+                currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
+            }
         }
+        else{
+            // context cannot be emtpy, so no check here
+            currentTrackViewer = context.get(0);
+        }
+
+        SNP_DetectionTopComponent snpDetection = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
+        snpDetection.resetComponent();
+        snpDetection.setTrackViewer(currentTrackViewer);
+        snpDetection.open();
     }
 }

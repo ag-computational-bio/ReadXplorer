@@ -48,14 +48,14 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        trackStatisticsPanel1 = new de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel();
+        trackStatisticsPanel = new de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel();
 
         setLayout(new java.awt.BorderLayout());
-        add(trackStatisticsPanel1, java.awt.BorderLayout.CENTER);
+        add(trackStatisticsPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel trackStatisticsPanel1;
+    private de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel trackStatisticsPanel;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
@@ -108,14 +108,14 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
         else{
             if (!isVisible()) setVisible(true);
             for (TrackViewer trackViewer : result.allInstances()) {
-                trackStatisticsPanel1.setTrackConnector(trackViewer.getTrackCon());
-                trackStatisticsPanel1.setTrackName(trackViewer.getTrackCon().getAssociatedTrackName());
+                trackStatisticsPanel.setTrackConnector(trackViewer.getTrackCon());
+                trackStatisticsPanel.setTrackName(trackViewer.getTrackCon().getAssociatedTrackName());
 
                 trackViewer.addMouseListener(new MouseListener() {
 
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        trackStatisticsPanel1.setTrackName(((TrackViewer) e.getSource()).getTrackCon().getAssociatedTrackName());
+                        trackStatisticsPanel.setTrackName(((TrackViewer) e.getSource()).getTrackCon().getAssociatedTrackName());
                     }
 
                     @Override

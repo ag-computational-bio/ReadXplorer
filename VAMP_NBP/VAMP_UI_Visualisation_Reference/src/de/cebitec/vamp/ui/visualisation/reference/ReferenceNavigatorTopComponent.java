@@ -38,9 +38,9 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
     }
 
     public void setRefViewer(ReferenceViewer viewer){
-        jumpPanel1.setReferenceGenome(viewer.getReference());
-        jumpPanel1.setBoundsInfoManager(viewer.getBoundsInformationManager());
-        codonSelector1.setGenomeViewer(viewer);
+        jumpPanel.setReferenceGenome(viewer.getReference());
+        jumpPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
+        codonSelector.setGenomeViewer(viewer);
     }
 
     /** This method is called from within the constructor to
@@ -51,17 +51,17 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jumpPanel1 = new de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel();
-        codonSelector1 = new de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector();
+        jumpPanel = new de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel();
+        codonSelector = new de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector();
 
         setLayout(new java.awt.BorderLayout());
-        add(jumpPanel1, java.awt.BorderLayout.CENTER);
-        add(codonSelector1, java.awt.BorderLayout.PAGE_END);
+        add(jumpPanel, java.awt.BorderLayout.CENTER);
+        add(codonSelector, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector codonSelector1;
-    private de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel jumpPanel1;
+    private de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector codonSelector;
+    private de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel jumpPanel;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,

@@ -69,6 +69,10 @@ public class ReadSearchResults extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(readname);
+        readname.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadSearchResults.class, "ReadSearchResults.readname.columnModel.title0")); // NOI18N
+        readname.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadSearchResults.class, "ReadSearchResults.readname.columnModel.title1")); // NOI18N
+        readname.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadSearchResults.class, "ReadSearchResults.readname.columnModel.title2")); // NOI18N
+        readname.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadSearchResults.class, "ReadSearchResults.readname.columnModel.title3")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

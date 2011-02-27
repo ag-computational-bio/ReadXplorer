@@ -27,7 +27,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="absNum" max="32767" attributes="1"/>
-                  <Component id="jButton1" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="searchButton" alignment="1" min="-2" max="-2" attributes="0"/>
                   <Component id="jSpinner1" alignment="0" pref="65" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -51,7 +51,7 @@
                           <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <Component id="searchButton" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -60,14 +60,14 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="searchButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionSetupPanel.jButton1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionSetupPanel.searchButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="searchButtonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JSpinner" name="jSpinner1">

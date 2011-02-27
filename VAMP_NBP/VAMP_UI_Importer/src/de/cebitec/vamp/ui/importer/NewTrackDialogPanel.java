@@ -237,7 +237,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                     Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                System.err.print("NewTrackDialog couldnt read file"); // TODO get rid of System.err.print
+                Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.WARNING, "Couldnt read file");
             }
         }
 }//GEN-LAST:event_chooseButtonActionPerformed

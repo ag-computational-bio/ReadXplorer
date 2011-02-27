@@ -91,9 +91,10 @@ public final class SNP_DetectionTopComponent extends TopComponent {
 
     @Override
     public void componentOpened() {
-        setupPanel.addPropertyChangeListener("snpsLoaded", new PropertyChangeListener() {
+        setupPanel.addPropertyChangeListener(SNP_DetectionSetupPanel.PROP_SNPS_LOADED, new PropertyChangeListener() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
                 resultPanel.addSNPs((List<Snp>) evt.getNewValue());
                 ((CardLayout) getLayout()).show(instance, "results");
@@ -103,9 +104,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        ((CardLayout) getLayout()).show(instance, "setup");
-        setupPanel.setCon(null);
-        resultPanel.setBoundsInfoManager(null);
+        resetComponent();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -136,5 +135,11 @@ public final class SNP_DetectionTopComponent extends TopComponent {
     public void setTrackViewer(TrackViewer trackViewer){
         setupPanel.setCon(trackViewer.getTrackCon());
         resultPanel.setBoundsInfoManager(trackViewer.getBoundsInformationManager());
+    }
+
+    public void resetComponent(){
+        ((CardLayout) getLayout()).show(instance, "setup");
+        setupPanel.setCon(null);
+        resultPanel.setBoundsInfoManager(null);
     }
 }

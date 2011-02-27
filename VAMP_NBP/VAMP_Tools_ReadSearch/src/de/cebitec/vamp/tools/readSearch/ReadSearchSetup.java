@@ -6,10 +6,14 @@
 
 package de.cebitec.vamp.tools.readSearch;
 
+import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.objects.Read;
 import java.util.List;
 import javax.swing.SwingWorker;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.RequestProcessor.Task;
 import org.openide.util.TaskListener;
@@ -24,6 +28,8 @@ public class ReadSearchSetup extends javax.swing.JPanel {
     private TrackConnector trackCon;
     private List<Read> reads;
 
+    public static final String PROP_SEARCH_FINISHED = "readSearchFinished";
+
     /** Creates new form ReadSearchSetup */
     public ReadSearchSetup() {
         initComponents();
@@ -31,23 +37,44 @@ public class ReadSearchSetup extends javax.swing.JPanel {
 
     private void findReads(){
         RequestProcessor rp = new RequestProcessor("ReadSearch Thread", 2);
-        final Task searchTask = rp.post(new ReadSearcher());
+        final Task searchTask = rp.post(new ReadSearcher(readNameField.getText()));
         searchTask.addTaskListener(new TaskListener() {
 
             @Override
             public void taskFinished(org.openide.util.Task task) {
-                firePropertyChange("readSearchFinished", null, reads);
+                firePropertyChange(PROP_SEARCH_FINISHED, null, reads);
                 searchTask.removeTaskListener(this);
+                searchButton.setEnabled(true);
             }
         });
+        searchButton.setEnabled(false);
     }
 
     private class ReadSearcher extends SwingWorker<List<Read>, Object>{
 
+        private String readName;
+        private ProgressHandle ph;
+
+        ReadSearcher(String readName) {
+            this.readName = readName;
+            this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(ReadSearcher.class, "MSG_ReadSearcher.progress.name"));
+        }
+
         @Override
         protected List<Read> doInBackground() throws Exception {
-            reads = trackCon.findReads(readNameField.getText());
+            CentralLookup.getDefault().add(this);
+
+            ph.start();
+
+            reads = trackCon.findReads(readName);
             return reads;
+        }
+
+        @Override
+        protected void done() {
+            CentralLookup.getDefault().remove(this);
+
+            ph.finish();
         }
 
     }

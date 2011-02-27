@@ -25,7 +25,6 @@
             </module-dependencies>
             <public-packages>
                 <package>de.cebitec.vamp.exporter</package>
-                <package>de.cebitec.vamp.exporter.excel</package>
             </public-packages>
         </data>
     </configuration>

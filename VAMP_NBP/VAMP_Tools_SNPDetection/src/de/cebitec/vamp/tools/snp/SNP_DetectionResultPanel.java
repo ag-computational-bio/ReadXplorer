@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
+    private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
     private List<Snp> snps;
 
