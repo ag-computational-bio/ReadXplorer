@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.AbstractInfoPanel;
@@ -19,7 +20,7 @@ public class TrackNavigatorPanel extends AbstractInfoPanel {
     private BasePanelFactory basePanelFactory;
     private PersistantTrack track;
     private BoundsInfoManager boundsManager;
-
+    private PersistantReference refGen;
     /** Creates new form TrackNavigatorPanel */
     public TrackNavigatorPanel() {
         initComponents();
@@ -27,13 +28,23 @@ public class TrackNavigatorPanel extends AbstractInfoPanel {
 
     }
 
-    public TrackNavigatorPanel(TrackConnector trackC, BasePanelFactory basePanelFactory, PersistantTrack track, BoundsInfoManager boundsManager){
+    public TrackNavigatorPanel(TrackConnector trackC, BasePanelFactory basePanelFactory, PersistantTrack track, BoundsInfoManager boundsManager, PersistantReference refGen){
         this.track = track;
         this.basePanelFactory = basePanelFactory;
         this.trackCon = trackC;
         this.boundsManager = boundsManager;
-
+        this.refGen = refGen;
         initComponents();
+    }
+
+        public TrackNavigatorPanel(TrackConnector trackC, BasePanelFactory basePanelFactory, PersistantTrack track, BoundsInfoManager boundsManager){
+        this.track = track;
+        this.basePanelFactory = basePanelFactory;
+        this.trackCon = trackC;
+        this.boundsManager = boundsManager;
+        initComponents();
+
+        statisticsTab.remove(trackOptionsPanel1);
     }
 
     /** This method is called from within the constructor to
@@ -47,17 +58,14 @@ public class TrackNavigatorPanel extends AbstractInfoPanel {
 
         statisticsTab = new javax.swing.JTabbedPane();
         trackStatisticsPanel1 = new de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel(trackCon);
-        trackOptionsPanel2 = new de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel(basePanelFactory, track, boundsManager);
+        trackOptionsPanel1 = new de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel(basePanelFactory,track,boundsManager,refGen);
 
         setMinimumSize(new java.awt.Dimension(0, 0));
         setPreferredSize(new java.awt.Dimension(211, 250));
 
         statisticsTab.setMinimumSize(new java.awt.Dimension(154, 206));
-
-        trackStatisticsPanel1.setBorder(null);
-        trackStatisticsPanel1.setPreferredSize(new java.awt.Dimension(191, 304));
         statisticsTab.addTab("Statistics", trackStatisticsPanel1);
-        statisticsTab.addTab("Tools", trackOptionsPanel2);
+        statisticsTab.addTab("Tools", trackOptionsPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -67,14 +75,14 @@ public class TrackNavigatorPanel extends AbstractInfoPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statisticsTab, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
+            .addComponent(statisticsTab, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane statisticsTab;
-    private de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel trackOptionsPanel2;
+    private de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackOptionsPanel trackOptionsPanel1;
     private de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel trackStatisticsPanel1;
     // End of variables declaration//GEN-END:variables
 
@@ -83,9 +91,9 @@ public class TrackNavigatorPanel extends AbstractInfoPanel {
         basePanelFactory = null;
         track = null;
         trackCon = null;
-        trackOptionsPanel2.close();
-        this.remove(trackOptionsPanel2);
-        trackOptionsPanel2 = null;
+        trackOptionsPanel1.close();
+        this.remove(trackOptionsPanel1);
+        trackOptionsPanel1 = null;
         trackStatisticsPanel1.close();
         this.remove(trackStatisticsPanel1);
         trackStatisticsPanel1 = null;

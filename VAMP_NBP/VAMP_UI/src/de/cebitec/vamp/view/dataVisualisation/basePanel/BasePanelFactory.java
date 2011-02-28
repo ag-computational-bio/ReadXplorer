@@ -28,6 +28,8 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -77,7 +79,7 @@ public class BasePanelFactory {
         return b;
     }
 
-    public BasePanel getTrackBasePanel(PersistantTrack track){
+    public BasePanel getTrackBasePanel(PersistantTrack track,PersistantReference refGen){
         
         BasePanel b = new BasePanel(boundsManager, viewController);
         b.setName(track.getDescription());
@@ -98,7 +100,7 @@ public class BasePanelFactory {
         trackV.setTrackInfoPanel(cil);
 
         // create navi panel
-//        TrackNavigatorPanel navi = new TrackNavigatorPanel(tc, this, track, boundsManager);
+//        TrackNavigatorPanel navi = new TrackNavigatorPanel(tc, this, track, boundsManager,refGen);
 
         // create zoom slider
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
@@ -112,6 +114,38 @@ public class BasePanelFactory {
 
         return b;
     }
+
+        public BasePanel getTrackBasePanel2(PersistantTrack track1,PersistantTrack track2,PersistantReference refGen, TrackConnector tcon){
+
+        BasePanel b = new BasePanel(boundsManager, viewController);
+        viewController.addMousePositionListener(b);
+
+        TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tcon);
+
+        // create and set up legend
+        trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
+
+        // create info panel
+        TrackInfoPanel info = new TrackInfoPanel(true);
+        trackV.setTrackInfoPanel(info);
+
+        // create navi panel
+        TrackNavigatorPanel navi = new TrackNavigatorPanel(tcon, this, track1, boundsManager);
+
+        // create zoom slider
+        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
+
+        // add panels to basepanel
+        b.setRightInfoPanel(info);
+        b.setLeftInfoPanel(navi);
+        b.setViewer(trackV, slider);
+        String title = track1.getDescription()+" - "+track2.getDescription();
+
+        b.setTitlePanel(this.getTitlePanel(title));
+         viewController.openTrack2(b,track1,track2);
+        return b;
+    }
+
 
     public BasePanel getDetailTrackBasePanel(TrackConnector connector){
         BasePanel b = new BasePanel(boundsManager, viewController);

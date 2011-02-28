@@ -1,13 +1,26 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.OpenTrackDialog;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.ExternalViewer;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.readPosition.ReadFrame;
 import de.cebitec.vamp.view.dataVisualisation.snpDetection.SnpFrame;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTextField;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -22,6 +35,10 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     private BasePanelFactory basePanelFactory;
     private PersistantTrack track;
     private BoundsInfoManager boundsManager;
+     PersistantReference refGen;
+    PersistantTrack selectedTrack;
+    OpenTrackDialog op;
+
 
     /** Creates new form TrackNavigatorPanel */
     public TrackOptionsPanel() {
@@ -31,11 +48,14 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     }
 
     /** Creates new form TrackNavigatorPanel */
-    public TrackOptionsPanel(BasePanelFactory basePanelFactory, PersistantTrack track, BoundsInfoManager boundsManager) {
+    public TrackOptionsPanel(BasePanelFactory basePanelFactory, PersistantTrack track, BoundsInfoManager boundsManager,PersistantReference refGen) {
         initComponents();
+        this.refGen = refGen;
         this.basePanelFactory = basePanelFactory;
         this.track = track;
         this.boundsManager = boundsManager;
+        //in development
+        getCovInfoButton.setVisible(false);
     }
 
 
@@ -51,6 +71,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         snpButton = new javax.swing.JButton();
         externalViewerButton = new javax.swing.JButton();
         readButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        getCovInfoButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
@@ -75,6 +97,20 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton1.setText("Choose a track");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        getCovInfoButton.setText("Get coverage infos");
+        getCovInfoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getCovInfoButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -84,7 +120,9 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(externalViewerButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
                     .addComponent(snpButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
-                    .addComponent(readButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))
+                    .addComponent(readButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                    .addComponent(getCovInfoButton, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -96,7 +134,11 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
                 .addComponent(readButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(externalViewerButton)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(getCovInfoButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -121,6 +163,74 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
        readPanel.setVisible(true);
     }//GEN-LAST:event_readButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+      op =  new OpenTrackDialog(this,refGen);
+      op.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    @SuppressWarnings("unchecked")
+    /*you will get a list with the position and the associated coverage(fw+rv)
+     *you can use it if you need the data
+     * but the function isnt on the right position and there have to be a bit more
+     * explanation
+     */
+    private void getCovInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getCovInfoButtonActionPerformed
+        JTextField t = new JTextField();
+        DialogDescriptor d =  new DialogDescriptor(t,"Get coverage Information");
+        DialogDisplayer.getDefault().createDialog(d).setVisible(true);
+        if(d.getValue().equals(DialogDescriptor.OK_OPTION)){
+             TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track);
+            
+             int from = 1;
+             int to = 100000;
+
+             String path = t.getText();
+             File f = new File(path);
+
+           
+           PrintWriter output = null;
+          
+                try {
+
+                    output  = new PrintWriter(new FileWriter(f));
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+        while(to <= refGen.getSequence().length()){
+             HashMap<Integer,Integer>map = new HashMap<Integer, Integer>();
+            map = con.getCoverageInfosofTrack(from,to);
+                for(int i : map.keySet()){
+                      
+                    output.println(i+"  "+map.get(i));
+
+                }
+                if(to == refGen.getSequence().length()){
+                  break;
+                }
+                from += 100000;
+                to += 100000;
+
+                if(to > refGen.getSequence().length()){
+                    to = refGen.getSequence().length();
+                }
+
+            }
+                output.flush();
+                output.close();
+                //map.clear();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Data is written to {0}", path);
+
+
+
+        }
+    }//GEN-LAST:event_getCovInfoButtonActionPerformed
+    public void secondTrackSelected(){
+      selectedTrack = op.getSelectedTrack();
+     // track2Name.setText(selectedTrack.getDescription());
+      TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track.getId(), selectedTrack.getId());
+      basePanelFactory.getTrackBasePanel2(track,selectedTrack ,refGen,con);
+    
+    }
     public void snpDetectionClosed(){
         if(snpDetection != null){
             snpDetection.close();
@@ -152,6 +262,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton externalViewerButton;
+    private javax.swing.JButton getCovInfoButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton readButton;
     private javax.swing.JButton snpButton;
     // End of variables declaration//GEN-END:variables

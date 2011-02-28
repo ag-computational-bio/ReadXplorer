@@ -427,7 +427,7 @@ public class SQLStatements {
 
 
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
-            "SELECT "+
+            "(SELECT "+
                 FieldNames.COVERAGE_POSITION+", "+
                 FieldNames.COVERAGE_BM_FW_MULT+", " +
                 FieldNames.COVERAGE_BM_FW_NUM+", " +
@@ -445,7 +445,30 @@ public class SQLStatements {
                 FieldNames.TABLE_COVERAGE+" " +
             "WHERE "+
                 FieldNames.COVERAGE_POSITION+ " between ? and ? and "+
+                FieldNames.COVERAGE_TRACK+" = ? )";
+
+    public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
+            "SELECT "+
+                FieldNames.COVERAGE_POSITION+", "+
+                FieldNames.COVERAGE_N_FW_MULT+", " +
+                FieldNames.COVERAGE_N_RV_MULT+" " +
+            "FROM " +
+                FieldNames.TABLE_COVERAGE+" " +
+            "WHERE "+
+                FieldNames.COVERAGE_POSITION+ " between ? and ? and "+
                 FieldNames.COVERAGE_TRACK+" = ? ";
+
+        public final static String FETCH_COVERAGE_FOR_TRACK =
+            "SELECT "+
+                FieldNames.COVERAGE_POSITION+", "+
+
+                FieldNames.COVERAGE_N_FW_MULT+" + " +FieldNames.COVERAGE_N_RV_MULT+
+               " as " + FieldNames.COVERAGE_N_MULT+
+
+            " FROM " +
+                FieldNames.TABLE_COVERAGE+" " +
+            "WHERE "+
+                FieldNames.COVERAGE_TRACK+" = ?  and " + FieldNames.COVERAGE_POSITION + " between ? and ?";
 
 
     public final static String FETCH_TRACKS_FOR_GENOME =

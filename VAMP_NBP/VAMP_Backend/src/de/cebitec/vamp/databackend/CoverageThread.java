@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 public class CoverageThread extends Thread{
 
     private long trackID;
+    private long trackID2;
     private Connection con;
     private ConcurrentLinkedQueue<CoverageRequest> requestQueue;
     private PersistantCoverage currentCov;
@@ -29,15 +30,27 @@ public class CoverageThread extends Thread{
     public CoverageThread(long trackID){
         super();
         this.trackID = trackID;
+        trackID2 = 0;
         this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();
         con = ProjectConnector.getInstance().getConnection();
         currentCov = new PersistantCoverage(0, 0);
         coveredWidth = 25000;
-        
         requestCounter = 0;
         skippedCounter = 0;
     }
 
+       public CoverageThread(long trackID,long trackID2){
+        super();
+        this.trackID = trackID;
+        this.trackID2 = trackID2;
+        this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();
+        con = ProjectConnector.getInstance().getConnection();
+        currentCov = new PersistantCoverage(0, 0,true);
+        coveredWidth = 25000;
+
+        requestCounter = 0;
+        skippedCounter = 0;
+    }
     private int calcCenterLeft(CoverageRequest request){
         int centerMiddle = calcCenterMiddle(request);
         int result = centerMiddle - coveredWidth;
@@ -73,11 +86,11 @@ public class CoverageThread extends Thread{
 
 
     private PersistantCoverage loadCoverage(CoverageRequest request){
-
         int from = calcCenterLeft(request);
         int to = calcCenterRight(request);
 
         PersistantCoverage cov = new PersistantCoverage(from, to);
+        cov.setTwoTracks(false);
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
             fetch.setInt(1, from);
@@ -85,20 +98,22 @@ public class CoverageThread extends Thread{
             fetch.setLong(3, trackID);
 
             ResultSet rs = fetch.executeQuery();
-            int counter = 0;
+         //  int counter = 0;
             while(rs.next()){
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-                counter++;
+             //   counter++;
+                //best match cov
+                
                 cov.setBmFwMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
                 cov.setBmFwNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
                 cov.setBmRvMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
                 cov.setBmRvNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
-
+                //complete cov
                 cov.setnFwMult(pos, rs.getInt(FieldNames.COVERAGE_N_FW_MULT));
                 cov.setnFwNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
                 cov.setnRvMult(pos, rs.getInt(FieldNames.COVERAGE_N_RV_MULT));
                 cov.setnRvNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
-
+                //perfect cov
                 cov.setzFwMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
                 cov.setzFwNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
                 cov.setzRvMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
@@ -113,6 +128,66 @@ public class CoverageThread extends Thread{
         return cov;
     }
 
+    private PersistantCoverage loadCoverage2(CoverageRequest request){
+        int from = calcCenterLeft(request);
+        int to = calcCenterRight(request);
+
+        PersistantCoverage cov = new PersistantCoverage(from, to,true);
+        cov.setTwoTracks(true);
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2);
+            PreparedStatement fetch2 = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2);
+            fetch.setInt(1, from);
+            fetch.setInt(2, to);
+            fetch.setLong(3, trackID);
+            fetch2.setInt(1, from);
+            fetch2.setInt(2, to);
+            fetch2.setLong(3, trackID2);
+            ResultSet rs2 = fetch2.executeQuery();
+            ResultSet rs = fetch.executeQuery();
+         //  int counter = 0;
+            while(rs2.next()){
+                int pos = rs2.getInt(FieldNames.COVERAGE_POSITION);
+                //coverage of Track2
+                cov.setNFwMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_FW_MULT));
+                cov.setNRvMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_RV_MULT));
+
+            }
+            while(rs.next()){
+                int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
+             
+                //check if cov of track 2 exists at position
+                int nFwMultTrack2= cov.getNFwMultTrack2(pos);   
+                int nRvMultTrack2= cov.getNRvMultTrack2(pos);    
+                int nFwMultTrack1= rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                int nRvMultTrack1= rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+
+                //we just set coverage of the diff if cov of  track 2 or track 1 exist
+                if(nFwMultTrack1 !=0 && nFwMultTrack2 != 0){
+                cov.setnFwMult(pos, Math.abs(nFwMultTrack1-nFwMultTrack2));
+                }
+                if(nRvMultTrack1 !=0&& nRvMultTrack2!=0){
+                cov.setnRvMult(pos, Math.abs(nRvMultTrack1-nRvMultTrack2));
+                }
+
+                cov.setNFwMultTrack1(pos, nFwMultTrack1);
+                cov.setNRvMultTrack1(pos, nRvMultTrack1);
+
+            }
+            fetch2.close();
+            fetch.close();
+            rs.close();
+            rs2.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        return cov;
+    }
+
+
+  
+
+
     @Override
     public void run(){
 
@@ -123,7 +198,11 @@ public class CoverageThread extends Thread{
                 if(!currentCov.coversBounds(r.getFrom(), r.getTo())){
                     requestCounter++;
                     if(matchesLatestRequestBounds(r)){
+                       if(trackID2 != 0){
+                        currentCov = this.loadCoverage2(r);
+                      }else{
                         currentCov = this.loadCoverage(r);
+                      }
                     } else {
                         skippedCounter++;
                     }

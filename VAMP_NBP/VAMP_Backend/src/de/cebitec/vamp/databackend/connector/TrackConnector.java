@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 public class TrackConnector {
 
     private String associatedTrackName;
-    private long trackID;
+    private long trackID;  
     private long runID;
     private int genomeSize;
     private CoverageThread thread;
@@ -61,6 +61,19 @@ public class TrackConnector {
         thread.start();
         genomeSize = this.getRefGenLength();
     }
+    
+        TrackConnector(long trackID1, long trackID2) {
+      // Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE,"Double TrackCon");
+        this.trackID = trackID1;
+        con = ProjectConnector.getInstance().getConnection();
+        runID = fetchRunID();
+
+        thread = new CoverageThread(trackID1,trackID2);
+        thread.start();
+        genomeSize = this.getRefGenLength();
+    }
+
+
 
     private int fetchRunID() {
         int id = 0;
@@ -809,5 +822,29 @@ public class TrackConnector {
         percentage = absValue / genomeSize * 100;
         return percentage;
     }
+
+        public HashMap<Integer,Integer> getCoverageInfosofTrack(int from , int to){
+            PreparedStatement fetch;
+            HashMap<Integer,Integer> positionMap = new HashMap<Integer,Integer>();
+            int coverage;
+            int position;
+        try {
+
+          fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
+
+            fetch.setLong(1, trackID);
+            fetch.setLong(2, from);
+            fetch.setLong(3, to);
+            ResultSet rs = fetch.executeQuery();
+            while (rs.next()) {
+                position = rs.getInt(FieldNames.COVERAGE_POSITION);
+                coverage = rs.getInt(FieldNames.COVERAGE_N_MULT);
+                positionMap.put(position,coverage);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return positionMap;
+        }
 
 }

@@ -379,17 +379,30 @@ public class H2SQLStatements {
             "WHERE "+
                 FieldNames.REF_GEN_ID+" = ?";
 
-      public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS =
+
+    public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS =
             "ALTER TABLE "+
                 FieldNames.TABLE_STATICS+" " +
             "ADD COLUMN "+
                 FieldNames.STATICS_NUMBER_OF_READS+" BIGINT UNSIGNED " ;
+
+     /*     public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ =
+            "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
+            + FieldNames.TABLE_STATICS
+            + " AND COLUMN_NAME =" + FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ + ")"
+            + " BEGIN "
+            + "ALTER TABLE "
+            + FieldNames.TABLE_STATICS
+            + " ADD COLUMN "
+            + FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ + " BIGINT UNSIGNED "+
+            " END";*/
 
           public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ =
             "ALTER TABLE "+
                 FieldNames.TABLE_STATICS+" " +
             "ADD COLUMN "+
                 FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+" BIGINT UNSIGNED  ";
+
 
     // statements to fetch data from database
 

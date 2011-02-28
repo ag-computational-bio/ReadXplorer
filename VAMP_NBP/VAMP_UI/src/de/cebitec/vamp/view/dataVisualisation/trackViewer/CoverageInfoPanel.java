@@ -25,13 +25,13 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        perfectCovLabel = new javax.swing.JLabel();
         zeroFwdField = new javax.swing.JTextField();
         zeroRevField = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
+        bmCovLabel = new javax.swing.JLabel();
         bestMatchFwdField = new javax.swing.JTextField();
         bestMatchRevField = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
+        complCovLabel = new javax.swing.JLabel();
         nFwdField = new javax.swing.JTextField();
         nRevField = new javax.swing.JTextField();
 
@@ -45,8 +45,8 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
         jTextField2.setText("rev");
         jTextField2.setToolTipText("reverse strand");
 
-        jLabel2.setText("Perfect cov.:");
-        jLabel2.setToolTipText("Number of perfect matches");
+        perfectCovLabel.setText("Perfect cov.:");
+        perfectCovLabel.setToolTipText("Number of perfect matches");
 
         zeroFwdField.setEditable(false);
         zeroFwdField.setToolTipText("");
@@ -54,8 +54,8 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
         zeroRevField.setEditable(false);
         zeroRevField.setToolTipText("");
 
-        jLabel3.setText("Best-Match cov.:");
-        jLabel3.setToolTipText("<html>Number of matches<br>that are optimal for their related read");
+        bmCovLabel.setText("Best-Match cov.:");
+        bmCovLabel.setToolTipText("<html>Number of matches<br>that are optimal for their related read");
 
         bestMatchFwdField.setEditable(false);
         bestMatchFwdField.setToolTipText("");
@@ -63,8 +63,8 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
         bestMatchRevField.setEditable(false);
         bestMatchRevField.setToolTipText("");
 
-        jLabel4.setText("Complete cov.:");
-        jLabel4.setToolTipText("Complete number of matches");
+        complCovLabel.setText("Complete cov.:");
+        complCovLabel.setToolTipText("Complete number of matches");
 
         nFwdField.setEditable(false);
         nFwdField.setToolTipText("");
@@ -79,9 +79,9 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2)
+                    .addComponent(complCovLabel)
+                    .addComponent(bmCovLabel)
+                    .addComponent(perfectCovLabel)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -107,17 +107,17 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
+                    .addComponent(perfectCovLabel)
                     .addComponent(zeroFwdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(zeroRevField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
+                    .addComponent(bmCovLabel)
                     .addComponent(bestMatchFwdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bestMatchRevField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
+                    .addComponent(complCovLabel)
                     .addComponent(nFwdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(nRevField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -128,14 +128,14 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField bestMatchFwdField;
     private javax.swing.JTextField bestMatchRevField;
+    private javax.swing.JLabel bmCovLabel;
+    private javax.swing.JLabel complCovLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField nFwdField;
     private javax.swing.JTextField nRevField;
+    private javax.swing.JLabel perfectCovLabel;
     private javax.swing.JTextField zeroFwdField;
     private javax.swing.JTextField zeroRevField;
     // End of variables declaration//GEN-END:variables
@@ -186,6 +186,13 @@ public class CoverageInfoPanel extends javax.swing.JPanel {
         } else {
             nRevField.setText("");
         }
+    }
+
+    public void renameFields(){
+        perfectCovLabel.setText("Diff cov.:");
+        bmCovLabel.setText("Track 1 cov.:");
+        complCovLabel.setText("Track 2 cov.:");
+
     }
 
 

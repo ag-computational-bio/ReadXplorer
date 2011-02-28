@@ -19,7 +19,13 @@ public class TrackInfoPanel extends AbstractInfoPanel implements CoverageInfoI{
     /** Creates new form TrackInfoPanel */
     public TrackInfoPanel() {
         initComponents();
-        //colorOptionPanel1 = new ColorOptionPanel(this);
+      
+    }
+
+        public TrackInfoPanel(boolean twoTracks) {
+        initComponents();
+        colorOptionTab.remove(colorOptionPanel1);
+      coverageInfoPanel1.renameFields();
     }
 
     /** This method is called from within the constructor to
@@ -59,16 +65,27 @@ public class TrackInfoPanel extends AbstractInfoPanel implements CoverageInfoI{
     @Override
     public void setCurrentMousePosition(int logPos) {
 
-        if(mouseOverWanted && cov != null){
+        if (mouseOverWanted && cov != null) {
+            
+            if (!cov.isTwoTracks()) {
 
-            coverageInfoPanel1.setZeroFwd(cov.getzFwMult(logPos));
-            coverageInfoPanel1.setZeroRev(cov.getzRvMult(logPos));
-            coverageInfoPanel1.setBmFwd(cov.getBmFwMult(logPos));
-            coverageInfoPanel1.setBmRev(cov.getBmRvMult(logPos));
-            coverageInfoPanel1.setNFwd(cov.getnFwMult(logPos));
-            coverageInfoPanel1.setNRev(cov.getnRvMult(logPos));
+                coverageInfoPanel1.setZeroFwd(cov.getzFwMult(logPos));
+                coverageInfoPanel1.setZeroRev(cov.getzRvMult(logPos));
+                coverageInfoPanel1.setBmFwd(cov.getBmFwMult(logPos));
+                coverageInfoPanel1.setBmRev(cov.getBmRvMult(logPos));
+                coverageInfoPanel1.setNFwd(cov.getnFwMult(logPos));
+                coverageInfoPanel1.setNRev(cov.getnRvMult(logPos));
 
+            } else {
+                coverageInfoPanel1.setZeroFwd(cov.getnFwMult(logPos));
+                coverageInfoPanel1.setZeroRev(cov.getnRvMult(logPos));
+                coverageInfoPanel1.setBmFwd(cov.getNFwMultTrack1(logPos));
+                coverageInfoPanel1.setBmRev(cov.getNRvMultTrack1(logPos));
+                coverageInfoPanel1.setNFwd(cov.getNFwMultTrack2(logPos));
+                coverageInfoPanel1.setNRev(cov.getNRvMultTrack2(logPos));
+            }
         } else {
+
             coverageInfoPanel1.setZeroFwd(-1);
             coverageInfoPanel1.setZeroRev(-1);
             coverageInfoPanel1.setBmFwd(-1);
