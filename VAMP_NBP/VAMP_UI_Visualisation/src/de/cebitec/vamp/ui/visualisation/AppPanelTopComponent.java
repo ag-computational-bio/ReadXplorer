@@ -7,6 +7,7 @@ import de.cebitec.vamp.api.cookies.CloseTrackCookie;
 import de.cebitec.vamp.api.cookies.OpenTrackCookie;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -242,8 +243,11 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
         // put the panel's TrackViewer in lookup so it can be accessed
         BasePanel bp = (BasePanel) trackPanel;
-        TrackViewer tv = (TrackViewer) bp.getViewer();
-        content.add(tv);
+        // make sure the multiple track viewers do not cause a mess in the lookup
+        if (!(bp.getViewer() instanceof MultipleTrackViewer)){
+            TrackViewer tv = (TrackViewer) bp.getViewer();
+            content.add(tv);
+        }
 
         CloseTrackCookie closeTrackCookie = new CloseTrackCookie() {
 

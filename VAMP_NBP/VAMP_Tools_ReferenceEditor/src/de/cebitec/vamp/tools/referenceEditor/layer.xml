@@ -19,7 +19,7 @@
         <folder name="Tools">
             <file name="de-cebitec-vamp-tools-referenceEditor-OpenReferenceEditorAction-separatorBefore.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-                <attr name="position" intvalue="162"/>
+                <attr name="position" intvalue="170"/>
             </file>
             <file name="de-cebitec-vamp-tools-referenceEditor-OpenReferenceEditorAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-tools-referenceEditor-OpenReferenceEditorAction.instance"/>

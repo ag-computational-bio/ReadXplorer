@@ -28,6 +28,8 @@ public final class OpenReadSearch implements ActionListener {
             DialogDisplayer.getDefault().notify(dd);
             if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()){
                 currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
+            } else {
+                return;
             }
         }
         else{

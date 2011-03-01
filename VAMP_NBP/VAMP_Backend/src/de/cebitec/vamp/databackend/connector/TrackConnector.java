@@ -61,19 +61,17 @@ public class TrackConnector {
         thread.start();
         genomeSize = this.getRefGenLength();
     }
-    
-        TrackConnector(long trackID1, long trackID2) {
-      // Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE,"Double TrackCon");
-        this.trackID = trackID1;
+
+    TrackConnector(long id, List<PersistantTrack> tracks) {
+        if (tracks.size() > 2) throw new UnsupportedOperationException("More than two tracks not supported yet.");
+        this.trackID = id;
         con = ProjectConnector.getInstance().getConnection();
         runID = fetchRunID();
 
-        thread = new CoverageThread(trackID1,trackID2);
+        thread = new CoverageThread(tracks.get(0).getId(),tracks.get(1).getId());
         thread.start();
         genomeSize = this.getRefGenLength();
     }
-
-
 
     private int fetchRunID() {
         int id = 0;

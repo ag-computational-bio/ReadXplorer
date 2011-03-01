@@ -1177,14 +1177,19 @@ public class ProjectConnector {
         }
         return trackConnectors.get(trackID);
     }
-
-        public TrackConnector getTrackConnector(long trackID,long trackID2) {
+    
+    public TrackConnector getTrackConnector(List<PersistantTrack> tracks) {
+        // makes sure the track id is not already used
+        long id = 9999;
+        for (PersistantTrack track : tracks) {
+            id += track.getId();
+        }
         // only return new object, if no suitable connector was created before
-            trackConnectors.put(trackID+trackID2+100, new TrackConnector(trackID,trackID2));
-        if (!trackConnectors.containsKey(trackID)) {
+            trackConnectors.put(id, new TrackConnector(id, tracks));
+        if (!trackConnectors.containsKey(id)) {
             
         }
-        return trackConnectors.get(trackID+trackID2+100);
+        return trackConnectors.get(id);
     }
 
     public Connection getConnection() {

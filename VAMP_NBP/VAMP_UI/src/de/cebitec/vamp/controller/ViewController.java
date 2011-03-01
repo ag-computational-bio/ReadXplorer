@@ -90,14 +90,14 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         openRefGenDialog.setVisible(true);
 
         if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTrack() != null){
-            PersistantTrack t = otp.getSelectedTrack();
+            for (PersistantTrack track : otp.getSelectedTracks()) {
+                // create basepanel
+                BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
+                trackToPanel.put(track, trackPanel);
 
-            // create basepanel 
-            BasePanel tp = basePanelFac.getTrackBasePanel(t,currentRefGen);
-            trackToPanel.put(t, tp);
-
-            // show the panel and the track
-            getApp().showTrackPanel(tp);
+                // show the panel and the track
+                getApp().showTrackPanel(trackPanel);
+            }
         }
     }
 
@@ -117,27 +117,8 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         trackToPanel.values().remove((BasePanel) track);
     }
 
-    public void openTrack2(BasePanel tp,PersistantTrack t,PersistantTrack t2) {
-
-        PersistantTrack newTrack = new PersistantTrack((t.getId()+t2.getId())+100, (t.getDescription()+"-"+t2.getDescription()), t.getTimestamp(),t.getRefGenID(),t.getRunID()+t2.getRunID());
-      // OpenTrackDialog d = new OpenTrackDialog(WindowManager.getDefault().getMainWindow(), true, currentRefGen);
-    //    d.setVisible(true);
-
-      //  if(d.wasTrackSelected()){
-        //    PersistantTrack t = d.getSelectedTrack();
-
-            // create basepanel
-          //  BasePanel tp = basePanelFac.getTrackBasePanel2(t,currentRefGen);
-//          Logger.getLogger(this.getClass().getName()).log(Level.INFO, "2trackid" + newTrack.getId());
-            // create a menuItem to close this track
-//            TrackItem trackItem = new TrackItem(newTrack);
-//            trackToItem.put(newTrack, trackItem);
-//            trackToPanel.put(newTrack, tp);
-
-            // show the panel and the track
-            getApp().showTrackPanel(tp);
-    //    }
-
+    public void openTrack2(BasePanel tp) {
+        getApp().showTrackPanel(tp);
     }
 
     @Deprecated

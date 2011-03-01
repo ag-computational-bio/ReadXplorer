@@ -5,13 +5,14 @@ import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 
 /**
  *
- * @author ddoppmeier
+ * @author jwinneba
  */
 public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInfoI, MousePositionListener{
 
     private static final long serialVersionUID = 812385;
     private PersistantCoverage cov;
     private boolean mouseOverWanted;
+    private boolean doubleTrackHackBoolean;
 
     /** Creates new form CoverageInfoPanel */
     public CoverageInfoLabel() {
@@ -27,19 +28,19 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
+        perfectCovLabel = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         zeroFwdField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         zeroRevField = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
-        jLabel3 = new javax.swing.JLabel();
+        bmCovLabel = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         bestMatchFwdField = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         bestMatchRevField = new javax.swing.JTextField();
         jSeparator2 = new javax.swing.JSeparator();
-        jLabel4 = new javax.swing.JLabel();
+        complCovLabel = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         nFwdField = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
@@ -48,8 +49,8 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         jLabel1 = new javax.swing.JLabel();
         currentPositionLabel = new javax.swing.JLabel();
 
-        jLabel2.setText("Perfect cov.:");
-        jLabel2.setToolTipText("Number of perfect matches");
+        perfectCovLabel.setText("Perfect cov.:");
+        perfectCovLabel.setToolTipText("Number of perfect matches");
 
         jLabel5.setText("+");
 
@@ -68,8 +69,8 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator1.setPreferredSize(new java.awt.Dimension(2, 20));
 
-        jLabel3.setText("Best-Match cov.:");
-        jLabel3.setToolTipText("<html>Number of matches<br>that are optimal for their related read");
+        bmCovLabel.setText("Best-Match cov.:");
+        bmCovLabel.setToolTipText("<html>Number of matches<br>that are optimal for their related read");
 
         jLabel7.setText("+");
 
@@ -86,8 +87,8 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator2.setPreferredSize(new java.awt.Dimension(5, 20));
 
-        jLabel4.setText("Complete cov.:");
-        jLabel4.setToolTipText("Complete number of matches");
+        complCovLabel.setText("Complete cov.:");
+        complCovLabel.setToolTipText("Complete number of matches");
 
         jLabel9.setText("+");
 
@@ -114,7 +115,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 8, Short.MAX_VALUE)
-                .addComponent(jLabel2)
+                .addComponent(perfectCovLabel)
                 .addGap(5, 5, 5)
                 .addComponent(jLabel5)
                 .addGap(5, 5, 5)
@@ -126,7 +127,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
                 .addGap(5, 5, 5)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
-                .addComponent(jLabel3)
+                .addComponent(bmCovLabel)
                 .addGap(5, 5, 5)
                 .addComponent(jLabel7)
                 .addGap(5, 5, 5)
@@ -138,7 +139,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
                 .addGap(5, 5, 5)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
-                .addComponent(jLabel4)
+                .addComponent(complCovLabel)
                 .addGap(5, 5, 5)
                 .addComponent(jLabel9)
                 .addGap(5, 5, 5)
@@ -163,7 +164,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
                     .addComponent(currentPositionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel2))
+                        .addComponent(perfectCovLabel))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addComponent(jLabel5))
@@ -175,7 +176,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel3))
+                        .addComponent(bmCovLabel))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addComponent(jLabel7))
@@ -187,7 +188,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
                     .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
-                        .addComponent(jLabel4))
+                        .addComponent(complCovLabel))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addComponent(jLabel9))
@@ -208,12 +209,11 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField bestMatchFwdField;
     private javax.swing.JTextField bestMatchRevField;
+    private javax.swing.JLabel bmCovLabel;
+    private javax.swing.JLabel complCovLabel;
     private javax.swing.JLabel currentPositionLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -224,6 +224,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTextField nFwdField;
     private javax.swing.JTextField nRevField;
+    private javax.swing.JLabel perfectCovLabel;
     private javax.swing.JTextField zeroFwdField;
     private javax.swing.JTextField zeroRevField;
     // End of variables declaration//GEN-END:variables
@@ -280,13 +281,25 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     public void setCurrentMousePosition(int logPos) {
         if(/*mouseOverWanted &&*/ cov != null){
 
-            setZeroFwd(cov.getzFwMult(logPos));
-            setZeroRev(cov.getzRvMult(logPos));
-            setBmFwd(cov.getBmFwMult(logPos));
-            setBmRev(cov.getBmRvMult(logPos));
-            setNFwd(cov.getnFwMult(logPos));
-            setNRev(cov.getnRvMult(logPos));
-            currentPositionLabel.setText(String.valueOf(logPos));
+            if (!doubleTrackHackBoolean) {
+                setZeroFwd(cov.getzFwMult(logPos));
+                setZeroRev(cov.getzRvMult(logPos));
+                setBmFwd(cov.getBmFwMult(logPos));
+                setBmRev(cov.getBmRvMult(logPos));
+                setNFwd(cov.getnFwMult(logPos));
+                setNRev(cov.getnRvMult(logPos));
+                currentPositionLabel.setText(String.valueOf(logPos));
+            }
+            // TODO there has to be a much nicer way, maybe alter PersistantTrack or something else
+            else {
+                setZeroFwd(cov.getnFwMult(logPos));
+                setZeroRev(cov.getnRvMult(logPos));
+                setBmFwd(cov.getNFwMultTrack1(logPos));
+                setBmRev(cov.getNRvMultTrack1(logPos));
+                setNFwd(cov.getNFwMultTrack2(logPos));
+                setNRev(cov.getNRvMultTrack2(logPos));
+                currentPositionLabel.setText(String.valueOf(logPos));
+            }
 
         } else {
             setZeroFwd(-1);
@@ -317,5 +330,14 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         return cov;
     }
 
+    /**
+     * little (hack) method to show the two track coverage info
+     */
+    public void renameFields(){
+        perfectCovLabel.setText("Diff cov.:");
+        bmCovLabel.setText("Track 1 cov.:");
+        complCovLabel.setText("Track 2 cov.:");
+        doubleTrackHackBoolean = true;
+    }
 
 }

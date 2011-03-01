@@ -23,11 +23,13 @@ public final class OpenSNPDetection implements ActionListener {
         TrackViewer currentTrackViewer = null;
         if (context.size() > 1){
             JList trackList = new JList(context.toArray());
-        DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenSNPDetection.class, "TTL_OpenSNPDetection"));
+            DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenSNPDetection.class, "TTL_OpenSNPDetection"));
             dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
             DialogDisplayer.getDefault().notify(dd);
             if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()){
                 currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
+            } else {
+                return;
             }
         }
         else{

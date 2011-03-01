@@ -227,8 +227,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     public void secondTrackSelected(){
       selectedTrack = op.getSelectedTrack();
      // track2Name.setText(selectedTrack.getDescription());
-      TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track.getId(), selectedTrack.getId());
-      basePanelFactory.getTrackBasePanel2(track,selectedTrack ,refGen,con);
+//      TrackConnector con = ProjectConnector.getInstance().getTrackConnector(track.getId(), selectedTrack.getId());
+//      basePanelFactory.getTrackBasePanel2(track,selectedTrack ,refGen,con);
     
     }
     public void snpDetectionClosed(){

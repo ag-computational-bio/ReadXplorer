@@ -12,13 +12,10 @@ import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceNavigator;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewerInfoPanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackInfoPanel;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackNavigatorPanel;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,8 +25,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,32 +45,21 @@ public class BasePanelFactory {
         this.viewController = viewController;
     }
 
-
     public BasePanel getGenomeViewerBasePanel(PersistantReference refGen){
 
         this.refGen = refGen;
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener((MousePositionListener) b);
 
-        // create info panel
-//        ReferenceViewerInfoPanel info = new ReferenceViewerInfoPanel();
-
         // create viewer
         ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGen);
-//        genomeViewer.setGenomeViewerInfoPanel(info);
 
         // show a color legend
         genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend());
 
-        // create navigator
-//        AbstractInfoPanel navigator = new ReferenceNavigator(refGen, boundsManager, genomeViewer);
-
         // add panels to basepanel
-//        b.setRightInfoPanel(info);
         b.setViewer(genomeViewer);
-//        b.setLeftInfoPanel(navigator);
         b.setAdjustmentPanel(this.createAdjustmentPanel(true, true));
-//        b.setTitlePanel(this.getTitlePanel(refGen.getName()));
 
         return b;
     }
@@ -93,57 +78,67 @@ public class BasePanelFactory {
         // create and set up legend
         trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
         
-        // create info panel
-//        TrackInfoPanel info = new TrackInfoPanel();
-//        trackV.setTrackInfoPanel(info);
+        // create info label
         CoverageInfoLabel cil = new CoverageInfoLabel();
         trackV.setTrackInfoPanel(cil);
-
-        // create navi panel
-//        TrackNavigatorPanel navi = new TrackNavigatorPanel(tc, this, track, boundsManager,refGen);
 
         // create zoom slider
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         // add panels to basepanel
         b.setTopInfoPanel(cil);
-//        b.setRightInfoPanel(info);
-//        b.setLeftInfoPanel(navi);
         b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
         return b;
     }
 
-        public BasePanel getTrackBasePanel2(PersistantTrack track1,PersistantTrack track2,PersistantReference refGen, TrackConnector tcon){
+    /**
+     * Method to get one <code>BasePanel</code> for multiple tracks.
+     * Only 2 tracks at once are currently supported.
+     *
+     * @param tracks to visualize on this <code>BasePanel</code>.
+     * @param refGen reference the tracks belong to.
+     * @return
+     */
+    public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks,PersistantReference refGen){
+        if (tracks.size() > 2){
+            throw new UnsupportedOperationException("More than two tracks not supported yet.");
+        }
+        else if (tracks.size() == 2) {
+            BasePanel b = new BasePanel(boundsManager, viewController);
+            viewController.addMousePositionListener(b);
 
-        BasePanel b = new BasePanel(boundsManager, viewController);
-        viewController.addMousePositionListener(b);
+            // get double track connector
+            TrackConnector trackCon = ProjectConnector.getInstance().getTrackConnector(tracks);
+            MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon);
 
-        TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tcon);
+            // create and set up legend
+            trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
 
-        // create and set up legend
-        trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
+            // create info panel
+            CoverageInfoLabel cil = new CoverageInfoLabel();
+            cil.renameFields();
+            trackV.setTrackInfoPanel(cil);
 
-        // create info panel
-        TrackInfoPanel info = new TrackInfoPanel(true);
-        trackV.setTrackInfoPanel(info);
+            // create zoom slider
+            CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
-        // create navi panel
-        TrackNavigatorPanel navi = new TrackNavigatorPanel(tcon, this, track1, boundsManager);
+            // add panels to basepanel
+            b.setTopInfoPanel(cil);
+            b.setViewer(trackV, slider);
+            String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
 
-        // create zoom slider
-        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
-
-        // add panels to basepanel
-        b.setRightInfoPanel(info);
-        b.setLeftInfoPanel(navi);
-        b.setViewer(trackV, slider);
-        String title = track1.getDescription()+" - "+track2.getDescription();
-
-        b.setTitlePanel(this.getTitlePanel(title));
-         viewController.openTrack2(b,track1,track2);
-        return b;
+            b.setTitlePanel(this.getTitlePanel(title));
+            viewController.openTrack2(b);
+            return b;
+        }
+        else if (tracks.size() == 1) {
+            return getTrackBasePanel(tracks.get(0), refGen);
+        }
+        else {
+            throw new UnknownError();
+        }
     }
 
 
@@ -152,7 +147,6 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create a trackviewer
-//        TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track.getId());
         AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGen, connector);
 
         // create a legend
@@ -170,7 +164,6 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create a trackviewer
-//        TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track.getId());
         HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGen, connector);
 
         // create a legend

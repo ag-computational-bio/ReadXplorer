@@ -9,6 +9,7 @@ package de.cebitec.vamp.view.dialogPanels;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +57,6 @@ public class OpenTrackPanel extends javax.swing.JPanel {
 
         setLayout(new java.awt.BorderLayout());
 
-        tracklist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tracklist.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 tracklistValueChanged(evt);
@@ -79,6 +79,17 @@ public class OpenTrackPanel extends javax.swing.JPanel {
 
     public PersistantTrack getSelectedTrack() {
         return selectedTrack;
+    }
+
+    public List<PersistantTrack> getSelectedTracks(){
+        List<PersistantTrack> selectedTracks = new ArrayList<PersistantTrack>();
+
+        Object[] trackArray = tracklist.getSelectedValues();
+        for (Object track : trackArray) {
+            selectedTracks.add((PersistantTrack) track);
+        }
+
+        return selectedTracks;
     }
 
 }
