@@ -16,14 +16,14 @@
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
   <SubComponents>
-    <Component class="de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel" name="jumpPanel">
+    <Component class="de.cebitec.vamp.ui.visualisation.reference.JumpPanel" name="jumpPanel">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
           <BorderConstraints direction="Center"/>
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector" name="codonSelector">
+    <Component class="de.cebitec.vamp.ui.visualisation.reference.CodonSelector" name="codonSelector">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
           <BorderConstraints direction="Last"/>

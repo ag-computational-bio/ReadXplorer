@@ -1,4 +1,6 @@
-package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
+package de.cebitec.vamp.ui.visualisation.reference;
+
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 
 /**
  *
@@ -86,7 +88,7 @@ public class CodonSelector extends javax.swing.JPanel {
                     .addComponent(atgCheckbox)
                     .addComponent(ttgCheckbox)
                     .addComponent(gtgCheckbox))
-                .addContainerGap(9, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

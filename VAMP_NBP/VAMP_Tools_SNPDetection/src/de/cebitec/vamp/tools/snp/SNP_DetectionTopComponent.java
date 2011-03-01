@@ -14,7 +14,9 @@ import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
- * Top component which displays something.
+ * Top component which displays SNP detection tabs.
+ * TODO make it show a new tab for each started snp detection.
+ * maybe use a method addSearch and call it in OpenSNPDetection
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.snp//SNP_Detection//EN", autostore = false)
 public final class SNP_DetectionTopComponent extends TopComponent {

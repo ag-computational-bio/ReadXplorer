@@ -55,20 +55,10 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         refGenList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        refGenList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                refGenListValueChanged(evt);
-            }
-        });
         jScrollPane1.setViewportView(refGenList);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void refGenListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_refGenListValueChanged
-        selectedReference = (PersistantReference) refGenList.getSelectedValue();
-}//GEN-LAST:event_refGenListValueChanged
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
@@ -76,7 +66,7 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     public PersistantReference getSelectedReference() {
-        return selectedReference;
+        return (PersistantReference) refGenList.getSelectedValue();
     }
 
 }

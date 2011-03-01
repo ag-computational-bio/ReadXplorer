@@ -14,7 +14,9 @@ import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
- * Top component which displays something.
+ * Top component which displays read searches.
+ * TODO make it show a new tab for each started read search.
+ * maybe use a method addSearch and call it in OpenReadSearch
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.readSearch//ReadSearch//EN", autostore = false)
 public final class ReadSearchTopComponent extends TopComponent {

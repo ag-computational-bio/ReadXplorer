@@ -1,4 +1,4 @@
-package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
+package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;

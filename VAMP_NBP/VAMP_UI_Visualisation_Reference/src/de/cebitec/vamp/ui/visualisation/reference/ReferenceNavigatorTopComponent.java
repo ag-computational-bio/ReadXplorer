@@ -51,8 +51,8 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jumpPanel = new de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel();
-        codonSelector = new de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector();
+        jumpPanel = new de.cebitec.vamp.ui.visualisation.reference.JumpPanel();
+        codonSelector = new de.cebitec.vamp.ui.visualisation.reference.CodonSelector();
 
         setLayout(new java.awt.BorderLayout());
         add(jumpPanel, java.awt.BorderLayout.CENTER);
@@ -60,8 +60,8 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.view.dataVisualisation.referenceViewer.CodonSelector codonSelector;
-    private de.cebitec.vamp.view.dataVisualisation.referenceViewer.JumpPanel jumpPanel;
+    private de.cebitec.vamp.ui.visualisation.reference.CodonSelector codonSelector;
+    private de.cebitec.vamp.ui.visualisation.reference.JumpPanel jumpPanel;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,

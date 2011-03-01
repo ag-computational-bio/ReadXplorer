@@ -26,7 +26,6 @@ import org.openide.DialogDisplayer;
  */
 public class ViewController implements de.cebitec.vamp.view.dataVisualisation.MousePositionListener {
 
-    private static ViewController instance;
     private List<MousePositionListener> mousePosListener;
     private BoundsInfoManager boundsManager;
     private BasePanelFactory basePanelFac;
@@ -89,7 +88,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
-        if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTrack() != null){
+        if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()){
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 // create basepanel
                 BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);

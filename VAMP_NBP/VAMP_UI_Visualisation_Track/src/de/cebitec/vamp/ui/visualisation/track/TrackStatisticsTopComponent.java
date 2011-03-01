@@ -48,14 +48,14 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        trackStatisticsPanel = new de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel();
+        trackStatisticsPanel = new de.cebitec.vamp.ui.visualisation.track.TrackStatisticsPanel();
 
         setLayout(new java.awt.BorderLayout());
         add(trackStatisticsPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel trackStatisticsPanel;
+    private de.cebitec.vamp.ui.visualisation.track.TrackStatisticsPanel trackStatisticsPanel;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,

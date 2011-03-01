@@ -25,7 +25,6 @@ public class ReferenceViewer extends AbstractViewer {
     private static int height = 250;
     private static int FRAMEHEIGHT = 20;
     private PersistantReference refGen;
-    private ReferenceViewerInfoPanel infoPanel;
     private Map<Integer, Integer> featureStats;
     private Feature currentlySelectedFeature;
     private int labelMargin;
@@ -211,15 +210,6 @@ public class ReferenceViewer extends AbstractViewer {
         if(i<=x2){
             g.drawLine(i, yCord, x2, yCord);
         }
-    }
-
-    public void setGenomeViewerInfoPanel(ReferenceViewerInfoPanel info) {
-        infoPanel = info;
-        infoPanel.setReference(this.refGen);
-    }
-
-    private void showFeatureDetails(PersistantFeature f) {
-        infoPanel.showFeatureDetails(f);
     }
 
     @Override

@@ -16,7 +16,7 @@
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
   <SubComponents>
-    <Component class="de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackStatisticsPanel" name="trackStatisticsPanel">
+    <Component class="de.cebitec.vamp.ui.visualisation.track.TrackStatisticsPanel" name="trackStatisticsPanel">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
           <BorderConstraints direction="Center"/>

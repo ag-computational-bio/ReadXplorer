@@ -19,7 +19,6 @@ import java.util.List;
 public class OpenTrackPanel extends javax.swing.JPanel {
 
     public final static long serialVersionUID = 724742798;
-    private PersistantTrack selectedTrack;
     private ReferenceConnector refGenConnector;
 
     /** Creates new form OpenTrackPanel */
@@ -57,29 +56,15 @@ public class OpenTrackPanel extends javax.swing.JPanel {
 
         setLayout(new java.awt.BorderLayout());
 
-        tracklist.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                tracklistValueChanged(evt);
-            }
-        });
         jScrollPane1.setViewportView(tracklist);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tracklistValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_tracklistValueChanged
-        selectedTrack = (PersistantTrack) tracklist.getSelectedValue();
-}//GEN-LAST:event_tracklistValueChanged
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList tracklist;
     // End of variables declaration//GEN-END:variables
-
-    public PersistantTrack getSelectedTrack() {
-        return selectedTrack;
-    }
 
     public List<PersistantTrack> getSelectedTracks(){
         List<PersistantTrack> selectedTracks = new ArrayList<PersistantTrack>();

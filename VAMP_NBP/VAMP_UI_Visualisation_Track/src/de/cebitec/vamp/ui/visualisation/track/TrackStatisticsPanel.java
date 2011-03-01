@@ -1,4 +1,4 @@
-package de.cebitec.vamp.view.dataVisualisation.trackViewer;
+package de.cebitec.vamp.ui.visualisation.track;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.RunConnector;
