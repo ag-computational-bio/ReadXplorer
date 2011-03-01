@@ -308,6 +308,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * Repaints the component.
+     * @param oldPos the old mouse position
+     * @param newPos the new mouse position
+     */
     private void repaintMousePosition(int oldPos, int newPos){
         if(isInDrawingMode()){
             PhysicalBaseBounds mouseAreaOld = getPhysBoundariesForLogPos(oldPos);
@@ -316,7 +321,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             int min;
             int max;
             if(oldPos >= newPos){
-                min = (int)  mouseAreaNew.getLeftPhysBound();
+                min = (int) mouseAreaNew.getLeftPhysBound();
                 max = (int) mouseAreaOld.getLeftPhysBound()+getWidthOfMouseOverlay(oldPos);
             } else {
                 min = (int) mouseAreaOld.getLeftPhysBound();
