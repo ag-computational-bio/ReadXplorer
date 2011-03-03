@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.objects.FeatureType;
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.Feature;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;

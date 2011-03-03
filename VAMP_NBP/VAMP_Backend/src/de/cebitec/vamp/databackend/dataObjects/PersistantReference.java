@@ -3,6 +3,8 @@ package de.cebitec.vamp.databackend.dataObjects;
 import java.sql.Timestamp;
 
 /**
+ * A persistant reference containing an id, name, description, sequence
+ * & timestamp of a reference.
  *
  * @author ddoppmeier
  */

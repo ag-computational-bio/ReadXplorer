@@ -1,7 +1,7 @@
 package de.cebitec.vamp.exporter.excel;
 
 import de.cebitec.vamp.exporter.ExporterI;
-import de.cebitec.vamp.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp;
 import jxl.write.Label;
 import java.io.File;
 import java.io.FileNotFoundException;

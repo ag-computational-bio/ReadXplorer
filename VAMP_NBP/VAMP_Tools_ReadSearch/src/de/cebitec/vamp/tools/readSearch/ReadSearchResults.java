@@ -6,7 +6,7 @@
 
 package de.cebitec.vamp.tools.readSearch;
 
-import de.cebitec.vamp.objects.Read;
+import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;

@@ -6,7 +6,7 @@
 
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.ArrayList;
 import java.util.List;

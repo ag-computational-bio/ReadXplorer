@@ -1,6 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;

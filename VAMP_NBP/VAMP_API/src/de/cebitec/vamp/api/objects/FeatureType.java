@@ -1,4 +1,4 @@
-package de.cebitec.vamp.objects;
+package de.cebitec.vamp.api.objects;
 
 import java.util.HashMap;
 

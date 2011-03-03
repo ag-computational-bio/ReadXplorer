@@ -48,14 +48,22 @@ public class ReferenceViewer extends AbstractViewer {
     public void setSelectedFeature(Feature feature){
 //        this.showFeatureDetails(feature.getPersistantFeature());
         firePropertyChange(PROP_FEATURE_SELECTED, currentlySelectedFeature, feature);
-        
-        // if there was a feature selected before, de-select it
-        if(currentlySelectedFeature != null ){
+
+        // if the currently selected feature is clicked again, de-select it
+        if (currentlySelectedFeature == feature){
             currentlySelectedFeature.setSelected(false);
+            currentlySelectedFeature = null;
+        } else {
+
+            // if there was a feature selected before, de-select it
+            if(currentlySelectedFeature != null){
+                currentlySelectedFeature.setSelected(false);
+            }
+
+            currentlySelectedFeature = feature;
+            currentlySelectedFeature.setSelected(true);
         }
 
-        currentlySelectedFeature = feature;
-        currentlySelectedFeature.setSelected(true);
         this.getSequenceBar().findCodons(); //update codons for current selection
         this.repaint();
     }

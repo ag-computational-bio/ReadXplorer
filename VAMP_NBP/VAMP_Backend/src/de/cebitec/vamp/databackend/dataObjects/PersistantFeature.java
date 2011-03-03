@@ -50,6 +50,10 @@ public class PersistantFeature {
         return stop;
     }
 
+    /**
+     * Returns if the feature is located on the fwd or rev strand.
+     * @return
+     */
     public int getStrand() {
         return strand;
     }

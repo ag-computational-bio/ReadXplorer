@@ -8,7 +8,7 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingWorker;

@@ -31,9 +31,6 @@ public class StartCodonFilter implements RegionFilterI {
     private boolean atgSelected;
     private boolean ttgSelected;
     private boolean gtgSelected;
-    private boolean atgCurrFeatureSel;
-    private boolean ttgCurrFeatureSel;
-    private boolean gtgCurrFeatureSel;
     private int frameCurrFeature;
 
     public StartCodonFilter(int absStart, int absStop, PersistantReference refGen){
@@ -51,9 +48,6 @@ public class StartCodonFilter implements RegionFilterI {
         this.atgSelected = false;
         this.ttgSelected = false;
         this.gtgSelected = false;
-        this.atgCurrFeatureSel = false;
-        this.gtgCurrFeatureSel = false;
-        this.ttgCurrFeatureSel = false;
 
         this.frameCurrFeature = StartCodonFilter.INIT; //because this is not a frame value
     }
@@ -65,8 +59,7 @@ public class StartCodonFilter implements RegionFilterI {
     private void findStartCodons(){
         regions.clear();
 
-        if(atgSelected || ttgSelected || gtgSelected || atgCurrFeatureSel
-                || ttgCurrFeatureSel || gtgCurrFeatureSel){
+        if(atgSelected || ttgSelected || gtgSelected){
             // extends intervall to search to the left and right,
             // to find start/stop codons that overlap this interalls boundaries
             int offset = 3;
@@ -82,30 +75,19 @@ public class StartCodonFilter implements RegionFilterI {
             }
 
             sequence = refGen.getSequence().substring(start, stop);
+            boolean isFeatureSelected = this.frameCurrFeature != INIT;
 
             if(this.atgSelected){
-               this.matchPattern(sequence, atgForward, true, offset, false);
-               this.matchPattern(sequence, atgReverse, false, offset, false);
+               this.matchPattern(sequence, atgForward, true, offset, isFeatureSelected);
+               this.matchPattern(sequence, atgReverse, false, offset, isFeatureSelected);
             }
             if(this.gtgSelected){
-               this.matchPattern(sequence, gtgForward, true, offset, false);
-               this.matchPattern(sequence, gtgReverse, false, offset, false);
+               this.matchPattern(sequence, gtgForward, true, offset, isFeatureSelected);
+               this.matchPattern(sequence, gtgReverse, false, offset, isFeatureSelected);
             }
             if(this.ttgSelected){
-               this.matchPattern(sequence, ttgForward, true, offset, false);
-               this.matchPattern(sequence, ttgReverse, false, offset, false);
-            }
-            if(this.atgCurrFeatureSel){
-               this.matchPattern(sequence, atgForward, true, offset, true);
-               this.matchPattern(sequence, atgReverse, false, offset, true);
-            }
-            if(this.gtgCurrFeatureSel){
-               this.matchPattern(sequence, gtgForward, true, offset, true);
-               this.matchPattern(sequence, gtgReverse, false, offset, true);
-            }
-            if(this.ttgCurrFeatureSel){
-               this.matchPattern(sequence, ttgForward, true, offset, true);
-               this.matchPattern(sequence, ttgReverse, false, offset, true);
+               this.matchPattern(sequence, ttgForward, true, offset, isFeatureSelected);
+               this.matchPattern(sequence, ttgReverse, false, offset, isFeatureSelected);
             }
         }
 
@@ -174,30 +156,6 @@ public class StartCodonFilter implements RegionFilterI {
 
     public boolean isTtgSelected() {
         return this.ttgSelected;
-    }
-
-    public void setAtgCurrFeatureSelected(boolean atgCurrFeatureSel) {
-        this.atgCurrFeatureSel = atgCurrFeatureSel;
-    }
-
-    public void setGtgCurrFeatureSelected(boolean gtgCurrFeatureSel) {
-        this.gtgCurrFeatureSel = gtgCurrFeatureSel;
-    }
-
-    public void setTtgCurrFeatureSelected(boolean ttgCurrFeatureSel) {
-        this.ttgCurrFeatureSel = ttgCurrFeatureSel;
-    }
-
-    public boolean isAtgCurrFeatureSelected() {
-        return this.atgCurrFeatureSel;
-    }
-
-    public boolean isGtgCurrFeatureSelected() {
-        return this.gtgCurrFeatureSel;
-    }
-
-    public boolean isTtgCurrFeatureSelected() {
-        return this.ttgCurrFeatureSel;
     }
 
     public int getFrameCurrFeature() {

@@ -8,7 +8,7 @@ package de.cebitec.vamp.tools.readSearch;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.objects.Read;
+import de.cebitec.vamp.api.objects.Read;
 import java.util.List;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
