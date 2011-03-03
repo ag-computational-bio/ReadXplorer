@@ -365,24 +365,6 @@ public class SequenceBar extends JComponent {
         this.repaint();
     }
 
-    public void showAtgCurrFeature(final boolean selected) {
-        this.codonFilter.setAtgCurrFeatureSelected(selected);
-        this.findCodons();
-        this.repaint();
-    }
-
-    public void showTtgCurrFeature(final boolean selected) {
-        this.codonFilter.setTtgCurrFeatureSelected(selected);
-        this.findCodons();
-        this.repaint();
-    }
-
-    public void showGtgCurrFeature(final boolean selected) {
-        this.codonFilter.setGtgCurrFeatureSelected(selected);
-        this.findCodons();
-        this.repaint();
-    }
-
     public boolean isATGCodonShown(){
         return codonFilter.isAtgSelected();
     }
@@ -393,18 +375,6 @@ public class SequenceBar extends JComponent {
 
     public boolean isTTGCodonShown(){
         return codonFilter.isTtgSelected();
-    }
-
-    public boolean isAtgCurrFeatureShown(){
-        return codonFilter.isAtgCurrFeatureSelected();
-    }
-
-    public boolean isTtgCurrFeatureShown(){
-        return codonFilter.isTtgCurrFeatureSelected();
-    }
-
-    public boolean isGtgCurrFeatureShown(){
-        return codonFilter.isGtgCurrFeatureSelected();
     }
 
     public void paintBaseBackgroundColor(int logX) {
