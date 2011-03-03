@@ -4,7 +4,7 @@ import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class CodonSelector extends javax.swing.JPanel {
 
@@ -14,12 +14,12 @@ public class CodonSelector extends javax.swing.JPanel {
 
     /** Creates new form CodonSelector */
     public CodonSelector() {
-        initComponents();
+        this.initComponents();
     }
 
     public void setGenomeViewer(ReferenceViewer viewer){
         this.viewer = viewer;
-        checkBoxes();
+        this.checkBoxes();
     }
 
     /**
@@ -27,9 +27,12 @@ public class CodonSelector extends javax.swing.JPanel {
      *
      */
     private void checkBoxes(){
-        atgCheckbox.setSelected(viewer.getSequenceBar().isATGCodonShown());
-        gtgCheckbox.setSelected(viewer.getSequenceBar().isGTGCodonShown());
-        ttgCheckbox.setSelected(viewer.getSequenceBar().isTTGCodonShown());
+        atgCheckbox.setSelected(this.viewer.getSequenceBar().isATGCodonShown());
+        gtgCheckbox.setSelected(this.viewer.getSequenceBar().isGTGCodonShown());
+        ttgCheckbox.setSelected(this.viewer.getSequenceBar().isTTGCodonShown());
+        atgCurrFeatureBox.setSelected(this.viewer.getSequenceBar().isAtgCurrFeatureShown());
+        ttgCurrFeatureBox.setSelected(this.viewer.getSequenceBar().isTtgCurrFeatureShown());
+        gtgCurrFeatureBox.setSelected(this.viewer.getSequenceBar().isGtgCurrFeatureShown());
     }
 
     /** This method is called from within the constructor to
@@ -41,9 +44,25 @@ public class CodonSelector extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         atgCheckbox = new javax.swing.JCheckBox();
         ttgCheckbox = new javax.swing.JCheckBox();
         gtgCheckbox = new javax.swing.JCheckBox();
+        jPanel2 = new javax.swing.JPanel();
+        atgCurrFeatureBox = new javax.swing.JCheckBox();
+        ttgCurrFeatureBox = new javax.swing.JCheckBox();
+        gtgCurrFeatureBox = new javax.swing.JCheckBox();
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Highlighted codons"));
 
@@ -68,18 +87,59 @@ public class CodonSelector extends javax.swing.JPanel {
             }
         });
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("For current feature only"));
+
+        atgCurrFeatureBox.setText("ATG");
+        atgCurrFeatureBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                atgCurrFeatureActionPerformed(evt);
+            }
+        });
+
+        ttgCurrFeatureBox.setText("TTG");
+        ttgCurrFeatureBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ttgCurrFeatureActionPerformed(evt);
+            }
+        });
+
+        gtgCurrFeatureBox.setText("GTG");
+        gtgCurrFeatureBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gtgCurrFeatureActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(atgCurrFeatureBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ttgCurrFeatureBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(gtgCurrFeatureBox))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(atgCurrFeatureBox)
+                .addComponent(ttgCurrFeatureBox)
+                .addComponent(gtgCurrFeatureBox))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
                 .addComponent(atgCheckbox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ttgCheckbox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(gtgCheckbox)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(gtgCheckbox))
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -88,27 +148,48 @@ public class CodonSelector extends javax.swing.JPanel {
                     .addComponent(atgCheckbox)
                     .addComponent(ttgCheckbox)
                     .addComponent(gtgCheckbox))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
+
+        jPanel2.getAccessibleContext().setAccessibleName("For current feature only");
     }// </editor-fold>//GEN-END:initComponents
 
     private void atgCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atgCheckboxActionPerformed
-        viewer.getSequenceBar().showATGCodon(atgCheckbox.isSelected());
+        this.viewer.getSequenceBar().showATGCodon(atgCheckbox.isSelected());
 }//GEN-LAST:event_atgCheckboxActionPerformed
 
     private void ttgCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ttgCheckboxActionPerformed
-        viewer.getSequenceBar().showTTGCodon(ttgCheckbox.isSelected());
+        this.viewer.getSequenceBar().showTTGCodon(ttgCheckbox.isSelected());
 }//GEN-LAST:event_ttgCheckboxActionPerformed
 
     private void gtgCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gtgCheckboxActionPerformed
-        viewer.getSequenceBar().showGTGCodon(gtgCheckbox.isSelected());
+        this.viewer.getSequenceBar().showGTGCodon(gtgCheckbox.isSelected());
 }//GEN-LAST:event_gtgCheckboxActionPerformed
+
+    private void atgCurrFeatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atgCurrFeatureActionPerformed
+       this.viewer.getSequenceBar().showAtgCurrFeature(atgCurrFeatureBox.isSelected());
+    }//GEN-LAST:event_atgCurrFeatureActionPerformed
+
+    private void ttgCurrFeatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ttgCurrFeatureActionPerformed
+        this.viewer.getSequenceBar().showTtgCurrFeature(ttgCurrFeatureBox.isSelected());
+    }//GEN-LAST:event_ttgCurrFeatureActionPerformed
+
+    private void gtgCurrFeatureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gtgCurrFeatureActionPerformed
+        this.viewer.getSequenceBar().showGtgCurrFeature(gtgCurrFeatureBox.isSelected());
+    }//GEN-LAST:event_gtgCurrFeatureActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox atgCheckbox;
+    private javax.swing.JCheckBox atgCurrFeatureBox;
     private javax.swing.JCheckBox gtgCheckbox;
+    private javax.swing.JCheckBox gtgCurrFeatureBox;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JCheckBox ttgCheckbox;
+    private javax.swing.JCheckBox ttgCurrFeatureBox;
     // End of variables declaration//GEN-END:variables
 
 }

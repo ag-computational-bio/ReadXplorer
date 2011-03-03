@@ -4,6 +4,7 @@ import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -16,7 +17,7 @@ import javax.swing.JComponent;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class SequenceBar extends JComponent {
 
@@ -40,19 +41,24 @@ public class SequenceBar extends JComponent {
     private int smallBar;
     private StartCodonFilter codonFilter;
 
+    /**
+     * Creates a new sequence bar instance.
+     * @param parentViewer the viewer containing the sequence bar
+     * @param refGen
+     */
     public SequenceBar(AbstractViewer parentViewer, PersistantReference refGen) {
         super();
         this.parentViewer = parentViewer;
-        this.setSize(new Dimension(0, height));
-        font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+        this.setSize(new Dimension(0, this.height));
+        this.font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
         this.refGen = refGen;
-        baseLineY = 30;
-        largeBar = 11;
-        smallBar = 7;
-        markingWidth = 10;
-        halfMarkingWidth = markingWidth / 2;
-        regionsToHighlight = new ArrayList<Region>();
-        codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
+        this.baseLineY = 30;
+        this.largeBar = 11;
+        this.smallBar = 7;
+        this.markingWidth = 10;
+        this.halfMarkingWidth = markingWidth / 2;
+        this.regionsToHighlight = new ArrayList<Region>();
+        this.codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
         
     }
 
@@ -62,7 +68,7 @@ public class SequenceBar extends JComponent {
 
     public void boundsChanged() {
         adjustMarkingIntervall();
-        findCodons();
+        this.findCodons();
     }
 
     @Override
@@ -286,13 +292,26 @@ public class SequenceBar extends JComponent {
         halfMarkingWidth = markingWidth / 2;
     }
 
-    private void findCodons() {
+    /**
+     * Identifies the start codons according to the currently selected codons to show.
+     */
+    public void findCodons() {
         this.removeAll();
-        codonFilter.setIntervall(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight());
-        regionsToHighlight = codonFilter.findRegions();
-        for (Region r : regionsToHighlight) {
+        this.codonFilter.setIntervall(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
+        
+        int frameCurrFeature = StartCodonFilter.INIT;//if it is -1 later, no selected feature exists yet!
+        if (this.parentViewer instanceof ReferenceViewer){
+            ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
+            if (refViewer.getCurrentlySelectedFeature() != null){
+                frameCurrFeature = refViewer.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
+            }
+        }
 
-            BoundsInfo bounds = parentViewer.getBoundsInfo();
+        this.codonFilter.setCurrFeatureData(frameCurrFeature);
+        this.regionsToHighlight = this.codonFilter.findRegions();
+        for (Region r : this.regionsToHighlight) {
+
+            BoundsInfo bounds = this.parentViewer.getBoundsInfo();
             int start = r.getStart();
             if (start < bounds.getLogLeft()) {
                 start = bounds.getLogLeft();
@@ -329,19 +348,37 @@ public class SequenceBar extends JComponent {
     }
 
     public void showATGCodon(boolean selected) {
-        codonFilter.setAtgSelected(selected);
+        this.codonFilter.setAtgSelected(selected);
         this.findCodons();
         this.repaint();
     }
 
     public void showGTGCodon(boolean selected) {
-        codonFilter.setGtgSelected(selected);
+        this.codonFilter.setGtgSelected(selected);
         this.findCodons();
         this.repaint();
     }
 
     public void showTTGCodon(boolean selected) {
-        codonFilter.setTtgSelected(selected);
+        this.codonFilter.setTtgSelected(selected);
+        this.findCodons();
+        this.repaint();
+    }
+
+    public void showAtgCurrFeature(final boolean selected) {
+        this.codonFilter.setAtgCurrFeatureSelected(selected);
+        this.findCodons();
+        this.repaint();
+    }
+
+    public void showTtgCurrFeature(final boolean selected) {
+        this.codonFilter.setTtgCurrFeatureSelected(selected);
+        this.findCodons();
+        this.repaint();
+    }
+
+    public void showGtgCurrFeature(final boolean selected) {
+        this.codonFilter.setGtgCurrFeatureSelected(selected);
         this.findCodons();
         this.repaint();
     }
@@ -356,6 +393,18 @@ public class SequenceBar extends JComponent {
 
     public boolean isTTGCodonShown(){
         return codonFilter.isTtgSelected();
+    }
+
+    public boolean isAtgCurrFeatureShown(){
+        return codonFilter.isAtgCurrFeatureSelected();
+    }
+
+    public boolean isTtgCurrFeatureShown(){
+        return codonFilter.isTtgCurrFeatureSelected();
+    }
+
+    public boolean isGtgCurrFeatureShown(){
+        return codonFilter.isGtgCurrFeatureSelected();
     }
 
     public void paintBaseBackgroundColor(int logX) {

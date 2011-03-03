@@ -393,11 +393,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public abstract void boundsChangedHook();
 
     /**
-     *
+     * Returns the current bounds of the visible area of this component.
      * @return the current bounds values
      */
     public BoundsInfo getBoundsInfo(){
-        return bounds;
+        return this.bounds;
     }
 
     /**

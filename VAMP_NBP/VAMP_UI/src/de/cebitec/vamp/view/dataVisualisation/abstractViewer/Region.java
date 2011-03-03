@@ -1,7 +1,9 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
 /**
- *
+ * A region marked by a start and stop position and if it should
+ * be read in fwd or reverse direction.
+ * 
  * @author ddoppmeier
  */
 public class Region {

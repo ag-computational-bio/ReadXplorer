@@ -56,6 +56,8 @@ public class ReferenceViewer extends AbstractViewer {
 
         currentlySelectedFeature = feature;
         currentlySelectedFeature.setSelected(true);
+        this.getSequenceBar().findCodons(); //update codons for current selection
+        this.repaint();
     }
 
     @Override
@@ -151,7 +153,7 @@ public class ReferenceViewer extends AbstractViewer {
         return result;
     }
 
-    private int determineFrame(PersistantFeature f){
+    public int determineFrame(PersistantFeature f){
         int frame = 0;
         int direction = f.getStrand();
 
@@ -222,11 +224,11 @@ public class ReferenceViewer extends AbstractViewer {
     }
 
     public Map<Integer, Integer> getFeatureStats() {
-        return featureStats;
+        return this.featureStats;
     }
 
     public Feature getCurrentlySelectedFeature() {
-        return currentlySelectedFeature;
+        return this.currentlySelectedFeature;
     }
 
 }
