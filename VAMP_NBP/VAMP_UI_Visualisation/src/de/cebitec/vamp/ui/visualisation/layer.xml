@@ -22,7 +22,7 @@
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
                 <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.CloseTrackCookie"/>
-            </file>
+            </file><!--
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenDialogAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenRefGenDialogAction"/>
@@ -32,7 +32,7 @@
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
                 <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.OpenRefGenCookie"/>
-            </file>
+            </file>-->
             <file name="de-cebitec-vamp-ui-visualisation-actions-OpenRefGenViewerAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.actions.Bundle#CTL_OpenRefGenViewerAction"/>

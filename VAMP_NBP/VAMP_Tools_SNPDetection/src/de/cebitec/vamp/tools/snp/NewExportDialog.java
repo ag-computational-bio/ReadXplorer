@@ -6,7 +6,7 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.exporter.ExportContoller;
-import de.cebitec.vamp.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp;
 import java.awt.Frame;
 import java.util.List;
 import javax.swing.JOptionPane;

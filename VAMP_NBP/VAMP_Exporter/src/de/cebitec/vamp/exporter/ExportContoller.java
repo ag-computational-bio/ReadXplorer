@@ -1,7 +1,7 @@
 package de.cebitec.vamp.exporter;
 
 import de.cebitec.vamp.exporter.excel.ExcelExporter;
-import de.cebitec.vamp.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

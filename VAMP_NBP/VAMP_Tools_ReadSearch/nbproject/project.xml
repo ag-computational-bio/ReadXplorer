@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.databackend</code-name-base>
+                    <code-name-base>de.cebitec.vamp.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -23,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.objects</code-name-base>
+                    <code-name-base>de.cebitec.vamp.databackend</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
-import de.cebitec.vamp.objects.FeatureType;
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;

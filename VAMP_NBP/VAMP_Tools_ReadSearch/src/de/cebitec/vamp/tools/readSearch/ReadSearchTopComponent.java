@@ -1,6 +1,6 @@
 package de.cebitec.vamp.tools.readSearch;
 
-import de.cebitec.vamp.objects.Read;
+import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
