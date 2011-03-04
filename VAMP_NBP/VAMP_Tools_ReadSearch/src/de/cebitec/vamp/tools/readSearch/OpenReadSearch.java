@@ -38,8 +38,7 @@ public final class OpenReadSearch implements ActionListener {
         }
 
         ReadSearchTopComponent readSearch = (ReadSearchTopComponent) WindowManager.getDefault().findTopComponent("ReadSearchTopComponent");
-        readSearch.resetComponent();
-        readSearch.setTrackViewer(currentTrackViewer);
+        readSearch.openReadSearchTab(currentTrackViewer);
         readSearch.open();
     }
 }

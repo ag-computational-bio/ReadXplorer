@@ -38,8 +38,7 @@ public final class OpenSNPDetection implements ActionListener {
         }
 
         SNP_DetectionTopComponent snpDetection = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
-        snpDetection.resetComponent();
-        snpDetection.setTrackViewer(currentTrackViewer);
+        snpDetection.openDetectionTab(currentTrackViewer);
         snpDetection.open();
     }
 }

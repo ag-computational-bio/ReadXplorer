@@ -1,12 +1,16 @@
 package de.cebitec.vamp.tools.readSearch;
 
 import de.cebitec.vamp.api.objects.Read;
+import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -15,8 +19,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
  * Top component which displays read searches.
- * TODO make it show a new tab for each started read search.
- * maybe use a method addSearch and call it in OpenReadSearch
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.readSearch//ReadSearch//EN", autostore = false)
 public final class ReadSearchTopComponent extends TopComponent {
@@ -33,6 +35,58 @@ public final class ReadSearchTopComponent extends TopComponent {
         setToolTipText(NbBundle.getMessage(ReadSearchTopComponent.class, "HINT_ReadSearchTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
+        // add listener to close TopComponent when no tabs are shown
+        readSearchTabbedPane.addContainerListener(new ContainerListener() {
+
+            @Override
+            public void componentAdded(ContainerEvent e) {
+
+            }
+
+            @Override
+            public void componentRemoved(ContainerEvent e) {
+                if (readSearchTabbedPane.getTabCount() == 0){
+                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
+                }
+            }
+        });
+    }
+
+    /**
+     * Creates a complete read search panel, that is used in the JTabbedPane.
+     * The <code>TrackViewer</code> instance is used to set up the setup and
+     * result panels.
+     *
+     * @param trackViewer instance used for this panels panels.
+     * @return complete read search panel
+     */
+    private javax.swing.JPanel getReadSearchPanel(TrackViewer trackViewer){
+        // initialise components
+        final JPanel readSearchPanel = new JPanel();
+        ReadSearchSetup setupPanel = new ReadSearchSetup();
+        final ReadSearchResults resultPanel = new ReadSearchResults();
+
+        // assign the trackviewer
+        setupPanel.setTrackCon(trackViewer.getTrackCon());
+        resultPanel.setBoundsInformationManager(trackViewer.getBoundsInformationManager());
+
+        // listen on changes of the search
+        setupPanel.addPropertyChangeListener(ReadSearchSetup.PROP_SEARCH_FINISHED, new PropertyChangeListener() {
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public void propertyChange(PropertyChangeEvent evt) {
+                resultPanel.addReads((List<Read>) evt.getNewValue());
+                ((CardLayout) readSearchPanel.getLayout()).show(readSearchPanel, "results");
+            }
+        });
+
+        // setup the layout
+        readSearchPanel.setLayout(new java.awt.CardLayout());
+        readSearchPanel.add(setupPanel, "setup");
+        readSearchPanel.add(resultPanel, "results");
+
+        return readSearchPanel;
     }
 
     /** This method is called from within the constructor to
@@ -45,15 +99,24 @@ public final class ReadSearchTopComponent extends TopComponent {
 
         readSearchSetup = new de.cebitec.vamp.tools.readSearch.ReadSearchSetup();
         readSearchResults = new de.cebitec.vamp.tools.readSearch.ReadSearchResults();
+        readSearchTabbedPane = new javax.swing.JTabbedPane();
 
-        setLayout(new java.awt.CardLayout());
-        add(readSearchSetup, "setup");
-        add(readSearchResults, "results");
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(readSearchTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(readSearchTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private de.cebitec.vamp.tools.readSearch.ReadSearchResults readSearchResults;
     private de.cebitec.vamp.tools.readSearch.ReadSearchSetup readSearchSetup;
+    private javax.swing.JTabbedPane readSearchTabbedPane;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
@@ -93,20 +156,12 @@ public final class ReadSearchTopComponent extends TopComponent {
 
     @Override
     public void componentOpened() {
-        readSearchSetup.addPropertyChangeListener(ReadSearchSetup.PROP_SEARCH_FINISHED, new PropertyChangeListener() {
 
-            @Override
-            @SuppressWarnings("unchecked")
-            public void propertyChange(PropertyChangeEvent evt) {
-                readSearchResults.addReads((List<Read>) evt.getNewValue());
-                ((CardLayout) getLayout()).show(instance, "results");
-            }
-        });
     }
 
     @Override
     public void componentClosed() {
-        resetComponent();
+        readSearchTabbedPane.removeAll();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -134,14 +189,8 @@ public final class ReadSearchTopComponent extends TopComponent {
         return PREFERRED_ID;
     }
 
-    public void setTrackViewer(TrackViewer trackViewer){
-        readSearchSetup.setTrackCon(trackViewer.getTrackCon());
-        readSearchResults.setBoundsInformationManager(trackViewer.getBoundsInformationManager());
-    }
-
-    public void resetComponent(){
-        ((CardLayout) getLayout()).show(instance, "setup");
-        readSearchSetup.setTrackCon(null);
-        readSearchResults.setBoundsInformationManager(null);
+    public void openReadSearchTab(TrackViewer trackViewer){
+        readSearchTabbedPane.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getReadSearchPanel(trackViewer));
+        readSearchTabbedPane.setTabComponentAt(readSearchTabbedPane.getTabCount()-1, new TabWithCloseX(readSearchTabbedPane));
     }
 }
