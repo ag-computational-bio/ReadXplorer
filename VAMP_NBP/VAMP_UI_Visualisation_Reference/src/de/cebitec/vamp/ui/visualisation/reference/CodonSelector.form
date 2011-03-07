@@ -47,20 +47,14 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="gtgCheckbox" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="jPanel2" alignment="0" min="-2" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="atgCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="ttgCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="gtgCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+          <Group type="103" groupAlignment="3" attributes="0">
+              <Component id="atgCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="ttgCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Component id="gtgCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -90,66 +84,5 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gtgCheckboxActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JPanel" name="jPanel2">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="For current feature only"/>
-          </Border>
-        </Property>
-      </Properties>
-      <AccessibilityProperties>
-        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="For current feature only"/>
-      </AccessibilityProperties>
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Component id="atgCurrFeatureBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="ttgCurrFeatureBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="gtgCurrFeatureBox" min="-2" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="atgCurrFeatureBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="ttgCurrFeatureBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="gtgCurrFeatureBox" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Component class="javax.swing.JCheckBox" name="atgCurrFeatureBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="ATG"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="atgCurrFeatureActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="ttgCurrFeatureBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="TTG"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ttgCurrFeatureActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="gtgCurrFeatureBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="GTG"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gtgCurrFeatureActionPerformed"/>
-          </Events>
-        </Component>
-      </SubComponents>
-    </Container>
   </SubComponents>
 </Form>
