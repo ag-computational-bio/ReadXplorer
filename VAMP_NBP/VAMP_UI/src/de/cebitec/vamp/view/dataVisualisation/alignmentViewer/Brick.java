@@ -74,7 +74,7 @@ public class Brick {
         } else if(type == Brick.READGAP){
             return "-";
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type "+type);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
             return "@";
         }
     }

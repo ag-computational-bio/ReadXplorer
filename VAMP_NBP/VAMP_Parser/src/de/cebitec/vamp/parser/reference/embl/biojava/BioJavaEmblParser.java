@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
@@ -127,7 +126,6 @@ public class BioJavaEmblParser implements ReferenceParserI {
                         } else if(name.equals("EC_number")){
                             ecNumber = value;
                         }
-
                     }
 
                     /* if the type of the feature is unknown to vamp (see below),

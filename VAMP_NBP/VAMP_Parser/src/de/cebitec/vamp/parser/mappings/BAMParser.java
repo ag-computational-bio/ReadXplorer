@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
@@ -55,8 +56,6 @@ public class BAMParser implements MappingParserI {
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());
 
         SAMRecordIterator itor = sam.iterator();
-
-        
 
         while (itor.hasNext()) {
             SAMRecord first = itor.next();
@@ -159,9 +158,9 @@ public class BAMParser implements MappingParserI {
             }
         }
         HashSet<Integer> s = new HashSet<Integer>();
-        Iterator it = readnameToSequenceID.values().iterator();
+        Iterator<Integer> it = readnameToSequenceID.values().iterator();
         while (it.hasNext()) {
-            int i = (Integer) it.next();
+            int i = it.next();
             s.add(i);
         }
        // it.remove();
@@ -291,7 +290,6 @@ public class BAMParser implements MappingParserI {
                 if (index > 2) {
                     if (!subSeq2Val.matches("[0-9]*")) {
                         subSeq2Val = (String) cigar.subSequence(index - 2, index);
-
                     }
                 }
 
@@ -485,7 +483,7 @@ public class BAMParser implements MappingParserI {
                 run.addReadData(editReadSeq, readname);
             }
         }
-         itor = null;
+        itor = null;
         run.setTimestamp(trackJob.getTimestamp());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from file \"{0}\"", trackJob.getFile().getAbsolutePath());
         if(run == null){
@@ -495,23 +493,5 @@ public class BAMParser implements MappingParserI {
         }
         return run;
     }
-
-    private class DiffAndGapResult {
-
-        private List<ParsedDiff> diffs;
-        private List<ParsedReferenceGap> gaps;
-
-        public DiffAndGapResult(List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps) {
-            this.diffs = diffs;
-            this.gaps = gaps;
-        }
-
-        public List<ParsedDiff> getDiffs() {
-            return diffs;
-        }
-
-        public List<ParsedReferenceGap> getGaps() {
-            return gaps;
-        }
-    }
+    
 }

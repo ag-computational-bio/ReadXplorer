@@ -1,6 +1,5 @@
 package de.cebitec.vamp.parser.common;
 
-import de.cebitec.vamp.parser.common.ParsedMapping;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

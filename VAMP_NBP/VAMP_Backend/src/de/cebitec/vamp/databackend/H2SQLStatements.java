@@ -7,6 +7,12 @@ package de.cebitec.vamp.databackend;
  */
 public class H2SQLStatements {
 
+    /**
+     * Private constructor so this utility class can not be instantiated.
+     */
+    private H2SQLStatements() {
+    }
+
     //////////////////  statements for table creation  /////////////////////////
 
     public final static String SETUP_REFERENCE_GENOME =

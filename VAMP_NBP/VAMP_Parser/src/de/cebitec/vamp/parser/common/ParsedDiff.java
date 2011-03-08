@@ -47,6 +47,5 @@ public class ParsedDiff {
         hash = 37 * hash + this.base;
         return hash;
     }
-
         
 }

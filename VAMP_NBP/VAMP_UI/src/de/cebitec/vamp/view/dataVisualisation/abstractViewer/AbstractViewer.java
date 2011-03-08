@@ -77,9 +77,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         inDrawingMode = true;
         isActive = true;
 
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, this.getMaximalHeight()));
-        this.setPreferredSize(new Dimension(this.getPreferredSize().width, this.getMaximalHeight()));
-        this.setMinimumSize(new Dimension(Integer.MIN_VALUE, this.getMaximalHeight()));
+        // sets min, max and preferred size
+        setSizes();
 
         // init physical bounds
         horizontalMargin = 40;
@@ -99,10 +98,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     }
 
+    private void setSizes(){
+        setMinimumSize(new Dimension(Integer.MIN_VALUE, getMaximalHeight()));
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, getMaximalHeight()));
+        setPreferredSize(new Dimension(getPreferredSize().width, getMaximalHeight()));
+    }
+
     public void close() {
         boundsManager.removeBoundListener(this);      
     }
-
 
     public void setupLegend(LegendLabel label, JPanel legend){
         this.hasLegend = true;
@@ -209,7 +213,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 basePanel.reportMouseOverPaintingStatus(false);
             }
         });
-    }    
+    }
 
     public abstract void changeToolTipText(int logPos);
 

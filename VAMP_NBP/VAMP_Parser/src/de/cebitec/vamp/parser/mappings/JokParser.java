@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
@@ -11,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,7 +38,6 @@ public class JokParser implements MappingParserI {
     public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         //  ParsedRun run = new ParsedRun("");
-
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -70,7 +69,7 @@ public class JokParser implements MappingParserI {
                 int errors = Integer.parseInt(tokens[6]);
                 // check tokens
                 //check for empty mappings saruman in some cases produce
-                if (readSeq != null && !readSeq.equals("") && refSeq != null && !refSeq.equals("")) {
+                if (readSeq != null && !readSeq.isEmpty() && refSeq != null && !refSeq.isEmpty()) {
                     if (readname == null || readname.isEmpty()) {
                         throw new ParsingException("could not read readname in "
                                 + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
@@ -126,10 +125,10 @@ public class JokParser implements MappingParserI {
                     mappingContainer.addParsedMapping(mapping, seqID);
                 }
             }
-            Iterator it = readnameToSequenceID.values().iterator();
+            Iterator<Integer> it = readnameToSequenceID.values().iterator();
             HashSet<Integer> s = new HashSet<Integer>();
             while (it.hasNext()) {
-                int i = (Integer) it.next();
+                int i = it.next();
                 s.add(i);
             }
             // it.remove();
@@ -141,7 +140,7 @@ public class JokParser implements MappingParserI {
             s.clear();
             readnameToSequenceID.clear();
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"" + trackJob.getFile().getAbsolutePath() + "\"" + "no of mappings" + noOfReads);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noOfReads});
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -242,7 +241,6 @@ public class JokParser implements MappingParserI {
 
     @Override
     public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
-
         ParsedRun run = new ParsedRun(fileDescription);
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -276,7 +274,7 @@ public class JokParser implements MappingParserI {
                         lineno = 0;
                     }
                 } else {
-                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "read doesnt match [ATGCN]+ " + readname + " " + editReadSeq);
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "read doesnt match [ATGCN]+ {0} {1}", new Object[]{readname, editReadSeq});
                 }
             }
             br.close();
@@ -286,27 +284,8 @@ public class JokParser implements MappingParserI {
             throw new ParsingException(ex);
         }
         run.setTimestamp(trackJob.getTimestamp());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed" + run.getSequences().size());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed{0}", run.getSequences().size());
         return run;
-    }
-
-    private class DiffAndGapResult {
-
-        private List<ParsedDiff> diffs;
-        private List<ParsedReferenceGap> gaps;
-
-        public DiffAndGapResult(List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps) {
-            this.diffs = diffs;
-            this.gaps = gaps;
-        }
-
-        public List<ParsedDiff> getDiffs() {
-            return diffs;
-        }
-
-        public List<ParsedReferenceGap> getGaps() {
-            return gaps;
-        }
     }
 
     public String reverseComplement(String readSeq) {
@@ -319,4 +298,5 @@ public class JokParser implements MappingParserI {
         }
         return revBase;
     }
+    
 }

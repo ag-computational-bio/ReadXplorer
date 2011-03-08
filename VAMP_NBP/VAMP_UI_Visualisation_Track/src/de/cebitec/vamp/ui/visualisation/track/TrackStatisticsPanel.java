@@ -235,7 +235,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel uniqueReadsLabel;
     // End of variables declaration//GEN-END:variables
 
-
     private void computeStats(){
         Thread t = new Thread(new Runnable() {
 

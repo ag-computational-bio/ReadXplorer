@@ -27,7 +27,6 @@ public class ParsedMapping {
         this.errors = errors;
         bestMapping = false;
         count = 1;
-
     }
 
     public void setIsBestmapping(boolean b){

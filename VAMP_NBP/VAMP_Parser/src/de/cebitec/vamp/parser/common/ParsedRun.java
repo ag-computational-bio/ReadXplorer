@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -39,30 +36,27 @@ public class ParsedRun {
     public String getDescription(){
         return description;
     }
-/*
- * this Method returns a Collection of reads
- */
+
+    /*
+     * this Method returns a Collection of reads
+     */
     public Collection<ParsedReadname> getReads(){
         return sequences.values();
     }
-    
-        public Set<String> getSequences(){
+
+    public Set<String> getSequences(){
         return sequences.keySet();
     }
 
-
-
-    
-   //ParsedReadname contains the names of the reads with the same sequence
+    //ParsedReadname contains the names of the reads with the same sequence
     public void addReadData(String sequence, String readName) throws OutOfMemoryError{
         if(!sequences.containsKey(sequence)){
             sequences.put(sequence, new ParsedReadname());
-            }
+        }
         sequences.get(sequence).addRead(readName);
     }
 
-    @SuppressWarnings("unchecked")
-    public void addErrorList(HashMap errorMap){
+    public void addErrorList(HashMap<String, String> errorMap){
         this.errorMap = errorMap;
     }
 
@@ -70,7 +64,7 @@ public class ParsedRun {
      *
      * @return
      */
-    public HashMap getErrorList(){
+    public HashMap<String, String> getErrorList(){
         return errorMap;
     }
 
@@ -79,7 +73,7 @@ public class ParsedRun {
         StringBuilder sb = new StringBuilder();
         for(Iterator<String> it = sequences.keySet().iterator(); it.hasNext() ; ){
             String sequence = it.next();
-            sb.append(sequence+" "+sequences.get(sequence).getReads().size()+"\n");
+            sb.append(sequence).append(" ").append(sequences.get(sequence).getReads().size()).append("\n");
         }
 
         return sb.toString();
@@ -97,4 +91,4 @@ public class ParsedRun {
         sequences.clear();
     }
 
-    }
+}

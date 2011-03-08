@@ -60,7 +60,7 @@ public class GenomeGapManager {
                 // of gap introduced shifts
                 continue;
             }
-            TreeSet gapsPerPosition = values.get(pos);
+            TreeSet<PersistantReferenceGap> gapsPerPosition = values.get(pos);
             int numOfGapsPerPosition = gapsPerPosition.size();
             int oldValue = getNumOfGapsAt(pos);
             // if the current mapping has more gaps at current position,

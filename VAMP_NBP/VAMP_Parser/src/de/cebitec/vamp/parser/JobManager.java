@@ -1,7 +1,5 @@
 package de.cebitec.vamp.parser;
 
-import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
 import java.util.List;
 
 /**

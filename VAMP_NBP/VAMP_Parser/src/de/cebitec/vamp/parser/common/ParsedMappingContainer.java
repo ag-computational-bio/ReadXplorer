@@ -1,12 +1,9 @@
 package de.cebitec.vamp.parser.common;
 
-import de.cebitec.vamp.parser.common.ParsedMapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,7 +35,6 @@ public class ParsedMappingContainer {
         return mappings.get(sequenceID);
     }
     
-    @SuppressWarnings("unchecked")
     public HashMap<Integer,Integer> getMappingInformations() {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
         int numberOfBM = 0;
@@ -54,9 +50,9 @@ public class ParsedMappingContainer {
         while (it.hasNext()) {
             ParsedMappingGroup p = it.next();
             List<ParsedMapping> mappingList = p.getMappings();
-            Iterator maps = mappingList.iterator();
+            Iterator<ParsedMapping> maps = mappingList.iterator();
             while (maps.hasNext()) {
-                ParsedMapping m = (ParsedMapping) maps.next();
+                ParsedMapping m = maps.next();
                 if(m.isBestMapping() == true) {
                         numberOfBM++;
                     if(m.getErrors() == 0){
@@ -65,17 +61,17 @@ public class ParsedMappingContainer {
                 }
                 numberOfMappings += m.getCount();
             }
-    }
-         mappingInfos.put(1, numberOfMappings);
-         mappingInfos.put(2, numberOfPerfect);
-         mappingInfos.put(3, numberOfBM);
-         mappingInfos.put(4, numberOfMappedSeq);
-         mappingInfos.put(5, numberOfReads);
-         mappingInfos.put(6, numberOfUniqueSeq);
-      
-    return mappingInfos;
-}
+        }
 
+        mappingInfos.put(1, numberOfMappings);
+        mappingInfos.put(2, numberOfPerfect);
+        mappingInfos.put(3, numberOfBM);
+        mappingInfos.put(4, numberOfMappedSeq);
+        mappingInfos.put(5, numberOfReads);
+        mappingInfos.put(6, numberOfUniqueSeq);
+
+        return mappingInfos;
+    }
 
     public void clear(){
         mappings.clear();
@@ -88,8 +84,5 @@ public class ParsedMappingContainer {
     public void setNumberOfUniqueSeq(int numberOfUniqueSeq) {
         this.numberOfUniqueSeq = numberOfUniqueSeq;
     }
-
-
-    
 
 }

@@ -41,4 +41,5 @@ public final class OpenSNPDetection implements ActionListener {
         snpDetection.openDetectionTab(currentTrackViewer);
         snpDetection.open();
     }
+    
 }

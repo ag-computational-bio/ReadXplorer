@@ -168,7 +168,7 @@ public final class ReadSearchTopComponent extends TopComponent {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings
     }
 
     Object readProperties(java.util.Properties p) {
@@ -181,7 +181,7 @@ public final class ReadSearchTopComponent extends TopComponent {
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
 
     @Override
@@ -193,4 +193,5 @@ public final class ReadSearchTopComponent extends TopComponent {
         readSearchTabbedPane.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getReadSearchPanel(trackViewer));
         readSearchTabbedPane.setTabComponentAt(readSearchTabbedPane.getTabCount()-1, new TabWithCloseX(readSearchTabbedPane));
     }
+    
 }

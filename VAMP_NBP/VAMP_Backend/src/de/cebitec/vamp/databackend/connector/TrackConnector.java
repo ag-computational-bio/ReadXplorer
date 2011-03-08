@@ -56,10 +56,11 @@ public class TrackConnector {
         trackID = track.getId();
         con = ProjectConnector.getInstance().getConnection();
         runID = fetchRunID();
-
-        thread = new CoverageThread(trackID);
-        thread.start();
         genomeSize = this.getRefGenLength();
+
+        List<PersistantTrack> tracks = new ArrayList<PersistantTrack>(1);
+        tracks.add(track);
+        startCoverageThread(tracks);
     }
 
     TrackConnector(long id, List<PersistantTrack> tracks) {
@@ -67,10 +68,19 @@ public class TrackConnector {
         this.trackID = id;
         con = ProjectConnector.getInstance().getConnection();
         runID = fetchRunID();
-
-        thread = new CoverageThread(tracks.get(0).getId(),tracks.get(1).getId());
-        thread.start();
         genomeSize = this.getRefGenLength();
+
+        startCoverageThread(tracks);
+    }
+
+    private void startCoverageThread(List<PersistantTrack> tracks){
+        List<Long> trackIds = new ArrayList<Long>(tracks.size());
+        for (PersistantTrack track : tracks) {
+            trackIds.add(track.getId());
+        }
+
+        thread = new CoverageThread(trackIds);
+        thread.start();
     }
 
     private int fetchRunID() {

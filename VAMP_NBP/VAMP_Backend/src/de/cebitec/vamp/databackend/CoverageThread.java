@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,30 +28,35 @@ public class CoverageThread extends Thread{
     private double requestCounter;
     private double skippedCounter;
 
-    public CoverageThread(long trackID){
+    public CoverageThread(List<Long> trackIds){
         super();
+        // do general stuff
+        this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();
+        con = ProjectConnector.getInstance().getConnection();
+        coveredWidth = 25000;
+        requestCounter = 0;
+        skippedCounter = 0;
+
+        // do id specific stuff
+        switch (trackIds.size()){
+            case 1: singleCoverageThread(trackIds.get(0)); break;
+            case 2: doubleCoverageThread(trackIds.get(0), trackIds.get(1)); break;
+            default: throw new UnsupportedOperationException("More than two tracks not supported yet.");
+        }
+    }
+
+    private void singleCoverageThread(long trackID){
         this.trackID = trackID;
         trackID2 = 0;
-        this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();
-        con = ProjectConnector.getInstance().getConnection();
         currentCov = new PersistantCoverage(0, 0);
-        coveredWidth = 25000;
-        requestCounter = 0;
-        skippedCounter = 0;
     }
 
-       public CoverageThread(long trackID,long trackID2){
-        super();
+    private void doubleCoverageThread(long trackID,long trackID2){
         this.trackID = trackID;
         this.trackID2 = trackID2;
-        this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();
-        con = ProjectConnector.getInstance().getConnection();
         currentCov = new PersistantCoverage(0, 0,true);
-        coveredWidth = 25000;
-
-        requestCounter = 0;
-        skippedCounter = 0;
     }
+
     private int calcCenterLeft(CoverageRequest request){
         int centerMiddle = calcCenterMiddle(request);
         int result = centerMiddle - coveredWidth;

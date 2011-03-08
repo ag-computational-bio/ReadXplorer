@@ -6,6 +6,12 @@ package de.cebitec.vamp.databackend;
  */
 public class FieldNames {
 
+    /**
+     * Private constructor so this utility class can not be instantiated.
+     */
+    private FieldNames() {
+    }
+
     // names for various database tables
     public final static String TABLE_REF_GEN = "REFERENCE";
     public final static String TABLE_DIFF = "DIFF";

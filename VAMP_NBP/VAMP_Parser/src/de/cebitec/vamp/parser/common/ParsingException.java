@@ -14,7 +14,6 @@ public class ParsingException extends Exception {
     public ParsingException() {
     }
 
-
     /**
      * Constructs an instance of <code>ParsingException</code> with the specified detail message.
      * @param msg the detail message.

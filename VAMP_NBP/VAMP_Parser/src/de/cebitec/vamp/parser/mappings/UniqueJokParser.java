@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
@@ -226,7 +227,7 @@ public class UniqueJokParser implements MappingParserI{
 
     @Override
     public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
-                ParsedRun run = new ParsedRun(fileDescription);
+        ParsedRun run = new ParsedRun(fileDescription);
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
@@ -258,27 +259,6 @@ public class UniqueJokParser implements MappingParserI{
         run.setTimestamp(trackJob.getTimestamp());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed");
         return run;
-    }
-
-    private class DiffAndGapResult{
-
-        private List<ParsedDiff> diffs;
-        private List<ParsedReferenceGap> gaps;
-
-        public DiffAndGapResult(List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps){
-            this.diffs = diffs;
-            this.gaps = gaps;
-        }
-
-        public List<ParsedDiff> getDiffs() {
-            return diffs;
-        }
-
-        public List<ParsedReferenceGap> getGaps() {
-            return gaps;
-        }
-
-
     }
 
 }

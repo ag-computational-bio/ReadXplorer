@@ -7,16 +7,17 @@ import java.awt.Color;
  * @author ddoppmeier
  */
 public class ColorProperties {
+
+    /**
+     * Private constructor so this utility class can not be instantiated.
+     */
+    private ColorProperties() {
+    }
+
     // track panel specific colors
     public static Color BEST_MATCH = new Color(244, 225, 49);
     public static Color N_ERROR_COLOR = new Color(180, 41, 36);
     public static Color PERFECT_MATCH = new Color(38, 180, 36);
-
-    public void setColorProperties(Color pM, Color bM, Color nError ){
-    BEST_MATCH = bM;
-    N_ERROR_COLOR = nError;
-    PERFECT_MATCH = pM;
-    }
 
     // global colors
     public static Color TRACKPANEL_SCALE_LINES = new Color(153, 153, 153);
@@ -70,4 +71,5 @@ public class ColorProperties {
     public static Color ALIGNMENT_FOREIGN_GENOMEGAP = Color.LIGHT_GRAY;
     public static Color ALIGNMENT_BASE_UNDEF = UNDEF_FEATURE;
     public static Color ALIGNMENT_BASE_READGAP = new Color(255, 255, 255);
+
 }

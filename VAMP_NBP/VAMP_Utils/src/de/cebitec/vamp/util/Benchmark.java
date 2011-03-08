@@ -6,6 +6,12 @@ package de.cebitec.vamp.util;
  */
 public class Benchmark {
 
+    /**
+     * Private constructor so this utility class can not be instantiated.
+     */
+    private Benchmark() {
+    }
+
     public static void printDiff(long smaller, long greater, String message){
         long diff = greater - smaller;
 
@@ -27,4 +33,5 @@ public class Benchmark {
 
         System.out.println(message+" dauerte "+minutes+" minuten, "+seconds+" sekunden, "+millis+" millisekunden");
     }
+
 }

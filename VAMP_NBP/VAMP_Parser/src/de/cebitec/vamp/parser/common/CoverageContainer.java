@@ -59,7 +59,6 @@ public class CoverageContainer {
     }
 
     private void increaseCoverage(ParsedMapping s, int coverageCase){
-
         int coverageIdx = coverageCase * FIELDS_PER_CASE;
         // if this mapping is on reverse strand, we need an offset of 2
         int  offset = (s.getDirection() == 1 ? 0 : 2);
@@ -80,7 +79,6 @@ public class CoverageContainer {
             cov[coverageIdx] = cov[coverageIdx] + s.getCount();
             cov[numIdx] = cov[numIdx] + 1;
         }
-
     }
 
     public Collection<Integer> getCoveredPositions(){
@@ -96,7 +94,7 @@ public class CoverageContainer {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , true, false);
     }
 
-   public int getBestMappingReverseCoverage(int position){
+    public int getBestMappingReverseCoverage(int position){
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , false, true);
     }
 

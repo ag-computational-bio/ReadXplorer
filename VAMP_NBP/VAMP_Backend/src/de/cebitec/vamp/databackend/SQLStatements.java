@@ -6,6 +6,12 @@ package de.cebitec.vamp.databackend;
  */
 public class SQLStatements {
 
+    /**
+     * Private constructor so this utility class can not be instantiated.
+     */
+    private SQLStatements() {
+    }
+
     //////////////////  statements for table creation  /////////////////////////
 
     public final static String SETUP_REFERENCE_GENOME =

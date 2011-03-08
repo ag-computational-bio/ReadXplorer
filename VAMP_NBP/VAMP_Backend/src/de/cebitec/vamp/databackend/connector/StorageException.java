@@ -14,7 +14,6 @@ public class StorageException extends Exception {
     public StorageException() {
     }
 
-
     /**
      * Constructs an instance of <code>StorageException</code> with the specified detail message.
      * @param msg the detail message.

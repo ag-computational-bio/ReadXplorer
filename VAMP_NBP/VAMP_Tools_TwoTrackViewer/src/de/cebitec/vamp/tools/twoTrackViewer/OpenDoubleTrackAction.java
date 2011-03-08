@@ -12,7 +12,7 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Utilities;
 
-// TODO this should be something like a serviceprovider and "overwrite" the standard opentrackaction
+// TODO this could be something like a serviceprovider and "overwrite" the standard opentrackaction
 public final class OpenDoubleTrackAction implements ActionListener {
 
     private final ReferenceViewer context;

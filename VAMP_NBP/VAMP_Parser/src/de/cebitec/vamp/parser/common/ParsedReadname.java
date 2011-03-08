@@ -1,8 +1,6 @@
 package de.cebitec.vamp.parser.common;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -13,6 +11,7 @@ public class ParsedReadname {
     private HashSet<String> reads;
     private long id;
     public int numOfReads;
+    
     public ParsedReadname(){
         reads = new HashSet<String>();
     }
@@ -29,8 +28,6 @@ public class ParsedReadname {
         return reads.size();
     }
 
-
-
     public long getID() {
         return id;
     }
@@ -38,4 +35,5 @@ public class ParsedReadname {
     public void setID(long seqID) {
         this.id = seqID;
     }
+
 }

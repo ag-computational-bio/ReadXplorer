@@ -30,16 +30,16 @@ public class PaintingAreaInfo {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("left: "+phyLeft+"\n");
-        sb.append("right: "+phyRight+"\n");
-        sb.append("width: "+phyWidth+"\n");
-        sb.append("fwHigh: "+forwardHigh+"\n");
-        sb.append("fwLow: "+forwardLow+"\n");
-        sb.append("fwHght: "+availableForwardHeight+"\n");
-        sb.append("rvLow: "+reverseLow+"\n");
-        sb.append("rvHigh: "+reverseHigh+"\n");
-        sb.append("rvHght: "+availableReverseHeight+"\n");
-        sb.append("compl. Hght: "+completeHeight);
+        sb.append("left: ").append(phyLeft).append("\n");
+        sb.append("right: ").append(phyRight).append("\n");
+        sb.append("width: ").append(phyWidth).append("\n");
+        sb.append("fwHigh: ").append(forwardHigh).append("\n");
+        sb.append("fwLow: ").append(forwardLow).append("\n");
+        sb.append("fwHght: ").append(availableForwardHeight).append("\n");
+        sb.append("rvLow: ").append(reverseLow).append("\n");
+        sb.append("rvHigh: ").append(reverseHigh).append("\n");
+        sb.append("rvHght: ").append(availableReverseHeight).append("\n");
+        sb.append("compl. Hght: ").append(completeHeight);
 
         return sb.toString();
     }

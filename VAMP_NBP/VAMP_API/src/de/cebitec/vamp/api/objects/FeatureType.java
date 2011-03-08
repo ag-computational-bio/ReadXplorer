@@ -20,7 +20,6 @@ public class FeatureType {
     public static final int MI_RNA = 9;
 
     private static final HashMap<Integer, String> map = new HashMap<Integer, String>() {{
-
           put( 0, "unknown" );
           put( 1, "mRNA" );
           put( 2, "CDS" );
@@ -35,6 +34,12 @@ public class FeatureType {
 
     public static String getTypeString(int type){
         return map.get(type);
+    }
+
+    /**
+     * Private constructor so this utility class can not be instantiated.
+     */
+    private FeatureType() {
     }
 
 }

@@ -18,7 +18,6 @@ public class ParsedTrack {
         this.description = description;
         this.mappings = mappings;
         this.coverageContainer = coverageContainer;
-
     }
 
     public CoverageContainer getCoverageContainer(){
@@ -53,6 +52,5 @@ public class ParsedTrack {
     mappings.clear();
     coverageContainer.clear();
     }
-
 
 }

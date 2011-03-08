@@ -259,7 +259,7 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings
     }
 
     Object readProperties(java.util.Properties p) {
@@ -272,7 +272,7 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
 
     @Override
