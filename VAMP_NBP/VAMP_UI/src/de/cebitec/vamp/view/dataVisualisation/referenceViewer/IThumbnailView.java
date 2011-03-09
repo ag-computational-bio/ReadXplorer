@@ -1,0 +1,22 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
+
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+
+/**
+ *
+ * @author dkramer
+ */
+public interface IThumbnailView {
+    
+    public void addToList(PersistantFeature feature);
+
+    public void showThumbnailView(ReferenceViewer refViewer);
+
+    public void removeAllFeatures();
+
+}

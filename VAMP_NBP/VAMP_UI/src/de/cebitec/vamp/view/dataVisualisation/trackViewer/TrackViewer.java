@@ -3,7 +3,7 @@ package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThreadListener;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -36,7 +36,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     private static final long serialVersionUID = 572406471;
 
-    private TrackConnector trackCon;
+    private ITrackConnector trackCon;
     private PersistantCoverage cov;
     private boolean covLoaded;
     private boolean twoTracks;
@@ -71,7 +71,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
      * @param viewerController controller that manages updates
      * @param trackCon database connection to one track, that is displayed
      */
-    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackCon){
+    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, ITrackConnector trackCon){
         super(boundsManager, basePanel, refGen);
         this.trackCon = trackCon;
         labelMargin = 3;
@@ -601,7 +601,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         repaint();
     }
 
-    public TrackConnector getTrackCon() {
+    public ITrackConnector getTrackCon() {
         return trackCon;
     }
 

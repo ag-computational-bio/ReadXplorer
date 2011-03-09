@@ -1,8 +1,8 @@
 package de.cebitec.vamp.ui.visualisation.track;
 
+import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.RunConnector;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -15,7 +15,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
     private final static long serialVersionUID = 1239345;
 
-    private TrackConnector trackCon;
+    private ITrackConnector trackCon;
 
     /** Creates new form TrackNavigator */
     public TrackStatisticsPanel() {
@@ -23,13 +23,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 //        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use empty Constructor for this object! Standard constructor is only meant for GUI builder means");
     }
 
-    public TrackStatisticsPanel(TrackConnector trackCon){
+    public TrackStatisticsPanel(ITrackConnector trackCon){
         this.trackCon = trackCon;
         initComponents();
         computeStats();
     }
 
-    public void setTrackConnector(TrackConnector trackCon){
+    public void setTrackConnector(ITrackConnector trackCon){
         this.trackCon = trackCon;
         // TODO don't make this class compute this everytime
         computeStats();

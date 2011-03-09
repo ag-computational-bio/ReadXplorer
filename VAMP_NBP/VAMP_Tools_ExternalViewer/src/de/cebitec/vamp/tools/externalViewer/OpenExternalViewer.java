@@ -1,5 +1,6 @@
 package de.cebitec.vamp.tools.externalViewer;
 
+import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -37,7 +38,7 @@ public final class OpenExternalViewer implements ActionListener {
         }
 
         ExternalViewerTopComponent externalViewer = new ExternalViewerTopComponent();
-        externalViewer.setTrackConnector(currentTrackViewer.getTrackCon());
+        externalViewer.setTrackConnector((TrackConnector) currentTrackViewer.getTrackCon());
         externalViewer.open();
     }
 }

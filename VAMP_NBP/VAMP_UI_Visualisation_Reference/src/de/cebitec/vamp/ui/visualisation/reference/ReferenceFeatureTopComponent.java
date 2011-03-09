@@ -55,7 +55,6 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         productLabel = new javax.swing.JLabel();
         strandText = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        productText = new javax.swing.JTextField();
         stopLabel = new javax.swing.JLabel();
         ecNumField = new javax.swing.JTextField();
         stopField = new javax.swing.JTextField();
@@ -63,6 +62,8 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         locusLabel = new javax.swing.JLabel();
         startField = new javax.swing.JTextField();
         startLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        productText = new javax.swing.JTextArea();
 
         org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeLabel.text")); // NOI18N
         typeLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeLabel.toolTipText")); // NOI18N
@@ -81,9 +82,6 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.jLabel4.text")); // NOI18N
         jLabel4.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.jLabel4.toolTipText")); // NOI18N
-
-        productText.setEditable(false);
-        productText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.productText.toolTipText")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(stopLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.stopLabel.text")); // NOI18N
         stopLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.stopLabel.toolTipText")); // NOI18N
@@ -106,35 +104,42 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         org.openide.awt.Mnemonics.setLocalizedText(startLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.startLabel.text")); // NOI18N
         startLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.startLabel.toolTipText")); // NOI18N
 
+        productText.setColumns(20);
+        productText.setRows(5);
+        jScrollPane1.setViewportView(productText);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(stopLabel)
-                    .addComponent(jLabel4)
-                    .addComponent(startLabel)
-                    .addComponent(locusLabel)
-                    .addComponent(productLabel)
-                    .addComponent(jLabel3)
-                    .addComponent(typeLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                    .addComponent(locusField, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                    .addComponent(startField, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                    .addComponent(stopField, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                    .addComponent(ecNumField, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                    .addComponent(productText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
-                    .addComponent(strandText, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(stopLabel)
+                            .addComponent(jLabel4)
+                            .addComponent(startLabel)
+                            .addComponent(locusLabel)
+                            .addComponent(productLabel)
+                            .addComponent(typeLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                            .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                            .addComponent(locusField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                            .addComponent(startField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                            .addComponent(stopField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                            .addComponent(ecNumField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(40, 40, 40)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(strandText, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 242, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -157,14 +162,14 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
                     .addComponent(ecNumField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(productText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(productLabel))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(productLabel)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(strandText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -172,10 +177,11 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
     private javax.swing.JTextField ecNumField;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField locusField;
     private javax.swing.JLabel locusLabel;
     private javax.swing.JLabel productLabel;
-    private javax.swing.JTextField productText;
+    private javax.swing.JTextArea productText;
     private javax.swing.JTextField startField;
     private javax.swing.JLabel startLabel;
     private javax.swing.JTextField stopField;

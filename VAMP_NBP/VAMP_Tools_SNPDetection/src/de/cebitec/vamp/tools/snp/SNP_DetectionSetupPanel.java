@@ -9,6 +9,7 @@ package de.cebitec.vamp.tools.snp;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingWorker;
@@ -28,7 +29,7 @@ import org.openide.util.TaskListener;
 public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private TrackConnector con;
+    private ITrackConnector con;
     private List<Snp> snps;
 
     public static final String PROP_SNPS_LOADED = "snpsLoaded";
@@ -200,7 +201,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
         return snps;
     }
 
-    public void setCon(TrackConnector con) {
+    public void setCon(ITrackConnector con) {
         this.con = con;
     }
 

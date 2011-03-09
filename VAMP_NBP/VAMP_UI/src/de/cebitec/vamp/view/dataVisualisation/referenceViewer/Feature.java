@@ -9,12 +9,19 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import org.openide.util.Lookup;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -43,10 +50,13 @@ public class Feature extends JComponent{
             @Override
             public void mouseClicked(MouseEvent e) {
                 genomeViewer.setSelectedFeature(Feature.this);
+                showPopUp(e);
+                
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
+                showPopUp(e);
             }
 
             @Override
@@ -59,6 +69,51 @@ public class Feature extends JComponent{
 
             @Override
             public void mouseExited(MouseEvent e) {
+            }
+
+            private void showPopUp(MouseEvent e) {
+                if((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())){
+                    final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
+                    if(thumb != null){
+                        JPopupMenu popUp = new JPopupMenu();
+                        JMenuItem addListItem = new JMenuItem("Add Feature");
+                        addListItem.addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                thumb.addToList(f);
+                            }
+                        });
+                        popUp.add(addListItem);
+                        JMenuItem removeItem = new JMenuItem("Remove all features");
+                        removeItem.addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                thumb.removeAllFeatures();
+                            }
+                        });
+                        popUp.add(removeItem);
+                        JMenuItem showThumbnail = new JMenuItem("Show ThumbnailView");
+                        showThumbnail.addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                Lookup.Result<ReferenceViewer> resultReferenceView = Utilities.actionsGlobalContext().lookupResult(ReferenceViewer.class);
+                                for (Iterator it = resultReferenceView.allInstances().iterator(); it.hasNext();) {
+                                    ReferenceViewer viewer = (ReferenceViewer) it.next();
+                                    thumb.showThumbnailView(viewer);
+                                }
+
+                                
+                            }
+                        });
+                        popUp.add(showThumbnail);
+                        popUp.show(genomeViewer, e.getX(), e.getY());
+                    }
+
+
+                }
             }
         });
         this.addMouseMotionListener(new MouseMotionListener() {

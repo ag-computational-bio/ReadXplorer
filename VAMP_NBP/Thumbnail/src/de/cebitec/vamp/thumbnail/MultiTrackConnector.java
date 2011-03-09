@@ -1,4 +1,4 @@
-package de.cebitec.vamp.databackend.connector;
+package de.cebitec.vamp.thumbnail;
 
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
@@ -11,6 +11,10 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.RunConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,10 +33,10 @@ import java.util.logging.Logger;
  *
  * @author ddoppmeier
  */
-public class TrackConnector implements ITrackConnector{
+public class MultiTrackConnector implements ITrackConnector{
 
     private String associatedTrackName;
-    private long trackID;  
+    private long trackID;
     private long runID;
     private int genomeSize;
     private CoverageThread thread;
@@ -51,7 +55,7 @@ public class TrackConnector implements ITrackConnector{
     private static int T_GAP = 11;
     private static int N_GAP = 12;
 
-    TrackConnector(PersistantTrack track) {
+    public MultiTrackConnector(PersistantTrack track) {
         associatedTrackName = track.getDescription();
         trackID = track.getId();
         con = ProjectConnector.getInstance().getConnection();
@@ -63,7 +67,7 @@ public class TrackConnector implements ITrackConnector{
         startCoverageThread(tracks);
     }
 
-    TrackConnector(long id, List<PersistantTrack> tracks) {
+    public MultiTrackConnector(long id, List<PersistantTrack> tracks) {
         if (tracks.size() > 2) throw new UnsupportedOperationException("More than two tracks not supported yet.");
         this.trackID = id;
         con = ProjectConnector.getInstance().getConnection();
@@ -112,7 +116,7 @@ public class TrackConnector implements ITrackConnector{
             fetch.setInt(3, to);
             fetch.setInt(4, from);
             fetch.setInt(5, to);
-            
+
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 // mapping data
@@ -168,7 +172,7 @@ public class TrackConnector implements ITrackConnector{
 
     @Override
     public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) {
-        
+
         ArrayList<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_IN_TRACK_FOR_INTERVAL);
@@ -191,13 +195,13 @@ public class TrackConnector implements ITrackConnector{
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        
+
         return diffs;
     }
 
     @Override
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to) {
-   
+
         Collection<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
         try {
             PreparedStatement fetchGaps = con.prepareStatement(SQLStatements.FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL);
@@ -741,7 +745,7 @@ public class TrackConnector implements ITrackConnector{
         double percentage = 0;
         double absValue = 0;
         PreparedStatement fetch;
-        try {   
+        try {
                 fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK);
 
             fetch.setLong(1, trackID);
@@ -780,7 +784,7 @@ public class TrackConnector implements ITrackConnector{
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-      
+
         percentage = absValue / genomeSize * 100;
         return percentage;
     }
