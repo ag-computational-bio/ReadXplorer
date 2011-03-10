@@ -67,9 +67,9 @@ public class MultiTrackConnector implements ITrackConnector{
         startCoverageThread(tracks);
     }
 
-    public MultiTrackConnector(long id, List<PersistantTrack> tracks) {
+    public MultiTrackConnector(List<PersistantTrack> tracks) {
         if (tracks.size() > 2) throw new UnsupportedOperationException("More than two tracks not supported yet.");
-        this.trackID = id;
+        this.trackID = 9999;
         con = ProjectConnector.getInstance().getConnection();
         runID = fetchRunID();
         genomeSize = this.getRefGenLength();

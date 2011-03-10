@@ -1,6 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
  */
 package de.cebitec.vamp.thumbnail;
 
@@ -9,6 +8,9 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.thumbnail.Actions.ASynchSliderCookie;
+import de.cebitec.vamp.thumbnail.Actions.CompareTrackCookie;
+import de.cebitec.vamp.thumbnail.Actions.SynchSliderCookie;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComponent;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -17,6 +19,7 @@ import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -35,33 +38,48 @@ import org.netbeans.api.visual.layout.LayoutFactory;
 import org.netbeans.api.visual.widget.ComponentWidget;
 import org.netbeans.api.visual.widget.Scene;
 import org.netbeans.api.visual.widget.Widget;
+import org.openide.util.Lookup;
 import org.openide.util.Lookup.Result;
 import org.openide.util.Utilities;
+import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.WindowManager;
 
 /**
- * Implements IThumbnailView. Is responsible for showing a thumbnail-view of all Tracks for given features.
+ * ServiceProvider for IThumbnailView
  * @author denis
  */
 @ServiceProvider(service = IThumbnailView.class)
-public class ThumbnailController extends MouseAdapter implements IThumbnailView, ActionListener {
+public class ThumbnailController extends MouseAdapter implements IThumbnailView, Lookup.Provider {
 
     private ThumbNailViewTopComponent topComp;
     private List<PersistantFeature> selectedFeatures;
+    //Gives access to all BasePanels for feature
     private HashMap<PersistantFeature, List<BasePanel>> featureToTrackpanelList;
+    //Gives access to PersistantTrack from BasePanel
+    private HashMap<BasePanel, PersistantTrack> trackPanelToTrack;
+    //Gives access to LayoutWidget for currentFeature
+    private HashMap<PersistantFeature, Widget> featureToLayoutWidget;
     private ReferenceViewer viewer;
     private PersistantFeature currentFeature;
     private ViewController controller;
-    final private String SYNCHCB = "SYNCH-CB";
+    private int countTracks = 0;
+    private BasePanel firstTrackPanelToCompare;
+    private InstanceContent content;
+    private MyLookup controllerLookup;
 
     public ThumbnailController() {
         this.selectedFeatures = new ArrayList<PersistantFeature>();
         this.featureToTrackpanelList = new HashMap<PersistantFeature, List<BasePanel>>();
+        this.trackPanelToTrack = new HashMap<BasePanel, PersistantTrack>();
+        this.featureToLayoutWidget = new HashMap<PersistantFeature, Widget>();
+        content = new InstanceContent();
+        controllerLookup = new MyLookup(content);
     }
 
     @Override
     public void showThumbnailView(ReferenceViewer refViewer) {
+        countTracks = 0;
         viewer = refViewer;
         topComp = ThumbNailViewTopComponent.findInstance();
         topComp.open();
@@ -69,36 +87,116 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         scene.removeChildren();
         scene.setLayout(LayoutFactory.createVerticalFlowLayout(LayoutFactory.SerialAlignment.LEFT_TOP, 5));
         scene.getActions().addAction(ActionFactory.createMouseCenteredZoomAction(1.1));
-        //ViewController holen
+        //Get ViewController
         Result<ViewController> viewControlResult = Utilities.actionsGlobalContext().lookupResult(ViewController.class);
         controller = viewControlResult.allInstances().iterator().next();
+        //After Lookup-stuff is done requestActive for ThumbnailTopComponent
         topComp.requestActive();
+        //Build scene
         drawScene();
-        ThumbnailOptionsTopComponent.findInstance().getjCheckBox1().setSelected(false);
-
+        removeCookies();
+        //Activate Synchronize-Action for ZoomSliders
+        addSynchCookieToLookup();
     }
 
-    private void createToolTipText(Widget compWidg, TrackViewer track) {
+    /**
+     * Activates synchronize-Sliders Action in Menu.
+     */
+    private void addSynchCookieToLookup() {
+        getLookup().add(new SynchSliderCookie() {
 
-        //TODO: Sinnvoller ToolTipText
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
-        sb.append("<b>TrackID:</b>: ").append(track.getTrackCon().getTrackID());
-        sb.append("</html>");
-
-        compWidg.setToolTipText(sb.toString());
+            @Override
+            public void synchSliders() {
+                sliderSynchronisation(true);
+                //Sliders a synchronized now so remove old cookie and add a new one so that they can be asynchronized again.
+                getLookup().removeAll(SynchSliderCookie.class);
+                addASynchCookieToLookup();
+            }
+        });
     }
 
-    @Override
-    public void addToList(PersistantFeature feature) {
-        this.selectedFeatures.add(feature);
+    /**
+     * Activates don't-synchronize-Sliders Action in Menu.
+     */
+    private void addASynchCookieToLookup() {
+        getLookup().add(new ASynchSliderCookie() {
+
+            @Override
+            public void asynch() {
+                sliderSynchronisation(false);
+                getLookup().removeAll(ASynchSliderCookie.class);
+                addSynchCookieToLookup();
+            }
+        });
+    }
+
+    /**
+     * Sets all Sliders based on synch-Value
+     * @param synch Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
+     */
+    private void sliderSynchronisation(boolean synch) {
+        for (PersistantFeature feature : selectedFeatures) {
+            ZoomChangeListener zoomChangeListener = new ZoomChangeListener();
+            for (BasePanel bp : featureToTrackpanelList.get(feature)) {
+                JPanel panel = (JPanel) bp.getComponent(0);
+                if (panel != null) {
+                    CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent(1);
+                    if (synch) {
+                        slider.setValue(5);
+                        slider.addChangeListener(zoomChangeListener);
+                        zoomChangeListener.addMapValue((TrackViewer) panel.getComponent(0), slider);
+
+                    } else {
+                        slider.setValue(0);
+                        while (slider.getChangeListeners().length > 1) {
+                            slider.removeChangeListener(slider.getChangeListeners()[0]);
+                        }
+                        //slider.removeChangeListener(slider.getChangeListeners()[0]);
+                        System.out.println(slider.getChangeListeners().length);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /*
+     * Draws all Thumbnail-Widgets for all features
+     */
+    private void drawScene() {
+        //Get all associated Tracks for Reference
+        ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
+        for (PersistantFeature feature : this.selectedFeatures) {
+            this.currentFeature = feature;
+            //Create LayoutWidget to layout all Tracks for a feature in GridLayout
+            Widget layoutWidg = new Widget(topComp.getScene());
+            layoutWidg.setLayout(new ThumbGridLayout((refCon.getAssociatedTracks().size())));
+            featureToLayoutWidget.put(feature, layoutWidg);
+            //Save all BasePanels for feature in List to put into HashMap
+            List<BasePanel> bps = new ArrayList<BasePanel>();
+            for (PersistantTrack track : refCon.getAssociatedTracks()) {
+                BasePanel trackPanel = createTrackPanel(track, controller);
+                bps.add(trackPanel);
+                this.trackPanelToTrack.put(trackPanel, track);
+                trackPanel.addMouseListener(this);
+                //Put TrackPanel into ComponentWidget for Scene
+                ComponentWidget compWidg = new ComponentWidget(topComp.getScene(), trackPanel);
+                compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
+                compWidg.getActions().addAction(ActionFactory.createResizeAction(ActionFactory.createFreeResizeStategy(), ActionFactory.createDefaultResizeProvider()));
+
+                layoutWidg.addChild(compWidg);
+                layoutWidg.setBorder(BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
+            }
+            this.featureToTrackpanelList.put(currentFeature, bps);
+            topComp.getScene().addChild(layoutWidg);
+            topComp.getScene().validate();
+        }
     }
 
     /*
-     * Creates actual BasePanel with TrackViewer and ZoomSlider for wrapping into ComponentWidget.
+     * Creates BasePanel for one Track with TrackViewer and ZoomSlider for wrapping into ComponentWidget.
      */
     private BasePanel createTrackPanel(PersistantTrack track, ViewController controller) {
-        //return controller.getBasePanelFac().getTrackBasePanel(track, controller.getCurrentRefGen());
         BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
         BasePanel b = new BasePanel(boundsManager, controller);
         b.setName(track.getDescription());
@@ -110,7 +208,6 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
         trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
 
-        //trackV.updatePhysicalBounds();
         trackV.setName(track.getDescription());
 
         CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -122,7 +219,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         // create zoom slider
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
-        
+
         b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
@@ -132,10 +229,61 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         return b;
     }
 
+    /**
+     * Creates BasePanel of two Tracks which have been compared.
+     * @param tracks Tracks to compare.
+     * @return
+     */
+    private BasePanel createMultipleTrackPanel(List<PersistantTrack> tracks, PersistantFeature feature) {
+        BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
+        BasePanel b = new BasePanel(boundsManager, controller);
+        controller.addMousePositionListener(b);
+
+        // get double track connector
+        MultiTrackConnector trackCon = new MultiTrackConnector(tracks);
+        MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon);
+
+        int featureWidth = (feature.getStop() - feature.getStart()) / 2;
+        trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
+
+        //eigener ComponentListener für TrackV
+        trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
+
+
+        // create info panel
+        CoverageInfoLabel cil = new CoverageInfoLabel();
+        cil.renameFields();
+        trackV.setTrackInfoPanel(cil);
+
+        // create zoom slider
+        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
+
+        // add panels to basepanel
+        b.setViewer(trackV, slider);
+
+        //TitlePanel
+        String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
+        JPanel tp = new JPanel();
+        tp.add(new JLabel(title));
+        tp.setBackground(ColorProperties.TITLE_BACKGROUND);
+        b.setTitlePanel(tp);
+
+        b.setMinimumSize(new Dimension(200, 150));
+        b.setPreferredSize(new Dimension(200, 150));
+        return b;
+    }
+
+    /**
+     * TitlePanel for TrackPanel with Label and Checkbox.
+     * @param title
+     * @return
+     */
     private JPanel getTitlePanel(String title) {
         JPanel p = new JPanel();
         p.add(new JLabel(title));
-        p.add(new JCheckBox("Compare Track"));
+        final JCheckBox compare = new JCheckBox("Compare");
+        compare.addActionListener(new CheckBoxActionListener(compare));
+        p.add(compare);
         p.setBackground(ColorProperties.TITLE_BACKGROUND);
         return p;
     }
@@ -145,77 +293,119 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         this.selectedFeatures.clear();
     }
 
-    //ActionListener fuer ThumbnailOptionsTopComponent
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equalsIgnoreCase(SYNCHCB)) {
-            /////Umstaendlich,alles neu zeichen!
-            //topComp.getScene().removeChildren();
-            //drawScene(ThumbnailOptionsTopComponent.findInstance().getjCheckBox1().isSelected());
+    public void addToList(PersistantFeature feature) {
+        this.selectedFeatures.add(feature);
+    }
 
-            for (PersistantFeature feature : this.selectedFeatures) {
-                ZoomChangeListener zoomChangeListener = new ZoomChangeListener();
-                for (BasePanel bp : this.featureToTrackpanelList.get(feature)) {
-                    JPanel panel = (JPanel) bp.getComponent(0);
-                    if (panel != null) {
-                        CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent(1);
-                        slider.setValue(5);
-                        if (ThumbnailOptionsTopComponent.findInstance().getjCheckBox1().isSelected()) {
-                            slider.addChangeListener(zoomChangeListener);
-                            zoomChangeListener.addMapValue((TrackViewer) panel.getComponent(0), slider);
-                        } else {
-                            slider.removeChangeListener(slider.getChangeListeners()[0]);
-                            System.out.println(slider.getChangeListeners().length);
-                        }
-                    }
+    private void compareTwoTracks(List<PersistantTrack> tracks, PersistantFeature feature) {
+        BasePanel bp = createMultipleTrackPanel(tracks, feature);
+        bp.addMouseListener(this);
+        featureToTrackpanelList.get(feature).add(bp);
+        //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
+        if (getLookup().lookup(ASynchSliderCookie.class) != null) {
+            sliderSynchronisation(true);
+        }
+        ComponentWidget compWidg = new ComponentWidget(topComp.getScene(), bp);
+        compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
+        compWidg.getActions().addAction(ActionFactory.createResizeAction(ActionFactory.createFreeResizeStategy(), ActionFactory.createDefaultResizeProvider()));
+        //Add MultipleTrackPanel to Layout for currentFeature
+        featureToLayoutWidget.get(currentFeature).addChild(compWidg);
+        topComp.getScene().validate();
+    }
+
+    /**
+     * MouseAdapter
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        BasePanel p = (BasePanel) e.getSource();
+        if (p != null) {
+            updateCurrentFeature(p);
+        }
+    }
+
+    @Override
+    public MyLookup getLookup() {
+        return controllerLookup;
+    }
+
+    void removeCookies() {
+        getLookup().removeAll(SynchSliderCookie.class);
+        getLookup().removeAll(ASynchSliderCookie.class);
+        getLookup().removeAll(CompareTrackCookie.class);
+    }
+
+    /**
+     * Updates the ReferenceFeatureComponent to the currently selected feature and sets currentFeature value.
+     * @param bp BasePanel where user has clicked
+     */
+    private void updateCurrentFeature(BasePanel bp) {
+        ReferenceFeatureTopComponent comp = (ReferenceFeatureTopComponent) WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent");
+        if (comp != null) {
+            for (PersistantFeature feature : featureToTrackpanelList.keySet()) {
+                if (featureToTrackpanelList.get(feature).contains(bp)) {
+                    currentFeature = feature;
+                    comp.showFeatureDetails(feature);
+                    break;
                 }
             }
         }
     }
 
-    /*
-     * Draws all thumbnail-Widgets for all features
+    /**
+     * ActionListener for CompareCheckBox's.
      */
-    private void drawScene() {
-        //Alle associatedTracks für Reference holen
-        ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
-        for (PersistantFeature feature : this.selectedFeatures) {
-            this.currentFeature = feature;
-            Widget layoutWidg = new Widget(topComp.getScene());
-            layoutWidg.setLayout(new ThumbGridLayout((refCon.getAssociatedTracks().size())));
-            List<BasePanel> bps = new ArrayList<BasePanel>();
-            for (PersistantTrack track : refCon.getAssociatedTracks()) {
-                BasePanel trackPanel = createTrackPanel(track, controller);
-                bps.add(trackPanel);
-                trackPanel.addMouseListener(this);
-                ComponentWidget compWidg = new ComponentWidget(topComp.getScene(), trackPanel);
-                compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
-                compWidg.getActions().addAction(ActionFactory.createResizeAction(ActionFactory.createFreeResizeStategy(), ActionFactory.createDefaultResizeProvider()));
-                compWidg.getActions().addAction(ActionFactory.createMoveAction());
+    private class CheckBoxActionListener implements ActionListener {
 
-                layoutWidg.addChild(compWidg);
-                layoutWidg.setBorder(BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
-            }
-            this.featureToTrackpanelList.put(currentFeature, bps);
-            topComp.getScene().addChild(layoutWidg);
-            topComp.getScene().validate();
-        }
-    }
+        private JCheckBox textBox;
 
-     /**
-     * MouseAdapter
-     */
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        ReferenceFeatureTopComponent comp = (ReferenceFeatureTopComponent) WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent");
-        BasePanel p = (BasePanel) e.getSource();
-        for (PersistantFeature feature : this.featureToTrackpanelList.keySet()) {
-            if (this.featureToTrackpanelList.get(feature).contains(p)) {
-                comp.showFeatureDetails(feature);
-                break;
-            }
+        public CheckBoxActionListener(JCheckBox tb) {
+            textBox = tb;
         }
 
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            //Get Source of Event i.e. BasePanel
+            BasePanel bp = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
+            if (bp != null) {
+                updateCurrentFeature(bp);
+                if (textBox.isSelected()) {
+                    countTracks++;
+                    switch (countTracks) {
+                        case 1:
+                            firstTrackPanelToCompare = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
+                            break;
+                        case 2: {
+                            if (featureToTrackpanelList.get(currentFeature).contains(firstTrackPanelToCompare)) {
+                                getLookup().add(new CompareTrackCookie() {
+
+                                    @Override
+                                    public void compare() {
+                                        BasePanel secondTrackBP = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
+                                        ArrayList<PersistantTrack> trackList = new ArrayList();
+                                        trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
+                                        trackList.add(trackPanelToTrack.get(secondTrackBP));
+                                        compareTwoTracks(trackList, currentFeature);
+                                    }
+                                });
+                            } else {
+                                countTracks--;
+                                textBox.setSelected(false);
+                            }
+                            break;
+                        }
+                        default:
+                            textBox.setSelected(false);
+                            break;
+                    }
+                } else {
+                    countTracks--;
+                    if (countTracks == 1) {
+                        getLookup().removeAll(CompareTrackCookie.class);
+                    }
+                }
+            }
+        }
     }
-  
 }

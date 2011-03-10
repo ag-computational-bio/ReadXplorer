@@ -50,8 +50,7 @@ public class Feature extends JComponent{
             @Override
             public void mouseClicked(MouseEvent e) {
                 genomeViewer.setSelectedFeature(Feature.this);
-                showPopUp(e);
-                
+                showPopUp(e);                
             }
 
             @Override
@@ -111,8 +110,6 @@ public class Feature extends JComponent{
                         popUp.add(showThumbnail);
                         popUp.show(genomeViewer, e.getX(), e.getY());
                     }
-
-
                 }
             }
         });

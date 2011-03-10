@@ -4,11 +4,13 @@
  */
 package de.cebitec.vamp.thumbnail;
 
-import de.cebitec.vamp.ui.visualisation.track.TrackStatisticsPanel;
+import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.vamp.thumbnail.Actions.ASynchSliderCookie;
+import de.cebitec.vamp.thumbnail.Actions.CompareTrackCookie;
+import de.cebitec.vamp.thumbnail.Actions.SynchSliderCookie;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import org.openide.util.NbBundle;
@@ -19,9 +21,6 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.api.visual.widget.BirdViewController;
 import org.netbeans.api.visual.widget.Scene;
 import org.openide.util.Lookup;
-import org.openide.util.lookup.AbstractLookup;
-import org.openide.util.lookup.InstanceContent;
-import org.openide.windows.Mode;
 
 /**
  * TopComponent to display a Scene for the Track-Widgets.
@@ -33,12 +32,10 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
     private JComponent myView;
     private Scene scene;
     private BirdViewController birdCont;
-    private ThumbnailOptionsTopComponent optionsComp;
     private boolean birdOn = false;
     private boolean trackStatsOn = false;
     private boolean refNavigatorOn = false;
     private boolean refIntervallOn = false;
-    private boolean refFeatureOn = false;
 
     public Scene getScene() {
         return scene;
@@ -64,7 +61,7 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
         jScrollPane1.setViewportView(myView);
 
         myView.addMouseListener(this);
-
+        associateLookup(Lookup.getDefault().lookup(ThumbnailController.class).getLookup());
     }
 
     /** This method is called from within the constructor to
@@ -80,7 +77,6 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
         setLayout(new java.awt.BorderLayout());
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
@@ -125,76 +121,79 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
 
     @Override
     public void componentOpened() {
-        optionsComp = ThumbnailOptionsTopComponent.findInstance();
-        optionsComp.open();
-        if(WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").isOpened()){
+               
+        if (WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").isOpened()) {
             refNavigatorOn = true;
             WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
         }
-        if(WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").isOpened()){
+        if (WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").isOpened()) {
             refIntervallOn = true;
             WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
 
         }
-        if(WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").isOpened()){
+        if (WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").isOpened()) {
             trackStatsOn = true;
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
         }
-                   
 
-        
+
+
     }
 
     @Override
     public void componentClosed() {
         scene.removeChildren();
-        optionsComp.close();
-        if(refNavigatorOn){
+        ThumbnailController thumbCon = Lookup.getDefault().lookup(ThumbnailController.class);
+        thumbCon.removeCookies();
+
+
+        if (refNavigatorOn) {
             WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
         }
-        if(refIntervallOn){
+        if (refIntervallOn) {
             WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
         }
-        if(trackStatsOn){
+        if (trackStatsOn) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
         }
-        
-        
+
+
     }
 
     @Override
     protected void componentHidden() {
-        if(refNavigatorOn){
+
+        if (refNavigatorOn) {
             WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
         }
-        if(refIntervallOn){
+        if (refIntervallOn) {
             WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
         }
-        if(trackStatsOn){
+        if (trackStatsOn) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
         }
-        optionsComp.close();
-        
+
+
     }
 
     @Override
     protected void componentShowing() {
-        if(WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").isOpened()){
+
+        if (WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").isOpened()) {
             refNavigatorOn = true;
             WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
         }
-        if(WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").isOpened()){
+        if (WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").isOpened()) {
             refIntervallOn = true;
             WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
 
         }
-        if(WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").isOpened()){
+        if (WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").isOpened()) {
             trackStatsOn = true;
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
         }
-        optionsComp.open();
-            
-       
+
+
     }
 
     void writeProperties(java.util.Properties p) {
