@@ -12,7 +12,7 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Utilities;
 
-// TODO this could be something like a serviceprovider and "overwrite" the standard opentrackaction
+// TODO this should be something like a serviceprovider and "overwrite" the standard opentrackaction
 public final class OpenDoubleTrackAction implements ActionListener {
 
     private final ReferenceViewer context;
@@ -30,12 +30,16 @@ public final class OpenDoubleTrackAction implements ActionListener {
         openRefGenDialog.setVisible(true);
 
         // check if two tracks were selected
-        while (!dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) || otp.getSelectedTracks().size() != 2){
+        boolean okSelected = false;
+        while (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().size() != 2){
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks.", NotifyDescriptor.INFORMATION_MESSAGE));
             openRefGenDialog.setVisible(true);
+            okSelected = true;
         }
-        ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
-        BasePanelFactory factory = viewCon.getBasePanelFac();
-        factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), context.getReference());
+        if (okSelected){
+            ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
+            BasePanelFactory factory = viewCon.getBasePanelFac();
+            factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), context.getReference());
+        }
     }
 }

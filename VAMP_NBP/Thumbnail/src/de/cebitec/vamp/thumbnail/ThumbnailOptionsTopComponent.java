@@ -31,7 +31,7 @@ public final class ThumbnailOptionsTopComponent extends TopComponent {
         setToolTipText(NbBundle.getMessage(ThumbnailOptionsTopComponent.class, "HINT_ThumbnailOptionsTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         ThumbnailController thumbControll = Lookup.getDefault().lookup(ThumbnailController.class);
-        jCheckBox1.addActionListener(thumbControll);
+//        jCheckBox1.addActionListener(thumbControll);
     }
 
     public JCheckBox getjCheckBox1() {

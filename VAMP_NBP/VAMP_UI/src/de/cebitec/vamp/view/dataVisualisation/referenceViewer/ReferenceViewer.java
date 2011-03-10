@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ReferenceViewer extends AbstractViewer {
 
