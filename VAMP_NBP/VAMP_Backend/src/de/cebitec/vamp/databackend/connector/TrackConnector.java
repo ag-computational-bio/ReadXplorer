@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author ddoppmeier
  */
-public class TrackConnector {
+public class TrackConnector implements ITrackConnector{
 
     private String associatedTrackName;
     private long trackID;  
@@ -101,6 +101,7 @@ public class TrackConnector {
         return id;
     }
 
+    @Override
     public Collection<PersistantMapping> getMappings(int from, int to) {
         HashMap<Integer, PersistantMapping> mappings = new HashMap<Integer, PersistantMapping>();
 
@@ -160,10 +161,12 @@ public class TrackConnector {
         return mappings.values();
     }
 
+    @Override
     public void addCoverageRequest(CoverageRequest request) {
         thread.addCoverageRequest(request);
     }
 
+    @Override
     public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) {
         
         ArrayList<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
@@ -192,6 +195,7 @@ public class TrackConnector {
         return diffs;
     }
 
+    @Override
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to) {
    
         Collection<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
@@ -219,6 +223,7 @@ public class TrackConnector {
         return gaps;
     }
 
+    @Override
     public int getNumOfMappedSequences() {
         int num = 0;
         PreparedStatement fetch;
@@ -241,6 +246,7 @@ public class TrackConnector {
         return num;
     }
 
+    @Override
         public int getNumOfMappedSequencesCalculate() {
         int num = 0;
         PreparedStatement fetch;
@@ -261,6 +267,7 @@ public class TrackConnector {
         return num;
     }
 
+    @Override
     public int getNumOfUniqueBmMappings() {
 
         int numOfBmMappings = 0;
@@ -286,6 +293,7 @@ public class TrackConnector {
         return numOfBmMappings;
     }
 
+    @Override
         public int getNumOfUniqueBmMappingsCalculate() {
 
         int numOfBmMappings = 0;
@@ -309,6 +317,7 @@ public class TrackConnector {
     }
 
 
+    @Override
     public int getNumOfUniqueMappings() {
         int num = 0;
         PreparedStatement fetch;
@@ -331,6 +340,7 @@ public class TrackConnector {
         return num;
     }
 
+    @Override
         public int getNumOfUniqueMappingsCalculate() {
         int num = 0;
         PreparedStatement fetch;
@@ -349,6 +359,7 @@ public class TrackConnector {
         return num;
     }
 
+    @Override
         public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete,int numOfReads, int numOfUniqueSeq){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
@@ -390,6 +401,7 @@ public class TrackConnector {
 
         }
 
+    @Override
     public int getNumOfPerfectUniqueMappings() {
         int num = 0;
         PreparedStatement fetch;
@@ -413,6 +425,7 @@ public class TrackConnector {
         return num;
     }
 
+    @Override
         public int getNumOfPerfectUniqueMappingsCalculate() {
         int num = 0;
         PreparedStatement fetch;
@@ -433,14 +446,17 @@ public class TrackConnector {
         return num;
     }
 
+    @Override
     public long getRunId() {
         return runID;
     }
 
+    @Override
     public long getTrackID(){
         return trackID;
     }
 
+    @Override
     public String getAssociatedTrackName() {
         return associatedTrackName;
     }
@@ -570,6 +586,7 @@ public class TrackConnector {
         return snps;
     }
 
+    @Override
     public List<Read> findReads(String read) {
         ArrayList<Read> reads = new ArrayList<Read>();
         try {
@@ -599,6 +616,7 @@ public class TrackConnector {
      * we take 50 entrys of the diff table and 400 (200 from the left and 200 from the right)
      * from the table mapping we have to do this so that we dont miss any mapping that have a diff in this 50 positions
      */
+    @Override
     public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
         ArrayList<Snp> snps = new ArrayList<Snp>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
@@ -692,6 +710,7 @@ public class TrackConnector {
 
     }
 
+    @Override
     public double getPercentRefGenPerfectCovered() {
         double percentage = 0;
         double absValue = 0;
@@ -717,6 +736,7 @@ public class TrackConnector {
         return percentage;
 
     }
+    @Override
  public double getPercentRefGenPerfectCoveredCalculate() {
         double percentage = 0;
         double absValue = 0;
@@ -740,6 +760,7 @@ public class TrackConnector {
     }
 
 
+    @Override
     public double getPercentRefGenBmCovered() {
         double percentage = 0;
         double absValue = 0;
@@ -764,6 +785,7 @@ public class TrackConnector {
         return percentage;
     }
 
+    @Override
         public double getPercentRefGenBmCoveredCalculate() {
         double percentage = 0;
         double absValue = 0;
@@ -785,6 +807,7 @@ public class TrackConnector {
         return percentage;
     }
 
+    @Override
     public double getPercentRefGenNErrorCovered() {
         double percentage = 0;
         double absValue = 0;
@@ -809,6 +832,7 @@ public class TrackConnector {
         return percentage;
     }
 
+    @Override
         public double getPercentRefGenNErrorCoveredCalculate() {
         double percentage = 0;
         double absValue = 0;
@@ -831,6 +855,7 @@ public class TrackConnector {
         return percentage;
     }
 
+    @Override
         public HashMap<Integer,Integer> getCoverageInfosofTrack(int from , int to){
             PreparedStatement fetch;
             HashMap<Integer,Integer> positionMap = new HashMap<Integer,Integer>();
@@ -854,5 +879,10 @@ public class TrackConnector {
         }
         return positionMap;
         }
+
+    @Override
+    public CoverageThread getThread() {
+        return this.thread;
+    }
 
 }

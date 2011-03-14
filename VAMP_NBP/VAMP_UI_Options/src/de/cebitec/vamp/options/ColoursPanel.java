@@ -1,7 +1,6 @@
 package de.cebitec.vamp.options;
 
 import java.awt.Color;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -212,26 +211,6 @@ final class ColoursPanel extends javax.swing.JPanel {
         if(d.getValue().equals(DialogDescriptor.OK_OPTION)){
             button.setBackground(colChooser.getColor());
         }
-    }
-
-    public Color getBestMatchColor() {
-        return bestMatchButton.getBackground();
-    }
-
-    public Color getCommonMatchColor() {
-        return commonMatchButton.getBackground();
-    }
-
-    public Color getPerfectMatchColor() {
-        return perfectMatchButton.getBackground();
-    }
-
-    public JCheckBox getUniqueColorationCheckBox() {
-        return uniformColorationCheckBox;
-    }
-
-    public Color getUnqiueColor() {
-        return uniformColButton.getBackground();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

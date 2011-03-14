@@ -5,6 +5,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.util.Properties;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -13,7 +14,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
 import javax.swing.JComponent;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -40,6 +45,7 @@ public class SequenceBar extends JComponent {
     private int largeBar;
     private int smallBar;
     private StartCodonFilter codonFilter;
+    private Preferences pref;
 
     /**
      * Creates a new sequence bar instance.
@@ -59,7 +65,25 @@ public class SequenceBar extends JComponent {
         this.halfMarkingWidth = markingWidth / 2;
         this.regionsToHighlight = new ArrayList<Region>();
         this.codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
-        
+        this.initListener();
+    }
+
+     /**
+     * Updates the sequence bar according to the genetic code chosen.
+     * After changing the genetic code, no start codons should be selected
+      * anymore.
+     */
+    private void initListener() {
+        this.pref = NbPreferences.forModule(Object.class);
+        this.pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                if (evt.getKey().equals(Properties.SEL_GENETIC_CODE)) {
+                    SequenceBar.this.codonFilter.resetStartCodons();
+                    SequenceBar.this.findCodons();
+                }
+            }
+        });
     }
 
     public void setGenomeGapManager(GenomeGapManager gapManager) {
@@ -347,34 +371,24 @@ public class SequenceBar extends JComponent {
         }
     }
 
-    public void showATGCodon(boolean selected) {
-        this.codonFilter.setAtgSelected(selected);
+    /**
+     * Calculates which codons should be highlighted and updates the gui.
+     * @param i the index of the codon to update
+     * @param isSelected true, if the codon should be selected
+     */
+    public void showCodons(final int i, final boolean isSelected){
+        this.codonFilter.setCodonSelected(i, isSelected);
         this.findCodons();
         this.repaint();
     }
 
-    public void showGTGCodon(boolean selected) {
-        this.codonFilter.setGtgSelected(selected);
-        this.findCodons();
-        this.repaint();
-    }
-
-    public void showTTGCodon(boolean selected) {
-        this.codonFilter.setTtgSelected(selected);
-        this.findCodons();
-        this.repaint();
-    }
-
-    public boolean isATGCodonShown(){
-        return codonFilter.isAtgSelected();
-    }
-
-    public boolean isGTGCodonShown(){
-        return codonFilter.isGtgSelected();
-    }
-
-    public boolean isTTGCodonShown(){
-        return codonFilter.isTtgSelected();
+    /**
+     * Returns if the codon with the index i is currently selected.
+     * @param i the index of the codon
+     * @return true, if the codon with the index i is currently selected
+     */
+    public boolean isCodonShown(final int i){
+        return this.codonFilter.isCodonSelected(i);
     }
 
     public void paintBaseBackgroundColor(int logX) {

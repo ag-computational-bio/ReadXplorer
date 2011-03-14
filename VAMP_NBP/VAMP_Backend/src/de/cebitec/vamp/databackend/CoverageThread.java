@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author ddoppmei
  */
-public class CoverageThread extends Thread{
+public class CoverageThread extends Thread {
 
     private long trackID;
     private long trackID2;
@@ -24,7 +24,6 @@ public class CoverageThread extends Thread{
     private PersistantCoverage currentCov;
     private int coveredWidth;
     private CoverageRequest latestRequest;
-
     private double requestCounter;
     private double skippedCounter;
 
@@ -56,42 +55,45 @@ public class CoverageThread extends Thread{
         this.trackID2 = trackID2;
         currentCov = new PersistantCoverage(0, 0,true);
     }
+    
+     public void setCoveredWidth(int coveredWidth) {
+        this.coveredWidth = coveredWidth;
+    }
 
-    private int calcCenterLeft(CoverageRequest request){
+    private int calcCenterLeft(CoverageRequest request) {
         int centerMiddle = calcCenterMiddle(request);
         int result = centerMiddle - coveredWidth;
         return result;
     }
 
-    private int calcCenterRight(CoverageRequest request){
+    private int calcCenterRight(CoverageRequest request) {
         int centerMiddle = calcCenterMiddle(request);
         int result = centerMiddle + coveredWidth;
         return result;
     }
 
-    private int calcCenterMiddle(CoverageRequest request){
-        return (request.getFrom()+request.getTo()) /2;
+    private int calcCenterMiddle(CoverageRequest request) {
+        return (request.getFrom() + request.getTo()) / 2;
     }
 
-    public void addCoverageRequest(CoverageRequest request){
+    public void addCoverageRequest(CoverageRequest request) {
         latestRequest = request;
         requestQueue.add(request);
     }
 
-    private boolean matchesLatestRequestBounds(CoverageRequest request){
+    private boolean matchesLatestRequestBounds(CoverageRequest request) {
         int latestMiddle = calcCenterMiddle(latestRequest);
         int currentMiddle = calcCenterMiddle(request);
 
         // rounding error somewhere....
-        if(currentMiddle -1 <= latestMiddle && latestMiddle <= currentMiddle+1){
+        if (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1) {
             return true;
         } else {
             return false;
         }
     }
 
-
-    private PersistantCoverage loadCoverage(CoverageRequest request){
+    private PersistantCoverage loadCoverage(CoverageRequest request) {
         int from = calcCenterLeft(request);
         int to = calcCenterRight(request);
 
@@ -104,12 +106,12 @@ public class CoverageThread extends Thread{
             fetch.setLong(3, trackID);
 
             ResultSet rs = fetch.executeQuery();
-         //  int counter = 0;
-            while(rs.next()){
+            //  int counter = 0;
+            while (rs.next()) {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-             //   counter++;
+                //   counter++;
                 //best match cov
-                
+
                 cov.setBmFwMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
                 cov.setBmFwNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
                 cov.setBmRvMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
@@ -124,7 +126,7 @@ public class CoverageThread extends Thread{
                 cov.setzFwNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
                 cov.setzRvMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
                 cov.setzRvNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
-                
+
             }
             fetch.close();
             rs.close();
@@ -134,11 +136,11 @@ public class CoverageThread extends Thread{
         return cov;
     }
 
-    private PersistantCoverage loadCoverage2(CoverageRequest request){
+    private PersistantCoverage loadCoverage2(CoverageRequest request) {
         int from = calcCenterLeft(request);
         int to = calcCenterRight(request);
 
-        PersistantCoverage cov = new PersistantCoverage(from, to,true);
+        PersistantCoverage cov = new PersistantCoverage(from, to, true);
         cov.setTwoTracks(true);
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2);
@@ -151,29 +153,29 @@ public class CoverageThread extends Thread{
             fetch2.setLong(3, trackID2);
             ResultSet rs2 = fetch2.executeQuery();
             ResultSet rs = fetch.executeQuery();
-         //  int counter = 0;
-            while(rs2.next()){
+            //  int counter = 0;
+            while (rs2.next()) {
                 int pos = rs2.getInt(FieldNames.COVERAGE_POSITION);
                 //coverage of Track2
                 cov.setNFwMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_FW_MULT));
                 cov.setNRvMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_RV_MULT));
 
             }
-            while(rs.next()){
+            while (rs.next()) {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-             
+
                 //check if cov of track 2 exists at position
-                int nFwMultTrack2= cov.getNFwMultTrack2(pos);   
-                int nRvMultTrack2= cov.getNRvMultTrack2(pos);    
-                int nFwMultTrack1= rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
-                int nRvMultTrack1= rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+                int nFwMultTrack2 = cov.getNFwMultTrack2(pos);
+                int nRvMultTrack2 = cov.getNRvMultTrack2(pos);
+                int nFwMultTrack1 = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                int nRvMultTrack1 = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
 
                 //we just set coverage of the diff if cov of  track 2 or track 1 exist
-                if(nFwMultTrack1 !=0 && nFwMultTrack2 != 0){
-                cov.setnFwMult(pos, Math.abs(nFwMultTrack1-nFwMultTrack2));
+                if (nFwMultTrack1 != 0 && nFwMultTrack2 != 0) {
+                    cov.setnFwMult(pos, Math.abs(nFwMultTrack1 - nFwMultTrack2));
                 }
-                if(nRvMultTrack1 !=0&& nRvMultTrack2!=0){
-                cov.setnRvMult(pos, Math.abs(nRvMultTrack1-nRvMultTrack2));
+                if (nRvMultTrack1 != 0 && nRvMultTrack2 != 0) {
+                    cov.setnRvMult(pos, Math.abs(nRvMultTrack1 - nRvMultTrack2));
                 }
 
                 cov.setNFwMultTrack1(pos, nFwMultTrack1);
@@ -190,32 +192,28 @@ public class CoverageThread extends Thread{
         return cov;
     }
 
-
-  
-
-
     @Override
-    public void run(){
+    public void run() {
 
-        while(!interrupted()){
+        while (!interrupted()) {
 
             CoverageRequest r = requestQueue.poll();
-            if(r != null){
-                if(!currentCov.coversBounds(r.getFrom(), r.getTo())){
+            if (r != null) {
+                if (!currentCov.coversBounds(r.getFrom(), r.getTo())) {
                     requestCounter++;
-                    if(matchesLatestRequestBounds(r)){
-                       if(trackID2 != 0){
-                        currentCov = this.loadCoverage2(r);
-                      }else{
-                        currentCov = this.loadCoverage(r);
-                      }
+                    if (matchesLatestRequestBounds(r)) {
+                        if (trackID2 != 0) {
+                            currentCov = this.loadCoverage2(r);
+                        } else {
+                            currentCov = this.loadCoverage(r);
+                        }
                     } else {
                         skippedCounter++;
                     }
                 }
-                    if(matchesLatestRequestBounds(r)){
-                        r.getSender().receiveCoverage(currentCov);
-                    }
+                if (matchesLatestRequestBounds(r)) {
+                    r.getSender().receiveCoverage(currentCov);
+                }
             } else {
                 try {
                     Thread.sleep(10);
@@ -227,6 +225,4 @@ public class CoverageThread extends Thread{
         }
 
     }
-
-
 }

@@ -80,7 +80,9 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>de.cebitec.vamp.ui.visualisation.reference</package>
+            </public-packages>
         </data>
     </configuration>
 </project>

@@ -7,8 +7,8 @@
 package de.cebitec.vamp.tools.readSearch;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.api.objects.Read;
+import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import java.util.List;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
@@ -25,7 +25,7 @@ import org.openide.util.TaskListener;
 public class ReadSearchSetup extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private TrackConnector trackCon;
+    private ITrackConnector trackCon;
     private List<Read> reads;
 
     public static final String PROP_SEARCH_FINISHED = "readSearchFinished";
@@ -158,7 +158,7 @@ public class ReadSearchSetup extends javax.swing.JPanel {
         return reads;
     }
 
-    public void setTrackCon(TrackConnector trackCon) {
+    public void setTrackCon(ITrackConnector trackCon) {
         this.trackCon = trackCon;
     }
 
