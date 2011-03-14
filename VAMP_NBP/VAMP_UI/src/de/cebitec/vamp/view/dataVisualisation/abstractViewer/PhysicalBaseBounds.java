@@ -3,6 +3,9 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 /**
  *
  * @author ddoppmeier
+ *
+ * Storage for the physical bounds of the base window.
+ * Contains the left and right bounds, width and middle position.
  */
 public class PhysicalBaseBounds {
 

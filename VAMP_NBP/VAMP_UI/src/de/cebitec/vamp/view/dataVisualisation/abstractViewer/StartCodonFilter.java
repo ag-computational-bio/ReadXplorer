@@ -1,10 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.GeneticCodesStore;
+import de.cebitec.vamp.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.openide.util.NbPreferences;
 
 /**
  * Filters for startcodons in two ways: First for all
@@ -22,15 +25,8 @@ public class StartCodonFilter implements RegionFilterI {
     private int absStop;
     private PersistantReference refGen;
     private String sequence;
-    private Pattern atgForward;
-    private Pattern atgReverse;
-    private Pattern gtgForward;
-    private Pattern gtgReverse;
-    private Pattern ttgForward;
-    private Pattern ttgReverse;
-    private boolean atgSelected;
-    private boolean ttgSelected;
-    private boolean gtgSelected;
+    private ArrayList<Boolean> selectedCodons;
+    private Pattern[] startCodons;
     private int frameCurrFeature;
 
     public StartCodonFilter(int absStart, int absStop, PersistantReference refGen){
@@ -38,16 +34,8 @@ public class StartCodonFilter implements RegionFilterI {
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
-        this.atgForward = Pattern.compile("atg");
-        this.atgReverse = Pattern.compile("cat");
-        this.gtgForward = Pattern.compile("gtg");
-        this.gtgReverse = Pattern.compile("cac");
-        this.ttgForward = Pattern.compile("ttg");
-        this.ttgReverse = Pattern.compile("caa");
 
-        this.atgSelected = false;
-        this.ttgSelected = false;
-        this.gtgSelected = false;
+        this.resetStartCodons();
 
         this.frameCurrFeature = StartCodonFilter.INIT; //because this is not a frame value
     }
@@ -59,7 +47,7 @@ public class StartCodonFilter implements RegionFilterI {
     private void findStartCodons(){
         regions.clear();
 
-        if(atgSelected || ttgSelected || gtgSelected){
+        if(this.atLeastOneCodonSelected()){
             // extends intervall to search to the left and right,
             // to find start/stop codons that overlap this interalls boundaries
             int offset = 3;
@@ -77,17 +65,14 @@ public class StartCodonFilter implements RegionFilterI {
             sequence = refGen.getSequence().substring(start, stop);
             boolean isFeatureSelected = this.frameCurrFeature != INIT;
 
-            if(this.atgSelected){
-               this.matchPattern(sequence, atgForward, true, offset, isFeatureSelected);
-               this.matchPattern(sequence, atgReverse, false, offset, isFeatureSelected);
-            }
-            if(this.gtgSelected){
-               this.matchPattern(sequence, gtgForward, true, offset, isFeatureSelected);
-               this.matchPattern(sequence, gtgReverse, false, offset, isFeatureSelected);
-            }
-            if(this.ttgSelected){
-               this.matchPattern(sequence, ttgForward, true, offset, isFeatureSelected);
-               this.matchPattern(sequence, ttgReverse, false, offset, isFeatureSelected);
+            int index = 0;
+            for (int i=0; i<this.selectedCodons.size(); ++i){
+                if (this.selectedCodons.get(i)){
+                    this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
+                    this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
+                } else {
+                    index +=2;
+                }
             }
         }
 
@@ -123,7 +108,6 @@ public class StartCodonFilter implements RegionFilterI {
 
     @Override
     public List<Region> findRegions() {
-
         this.findStartCodons();
         return this.regions;
     }
@@ -134,28 +118,22 @@ public class StartCodonFilter implements RegionFilterI {
         this.absStop = stop;
     }
 
-    public void setAtgSelected(boolean atgSelected) {
-        this.atgSelected = atgSelected;
+    /**
+     * Sets if the start codon with the index i is currently selected.
+     * @param i the index of the current start codon
+     * @param isSelected true, if the start codon is selected, false otherwise
+     */
+    public void setCodonSelected(final int i, final boolean isSelected){
+        this.selectedCodons.set(i, isSelected);
     }
 
-    public void setGtgSelected(boolean gtgSelected) {
-        this.gtgSelected = gtgSelected;
-    }
-
-    public void setTtgSelected(boolean ttgSelected) {
-        this.ttgSelected = ttgSelected;
-    }
-
-    public boolean isAtgSelected() {
-        return this.atgSelected;
-    }
-
-    public boolean isGtgSelected() {
-        return this.gtgSelected;
-    }
-
-    public boolean isTtgSelected() {
-        return this.ttgSelected;
+    /**
+     * Returns if the codon with index i is currently selected.
+     * @param i index of the start codon
+     * @return true if the start codon with index i is currently selected
+     */
+    public boolean isCodonSelected(final int i){
+        return this.selectedCodons.get(i);
     }
 
     public int getFrameCurrFeature() {
@@ -171,5 +149,38 @@ public class StartCodonFilter implements RegionFilterI {
     public void setCurrFeatureData(int frameCurrFeature) {
         this.frameCurrFeature = frameCurrFeature;
     }
+
+    /**
+     * Checks if at least one codon is currently selected.
+     * @return true if at least one codon is currently selected
+     */
+    private boolean atLeastOneCodonSelected() {
+        for (int i=0; i<this.selectedCodons.size(); ++i){
+            if (this.selectedCodons.get(i)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Resets the set of start codons according to the currently selected genetic code.
+     */
+    public final void resetStartCodons() {
+        // TODO: hier ersetzen
+        String[] startCodonsNew = GeneticCodesStore.getGeneticCode(NbPreferences.forModule(Object.class).get("selectedGeneticCode", ""))[0];
+        this.startCodons = new Pattern[startCodonsNew.length*2];
+        this.selectedCodons = new ArrayList<Boolean>();
+        int index = 0;
+        String codon;
+        for (int i=0; i<startCodonsNew.length; ++i){
+            codon = startCodonsNew[i].toLowerCase();
+            this.startCodons[index++] = Pattern.compile(codon);
+            this.startCodons[index++] = Pattern.compile(Utils.complementDNA(Utils.reverseString(codon)));
+            this.selectedCodons.add(false);
+        }
+    }
+    
+    
 
 }
