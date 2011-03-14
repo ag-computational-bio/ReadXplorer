@@ -13,10 +13,10 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
  */
 public interface IThumbnailView {
     
-    public void addToList(PersistantFeature feature);
+    public void addToList(PersistantFeature feature,ReferenceViewer refViewer);
 
     public void showThumbnailView(ReferenceViewer refViewer);
 
-    public void removeAllFeatures();
+    public void removeAllFeatures(ReferenceViewer refViewer);
 
 }

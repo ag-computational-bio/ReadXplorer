@@ -14,17 +14,17 @@ import org.openide.util.lookup.InstanceContent;
  *
  * @author denis
  */
-public class MyLookup extends AbstractLookup {
+public class ThumbControllerLookup extends AbstractLookup {
 
 	private InstanceContent content = null;
-	private static MyLookup def = new MyLookup();
+	private static ThumbControllerLookup def = new ThumbControllerLookup();
 
-	public MyLookup(InstanceContent content) {
+	public ThumbControllerLookup(InstanceContent content) {
 		super(content);
 		this.content = content;
 	}
 
-	public MyLookup() {
+	public ThumbControllerLookup() {
 		this(new InstanceContent());
 	}
 
@@ -43,7 +43,7 @@ public class MyLookup extends AbstractLookup {
 		}
 	}
 
-	public static MyLookup getDefault() {
+	public static ThumbControllerLookup getDefault() {
 		return def;
 	}
 }
