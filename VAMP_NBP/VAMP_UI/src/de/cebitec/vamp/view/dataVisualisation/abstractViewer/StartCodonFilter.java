@@ -167,8 +167,12 @@ public class StartCodonFilter implements RegionFilterI {
      * Resets the set of start codons according to the currently selected genetic code.
      */
     public final void resetStartCodons() {
+        // check if property is already stored and use standard value if not XXX just a quick fix
+        String codonIdentifier = NbPreferences.forModule(Object.class).get("selectedGeneticCode", "");
+        if (codonIdentifier.isEmpty()) codonIdentifier = "Standard";
+
         // TODO: hier ersetzen
-        String[] startCodonsNew = GeneticCodesStore.getGeneticCode(NbPreferences.forModule(Object.class).get("selectedGeneticCode", ""))[0];
+        String[] startCodonsNew = GeneticCodesStore.getGeneticCode(codonIdentifier)[0];
         this.startCodons = new Pattern[startCodonsNew.length*2];
         this.selectedCodons = new ArrayList<Boolean>();
         int index = 0;
