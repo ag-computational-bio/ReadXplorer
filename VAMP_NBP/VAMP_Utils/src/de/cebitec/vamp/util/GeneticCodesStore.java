@@ -30,7 +30,8 @@ public final class GeneticCodesStore {
 /*14*/      "Alternative Flatworm Mitochondrial",
 /*15,16*/   "Blepharisma Macronuclear; Chlorophycean Mitochondrial",
 /*22*/      "Scenedesmus obliquus mitochondrial",
-/*23*/      "Thraustochytrium mitochondrial code"
+/*23*/      "Thraustochytrium mitochondrial code",
+/*empty*/   "" // special case, if no value set yet, the standard codons should be selected.
     };
 
     private static final String[][] START_CODONS = {
@@ -47,7 +48,8 @@ public final class GeneticCodesStore {
 /*14*/      { "ATG" },
 /*15, 16*/  { "ATG" },
 /*22*/      { "ATG" },
-/*23*/      { "ATT", "ATG", "GTG" }
+/*23*/      { "ATT", "ATG", "GTG" },
+/*empty*/   { "TTG", "CTG", "ATG" }
     };
 
     private static final String[][] STOP_CODONS = {
@@ -64,7 +66,8 @@ public final class GeneticCodesStore {
 /*14*/      { "TAG" },
 /*15, 16*/  { "TAA", "TGA" },
 /*22*/      { "TCA", "TAA", "TGA" },
-/*23*/      { "TTA", "TAA", "TAG", "TGA" }
+/*23*/      { "TTA", "TAA", "TAG", "TGA" },
+/*empty*/   { "TAA", "TAG", "TGA" }
     };
 
     /**
