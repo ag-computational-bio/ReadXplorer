@@ -6,8 +6,9 @@
 package de.cebitec.vamp.util;
 
 /**
- *
  * @author Rolf Hilker
+ *
+ * Contains non language specific global constants.
  */
 public class Properties {
 

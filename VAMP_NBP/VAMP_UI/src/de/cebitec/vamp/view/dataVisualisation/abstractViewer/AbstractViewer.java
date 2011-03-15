@@ -131,7 +131,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         } else {
             seqBar = null;
         }
-        updatePhysicalBounds();
+        this.updatePhysicalBounds();
     }
 
     private void adjustPaintingAreaInfo(){
@@ -266,8 +266,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     private void updatePhysicalBounds(){
 
-        adjustPaintingAreaInfo();
-        boundsManager.getUpdatedBoundsInfo((LogicalBoundsListener) this);
+        this.adjustPaintingAreaInfo();
+        this.boundsManager.getUpdatedBoundsInfo((LogicalBoundsListener) this);
     }
 
     /**
@@ -495,7 +495,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     public BoundsInfoManager getBoundsInformationManager(){
-        return boundsManager;
+        return this.boundsManager;
     }
 
   }

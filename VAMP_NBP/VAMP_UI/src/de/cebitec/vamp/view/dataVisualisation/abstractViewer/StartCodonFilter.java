@@ -49,7 +49,7 @@ public class StartCodonFilter implements RegionFilterI {
 
         if(this.atLeastOneCodonSelected()){
             // extends intervall to search to the left and right,
-            // to find start/stop codons that overlap this interalls boundaries
+            // to find start/stop codons that overlap this intervalls boundaries
             int offset = 3;
             int start = absStart - offset;
             int stop = absStop+2;
@@ -90,18 +90,20 @@ public class StartCodonFilter implements RegionFilterI {
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, 
             int offset, boolean restricted){
         // match forward
-        Matcher m = p.matcher(sequence);
-        while(m.find()){
-            int from = m.start();
-            int to = m.end()-1;
-            if(restricted){
-                final int start = absStart-offset+from+1;
-                final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
-                if ((start % 3)+1 == Math.abs(this.frameCurrFeature) && codonFwdStrand == isForwardStrand){
-                    regions.add(new Region(start, absStart-offset+to+1, isForwardStrand));
+        final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
+        if (!restricted || restricted && codonFwdStrand == isForwardStrand){
+            Matcher m = p.matcher(sequence);
+            while (m.find()) {
+                int from = m.start();
+                int to = m.end() - 1;
+                if (restricted) {
+                    final int start = absStart - offset + from + 1;
+                    if (((start % 3) + 1 == this.frameCurrFeature || -(start % 3) == (-this.frameCurrFeature) - 3)) {
+                        regions.add(new Region(start, absStart - offset + to + 1, isForwardStrand));
+                    }
+                } else {
+                    regions.add(new Region(absStart - offset + from + 1, absStart - offset + to + 1, isForwardStrand));
                 }
-            } else {
-                regions.add(new Region(absStart-offset+from+1, absStart-offset+to+1, isForwardStrand));
             }
         }
     }
@@ -167,7 +169,6 @@ public class StartCodonFilter implements RegionFilterI {
      * Resets the set of start codons according to the currently selected genetic code.
      */
     public final void resetStartCodons() {
-        // TODO: hier ersetzen
         String[] startCodonsNew = GeneticCodesStore.getGeneticCode(NbPreferences.forModule(Object.class).get("selectedGeneticCode", ""))[0];
         this.startCodons = new Pattern[startCodonsNew.length*2];
         this.selectedCodons = new ArrayList<Boolean>();
@@ -180,7 +181,4 @@ public class StartCodonFilter implements RegionFilterI {
             this.selectedCodons.add(false);
         }
     }
-    
-    
-
 }

@@ -46,6 +46,7 @@ public class SequenceBar extends JComponent {
     private int smallBar;
     private StartCodonFilter codonFilter;
     private Preferences pref;
+    private ArrayList<BaseBackground> backgroundBoxes;
 
     /**
      * Creates a new sequence bar instance.
@@ -64,6 +65,7 @@ public class SequenceBar extends JComponent {
         this.markingWidth = 10;
         this.halfMarkingWidth = markingWidth / 2;
         this.regionsToHighlight = new ArrayList<Region>();
+        this.backgroundBoxes = new ArrayList<BaseBackground>();
         this.codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
         this.initListener();
     }
@@ -369,6 +371,7 @@ public class SequenceBar extends JComponent {
             }
             this.add(jreg);
         }
+        this.repaint();
     }
 
     /**
@@ -379,7 +382,6 @@ public class SequenceBar extends JComponent {
     public void showCodons(final int i, final boolean isSelected){
         this.codonFilter.setCodonSelected(i, isSelected);
         this.findCodons();
-        this.repaint();
     }
 
     /**
@@ -391,6 +393,12 @@ public class SequenceBar extends JComponent {
         return this.codonFilter.isCodonSelected(i);
     }
 
+    /**
+     * Paints the background of each base with a base specific color.
+     * Before calling this method make sure to call "removeAll" on this sequence
+     * bar! Otherwise the colors accumulate.
+     * @param logX
+     */
     public void paintBaseBackgroundColor(int logX) {
         int basePosition = 0;
         if (logX > 0) {

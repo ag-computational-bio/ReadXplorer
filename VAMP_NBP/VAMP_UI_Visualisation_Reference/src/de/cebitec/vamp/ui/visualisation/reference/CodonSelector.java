@@ -2,7 +2,6 @@ package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import java.awt.Dimension;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
@@ -25,9 +24,6 @@ public class CodonSelector extends javax.swing.JPanel {
 
     /** Creates new form CodonSelector */
     public CodonSelector() {
-        if (!NbPreferences.forModule(Object.class).getBoolean(Properties.SEL_GENETIC_CODE, false)){
-            NbPreferences.forModule(Object.class).put(Properties.SEL_GENETIC_CODE, Properties.STANDARD);
-        }
         this.initComponents();
         this.initListener();
         this.updateComponents();

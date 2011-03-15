@@ -204,6 +204,9 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         });
     }
 
+    /**
+     * Sets up whole data of this class.
+     */
     private synchronized void setupData() {
         gapManager = new GenomeGapManager(lowerBound, upperBound);
 
@@ -211,19 +214,20 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             gaps = trackConnector.getExtendedReferenceGapsForIntervallOrderedByMappingID(lowerBound, upperBound);
         } catch (Exception ex) {
             System.err.print("trackConnector couldnt initialse gaps" + ex);
+            //TOTO: error an nutzer geben
         }
         this.fillGapManager();
-        getSequenceBar().setGenomeGapManager(gapManager);
+        this.getSequenceBar().setGenomeGapManager(gapManager);
         this.adjustAbsStop();
 
-        diffs = trackConnector.getDiffsForIntervall(lowerBound, upperBound);
+        this.diffs = trackConnector.getDiffsForIntervall(lowerBound, upperBound);
         this.setUpLogoData();
         if (logoData.getMaxFoundCoverage() != 0) {
             this.createLogoBlocks();
-            scaleValues = getCoverageScaleLineValues();
+            this.scaleValues = getCoverageScaleLineValues();
         }
-        dataLoaded = true;
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.dataLoaded = true;
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     private void requestData() {
@@ -240,7 +244,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
         this.width = upperBound - lowerBound + 1;
-        dataLoaded = false;
+        this.dataLoaded = false;
         this.removeAll();
 
         if (isInMaxZoomLevel()) {
@@ -254,7 +258,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
                 this.add(this.getSequenceBar());
             }
 
-            requestData();
+            this.requestData();
 
         } else {
             this.setInDrawingMode(false);
@@ -330,6 +334,10 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         }
     }
 
+    /**
+     * Creates the whole color model of the alignment view and the coloring of
+     * the bases in their background.
+     */
     private void createLogoBlocks() {
         maxCoverage = logoData.getMaxFoundCoverage();
         PaintingAreaInfo info = this.getPaintingAreaInfo();
@@ -338,7 +346,10 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
 
         pxPerCoverageUnit = (double) availableHeight / maxCoverage;
 
-
+        SequenceBar seqBar = this.getSequenceBar();
+        if (seqBar != null) {
+            seqBar.removeAll();
+        }
         for (int i = lowerBound; i <= upperBound; i++) {
             // compute relative position in layout
             int relPos = i + gapManager.getNumOfGapsSmaller(i);
@@ -348,10 +359,9 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             int x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound();
             x += getPhysBoundariesForLogPos(i).getPhysWidth() * gapManager.getNumOfGapsAt(i);
 
-            this.cycleBases(i, relPos, x, pxPerCoverageUnit, true,isColored);
+            this.cycleBases(i, relPos, x, pxPerCoverageUnit, true, isColored);
             this.cycleBases(i, relPos, x, pxPerCoverageUnit, false, isColored);
 
-            SequenceBar seqBar = this.getSequenceBar();
             if (seqBar != null) {
                 seqBar.paintBaseBackgroundColor(i);
             }
@@ -363,14 +373,23 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
                     x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound();
                     x += getPhysBoundariesForLogPos(i).getPhysWidth() * j;
 
-                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, true,isColored);
-                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, false,isColored);
+                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, true, isColored);
+                    this.cycleBases(i, relPos, x, pxPerCoverageUnit, false, isColored);
                 }
             }
         }
     }
 
-    private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean hasColored) {
+    /**
+     * Creates the colored histogram bars.
+     * @param absPos
+     * @param relPos
+     * @param x
+     * @param heightPerCoverageUnit
+     * @param isForwardStrand true, if bars for fwd strand should be painted
+     * @param isColored true, if the histogram should be colored
+     */
+    private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean isColored) {
         double value;
         int featureHeight;
         Color c = null;
@@ -380,7 +399,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         }
 
         for (String type : bases) {
-            if (type.equals("match") && hasColored) {
+            if (type.equals("match") && isColored) {
                 value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
                 if (isForwardStrand) {
                     if (base.equals("a")) {
@@ -412,7 +431,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
                     }
                 }
                 
-             }else if (type.equals("match")&& !hasColored){
+             }else if (type.equals("match")&& !isColored){
                 c = ColorProperties.LOGO_MATCH;
                  value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
             } else if (type.equals("a")) {
@@ -451,7 +470,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             } else {
                 block.setBounds(x, y + 1, (int) bounds.getPhysWidth(), featureHeight);
             }
-            add(block);
+            this.add(block);
 
             if (!isForwardStrand) {
                 y += featureHeight;
