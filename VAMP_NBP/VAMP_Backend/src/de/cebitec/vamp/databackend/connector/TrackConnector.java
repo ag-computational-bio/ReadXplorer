@@ -112,7 +112,7 @@ public class TrackConnector implements ITrackConnector{
             fetch.setInt(3, to);
             fetch.setInt(4, from);
             fetch.setInt(5, to);
-            
+
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 // mapping data
@@ -168,7 +168,7 @@ public class TrackConnector implements ITrackConnector{
 
     @Override
     public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) {
-        
+
         ArrayList<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_IN_TRACK_FOR_INTERVAL);
@@ -191,13 +191,13 @@ public class TrackConnector implements ITrackConnector{
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        
+
         return diffs;
     }
 
     @Override
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to) {
-   
+
         Collection<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
         try {
             PreparedStatement fetchGaps = con.prepareStatement(SQLStatements.FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL);
@@ -741,7 +741,7 @@ public class TrackConnector implements ITrackConnector{
         double percentage = 0;
         double absValue = 0;
         PreparedStatement fetch;
-        try {   
+        try {
                 fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK);
 
             fetch.setLong(1, trackID);
@@ -780,7 +780,7 @@ public class TrackConnector implements ITrackConnector{
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-      
+
         percentage = absValue / genomeSize * 100;
         return percentage;
     }

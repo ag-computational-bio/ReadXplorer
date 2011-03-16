@@ -414,7 +414,7 @@ public class ProjectConnector {
             if (rs.next()) {
                 readID = rs.getLong("LATEST_ID");
             }
-            
+
             int batchCounter = 1;
             Iterator<ParsedReadname> readMapIt = run.getReads().iterator();
             while (readMapIt.hasNext()) {
@@ -818,7 +818,7 @@ public class ProjectConnector {
 
     private void storeTrackH2(ParsedTrack track, long refGenID, long runID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        
+
         try {
             PreparedStatement insertTrack = con.prepareStatement(H2SQLStatements.INSERT_TRACK);
             PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_TRACK_ID);

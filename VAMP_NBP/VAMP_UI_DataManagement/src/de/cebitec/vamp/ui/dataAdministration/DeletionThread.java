@@ -54,7 +54,8 @@ public class DeletionThread extends SwingWorker<Object, Object>{
         }
         io.select();
 
-        ph.start(workunits);
+        // when deleting only one item there would be always 100% otherwise
+        ph.start(workunits == 1 ? 2 : workunits);
         workunits = 0;
 
         Logger.getLogger(DeletionThread.class.getName()).log(Level.INFO, "Starting deletion of data");
@@ -109,6 +110,7 @@ public class DeletionThread extends SwingWorker<Object, Object>{
     @Override
     protected void done(){
         super.done();
+        ph.progress(workunits);
         io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.finished"));
         io.getOut().close();
         ph.finish();

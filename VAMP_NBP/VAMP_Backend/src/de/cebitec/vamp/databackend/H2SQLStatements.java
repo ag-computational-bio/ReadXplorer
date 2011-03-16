@@ -1,4 +1,3 @@
-
 package de.cebitec.vamp.databackend;
 
 /**
@@ -448,7 +447,7 @@ public class H2SQLStatements {
                 "T."+FieldNames.TRACK_TIMESTAMP+", " +
                 "T."+FieldNames.TRACK_REFGEN+", " +
                 "T."+FieldNames.TRACK_RUN+" " +
-               
+
             "FROM "+
                 FieldNames.TABLE_TRACKS+" AS T ";
 
@@ -511,7 +510,7 @@ public class H2SQLStatements {
                 FieldNames.TRACK_TIMESTAMP+", " +
                 FieldNames.TRACK_REFGEN+", "+
                 FieldNames.TRACK_RUN+" " +
-               
+
             "FROM "+
                 FieldNames.TABLE_TRACKS+" " +
             "WHERE "+
@@ -792,7 +791,7 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
            FieldNames.READ_NAME + "= ? "+" AND M."+FieldNames.MAPPING_SEQUENCE + " = R." +FieldNames.READ_SEQUENCE+" AND " +FieldNames.MAPPING_TRACK+" = ? "  ;
 
 
-   
+
     public final static String GET_LATEST_COVERAGE_ID =
             "SELECT MAX("+FieldNames.COVERAGE_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_COVERAGE;
 

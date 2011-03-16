@@ -256,7 +256,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
 
                 int numOfMappedUniqueReads = trackCon.getNumOfMappedSequences();
-                
+
                 if(numOfMappedUniqueReads == 0){
                     numOfMappedUniqueReads = trackCon.getNumOfMappedSequencesCalculate();
                 }

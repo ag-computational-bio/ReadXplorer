@@ -321,6 +321,7 @@ public class ImportThread extends SwingWorker<Object, Object> {
     @Override
     protected void done(){
         super.done();
+        ph.progress(workunits);
         io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.finished"));
         io.getOut().close();
         ph.finish();

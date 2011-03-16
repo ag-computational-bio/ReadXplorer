@@ -31,7 +31,7 @@ public class CoverageContainer {
     private void computeCoverage(ParsedMappingContainer mappings){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start computing the coverage");
         Iterator<Integer> sequenceIDIt = mappings.getMappedSequenceIDs().iterator();
-        
+
         // add all mappings to their mapping groups
         while(sequenceIDIt.hasNext()){
             ParsedMappingGroup g = mappings.getParsedMappingGroupBySeqID(sequenceIDIt.next());
