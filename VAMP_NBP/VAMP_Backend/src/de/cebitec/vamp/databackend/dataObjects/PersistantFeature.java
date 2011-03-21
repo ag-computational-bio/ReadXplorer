@@ -1,6 +1,8 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 /**
+ * A persistant feature. Containing background information about a feature, such as id,
+ * ec number, locus, product, start and stop positions, strand and type.
  *
  * @author ddoppmeier
  */

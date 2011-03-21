@@ -1,11 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
 /**
- *
- * @author ddoppmeier
- *
  * Storage for the physical bounds of the base window.
  * Contains the left and right bounds, width and middle position.
+ *
+ * @author ddoppmeier
  */
 public class PhysicalBaseBounds {
 
@@ -21,18 +20,34 @@ public class PhysicalBaseBounds {
         phyMiddle = (leftPhysBound + rightPhysBound) / 2;
     }
 
+    /**
+     * Returns the left physical bound.
+     * @return
+     */
     public double getLeftPhysBound() {
         return leftPhysBound;
     }
 
+    /**
+     * Returns the right physical bound.
+     * @return
+     */
     public double getRightPhysBound() {
         return rightPhysBound;
     }
 
+    /**
+     * Returns the physical width.
+     * @return
+     */
     public double getPhysWidth() {
         return physWidth;
     }
 
+    /**
+     * Returns the physical center value.
+     * @return
+     */
     public double getPhyMiddle() {
         return phyMiddle;
     }

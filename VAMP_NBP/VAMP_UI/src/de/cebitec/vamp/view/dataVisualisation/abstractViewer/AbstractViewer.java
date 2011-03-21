@@ -301,14 +301,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         oldLogMousePos = currentLogMousePos;
         currentLogMousePos = newPos;
         if(oldLogMousePos != currentLogMousePos){
-            repaintMousePosition(oldLogMousePos, currentLogMousePos);
-            firePropertyChange(PROP_MOUSEPOSITION_CHANGED, oldLogMousePos, currentLogMousePos);
+            this.repaintMousePosition(oldLogMousePos, currentLogMousePos);
+            this.firePropertyChange(PROP_MOUSEPOSITION_CHANGED, oldLogMousePos, currentLogMousePos);
         }
 
         if(newPos >= this.getBoundsInfo().getLogLeft() && newPos <= this.getBoundsInfo().getLogRight()){
-            changeToolTipText(newPos);
+            this.changeToolTipText(newPos);
         } else {
-            setToolTipText(null);
+            this.setToolTipText(null);
         }
     }
 
@@ -339,10 +339,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * Paints the rectangle marking the mouse position. It covers the whole height
+     * of the viewer.
+     * @param g the grapics object to paint in
+     */
     private void drawMouseCursor(Graphics g){
         int currentLogPos = getCurrentMousePos();
         if(getBoundsInfo().getLogLeft() <= currentLogPos && currentLogPos <= getBoundsInfo().getLogRight()){
-            PhysicalBaseBounds mouseArea = getPhysBoundariesForLogPos(currentLogPos);
+            PhysicalBaseBounds mouseArea = this.getPhysBoundariesForLogPos(currentLogPos);
             int width = getWidthOfMouseOverlay(currentLogPos);
             PaintingAreaInfo info = this.getPaintingAreaInfo();
             g.drawRect((int)mouseArea.getLeftPhysBound(), info.getForwardHigh(), width-1, info.getCompleteHeight()-1);

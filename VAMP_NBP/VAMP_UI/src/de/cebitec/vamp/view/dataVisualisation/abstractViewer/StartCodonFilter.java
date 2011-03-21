@@ -2,6 +2,7 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.GeneticCodesStore;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
@@ -169,11 +170,8 @@ public class StartCodonFilter implements RegionFilterI {
      * Resets the set of start codons according to the currently selected genetic code.
      */
     public final void resetStartCodons() {
-        // check if property is already stored and use standard value if not XXX just a quick fix
-        String codonIdentifier = NbPreferences.forModule(Object.class).get("selectedGeneticCode", "");
-        if (codonIdentifier.isEmpty()) codonIdentifier = "Standard";
-
-        String[] startCodonsNew = GeneticCodesStore.getGeneticCode(codonIdentifier)[0];
+        String[] startCodonsNew = GeneticCodesStore.getGeneticCode(NbPreferences.forModule(Object.class).get(
+                Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
         this.startCodons = new Pattern[startCodonsNew.length*2];
         this.selectedCodons = new ArrayList<Boolean>();
         int index = 0;

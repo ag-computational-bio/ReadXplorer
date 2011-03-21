@@ -108,7 +108,7 @@ public class CodonSelector extends javax.swing.JPanel {
      */
     private void updateComponents() {
 
-        String[] startCodons = GeneticCodesStore.getGeneticCode(pref.get(Properties.SEL_GENETIC_CODE, ""))[0];
+        String[] startCodons = GeneticCodesStore.getGeneticCode(this.pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
         JCheckBox[] newBoxes = new JCheckBox[startCodons.length];
         for (int i = 0; i < startCodons.length; ++i) {
 

@@ -14,4 +14,7 @@ public class Properties {
 
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";
+    public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
+
+    public static final String VAMP_FILECHOOSER_DIRECTORY = "VampFileChooser.Directory";
 }
