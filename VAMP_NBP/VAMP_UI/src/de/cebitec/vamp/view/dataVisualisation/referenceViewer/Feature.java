@@ -26,8 +26,8 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.openide.DialogDisplayer;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
@@ -88,7 +88,7 @@ public class Feature extends JComponent implements ClipboardOwner {
 
                     JPopupMenu popUp = new JPopupMenu();
                     if (thumb != null) {
-                        JMenuItem addListItem = new JMenuItem("Add Feature");
+                        JMenuItem addListItem = new JMenuItem("Add feature");
                         addListItem.addActionListener(new ActionListener() {
 
                             @Override
@@ -118,7 +118,7 @@ public class Feature extends JComponent implements ClipboardOwner {
                     }
 
                     //add copy option
-                    JMenuItem copyItem = new JMenuItem("Copy sequence");
+                    JMenuItem copyItem = new JMenuItem(NbBundle.getMessage(Feature.class, "Feature_Copy"));
                     copyItem.addActionListener(new ActionListener() {
 
                         @Override
@@ -131,7 +131,7 @@ public class Feature extends JComponent implements ClipboardOwner {
                     popUp.add(copyItem);
 
                     //add store as fasta file option
-                    JMenuItem storeItem = new JMenuItem("Store sequence (fasta)");
+                    JMenuItem storeItem = new JMenuItem(NbBundle.getMessage(Feature.class, "Feature_StoreFasta"));
                     storeItem.addActionListener(new ActionListener() {
 
                         @Override

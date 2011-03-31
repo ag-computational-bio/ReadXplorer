@@ -224,6 +224,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         basewidth = (double) paintingAreaInfo.getPhyWidt() / bounds.getLogWidth();
     }
 
+    /**
+     * Returns the physical boundaries (left, right) of a single base of the sequence.
+     * @param logPos
+     * @return
+     */
     public PhysicalBaseBounds getPhysBoundariesForLogPos(int logPos){
         double left =  transformToPhysicalCoord(logPos);
         double right = left + basewidth - 1;
@@ -233,7 +238,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     /**
      * Compute the horizontal position (pixel) for a logical position (base in genome).
      * If a base has more space than one pixel, this method returns the leftmost pixel,
-     * meaning the beginning of the available intervall for displaying this base
+     * meaning the beginning of the available interval for displaying this base
      * @param logPos a position in the genome
      * @return horizontal position for requested base position
      */
@@ -494,6 +499,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.adjustPaintingAreaInfo();
     }
 
+    public int getHorizontalMargin(){
+        return this.horizontalMargin;
+    }
+
     public void setVerticalMargin(int verticalMargin) {
         this.verticalMargin = verticalMargin;
         this.adjustPaintingAreaInfo();
@@ -501,6 +510,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public BoundsInfoManager getBoundsInformationManager(){
         return this.boundsManager;
+    }
+
+    /**
+     * Returns the current width of a single base of the sequence.
+     * @return the current width of a single base of the sequence
+     */
+    public double getBaseWidth(){
+        this.calcBaseWidth();
+        return this.basewidth;
     }
 
   }

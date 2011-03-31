@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -52,26 +49,15 @@ public abstract class VampFileChooser  extends JFileChooser {
      */
     private void openFileChooser(final int option) {
 
-        final LookAndFeel stdLookAndFeel = UIManager.getLookAndFeel();
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException exception) {
-            // do nothing and keep old look and feel
-        } catch (InstantiationException exception) {
-            // do nothing and keep old look and feel
-        } catch (IllegalAccessException exception) {
-            // do nothing and keep old look and feel
-        } catch (UnsupportedLookAndFeelException exception) {
-            // do nothing and keep old look and feel
-        }////////////// open file chooser /////////////////////////
+        ////////////// open file chooser /////////////////////////
         final JFileChooser jfc = new JFileChooser();
         String currentDirectory = this.pref.get(Properties.VAMP_FILECHOOSER_DIRECTORY, ".");
-        if(currentDirectory.isEmpty()){
+        if (currentDirectory.isEmpty()){
             currentDirectory = ".";
         }
         try {
-            jfc.setCurrentDirectory(new File(new File(currentDirectory).getCanonicalPath())); //TODO: last directory if exists
-        } catch (final IOException exception) { //store directory in property file?
+            jfc.setCurrentDirectory(new File(new File(currentDirectory).getCanonicalPath()));
+        } catch (final IOException exception) {
             jfc.setCurrentDirectory(null);
         }
         int result;
@@ -99,11 +85,6 @@ public abstract class VampFileChooser  extends JFileChooser {
             if (!fileLocation.endsWith(".".concat(this.fileExtension)) && !fileLocation.endsWith(".".concat(this.fileExtension.toUpperCase()))){
         	fileLocation = fileLocation.concat(".".concat(this.fileExtension));
             }
-        }
-        try {
-            UIManager.setLookAndFeel(stdLookAndFeel);
-        } catch (final UnsupportedLookAndFeelException e) {
-            // do nothing and keep old look and feel
         }
 
         if (option == FastaFileChooser.OPEN) {
