@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.util;
 
 /**
@@ -14,6 +9,7 @@ public class Parser {
 
 
     /**
+     * TODO: put in parser module
      * Generates a string formatted in fasta format.
      * @param sequence the sequence to be stored
      * @param headerParameters the strings to be contained in the header line of the fasta

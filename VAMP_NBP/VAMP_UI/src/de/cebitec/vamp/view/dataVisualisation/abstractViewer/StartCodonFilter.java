@@ -3,7 +3,7 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.GeneticCodesStore;
 import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.util.Utils;
+import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -179,7 +179,7 @@ public class StartCodonFilter implements RegionFilterI {
         for (int i=0; i<startCodonsNew.length; ++i){
             codon = startCodonsNew[i].toLowerCase();
             this.startCodons[index++] = Pattern.compile(codon);
-            this.startCodons[index++] = Pattern.compile(Utils.complementDNA(Utils.reverseString(codon)));
+            this.startCodons[index++] = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(codon)));
             this.selectedCodons.add(false);
         }
     }

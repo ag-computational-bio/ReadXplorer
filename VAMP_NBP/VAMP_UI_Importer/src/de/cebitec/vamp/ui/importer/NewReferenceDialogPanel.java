@@ -197,6 +197,8 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
                 Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
                 prefs.put("RefGenome.Filepath", refGenFile.getAbsolutePath());
                 fileField.setText(refGenFile.getAbsolutePath());
+                nameField.setText(refGenFile.getName());
+                descriptionField.setText(refGenFile.getName());
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex) {
