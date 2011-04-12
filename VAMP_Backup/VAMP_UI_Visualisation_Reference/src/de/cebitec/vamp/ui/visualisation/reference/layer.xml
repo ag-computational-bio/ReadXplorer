@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Window">
+            <file name="de-cebitec-vamp-ui-visualisation-reference-ReferenceFeatureAction.instance">
+                <attr name="component" methodvalue="de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.reference.Bundle#CTL_ReferenceFeatureAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="de-cebitec-vamp-ui-visualisation-reference-ReferenceIntervalAction.instance">
+                <attr name="component" methodvalue="de.cebitec.vamp.ui.visualisation.reference.ReferenceIntervalTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.reference.Bundle#CTL_ReferenceIntervalAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+            <file name="de-cebitec-vamp-ui-visualisation-reference-ReferenceNavigatorAction.instance">
+                <attr name="component" methodvalue="de.cebitec.vamp.ui.visualisation.reference.ReferenceNavigatorTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.reference.Bundle#CTL_ReferenceNavigatorAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
+            </file>
+        </folder>
+    </folder><!--
+    <folder name="Menu">
+        <folder name="Window">
+            <file name="ReferenceFeatureAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-ui-visualisation-reference-ReferenceFeatureAction.instance"/>
+            </file>
+            <file name="ReferenceIntervalAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-ui-visualisation-reference-ReferenceIntervalAction.instance"/>
+            </file>
+            <file name="ReferenceNavigatorAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-vamp-ui-visualisation-reference-ReferenceNavigatorAction.instance"/>
+            </file>
+        </folder>
+    </folder>-->
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="ReferenceFeatureTopComponent.settings" url="ReferenceFeatureTopComponentSettings.xml"/>
+            <file name="ReferenceIntervalTopComponent.settings" url="ReferenceIntervalTopComponentSettings.xml"/>
+            <file name="ReferenceNavigatorTopComponent.settings" url="ReferenceNavigatorTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <file name="rightLowerSide.wsmode" url="rightLowerSide.wsmode"/>
+            <folder name="explorer">
+                <file name="ReferenceNavigatorTopComponent.wstcref" url="ReferenceNavigatorTopComponentWstcref.xml"/>
+            </folder>
+            <folder name="properties">
+                <file name="ReferenceFeatureTopComponent.wstcref" url="ReferenceFeatureTopComponentWstcref.xml"/>
+            </folder>
+            <folder name="rightLowerSide">
+                <file name="ReferenceIntervalTopComponent.wstcref" url="ReferenceIntervalTopComponentWstcref.xml"/>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

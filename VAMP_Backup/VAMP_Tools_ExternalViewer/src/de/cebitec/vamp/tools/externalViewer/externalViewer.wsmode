@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mode version="2.3">
+    <name unique="externalViewer" />
+  <kind type="editor" />
+  <state type="separated" />
+  <bounds x="371" y="578" width="909" height="399" />
+  <frame state="0"/>
+    <empty-behavior permanent="false"/>
+</mode>
