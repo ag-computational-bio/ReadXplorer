@@ -3,8 +3,8 @@ package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.parser.output.OutputParser;
 import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
-import de.cebitec.vamp.util.Parser;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -30,7 +29,6 @@ import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
-import org.openide.windows.WindowManager;
 
 /**
  * Contains the content of a feature and takes care of the painting process.
@@ -72,11 +70,11 @@ public class Feature extends JComponent implements ClipboardOwner {
 
             @Override
             public void mousePressed(MouseEvent e) {
-            	showPopUp(e);
+                showPopUp(e);
                 final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                 if ((thumb != null) && ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()))) {
                     thumb.showPopUp(f, genomeViewer, e);
-                }
+            }
 
             }
 
@@ -94,9 +92,10 @@ public class Feature extends JComponent implements ClipboardOwner {
 
             private void showPopUp(MouseEvent e) {
                 if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
-                   
-                    JPopupMenu popUp = new JPopupMenu();
+                    final Lookup.Result<ReferenceViewer> resultReferenceView = Utilities.actionsGlobalContext().lookupResult(ReferenceViewer.class);
+                    final ReferenceViewer viewer = (ReferenceViewer) resultReferenceView.allInstances().iterator().next();
 
+                    JPopupMenu popUp = new JPopupMenu();
 
                     //add copy option
                     JMenuItem copyItem = new JMenuItem(NbBundle.getMessage(Feature.class, "Feature_Copy"));
@@ -130,7 +129,7 @@ public class Feature extends JComponent implements ClipboardOwner {
                             String locus = Feature.this.f.getLocus() != null ? Feature.this.f.getLocus() : "no locus";
                             String product = Feature.this.f.getProduct() != null ? Feature.this.f.getProduct() : "no product";
                             
-                            return Parser.generateFasta(sequence, ecNumber, locus, product);
+                            return OutputParser.generateFasta(sequence, ecNumber, locus, product);
                         }
                     });
                     popUp.add(storeItem);

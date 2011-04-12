@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.vamp.util.Parser;
+import de.cebitec.vamp.parser.output.OutputParser;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.externalTools.RNAFoldCaller;
+import de.cebitec.vamp.util.externalTools.RNAFolderException;
 import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
@@ -21,24 +18,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.RemoteException;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ServiceException;
-import org.apache.axis.AxisFault;
-import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
-import org.openide.util.Exceptions;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
-import org.w3c.dom.Element;
 
 /**
- * Listener for highlighting areas. For example the dna sequence on the sequence bar.
+ * Listener for highlighting areas on a sequence bar.
  * Note that classes with a HighlightAreaListener have to implement IHighlightable
  *
  * @author Rolf Hilker
@@ -183,7 +171,7 @@ public class HighlightAreaListener extends MouseAdapter implements ClipboardOwne
                     String selSequence = HighlightAreaListener.this.getMarkedSequence();
                     String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ")
                             .concat(String.valueOf(seqEnd));
-                    return Parser.generateFasta(selSequence, header);
+                    return OutputParser.generateFasta(selSequence, header);
                 }
             });
             popUp.add(storeItem);
@@ -194,20 +182,16 @@ public class HighlightAreaListener extends MouseAdapter implements ClipboardOwne
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String selSequence = HighlightAreaListener.this.getMarkedSequence();//TODO: generate output from calling a rna folder
-                    //http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html
-                    //über webservice ansprechen & online ergebnis abrufen + grafische darstellung in vamp anschließen
-                    //würde dafür kleines extra tab oder fenster öffnen (tab wohl sinnvoller)
-                    //über webservice ansprechen & online ergebnis abrufen + grafische darstellung in vamp anschließen
-                    //würde dafür kleines extra tab oder fenster öffnen (tab wohl sinnvoller)
+                    String selSequence = HighlightAreaListener.this.getMarkedSequence();
                     try {
-                        String foldedSequence = HighlightAreaListener.this.callRNAFolder(selSequence); //TODO: find better place for method
+                        String foldedSequence = RNAFoldCaller.callRNAFolder(selSequence);
+                        //TODO: grafische darstellung in vamp anschließen
+                        //würde dafür kleines extra tab oder fenster öffnen (tab wohl sinnvoller)
                         System.out.println(foldedSequence);
 
-                    } catch (MalformedURLException ex) {
-                        Exceptions.printStackTrace(ex); //TODO: correct exception
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
+                    } catch (RNAFolderException ex) {
+                        NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                        DialogDisplayer.getDefault().notify(nd);
                     }
                 }
             });
@@ -250,93 +234,5 @@ public class HighlightAreaListener extends MouseAdapter implements ClipboardOwne
         this.seqStart = logleft+1;
         this.seqEnd = logright;
         return selSequence;
-    }
-
-
-    /**
-     * Calls http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html with the given string
-     * and returns the result string of the program.
-     * @param selSequence the sequence to start RNA folder with
-     * @throws MalformedURLException
-     */
-    @SuppressWarnings("SleepWhileHoldingLock")
-    private String callRNAFolder(String selSequence) throws MalformedURLException, IOException {
-
-        selSequence = ">vampSeq\r\n".concat(selSequence);
-
-        try {
-            /* declare addresslocation for service */
-            final String server = "http://bibiwsserv.techfak.uni-bielefeld.de";
-            /* declare where to find the describing WSDL */
-            final URL wsdl = new URL("http://bibiserv.techfak.uni-bielefeld.de/wsdl/RNAfold.wsdl");
-
-
-            if (selSequence.isEmpty() || selSequence == null) {
-                System.err.println("java RNAfoldCOrig -F <FastaFile> [-T <double>] \n"); //return popup with msg
-            }
-
-            /* prepare the call (the same for all called methods) */
-            Service ser = new Service(wsdl, new QName(
-                    server + "/RNAfold/axis/RNAfoldPort", "RNAfoldImplementationService"));
-            Call call = (Call) ser.createCall(new QName("RNAfoldPort"), "request_orig");
-            /* call and get id */
-            String id = (String) call.invoke(new Object[] {selSequence}); //new Object[] {"T", 37.0},
-            /* print id on STDOUT */
-            System.err.println("get id - '" + id + "'");
-            int statuscode = 601;
-            while ((statuscode > 600) && (statuscode < 700)) {
-                try {
-                    Thread.sleep(2500);
-                    call = (Call) ser.createCall(new QName("RNAfoldPort"), "response_orig");
-                    // call and get result as DOM Tree(if finished)
-                    return (String) call.invoke(new Object[]{id});
-
-                } catch (InterruptedException e) {
-                    System.err.println("process can't sleep!");
-                } catch (RemoteException e) {
-                    // on error WS will throw a soapfault as hobitstatuscode
-                    Element root = ((AxisFault) e).lookupFaultDetail(new QName(
-                            "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode"));
-                    if (root == null) {
-                        System.err.println("ws remote error (no Hobitstatuscode): " + e.toString());
-                    }
-                    String description = root.getLastChild().getFirstChild().getNodeValue();
-                    statuscode = Integer.parseInt(root.getFirstChild().getFirstChild().getNodeValue());
-                    // print Statusinformation to STDERR
-                    System.err.println("(" + statuscode + " - " + description + ")");
-                }
-            }
-
-            /* error handling with proper information for the user */
-
-        } catch (RemoteException e) {
-            /* on error WS will throw a soapfault as hobitstatuscode */
-            Element root = ((AxisFault) e).lookupFaultDetail(new QName(
-                    "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode"));
-            if (root == null) {
-                System.err.println("ws remote error (no Hobitstatuscode): " + e.toString());
-            } else {
-                String description = root.getLastChild().getFirstChild().getNodeValue();
-                String code = root.getFirstChild().getFirstChild().getNodeValue();
-                System.out.println("Statuscode:  " + code);
-                System.out.println("Description: " + description);
-            }
-
-            /*
-             * Using this kind of Webservice there is only one one field for
-             * returning an error message. When an axception occours, the
-             * client side of Axis will throw a RemoteException which includes
-             * the class name of the thrown exception. There is no way to get
-             * more information, like the original stacktrace !!!
-             */
-        } catch (MalformedURLException e) {
-            System.err.println("failed (" + e.toString() + ")");
-        } catch (ServiceException e) {
-            System.err.println("Service unavailable (" + e.toString() + ")");
-        } catch (IOException e) {
-            System.err.println("can't read sequence");
-        }
-
-        return "didn't work";
     }
 }

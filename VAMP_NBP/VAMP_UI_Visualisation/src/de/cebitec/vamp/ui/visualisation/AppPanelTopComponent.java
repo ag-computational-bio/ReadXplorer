@@ -206,7 +206,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.add(refGenPanel);
         visualPanel.updateUI();
 
-        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
+        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();//TODO: wieso null pointer?
         WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
         WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").open();
 
