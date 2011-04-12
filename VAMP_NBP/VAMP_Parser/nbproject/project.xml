@@ -35,6 +35,7 @@
                 <package>de.cebitec.vamp.parser</package>
                 <package>de.cebitec.vamp.parser.common</package>
                 <package>de.cebitec.vamp.parser.mappings</package>
+                <package>de.cebitec.vamp.parser.output</package>
                 <package>de.cebitec.vamp.parser.reference</package>
                 <package>de.cebitec.vamp.parser.reference.Filter</package>
                 <package>de.cebitec.vamp.parser.reference.embl.biojava</package>
