@@ -14,6 +14,7 @@ import de.cebitec.vamp.parser.mappings.TrackParserI;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
+import de.cebitec.vamp.util.Observer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,10 +30,11 @@ import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
 /**
+ * Thread handling the import of data.
  *
  * @author ddoppmeier
  */
-public class ImportThread extends SwingWorker<Object, Object> {
+public class ImportThread extends SwingWorker<Object, Object> implements Observer {
 
     private InputOutput io;
     private List<ReferenceJob> gens;
@@ -89,7 +91,7 @@ public class ImportThread extends SwingWorker<Object, Object> {
         HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID(), trackJob.getID()).getReadnameToSeqIDMapping();
 
         // XXX does this work for all import methods???
-        // TODO somehow get the information if sequenceString is neccessary
+        // TODO: somehow get the information if sequenceString is neccessary
         String sequenceString = null;
         try {
             Long id = trackJob.getRefGen().getID();
@@ -99,7 +101,7 @@ public class ImportThread extends SwingWorker<Object, Object> {
         }
 
         TrackParserI parser = new TrackParser();
-        ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap, sequenceString);
+        ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap, sequenceString, this);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished parsing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
         return track;
@@ -326,6 +328,22 @@ public class ImportThread extends SwingWorker<Object, Object> {
         ph.finish();
 
         CentralLookup.getDefault().remove(this);
+    }
+
+    @Override
+    public void update(Object errorMsg) {
+        if (errorMsg instanceof String){
+            this.showErrorMsg((String) errorMsg);
+        }
+    }
+
+    /**
+     * If an error occured during the run of the parser, which does not interrupt
+     * the parsing process, this method prints the error to the program console.
+     * @param errorMsg
+     */
+    private void showErrorMsg(String errorMsg) {
+        this.io.getOut().println("\""+errorMsg);
     }
 
 }

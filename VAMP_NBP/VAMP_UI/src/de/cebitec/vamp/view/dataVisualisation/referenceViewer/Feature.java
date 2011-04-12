@@ -3,12 +3,19 @@ package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
+import de.cebitec.vamp.util.Parser;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -21,14 +28,17 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.WindowManager;
 
 /**
+ * Contains the content of a feature and takes care of the painting process.
+ * Also contains its popup menu.
  *
  * @author ddoppmei
  */
-public class Feature extends JComponent {
+public class Feature extends JComponent implements ClipboardOwner {
 
     private static final long serialVersionUID = 347348234;
     private PersistantFeature f;
@@ -49,16 +59,20 @@ public class Feature extends JComponent {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                genomeViewer.setSelectedFeature(Feature.this);
+                if (e.getButton() == MouseEvent.BUTTON1){
+                    genomeViewer.setSelectedFeature(Feature.this);
+                    showPopUp(e);
                 final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                 if ((thumb != null) && ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()))) {
                     thumb.showPopUp(f, genomeViewer, e);
                 }
+            }
 
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
+            	showPopUp(e);
                 final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                 if ((thumb != null) && ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()))) {
                     thumb.showPopUp(f, genomeViewer, e);
@@ -76,6 +90,53 @@ public class Feature extends JComponent {
 
             @Override
             public void mouseExited(MouseEvent e) {
+            }
+
+            private void showPopUp(MouseEvent e) {
+                if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
+                   
+                    JPopupMenu popUp = new JPopupMenu();
+
+
+                    //add copy option
+                    JMenuItem copyItem = new JMenuItem(NbBundle.getMessage(Feature.class, "Feature_Copy"));
+                    copyItem.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String selFeatureSequence = viewer.getReference().getSequence().substring(f.getStart()-1, f.getStop());
+                            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                            clipboard.setContents(new StringSelection(selFeatureSequence), Feature.this);
+                        }
+                    });
+                    popUp.add(copyItem);
+
+                    //add store as fasta file option
+                    JMenuItem storeItem = new JMenuItem(NbBundle.getMessage(Feature.class, "Feature_StoreFasta"));
+                    storeItem.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String output = this.generateFastaFromFeature();
+                            FastaFileChooser storeFastaFileChoser = new FastaFileChooser("fasta", output);
+                        }
+                        
+                        /**
+                         * Generates a string ready for output in a fasta file.
+                         */
+                        private String generateFastaFromFeature() {
+                            String sequence = viewer.getReference().getSequence().substring(Feature.this.f.getStart() - 1, Feature.this.f.getStop());
+                            String ecNumber = Feature.this.f.getEcNumber() != null ? Feature.this.f.getEcNumber() : "no EC number";
+                            String locus = Feature.this.f.getLocus() != null ? Feature.this.f.getLocus() : "no locus";
+                            String product = Feature.this.f.getProduct() != null ? Feature.this.f.getProduct() : "no product";
+                            
+                            return Parser.generateFasta(sequence, ecNumber, locus, product);
+                        }
+                    });
+                    popUp.add(storeItem);
+
+                    popUp.show(genomeViewer, e.getX(), e.getY());
+                }
             }
         });
         this.addMouseMotionListener(new MouseMotionListener() {
@@ -195,5 +256,10 @@ public class Feature extends JComponent {
         }
 
         return c;
+    }
+
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+        //do nothing
     }
 }

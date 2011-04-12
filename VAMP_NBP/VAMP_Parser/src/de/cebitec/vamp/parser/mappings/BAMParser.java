@@ -8,6 +8,7 @@ import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
 import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -492,6 +493,21 @@ public class BAMParser implements MappingParserI {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "run is not empty", trackJob.getFile().getAbsolutePath());
         }
         return run;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        //TODO: to be done
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        //TODO: to be done
+    }
+
+    @Override
+    public void notifyObservers() {
+        //TODO: to be done
     }
     
 }

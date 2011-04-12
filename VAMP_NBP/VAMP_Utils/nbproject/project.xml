@@ -5,9 +5,19 @@
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
             <code-name-base>de.cebitec.vamp.util</code-name-base>
             <suite-component/>
-            <module-dependencies/>
+            <module-dependencies>
+                <dependency>
+                    <code-name-base>org.openide.util</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>8.6.2</specification-version>
+                    </run-dependency>
+                </dependency>
+            </module-dependencies>
             <public-packages>
                 <package>de.cebitec.vamp.util</package>
+                <package>de.cebitec.vamp.util.fileChooser</package>
             </public-packages>
         </data>
     </configuration>

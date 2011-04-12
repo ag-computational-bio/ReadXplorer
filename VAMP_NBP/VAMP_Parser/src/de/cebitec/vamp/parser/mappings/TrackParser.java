@@ -6,6 +6,7 @@ import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Observer;
 import java.util.HashMap;
 
 /**
@@ -15,9 +16,11 @@ import java.util.HashMap;
 public class TrackParser implements TrackParserI {
 
     @Override
-    public ParsedTrack parseMappings(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
+    public ParsedTrack parseMappings(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID, 
+            String sequenceString, Observer observer) throws ParsingException {
         // parse mapping files and store them in appropriate source objects
         MappingParserI mappingp = trackJob.getParser();
+        mappingp.registerObserver(observer);
         ParsedMappingContainer mappings = mappingp.parseInput(trackJob, readnameToSequenceID, sequenceString);
         
         // release ressources
@@ -29,7 +32,7 @@ public class TrackParser implements TrackParserI {
 
         ParsedTrack track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
         track.setTimestamp(trackJob.getTimestamp());
-
+        //TODO: mappings freigeben oder garbage collector aufrufen?
         return track;
     }
 

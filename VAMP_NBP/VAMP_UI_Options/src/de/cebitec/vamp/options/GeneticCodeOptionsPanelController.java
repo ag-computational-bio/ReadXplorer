@@ -12,7 +12,7 @@ import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 @OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_GeneticCode",
-iconBase = "de/cebitec/vamp/options/colorOptions.png",
+iconBase = "de/cebitec/vamp/options/geneticCode.png",
 keywords = "#OptionsCategory_Keywords_GeneticCode",
 keywordsCategory = "GeneticCode",
 position = 905)

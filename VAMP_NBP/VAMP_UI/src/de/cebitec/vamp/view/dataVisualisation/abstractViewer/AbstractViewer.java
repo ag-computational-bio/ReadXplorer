@@ -224,6 +224,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         basewidth = (double) paintingAreaInfo.getPhyWidt() / bounds.getLogWidth();
     }
 
+    /**
+     * Returns the physical boundaries (left, right) of a single base of the sequence.
+     * @param logPos
+     * @return
+     */
     public PhysicalBaseBounds getPhysBoundariesForLogPos(int logPos){
         double left =  transformToPhysicalCoord(logPos);
         double right = left + basewidth - 1;
@@ -233,7 +238,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     /**
      * Compute the horizontal position (pixel) for a logical position (base in genome).
      * If a base has more space than one pixel, this method returns the leftmost pixel,
-     * meaning the beginning of the available intervall for displaying this base
+     * meaning the beginning of the available interval for displaying this base
      * @param logPos a position in the genome
      * @return horizontal position for requested base position
      */
@@ -301,14 +306,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         oldLogMousePos = currentLogMousePos;
         currentLogMousePos = newPos;
         if(oldLogMousePos != currentLogMousePos){
-            repaintMousePosition(oldLogMousePos, currentLogMousePos);
-            firePropertyChange(PROP_MOUSEPOSITION_CHANGED, oldLogMousePos, currentLogMousePos);
+            this.repaintMousePosition(oldLogMousePos, currentLogMousePos);
+            this.firePropertyChange(PROP_MOUSEPOSITION_CHANGED, oldLogMousePos, currentLogMousePos);
         }
 
         if(newPos >= this.getBoundsInfo().getLogLeft() && newPos <= this.getBoundsInfo().getLogRight()){
-            changeToolTipText(newPos);
+            this.changeToolTipText(newPos);
         } else {
-            setToolTipText(null);
+            this.setToolTipText(null);
         }
     }
 
@@ -339,10 +344,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * Paints the rectangle marking the mouse position. It covers the whole height
+     * of the viewer.
+     * @param g the grapics object to paint in
+     */
     private void drawMouseCursor(Graphics g){
         int currentLogPos = getCurrentMousePos();
         if(getBoundsInfo().getLogLeft() <= currentLogPos && currentLogPos <= getBoundsInfo().getLogRight()){
-            PhysicalBaseBounds mouseArea = getPhysBoundariesForLogPos(currentLogPos);
+            PhysicalBaseBounds mouseArea = this.getPhysBoundariesForLogPos(currentLogPos);
             int width = getWidthOfMouseOverlay(currentLogPos);
             PaintingAreaInfo info = this.getPaintingAreaInfo();
             g.drawRect((int)mouseArea.getLeftPhysBound(), info.getForwardHigh(), width-1, info.getCompleteHeight()-1);
@@ -489,6 +499,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.adjustPaintingAreaInfo();
     }
 
+    public int getHorizontalMargin(){
+        return this.horizontalMargin;
+    }
+
     public void setVerticalMargin(int verticalMargin) {
         this.verticalMargin = verticalMargin;
         this.adjustPaintingAreaInfo();
@@ -496,6 +510,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public BoundsInfoManager getBoundsInformationManager(){
         return this.boundsManager;
+    }
+
+    /**
+     * Returns the current width of a single base of the sequence.
+     * @return the current width of a single base of the sequence
+     */
+    public double getBaseWidth(){
+        this.calcBaseWidth();
+        return this.basewidth;
     }
 
   }

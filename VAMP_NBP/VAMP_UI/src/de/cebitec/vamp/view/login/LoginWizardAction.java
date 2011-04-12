@@ -34,8 +34,8 @@ public final class LoginWizardAction implements ActionListener{
         if (loggedIn){
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
-            // TODO find a way to do an automatic logout below
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please log out first.", NotifyDescriptor.WARNING_MESSAGE));
+            // TODO: find a way to do an automatic logout below
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.warning.doubleLogin"), NotifyDescriptor.WARNING_MESSAGE));
             return;
         }
 

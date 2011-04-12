@@ -65,7 +65,7 @@ public class ReferenceViewer extends AbstractViewer {
         }
 
         this.getSequenceBar().findCodons(); //update codons for current selection
-        this.repaint();
+        //this.repaint();
     }
 
     @Override
