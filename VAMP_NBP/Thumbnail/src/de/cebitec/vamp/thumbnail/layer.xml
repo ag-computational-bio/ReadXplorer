@@ -12,15 +12,6 @@
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
                 <attr name="type" stringvalue="de.cebitec.vamp.thumbnail.Actions.ASynchSliderCookie"/>
             </file>
-            <file name="de-cebitec-vamp-thumbnail-Actions-CompareTracks.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.thumbnail.Actions.Bundle#CTL_CompareTracks"/>
-                <attr name="injectable" stringvalue="de.cebitec.vamp.thumbnail.Actions.CompareTracks"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
-                <attr name="noIconInMenu" boolvalue="false"/>
-                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.thumbnail.Actions.CompareTrackCookie"/>
-            </file>
             <file name="de-cebitec-vamp-thumbnail-Actions-SynchSliders.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.thumbnail.Actions.Bundle#CTL_SynchSliders"/>
@@ -29,6 +20,33 @@
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
                 <attr name="type" stringvalue="de.cebitec.vamp.thumbnail.Actions.SynchSliderCookie"/>
+            </file>
+        </folder>
+        <folder name="RemoveTracks">
+            <file name="de-cebitec-vamp-thumbnail-Actions-RemoveFeatureAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.thumbnail.Actions.Bundle#CTL_RemoveTracksAction"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.thumbnail.Actions.RemoveFeatureAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.thumbnail.Actions.RemoveCookie"/>
+            </file>
+        </folder>
+        <folder name="Tools">
+            <file name="de-cebitec-vamp-thumbnail-Actions-ActivateSliderCalc.instance">
+                <attr name="delegate" newvalue="de.cebitec.vamp.thumbnail.Actions.ActivateSliderCalc"/>
+                <attr name="noIconInMenu" boolvalue="true"/>
+            </file>
+            <file name="de-cebitec-vamp-thumbnail-Actions-OpenThumbnail.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.thumbnail.Actions.Bundle#CTL_OpenThumbnail"/>
+                <attr name="iconBase" stringvalue="de/cebitec/vamp/thumbnail/thumbOpen.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.thumbnail.Actions.OpenThumbnail"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.thumbnail.Actions.OpenThumbCookie"/>
             </file>
         </folder>
         <folder name="Window">
@@ -45,22 +63,53 @@
         </folder>
     </folder>
     <folder name="Menu">
-        <folder name="Thumbnail">
-            <attr name="position" intvalue="500"/>
-            <attr name="de-cebitec-vamp-thumbnail-Actions-SynchSliders-separatorAfter.instance/de-cebitec-vamp-thumbnail-Actions-CompareTracks.shadow" boolvalue="true"/>
-            <attr name="de-cebitec-vamp-thumbnail-Actions-SynchSliders.shadow/de-cebitec-vamp-thumbnail-Actions-CompareTracks.shadow" boolvalue="true"/>
-            <attr name="de-cebitec-vamp-thumbnail-Actions-SynchSliders.shadow/de-cebitec-vamp-thumbnail-Actions-SynchSliders-separatorAfter.instance" boolvalue="true"/>
-            <file name="de-cebitec-vamp-thumbnail-Actions-CompareTracks.shadow">
-                <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-vamp-thumbnail-Actions-CompareTracks.instance"/>
-            </file>
-            <file name="de-cebitec-vamp-thumbnail-Actions-SynchSliders-separatorAfter.instance">
-                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
-            </file>
-            <file name="de-cebitec-vamp-thumbnail-Actions-SynchSliders.shadow">
-                <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-vamp-thumbnail-Actions-SynchSliders.instance"/>
-            </file>
-            <file name="de-cebitec-vamp-thumbnail-Actions-ASynchSliders.shadow">
-                <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-vamp-thumbnail-Actions-ASynchSliders.instance"/>
+        <folder name="Tools">
+            <folder name="Thumbnail">
+                <attr name="position" intvalue="500"/>                
+                <file name="de-cebitec-vamp-thumbnail-Actions-OpenThumbnail.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-thumbnail-Actions-OpenThumbnail.instance"/>
+                    <attr name="position" intvalue="100"/>
+                </file>                
+                <folder name="Slider">
+                    <attr name="position" intvalue="150"/>
+                    <file name="de-cebitec-vamp-thumbnail-Actions-ActivateSliderCalc.shadow">
+                        <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-thumbnail-Actions-ActivateSliderCalc.instance"/>
+                        
+                    </file>
+                </folder>
+                <file name="de-cebitec-vamp-thumbnail-Actions-OpenThumbnail-separatorAfter.instance">
+                    <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    <attr name="position" intvalue="200"/>
+                </file>
+                <file name="de-cebitec-vamp-thumbnail-Actions-SynchSliders.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-vamp-thumbnail-Actions-SynchSliders.instance"/>
+                    <attr name="position" intvalue="300"/>
+                </file>
+                <file name="de-cebitec-vamp-thumbnail-Actions-ASynchSliders.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-vamp-thumbnail-Actions-ASynchSliders.instance"/>
+                    <attr name="position" intvalue="350"/>
+                </file>
+                <file name="de-cebitec-vamp-thumbnail-Actions-SynchSliders-separatorAfter.instance">
+                    <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    <attr name="position" intvalue="400"/>
+                </file>
+                <file name="de-cebitec-vamp-thumbnail-Actions-RemoveTracksAction-separatorBefore.instance">
+                    <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    <attr name="position" intvalue="600"/>
+                </file>
+                <file name="de-cebitec-vamp-thumbnail-Actions-RemoveTracksAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/RemoveTracks/de-cebitec-vamp-thumbnail-Actions-RemoveFeatureAction.instance"/>
+                    <attr name="position" intvalue="700"/>
+                </file>
+            </folder>
+        </folder>
+        
+    </folder>
+    <folder name="Toolbars">
+        <folder name="Tools">
+            <file name="de-cebitec-vamp-thumbnail-Actions-OpenThumbnail.shadow">
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-thumbnail-Actions-OpenThumbnail.instance"/>
+                <attr name="position" intvalue="400"/>
             </file>
         </folder>
     </folder>
@@ -69,7 +118,8 @@
             <file name="ThumbNailViewTopComponent.settings" url="ThumbNailViewTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
-            <folder name="editor">
+            <file name="ThumbMode.wsmode" url="ThumbMode.wsmode.xml"/>
+            <folder name="ThumbMode">
                 <file name="ThumbNailViewTopComponent.wstcref" url="ThumbNailViewTopComponentWstcref.xml"/>
             </folder>
         </folder>

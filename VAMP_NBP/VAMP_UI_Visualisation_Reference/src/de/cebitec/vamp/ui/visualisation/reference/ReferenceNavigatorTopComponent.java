@@ -107,6 +107,13 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
     }
 
     @Override
+    protected void componentDeactivated() {
+       jumpPanel.clearFilter();
+    }
+
+
+
+    @Override
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer refViewer : result.allInstances()) {
             setRefViewer(refViewer);

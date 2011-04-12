@@ -5,29 +5,110 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
+import org.openide.util.Utilities;
 
 /**
  *
  * @author ddoppmeier
  */
-public class JumpPanel extends javax.swing.JPanel {
+public class JumpPanel extends javax.swing.JPanel implements LookupListener, PropertyChangeListener {
 
     private final static long serialVersionUID = 247246234;
-
     private int jumpPosition;
     private PersistantReference refGen;
     private ReferenceConnector refGenCon;
     private BoundsInfoManager boundsManager;
+    private ReferenceViewer curRefViewer;
+    private Lookup.Result<ReferenceViewer> res;
+
+    public BoundsInfoManager getBoundsManager() {
+        return boundsManager;
+    }
 
     /** Creates new form JumpPanel */
     public JumpPanel() {
         initComponents();
         jumpPosition = 1;
+        filterText.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateFilter();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateFilter();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateFilter();
+
+            }
+        });
+
+        //Listener for TableSelect-Events
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int[] selectedRows = jTable1.getSelectedRows();
+                if (selectedRows.length > 0) {
+                    int correctedRow = jTable1.convertRowIndexToModel(selectedRows[0]);
+                    PersistantFeature feature = (PersistantFeature) jTable1.getModel().getValueAt(correctedRow, 0);
+                    boundsManager.navigatorBarUpdated(feature.getStart());
+                }
+            }
+        });
+
+        jTable1.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
+                    final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
+                    if (thumb != null) {
+                        thumb.showTablePopUp(jTable1, curRefViewer, e);
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
+                    final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
+                    if (thumb != null) {
+                        thumb.showTablePopUp(jTable1, curRefViewer, e);
+                    }
+                }
+            }
+        });
+
+        //PropertyChangeListener for RevViewer
+        res = Utilities.actionsGlobalContext().lookupResult(ReferenceViewer.class);
+        res.addLookupListener(this);
+
     }
 
     /** This method is called from within the constructor to
@@ -39,13 +120,18 @@ public class JumpPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jumpPositionLabel = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
-        jumpFeatureLabel = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jumpList = new javax.swing.JList();
-        jumpList.setSelectionModel(new DefaultListSelectionModel());
         jumpButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        jumpFilterLabel = new javax.swing.JLabel();
+        filterText = new javax.swing.JTextField();
+        filterForLabel = new javax.swing.JLabel();
+        radioProduct = new javax.swing.JRadioButton();
+        radioEC = new javax.swing.JRadioButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Navigation"));
         setPreferredSize(new java.awt.Dimension(190, 500));
@@ -63,16 +149,6 @@ public class JumpPanel extends javax.swing.JPanel {
             }
         });
 
-        jumpFeatureLabel.setText("Feature:");
-
-        jumpList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jumpList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jumpListValueChanged(evt);
-            }
-        });
-        jScrollPane1.setViewportView(jumpList);
-
         jumpButton.setText("Go");
         jumpButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,53 +156,99 @@ public class JumpPanel extends javax.swing.JPanel {
             }
         });
 
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jScrollPane1.setViewportView(jTable1);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("FilterProperties"));
+
+        jumpFilterLabel.setText("Filter:");
+
+        filterText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterTextActionPerformed(evt);
+            }
+        });
+
+        filterForLabel.setText("Filter for:");
+
+        buttonGroup1.add(radioProduct);
+        radioProduct.setSelected(true);
+        radioProduct.setText("Product");
+        radioProduct.setActionCommand("product");
+
+        buttonGroup1.add(radioEC);
+        radioEC.setText("EC-Number");
+        radioEC.setActionCommand("ec");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(filterForLabel)
+                    .addComponent(jumpFilterLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(filterText, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                        .addGap(5, 5, 5))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(radioProduct)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioEC)
+                        .addContainerGap())))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jumpFilterLabel)
+                    .addComponent(filterText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(filterForLabel)
+                    .addComponent(radioProduct)
+                    .addComponent(radioEC))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jumpPositionLabel)
-                    .addComponent(jumpFeatureLabel))
-                .addContainerGap())
-            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jumpPositionLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 156, Short.MAX_VALUE)
                 .addComponent(jumpButton))
+            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jumpPositionLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jumpPositionLabel)
+                    .addComponent(jumpButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jumpFeatureLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jumpButton))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
-        jumpList.setSelectedValue(null, false);
-        DefaultListSelectionModel model = (DefaultListSelectionModel) jumpList.getSelectionModel();
-        model.clearSelection();
+        //jumpList.setSelectedValue(null, false);
+        //DefaultListSelectionModel model = (DefaultListSelectionModel) jumpList.getSelectionModel();
+        //model.clearSelection();
 }//GEN-LAST:event_jTextField1KeyTyped
 
-    private void jumpListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jumpListValueChanged
-        PersistantFeature f = (PersistantFeature) jumpList.getSelectedValue();
-        if (f != null) {
-            jumpPosition = f.getStart();
-            jTextField1.setText(String.valueOf(jumpPosition));
-            this.jumpButtonActionPerformed(null);
-        }
-}//GEN-LAST:event_jumpListValueChanged
-
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
-        if(isValidInput(jTextField1.getText())){
+        if (isValidInput(jTextField1.getText())) {
             jumpPosition = Integer.parseInt(jTextField1.getText());
             boundsManager.navigatorBarUpdated(jumpPosition);
         } else {
@@ -138,10 +260,14 @@ public class JumpPanel extends javax.swing.JPanel {
         jumpButtonActionPerformed(evt);
     }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private boolean isValidInput(String s){
+    private void filterTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_filterTextActionPerformed
+
+    private boolean isValidInput(String s) {
         try {
             int tmp = Integer.parseInt(s);
-            if(tmp >= 1 && tmp <= refGen.getSequence().length()){
+            if (tmp >= 1 && tmp <= refGen.getSequence().length()) {
                 return true;
             } else {
                 return false;
@@ -150,14 +276,19 @@ public class JumpPanel extends javax.swing.JPanel {
             return false;
         }
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel filterForLabel;
+    private javax.swing.JTextField filterText;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton jumpButton;
-    private javax.swing.JLabel jumpFeatureLabel;
-    private javax.swing.JList jumpList;
+    private javax.swing.JLabel jumpFilterLabel;
     private javax.swing.JLabel jumpPositionLabel;
+    private javax.swing.JRadioButton radioEC;
+    private javax.swing.JRadioButton radioProduct;
     // End of variables declaration//GEN-END:variables
 
     public void setReferenceGenome(PersistantReference refGen) {
@@ -169,12 +300,53 @@ public class JumpPanel extends javax.swing.JPanel {
     private void fillFeatureList() {
         List<PersistantFeature> feat = refGenCon.getFeaturesForRegion(0, refGen.getSequence().length());
         Collections.sort(feat, new FeatureNameSorter());
-        PersistantFeature[] data = feat.toArray(new PersistantFeature[0]);
-        jumpList.setListData(data);
+        PersistantFeature[] featureData = feat.toArray(new PersistantFeature[0]);
+
+        //Create new Model for Table
+        jTable1.setModel(new FeatureTableModel(featureData));
+        jTable1.setRowSorter(new TableRowSorter<TableModel>(jTable1.getModel()));
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(150);
+    }
+
+    /*
+     * Uses regular expression to filter all matching entries in Product- or EC-Column.
+     */
+    private void updateFilter() {
+        RowFilter<TableModel, Object> rf = null;
+        //If current expression doesn't parse, don't update.
+        try {
+            if (radioProduct.isSelected()) {
+                rf = RowFilter.regexFilter(filterText.getText(), 1);
+            }
+            if (radioEC.isSelected()) {
+                rf = RowFilter.regexFilter(filterText.getText(), 2);
+            }
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return;
+        }
+        ((TableRowSorter<TableModel>) jTable1.getRowSorter()).setRowFilter(rf);
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsManager) {
         this.boundsManager = boundsManager;
+
+    }
+
+    @Override
+    public void resultChanged(LookupEvent le) {
+        for (ReferenceViewer refViewer : res.allInstances()) {
+            refViewer.addPropertyChangeListener(this);
+            curRefViewer = refViewer;
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        //do something because jumpPanel gets updated every time referenceViewer triggers PropertyChangeEvent
+    }
+
+    void clearFilter() {
+        filterText.setText("");
     }
 
     private class FeatureNameSorter implements Comparator<PersistantFeature> {
@@ -185,11 +357,11 @@ public class JumpPanel extends javax.swing.JPanel {
             String name2 = o2.getLocus();
 
             // null string is always "bigger" than anything else
-            if(name1 == null && name1 != null){
+            if (name1 == null && name1 != null) {
                 return 1;
-            } else if( name1 != null && name2 == null){
+            } else if (name1 != null && name2 == null) {
                 return -1;
-            } else if( name1 == name2){
+            } else if (name1 == name2) {
                 // both are null
                 return 0;
             } else {
@@ -197,5 +369,4 @@ public class JumpPanel extends javax.swing.JPanel {
             }
         }
     }
-
 }

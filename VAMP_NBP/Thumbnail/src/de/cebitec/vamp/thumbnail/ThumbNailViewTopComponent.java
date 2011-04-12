@@ -4,10 +4,6 @@
  */
 package de.cebitec.vamp.thumbnail;
 
-import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.thumbnail.Actions.ASynchSliderCookie;
-import de.cebitec.vamp.thumbnail.Actions.CompareTrackCookie;
-import de.cebitec.vamp.thumbnail.Actions.SynchSliderCookie;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -32,10 +28,8 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
     private JComponent myView;
     private Scene scene;
     private BirdViewController birdCont;
-    private boolean birdOn = false;
-    private boolean trackStatsOn = false;
-    private boolean refNavigatorOn = false;
-    private boolean refIntervallOn = false;
+    private ThumbnailController thumbCon;
+    private boolean navClosed;
 
     public Scene getScene() {
         return scene;
@@ -62,6 +56,8 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
 
         myView.addMouseListener(this);
         associateLookup(Lookup.getDefault().lookup(ThumbnailController.class).getLookup());
+        thumbCon = Lookup.getDefault().lookup(ThumbnailController.class);
+
     }
 
     /** This method is called from within the constructor to
@@ -120,82 +116,38 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
     }
 
     @Override
-    public void componentOpened() {
-               
-        if (WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").isOpened()) {
-            refNavigatorOn = true;
-            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
+    public void componentClosed() {
+        scene.removeChildren();
+        if (thumbCon != null) {
+            thumbCon.removeThumbSpecificCookies();
+            thumbCon.addOpenCookie();
         }
-        if (WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").isOpened()) {
-            refIntervallOn = true;
-            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
-
-        }
-        if (WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").isOpened()) {
-            trackStatsOn = true;
-            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
-        }
-
-
-
+     
     }
 
     @Override
-    public void componentClosed() {
-        scene.removeChildren();
-        ThumbnailController thumbCon = Lookup.getDefault().lookup(ThumbnailController.class);
-        thumbCon.removeCookies();
-
-
-        if (refNavigatorOn) {
-            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
+    protected void componentOpened() {
+        if (thumbCon != null) {
+            thumbCon.removeOpenCookie();
         }
-        if (refIntervallOn) {
-            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
-        }
-        if (trackStatsOn) {
-            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
-        }
-
-
     }
+
+    @Override
+    protected void componentActivated() {
+        if (thumbCon != null) {
+            thumbCon.setMeAsActive(this);
+            thumbCon.removeOpenCookie();
+        }
+    }
+
 
     @Override
     protected void componentHidden() {
-
-        if (refNavigatorOn) {
-            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
-        }
-        if (refIntervallOn) {
-            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
-        }
-        if (trackStatsOn) {
-            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
-        }
-
-
+        if (thumbCon != null) {
+            thumbCon.addOpenCookie();
+        }        
     }
-
-    @Override
-    protected void componentShowing() {
-
-        if (WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").isOpened()) {
-            refNavigatorOn = true;
-            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
-        }
-        if (WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").isOpened()) {
-            refIntervallOn = true;
-            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
-
-        }
-        if (WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").isOpened()) {
-            trackStatsOn = true;
-            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
-        }
-
-
-    }
-
+    
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
@@ -228,9 +180,7 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
-            birdOn = true;
             birdCont.show();
-
         }
 
     }
@@ -238,7 +188,6 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
-            birdOn = false;
             birdCont.hide();
         }
 
