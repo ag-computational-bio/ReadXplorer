@@ -158,7 +158,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller = con;
         activeTopComp.requestActive();
         //Build scene
-        if (selectedFeatures.get(activeViewer).size() > 49) {
+        if (selectedFeatures.containsKey(activeViewer) && selectedFeatures.get(activeViewer).size() > 40) {
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
         } else {
@@ -269,7 +269,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         // create track viewer
         MultiTrackConnector tc = new MultiTrackConnector(track);
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, (BasePanel) b, controller.getCurrentRefGen(), tc);        
+        final TrackViewer trackV = new TrackViewer(boundsManager, (BasePanel) b, controller.getCurrentRefGen(), tc);
         int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
         trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
 
@@ -410,8 +410,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         if (WindowManager.getDefault().getRegistry().getOpened().contains(activeTopComp)) {
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
             addFeatureToView(feature, refCon);
+            if (getLookup().lookup(ASynchSliderCookie.class) != null) {
+                sliderSynchronisation(true);
+            }
             if (!(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp)) {
-               activeTopComp.requestAttention(true);
+                activeTopComp.requestAttention(true);
             }
             //activeTopComp.requestActive();
         }
@@ -436,7 +439,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                 for (BasePanel p : featureToTrackpanelList.get(feat)) {
                                     trackPanelToTrack.remove(p);
                                     //Stop CoverageThread
-                                    ((MultiTrackConnector)((TrackViewer)p.getViewer()).getTrackCon()).getThread().stop();
+                                    ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getThread().stop();
                                 }
                                 featureToTrackpanelList.remove(feat);
                                 featureToLayoutWidget.remove(feat);

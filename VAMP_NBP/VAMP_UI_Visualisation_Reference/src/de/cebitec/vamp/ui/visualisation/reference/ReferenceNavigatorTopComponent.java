@@ -106,12 +106,6 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
         resultChanged(new LookupEvent(result));
     }
 
-    @Override
-    protected void componentDeactivated() {
-       jumpPanel.clearFilter();
-    }
-
-
 
     @Override
     public void resultChanged(LookupEvent ev) {

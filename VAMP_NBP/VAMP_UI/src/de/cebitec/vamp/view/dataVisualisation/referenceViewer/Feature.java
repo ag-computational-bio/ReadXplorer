@@ -57,14 +57,13 @@ public class Feature extends JComponent implements ClipboardOwner {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1){
-                    genomeViewer.setSelectedFeature(Feature.this);
-                    showPopUp(e);
+                genomeViewer.setSelectedFeature(Feature.this);
+                showPopUp(e);
                 final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                 if ((thumb != null) && ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()))) {
-                    thumb.showPopUp(f, genomeViewer, e);
+                thumb.showPopUp(f, genomeViewer, e);
+                
                 }
-            }
 
             }
 
@@ -74,7 +73,7 @@ public class Feature extends JComponent implements ClipboardOwner {
                 final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                 if ((thumb != null) && ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()))) {
                     thumb.showPopUp(f, genomeViewer, e);
-            }
+                }
 
             }
 
@@ -103,7 +102,7 @@ public class Feature extends JComponent implements ClipboardOwner {
 
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String selFeatureSequence = viewer.getReference().getSequence().substring(f.getStart()-1, f.getStop());
+                            String selFeatureSequence = viewer.getReference().getSequence().substring(f.getStart() - 1, f.getStop());
                             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                             clipboard.setContents(new StringSelection(selFeatureSequence), Feature.this);
                         }
@@ -119,7 +118,7 @@ public class Feature extends JComponent implements ClipboardOwner {
                             String output = this.generateFastaFromFeature();
                             FastaFileChooser storeFastaFileChoser = new FastaFileChooser("fasta", output);
                         }
-                        
+
                         /**
                          * Generates a string ready for output in a fasta file.
                          */
@@ -128,7 +127,7 @@ public class Feature extends JComponent implements ClipboardOwner {
                             String ecNumber = Feature.this.f.getEcNumber() != null ? Feature.this.f.getEcNumber() : "no EC number";
                             String locus = Feature.this.f.getLocus() != null ? Feature.this.f.getLocus() : "no locus";
                             String product = Feature.this.f.getProduct() != null ? Feature.this.f.getProduct() : "no product";
-                            
+
                             return OutputParser.generateFasta(sequence, ecNumber, locus, product);
                         }
                     });
