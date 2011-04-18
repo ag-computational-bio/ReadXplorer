@@ -304,14 +304,17 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
     private void fillFeatureList() {
         List<PersistantFeature> feat = refGenCon.getFeaturesForRegion(0, refGen.getSequence().length());
-        Collections.sort(feat, new FeatureNameSorter());
-        PersistantFeature[] featureData = feat.toArray(new PersistantFeature[0]);
+        if (!feat.isEmpty()){
+            Collections.sort(feat, new FeatureNameSorter());
+            PersistantFeature[] featureData = feat.toArray(new PersistantFeature[0]);
 
-        //Create new Model for Table
-        jTable1.setModel(new FeatureTableModel(featureData));
-        jTable1.setRowSorter(new TableRowSorter<TableModel>(jTable1.getModel()));
-        jTable1.getColumnModel().getColumn(1).setPreferredWidth(150);
-        updateFilter();
+            //Create new Model for Table
+            jTable1.setModel(new FeatureTableModel(featureData));
+            jTable1.setRowSorter(new TableRowSorter<TableModel>(jTable1.getModel()));
+            jTable1.getColumnModel().getColumn(1).setPreferredWidth(150);
+            updateFilter();
+        }
+        
     }
 
     /*
