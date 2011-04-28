@@ -4,7 +4,7 @@
  * Created on 31.01.2011, 16:00:51
  */
 
-package de.cebitec.vamp.view.dialogPanels;
+package de.cebitec.vamp.view.dialogMenus;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;

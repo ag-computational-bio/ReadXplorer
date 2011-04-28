@@ -30,7 +30,7 @@ public class RemoveFeatureListPanel extends javax.swing.JPanel {
     }
 
     private PersistantFeature[] fillList(){
-        return (PersistantFeature[]) selectedFeatures.toArray(new PersistantFeature[0]);
+        return selectedFeatures.toArray(new PersistantFeature[0]);
     }
 
     RemoveFeatureListPanel(List<PersistantFeature> features) {

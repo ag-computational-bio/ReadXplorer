@@ -1,4 +1,4 @@
-package de.cebitec.vamp.util.externalTools;
+package de.cebitec.vamp.tools.rnaFolder;
 
 /**
  * Should be used to combine all exceptions occuring during the run of RNAFolder.
@@ -7,13 +7,13 @@ package de.cebitec.vamp.util.externalTools;
  *
  * @author Rolf Hilker
  */
-public class RNAFolderException extends Exception {
+public class RNAFoldException extends Exception {
 
     /**
-     * Constructs an instance of <code>RNAFolderException</code> with the specified detail message.
+     * Constructs an instance of <code>RNAFoldException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public RNAFolderException(String msg) {
+    public RNAFoldException(String msg) {
         super(msg);
     }
 

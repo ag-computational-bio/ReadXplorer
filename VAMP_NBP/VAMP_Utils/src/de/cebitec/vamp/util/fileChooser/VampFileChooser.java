@@ -87,7 +87,7 @@ public abstract class VampFileChooser  extends JFileChooser {
             }
         }
 
-        if (option == FastaFileChooser.OPEN) {
+        if (option == VampFileChooser.OPEN) {
             this.open(fileLocation);
         } else
         if (option == VampFileChooser.SAVE) {

@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 /**
+ * A BasePanel serves as basis for other visual components.
  *
  * @author ddoppmei
  */

@@ -530,9 +530,8 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     @Override
-    public void showPopUp(final PersistantFeature f, final ReferenceViewer viewer, MouseEvent e) {
-        JPopupMenu popUp = new JPopupMenu();
-        JMenuItem addListItem = new JMenuItem("Add Feature");
+    public void showPopUp(final PersistantFeature f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp) {
+        JMenuItem addListItem = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Add"));
         addListItem.addActionListener(new ActionListener() {
 
             @Override
@@ -542,7 +541,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         });
         popUp.add(addListItem);
 
-        JMenuItem showThumbnail = new JMenuItem("Show ThumbnailView");
+        JMenuItem showThumbnail = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Show"));
         showThumbnail.addActionListener(new ActionListener() {
 
             @Override
@@ -551,13 +550,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             }
         });
         popUp.add(showThumbnail);
-        popUp.show(viewer, e.getX(), e.getY());
     }
 
     @Override
     public void showTablePopUp(final JTable table, final ReferenceViewer refViewer, MouseEvent e) {
         JPopupMenu popUp = new JPopupMenu();
-        JMenuItem addListItem = new JMenuItem("Add Feature");
+        JMenuItem addListItem = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Add"));
         addListItem.addActionListener(new ActionListener() {
 
             @Override
@@ -574,7 +572,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             }
         });
         popUp.add(addListItem);
-        JMenuItem showThumbnail = new JMenuItem("Show ThumbnailView");
+        JMenuItem showThumbnail = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Show"));
         showThumbnail.addActionListener(new ActionListener() {
 
             @Override

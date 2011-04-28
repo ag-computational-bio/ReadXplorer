@@ -7,7 +7,7 @@ import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.HighlightAreaListener;
-import de.cebitec.vamp.view.dataVisualisation.IHighlightable;
+import de.cebitec.vamp.view.dataVisualisation.HighlightableI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -28,7 +28,7 @@ import org.openide.util.NbPreferences;
  *
  * @author ddoppmeier, rhilker
  */
-public class SequenceBar extends JComponent implements IHighlightable {
+public class SequenceBar extends JComponent implements HighlightableI {
 
     private static final long serialVersionUID = 23446398;
     private int height = 50;

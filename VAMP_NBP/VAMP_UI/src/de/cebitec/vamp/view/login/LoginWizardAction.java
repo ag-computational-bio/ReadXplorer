@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
+import org.h2.jdbc.JdbcSQLException;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
@@ -66,7 +67,8 @@ public final class LoginWizardAction implements ActionListener{
                     }
                 });
             } catch (SQLException ex) {
-                Exceptions.printStackTrace(ex);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LogoutAction.class, "MSG_LoginWizardAction.sqlError"), NotifyDescriptor.ERROR_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
             }
         }
     }
