@@ -7,6 +7,7 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.LogicalBoundsListener;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -64,10 +65,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
+    public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference){
         super();
-        setLayout(null);
+        this.setLayout(null);
+        this.setBackground(AbstractViewer.backgroundColor);
         this.boundsManager = boundsManager;
         this.basePanel = basePanel;
         this.reference = reference;
@@ -78,7 +81,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         isActive = true;
 
         // sets min, max and preferred size
-        setSizes();
+        this.setSizes();
 
         // init physical bounds
         horizontalMargin = 40;
@@ -90,11 +93,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
         printMouseOver = false;
         // setup all components
-        initComponents();
+        this.initComponents();
         bounds = new BoundsInfo(0, 0, 0, 0);
 
-        calcBaseWidth();
-        recalcCorrelatioFactor();
+        this.calcBaseWidth();
+        this.recalcCorrelatioFactor();
 
     }
 
