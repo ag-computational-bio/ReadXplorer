@@ -3,13 +3,18 @@ package de.cebitec.vamp.view.dataVisualisation.basePanel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -86,6 +91,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
         centerPanel.add(verticalZoom, BorderLayout.WEST);
+
         this.updateSize();
     }
 
@@ -94,6 +100,12 @@ public class BasePanel extends JPanel implements MousePositionListener {
         boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
+        if(viewer instanceof ReferenceViewer){
+              JPanel p = new JPanel();
+              p.add(new JLabel(" "));
+              p.setLayout(new FlowLayout(FlowLayout.LEFT));
+            centerPanel.add(p, BorderLayout.WEST);
+        }
         this.updateSize();
     }
 

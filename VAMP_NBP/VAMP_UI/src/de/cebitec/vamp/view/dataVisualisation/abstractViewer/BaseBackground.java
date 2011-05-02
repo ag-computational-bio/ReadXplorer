@@ -12,17 +12,30 @@ import javax.swing.JComponent;
 public class BaseBackground extends JComponent{
 
     private static final long serialVersionUID = 27956465;
-    private String bases = null;
+    private String   bases = null;
 
     public BaseBackground(int length, int height, String base){
         super();
         this.setSize(new Dimension(length, height));
-        bases = base;
+       //bases = base.charAt(0);
+         bases = base;
     }
 
     @Override
+    @SuppressWarnings("fallthrough")
     protected void paintComponent(Graphics graphics) {
+      
         super.paintComponent(graphics);
+        System.out.println(bases);
+//        switch (bases) {
+//            case 'a':  graphics.setColor(ColorProperties.BACKGROUND_A);
+//            case 'c': graphics.setColor(ColorProperties.BACKGROUND_C);
+//            case 'g': graphics.setColor(ColorProperties.BACKGROUND_G);
+//            case 't': graphics.setColor(ColorProperties.BACKGROUND_T);
+//            case '-': graphics.setColor(ColorProperties.BACKGROUND_READGAP);
+//            case 'n':  graphics.setColor(ColorProperties.BACKGROUND_N);
+//            default: graphics.setColor(ColorProperties.BACKGROUND_BASE_UNDEF);
+//        }
         if (bases.equals("a")) {
             graphics.setColor(ColorProperties.BACKGROUND_A);
         } else if (bases.equals("c")) {
