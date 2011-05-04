@@ -12,11 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JSlider;
-import javax.swing.SwingConstants;
 
 /**
+ * A BasePanel serves as basis for other visual components.
  *
  * @author ddoppmei
  */

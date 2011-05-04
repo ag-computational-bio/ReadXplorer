@@ -3,7 +3,7 @@ package de.cebitec.vamp.tools.twoTrackViewer;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogPanels.OpenTrackPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTrackPanel;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

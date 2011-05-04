@@ -7,6 +7,8 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.LogicalBoundsListener;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -14,8 +16,13 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * AbstractViewer ist a superclass for displaying genome related information.
@@ -32,14 +39,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     // logical coordinates for genome interval
     private BoundsInfo bounds;
-
+    private boolean isPanning = false;
     // correlation factor to compute physical position from logical position
     private double correlationFactor;
     
     // gap at the sides of panel
     private int horizontalMargin;
     private int verticalMargin;
-
+    private int zoom =1;
+    private int tmpzoom = 1;
     private double basewidth;
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
@@ -64,10 +72,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
+    public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference){
         super();
-        setLayout(null);
+        this.setLayout(null);
+        this.setBackground(AbstractViewer.backgroundColor);
         this.boundsManager = boundsManager;
         this.basePanel = basePanel;
         this.reference = reference;
@@ -78,7 +88,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         isActive = true;
 
         // sets min, max and preferred size
-        setSizes();
+        this.setSizes();
 
         // init physical bounds
         horizontalMargin = 40;
@@ -90,11 +100,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
         printMouseOver = false;
         // setup all components
-        initComponents();
+        this.initComponents();
         bounds = new BoundsInfo(0, 0, 0, 0);
 
-        calcBaseWidth();
-        recalcCorrelatioFactor();
+        this.calcBaseWidth();
+        this.recalcCorrelatioFactor();
 
     }
 
@@ -175,13 +185,36 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 updatePhysicalBounds();
             }
         });
+
+
+        this.addMouseWheelListener(new MouseWheelListener() {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+
+             if((zoom <=500&&zoom>0 &&e.getUnitsToScroll() >0 )||(zoom <=500&& zoom >0&&e.getUnitsToScroll()<0)){
+                  zoom+= e.getUnitsToScroll();
+                  if(zoom >500){
+                      zoom =500;
+                  }
+                  if(zoom<1){
+                      zoom =1;
+                }
+                  boundsManager.zoomLevelUpdated(zoom);
+                }
+            }
+        });
+
         this.addMouseMotionListener(new MouseMotionListener() {
 
             @Override
-            public void mouseDragged(MouseEvent e) {}
+            public void mouseDragged(MouseEvent e) {
+                     setPanMode(e.getX());
+            }
 
             @Override
             public void mouseMoved(MouseEvent e) {
+            
                 Point p = e.getPoint();
                 // only report mouse position when moved over viewing area and panel is requested to draw
                 int tmpPos = transformToLogicalCoord(p.x);
@@ -192,6 +225,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                     basePanel.reportMouseOverPaintingStatus(false);
                     AbstractViewer.this.repaintMousePosition(AbstractViewer.this.getCurrentMousePos(), AbstractViewer.this.getCurrentMousePos());
                 }
+       
             }
         });
         this.addMouseListener(new MouseListener() {
@@ -200,10 +234,18 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             public void mouseClicked(MouseEvent e) {}
 
             @Override
-            public void mousePressed(MouseEvent e) {}
-
+            public void mousePressed(MouseEvent e) {
+             
+            if( SwingUtilities.isLeftMouseButton(e)){
+                isPanning = true;
+                AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+            }
             @Override
-            public void mouseReleased(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {
+            isPanning=false;
+             AbstractViewer.this.setCursor(Cursor.getDefaultCursor());
+            }
 
             @Override
             public void mouseEntered(MouseEvent e) {}
@@ -214,6 +256,18 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             }
         });
     }
+    
+    
+    private void setPanMode(int position){
+        if(isPanning){
+           int logi= transformToLogicalCoord(position);
+            bounds.setCurrentLogPos(logi);
+            updateLogicalBounds(bounds);
+             boundsManager.navigatorBarUpdated(logi);
+        }
+    }
+
+
 
     public abstract void changeToolTipText(int logPos);
 

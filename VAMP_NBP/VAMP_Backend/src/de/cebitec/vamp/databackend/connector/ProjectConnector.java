@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.h2.jdbc.JdbcSQLException;
 
 /**
  *
@@ -123,7 +124,7 @@ public class ProjectConnector {
         }
     }
 
-    public void connect(String adapter, String hostname, String database, String user, String password) throws SQLException {
+    public void connect(String adapter, String hostname, String database, String user, String password) throws SQLException, JdbcSQLException {
         if (adapter.equalsIgnoreCase("mysql")) {
             this.adapter = adapter;
             this.url = "jdbc:" + adapter + "://" + hostname + "/" + database;
@@ -149,7 +150,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to database");
     }
 
-    private void connectH2DataBase(String url) throws SQLException {
+    private void connectH2DataBase(String url) throws SQLException, JdbcSQLException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to database");
         con = DriverManager.getConnection(url);
         con.setAutoCommit(true);

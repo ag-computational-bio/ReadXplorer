@@ -8,6 +8,7 @@ package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import java.awt.event.MouseEvent;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 /**
@@ -30,7 +31,7 @@ public interface IThumbnailView {
 
     public void removeCertainFeatures(PersistantFeature f);
 
-    public void showPopUp(PersistantFeature f, ReferenceViewer refViewer,MouseEvent e);
+    public void showPopUp(PersistantFeature f, ReferenceViewer refViewer,MouseEvent e, JPopupMenu popUp);
 
     public void showTablePopUp(JTable table,ReferenceViewer refViewer,MouseEvent e);
 

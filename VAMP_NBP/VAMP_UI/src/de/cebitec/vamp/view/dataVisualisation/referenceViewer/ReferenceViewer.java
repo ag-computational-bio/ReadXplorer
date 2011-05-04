@@ -33,7 +33,7 @@ public class ReferenceViewer extends AbstractViewer {
 //    public final static String PROP_INTERVALL_CHANGED = "intervall changed";
     public final static String PROP_FEATURE_STATISTICS_CHANGED = "feats changed";
     public final static String PROP_FEATURE_SELECTED = "feat selected";
-    
+    private int zoom;
 
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen){
         super(boundsInfoManager, basePanel, refGen);
@@ -42,9 +42,9 @@ public class ReferenceViewer extends AbstractViewer {
         this.refGen = refGen;
         this.showSequenceBar(true);
         this.labelMargin = 3;
-       
     }
-    
+           
+
     public void setSelectedFeature(Feature feature){
 //        this.showFeatureDetails(feature.getPersistantFeature());
         firePropertyChange(PROP_FEATURE_SELECTED, currentlySelectedFeature, feature);

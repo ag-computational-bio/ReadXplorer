@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
+ * Factory used to initialize all different kinds of base panels.
  *
  * @author ddoppmeier
  */

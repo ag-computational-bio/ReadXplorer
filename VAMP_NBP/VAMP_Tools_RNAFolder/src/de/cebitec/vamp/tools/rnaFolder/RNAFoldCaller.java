@@ -1,4 +1,4 @@
-package de.cebitec.vamp.util.externalTools;
+package de.cebitec.vamp.tools.rnaFolder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,9 +28,9 @@ public class RNAFoldCaller {
      * @throws MalformedURLException
      */
     @SuppressWarnings("SleepWhileHoldingLock")
-    public static String callRNAFolder(String selSequence) throws RNAFolderException {
+    public static String callRNAFolder(String selSequence, String header) throws RNAFoldException {
 
-        selSequence = ">vampSeq\r\n".concat(selSequence);
+        selSequence = ">".concat(header).concat("\r\n").concat(selSequence);
 
         /* declare addresslocation for service */
         final String server = "http://bibiwsserv.techfak.uni-bielefeld.de";
@@ -41,7 +41,7 @@ public class RNAFoldCaller {
 
 
             if (selSequence.isEmpty() || selSequence == null) {
-                throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.HighlightError"));
+                throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.HighlightError"));
                 //System.err.println("java RNAfoldCOrig -F <FastaFile> [-T <double>] \n"); //return popup with msg
             }
 
@@ -50,8 +50,7 @@ public class RNAFoldCaller {
             Call call = (Call) ser.createCall(new QName("RNAfoldPort"), "request_orig");
             /* call and get id */
             String id = (String) call.invoke(new Object[] {new Object[] {"T", 37.0}, selSequence});
-            /* print id on STDOUT */
-            //System.err.println("get id - '" + id + "'");
+
             int statuscode = 601;
             while ((statuscode > 600) && (statuscode < 700)) {
                 try {
@@ -61,18 +60,18 @@ public class RNAFoldCaller {
                     return (String) call.invoke(new Object[]{id});
 
                 } catch (InterruptedException e) {
-                    throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ThreadError"));
+                    throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ThreadError"));
                 } catch (RemoteException e) {
                     // on error WS will throw a soapfault as hobitstatuscode
                     Element root = ((AxisFault) e).lookupFaultDetail(new QName(
                             "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode"));
                     if (root == null) {
-                        throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.RemoteError") + e.toString());
+                        throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.RemoteError") + e.toString());
                     }
                     String description = root.getLastChild().getFirstChild().getNodeValue();
                     statuscode = Integer.parseInt(root.getFirstChild().getFirstChild().getNodeValue());
                     // print error to parent
-                    throw new RNAFolderException("(" + statuscode + " - " + description + ")");
+                    throw new RNAFoldException("(" + statuscode + " - " + description + ")");
                 }
             }
 
@@ -83,11 +82,11 @@ public class RNAFoldCaller {
             Element root = ((AxisFault) e).lookupFaultDetail(new QName(
                     "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode"));
             if (root == null) {
-                throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ThreadError")+ " " + e.toString());
+                throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ThreadError")+ " " + e.toString());
             } else {
                 String description = root.getLastChild().getFirstChild().getNodeValue();
                 String code = root.getFirstChild().getFirstChild().getNodeValue();
-                throw new RNAFolderException("Remote Error: Statuscode:  " + code + ", Description: " + description);
+                throw new RNAFoldException("Remote Error: Statuscode:  " + code + ", Description: " + description);
             }
 
             /*
@@ -98,12 +97,12 @@ public class RNAFoldCaller {
              * more information, like the original stacktrace !!!
              */
         } catch (MalformedURLException e) {
-            throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.URLError"));
+            throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.URLError"));
             //System.err.println("failed (" + e.toString() + ")");
         } catch (ServiceException e) {
-            throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ServiceError") + " " + server);
+            throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ServiceError") + " " + server);
         } catch (IOException e) {
-            throw new RNAFolderException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.InputError"));
+            throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.InputError"));
         }
 
         //should never be reached!

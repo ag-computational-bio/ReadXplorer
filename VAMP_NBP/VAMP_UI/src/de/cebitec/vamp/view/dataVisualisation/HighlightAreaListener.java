@@ -1,29 +1,17 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.vamp.parser.output.OutputParser;
 import de.cebitec.vamp.util.SequenceUtils;
-import de.cebitec.vamp.util.externalTools.RNAFoldCaller;
-import de.cebitec.vamp.util.externalTools.RNAFolderException;
-import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
+import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
+import de.cebitec.vamp.view.dialogMenus.RNAFolderI;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.util.NbBundle;
+import org.openide.util.Lookup;
 
 /**
  * Listener for highlighting areas on a sequence bar.
@@ -31,7 +19,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker
  */
-public class HighlightAreaListener extends MouseAdapter implements ClipboardOwner {
+public class HighlightAreaListener extends MouseAdapter {
 
     private static final int HEIGHT = 12;
 
@@ -141,69 +129,23 @@ public class HighlightAreaListener extends MouseAdapter implements ClipboardOwne
 
         if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
             JPopupMenu popUp = new JPopupMenu();
+            MenuItemFactory menuItemFactory = new MenuItemFactory();
 
+            final String selSequence = HighlightAreaListener.this.getMarkedSequence();
+            final String header = HighlightAreaListener.this.getHeader();
             //add copy option
-            JMenuItem copyItem = new JMenuItem(NbBundle.getMessage(HighlightAreaListener.class, "HighlightListener_Copy"));
-            copyItem.addActionListener(new ActionListener() {
-
-                @Override//
-                public void actionPerformed(ActionEvent e) {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    clipboard.setContents(new StringSelection(HighlightAreaListener.this.getMarkedSequence()), HighlightAreaListener.this);
-                }
-            });
-            popUp.add(copyItem);
-
+            popUp.add(menuItemFactory.getCopyItem(selSequence));
             //add store as fasta file option
-            JMenuItem storeItem = new JMenuItem(NbBundle.getMessage(HighlightAreaListener.class, "HLA_StoreFasta"));
-            storeItem.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String output = this.generateFastaFromFeature();
-                    FastaFileChooser storeFastaFileChoser = new FastaFileChooser("fasta", output);
-                }
-
-                /**
-                 * Generates a string ready for output in a fasta file.
-                 */
-                private String generateFastaFromFeature() {
-                    String selSequence = HighlightAreaListener.this.getMarkedSequence();
-                    String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ")
-                            .concat(String.valueOf(seqEnd));
-                    return OutputParser.generateFasta(selSequence, header);
-                }
-            });
-            popUp.add(storeItem);
-
+            popUp.add(menuItemFactory.getStoreFastaItem(selSequence, seqStart, seqEnd));
             //add calculate secondary structure option
-            JMenuItem calcItem = new JMenuItem(NbBundle.getMessage(HighlightAreaListener.class, "HighlightListener_SecondaryStruct"));
-            calcItem.addActionListener(new ActionListener() {
+            final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
+            if (rnaFolderControl != null) {
+                popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, selSequence, header));
+            }
+            
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String selSequence = HighlightAreaListener.this.getMarkedSequence();
-                    try {
-                        String foldedSequence = RNAFoldCaller.callRNAFolder(selSequence);
-                        //TODO: grafische darstellung in vamp anschließen
-                        //würde dafür kleines extra tab oder fenster öffnen (tab wohl sinnvoller)
-                        System.out.println(foldedSequence);
-
-                    } catch (RNAFolderException ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-                        DialogDisplayer.getDefault().notify(nd);
-                    }
-                }
-            });
-            popUp.add(calcItem);
-
-            popUp.show((JComponent) HighlightAreaListener.this.parentComponent, e.getX(), e.getY());
+            popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
         }
-    }
-
-    @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-        //do nothing
     }
 
     /**
@@ -234,5 +176,14 @@ public class HighlightAreaListener extends MouseAdapter implements ClipboardOwne
         this.seqStart = logleft+1;
         this.seqEnd = logright;
         return selSequence;
+    }
+
+    /**
+     * Creates the header for the highlighted sequence.
+     * @return the header for the sequence
+     */
+    private String getHeader() {
+        final String strand = fwdStrand ? ">>" : "<<";
+        return grandparentViewer.getReference().getName()+" ("+strand+" " + seqStart + "-" + seqEnd + ")";
     }
 }

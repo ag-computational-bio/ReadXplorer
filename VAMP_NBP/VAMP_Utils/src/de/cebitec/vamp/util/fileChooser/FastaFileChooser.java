@@ -11,8 +11,8 @@ import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
 /**
- * Vamps file chooser. Contains all options and values of how to open a specific
- * file chooser for saving or opening different files
+ * Vamps fasta file chooser. Contains the save method storing a string in fasta
+ * format.
  *
  * @author Rolf Hilker
  */

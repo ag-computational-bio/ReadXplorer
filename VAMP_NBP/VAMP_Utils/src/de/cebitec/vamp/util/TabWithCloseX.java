@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
+import org.openide.util.NbBundle;
 
 /**
  * A tab with an 'X' that will close the tab if used in a <code>JTabbedPane</code>.
@@ -74,7 +75,7 @@ public class TabWithCloseX extends JPanel {
         TabButton() {
             int size = 17;
             setPreferredSize(new Dimension(size, size));
-            setToolTipText("close this tab");
+            setToolTipText(NbBundle.getBundle(TabWithCloseX.class).getString("TabWithCloseX.Hint"));
             //Make the button looks the same for all Laf's
             setUI(new BasicButtonUI());
             //Make it transparent

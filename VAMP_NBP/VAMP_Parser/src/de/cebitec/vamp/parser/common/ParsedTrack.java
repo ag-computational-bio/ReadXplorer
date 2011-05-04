@@ -3,7 +3,9 @@ package de.cebitec.vamp.parser.common;
 import java.sql.Timestamp;
 
 /**
- *
+ * Contains all data (description, mappings and coverageContainer) belonging
+ * to a track, which can be stored into a database now.
+ * 
  * @author ddoppmeier
  */
 public class ParsedTrack {
@@ -48,6 +50,10 @@ public class ParsedTrack {
         this.id = id;
     }
 
+    /**
+     * Clears the mappings and the coverage container.
+     * All other information persits!
+     */
     public void clear(){
     mappings.clear();
     coverageContainer.clear();
