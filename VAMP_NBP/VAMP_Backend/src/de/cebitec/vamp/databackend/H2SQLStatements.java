@@ -2,6 +2,7 @@
 package de.cebitec.vamp.databackend;
 
 /**
+ * Contains H2SQL statements needed for data base connection and fetching of data.
  *
  * @author jstraube
  */
@@ -12,6 +13,13 @@ public class H2SQLStatements {
      */
     private H2SQLStatements() {
     }
+
+    /**
+     * All commands belonging to the RUN domain have been commented out,
+     * because the run domain has been excluded from VAMP!!!!
+     * This includes the Run, Unique_Sequence and Readname tables!
+     */
+
 
     //////////////////  statements for table creation  /////////////////////////
 
@@ -108,8 +116,8 @@ public class H2SQLStatements {
             + FieldNames.TRACK_ID + " BIGINT UNSIGNED PRIMARY KEY, "
             + FieldNames.TRACK_REFGEN + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.TRACK_DESCRIPTION + " VARCHAR (200) NOT NULL, "
-            + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL, "
-            + FieldNames.TRACK_RUN + " BIGINT UNSIGNED NOT NULL "
+            + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL "//, "
+            //+ FieldNames.TRACK_RUN + " BIGINT UNSIGNED NOT NULL "
             + ") ";
 
      public final static String SETUP_STATICS =
@@ -129,35 +137,35 @@ public class H2SQLStatements {
     public final static String INDEX_TRACKS =
              "CREATE INDEX IF NOT EXISTS INDEXTRACK ON "+FieldNames.TABLE_TRACKS+" ("+FieldNames.TRACK_REFGEN+") ";
 
-    public final static String SETUP_RUN =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_RUN+" " +
-            "( " +
-            FieldNames.RUN_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.RUN_DESCRIPTION+" VARCHAR (100) NOT NULL, " +
-            FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL "+
-            ")";
+//    public final static String SETUP_RUN =
+//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_RUN+" " +
+//            "( " +
+//            FieldNames.RUN_ID+" BIGINT PRIMARY KEY, " +
+//            FieldNames.RUN_DESCRIPTION+" VARCHAR (100) NOT NULL, " +
+//            FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL "+
+//            ")";
 
 
-    public final static String SETUP_SEQUENCE =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_SEQUENCE+" " +
-            "(" +
-            FieldNames.SEQUENCE_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.SEQUENCE_RUN+" BIGINT UNSIGNED NOT NULL " +
-            ") ";
+//    public final static String SETUP_SEQUENCE =
+//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_SEQUENCE+" " +
+//            "(" +
+//            FieldNames.SEQUENCE_ID+" BIGINT PRIMARY KEY, " +
+//            FieldNames.SEQUENCE_RUN+" BIGINT UNSIGNED NOT NULL " +
+//            ") ";
+//
+//        public final static String INDEX_SEQUENCE=
+//             "CREATE INDEX IF NOT EXISTS INDEXSEQUENCE ON "+FieldNames.TABLE_SEQUENCE+" ("+FieldNames.SEQUENCE_RUN+") ";
 
-        public final static String INDEX_SEQUENCE=
-             "CREATE INDEX IF NOT EXISTS INDEXSEQUENCE ON "+FieldNames.TABLE_SEQUENCE+" ("+FieldNames.SEQUENCE_RUN+") ";
-
-    public final static String SETUP_READS =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_READS+" " +
-            "( " +
-            FieldNames.READ_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.READ_NAME+" VARCHAR (100) NOT NULL, " +
-            FieldNames.READ_SEQUENCE+" BIGINT UNSIGNED NOT NULL " +
-            ")";
-
-            public final static String INDEX_READS=
-             "CREATE INDEX IF NOT EXISTS INDEXREADS ON "+FieldNames.TABLE_READS+" ("+FieldNames.READ_SEQUENCE+") ";
+//    public final static String SETUP_READS =
+//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_READS+" " +
+//            "( " +
+//            FieldNames.READ_ID+" BIGINT PRIMARY KEY, " +
+//            FieldNames.READ_NAME+" VARCHAR (100) NOT NULL, " +
+//            FieldNames.READ_SEQUENCE+" BIGINT UNSIGNED NOT NULL " +
+//            ")";
+//
+//            public final static String INDEX_READS=
+//             "CREATE INDEX IF NOT EXISTS INDEXREADS ON "+FieldNames.TABLE_READS+" ("+FieldNames.READ_SEQUENCE+") ";
 
     //////////////////  statements for data insertion  /////////////////////////
 
@@ -193,10 +201,10 @@ public class H2SQLStatements {
             FieldNames.TRACK_ID+", " +
             FieldNames.TRACK_REFGEN+", " +
             FieldNames.TRACK_DESCRIPTION+", " +
-            FieldNames.TRACK_TIMESTAMP+", " +
-            FieldNames.TRACK_RUN+" " +
+            FieldNames.TRACK_TIMESTAMP+" "+//", " +
+            //FieldNames.TRACK_RUN+" " +
             ") " +
-            "VALUES (?,?,?,?,?)";
+            "VALUES (?,?,?,?)";//,?)";
 
         public final static String INSERT_STATICS =
             "INSERT INTO "+FieldNames.TABLE_STATICS+" " +
@@ -277,14 +285,14 @@ public class H2SQLStatements {
             ") " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    public final static String INSERT_RUN =
-            "INSERT INTO "+FieldNames.TABLE_RUN+" " +
-            "( " +
-            FieldNames.RUN_ID+", "+
-            FieldNames.RUN_DESCRIPTION+", " +
-            FieldNames.RUN_TIMESTAMP+" " +
-            ") " +
-            "VALUES (?,?,?)";
+//    public final static String INSERT_RUN =
+//            "INSERT INTO "+FieldNames.TABLE_RUN+" " +
+//            "( " +
+//            FieldNames.RUN_ID+", "+
+//            FieldNames.RUN_DESCRIPTION+", " +
+//            FieldNames.RUN_TIMESTAMP+" " +
+//            ") " +
+//            "VALUES (?,?,?)";
 
         public final static String UPDATE_STATIC_VALUES =
             "UPDATE "+FieldNames.TABLE_STATICS+" " +
@@ -294,22 +302,22 @@ public class H2SQLStatements {
             "WHERE " +
                 FieldNames.TRACK_ID+" = ? " ;
 
-    public final static String INSERT_SEQUENCE =
-            "INSERT INTO "+FieldNames.TABLE_SEQUENCE+" " +
-            "(" +
-            FieldNames.SEQUENCE_ID+", "+
-            FieldNames.SEQUENCE_RUN+" " +
-            ")" +
-            "VALUES (?,?)";
+//    public final static String INSERT_SEQUENCE =
+//            "INSERT INTO "+FieldNames.TABLE_SEQUENCE+" " +
+//            "(" +
+//            FieldNames.SEQUENCE_ID+", "+
+//            FieldNames.SEQUENCE_RUN+" " +
+//            ")" +
+//            "VALUES (?,?)";
 
-    public final static String INSERT_READ =
-            "INSERT INTO "+FieldNames.TABLE_READS+" " +
-            "( " +
-            FieldNames.READ_ID+", "+
-            FieldNames.READ_NAME+", " +
-            FieldNames.READ_SEQUENCE+" " +
-            ") " +
-            "VALUES (?,?,?)";
+//    public final static String INSERT_READ =
+//            "INSERT INTO "+FieldNames.TABLE_READS+" " +
+//            "( " +
+//            FieldNames.READ_ID+", "+
+//            FieldNames.READ_NAME+", " +
+//            FieldNames.READ_SEQUENCE+" " +
+//            ") " +
+//            "VALUES (?,?,?)";
 
 
 
@@ -346,32 +354,32 @@ public class H2SQLStatements {
             "WHERE "+
                 FieldNames.TRACK_ID+" = ? ";
 
-    public final static String DELETE_READS_FROM_RUN =
-            "DELETE FROM "+
-                FieldNames.TABLE_READS+" " +
-            "WHERE "+
-                FieldNames.READ_SEQUENCE+" " +
-            "IN " +
-            "(" +
-                "SELECT "+
-                    FieldNames.SEQUENCE_ID+" " +
-                "FROM "+
-                FieldNames.TABLE_SEQUENCE+" " +
-                "WHERE "+
-                    FieldNames.SEQUENCE_RUN+" = ?" +
-            ")";
+//    public final static String DELETE_READS_FROM_RUN =
+//            "DELETE FROM "+
+//                FieldNames.TABLE_READS+" " +
+//            "WHERE "+
+//                FieldNames.READ_SEQUENCE+" " +
+//            "IN " +
+//            "(" +
+//                "SELECT "+
+//                    FieldNames.SEQUENCE_ID+" " +
+//                "FROM "+
+//                FieldNames.TABLE_SEQUENCE+" " +
+//                "WHERE "+
+//                    FieldNames.SEQUENCE_RUN+" = ?" +
+//            ")";
 
-    public final static String DELETE_SEQUENCE_FROM_RUN =
-            "DELETE FROM "+
-                FieldNames.TABLE_SEQUENCE+" " +
-            "WHERE "+
-                FieldNames.SEQUENCE_RUN+" = ?";
+//    public final static String DELETE_SEQUENCE_FROM_RUN =
+//            "DELETE FROM "+
+//                FieldNames.TABLE_SEQUENCE+" " +
+//            "WHERE "+
+//                FieldNames.SEQUENCE_RUN+" = ?";
 
-    public final static String DELETE_RUN =
-            "DELETE FROM "+
-                FieldNames.TABLE_RUN+" " +
-            "WHERE "+
-                FieldNames.RUN_ID+" = ?";
+//    public final static String DELETE_RUN =
+//            "DELETE FROM "+
+//                FieldNames.TABLE_RUN+" " +
+//            "WHERE "+
+//                FieldNames.RUN_ID+" = ?";
 
     public final static String DELETE_FEATURES_FROM_GENOME =
             "DELETE FROM "+
@@ -412,24 +420,24 @@ public class H2SQLStatements {
 
     // statements to fetch data from database
 
-    public final static String FETCH_READNAME_SEQUENCEID_MAPPING =
-            "SELECT " +
-                "S."+FieldNames.SEQUENCE_ID+" as seqID, " +
-                "R."+FieldNames.READ_NAME+" as readname "+
-            "FROM "+
-                FieldNames.TABLE_READS+" AS R, " +
-                FieldNames.TABLE_SEQUENCE+" AS S "+
-            "WHERE "+
-                FieldNames.SEQUENCE_RUN+" = ? and " +
-                "S."+FieldNames.SEQUENCE_ID+" = R."+FieldNames.READ_SEQUENCE;
+//    public final static String FETCH_READNAME_SEQUENCEID_MAPPING =
+//            "SELECT " +
+//                "S."+FieldNames.SEQUENCE_ID+" as seqID, " +
+//                "R."+FieldNames.READ_NAME+" as readname "+
+//            "FROM "+
+//                FieldNames.TABLE_READS+" AS R, " +
+//                FieldNames.TABLE_SEQUENCE+" AS S "+
+//            "WHERE "+
+//                FieldNames.SEQUENCE_RUN+" = ? and " +
+//                "S."+FieldNames.SEQUENCE_ID+" = R."+FieldNames.READ_SEQUENCE;
 
-    public final static String FETCH_RUNS =
-            "SELECT " +
-                "R."+FieldNames.RUN_ID+", " +
-                "R."+FieldNames.RUN_DESCRIPTION+", " +
-                "R."+FieldNames.RUN_TIMESTAMP +" "+
-            "FROM "+
-                FieldNames.TABLE_RUN+" AS R ";
+//    public final static String FETCH_RUNS =
+//            "SELECT " +
+//                "R."+FieldNames.RUN_ID+", " +
+//                "R."+FieldNames.RUN_DESCRIPTION+", " +
+//                "R."+FieldNames.RUN_TIMESTAMP +" "+
+//            "FROM "+
+//                FieldNames.TABLE_RUN+" AS R ";
 
     public final static String FETCH_GENOMES =
             "SELECT " +
@@ -446,9 +454,9 @@ public class H2SQLStatements {
                 "T."+FieldNames.TRACK_ID+", " +
                 "T."+FieldNames.TRACK_DESCRIPTION+", " +
                 "T."+FieldNames.TRACK_TIMESTAMP+", " +
-                "T."+FieldNames.TRACK_REFGEN+", " +
-                "T."+FieldNames.TRACK_RUN+" " +
-               
+                "T."+FieldNames.TRACK_REFGEN+" "+//", " +
+               // "T."+FieldNames.TRACK_RUN+" " +
+
             "FROM "+
                 FieldNames.TABLE_TRACKS+" AS T ";
 
@@ -509,9 +517,9 @@ public class H2SQLStatements {
                 FieldNames.TRACK_ID+", "+
                 FieldNames.TRACK_DESCRIPTION+", "+
                 FieldNames.TRACK_TIMESTAMP+", " +
-                FieldNames.TRACK_REFGEN+", "+
-                FieldNames.TRACK_RUN+" " +
-               
+                FieldNames.TRACK_REFGEN+" "+//", "+
+                //FieldNames.TRACK_RUN+" " +
+
             "FROM "+
                 FieldNames.TABLE_TRACKS+" " +
             "WHERE "+
@@ -569,13 +577,13 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                 "M."+FieldNames.MAPPING_ID+" = D."+FieldNames.DIFF_MAPPING_ID;
 
 
-    public final static String FETCH_READNAMES_FOR_SEQUENCE_ID =
-            "SELECT "+
-                FieldNames.READ_NAME+" " +
-            "FROM "+
-                FieldNames.TABLE_READS+" " +
-            "WHERE "+
-                FieldNames.READ_SEQUENCE+" = ?";
+//    public final static String FETCH_READNAMES_FOR_SEQUENCE_ID =
+//            "SELECT "+
+//                FieldNames.READ_NAME+" " +
+//            "FROM "+
+//                FieldNames.TABLE_READS+" " +
+//            "WHERE "+
+//                FieldNames.READ_SEQUENCE+" = ?";
 
 
     public final static String FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL =
@@ -610,31 +618,33 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                 "D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" and " +
                 "M."+FieldNames.MAPPING_TRACK+" = ?";
 
-    public final static String FETCH_NUM_OF_READS_FOR_RUN_CALCULATE =
-            "SELECT " +
-                "COUNT(R."+FieldNames.READ_ID+") as NUM " +
-            "FROM "+
-                FieldNames.TABLE_READS+" as R , "+
-                FieldNames.TABLE_SEQUENCE+" as S " +
-            "WHERE "+
-                "S."+FieldNames.SEQUENCE_RUN+" = ? and " +
-                "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
+//    public final static String FETCH_NUM_OF_READS_FOR_RUN_CALCULATE =
+//            "SELECT " +
+//                "COUNT(R."+FieldNames.READ_ID+") as NUM " +
+//            "FROM "+
+//                FieldNames.TABLE_READS+" as R , "+
+//                FieldNames.TABLE_SEQUENCE+" as S " +
+//            "WHERE "+
+//                "S."+FieldNames.SEQUENCE_RUN+" = ? and " +
+//                "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
 
-        public final static String FETCH_NUM_OF_READS_FOR_TRACK =
-            "SELECT " +
-               "S."+ FieldNames.STATICS_NUMBER_OF_READS+" as NUM " +
-            "FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
-            " WHERE "+
-              "S."+ FieldNames.TRACK_ID+" = ?" ;
+
+    public final static String FETCH_NUM_OF_READS_FOR_TRACK =
+        "SELECT " +
+            "S."+ FieldNames.STATICS_NUMBER_OF_READS+" as NUM " +
+        "FROM "+
+            FieldNames.TABLE_STATICS+" as S " +
+        " WHERE "+
+            "S."+ FieldNames.TRACK_ID+" = ?" ;
+
 
     public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK =
-            "SELECT " +
-                 "S."+FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ +" as NUM " +
-            "FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
-            "WHERE "+
-                "S."+FieldNames.TRACK_ID+" = ?" ;
+        "SELECT " +
+            "S."+FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ +" as NUM " +
+        "FROM "+
+            FieldNames.TABLE_STATICS+" as S " +
+        "WHERE "+
+            "S."+FieldNames.TRACK_ID+" = ?" ;
 
 
 
@@ -695,13 +705,13 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "WHERE "+
                 "S."+FieldNames.STATICS_TRACK+" = ?";
 
-    public final static String FETCH_RUNID_FOR_TRACK =
-            "SELECT "+
-                "T."+FieldNames.TRACK_RUN+" " +
-            "FROM "+
-                FieldNames.TABLE_TRACKS+" as T " +
-            "WHERE "+
-                "T."+FieldNames.TRACK_ID+" = ?";
+//    public final static String FETCH_RUNID_FOR_TRACK =
+//            "SELECT "+
+//                "T."+FieldNames.TRACK_RUN+" " +
+//            "FROM "+
+//                FieldNames.TABLE_TRACKS+" as T " +
+//            "WHERE "+
+//                "T."+FieldNames.TRACK_ID+" = ?";
 
 
 
@@ -783,27 +793,27 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                 "("+FieldNames.COVERAGE_N_FW_MULT+" + "+FieldNames.COVERAGE_N_RV_MULT+") != 0 AND "+
                 FieldNames.COVERAGE_TRACK+" = ?";
 
-    public final static String FETCH_READ_POSITION_BY_READNAME =
-            "SELECT "+
-            "R."+ FieldNames.READ_NAME +", M."+ FieldNames.MAPPING_START+", M."+FieldNames.MAPPING_NUM_OF_ERRORS+", M."+FieldNames.MAPPING_BEST_MAPPING+
-            " FROM " +
-            FieldNames.TABLE_MAPPINGS+ " AS M , " + FieldNames.TABLE_READS+ " AS R " +
-           "WHERE  R." +
-           FieldNames.READ_NAME + "= ? "+" AND M."+FieldNames.MAPPING_SEQUENCE + " = R." +FieldNames.READ_SEQUENCE+" AND " +FieldNames.MAPPING_TRACK+" = ? "  ;
+//    public final static String FETCH_READ_POSITION_BY_READNAME =
+//            "SELECT "+
+//            "R."+ FieldNames.READ_NAME +", M."+ FieldNames.MAPPING_START+", M."+FieldNames.MAPPING_NUM_OF_ERRORS+", M."+FieldNames.MAPPING_BEST_MAPPING+
+//            " FROM " +
+//            FieldNames.TABLE_MAPPINGS+ " AS M , " + FieldNames.TABLE_READS+ " AS R " +
+//           "WHERE  R." +
+//           FieldNames.READ_NAME + "= ? "+" AND M."+FieldNames.MAPPING_SEQUENCE + " = R." +FieldNames.READ_SEQUENCE+" AND " +FieldNames.MAPPING_TRACK+" = ? "  ;
 
 
-   
+
     public final static String GET_LATEST_COVERAGE_ID =
             "SELECT MAX("+FieldNames.COVERAGE_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_COVERAGE;
 
-    public final static String GET_LATEST_SEQUENCE_ID =
-            "SELECT MAX("+FieldNames.SEQUENCE_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_SEQUENCE;
-
-    public final static String GET_LATEST_READ_ID =
-            "SELECT MAX("+FieldNames.READ_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_READS;
-
-    public final static String GET_LATEST_RUN_ID =
-            "SELECT MAX("+FieldNames.RUN_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_RUN;
+//    public final static String GET_LATEST_SEQUENCE_ID =
+//            "SELECT MAX("+FieldNames.SEQUENCE_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_SEQUENCE;
+//
+//    public final static String GET_LATEST_READ_ID =
+//            "SELECT MAX("+FieldNames.READ_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_READS;
+//
+//    public final static String GET_LATEST_RUN_ID =
+//            "SELECT MAX("+FieldNames.RUN_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_RUN;
 
     public final static String GET_LATEST_REFERENCE_ID =
             "SELECT MAX("+FieldNames.REF_GEN_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_REF_GEN;

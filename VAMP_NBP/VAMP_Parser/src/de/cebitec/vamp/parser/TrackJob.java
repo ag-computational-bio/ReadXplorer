@@ -5,10 +5,11 @@ import java.io.File;
 import java.sql.Timestamp;
 
 /**
+ * A track job is a container for all necessary data for a track to be parsed.
  *
  * @author jstraube
  */
-public class TrackJobs implements Job{
+public class TrackJob implements Job{
 
     private File file;
     private String description;
@@ -17,7 +18,16 @@ public class TrackJobs implements Job{
     private Long trackID;
     private ReferenceJob refGen;
 
-    public TrackJobs(Long trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp){
+    /**
+     * Creates a new track job along with its data.
+     * @param trackID id of the track to create
+     * @param file the file to be parsed as track
+     * @param description the description of the track
+     * @param refGen the ReferenceJob with all information about the reference
+     * @param parser the parser to use for parsing
+     * @param timestamp the timestamp when it was created
+     */
+    public TrackJob(Long trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp){
         this.trackID = trackID;
         this.file = file;
         this.description = description;

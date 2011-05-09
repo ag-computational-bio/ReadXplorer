@@ -12,11 +12,11 @@ public interface JobManager {
 
     public void unRemoveRefGenJob(ReferenceJob refGenJob);
 
-    public void removeTrackJobRun(TrackJobs trackJob);
+    public void removeTrackJobRun(TrackJob trackJob);
 
-    public void unRemoveTrackJobRun(TrackJobs trackJob);
+    public void unRemoveTrackJobRun(TrackJob trackJob);
 
-    public List<TrackJobs> getScheduledTrackJobsRun();
+    public List<TrackJob> getScheduledTrackJobsRun();
 
     public List<ReferenceJob> getScheduledRefGenJobs();
 

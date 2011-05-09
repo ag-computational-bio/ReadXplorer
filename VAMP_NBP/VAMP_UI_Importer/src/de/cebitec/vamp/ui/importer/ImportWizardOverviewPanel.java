@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
 import java.util.List;
@@ -59,7 +59,7 @@ public class ImportWizardOverviewPanel implements WizardDescriptor.Panel<WizardD
     public void readSettings(WizardDescriptor settings) {
         // load jobs to be imported
         List<ReferenceJob> refJobs = (List<ReferenceJob>) settings.getProperty(ImportWizardAction.PROP_REFJOBLIST);
-        List<TrackJobs> trackJobs = (List<TrackJobs>) settings.getProperty(ImportWizardAction.PROP_TRACKJOBLIST);
+        List<TrackJob> trackJobs = (List<TrackJob>) settings.getProperty(ImportWizardAction.PROP_TRACKJOBLIST);
 
         component.showOverview(refJobs, trackJobs);
     }

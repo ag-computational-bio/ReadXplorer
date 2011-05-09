@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;
@@ -9,31 +9,32 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Shows a table containing the current track jobs to import.
  *
  * @author ddoppmeier
  */
 public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener{
 
-    private List<TrackJobs> tracks;
+    private List<TrackJob> tracks;
     public final static long serialVersionUID = 774292377;
     private boolean hasJobs;
 
     /** Creates new form TaskViewerTemplate */
     public TrackJobView() {
-        tracks = new ArrayList<TrackJobs>();
+        tracks = new ArrayList<TrackJob>();
         initComponents();
     }
 
-    public TrackJobs getSelectedItem() {
+    public TrackJob getSelectedItem() {
         return tracks.get(trackTable.getSelectedRow());
     }
 
-    public void add(TrackJobs trackJob){
+    public void add(TrackJob trackJob){
         DefaultTableModel model = (DefaultTableModel) trackTable.getModel();
         model.addRow(new Object[]{
             trackJob.getFile().getName(),
             trackJob.getDescription(),
-            "do not know",
+            //"do not know", //entry for RUN information, if run is included again
             trackJob.getRefGen().getDescription()});
         tracks.add(trackJob);
 
@@ -43,7 +44,7 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         }
     }
 
-    public void remove(TrackJobs trackJob){
+    public void remove(TrackJob trackJob){
         int index = tracks.indexOf(trackJob);
         tracks.remove(trackJob);
 
@@ -56,7 +57,7 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         }
     }
 
-    public List<TrackJobs> getJobs(){
+    public List<TrackJob> getJobs(){
         return tracks;
     }
 
@@ -80,14 +81,14 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
 
             },
             new String [] {
-                "File", "Description", "Run", "Reference"
+                "File", "Description", "Reference"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -102,8 +103,7 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
         jScrollPane1.setViewportView(trackTable);
         trackTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.file")); // NOI18N
         trackTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.description")); // NOI18N
-        trackTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.run")); // NOI18N
-        trackTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.reference")); // NOI18N
+        trackTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.reference")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

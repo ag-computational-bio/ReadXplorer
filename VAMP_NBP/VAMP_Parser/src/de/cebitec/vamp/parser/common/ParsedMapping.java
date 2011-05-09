@@ -3,8 +3,12 @@ package de.cebitec.vamp.parser.common;
 import java.util.List;
 
 /**
+ * Container for a parsed mapping. It contains all data a mapping should have.
+ * ID, start, stop, direction, errors, diffs, gaps, bestmapping and count.
+ * Also the read sequence can be stored here, but should be removed when not needed
+ * anymore.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ParsedMapping {
 
@@ -18,6 +22,15 @@ public class ParsedMapping {
     private boolean bestMapping;
     private int count;
 
+    /**
+     * Standard constructor for a parsed mapping.
+     * @param start start of the mapping
+     * @param stop end of the mapping
+     * @param direction direction of the mapping: 1 for fwd and -1 for rev
+     * @param diffs the list of diffs between the reference and the mapping //TODO: maybe treat diffs and gaps the same way
+     * @param gaps list of gaps between the reference and the mapping
+     * @param errors number of errors
+     */
     public ParsedMapping(int start, int stop, byte direction, List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps, int errors){
         this.start = start;
         this.stop = stop;
@@ -25,16 +38,16 @@ public class ParsedMapping {
         this.diffs = diffs;
         this.gaps = gaps;
         this.errors = errors;
-        bestMapping = false;
-        count = 1;
+        this.bestMapping = false;
+        this.count = 1;
     }
 
     public void setIsBestmapping(boolean b){
-        bestMapping = b;
+        this.bestMapping = b;
     }
 
     public boolean isBestMapping(){
-        return bestMapping;
+        return this.bestMapping;
     }
 
     public int getCount(){

@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.dataAdministration;
 
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import java.util.Iterator;
 import java.util.List;
 import org.openide.util.NbBundle;
@@ -19,7 +19,7 @@ public class OverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void showGenereateOverview(List<ReferenceJob> scheduledRefGenJobs, List<TrackJobs> scheduledTrackJobs) {
+    public void showGenereateOverview(List<ReferenceJob> scheduledRefGenJobs, List<TrackJob> scheduledTrackJobs) {
         overviewTextArea.setText("");
 
         if(!scheduledRefGenJobs.isEmpty()){
@@ -34,8 +34,8 @@ public class OverviewCard extends javax.swing.JPanel {
 
         if(!scheduledTrackJobs.isEmpty()){
             overviewTextArea.append("Tracks:\n");
-            for(Iterator<TrackJobs> it = scheduledTrackJobs.iterator(); it.hasNext(); ){
-                TrackJobs r = it.next();
+            for(Iterator<TrackJob> it = scheduledTrackJobs.iterator(); it.hasNext(); ){
+                TrackJob r = it.next();
                 overviewTextArea.append(r.getDescription()+"\n");
             }
             overviewTextArea.append("\n");

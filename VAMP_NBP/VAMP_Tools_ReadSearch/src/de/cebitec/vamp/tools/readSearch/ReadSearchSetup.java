@@ -66,7 +66,7 @@ public class ReadSearchSetup extends javax.swing.JPanel {
 
             ph.start();
 
-            reads = trackCon.findReads(readName);
+//            reads = trackCon.findReads(readName);
             return reads;
         }
 

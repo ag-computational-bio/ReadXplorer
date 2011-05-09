@@ -11,23 +11,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author jstraube
- */
-
-/*
  * The FastaReferenceParser can parse the reference genome from a fasta file.
- * Attention: there are no features in this file just the sequence
+ * Attention: there will be no features in this file just the sequence
+ *
+ * @author jstraube, rhilker
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
     private static String parsername = "Fasta Reference Parser";
-    private static String[] fileExtension = new String[]{"fas", "fasta", "fna"}; //TODO: ask: , "ffn", "faa", "frn"
+    private static String[] fileExtension = new String[]{"fas", "fasta", "fna"};
     private static String fileDescription = "Fasta File";
 
     /*
      * parses the containing sequences to one long sequence
-     * but its much faster to delete all linebreaks first!
      * @return returns the object parsedReference with the name, describtion
      * and the sequence from the reference genome
      */

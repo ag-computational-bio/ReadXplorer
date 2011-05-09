@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.databackend.connector;
 
-import de.cebitec.vamp.api.objects.Read;
+//import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
@@ -32,6 +27,14 @@ public interface ITrackConnector {
 
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to);
 
+    public void updateTableStatics(int numOfReads, int numOfUniqueSeq);
+
+    public int getNumOfReads();
+
+    public int getNumOfReadsCalculate();
+
+    public int getNumOfUniqueSequences();
+
     public int getNumOfMappedSequences();
 
     public int getNumOfMappedSequencesCalculate();
@@ -50,13 +53,22 @@ public interface ITrackConnector {
 
      public int getNumOfPerfectUniqueMappingsCalculate();
 
-     public long getRunId();
+     //public long getRunId();
 
      public long getTrackID();
 
      public String getAssociatedTrackName() ;
 
-     public List<Read> findReads(String read) ;
+     //public List<Read> findReads(String read) ;
+
+     /**
+      * Returns all unique reads containing the given sequence.
+      * Sequence cannot be longer than the readlength.
+      * TODO: should also return all positions of the reads
+      * @param sequence the sequence to search for
+      * @return
+      */
+//     public List<Read> findSequence(String sequence) ;
 
      public List<Snp> findSNPs(int percentageThreshold, int absThreshold) ;
 

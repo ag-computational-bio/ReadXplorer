@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Container for the coverage data. Computes the coverage, on creation.
  *
  * @author ddoppmeier
  */
@@ -22,6 +23,10 @@ public class CoverageContainer {
 
     private int coverageArrayLength;
 
+    /**
+     * Creates a new CoverageContainer and immediately computes the coverage.
+     * @param mappings The mappings whose coverage has to be computed
+     */
     public CoverageContainer(ParsedMappingContainer mappings){
         coverage = new HashMap<Integer, Integer[]>();
         coverageArrayLength = NUM_OF_CASES * FIELDS_PER_CASE;
@@ -47,14 +52,14 @@ public class CoverageContainer {
     private void addMapping(ParsedMapping s){
         // store best mapping coverage
         if(s.isBestMapping()){
-            increaseCoverage(s, BEST_MAPPING_CASE);
+            this.increaseCoverage(s, BEST_MAPPING_CASE);
         }
         // store zero error coverage
         if(!s.hasDiffs()){
-            increaseCoverage(s, ZERO_ERROR_CASE);
+            this.increaseCoverage(s, ZERO_ERROR_CASE);
         }
         // store n error coverage
-        increaseCoverage(s, N_ERROR_CASE);
+        this.increaseCoverage(s, N_ERROR_CASE);
 
     }
 

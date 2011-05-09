@@ -3,9 +3,11 @@ package de.cebitec.vamp.databackend.dataObjects;
 import java.sql.Timestamp;
 
 /**
+ * Since the RUN domain has been excluded a PersistantRun is not needed anymore!
  *
  * @author ddoppmeier
  */
+@Deprecated
 public class PersistentRun {
 
     private long id;

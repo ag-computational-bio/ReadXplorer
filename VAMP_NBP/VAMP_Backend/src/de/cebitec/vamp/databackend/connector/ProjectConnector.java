@@ -5,15 +5,16 @@ import de.cebitec.vamp.databackend.H2SQLStatements;
 import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.databackend.dataObjects.PersistentRun;
+//import de.cebitec.vamp.databackend.dataObjects.PersistentRun;
+//import de.cebitec.vamp.parser.common.ParsedReadname;
+//import de.cebitec.vamp.parser.common.ParsedRun;
+//import java.util.Collection;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedFeature;
 import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedReadname;
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +24,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,10 +32,17 @@ import java.util.logging.Logger;
 import org.h2.jdbc.JdbcSQLException;
 
 /**
+ * Responsible for the connection between user interface and data base.
+ * Contains the methods to communicate with the data base.
  *
  * @author ddoppmeier
  */
 public class ProjectConnector {
+
+    /* !!!!!!!!!!!!
+     * Note that all parts belonging to the RUN domain have been commented out!
+     * !!!!!!!!!!!!
+     */
 
     private static ProjectConnector dbConnector;
     private Connection con;
@@ -44,7 +51,7 @@ public class ProjectConnector {
     private String password;
     private String adapter;
     private HashMap<Long, TrackConnector> trackConnectors;
-    private HashMap<Long, RunConnector> runConnectors;
+//    private HashMap<Long, RunConnector> runConnectors;
     private HashMap<Long, ReferenceConnector> refConnectors;
     private final static int SEQUENCE_BATCH_SIZE = 100000;
     private final static int READNAME_BATCH_SIZE = 100000;
@@ -58,13 +65,13 @@ public class ProjectConnector {
 
     private ProjectConnector() {
         trackConnectors = new HashMap<Long, TrackConnector>();
-        runConnectors = new HashMap<Long, RunConnector>();
+//        runConnectors = new HashMap<Long, RunConnector>();
         refConnectors = new HashMap<Long, ReferenceConnector>();
     }
 
     private void cleanUp() {
         trackConnectors.clear();
-        runConnectors.clear();
+//       runConnectors.clear();
         refConnectors.clear();
     }
 
@@ -89,8 +96,8 @@ public class ProjectConnector {
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
                 Long refGenID = rs.getLong(FieldNames.TRACK_REFGEN);
-                Long runID = rs.getLong(FieldNames.TRACK_RUN);
-                tracks.add(new PersistantTrack(id, description, date, refGenID, runID));
+ //               Long runID = rs.getLong(FieldNames.TRACK_RUN);
+                tracks.add(new PersistantTrack(id, description, date, refGenID));//, runID));
             }
 
         } catch (SQLException ex) {
@@ -182,11 +189,11 @@ public class ProjectConnector {
             }catch(Exception ex){
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Columns already exist");
             }
-            con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
-            con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQUENCE).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_READS).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_READS).executeUpdate();
+//           con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
+//            con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
+//            con.prepareStatement(H2SQLStatements.INDEX_SEQUENCE).executeUpdate();
+//           con.prepareStatement(H2SQLStatements.SETUP_READS).execute();
+//           con.prepareStatement(H2SQLStatements.INDEX_READS).executeUpdate();
 
 
             con.commit();
@@ -211,10 +218,10 @@ public class ProjectConnector {
             con.prepareStatement(SQLStatements.SETUP_FEATURES).executeUpdate();
             con.prepareStatement(SQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(SQLStatements.SETUP_TRACKS).execute();
-            con.prepareStatement(SQLStatements.SETUP_RUN).execute();
-            con.prepareStatement(SQLStatements.SETUP_STATICS).execute();
-            con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();
-            con.prepareStatement(SQLStatements.SETUP_READS).execute();
+//           con.prepareStatement(SQLStatements.SETUP_RUN).execute();
+//            con.prepareStatement(SQLStatements.SETUP_STATICS).execute();
+//            con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();
+//            con.prepareStatement(SQLStatements.SETUP_READS).execute();
 
 
             con.commit();
@@ -266,18 +273,18 @@ public class ProjectConnector {
         }
     }
 
-    private void lockRunDomainTables() {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start locking run domain tables");
-        try {
-            Statement lock = con.createStatement();
-            lock.execute(SQLStatements.LOCK_TABLE_RUN_DOMAIN);
-            con.commit();
-            lock.close();
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done locking run domain tables");
-    }
+//    private void lockRunDomainTables() {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start locking run domain tables");
+//        try {
+//            Statement lock = con.createStatement();
+//            lock.execute(SQLStatements.LOCK_TABLE_RUN_DOMAIN);
+//            con.commit();
+//            lock.close();
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done locking run domain tables");
+//    }
 
     private void unlockTables() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start unlocking tables");
@@ -294,253 +301,253 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done unlocking tables");
     }
 
-    private void storeRun(ParsedRun run) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
+//    private void storeRun(ParsedRun run) throws StorageException {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
+//
+//        try {
+//            PreparedStatement insertRun = con.prepareStatement(SQLStatements.INSERT_RUN);
+//            PreparedStatement fetchRunID = con.prepareStatement(SQLStatements.GET_LATEST_RUN_ID);
+//
+//            long runID = 0;
+//            ResultSet rs = fetchRunID.executeQuery();
+//            if (rs.next()) {
+//                runID = rs.getLong("LATEST_ID");
+//            }
+//
+//            runID++;
+//            run.setID(runID);
+//
+//            insertRun.setLong(1, runID);
+//            insertRun.setString(2, run.getDescription());
+//            insertRun.setTimestamp(3, run.getTimestamp());
+//            insertRun.execute();
+//
+//            insertRun.close();
+//            fetchRunID.close();
+//
+//            con.commit();
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
+//    }
 
-        try {
-            PreparedStatement insertRun = con.prepareStatement(SQLStatements.INSERT_RUN);
-            PreparedStatement fetchRunID = con.prepareStatement(SQLStatements.GET_LATEST_RUN_ID);
+//    private void storeRunH2(ParsedRun run) throws StorageException {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
+//
+//        try {
+//            PreparedStatement insertRun = con.prepareStatement(H2SQLStatements.INSERT_RUN);
+//            PreparedStatement fetchRunID = con.prepareStatement(H2SQLStatements.GET_LATEST_RUN_ID);
+//
+//            long runID = 0;
+//            ResultSet rs = fetchRunID.executeQuery();
+//            if (rs.next()) {
+//                runID = rs.getLong("LATEST_ID");
+//            }
+//
+//            runID++;
+//            run.setID(runID);
+//
+//            insertRun.setLong(1, runID);
+//            insertRun.setString(2, run.getDescription());
+//            insertRun.setTimestamp(3, run.getTimestamp());
+//            insertRun.execute();
+//
+//            insertRun.close();
+//            fetchRunID.close();
+//
+//            con.commit();
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
+//    }
 
-            long runID = 0;
-            ResultSet rs = fetchRunID.executeQuery();
-            if (rs.next()) {
-                runID = rs.getLong("LATEST_ID");
-            }
+//    private void storeSequences(ParsedRun run) {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing unique sequences");
+//
+//        try {
+//            PreparedStatement insertSequence = con.prepareStatement(SQLStatements.INSERT_SEQUENCE);
+//            PreparedStatement latestSeqID = con.prepareStatement(SQLStatements.GET_LATEST_SEQUENCE_ID);
+//
+//            long seqID = 0;
+//            ResultSet rs = latestSeqID.executeQuery();
+//            if (rs.next()) {
+//                seqID = rs.getLong("LATEST_ID");
+//            }
+//
+//            // store sequences
+//            Collection<ParsedReadname> reads = run.getReads();
+//            int batchCounter = 1;
+//            Iterator<ParsedReadname> it = reads.iterator();
+//            while( it.hasNext()) {
+//                batchCounter++;
+//                ParsedReadname read = it.next();
+//                seqID++;
+//                read.setID(seqID);
+//                insertSequence.setLong(1, seqID);
+//                insertSequence.setLong(2, run.getID());
+//                insertSequence.addBatch();
+//
+//                if (batchCounter == SEQUENCE_BATCH_SIZE) {
+//                    insertSequence.executeBatch();
+//                   batchCounter = 1;
+//                }
+//              //  it.remove();
+//            }
+//
+//            insertSequence.executeBatch();
+//
+//            con.commit();
+//            insertSequence.close();
+//            latestSeqID.close();
+//
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing unique sequences");
+//    }
 
-            runID++;
-            run.setID(runID);
+//    private void storeReads(ParsedRun run) {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing readnames");
+//        try {
+//            PreparedStatement insertRead = con.prepareStatement(SQLStatements.INSERT_READ);
+//            PreparedStatement getLatestID = con.prepareStatement(SQLStatements.GET_LATEST_READ_ID);
+//
+//            ResultSet rs = getLatestID.executeQuery();
+//            long readID = 0;
+//            if (rs.next()) {
+//                readID = rs.getLong("LATEST_ID");
+//            }
+//
+//            int batchCounter = 1;
+//            Iterator<ParsedReadname> readMapIt = run.getReads().iterator();
+//            while (readMapIt.hasNext()) {
+//                ParsedReadname readMap = readMapIt.next();
+//                Iterator<String> readIt = readMap.getReads().iterator();
+//                while( readIt.hasNext()) {
+//                    batchCounter++;
+//                    readID++;
+//                    insertRead.setLong(1, readID);
+//                    insertRead.setString(2, readIt.next());
+//                    insertRead.setLong(3, readMap.getID());
+//                    insertRead.addBatch();
+//
+//                    if (batchCounter == READNAME_BATCH_SIZE) {
+//                          batchCounter = 1;
+//                        insertRead.executeBatch();
+//                    }
+//                   // readIt.remove();
+//                }
+//              //  readMapIt.remove();
+//            }
+//
+//            insertRead.executeBatch();
+//            con.commit();
+//            insertRead.close();
+//            getLatestID.close();
+//
+//        } catch (SQLException ex) {
+//            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing readnames");
+//    }
 
-            insertRun.setLong(1, runID);
-            insertRun.setString(2, run.getDescription());
-            insertRun.setTimestamp(3, run.getTimestamp());
-            insertRun.execute();
+//    public long addRun(ParsedRun run) throws StorageException {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"{0}to {1}", new Object[]{run.getDescription(), adapter});
+//
+//        if (adapter.equalsIgnoreCase("mysql")) {
+//            try {
+//                con.setAutoCommit(false);
+//                this.lockRunDomainTables();
+//                this.disableRunIndices();
+//                storeRun(run);
+//                storeSequences(run);
+//                storeReads(run);
+//                run.deleteMap();
+//                this.enableRunIndices();
+//                this.unlockTables();
+//                con.setAutoCommit(true);
+//
+//            } catch (SQLException ex) {
+//                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//                throw new StorageException(ex);
+//            } catch (Exception ex) {
+//                throw new StorageException(ex);
+//            }
+//        } else {
+//            try {
+//                con.setAutoCommit(false);
+//                //storeRunH2(run);
+//                storeSequences(run);
+//                storeReads(run);
+//                run.deleteMap();
+//                con.setAutoCommit(true);
+//
+//            } catch (SQLException ex) {
+//                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//                throw new StorageException(ex);
+//            } catch (Exception ex) {
+//                throw new StorageException(ex);
+//            }
+//
+//        }
+//
+//        return run.getID();
+//    }
 
-            insertRun.close();
-            fetchRunID.close();
+//    private void disableRunIndices() {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start disabling run domain indexing");
+//        try {
+//
+//            PreparedStatement run = con.prepareStatement(SQLStatements.DISABLE_RUN_INDICES);
+//            PreparedStatement sequence = con.prepareStatement(SQLStatements.DISABLE_SEQUENCE_INDICES);
+//            PreparedStatement read = con.prepareStatement(SQLStatements.DISABLE_READNAMES_INDICES);
+//
+//            run.execute();
+//            sequence.execute();
+//            read.execute();
+//
+//            con.commit();
+//
+//            run.close();
+//            sequence.close();
+//            read.close();
+//
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "disabled run data domain indexing");
+//    }
 
-            con.commit();
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
-    }
-
-    private void storeRunH2(ParsedRun run) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
-
-        try {
-            PreparedStatement insertRun = con.prepareStatement(H2SQLStatements.INSERT_RUN);
-            PreparedStatement fetchRunID = con.prepareStatement(H2SQLStatements.GET_LATEST_RUN_ID);
-
-            long runID = 0;
-            ResultSet rs = fetchRunID.executeQuery();
-            if (rs.next()) {
-                runID = rs.getLong("LATEST_ID");
-            }
-
-            runID++;
-            run.setID(runID);
-
-            insertRun.setLong(1, runID);
-            insertRun.setString(2, run.getDescription());
-            insertRun.setTimestamp(3, run.getTimestamp());
-            insertRun.execute();
-
-            insertRun.close();
-            fetchRunID.close();
-
-            con.commit();
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
-    }
-
-    private void storeSequences(ParsedRun run) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing unique sequences");
-
-        try {
-            PreparedStatement insertSequence = con.prepareStatement(SQLStatements.INSERT_SEQUENCE);
-            PreparedStatement latestSeqID = con.prepareStatement(SQLStatements.GET_LATEST_SEQUENCE_ID);
-
-            long seqID = 0;
-            ResultSet rs = latestSeqID.executeQuery();
-            if (rs.next()) {
-                seqID = rs.getLong("LATEST_ID");
-            }
-
-            // store sequences
-            Collection<ParsedReadname> reads = run.getReads();
-            int batchCounter = 1;
-            Iterator<ParsedReadname> it = reads.iterator();
-            while( it.hasNext()) {
-                batchCounter++;
-                ParsedReadname read = it.next();
-                seqID++;
-                read.setID(seqID);
-                insertSequence.setLong(1, seqID);
-                insertSequence.setLong(2, run.getID());
-                insertSequence.addBatch();
-
-                if (batchCounter == SEQUENCE_BATCH_SIZE) {
-                    insertSequence.executeBatch();
-                   batchCounter = 1;
-                }
-              //  it.remove();
-            }
-
-            insertSequence.executeBatch();
-
-            con.commit();
-            insertSequence.close();
-            latestSeqID.close();
-
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing unique sequences");
-    }
-
-    private void storeReads(ParsedRun run) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing readnames");
-        try {
-            PreparedStatement insertRead = con.prepareStatement(SQLStatements.INSERT_READ);
-            PreparedStatement getLatestID = con.prepareStatement(SQLStatements.GET_LATEST_READ_ID);
-
-            ResultSet rs = getLatestID.executeQuery();
-            long readID = 0;
-            if (rs.next()) {
-                readID = rs.getLong("LATEST_ID");
-            }
-            
-            int batchCounter = 1;
-            Iterator<ParsedReadname> readMapIt = run.getReads().iterator();
-            while (readMapIt.hasNext()) {
-                ParsedReadname readMap = readMapIt.next();
-                Iterator<String> readIt = readMap.getReads().iterator();
-                while( readIt.hasNext()) {
-                    batchCounter++;
-                    readID++;
-                    insertRead.setLong(1, readID);
-                    insertRead.setString(2, readIt.next());
-                    insertRead.setLong(3, readMap.getID());
-                    insertRead.addBatch();
-
-                    if (batchCounter == READNAME_BATCH_SIZE) {
-                          batchCounter = 1;
-                        insertRead.executeBatch();
-                    }
-                   // readIt.remove();
-                }
-              //  readMapIt.remove();
-            }
-
-            insertRead.executeBatch();
-            con.commit();
-            insertRead.close();
-            getLatestID.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing readnames");
-    }
-
-    public long addRun(ParsedRun run) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"{0}to {1}", new Object[]{run.getDescription(), adapter});
-
-        if (adapter.equalsIgnoreCase("mysql")) {
-            try {
-                con.setAutoCommit(false);
-                this.lockRunDomainTables();
-                this.disableRunIndices();
-                storeRun(run);
-                storeSequences(run);
-                storeReads(run);
-                run.deleteMap();
-                this.enableRunIndices();
-                this.unlockTables();
-                con.setAutoCommit(true);
-
-            } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-                throw new StorageException(ex);
-            } catch (Exception ex) {
-                throw new StorageException(ex);
-            }
-        } else {
-            try {
-                con.setAutoCommit(false);
-                storeRunH2(run);
-                storeSequences(run);
-                storeReads(run);
-                run.deleteMap();
-                con.setAutoCommit(true);
-
-            } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-                throw new StorageException(ex);
-            } catch (Exception ex) {
-                throw new StorageException(ex);
-            }
-
-        }
-
-        return run.getID();
-    }
-
-    private void disableRunIndices() {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start disabling run domain indexing");
-        try {
-
-            PreparedStatement run = con.prepareStatement(SQLStatements.DISABLE_RUN_INDICES);
-            PreparedStatement sequence = con.prepareStatement(SQLStatements.DISABLE_SEQUENCE_INDICES);
-            PreparedStatement read = con.prepareStatement(SQLStatements.DISABLE_READNAMES_INDICES);
-
-            run.execute();
-            sequence.execute();
-            read.execute();
-
-            con.commit();
-
-            run.close();
-            sequence.close();
-            read.close();
-
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "disabled run data domain indexing");
-    }
-
-    private void enableRunIndices() {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling run data domain indexing");
-        try {
-
-            PreparedStatement run = con.prepareStatement(SQLStatements.ENABLE_RUN_INDICES);
-            PreparedStatement sequence = con.prepareStatement(SQLStatements.ENABLE_SEQUENCE_INDICES);
-            PreparedStatement read = con.prepareStatement(SQLStatements.ENABLE_READNAMES_INDICES);
-
-            run.execute();
-            sequence.execute();
-            read.execute();
-
-            con.commit();
-
-            run.close();
-            sequence.close();
-            read.close();
-
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "enabled run data domain indexing");
-    }
+//    private void enableRunIndices() {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling run data domain indexing");
+//        try {
+//
+//            PreparedStatement run = con.prepareStatement(SQLStatements.ENABLE_RUN_INDICES);
+//            PreparedStatement sequence = con.prepareStatement(SQLStatements.ENABLE_SEQUENCE_INDICES);
+//            PreparedStatement read = con.prepareStatement(SQLStatements.ENABLE_READNAMES_INDICES);
+//
+//            run.execute();
+//            sequence.execute();
+//            read.execute();
+//
+//            con.commit();
+//
+//            run.close();
+//            sequence.close();
+//            read.close();
+//
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "enabled run data domain indexing");
+//    }
 
     private void disableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start disabling reference data domain indexing...");
@@ -838,7 +845,7 @@ public class ProjectConnector {
             insertTrack.setLong(2, refGenID);
             insertTrack.setString(3, track.getDescription());
             insertTrack.setTimestamp(4, track.getTimestamp());
-            insertTrack.setLong(5, runID);
+//            insertTrack.setLong(5, runID);
             insertTrack.execute();
 
             insertTrack.close();
@@ -925,23 +932,23 @@ public class ProjectConnector {
             // start storing the mappings
             int batchCounter = 1;
             Iterator<Integer> sequenceIDIterator = track.getParsedMappingContainer().getMappedSequenceIDs().iterator();
-            while (sequenceIDIterator.hasNext()) {
+            while (sequenceIDIterator.hasNext()) { //sequence ids aller unterschiedlichen readsequenzen = unique reads
                 int sequenceID = sequenceIDIterator.next();
                 List<ParsedMapping> c = track.getParsedMappingContainer().getParsedMappingGroupBySeqID(sequenceID).getMappings();
-                Iterator<ParsedMapping> mappingsIt = c.iterator();
+                Iterator<ParsedMapping> mappingsIt = c.iterator(); //eine mapping group, alle gleiche seq id, untersch. pos
                 while (mappingsIt.hasNext()) {
-                    ParsedMapping m = mappingsIt.next();
+                    ParsedMapping m = mappingsIt.next(); //einzelnes mapping
                     m.setID(mappingID);
 
-                    insertMapping.setLong(1, mappingID);
-                    insertMapping.setInt(2, m.getStart());
-                    insertMapping.setInt(3, m.getStop());
+                    insertMapping.setLong(1, mappingID); //einzigartig
+                    insertMapping.setInt(2, m.getStart()); //einzigartig im zusammenhang
+                    insertMapping.setInt(3, m.getStop()); //einzigartig im zusammenhang
                     insertMapping.setInt(4, (m.isBestMapping() ? 1 : 0));
-                    insertMapping.setInt(5, m.getCount());
+                    insertMapping.setInt(5, m.getCount()); //count der gleichen seq (seq id) in reads
                     insertMapping.setByte(6, m.getDirection());
                     insertMapping.setInt(7, m.getErrors());
-                    insertMapping.setInt(8, sequenceID);
-                    insertMapping.setLong(9, track.getID());
+                    insertMapping.setInt(8, sequenceID); // mappings der gleichen seq an anderer stelle enthalten sie auch +
+                    insertMapping.setLong(9, track.getID()); //gleichen count
 
                     insertMapping.addBatch();
 
@@ -1162,13 +1169,20 @@ public class ProjectConnector {
         return refConnectors.get(refGenID);
     }
 
-    public RunConnector getRunConnector(long runID,long trackID) {
-        // only return new object, if no suitable connector was created before
-        if (!runConnectors.containsKey(runID)) {
-            runConnectors.put(runID, new RunConnector(runID,trackID));
-        }
-        return runConnectors.get(runID);
-    }
+//    /**
+//     * @param runID
+//     * @param trackID
+//     * @return
+//     * @deprecated Since the RUN domain has been exckluded from VAMP
+//     */
+//    @Deprecated
+//    public RunConnector getRunConnector(long runID,long trackID) {
+//        // only return new object, if no suitable connector was created before
+//        if (!runConnectors.containsKey(runID)) {
+//            runConnectors.put(runID, new RunConnector(runID,trackID));
+//        }
+//        return runConnectors.get(runID);
+//    }
 
     public TrackConnector getTrackConnector(PersistantTrack track) {
         // only return new object, if no suitable connector was created before
@@ -1197,28 +1211,28 @@ public class ProjectConnector {
         return con;
     }
 
-    public List<PersistentRun> getRuns() {
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading run data from database");
-        ArrayList<PersistentRun> runs = new ArrayList<PersistentRun>();
-
-        try {
-            PreparedStatement fetchRuns = con.prepareStatement(SQLStatements.FETCH_RUNS);
-            ResultSet rs = fetchRuns.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt(FieldNames.RUN_ID);
-                String description = rs.getString(FieldNames.RUN_DESCRIPTION);
-                Timestamp date = rs.getTimestamp(FieldNames.RUN_TIMESTAMP);
-                runs.add(new PersistentRun(id, description, date));
-            }
-
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        return runs;
-    }
+//    public List<PersistentRun> getRuns() {
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading run data from database");
+//        ArrayList<PersistentRun> runs = new ArrayList<PersistentRun>();
+//
+//        try {
+//            PreparedStatement fetchRuns = con.prepareStatement(SQLStatements.FETCH_RUNS);
+//            ResultSet rs = fetchRuns.executeQuery();
+//
+//            while (rs.next()) {
+//                int id = rs.getInt(FieldNames.RUN_ID);
+//                String description = rs.getString(FieldNames.RUN_DESCRIPTION);
+//                Timestamp date = rs.getTimestamp(FieldNames.RUN_TIMESTAMP);
+//                runs.add(new PersistentRun(id, description, date));
+//            }
+//
+//        } catch (SQLException ex) {
+//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+//        }
+//
+//        return runs;
+//    }
 
     public List<PersistantReference> getGenomes() {
 
@@ -1283,35 +1297,35 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"{0}\"", trackID);
     }
 
-    public void deleteRun(long runID) throws StorageException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of run with id \"{0}\"", runID);
-        try {
-            con.setAutoCommit(false);
-
-            PreparedStatement deleteReads = con.prepareStatement(SQLStatements.DELETE_READS_FROM_RUN);
-            deleteReads.setLong(1, runID);
-            PreparedStatement deleteSeqs = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_FROM_RUN);
-            deleteSeqs.setLong(1, runID);
-            PreparedStatement deleteRun = con.prepareStatement(SQLStatements.DELETE_RUN);
-            deleteRun.setLong(1, runID);
-
-            deleteReads.execute();
-            deleteSeqs.execute();
-            deleteRun.execute();
-
-            con.commit();
-
-            deleteReads.close();
-            deleteSeqs.close();
-            deleteRun.close();
-
-            con.setAutoCommit(true);
-
-        } catch (SQLException ex) {
-            throw new StorageException(ex);
-        }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \"{0}\"", runID);
-    }
+//    public void deleteRun(long runID) throws StorageException {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of run with id \"{0}\"", runID);
+//        try {
+//            con.setAutoCommit(false);
+//
+//            PreparedStatement deleteReads = con.prepareStatement(SQLStatements.DELETE_READS_FROM_RUN);
+//            deleteReads.setLong(1, runID);
+//            PreparedStatement deleteSeqs = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_FROM_RUN);
+//            deleteSeqs.setLong(1, runID);
+//            PreparedStatement deleteRun = con.prepareStatement(SQLStatements.DELETE_RUN);
+//            deleteRun.setLong(1, runID);
+//
+//            deleteReads.execute();
+//            deleteSeqs.execute();
+//            deleteRun.execute();
+//
+//            con.commit();
+//
+//            deleteReads.close();
+//            deleteSeqs.close();
+//            deleteRun.close();
+//
+//            con.setAutoCommit(true);
+//
+//        } catch (SQLException ex) {
+//            throw new StorageException(ex);
+//        }
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \"{0}\"", runID);
+//    }
 
     public void deleteGenome(long refGenID) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID);
@@ -1339,23 +1353,23 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
 
-    public List<String> getReadNamesForSequenceID(int id) {
-        List<String> names = new ArrayList<String>();
-
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_READNAMES_FOR_SEQUENCE_ID);
-            fetch.setInt(1, id);
-
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                names.add(rs.getString(FieldNames.READ_NAME));
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
-        return names;
-    }
+//    public List<String> getReadNamesForSequenceID(int id) {
+//        List<String> names = new ArrayList<String>();
+//
+//        try {
+//            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_READNAMES_FOR_SEQUENCE_ID);
+//            fetch.setInt(1, id);
+//
+//            ResultSet rs = fetch.executeQuery();
+//            while (rs.next()) {
+//                names.add(rs.getString(FieldNames.READ_NAME));
+//            }
+//
+//        } catch (SQLException ex) {
+//            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//
+//        return names;
+//    }
 }

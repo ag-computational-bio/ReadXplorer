@@ -1,8 +1,8 @@
 package de.cebitec.vamp.ui.visualisation.track;
 
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.RunConnector;
+//import de.cebitec.vamp.databackend.connector.ProjectConnector;
+//import de.cebitec.vamp.databackend.connector.RunConnector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -240,20 +240,19 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
             @Override
             public void run() {
-                RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId(),trackCon.getTrackID());
+                //RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId(),trackCon.getTrackID());
 
-                int numUniqueReads = runC.getNumberOfUniqueSequences();
+                int numUniqueReads = trackCon.getNumOfUniqueSequences();
                 if(numUniqueReads == 0 ){
-                numUniqueReads = runC.getNumberOfUniqueSequencesCalculate();
-
+                numUniqueReads = trackCon.getNumOfMappedSequencesCalculate();
                 }
-                int numOfReads = runC.getNumberOfReads();
+
+                int numOfReads = trackCon.getNumOfReads();
                 if(numOfReads == 0 ){
-                numOfReads = runC.getNumberOfReadsCalculate();
+                numOfReads = trackCon.getNumOfReadsCalculate();
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating static information");
-                runC.updateTableStatics(numOfReads, numUniqueReads);
+                trackCon.updateTableStatics(numOfReads, numUniqueReads);
                 }
-
 
                 int numOfMappedUniqueReads = trackCon.getNumOfMappedSequences();
                 

@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import java.util.Iterator;
 import java.util.List;
 import org.openide.util.NbBundle;
@@ -19,7 +19,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJobs> trackJobList) {
+    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList) {
         overviewTextArea.setText("");
 
         if(!refGenJobList.isEmpty()){
@@ -36,8 +36,8 @@ public class ImportOverviewCard extends javax.swing.JPanel {
 
         if(!trackJobList.isEmpty()){
             overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.tracks") + ":\n");
-            for(Iterator<TrackJobs> it = trackJobList.iterator(); it.hasNext(); ){
-                TrackJobs r = it.next();
+            for(Iterator<TrackJob> it = trackJobList.iterator(); it.hasNext(); ){
+                TrackJob r = it.next();
                 overviewTextArea.append(r.getFile().getAbsolutePath()+"\n");
                 overviewTextArea.append("\t"+r.getDescription()+"\n");
             }

@@ -5,7 +5,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.parser.Job;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -89,7 +89,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
 
     private Map<String, List<? extends Job>> getDeletableReferencesAndTracks(){
         List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
-        List<TrackJobs> trackJobs = new ArrayList<TrackJobs>();
+        List<TrackJob> trackJobs = new ArrayList<TrackJob>();
         HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
 
         List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
@@ -106,7 +106,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
             PersistantTrack dbTrack = it.next();
 
             // File and parser, refgenjob, runjob parameters meaningles in this context
-            TrackJobs t = new TrackJobs(dbTrack.getId(), null, dbTrack.getDescription(),
+            TrackJob t = new TrackJob(dbTrack.getId(), null, dbTrack.getDescription(),
                     indexedGens.get(dbTrack.getRefGenID()),
                     null, dbTrack.getTimestamp());
 
@@ -134,7 +134,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
         Map<String, List<? extends Job>> possibleJobs = getDeletableReferencesAndTracks();
 
         List<ReferenceJob> refJobs = (List<ReferenceJob>) possibleJobs.get("references");
-        List<TrackJobs> trackJobs = (List<TrackJobs>) possibleJobs.get("tracks");
+        List<TrackJob> trackJobs = (List<TrackJob>) possibleJobs.get("tracks");
 
         component.setSelectableJobs(refJobs, trackJobs);
 

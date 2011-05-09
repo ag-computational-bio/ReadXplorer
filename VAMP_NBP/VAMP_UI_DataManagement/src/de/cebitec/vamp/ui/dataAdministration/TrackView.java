@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.dataAdministration;
 
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
@@ -15,8 +15,8 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
 
     private static final long serialVersionUID = 762498252;
 
-    private List<TrackJobs> jobs;
-    private List<TrackJobs> jobs2del;
+    private List<TrackJob> jobs;
+    private List<TrackJob> jobs2del;
     private Boolean hasCheckedJobs;
 
     public static final String PROP_DESELECT = "deselect";
@@ -24,21 +24,21 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     /** Creates new form MappingView */
     public TrackView() {
         initComponents();
-        jobs = new ArrayList<TrackJobs>();
+        jobs = new ArrayList<TrackJob>();
     }
 
-    public void setTrackJobs(List<TrackJobs> trackJobs){
+    public void setTrackJobs(List<TrackJob> trackJobs){
         this.jobs = trackJobs;
         clearTableRows();
 
         DefaultTableModel model = (DefaultTableModel) jobTable.getModel();
-        for (TrackJobs trackJob : trackJobs) {
+        for (TrackJob trackJob : trackJobs) {
             model.addRow(new Object[]{false, trackJob.getDescription(), trackJob.getTimestamp()});
         }
     }
 
-    public List<TrackJobs> getJobs2Del(){
-        jobs2del = new ArrayList<TrackJobs>();
+    public List<TrackJob> getJobs2Del(){
+        jobs2del = new ArrayList<TrackJob>();
 
         for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
             if ((Boolean) jobTable.getValueAt(row, 0)){
@@ -132,7 +132,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
         int column = e.getColumn();
 
         if (row >= 0 && column >= 0) {
-            TrackJobs trackJob = jobs.get(row);
+            TrackJob trackJob = jobs.get(row);
             DefaultTableModel model = (DefaultTableModel) e.getSource();
             boolean selected = (Boolean) model.getValueAt(row, column);
 

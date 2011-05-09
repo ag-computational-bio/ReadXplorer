@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
+//import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
@@ -16,7 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
-import java.util.List;
+//import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -43,7 +43,7 @@ public class BlockComponent extends JComponent implements ActionListener {
     private float percentSandBPerCovUnit;
     private float minSaturationAndBrightness;
     private String nameofRead = "";
-    private static String COPY_READNAME = "Copy readname";
+//    private static String COPY_READNAME = "Copy readname"; //no readnames are stored anymore: RUN domain excluded
     private static String COPY_SEQUENCE = "Copy sequence";
     private static String EXIT_POPUP = "Exit popup menu";
     private JPopupMenu p = new JPopupMenu();
@@ -105,16 +105,16 @@ public class BlockComponent extends JComponent implements ActionListener {
 
     }
 
-    public void setReadname() {
-        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(b.getMapping().getSequenceID());
-        JTextField j = new JTextField();
-        for (String name : names) {
-            nameofRead = name;
-        }
-        j.setText(nameofRead);
-        j.selectAll();
-        j.copy();
-    }
+//    public void setReadname() { //no readnames are stored anymore: RUN domain excluded
+//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(b.getMapping().getSequenceID());
+//        JTextField j = new JTextField();
+//        for (String name : names) {
+//            nameofRead = name;
+//        }
+//        j.setText(nameofRead);
+//        j.selectAll();
+//        j.copy();
+//    }
 
     public void setSequence() {
         JTextField j = new JTextField();
@@ -136,7 +136,7 @@ public class BlockComponent extends JComponent implements ActionListener {
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
         sb.append(createTableRow("Replicates", String.valueOf(mapping.getCoverage())));
-        this.appendReadnames(mapping, sb);
+//        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
         sb.append(createTableRow("Mismatches", String.valueOf(mapping.getErrors())));
         this.appendDiffs(mapping, sb);
         this.appendGaps(mapping, sb);
@@ -149,10 +149,10 @@ public class BlockComponent extends JComponent implements ActionListener {
     }
 
     private void setPopupMenu() {
-        JMenuItem copyName = new JMenuItem();
-        copyName.addActionListener(this);
-        copyName.setActionCommand(COPY_READNAME);
-        copyName.setText("Copy readname");
+//        JMenuItem copyName = new JMenuItem(); //no readnames are stored anymore: RUN domain excluded
+//        copyName.addActionListener(this);
+//        copyName.setActionCommand(COPY_READNAME);
+//        copyName.setText("Copy readname");
 
         JMenuItem copySequence = new JMenuItem();
         copySequence.addActionListener(this);
@@ -165,23 +165,24 @@ public class BlockComponent extends JComponent implements ActionListener {
         exit.setActionCommand(EXIT_POPUP);
         exit.setText("Exit");
         
-        p.add(copyName);
+ //       p.add(copyName); //no readnames are stored anymore: RUN domain excluded
         p.add(copySequence);
         p.add(exit);
     }
 
-    private void appendReadnames(PersistantMapping mapping, StringBuilder sb) {
-        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(mapping.getSequenceID());
-        boolean printLabel = true;
-        for (String name : names) {
-            String key = "";
-            if (printLabel) {
-                key = "Reads";
-                printLabel = false;
-            }
-            sb.append(createTableRow(key, name));
-        }
-    }
+    //no readnames are stored anymore: RUN domain excluded
+//    private void appendReadnames(PersistantMapping mapping, StringBuilder sb) {
+//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(mapping.getSequenceID());
+//        boolean printLabel = true;
+//        for (String name : names) {
+//            String key = "";
+//            if (printLabel) {
+//                key = "Reads";
+//                printLabel = false;
+//            }
+//            sb.append(createTableRow(key, name));
+//        }
+//    }
 
     private void appendDiffs(PersistantMapping mapping, StringBuilder sb) {
         boolean printLabel = true;
@@ -393,10 +394,10 @@ public class BlockComponent extends JComponent implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals(COPY_READNAME)) {
-            this.setReadname();
-            p.setVisible(false);
-        }
+//        if (e.getActionCommand().equals(COPY_READNAME)) {
+//            this.setReadname();
+//            p.setVisible(false);
+//        } //no readnames are stored anymore: RUN domain excluded
         if (e.getActionCommand().equals(COPY_SEQUENCE)) {
             this.setSequence();
             p.setVisible(false);

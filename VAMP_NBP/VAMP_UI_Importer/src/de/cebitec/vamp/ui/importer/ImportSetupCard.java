@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -26,6 +26,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
     public static final String PROP_HAS_JOBS = "hasJobs";
     public static final String PROP_JOB_SELECTED = "jobSelected";
+
+    private long trackID = 0;
 
     /** Creates new form SetupImportCard */
     public ImportSetupCard() {
@@ -66,7 +68,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         return refJobView.getJobs();
     }
 
-    public List<TrackJobs> getTrackJobList(){
+    public List<TrackJob> getTrackJobList(){
         return trackJobView.getJobs();
     }
 
@@ -178,7 +180,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 else if (dialogPane instanceof NewTrackDialogPanel){
                     NewTrackDialogPanel ntdp = (NewTrackDialogPanel) dialogPane;
                     ReferenceJob refJob = ntdp.getReferenceJob();
-                    TrackJobs trackJob = new TrackJobs(null, ntdp.gettMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob = new TrackJob(trackID++, ntdp.gettMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
                     refJob.registerTrackWithoutRunJob(trackJob);
                     trackJobView.add(trackJob);
                 }

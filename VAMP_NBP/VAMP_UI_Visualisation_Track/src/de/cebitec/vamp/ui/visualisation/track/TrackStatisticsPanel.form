@@ -45,20 +45,20 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="nerrorPercentage" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="bmPercentage" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="perfectPercentage" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="perfectMappingsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="allReadsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="uniqueReadsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="mappedReadsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="nonMappedReadsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="nErrorMappingsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="bestMatchMappingsAbsLabel" alignment="0" pref="63" max="32767" attributes="0"/>
-                          <Component id="nameLabel" alignment="1" pref="63" max="32767" attributes="0"/>
+                          <Component id="nerrorPercentage" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="bmPercentage" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="perfectPercentage" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="perfectMappingsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="allReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="uniqueReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="mappedReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="nonMappedReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="nErrorMappingsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="bestMatchMappingsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
+                          <Component id="nameLabel" alignment="1" pref="72" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="progressbar" alignment="0" pref="151" max="32767" attributes="0"/>
+                  <Component id="progressbar" alignment="0" pref="149" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>

@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Container for all mappings belonging to one track. Contains statistics as well
+ * as a HashMap with all mappings.
  *
  * @author ddoppmeier
  */
@@ -15,6 +17,9 @@ public class ParsedMappingContainer {
     private int numberOfReads;
     private HashMap<Integer, ParsedMappingGroup> mappings;
 
+    /**
+     * Creates an empty mapping container.
+     */
     public ParsedMappingContainer(){
         mappings = new HashMap<Integer, ParsedMappingGroup>();
     }

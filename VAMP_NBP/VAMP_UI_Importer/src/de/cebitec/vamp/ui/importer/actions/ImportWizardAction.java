@@ -3,7 +3,7 @@ package de.cebitec.vamp.ui.importer.actions;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.ImportThread;
 import de.cebitec.vamp.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.vamp.ui.importer.ImportWizardOverviewPanel;
@@ -53,7 +53,7 @@ public final class ImportWizardAction implements ActionListener {
         if (!cancelled) {
             // do something
             List<ReferenceJob> refJobs = (List<ReferenceJob>) wizardDescriptor.getProperty(PROP_REFJOBLIST);
-            List<TrackJobs> trackJobs = (List<TrackJobs>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
+            List<TrackJob> trackJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
 
             ImportThread i = new ImportThread(refJobs, trackJobs);
             RequestProcessor rp = new RequestProcessor("Import Threads", 2);

@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend;
 
 /**
+ * Contains all field names for data base requests.
  *
  * @author ddoppmeier
  */
@@ -12,16 +13,22 @@ public class FieldNames {
     private FieldNames() {
     }
 
+    /**
+     * NOTE: All commands belonging to the RUN domain have been commented out,
+     * because the run domain has been excluded from VAMP!!!!
+     * This includes the Run, Unique_Sequence and Readname tables!
+     */
+
     // names for various database tables
     public final static String TABLE_REF_GEN = "REFERENCE";
     public final static String TABLE_DIFF = "DIFF";
-    public final static String TABLE_SEQUENCE = "UNIQUE_SEQUENCE";
+//    public final static String TABLE_SEQUENCE = "UNIQUE_SEQUENCE";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
     public final static String TABLE_MAPPINGS = "MAPPING";
     public final static String TABLE_TRACKS = "TRACK";
-    public final static String TABLE_RUN = "RUN";
-    public final static String TABLE_READS = "READNAME";
+//    public final static String TABLE_RUN = "RUN";
+//    public final static String TABLE_READS = "READNAME";
     public final static String TABLE_STATICS = "STATICS";
 
 
@@ -42,9 +49,9 @@ public class FieldNames {
     public final static String DIFF_TYPE = "TYPE";
     public final static String DIFF_ORDER = "GAP_ORDER";
 
-    // source table fields
-    public final static String SEQUENCE_ID = "ID";
-    public final static String SEQUENCE_RUN = "RUN_ID";
+//    // source table fields
+//    public final static String SEQUENCE_ID = "ID";
+//    public final static String SEQUENCE_RUN = "RUN_ID";
 
     // coverage table fields
     public final static String COVERAGE_ID = "ID";
@@ -78,7 +85,7 @@ public class FieldNames {
     public final static String COVERAGE_N_RV_MULT_TRACK_DIFF =     "COMPLETE_REVERSE_REDUNDANT__DIFF";
     public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
 
-    
+
     // feature table fields
     public final static String FEATURE_ID = "ID";
     public final static String FEATURE_REFGEN = "REFERENCE_ID";
@@ -101,23 +108,24 @@ public class FieldNames {
     public final static String MAPPING_COUNT = "NUM_OF_REPLICATES";
     public final static String MAPPING_TRACK = "TRACK_ID";
 
+
     // track table fields
     public final static String TRACK_ID = "ID";
     public final static String TRACK_REFGEN = "REFERENCE_ID";
     public final static String TRACK_DESCRIPTION = "DESCRIPTION";
     public final static String TRACK_TIMESTAMP = "CREATIONTIME";
-    public final static String TRACK_RUN = "RUN_ID";
+    //public final static String TRACK_RUN = "RUN_ID";
 
-    
-    // run table fields
-    public final static String RUN_ID = "ID";
-    public final static String RUN_DESCRIPTION = "DESCRIPTION";
-    public final static String RUN_TIMESTAMP = "CREATIONTIME";
 
-    // read table fields
-    public final static String READ_ID = "ID";
-    public final static String READ_NAME = "NAME";
-    public final static String READ_SEQUENCE = "SEQUENCE_ID";
+//    // run table fields
+//    public final static String RUN_ID = "ID";
+//    public final static String RUN_DESCRIPTION = "DESCRIPTION";
+//    public final static String RUN_TIMESTAMP = "CREATIONTIME";
+//
+//    // read table fields
+//    public final static String READ_ID = "ID";
+//    public final static String READ_NAME = "NAME";
+//    public final static String READ_SEQUENCE = "SEQUENCE_ID";
 
    // statics table fields
     public final static String STATICS_ID = "ID";

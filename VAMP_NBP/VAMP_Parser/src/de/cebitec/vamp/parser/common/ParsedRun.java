@@ -8,9 +8,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
+ * Since the RUN domain has been excluded a PersistantRun is not needed anymore!
  *
  * @author ddoppmeier
  */
+@Deprecated
 public class ParsedRun {
     
     HashMap<String, ParsedReadname> sequences;

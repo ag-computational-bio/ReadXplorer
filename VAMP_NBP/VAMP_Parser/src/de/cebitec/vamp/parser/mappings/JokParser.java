@@ -1,6 +1,6 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
@@ -15,8 +15,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+//import java.util.HashSet;
+//import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,17 +31,20 @@ public class JokParser implements MappingParserI {
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
     private static String fileDescription = "Jok Output";
     private HashMap<Integer, Integer> gapOrderIndex;
+    private HashMap<String, Integer> seqToIDMap;
 
     private ArrayList<Observer> observers;
     private String errorMsg;
 
     public JokParser() {
-        gapOrderIndex = new HashMap<Integer, Integer>();
-        observers = new ArrayList<Observer>();
+        this.gapOrderIndex = new HashMap<Integer, Integer>();
+        this.seqToIDMap = new HashMap<String, Integer>();
+        this.observers = new ArrayList<Observer>();
     }
 
     @Override
-    public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
+//    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
+    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         //  ParsedRun run = new ParsedRun("");
         try {
@@ -51,7 +54,8 @@ public class JokParser implements MappingParserI {
 
             int lineno = 0;
             String line = null;
-            boolean readErroneous = false;
+            int noUniqueReads = 0;
+            int noReads = 0;
             while ((line = br.readLine()) != null) {
                 lineno++;
 
@@ -78,7 +82,7 @@ public class JokParser implements MappingParserI {
                                     + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number or *. "
                                     + "Found stop: " + tokens[2]);
                         }
-                        readErroneous = true; //*'s are ignored = unmapped read
+                        continue; //*'s are ignored = unmapped read
                     }
 
                     byte direction = 0;
@@ -92,101 +96,104 @@ public class JokParser implements MappingParserI {
                     int errors = Integer.parseInt(tokens[6]);
                     // check tokens
                     // report empty mappings saruman should not be producing anymore
-                    if (readname == null || readname.isEmpty()) { //TODO: listener fuer errors + import thread kennt den listener
+                    if (readname == null || readname.isEmpty()) {
                         this.sendErrorMsg("Could not read readname in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Found read name: " + readname);
-//                                throw new ParsingException("could not read readname in "
-//                                        + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-//                                        + "Found read name: " + readname);
-                        readErroneous = true;
+                        continue;
 
                     }
                     if (start >= stop) {
                         this.sendErrorMsg("Start bigger than stop in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Found start: " + start + ", stop: " + stop);
-                        readErroneous = true;
+                        continue;
                     }
                     if (direction == 0) {
                         this.sendErrorMsg("Could not parse direction in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Must be >> oder <<");
-                        readErroneous = true;
+                        continue;
                     }
                     if (readSeq == null || readSeq.isEmpty()) {
                         this.sendErrorMsg("Read sequence could not be parsed in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Found: " + readSeq + tokens.length);
-                        readErroneous = true;
+                        continue;
                     }
                     if (refSeq == null || refSeq.isEmpty()) {
                         this.sendErrorMsg("Reference sequence could not be parsed in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Found: " + refSeq);
-                        readErroneous = true;
+                        continue;
                     }
                     if (readSeq.length() != refSeq.length() && !refSeq.equals(("*"))) {
                         this.sendErrorMsg("Alignment sequences have different length in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + "! "
                                 + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
-                        readErroneous = true;
+                        continue;
                     }
                     if (errors < 0 || errors > readSeq.length()) {
                         this.sendErrorMsg("Error number has invalid value " + errors
                                 + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Must be bigger or equal to zero and smaller than alignment length.");
-                        readErroneous = true;
+                        continue;
                     }
-                    if (!readnameToSequenceID.containsKey(readname)) {
-                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
-                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
-                                + "Please make sure you are referencing the correct read data set!");
-                        readErroneous = true;
+//                    if (!readnameToSequenceID.containsKey(readname)) {
+//                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
+//                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
+//                                + "Please make sure you are referencing the correct read data set!");
+//                        readErroneous = true;
+//                    }
+
+
+                    // Reads with an error already skip this part because of "continue" statements
+                    ++noReads;
+                    // parse read
+                    DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    List<ParsedDiff> diffs = result.getDiffs();
+                    List<ParsedReferenceGap> gaps = result.getGaps();
+                    //dont ask me why but we have to do it
+                    if (!gaps.isEmpty() || !diffs.isEmpty()) {
+                        stop = stop - 1;
                     }
 
-
-                    if (!readErroneous) { // skip this read if an error occured
-                        // parse read
-                        DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
-                        List<ParsedDiff> diffs = result.getDiffs();
-                        List<ParsedReferenceGap> gaps = result.getGaps();
-                        //dont ask me why but we have to do it
-                        if (!gaps.isEmpty() || !diffs.isEmpty()) {
-                            stop = stop - 1;
-                        }
-
-                        ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
-                        int seqID = readnameToSequenceID.get(readname);
-                        mappingContainer.addParsedMapping(mapping, seqID);
+                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
+                    int seqID;
+                    if (this.seqToIDMap.containsKey(readSeq)) {
+                        seqID = this.seqToIDMap.get(readSeq);
                     } else {
-                        readErroneous = false;
+                        seqID = ++noUniqueReads; //int seqID = readnameToSequenceID.get(readname);
+                        this.seqToIDMap.put(readSeq, seqID);
                     }
+                    mappingContainer.addParsedMapping(mapping, seqID);
                 } else {
-                    this.sendErrorMsg("The current read in line" + lineno + "is missing some data: ".concat(line));
+                    this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
                 }
             }
-            Iterator<Integer> it = readnameToSequenceID.values().iterator();
-            HashSet<Integer> s = new HashSet<Integer>();
-            while (it.hasNext()) {
-                int i = it.next();
-                s.add(i);
-            }
-            // it.remove();
-            //Data for statics no of reads and number of unique reads
-            int noOfReads = readnameToSequenceID.keySet().size();
-            int noOfUniqueSeq = s.size();
-            mappingContainer.setNumberOfReads(noOfReads);
-            mappingContainer.setNumberOfUniqueSeq(noOfUniqueSeq);
-            s.clear();
-            readnameToSequenceID.clear();
+//            Iterator<Integer> it = readnameToSequenceID.values().iterator();
+//            HashSet<Integer> s = new HashSet<Integer>();
+//            while (it.hasNext()) { //!!! was used before RUN domain was kicked!!!
+//                int i = it.next();
+//                s.add(i);
+//            }
+//            // it.remove();
+//            //Data for statics no of reads and number of unique reads
+//            int noOfReads = readnameToSequenceID.keySet().size();
+//            int noOfUniqueSeq = s.size();
+
+            mappingContainer.setNumberOfReads(noReads);
+            mappingContainer.setNumberOfUniqueSeq(noUniqueReads);
+//            s.clear();
+//            readnameToSequenceID.clear();
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noOfReads});
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueReads});
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
         }
 
+        this.seqToIDMap = null; //release resources
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
     }
@@ -260,7 +267,7 @@ public class JokParser implements MappingParserI {
     }
 
     @Override
-    public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {
+    public ParsedRun parseInputForReadData(TrackJob trackJob) throws ParsingException {
         ParsedRun run = new ParsedRun(fileDescription);
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());

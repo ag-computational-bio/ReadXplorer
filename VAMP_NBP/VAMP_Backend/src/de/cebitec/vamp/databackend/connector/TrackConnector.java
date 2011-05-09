@@ -9,7 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.api.objects.Read;
+//import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,9 +31,14 @@ import java.util.logging.Logger;
  */
 public class TrackConnector implements ITrackConnector{
 
+    /* !!!!!!!!!!!!
+     * Note that all parts belonging to the RUN domain have been commented out!
+     * !!!!!!!!!!!!
+     */
+
     private String associatedTrackName;
     private long trackID;  
-    private long runID;
+    //private long runID;
     private int genomeSize;
     private CoverageThread thread;
     private Connection con;
@@ -55,7 +60,7 @@ public class TrackConnector implements ITrackConnector{
         associatedTrackName = track.getDescription();
         trackID = track.getId();
         con = ProjectConnector.getInstance().getConnection();
-        runID = fetchRunID();
+        //runID = fetchRunID();
         genomeSize = this.getRefGenLength();
 
         List<PersistantTrack> tracks = new ArrayList<PersistantTrack>(1);
@@ -67,7 +72,7 @@ public class TrackConnector implements ITrackConnector{
         if (tracks.size() > 2) throw new UnsupportedOperationException("More than two tracks not supported yet.");
         this.trackID = id;
         con = ProjectConnector.getInstance().getConnection();
-        runID = fetchRunID();
+        //runID = fetchRunID();
         genomeSize = this.getRefGenLength();
 
         startCoverageThread(tracks);
@@ -83,23 +88,23 @@ public class TrackConnector implements ITrackConnector{
         thread.start();
     }
 
-    private int fetchRunID() {
-        int id = 0;
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_RUNID_FOR_TRACK);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                id = rs.getInt(FieldNames.TRACK_RUN);
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return id;
-    }
+//    private int fetchRunID() {
+//        int id = 0;
+//        try {
+//            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_RUNID_FOR_TRACK);
+//            fetch.setLong(1, trackID);
+//
+//            ResultSet rs = fetch.executeQuery();
+//            if (rs.next()) {
+//                id = rs.getInt(FieldNames.TRACK_RUN);
+//            }
+//
+//        } catch (SQLException ex) {
+//            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        return id;
+//    }
 
     @Override
     public Collection<PersistantMapping> getMappings(int from, int to) {
@@ -224,6 +229,88 @@ public class TrackConnector implements ITrackConnector{
     }
 
     @Override
+    public int getNumOfReads(){
+        int num = 0;
+
+        try {
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if(rs.next()){
+                num = rs.getInt("NUM");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+    @Override
+        public int getNumOfReadsCalculate(){
+        int num = 0;
+
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            fetch.setLong(1, this.trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if(rs.next()){
+                num = rs.getInt("NUM");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+    @Override
+    public int getNumOfUniqueSequences(){
+        int num = 0;
+        try {
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK);
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if(rs.next()){
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+
+    /**
+     * Updates the values for number of reads and number of unique sequences
+     * in the statics table of the database.
+     * @param numOfReads calculated total number of reads
+     * @param numOfUniqueSeq calculated total number of unique sequences
+     */
+    @Override
+    public void updateTableStatics(int numOfReads, int numOfUniqueSeq){
+      try {
+            con.setAutoCommit(false);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_STATIC_VALUES);
+            fetch.setInt(1, numOfReads);
+            fetch.setInt(2, numOfUniqueSeq);
+            fetch.setLong(3, trackID);
+            fetch.execute();
+            con.commit();
+            con.setAutoCommit(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    @Override
     public int getNumOfMappedSequences() {
         int num = 0;
         PreparedStatement fetch;
@@ -240,7 +327,7 @@ public class TrackConnector implements ITrackConnector{
                 num = rs.getInt("NUM");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return num;
@@ -252,8 +339,7 @@ public class TrackConnector implements ITrackConnector{
         PreparedStatement fetch;
         try {
 
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE);
-
+            fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE);
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -261,7 +347,7 @@ public class TrackConnector implements ITrackConnector{
                 num = rs.getInt("NUM");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return num;
@@ -287,7 +373,7 @@ public class TrackConnector implements ITrackConnector{
                 numOfBmMappings = rs.getInt("NUM");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return numOfBmMappings;
@@ -310,7 +396,7 @@ public class TrackConnector implements ITrackConnector{
                 numOfBmMappings = rs.getInt("NUM");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return numOfBmMappings;
@@ -446,10 +532,10 @@ public class TrackConnector implements ITrackConnector{
         return num;
     }
 
-    @Override
-    public long getRunId() {
-        return runID;
-    }
+//    @Override
+//    public long getRunId() {
+//        return runID;
+//    }
 
     @Override
     public long getTrackID(){
@@ -586,28 +672,28 @@ public class TrackConnector implements ITrackConnector{
         return snps;
     }
 
-    @Override
-    public List<Read> findReads(String read) {
-        ArrayList<Read> reads = new ArrayList<Read>();
-        try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_READ_POSITION_BY_READNAME);
-            fetch.setString(1, read);
-            fetch.setLong(2, trackID);
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                String name = rs.getString(FieldNames.READ_NAME);
-                int position = rs.getInt(FieldNames.MAPPING_START);
-                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                int isBestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
-
-                Read e = new Read(name, position, errors, isBestMapping);
-                reads.add(e);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return reads;
-    }
+//    @Override
+//    public List<Read> findReads(String read) {
+//        ArrayList<Read> reads = new ArrayList<Read>();
+//        try {
+//            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_READ_POSITION_BY_READNAME);
+//            fetch.setString(1, read);
+//            fetch.setLong(2, trackID);
+//            ResultSet rs = fetch.executeQuery();
+//            while (rs.next()) {
+//                String name = rs.getString(FieldNames.READ_NAME);
+//                int position = rs.getInt(FieldNames.MAPPING_START);
+//                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+//                int isBestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
+//
+//                Read e = new Read(name, position, errors, isBestMapping);
+//                reads.add(e);
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return reads;
+//    }
 
     /*
      * this methods searches for SNPs in the whole genome

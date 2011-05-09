@@ -1,6 +1,6 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
@@ -11,8 +11,8 @@ import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+//import java.util.HashSet;
+//import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,8 +21,8 @@ import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 
 /**
- *
- * @author jstraube
+ * TODO: update parser with correct error handling
+ * @author jstraube, rhilker
  */
 public class BAMParser implements MappingParserI {
 
@@ -32,13 +32,20 @@ public class BAMParser implements MappingParserI {
     private HashMap<Integer, Integer> gapOrderIndex;
     private int errors = 0;
     private HashMap<String, String> mappedRefAndReadPlusGaps = new HashMap<String, String>();
+    private HashMap<String, Integer> seqToIDMap;
+
+    private ArrayList<Observer> observers;
+    private String errorMsg;
 
     public BAMParser() {
-        gapOrderIndex = new HashMap<Integer, Integer>();
+        this.gapOrderIndex = new HashMap<Integer, Integer>();
+        this.seqToIDMap = new HashMap<String, Integer>();
+        this.observers = new ArrayList<Observer>();
     }
 
     @Override
-    public ParsedMappingContainer parseInput(TrackJobs trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
+//    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
+    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         int flag = 0;
         int lineno = 0;
         String readname = null;
@@ -49,6 +56,8 @@ public class BAMParser implements MappingParserI {
         String cigar = null;
         String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
+        int noUniqueReads = 0;
+        int noReads = 0;
 
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
 
@@ -83,7 +92,7 @@ public class BAMParser implements MappingParserI {
 
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")) {
                     //need the stop position
-                    stop = countStopPosition(cigar, start, readSeqwithoutGaps.length() - 1);
+                    stop = this.countStopPosition(cigar, start, readSeqwithoutGaps.length() - 1);
 
                 } else {
 
@@ -94,7 +103,7 @@ public class BAMParser implements MappingParserI {
 
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")) {
 
-                    refSeq = createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
+                    refSeq = this.createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
                     readSeq = mappedRefAndReadPlusGaps.get(refSeq);
                     mappedRefAndReadPlusGaps.clear();
                 } else {
@@ -103,81 +112,101 @@ public class BAMParser implements MappingParserI {
                 }
                 //check parameters
                 if (readname == null || readname.isEmpty()) {
-                    throw new ParsingException("could not read readname in "
-                            + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                            + "Found read name: " + readname);
+                    this.sendErrorMsg("Could not read readname in "
+                          + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                          + "Found read name: " + readname);
+                    continue;
                 }
 
                 if (start >= stop) {
-                    throw new ParsingException("start bigger than stop in "
-                            + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                    this.sendErrorMsg("Start bigger than stop in "
+                            + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                             + "Found start: " + start + ", stop: " + stop);
+                    continue;
                 }
                 if (direction == 0) {
-                    throw new ParsingException("could not parse direction in "
-                            + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                    this.sendErrorMsg("Could not parse direction in "
+                            + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                             + "Must be 0 oder 1");
+                    continue;
                 }
                 if (readSeq == null || readSeq.isEmpty()) {
-                    throw new ParsingException("read sequence could not be parsed in "
-                            + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                    this.sendErrorMsg("Read sequence could not be parsed in "
+                            + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                             + "Found: " + readSeq);
+                    continue;
                 }
                 if (refSeq == null || refSeq.isEmpty()) {
-                    throw new ParsingException("reference sequence could not be parsed in "
-                            + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                    this.sendErrorMsg("Reference sequence could not be parsed in "
+                            + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                             + "Found: " + refSeq);
+                    continue;
                 }
                 if (readSeq.length() != refSeq.length()) {
-                    throw new ParsingException("alignment sequences have different length in "
-                            + "" + trackJob.getFile().getAbsolutePath() + " line " + lineno + "! "
+                    this.sendErrorMsg("Alignment sequences have different length in "
+                            + trackJob.getFile().getAbsolutePath() + " line " + lineno + "! "
                             + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
+                    continue;
                 }
                 if (errors < 0 || errors > readSeq.length()) {
-                    throw new ParsingException("Error number has invalid value " + errors + ""
+                    this.sendErrorMsg("Error number has invalid value " + errors
                             + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                            + "Must be bigger or equal to zero and smaller that alignment length."
-                            + "readname");
+                            + "Must be bigger or equal to zero and smaller than alignment length.");
+                    continue;
                 }
-                if (!readnameToSequenceID.containsKey(readname)) {
-                    throw new ParsingException("Could not find sequence id mapping for read  " + readname + ""
-                            + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
-                            + "Please make sure you are referencing the correct read data set!");
-                }
+//                if (!readnameToSequenceID.containsKey(readname)) {
+//                    throw new ParsingException("Could not find sequence id mapping for read  " + readname + ""
+//                            + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
+//                            + "Please make sure you are referencing the correct read data set!");
+//                }
 
+                // Reads with an error already skip this part because of "continue" statements
+                ++noReads;
                 DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction, cigar);
                 List<ParsedDiff> diffs = result.getDiffs();
                 List<ParsedReferenceGap> gaps = result.getGaps();
 
                 //   System.out.println("error" + errors);
                 ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
-                int seqID = readnameToSequenceID.get(readname);
+                int seqID;
+                if (this.seqToIDMap.containsKey(readSeq)) {
+                    seqID = this.seqToIDMap.get(readSeq);
+                } else {
+                    seqID = ++noUniqueReads; //int seqID = readnameToSequenceID.get(readname);
+                    this.seqToIDMap.put(readSeq, seqID);
+                } //readnameToSequenceID.get(readname);
                 mappingContainer.addParsedMapping(mapping, seqID);
                 if (!itor.hasNext()) {
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Iterator has no more data from \"{0}\"", trackJob.getFile().getAbsolutePath());
                 }
             }
         }
-        HashSet<Integer> s = new HashSet<Integer>();
-        Iterator<Integer> it = readnameToSequenceID.values().iterator();
-        while (it.hasNext()) {
-            int i = it.next();
-            s.add(i);
-        }
-       // it.remove();
+//        HashSet<Integer> s = new HashSet<Integer>();
+//        Iterator<Integer> it = readnameToSequenceID.values().iterator();
+//        while (it.hasNext()) {
+//            int i = it.next();
+//            s.add(i);
+//        }
+//       // it.remove();
+//
+//        int noOfReads = readnameToSequenceID.keySet().size();
+//        int noOfUniqueSeq = s.size();
+//        s.clear();
+//        readnameToSequenceID.clear();
 
-        int noOfReads = readnameToSequenceID.keySet().size();
-        int noOfUniqueSeq = s.size();
-        mappingContainer.setNumberOfReads(noOfReads);
-        mappingContainer.setNumberOfUniqueSeq(noOfUniqueSeq);
-        s.clear();
-        readnameToSequenceID.clear();
-
+        mappingContainer.setNumberOfReads(noReads);//TODO: check if counting is correct here
+        mappingContainer.setNumberOfUniqueSeq(noUniqueReads);
+        this.seqToIDMap = null; //release resources
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
     }
-    //this method save which gap is the first if we have more than one gap
+    
+    /**
+     * This method saves which gap is the first if we have more than one gap.
+     * @param gapPos position of the gap
+     */
     private int getOrderForGap(int gapPos) {
         if (!gapOrderIndex.containsKey(gapPos)) {
             gapOrderIndex.put(gapPos, 0);
@@ -343,9 +372,9 @@ public class BAMParser implements MappingParserI {
                 } else if (c == 'S') {
                     if (index > 3) {
                         //soft clipping of the last bases
-                        newreadSeq = newreadSeq.substring(0, readSeq.length()-Integer.parseInt(subSeq2Val));
+                        newreadSeq = newreadSeq.substring(0, readSeq.length() - Integer.parseInt(subSeq2Val));
                     } else {
-                          //soft clipping of the first bases
+                        //soft clipping of the first bases
                         readPos = readPos + Integer.parseInt(subSeq2Val);
                         softclipped = Integer.parseInt(subSeq2Val);
                     }
@@ -467,7 +496,7 @@ public class BAMParser implements MappingParserI {
     }
 
     @Override
-    public ParsedRun parseInputForReadData(TrackJobs trackJob) throws ParsingException {    
+    public ParsedRun parseInputForReadData(TrackJob trackJob) throws ParsingException {
         String readSeqwithoutGaps = null;
         ParsedRun run = new ParsedRun("descrp");
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -487,9 +516,9 @@ public class BAMParser implements MappingParserI {
         itor = null;
         run.setTimestamp(trackJob.getTimestamp());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from file \"{0}\"", trackJob.getFile().getAbsolutePath());
-        if(run == null){
+        if (run == null) {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "run is empty", trackJob.getFile().getAbsolutePath());
-        }else{
+        } else {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "run is not empty", trackJob.getFile().getAbsolutePath());
         }
         return run;
@@ -497,17 +526,27 @@ public class BAMParser implements MappingParserI {
 
     @Override
     public void registerObserver(Observer observer) {
-        //TODO: to be done
+        this.observers.add(observer);
     }
 
     @Override
     public void removeObserver(Observer observer) {
-        //TODO: to be done
+        this.observers.remove(observer);
     }
 
     @Override
     public void notifyObservers() {
-        //TODO: to be done
+        for (Observer observer : this.observers){
+            observer.update(this.errorMsg);
+        }
     }
-    
+
+    /**
+     * Method setting and sending the error msg to all observers.
+     * @param errorMsg the error msg to send
+     */
+    private void sendErrorMsg(final String errorMsg){
+        this.errorMsg = errorMsg;
+        this.notifyObservers();
+    }
 }
