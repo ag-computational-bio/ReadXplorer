@@ -15,7 +15,6 @@ import org.h2.jdbc.JdbcSQLException;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 // An example action demonstrating how the wizard could be called from within
@@ -67,7 +66,8 @@ public final class LoginWizardAction implements ActionListener{
                     }
                 });
             } catch (SQLException ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LogoutAction.class, "MSG_LoginWizardAction.sqlError"), NotifyDescriptor.ERROR_MESSAGE);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                nd.setTitle(NbBundle.getBundle(LoginWizardAction.class).getString("MSG_LoginWizardAction.sqlError"));
                 DialogDisplayer.getDefault().notify(nd);
             }
         }

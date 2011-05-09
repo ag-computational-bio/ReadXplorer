@@ -1,6 +1,8 @@
 package de.cebitec.vamp.view.login;
 
+import de.cebitec.vamp.util.Properties;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -12,6 +14,7 @@ import javax.swing.JPanel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 public final class LoginVisualPanel extends JPanel {
 
@@ -258,7 +261,7 @@ public final class LoginVisualPanel extends JPanel {
 }//GEN-LAST:event_dbTypeBoxActionPerformed
 
     private void dbChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbChooseButtonActionPerformed
-        JFileChooser fc = new JFileChooser();
+        JFileChooser fc = new JFileChooser(NbPreferences.forModule(Object.class).get(Properties.VAMP_DATABASE_DIRECTORY, null));
         int result = fc.showOpenDialog(this);
 
         Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel.class);
@@ -279,6 +282,12 @@ public final class LoginVisualPanel extends JPanel {
         if (result == 0) {
             // file chosen
             file = fc.getSelectedFile();
+            try { //store current directory
+                NbPreferences.forModule(Object.class).put(Properties.VAMP_DATABASE_DIRECTORY, fc.getCurrentDirectory().getCanonicalPath());
+            } catch (IOException ex) {
+                // do nothing, path is not stored in properties...
+            }
+            
             if(!file.exists()){
                 NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", file.getAbsolutePath()), NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);

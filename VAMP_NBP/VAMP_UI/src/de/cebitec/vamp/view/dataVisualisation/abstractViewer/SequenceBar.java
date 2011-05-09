@@ -15,6 +15,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private int smallBar;
     private StartCodonFilter codonFilter;
     private Preferences pref;
+    private HighlightAreaListener highlightListener;
 
     /**
      * Creates a new sequence bar instance.
@@ -98,9 +101,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * sequence, currently displayed on the screen.
      */
     private void initHighlightListener(){
-        HighlightAreaListener mouseListener = new HighlightAreaListener(this, this.baseLineY, this.offsetY, this.parentViewer);
-        this.addMouseListener(mouseListener);
-        this.addMouseMotionListener(mouseListener);
+        highlightListener = new HighlightAreaListener(this, this.baseLineY, this.offsetY);
+        this.addMouseListener(highlightListener);
+        this.addMouseMotionListener(highlightListener);
     }
 
     public void setGenomeGapManager(GenomeGapManager gapManager) {
@@ -114,6 +117,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     public void boundsChanged() {
         this.adjustMarkingIntervall();
         this.findCodons();
+        this.highlightListener.boundsChangedHook();
     }
 
     @Override
@@ -163,6 +167,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
         if (printSeq) {
             BoundsInfo bounds = parentViewer.getBoundsInfo();
             int logleft = bounds.getLogLeft();
+            if (logleft < 1){ //might happen for very short reference sequences
+                logleft = 1;
+            }
             int logright = bounds.getLogRight();
             for (int i = logleft; i <= logright; i++) {
                 this.drawChar(g, i);
@@ -479,4 +486,39 @@ public class SequenceBar extends JComponent implements HighlightableI {
     public PersistantReference getPersistantReference(){
         return this.refGen;
     }
+
+    /**
+     * @return The bounds info of the parent viewer
+     */
+    public BoundsInfo getViewerBoundsInfo() {
+        return this.parentViewer.getBoundsInfo();
+    }
+
+    /**
+     * @return the base width defined in the parent viewer.
+     */
+    public double getBaseWidth() {
+        return this.parentViewer.getBaseWidth();
+    }
+
+    /**
+     * @return the horizontal margin of the parent viewer.
+     */
+    public int getViewerHorizontalMargin() {
+        return this.parentViewer.getHorizontalMargin();
+    }
+
+    /**
+     * This method is to be called, when a mouse listener associated to this component
+     * registered a mouse moved event.
+     * @param e the mouse event which triggered this call
+     */
+    public void updateMouseListeners(MouseEvent e) {
+        for (MouseMotionListener mml : this.parentViewer.getMouseMotionListeners()){
+            mml.mouseMoved(e);
+            this.setToolTipText(this.parentViewer.getToolTipText());
+        }
+    }
+
+
 }

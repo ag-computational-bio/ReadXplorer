@@ -1,14 +1,12 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
 import de.cebitec.vamp.util.SequenceUtils;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import de.cebitec.vamp.view.dialogMenus.RNAFolderI;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
@@ -26,7 +24,6 @@ public class HighlightAreaListener extends MouseAdapter {
     private final SequenceBar parentComponent;
     private final int baseLineY;
     private final int offsetY;
-    private AbstractViewer grandparentViewer;
     private int startX;
     private boolean keepPainted;
     private boolean freezeRect;
@@ -37,16 +34,15 @@ public class HighlightAreaListener extends MouseAdapter {
     private int seqEnd;
 
     /**
-     * @param graphic the graphics object to paint on
+     * @param parentComponent the component the listener is associated to
+     * @param baseLineY the baseline of the vie
      * @param offsetY the y offset from the middle, which determines where to start painting the
      * highlighting rectangle
      */
-    public HighlightAreaListener(final SequenceBar parentComponent, final int baseLineY,
-                final int offsetY, final AbstractViewer grandparentViewer){
+    public HighlightAreaListener(final SequenceBar parentComponent, final int baseLineY, final int offsetY){
         this.parentComponent = parentComponent;
         this.baseLineY = baseLineY;
         this.offsetY = offsetY;
-        this.grandparentViewer = grandparentViewer;
         this.startX = -1;
         this.keepPainted = false;
         this.freezeRect = false;
@@ -78,7 +74,7 @@ public class HighlightAreaListener extends MouseAdapter {
         if (e.getButton() == MouseEvent.BUTTON1){
             this.freezeRect = false;
             this.keepPainted = true;
-            double baseWidth = this.grandparentViewer.getBaseWidth();
+            double baseWidth = this.parentComponent.getBaseWidth();
             this.startX = (int) (Math.round(e.getX()/baseWidth)*baseWidth);
             int yPos = this.baseLineY - 7;
             this.fwdStrand = e.getY() <= this.baseLineY;
@@ -102,7 +98,7 @@ public class HighlightAreaListener extends MouseAdapter {
         /* update rectangle according to new mouse position & start position
          * only x value of mouse event is important! */
         if (!this.freezeRect){
-            double baseWidth = this.grandparentViewer.getBaseWidth();
+            double baseWidth = this.parentComponent.getBaseWidth();
             int x = (int) (Math.round(e.getX()/baseWidth)*baseWidth);
             int xPos = x <= this.startX ? x : this.startX;
             int yPos = this.baseLineY - 7;
@@ -114,10 +110,18 @@ public class HighlightAreaListener extends MouseAdapter {
 
     @Override
     public void mouseMoved(MouseEvent e){
-        for (MouseMotionListener mml : grandparentViewer.getMouseMotionListeners()){
-            mml.mouseMoved(e);
-            parentComponent.setToolTipText(grandparentViewer.getToolTipText());
-        }
+        this.parentComponent.updateMouseListeners(e);
+    }
+
+    /**
+     * Should be called when the bounds of the parent component changed their hook.
+     * We don't want the rectangle to remain in that case.
+     * TODO: Implement that rectangle moves with bounds.
+     */
+    public void boundsChangedHook(){
+        this.keepPainted = false;
+        this.freezeRect = false;
+        this.setHighlightRectangle(null);
     }
 
     /**
@@ -162,10 +166,10 @@ public class HighlightAreaListener extends MouseAdapter {
      * @return the highlighted sequence
      */
     private String getMarkedSequence() {
-        BoundsInfo bounds = grandparentViewer.getBoundsInfo();
-        final double baseWidth = grandparentViewer.getBaseWidth();
+        BoundsInfo bounds = parentComponent.getViewerBoundsInfo();
+        final double baseWidth = parentComponent.getBaseWidth();
         final String seq = parentComponent.getPersistantReference().getSequence();
-        int logleft = bounds.getLogLeft() - 1 + (int) (Math.round((highlightRect.x - grandparentViewer.getHorizontalMargin()) / baseWidth));
+        int logleft = bounds.getLogLeft() - 1 +  Math.round((float) ((highlightRect.x - parentComponent.getViewerHorizontalMargin()) / baseWidth));
         int logright = logleft + (int) (Math.round(highlightRect.width / baseWidth));
         logleft = logleft < 0 ? 0 : logleft;
         logright = logright > seq.length() ? seq.length() : logright;
@@ -184,6 +188,6 @@ public class HighlightAreaListener extends MouseAdapter {
      */
     private String getHeader() {
         final String strand = fwdStrand ? ">>" : "<<";
-        return grandparentViewer.getReference().getName()+" ("+strand+" " + seqStart + "-" + seqEnd + ")";
+        return this.parentComponent.getPersistantReference().getName()+" ("+strand+" " + seqStart + "-" + seqEnd + ")";
     }
 }
