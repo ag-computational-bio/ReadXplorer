@@ -11,7 +11,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
@@ -51,6 +50,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @param sequence the sequence to store as fasta
      * @param feature the feature whose sequence is to be converted to fasta
      *                it contains the header information, but not the sequence
+     * @return jmenuitem for storing a sequence in fasta format
      */
     public JMenuItem getStoreFastaItem(final String sequence, final PersistantFeature feature){
         return this.initStoreFastaItem(sequence, feature, -1, -1);
@@ -63,6 +63,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @param sequence the sequence to store as fasta
      * @param seqStart the startpoint of the sequence
      * @param seqStop the endpoint of the sequence
+     * @return jmenuitem for storing a sequence in fasta format
      */
     public JMenuItem getStoreFastaItem(final String sequence, final int seqStart, final int seqStop){
         return this.initStoreFastaItem(sequence, null, seqStart, seqStop);
@@ -114,10 +115,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for calculating a possible folding of the selected DNA
      * sequence with RNAFold.
      * The sequence to fold has to be known already!
+     * @param rnaFolderControl instance of an rnafoldercontroller
      * @param sequenceToFold the DNA/RNA sequence to fold with RNAFold
-     * @param refName name of the reference
-     * @param start start position of the sequence
-     * @param stop stop position of the sequence
+     * @param header header string used for describing the folded rna
      * @return the menu item for RNA folding
      */
     public JMenuItem getRNAFoldItem(final RNAFolderI rnaFolderControl, final String sequenceToFold, final String header) {

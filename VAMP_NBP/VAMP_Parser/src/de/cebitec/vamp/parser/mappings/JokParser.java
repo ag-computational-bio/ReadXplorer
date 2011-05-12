@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  *
  * @author ddoppmeier
  */
-public class JokParser implements MappingParserI {
+public class JokParser implements MappingParserI, Observer {
 
     private static String name = "Jok Output Parser";
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
@@ -35,6 +35,7 @@ public class JokParser implements MappingParserI {
 
     private ArrayList<Observer> observers;
     private String errorMsg;
+    private int noUniqueMappings;
 
     public JokParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
@@ -46,6 +47,7 @@ public class JokParser implements MappingParserI {
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
+        mappingContainer.registerObserver(this);
         //  ParsedRun run = new ParsedRun("");
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -54,8 +56,8 @@ public class JokParser implements MappingParserI {
 
             int lineno = 0;
             String line = null;
-            int noUniqueReads = 0;
-            int noReads = 0;
+            int noUniqueSeq = 0;
+            this.noUniqueMappings = 0;
             while ((line = br.readLine()) != null) {
                 lineno++;
 
@@ -148,14 +150,14 @@ public class JokParser implements MappingParserI {
 
 
                     // Reads with an error already skip this part because of "continue" statements
-                    ++noReads;
+                    //++noReads; //would be the count mappings
                     // parse read
                     DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
                     //dont ask me why but we have to do it
                     if (!gaps.isEmpty() || !diffs.isEmpty()) {
-                        stop = stop - 1;
+                        stop -= 1;
                     }
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
@@ -163,7 +165,7 @@ public class JokParser implements MappingParserI {
                     if (this.seqToIDMap.containsKey(readSeq)) {
                         seqID = this.seqToIDMap.get(readSeq);
                     } else {
-                        seqID = ++noUniqueReads; //int seqID = readnameToSequenceID.get(readname);
+                        seqID = ++noUniqueSeq; //int seqID = readnameToSequenceID.get(readname);
                         this.seqToIDMap.put(readSeq, seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
@@ -182,12 +184,12 @@ public class JokParser implements MappingParserI {
 //            int noOfReads = readnameToSequenceID.keySet().size();
 //            int noOfUniqueSeq = s.size();
 
-            mappingContainer.setNumberOfReads(noReads);
-            mappingContainer.setNumberOfUniqueSeq(noUniqueReads);
+            mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
+            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
 //            s.clear();
 //            readnameToSequenceID.clear();
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueReads});
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueSeq});
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -339,6 +341,13 @@ public class JokParser implements MappingParserI {
     private void sendErrorMsg(final String errorMsg){
         this.errorMsg = errorMsg;
         this.notifyObservers();
+    }
+
+    @Override
+    public void update(Object args) {
+       if (args instanceof Boolean && (Boolean) args == true){
+            ++this.noUniqueMappings;
+        }
     }
     
 }

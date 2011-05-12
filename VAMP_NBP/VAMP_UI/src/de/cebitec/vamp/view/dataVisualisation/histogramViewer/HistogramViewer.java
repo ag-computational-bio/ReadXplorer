@@ -491,7 +491,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             gapNo += num;
             i++;
         }
-        upperBound = upperBound - gapNo;
+        upperBound -= gapNo;
         this.getBoundsInfo().correctLogRight(upperBound);
     }
 
@@ -607,7 +607,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         int tmp = (int) mouseAreaLeft.getPhysWidth();
         // if currentPosition is a gap, the following bases to the right marks the same position!
         if (isInDrawingMode() && gapManager.hasGapAt(position)) {
-            tmp = tmp * (gapManager.getNumOfGapsAt(position) + 1);
+            tmp *= (gapManager.getNumOfGapsAt(position) + 1);
         }
         return tmp;
     }

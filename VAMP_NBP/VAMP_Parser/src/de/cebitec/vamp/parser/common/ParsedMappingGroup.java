@@ -1,5 +1,7 @@
 package de.cebitec.vamp.parser.common;
 
+import de.cebitec.vamp.util.Observable;
+import de.cebitec.vamp.util.Observer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,13 +10,16 @@ import java.util.List;
  *
  * @author ddoppmeier
  */
-public class ParsedMappingGroup {
+public class ParsedMappingGroup implements Observable {
 
     private ArrayList<ParsedMapping> mappings;
     private int minError;
     private boolean bestMappingTagged;
+    private boolean hasNewRead; //set true when new read was added until this variable was send to the observers
+    private ArrayList<Observer> observers;
 
     public ParsedMappingGroup(){
+        observers = new ArrayList<Observer>();
         mappings = new ArrayList<ParsedMapping>();
         minError = Integer.MAX_VALUE;
         bestMappingTagged = true;
@@ -31,6 +36,8 @@ public class ParsedMappingGroup {
             if(mapping.getErrors() < minError){
                 minError = mapping.getErrors();
             }
+            this.hasNewRead = true;
+            this.notifyObservers();
         }
     }
 
@@ -53,6 +60,24 @@ public class ParsedMappingGroup {
             tagBestMatches();
         }
         return mappings;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(this.hasNewRead);
+        }
+        this.hasNewRead = false;
     }
 
 }

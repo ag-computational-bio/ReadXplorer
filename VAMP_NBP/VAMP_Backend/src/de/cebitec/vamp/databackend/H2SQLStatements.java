@@ -128,10 +128,11 @@ public class H2SQLStatements {
             + FieldNames.STATICS_NUMBER_OF_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.STATICS_NUMBER_OF_PERFECT_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.STATICS_NUMBER_OF_BM_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_NUMBER_OF_MAPPED_SEQ + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.STATICS_PERFECT_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.STATICS_BM_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL "
+            + FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ + " BIGINT UNSIGNED  "
             + ") ";
 
     public final static String INDEX_TRACKS =
@@ -214,15 +215,14 @@ public class H2SQLStatements {
             FieldNames.STATICS_NUMBER_OF_MAPPINGS +", " +
             FieldNames.STATICS_NUMBER_OF_PERFECT_MAPPINGS +", " +
             FieldNames.STATICS_NUMBER_OF_BM_MAPPINGS +", " +
-            FieldNames.STATICS_NUMBER_OF_MAPPED_SEQ+ ", "+
+            FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS+", " +
             FieldNames.STATICS_PERFECT_COVERAGE_OF_GENOME+", " +
             FieldNames.STATICS_BM_COVERAGE_OF_GENOME+", " +
             FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME+", " +
-            FieldNames.STATICS_NUMBER_OF_READS+", " +
-            FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+" " +
+            FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+ " "+
 
             ") " +
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+            "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
 
     public final static String INSERT_MAPPING =
@@ -297,7 +297,7 @@ public class H2SQLStatements {
         public final static String UPDATE_STATIC_VALUES =
             "UPDATE "+FieldNames.TABLE_STATICS+" " +
             "SET " +
-            FieldNames.STATICS_NUMBER_OF_READS+" = ? , " +
+            FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS+" = ? , " +
             FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ+"  = ?" +
             "WHERE " +
                 FieldNames.TRACK_ID+" = ? " ;
@@ -398,7 +398,7 @@ public class H2SQLStatements {
             "ALTER TABLE "+
                 FieldNames.TABLE_STATICS+" " +
             "ADD COLUMN "+
-                FieldNames.STATICS_NUMBER_OF_READS+" BIGINT UNSIGNED " ;
+                FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS+" BIGINT UNSIGNED " ;
 
      /*     public final static String ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ =
             "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
@@ -629,9 +629,9 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
 //                "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
 
 
-    public final static String FETCH_NUM_OF_READS_FOR_TRACK =
+    public final static String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK =
         "SELECT " +
-            "S."+ FieldNames.STATICS_NUMBER_OF_READS+" as NUM " +
+            "S."+ FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS+" as NUM " +
         "FROM "+
             FieldNames.TABLE_STATICS+" as S " +
         " WHERE "+
@@ -646,15 +646,22 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
         "WHERE "+
             "S."+FieldNames.TRACK_ID+" = ?" ;
 
-
-
-    public final static String FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK =
+       public static final String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT " +
-            FieldNames.STATICS_NUMBER_OF_MAPPED_SEQ +" as Num "+
-            " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                "COUNT(DISTINCT M."+FieldNames.MAPPING_ID+") as NUM " +
+            "FROM "+
+                FieldNames.TABLE_MAPPINGS + " as M " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "M."+FieldNames.MAPPING_TRACK+" = ?";
+
+
+//    public final static String FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK =
+//            "SELECT " +
+//            FieldNames.STATICS_NUMBER_OF_MAPPED_SEQ +" as Num "+
+//            " FROM "+
+//                FieldNames.TABLE_STATICS+" as S " +
+//            "WHERE "+
+//                "S."+FieldNames.STATICS_TRACK+" = ?";
 
 
     public final static String FETCH_NUM_BM_MAPPINGS_FOR_TRACK =

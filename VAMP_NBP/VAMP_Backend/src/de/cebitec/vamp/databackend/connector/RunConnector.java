@@ -64,7 +64,7 @@ public class RunConnector {
         int num = 0;
 
         try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK);
             fetch.setLong(1, this.runID);
 
             ResultSet rs = fetch.executeQuery();
@@ -84,7 +84,7 @@ public class RunConnector {
         int num = 0;
 
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE);
             fetch.setLong(1, this.runID);
 
             ResultSet rs = fetch.executeQuery();
@@ -128,7 +128,7 @@ public class RunConnector {
     public int getNumberOfUniqueSequencesCalculate() {
         int num = 0;
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE);
             fetch.setLong(1, this.runID);
 
             ResultSet rs = fetch.executeQuery();

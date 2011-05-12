@@ -21,73 +21,87 @@ public interface ITrackConnector {
 
     public Collection<PersistantMapping> getMappings(int from, int to);
 
-    public void addCoverageRequest(CoverageRequest request) ;
+    public void addCoverageRequest(CoverageRequest request);
 
-    public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) ;
+    public Collection<PersistantDiff> getDiffsForIntervall(int from, int to);
 
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to);
 
     public void updateTableStatics(int numOfReads, int numOfUniqueSeq);
 
+    /**
+     * @return
+     * @deprecated Since the RUN domain has been excluded from vamp
+     */
+    @Deprecated
     public int getNumOfReads();
 
+    /**
+     * @return 
+     * @deprecated Since the RUN domain has been excluded from vamp
+     */
+    @Deprecated
     public int getNumOfReadsCalculate();
+
+    public int getNumOfMappings();
+
+    public int getNumOfMappingsCalculate();
+
+    public int getNumOfUniqueMappings();
+
+    public int getNumOfUniqueMappingsCalculate();
 
     public int getNumOfUniqueSequences();
 
-    public int getNumOfMappedSequences();
+    public int getNumOfUniqueSequencesCalculate();
 
-    public int getNumOfMappedSequencesCalculate();
+    public int getNumOfPerfectUniqueMappings();
+
+    public int getNumOfPerfectUniqueMappingsCalculate();
 
     public int getNumOfUniqueBmMappings();
 
     public int getNumOfUniqueBmMappingsCalculate();
 
-    public int getNumOfUniqueMappings() ;
+    public void setStatics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
+                            int numPerfectMappings, int numBestMatchMappings, double coveragePerf,
+                            double coverageBM, double coverageComplete);
 
-    public int getNumOfUniqueMappingsCalculate();
+    //public long getRunId();
+    public long getTrackID();
 
-    public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete,int numOfReads, int numOfUniqueSeq);
+    public String getAssociatedTrackName();
 
-     public int getNumOfPerfectUniqueMappings();
-
-     public int getNumOfPerfectUniqueMappingsCalculate();
-
-     //public long getRunId();
-
-     public long getTrackID();
-
-     public String getAssociatedTrackName() ;
-
-     //public List<Read> findReads(String read) ;
-
-     /**
-      * Returns all unique reads containing the given sequence.
-      * Sequence cannot be longer than the readlength.
-      * TODO: should also return all positions of the reads
-      * @param sequence the sequence to search for
-      * @return
-      */
+        /**
+     * Returns all unique reads containing the given sequence.
+     * Sequence cannot be longer than the readlength.
+     * TODO: should also return all positions of the reads
+     * @param sequence the sequence to search for
+     * @return
+     */
 //     public List<Read> findSequence(String sequence) ;
 
-     public List<Snp> findSNPs(int percentageThreshold, int absThreshold) ;
+    //public List<Read> findReads(String read) ;
 
-     public double getPercentRefGenPerfectCovered();
+    /**
+     * identifies SNPs.
+     * @param percentageThreshold
+     * @param absThreshold
+     * @return
+     */
+    public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
 
-     public double getPercentRefGenPerfectCoveredCalculate() ;
+    public double getPercentRefGenPerfectCovered();
 
-     public double getPercentRefGenBmCovered() ;
+    public double getPercentRefGenPerfectCoveredCalculate();
 
-     public double getPercentRefGenBmCoveredCalculate();
+    public double getPercentRefGenBmCovered();
 
-     public double getPercentRefGenNErrorCovered() ;
+    public double getPercentRefGenBmCoveredCalculate();
 
-     public double getPercentRefGenNErrorCoveredCalculate() ;
+    public double getPercentRefGenNErrorCovered();
 
-     public HashMap<Integer,Integer> getCoverageInfosofTrack(int from , int to);
+    public double getPercentRefGenNErrorCoveredCalculate();
 
-
-
-
-
+    public HashMap<Integer, Integer> getCoverageInfosofTrack(int from, int to);
 }

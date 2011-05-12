@@ -130,10 +130,10 @@ public class FieldNames {
    // statics table fields
     public final static String STATICS_ID = "ID";
     public final static String STATICS_TRACK = "TRACK_ID";
-    public final static String STATICS_NUMBER_OF_READS = "NUMBER_OF_READS";
+    public final static String STATICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
     public final static String STATICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
     public final static String STATICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
+//    public final static String STATICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
     public final static String STATICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
     public final static String STATICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
     public final static String STATICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";

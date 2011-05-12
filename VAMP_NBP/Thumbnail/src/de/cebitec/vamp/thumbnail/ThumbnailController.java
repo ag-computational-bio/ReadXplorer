@@ -269,7 +269,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         // create track viewer
         MultiTrackConnector tc = new MultiTrackConnector(track);
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, (BasePanel) b, controller.getCurrentRefGen(), tc);
+        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc);
         int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
         trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
 
@@ -695,7 +695,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         void startCompare(ActionEvent e) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
-                ArrayList<PersistantTrack> trackList = new ArrayList();
+                ArrayList<PersistantTrack> trackList = new ArrayList<PersistantTrack>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
                 compareTwoTracks(trackList, currentFeature);
