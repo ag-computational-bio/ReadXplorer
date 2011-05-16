@@ -8,9 +8,9 @@ package de.cebitec.vamp.util;
 import java.util.HashMap;
 
 /**
- * @author Rolf Hilker
- *
  * Storage for all start and stop codons of the different genetic codes.
+ * 
+ * @author Rolf Hilker
  */
 public final class GeneticCodesStore {
 
@@ -30,8 +30,7 @@ public final class GeneticCodesStore {
 /*14*/      "Alternative Flatworm Mitochondrial",
 /*15,16*/   "Blepharisma Macronuclear; Chlorophycean Mitochondrial",
 /*22*/      "Scenedesmus obliquus mitochondrial",
-/*23*/      "Thraustochytrium mitochondrial code",
-/*empty*/   "" // special case, if no value set yet, the standard codons should be selected.
+/*23*/      "Thraustochytrium mitochondrial code"
     };
 
     private static final String[][] START_CODONS = {
@@ -48,8 +47,7 @@ public final class GeneticCodesStore {
 /*14*/      { "ATG" },
 /*15, 16*/  { "ATG" },
 /*22*/      { "ATG" },
-/*23*/      { "ATT", "ATG", "GTG" },
-/*empty*/   { "TTG", "CTG", "ATG" }
+/*23*/      { "ATT", "ATG", "GTG" }
     };
 
     private static final String[][] STOP_CODONS = {
@@ -66,8 +64,7 @@ public final class GeneticCodesStore {
 /*14*/      { "TAG" },
 /*15, 16*/  { "TAA", "TGA" },
 /*22*/      { "TCA", "TAA", "TGA" },
-/*23*/      { "TTA", "TAA", "TAG", "TGA" },
-/*empty*/   { "TAA", "TAG", "TGA" }
+/*23*/      { "TTA", "TAA", "TAG", "TGA" }
     };
 
     /**
@@ -100,5 +97,13 @@ public final class GeneticCodesStore {
         return GeneticCodesStore.IDENTIFIERS.clone();
     }
 
-
+    /**
+     * Returns the array of start codons. The order is the same to the IDENTIFIERS
+     * array.
+     * @return the array of start codons. The order is the same to the IDENTIFIERS
+     * array.
+     */
+    public static String[][] getStartCodons(){
+        return GeneticCodesStore.START_CODONS.clone();
+    }
 }

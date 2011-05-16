@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<actions>
+  <menu name="File" mnemonic="F">
+    <action class="de.unibi.bibiserv.rnamovies.actions.OpenAction"
+            key="O" modifier="2"
+            toolBar="true"/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.ImportAction"
+            key="I" modifier="2"/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.Export"
+            key="S" modifier="2"/>
+    <separator/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.Config"
+            key="C" modifier="2"/>
+    <separator/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.Quit"
+            key="Q" modifier="2"/>
+  </menu>
+  <menu name="Movie" mnemonic="M">
+     <action class="de.unibi.bibiserv.rnamovies.actions.StartAction"
+             key="P" modifier="0"
+             toolBar="true"/>
+     <action class="de.unibi.bibiserv.rnamovies.actions.StopAction"
+             key="S" modifier="0"
+             toolBar="true"/>
+     <action class="de.unibi.bibiserv.rnamovies.actions.BSkip"
+             key="B" modifier="0"
+             toolBar="true"/>
+     <action class="de.unibi.bibiserv.rnamovies.actions.FSkip"
+             key="F" modifier="0"
+             toolBar="true"/>
+     <separator/>
+     <action class="de.unibi.bibiserv.rnamovies.actions.Goto"
+             key="G" modifier="2"
+             toolBar="false"/>
+  </menu>
+  <menu name="View" mnemonic="V">
+    <action class="de.unibi.bibiserv.rnamovies.actions.ZoomIn"
+            key="Z" modifier="2"/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.ZoomOut"
+            key="U" modifier="2"/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.ZoomFit"
+            key="F" modifier="2"/>
+    <separator/>
+    <action class="de.unibi.bibiserv.rnamovies.actions.Reset"
+            key="R" modifier="2"/>
+  </menu>
+  <menu name="Help" mnemonic="H">
+    <action class="de.unibi.bibiserv.rnamovies.actions.About"
+            key="A" modifier="2"
+            toolBar="false"/>
+  </menu>
+</actions>

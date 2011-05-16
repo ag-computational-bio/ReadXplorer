@@ -87,7 +87,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         refJobView = new de.cebitec.vamp.ui.importer.RefJobView();
         trackJobView = new de.cebitec.vamp.ui.importer.TrackJobView();
-        newJob = new javax.swing.JButton();
+        addJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
         jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -98,10 +98,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
         jTabbedPane1.addTab("References", refJobView);
         jTabbedPane1.addTab("Tracks", trackJobView);
 
-        newJob.setText(org.openide.util.NbBundle.getMessage(ImportSetupCard.class, "ImportSetupCard.button.newJob")); // NOI18N
-        newJob.addActionListener(new java.awt.event.ActionListener() {
+        addJob.setText(org.openide.util.NbBundle.getMessage(ImportSetupCard.class, "ImportSetupCard.button.newJob")); // NOI18N
+        addJob.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newJobActionPerformed(evt);
+                addJobActionPerformed(evt);
             }
         });
 
@@ -117,12 +117,12 @@ public class ImportSetupCard extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(304, Short.MAX_VALUE)
                 .addComponent(removeJob)
                 .addGap(7, 7, 7)
-                .addComponent(newJob)
+                .addComponent(addJob)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -131,13 +131,13 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(newJob, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addJob, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(removeJob, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(17, 17, 17))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void newJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newJobActionPerformed
+    private void addJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobActionPerformed
         Component c = jTabbedPane1.getSelectedComponent();
         if(c != null){
             String title;
@@ -186,7 +186,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         } else{
             // do nothing
         }
-}//GEN-LAST:event_newJobActionPerformed
+}//GEN-LAST:event_addJobActionPerformed
 
     private void removeJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeJobActionPerformed
         Component c = jTabbedPane1.getSelectedComponent();
@@ -228,8 +228,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addJob;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JButton newJob;
     private de.cebitec.vamp.ui.importer.RefJobView refJobView;
     private javax.swing.JButton removeJob;
     private de.cebitec.vamp.ui.importer.TrackJobView trackJobView;

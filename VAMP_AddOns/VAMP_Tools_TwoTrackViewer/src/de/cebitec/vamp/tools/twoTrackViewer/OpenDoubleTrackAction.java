@@ -3,7 +3,7 @@ package de.cebitec.vamp.tools.twoTrackViewer;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogPanels.OpenTrackPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTrackPanel;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -31,12 +31,14 @@ public final class OpenDoubleTrackAction implements ActionListener {
 
         // check if two tracks were selected
         boolean okSelected = false;
-        while (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().size() != 2){
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().size() == 2) {
+            okSelected = true;
+        } else {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks.", NotifyDescriptor.INFORMATION_MESSAGE));
             openRefGenDialog.setVisible(true);
             okSelected = true;
         }
-        if (okSelected){
+        if (okSelected) {
             ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
             BasePanelFactory factory = viewCon.getBasePanelFac();
             factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), context.getReference());

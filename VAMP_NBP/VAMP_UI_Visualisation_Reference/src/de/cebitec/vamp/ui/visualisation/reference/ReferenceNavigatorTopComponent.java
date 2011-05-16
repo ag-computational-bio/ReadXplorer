@@ -106,6 +106,7 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
         resultChanged(new LookupEvent(result));
     }
 
+
     @Override
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer refViewer : result.allInstances()) {

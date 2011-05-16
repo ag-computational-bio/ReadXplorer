@@ -7,6 +7,7 @@ package de.cebitec.vamp.options;
 import org.openide.util.NbPreferences;
 import de.cebitec.vamp.util.GeneticCodesStore;
 import de.cebitec.vamp.util.Properties;
+import javax.swing.ListSelectionModel;
 
 /**
  * @author Rolf Hilker
@@ -22,7 +23,6 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         this.controller = controller;
         this.initComponents();
         this.initChooseCodeComboBox();
-        // TODO listen to changes in form fields and call controller.changed()
     }
 
     /** This method is called from within the constructor to
@@ -34,73 +34,91 @@ final class GeneticCodePanel extends javax.swing.JPanel {
     private void initComponents() {
 
         chooseCodeLabel = new javax.swing.JLabel();
-        chooseCodeComboBox = new javax.swing.JComboBox();
+        geneticCodeScrolPane = new javax.swing.JScrollPane();
+        geneticCodeList = new javax.swing.JList();
 
         org.openide.awt.Mnemonics.setLocalizedText(chooseCodeLabel, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.chooseCodeLabel.text")); // NOI18N
 
-        chooseCodeComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chooseCodeComboBoxActionPerformed(evt);
-            }
-        });
+        geneticCodeScrolPane.setViewportView(geneticCodeList);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(chooseCodeComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chooseCodeLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
+                    .addComponent(chooseCodeLabel))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(chooseCodeLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chooseCodeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(91, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void chooseCodeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseCodeComboBoxActionPerformed
-        //nothing to do here
-    }//GEN-LAST:event_chooseCodeComboBoxActionPerformed
-
     void load() {
-        // TODO read settings and initialize GUI
-        // Example:        
-        // someCheckBox.setSelected(Preferences.userNodeForPackage(GeneticCodePanel.class).getBoolean("someFlag", false));
-        // or for org.openide.util with API spec. version >= 7.4:
-        // someCheckBox.setSelected(NbPreferences.forModule(GeneticCodePanel.class).getBoolean("someFlag", false));
-        // or:
-        // someTextField.setText(SomeSystemOption.getDefault().getSomeStringProperty());
+        this.geneticCodeList.setSelectedIndex(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.GENETIC_CODE_INDEX, "0")));
     }
 
     void store() {
         // store modified settings
-        NbPreferences.forModule(Object.class).put(Properties.SEL_GENETIC_CODE, chooseCodeComboBox.getSelectedItem().toString());
+        // remember selected indices in geneticCodeList have to be conform with GeneticCodesStore order!
+        String identifier = GeneticCodesStore.getGeneticCodeIdentifiers()[geneticCodeList.getSelectedIndex()];
+        NbPreferences.forModule(Object.class).put(Properties.SEL_GENETIC_CODE, identifier);
+        NbPreferences.forModule(Object.class).put(Properties.GENETIC_CODE_INDEX, String.valueOf(geneticCodeList.getSelectedIndex()));
     }
 
     boolean valid() {
-        // TODO check whether form is consistent and complete
+        // checks whether form is consistent and complete
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox chooseCodeComboBox;
     private javax.swing.JLabel chooseCodeLabel;
+    private javax.swing.JList geneticCodeList;
+    private javax.swing.JScrollPane geneticCodeScrolPane;
     // End of variables declaration//GEN-END:variables
 
     /**
      * Creates the content of the combo box containing the genetic codes.
      */
     private void initChooseCodeComboBox() {
+        this.geneticCodeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         final String[] identifiers = GeneticCodesStore.getGeneticCodeIdentifiers();
+        final String[][] geneticCodes = GeneticCodesStore.getStartCodons();
+        final String[] geneticCodesData = new String[identifiers.length];
+        
+        String[] startCodons;
+        String startCodonsConcat;
         for (int i=0; i<identifiers.length; ++i){
-            this.chooseCodeComboBox.addItem(identifiers[i]);
+            startCodons = geneticCodes[i];
+            startCodonsConcat = "<html><b>(";
+            for (int j=0; j<startCodons.length; ++j){
+                startCodonsConcat = startCodonsConcat.concat(startCodons[j].concat(", "));
+            }
+            startCodonsConcat = startCodonsConcat.substring(0, startCodonsConcat.length()-2);
+            geneticCodesData[i] = startCodonsConcat.concat(")</b> - <i>").concat(identifiers[i]).concat("</i></html>");
         }
+        
+        this.geneticCodeList.setModel(new javax.swing.AbstractListModel() {
+            String[] geneticCodesDataModel = geneticCodesData.clone();
+
+            @Override
+            public int getSize() { 
+                return this.geneticCodesDataModel.length;
+            }
+
+            @Override
+            public Object getElementAt(int i) { 
+                return this.geneticCodesDataModel[i];
+            }
+        });
     }
 }

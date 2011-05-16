@@ -39,6 +39,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>de.cebitec.vamp.libs</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>de.cebitec.vamp.parser</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -130,13 +138,16 @@
             </module-dependencies>
             <public-packages>
                 <package>de.cebitec.vamp.controller</package>
+                <package>de.cebitec.vamp.view</package>
                 <package>de.cebitec.vamp.view.dataVisualisation</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.abstractViewer</package>
+                <package>de.cebitec.vamp.view.dataVisualisation.alignmentViewer</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.basePanel</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.histogramViewer</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.referenceViewer</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.trackViewer</package>
-                <package>de.cebitec.vamp.view.dialogPanels</package>
+                <package>de.cebitec.vamp.view.dialogMenus</package>
+                <package>de.cebitec.vamp.view.login</package>
             </public-packages>
         </data>
     </configuration>

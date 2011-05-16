@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -42,14 +43,15 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private static final String PREFERRED_ID = "AppPanelTopComponent";
     private static final long serialVersionUID = 1L;
     private InstanceContent content = new InstanceContent();
+    private Lookup localLookup;
 
     public AppPanelTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
         setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
-        associateLookup(new AbstractLookup(content));
+        localLookup = new AbstractLookup(content);
+        associateLookup(localLookup);
     }
 
     private void clearLookup(){
@@ -166,6 +168,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         }
     }
 
+   
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
@@ -191,6 +194,11 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         return PREFERRED_ID;
     }
 
+    @Override
+    public Lookup getLookup() {
+        return localLookup;
+    }
+
     // ===================== AppFrameI stuff ============================== //
 
     @Override
@@ -198,7 +206,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.add(refGenPanel);
         visualPanel.updateUI();
 
-        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
+        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();//TODO: wieso null pointer?
         WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
         WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").open();
 

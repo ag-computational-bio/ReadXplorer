@@ -11,10 +11,10 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
+import org.h2.jdbc.JdbcSQLException;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 // An example action demonstrating how the wizard could be called from within
@@ -34,8 +34,8 @@ public final class LoginWizardAction implements ActionListener{
         if (loggedIn){
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
-            // TODO find a way to do an automatic logout below
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please log out first.", NotifyDescriptor.WARNING_MESSAGE));
+            // TODO: find a way to do an automatic logout below
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.warning.doubleLogin"), NotifyDescriptor.WARNING_MESSAGE));
             return;
         }
 
@@ -66,7 +66,9 @@ public final class LoginWizardAction implements ActionListener{
                     }
                 });
             } catch (SQLException ex) {
-                Exceptions.printStackTrace(ex);
+                NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                nd.setTitle(NbBundle.getBundle(LoginWizardAction.class).getString("MSG_LoginWizardAction.sqlError"));
+                DialogDisplayer.getDefault().notify(nd);
             }
         }
     }

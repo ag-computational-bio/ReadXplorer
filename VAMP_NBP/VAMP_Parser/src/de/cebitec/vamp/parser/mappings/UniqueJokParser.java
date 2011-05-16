@@ -8,6 +8,7 @@ import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
 import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -259,6 +260,21 @@ public class UniqueJokParser implements MappingParserI{
         run.setTimestamp(trackJob.getTimestamp());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed");
         return run;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        //TODO: to be done
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        //TODO: to be done
+    }
+
+    @Override
+    public void notifyObservers() {
+        //TODO: to be done
     }
 
 }

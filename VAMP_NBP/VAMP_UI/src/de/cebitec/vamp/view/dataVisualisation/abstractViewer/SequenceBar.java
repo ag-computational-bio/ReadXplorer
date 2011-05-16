@@ -6,11 +6,17 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.view.dataVisualisation.HighlightAreaListener;
+import de.cebitec.vamp.view.dataVisualisation.HighlightableI;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +30,7 @@ import org.openide.util.NbPreferences;
  *
  * @author ddoppmeier, rhilker
  */
-public class SequenceBar extends JComponent {
+public class SequenceBar extends JComponent implements HighlightableI {
 
     private static final long serialVersionUID = 23446398;
     private int height = 50;
@@ -34,9 +40,10 @@ public class SequenceBar extends JComponent {
     private FontMetrics metrics;
     private boolean printSeq;
     private int baseLineY;
+    private int offsetY;
+    private Rectangle highlightRect;
     private GenomeGapManager gapManager;
     private List<Region> regionsToHighlight;
-    int bla = 0;
     // the width in bases (logical positions), that is used for marking
     // a value of 100 means every 100th base is marked by a large and every 50th
     // base is marked by a small bar
@@ -46,7 +53,7 @@ public class SequenceBar extends JComponent {
     private int smallBar;
     private StartCodonFilter codonFilter;
     private Preferences pref;
-    private ArrayList<BaseBackground> backgroundBoxes;
+    private HighlightAreaListener highlightListener;
 
     /**
      * Creates a new sequence bar instance.
@@ -60,22 +67,23 @@ public class SequenceBar extends JComponent {
         this.font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
         this.refGen = refGen;
         this.baseLineY = 30;
+        this.offsetY = 10;
         this.largeBar = 11;
         this.smallBar = 7;
         this.markingWidth = 10;
         this.halfMarkingWidth = markingWidth / 2;
         this.regionsToHighlight = new ArrayList<Region>();
-        this.backgroundBoxes = new ArrayList<BaseBackground>();
         this.codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
-        this.initListener();
+        this.initPrefListener();
+        this.initHighlightListener();
     }
 
      /**
      * Updates the sequence bar according to the genetic code chosen.
-     * After changing the genetic code, no start codons should be selected
-      * anymore.
+     * After changing the genetic code, no start codons are be selected
+     * anymore.
      */
-    private void initListener() {
+    private void initPrefListener() {
         this.pref = NbPreferences.forModule(Object.class);
         this.pref.addPreferenceChangeListener(new PreferenceChangeListener() {
             @Override
@@ -88,13 +96,28 @@ public class SequenceBar extends JComponent {
         });
     }
 
+    /**
+     * Adds a mouse listener to this sequence bar, which allows selecting the
+     * sequence, currently displayed on the screen.
+     */
+    private void initHighlightListener(){
+        highlightListener = new HighlightAreaListener(this, this.baseLineY, this.offsetY);
+        this.addMouseListener(highlightListener);
+        this.addMouseMotionListener(highlightListener);
+    }
+
     public void setGenomeGapManager(GenomeGapManager gapManager) {
         this.gapManager = gapManager;
     }
 
+    /**
+     * Should be called, when the bounds have been changed. Updates the content
+     * of the sequence bar.
+     */
     public void boundsChanged() {
-        adjustMarkingIntervall();
+        this.adjustMarkingIntervall();
         this.findCodons();
+        this.highlightListener.boundsChangedHook();
     }
 
     @Override
@@ -104,12 +127,9 @@ public class SequenceBar extends JComponent {
         PaintingAreaInfo info = parentViewer.getPaintingAreaInfo();
 
         g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
-        drawRuler(g);
+        this.drawSequence(g);
         // draw a line indicating the sequence
-        g.draw(new Line2D.Double(info.getPhyLeft(),
-                baseLineY,
-                info.getPhyRight(),
-                baseLineY));
+        g.draw(new Line2D.Double(info.getPhyLeft(), baseLineY, info.getPhyRight(), baseLineY));
 
         // draw markings to indicate current parentViewerposition
         int temp = bounds.getLogLeft();
@@ -118,20 +138,27 @@ public class SequenceBar extends JComponent {
         int logright = bounds.getLogRight();
         while (temp <= logright) {
             if (temp % markingWidth == 0) {
-                drawThickLine(g, temp);
+                this.drawThickLine(g, temp);
             } else {
-                drawThinLine(g, temp);
+                this.drawThinLine(g, temp);
             }
             temp += halfMarkingWidth;
         }
+        
+        //paint the hightlight rectangle if there is currently one
+        if (this.highlightRect != null){
+            g.setColor(new Color(51, 153, 255));
+            g.draw(this.highlightRect);
+            g.setColor(new Color(168, 202, 236, 75));
+            g.fill(this.highlightRect);
         }
+    }
 
     /**
-     * Draw a line in the middle of the area including markings for position and
-     * sequence if possible.
+     * Draw sequence, if current zoom allows it.
      * @param g Graphics2D object to print on
      */
-    private void drawRuler(Graphics2D g) {
+    private void drawSequence(Graphics2D g) {
         // get the font metrics
         g.setFont(font);
         metrics = g.getFontMetrics(font);
@@ -140,35 +167,36 @@ public class SequenceBar extends JComponent {
         if (printSeq) {
             BoundsInfo bounds = parentViewer.getBoundsInfo();
             int logleft = bounds.getLogLeft();
+            if (logleft < 1){ //might happen for very short reference sequences
+                logleft = 1;
+            }
             int logright = bounds.getLogRight();
             for (int i = logleft; i <= logright; i++) {
-                drawChar(g, i);
-                drawCharReverse(g, i);
+                this.drawChar(g, i);
+                this.drawCharReverse(g, i);
             }
         }
     }
 
     /**
-     * Draw base of the sequence
+     * Draw base of the sequence.
      * @param g Graphics2D object to paint on
-     * @param logX position of the base in the reference genome
+     * @param pos position of the base in the reference genome
      */
-    private void drawChar(Graphics2D g, int logX) {
-        // logX depents on slider value and cannot be smaller 1
+    private void drawChar(Graphics2D g, int pos) {
+        // pos depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
-        int basePosition = logX - 1;
+        int basePosition = pos - 1;
 
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logX);
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(pos);
         double physX = bounds.getPhyMiddle();
-        if (gapManager != null && gapManager.hasGapAt(logX)) {
-            int numOfGaps = gapManager.getNumOfGapsAt(logX);
+        if (gapManager != null && gapManager.hasGapAt(pos)) {
+            int numOfGaps = gapManager.getNumOfGapsAt(pos);
             for (int i = 0; i < numOfGaps; i++) {
                 int tmp = (int) (physX + i * bounds.getPhysWidth());
                 String base = "-";
                 int offset = metrics.stringWidth(base) / 2;
-                g.drawString(base,
-                        (float) tmp - offset,
-                        (float) baseLineY - 10);
+                g.drawString(base, (float) tmp - offset, (float) baseLineY - offsetY);
             }
             physX += numOfGaps * bounds.getPhysWidth();
         }
@@ -177,32 +205,30 @@ public class SequenceBar extends JComponent {
         /*BaseBackground b = new BaseBackground(12,5, base);
         b.setBounds((int)physX-offset,baseLineY-10,b.getSize().width, b.getSize().height);
         this.add(b);*/
-        g.drawString(base,
-                (float) physX - offset,
-                (float) baseLineY - 10);
+        g.drawString(base, (float) physX - offset, (float) baseLineY - offsetY);
     }
 
     /**
-     * draws the rev Strand of the ref Genome
-     * @param g
-     * @param logX
+     * draws the a character of the reverse strand of the sequence.
+     * @param g the graphics object to paint on
+     * @param pos position of the base in the reference genome
      */
-    private void drawCharReverse(Graphics2D g, int logX) {
+    private void drawCharReverse(Graphics2D g, int pos) {
         // logX depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
-        int basePosition = logX - 1;
+        int basePosition = pos - 1;
 
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logX);
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(pos);
         double physX = bounds.getPhyMiddle();
-        if (gapManager != null && gapManager.hasGapAt(logX)) {
-            int numOfGaps = gapManager.getNumOfGapsAt(logX);
+        if (gapManager != null && gapManager.hasGapAt(pos)) {
+            int numOfGaps = gapManager.getNumOfGapsAt(pos);
             for (int i = 0; i < numOfGaps; i++) {
                 int tmp = (int) (physX + i * bounds.getPhysWidth());
                 String base = "-";
                 int offset = metrics.stringWidth(base) / 2;
                 g.drawString(base,
                         (float) tmp - offset,
-                        (float) baseLineY + 10);
+                        (float) baseLineY + offsetY);
             }
             physX += numOfGaps * bounds.getPhysWidth();
         }
@@ -211,7 +237,7 @@ public class SequenceBar extends JComponent {
         int offset = metrics.stringWidth(revBase) / 2;
         g.drawString(revBase,
                 (float) physX - offset,
-                (float) baseLineY + 10);
+                (float) baseLineY + offsetY);
     }
 
     /**
@@ -220,7 +246,7 @@ public class SequenceBar extends JComponent {
      * @param logPos logical position, that should be marked
      */
     private void drawThickLine(Graphics2D g, int logPos) {
-        // draw a line and the label in the middle of the space for this base
+        // draw a line and the label (position) in the middle of the space for this base
         PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logPos);
         double physX = bounds.getPhyMiddle();
         if (gapManager != null && gapManager.hasGapAt(logPos)) {
@@ -233,10 +259,7 @@ public class SequenceBar extends JComponent {
         String label = getRulerLabel(logPos);
 
         int offset = metrics.stringWidth(label) / 2;
-        g.drawString(
-                label,
-                (float) physX - offset,
-                (float) baseLineY + 20);
+        g.drawString(label, (float) physX - offset, (float) baseLineY + 2*offsetY);
     }
 
     /**
@@ -434,16 +457,68 @@ public class SequenceBar extends JComponent {
             revBase = "a";
         } else if (base.equals("g")) {
             revBase = "c";
-        }else if (base.equals("c")) {
+        } else if (base.equals("c")) {
             revBase = "g";
         } else if (base.equals("n")) {
             revBase = "n";
-        }else if (base.equals("-")) {
+        } else if (base.equals("-")) {
             revBase = "-";
     } else {
             revBase = base;
     }
         return revBase;
     }
+
+    /**
+     * Sets the rectangle used for highlighting something in this sequence bar.
+     * @param rect the rectangle to set
+     */
+    @Override
+    public void setHighlightRectangle(final Rectangle rect) {
+        this.highlightRect = rect;
+        this.repaint();
+    }
+
+    /**
+     * Returns the persistant reference used for this sequence bar.
+     * @return the persistant reference used for this sequence bar
+     */
+    public PersistantReference getPersistantReference(){
+        return this.refGen;
+    }
+
+    /**
+     * @return The bounds info of the parent viewer
+     */
+    public BoundsInfo getViewerBoundsInfo() {
+        return this.parentViewer.getBoundsInfo();
+    }
+
+    /**
+     * @return the base width defined in the parent viewer.
+     */
+    public double getBaseWidth() {
+        return this.parentViewer.getBaseWidth();
+    }
+
+    /**
+     * @return the horizontal margin of the parent viewer.
+     */
+    public int getViewerHorizontalMargin() {
+        return this.parentViewer.getHorizontalMargin();
+    }
+
+    /**
+     * This method is to be called, when a mouse listener associated to this component
+     * registered a mouse moved event.
+     * @param e the mouse event which triggered this call
+     */
+    public void updateMouseListeners(MouseEvent e) {
+        for (MouseMotionListener mml : this.parentViewer.getMouseMotionListeners()){
+            mml.mouseMoved(e);
+            this.setToolTipText(this.parentViewer.getToolTipText());
+        }
+    }
+
 
 }

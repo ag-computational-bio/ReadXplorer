@@ -229,6 +229,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             if (file.canRead()) {
                 mappingFile = file;
                 mappingFileField.setText(mappingFile.getAbsolutePath());
+                descriptionField.setText(mappingFile.getName());
                 Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class); // TODO is the class correct?
                 prefs.put("RefGenome.Filepath", mappingFile.getAbsolutePath());
                 try {
