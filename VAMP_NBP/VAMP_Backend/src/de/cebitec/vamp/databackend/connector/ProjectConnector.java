@@ -2,6 +2,7 @@ package de.cebitec.vamp.databackend.connector;
 
 import de.cebitec.vamp.databackend.FieldNames;
 import de.cebitec.vamp.databackend.H2SQLStatements;
+import de.cebitec.vamp.databackend.MySQLStatements;
 import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -212,12 +213,12 @@ public class ProjectConnector {
 
             con.setAutoCommit(false);
             //create tables if not exist yet
-            con.prepareStatement(SQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
-            con.prepareStatement(SQLStatements.SETUP_DIFFS).executeUpdate();
-            con.prepareStatement(SQLStatements.SETUP_COVERAGE).executeUpdate();
-            con.prepareStatement(SQLStatements.SETUP_FEATURES).executeUpdate();
-            con.prepareStatement(SQLStatements.SETUP_MAPPINGS).executeUpdate();
-            con.prepareStatement(SQLStatements.SETUP_TRACKS).execute();
+            con.prepareStatement(MySQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_DIFFS).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_COVERAGE).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_FEATURES).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
 //           con.prepareStatement(SQLStatements.SETUP_RUN).execute();
 //            con.prepareStatement(SQLStatements.SETUP_STATICS).execute();
 //            con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();
@@ -828,8 +829,8 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
         
         try {
-            PreparedStatement insertTrack = con.prepareStatement(H2SQLStatements.INSERT_TRACK);
-            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_TRACK_ID);
+            PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
+            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_ID);
 
             // get latest id for track
             long id = 0;

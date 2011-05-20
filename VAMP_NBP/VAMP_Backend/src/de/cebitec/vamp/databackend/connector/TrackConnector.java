@@ -11,6 +11,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 //import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.MySQLStatements;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -408,11 +409,9 @@ public class TrackConnector implements ITrackConnector{
         int num = 0;
         PreparedStatement fetch;
         try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
+       
                 fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK);
-            }
+            
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -431,7 +430,7 @@ public class TrackConnector implements ITrackConnector{
         int num = 0;
         PreparedStatement fetch;
         try {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE);
+                fetch = con.prepareStatement(MySQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE);
                 fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -493,11 +492,8 @@ public class TrackConnector implements ITrackConnector{
         PreparedStatement fetch;
 
         try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
                 fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK);
-            }
+            
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -517,7 +513,7 @@ public class TrackConnector implements ITrackConnector{
         PreparedStatement fetch;
 
         try {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE);
+                fetch = con.prepareStatement(MySQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE);
 
             fetch.setLong(1, trackID);
 
@@ -802,12 +798,7 @@ public class TrackConnector implements ITrackConnector{
         double absValue = 0;
         PreparedStatement fetch;
         try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
                 fetch = con.prepareStatement(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
-            }
-
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -852,11 +843,9 @@ public class TrackConnector implements ITrackConnector{
         double absValue = 0;
         PreparedStatement fetch;
         try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
+    
                 fetch = con.prepareStatement(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_BM_COVERAGE_OF_GENOME);
-            }
+
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -899,11 +888,9 @@ public class TrackConnector implements ITrackConnector{
         double absValue = 0;
         PreparedStatement fetch;
         try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-                fetch = con.prepareStatement(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME);
-            }
+
+                fetch = con.prepareStatement(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME);
+            
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
