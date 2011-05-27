@@ -21,10 +21,10 @@ import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 
 /**
- * TODO: update parser with correct error handling
+ * 
  * @author jstraube, rhilker
  */
-public class BAMParser implements MappingParserI {
+public class BAMParser implements MappingParserI, Observer {
 
     private static String name = "BAM Parser";
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam"};
@@ -36,6 +36,7 @@ public class BAMParser implements MappingParserI {
 
     private ArrayList<Observer> observers;
     private String errorMsg;
+    private int noUniqueMappings;
 
     public BAMParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
@@ -56,15 +57,15 @@ public class BAMParser implements MappingParserI {
         String cigar = null;
         String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
+        noUniqueMappings = 0;
         int noUniqueReads = 0;
-        int noReads = 0;
 
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
+        mappingContainer.registerObserver(this);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());
-
         SAMRecordIterator itor = sam.iterator();
 
         while (itor.hasNext()) {
@@ -93,12 +94,10 @@ public class BAMParser implements MappingParserI {
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")) {
                     //need the stop position
                     stop = this.countStopPosition(cigar, start, readSeqwithoutGaps.length() - 1);
-
                 } else {
-
                     stop = start + readSeqwithoutGaps.length() - 1;
-
                 }
+                
                 refSeqwithoutgaps = refSeqfulllength.substring(start - 1, stop).toLowerCase();
 
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")) {
@@ -162,7 +161,6 @@ public class BAMParser implements MappingParserI {
                 //TODO: calc reads for stats bam parser
                 // Reads with an error already skip this part because of "continue" statements
                 //!!Thats wrong you can have one read mapped on different positions
-                ++noReads;
                 DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction, cigar);
                 List<ParsedDiff> diffs = result.getDiffs();
                 List<ParsedReferenceGap> gaps = result.getGaps();
@@ -195,7 +193,7 @@ public class BAMParser implements MappingParserI {
 //        s.clear();
 //        readnameToSequenceID.clear();
 
-        mappingContainer.setNumberOfReads(noReads);//TODO: check if counting is correct here
+        mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);//TODO: check if counting is correct here
         mappingContainer.setNumberOfUniqueSeq(noUniqueReads);
         this.seqToIDMap = null; //release resources
         
@@ -549,5 +547,12 @@ public class BAMParser implements MappingParserI {
     private void sendErrorMsg(final String errorMsg){
         this.errorMsg = errorMsg;
         this.notifyObservers();
+    }
+
+    @Override
+    public void update(Object args) {
+        if (args instanceof Boolean && (Boolean) args == true) {
+            ++this.noUniqueMappings;
+        }
     }
 }

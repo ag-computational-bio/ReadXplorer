@@ -89,7 +89,7 @@ public class Installer extends ModuleInstall {
             }
             // log out before exitting
             ProjectConnector pc = ProjectConnector.getInstance();
-            if (pc.isConnected()) pc.disconnect();
+            if (pc.isConnected()) { pc.disconnect(); }
 
             return super.closing();
         }

@@ -864,17 +864,15 @@ public class ProjectConnector {
         int mappings = 0;
         int perfectmappings = 0;
         int bmmappings = 0;
-        int mappedSeq = 0;
-        int noOfReads= 0;
-        int noOfUniqueSeq = 0;
+        int noUniqueSeq = 0;
+        int noUniqueMappings= 0;
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
             mappings = mappingInfos.get(1);
             perfectmappings = mappingInfos.get(2);
             bmmappings = mappingInfos.get(3);
-            mappedSeq = mappingInfos.get(4);
-            noOfReads =  mappingInfos.get(5);
-            noOfUniqueSeq =  mappingInfos.get(6);
+            noUniqueSeq = mappingInfos.get(4);
+            noUniqueMappings =  mappingInfos.get(5);
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the list");
         }
@@ -896,12 +894,11 @@ public class ProjectConnector {
             insertStatics.setInt(3, mappings);
             insertStatics.setInt(4, perfectmappings);
             insertStatics.setInt(5, bmmappings);
-            insertStatics.setInt(6, mappedSeq);
-            insertStatics.setInt(7,coveragePerf);
-            insertStatics.setInt(8,coverageBM);
-            insertStatics.setInt(9,coverageComplete);
-            insertStatics.setInt(10,noOfReads);
-            insertStatics.setInt(11,noOfUniqueSeq);
+            insertStatics.setInt(6, noUniqueMappings);
+            insertStatics.setInt(7, coveragePerf);
+            insertStatics.setInt(8, coverageBM);
+            insertStatics.setInt(9, coverageComplete);
+            insertStatics.setInt(10, noUniqueSeq);
             insertStatics.execute();
 
             insertStatics.close();

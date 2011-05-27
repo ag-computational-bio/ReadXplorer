@@ -73,9 +73,7 @@ public class MultiTrackConnector implements ITrackConnector {
     }
 
     public MultiTrackConnector(List<PersistantTrack> tracks) {
-        if (tracks.size() > 2) {
-            throw new UnsupportedOperationException("More than two tracks not supported yet.");
-        }
+        if (tracks.size() > 2) { throw new UnsupportedOperationException("More than two tracks not supported yet."); }
         this.trackID = 9999;
         con = ProjectConnector.getInstance().getConnection();
         //runID = fetchRunID();
@@ -233,36 +231,36 @@ public class MultiTrackConnector implements ITrackConnector {
         return gaps;
     }
 
+//    @Override
+//    public int getNumOfMappedSequences() {
+//        int num = 0;
+//        PreparedStatement fetch;
+//        try {
+//            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
+//                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK);
+//            } else {
+//                fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK);
+//            }
+//            fetch.setLong(1, trackID);
+//
+//            ResultSet rs = fetch.executeQuery();
+//            if (rs.next()) {
+//                num = rs.getInt("NUM");
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(MultiTrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//        return num;
+//    }
+
     @Override
-    public int getNumOfMappedSequences() {
+        public int getNumOfUniqueSequencesCalculate() {
         int num = 0;
         PreparedStatement fetch;
         try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK);
-            }
-            fetch.setLong(1, trackID);
 
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(MultiTrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
-    }
-
-    @Override
-    public int getNumOfMappedSequencesCalculate() {
-        int num = 0;
-        PreparedStatement fetch;
-        try {
-
-            fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE);
+                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE);
 
             fetch.setLong(1, trackID);
 
@@ -327,7 +325,7 @@ public class MultiTrackConnector implements ITrackConnector {
     }
 
     @Override
-    public int getNumOfUniqueMappings() {
+    public int getNumOfMappings() {
         int num = 0;
         PreparedStatement fetch;
         try {
@@ -346,7 +344,7 @@ public class MultiTrackConnector implements ITrackConnector {
     }
 
     @Override
-    public int getNumOfUniqueMappingsCalculate() {
+        public int getNumOfMappingsCalculate() {
         int num = 0;
         PreparedStatement fetch;
         try {
@@ -364,8 +362,8 @@ public class MultiTrackConnector implements ITrackConnector {
         return num;
     }
 
-    @Override
-    public void setStatics(int mappings, int perfectMappings, int bmMappings, int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete, int numOfReads, int numOfUniqueSeq) {
+   @Override
+    public void setStatics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
             PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
@@ -384,15 +382,14 @@ public class MultiTrackConnector implements ITrackConnector {
             // store track in table
             insertStatics.setLong(1, id);
             insertStatics.setLong(2, trackID);
-            insertStatics.setInt(3, mappings);
-            insertStatics.setInt(4, perfectMappings);
-            insertStatics.setInt(5, bmMappings);
-            insertStatics.setInt(6, mappedSeq);
+            insertStatics.setInt(3, numMappings);
+            insertStatics.setInt(4, numPerfectMappings);
+            insertStatics.setInt(5, numBestMatchMappings);
+            insertStatics.setInt(6, numUniqueMappings);
             insertStatics.setInt(7, covPerf);
             insertStatics.setInt(8, covBM);
             insertStatics.setInt(9, covComplete);
-            insertStatics.setInt(10, numOfReads);
-            insertStatics.setInt(11, numOfUniqueSeq);
+            insertStatics.setInt(10, numUniqueSeq);
             insertStatics.execute();
 
             insertStatics.close();
@@ -494,35 +491,35 @@ public class MultiTrackConnector implements ITrackConnector {
 
         Integer[] values = map.get(position);
         values[COV] = coverage;
-        values[DIFF_COV] = values[DIFF_COV] + count;
+        values[DIFF_COV] += count;
         if (!isGenomeGap) {
             if (base == 'A') {
-                values[A_COV] = values[A_COV] + count;
+                values[A_COV] += count;
             } else if (base == 'C') {
-                values[C_COV] = values[C_COV] + count;
+                values[C_COV] += count;
             } else if (base == 'G') {
-                values[G_COV] = values[G_COV] + count;
+                values[G_COV] += count;
             } else if (base == 'T') {
-                values[T_COV] = values[T_COV] + count;
+                values[T_COV] += count;
             } else if (base == 'N') {
-                values[N_COV] = values[N_COV] + count;
+                values[N_COV] += count;
             } else if (base == '_') {
-                values[_COV] = values[_COV] + count;
+                values[_COV] += count;
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown diff base {0}", base);
             }
 
         } else {
             if (base == 'A') {
-                values[A_GAP] = values[A_GAP] + count;
+                values[A_GAP] += count;
             } else if (base == 'C') {
-                values[C_GAP] = values[C_GAP] + count;
+                values[C_GAP] += count;
             } else if (base == 'G') {
-                values[G_GAP] = values[G_GAP] + count;
+                values[G_GAP] += count;
             } else if (base == 'T') {
-                values[T_GAP] = values[T_GAP] + count;
+                values[T_GAP] += count;
             } else if (base == 'N') {
-                values[N_GAP] = values[N_GAP] + count;
+                values[N_GAP] += count;
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown genome gap base {0}", base);
             }
@@ -637,8 +634,8 @@ public class MultiTrackConnector implements ITrackConnector {
                 fetch.setLong(5, toDiff);
                 fetch.setLong(6, trackID);
 
-                fromDiff = fromDiff + 50;
-                toDiff = toDiff + 50;
+                fromDiff += 50;
+                toDiff += 50;
                 if (toDiff > genomeSize) {
                     toDiff = genomeSize;
                 }
@@ -881,7 +878,7 @@ public class MultiTrackConnector implements ITrackConnector {
         int num = 0;
 
         try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK);
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -901,7 +898,7 @@ public class MultiTrackConnector implements ITrackConnector {
         int num = 0;
 
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE);
             fetch.setLong(1, this.trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -955,5 +952,43 @@ public class MultiTrackConnector implements ITrackConnector {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    @Override
+    public int getNumOfUniqueMappingsCalculate(){
+        int num = 0;
+        PreparedStatement fetch;
+        try {
+            fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE);
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+    @Override
+    public int getNumOfUniqueMappings(){
+        int num = 0;
+        PreparedStatement fetch;
+        try {
+            fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK);
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                num = rs.getInt("NUM");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
     }
 }

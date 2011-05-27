@@ -111,25 +111,25 @@ public class ParsedMapping {
             return false;
         }
         final ParsedMapping other = (ParsedMapping) obj;
-        if (this.start != other.start) {
+        if (this.start != other.getStart()) {
             return false;
         }
-        if (this.stop != other.stop) {
+        if (this.stop != other.getStop()) {
             return false;
         }
-        if (this.direction != other.direction) {
+        if (this.direction != other.getDirection()) {
             return false;
         }
-        if (this.errors != other.errors) {
+        if (this.errors != other.getErrors()) {
             return false;
         }
-        if (this.diffs != other.diffs && (this.diffs == null || !this.diffs.equals(other.diffs))) {
+        if (this.diffs != other.getDiffs() && (this.diffs == null || !this.diffs.equals(other.getDiffs()))) {
             return false;
         }
-        if (this.gaps != other.gaps && (this.gaps == null || !this.gaps.equals(other.gaps))) {
+        if (this.gaps != other.getGenomeGaps() && (this.gaps == null || !this.gaps.equals(other.getGenomeGaps()))) {
             return false;
         }
-        if (this.bestMapping != other.bestMapping) {
+        if (this.bestMapping != other.isBestMapping()) {
             return false;
         }
         return true;

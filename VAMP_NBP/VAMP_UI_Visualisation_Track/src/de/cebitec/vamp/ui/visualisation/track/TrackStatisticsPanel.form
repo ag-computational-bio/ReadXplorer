@@ -26,41 +26,35 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="perfectMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
-                          <Component id="allReadsLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="mappedReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="nonMappedReads" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="uniqueReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="nErrorMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="bestMatchMappingsLabel" min="-2" max="-2" attributes="1"/>
-                          <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel2" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel3" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="labelNameLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="nerrorPercentage" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="bmPercentage" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="perfectPercentage" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="perfectMappingsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="allReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="uniqueReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="mappedReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="nonMappedReadsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="nErrorMappingsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="bestMatchMappingsAbsLabel" alignment="0" pref="72" max="32767" attributes="0"/>
-                          <Component id="nameLabel" alignment="1" pref="72" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Component id="progressbar" alignment="0" pref="149" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="labelNameLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="numMappingsLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="uniqueSequencesLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="allReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="bestMatchMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
+                  <Component id="perfectMappingsLabel" min="-2" max="-2" attributes="1"/>
+                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="numMappingsAbsLabel" pref="58" max="32767" attributes="0"/>
+                  <Component id="uniqueSequencesAbsLabel" pref="58" max="32767" attributes="0"/>
+                  <Component id="numUniqueMappingsAbsLabel" pref="58" max="32767" attributes="0"/>
+                  <Component id="nameLabel" alignment="1" pref="58" max="32767" attributes="0"/>
+                  <Component id="bestMatchMappingsAbsLabel" alignment="0" pref="58" max="32767" attributes="0"/>
+                  <Component id="perfectMappingsAbsLabel" alignment="0" pref="58" max="32767" attributes="0"/>
+                  <Component id="perfectPercentage" alignment="0" pref="58" max="32767" attributes="0"/>
+                  <Component id="bmPercentage" alignment="0" pref="58" max="32767" attributes="0"/>
+                  <Component id="nerrorPercentage" alignment="0" pref="58" max="32767" attributes="0"/>
+              </Group>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="progressbar" pref="139" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -68,63 +62,53 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="labelNameLabel" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="nameLabel" min="-2" pref="15" max="-2" attributes="0"/>
+                  <Component id="labelNameLabel" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="numMappingsLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="numMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="numUniqueMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
                   <Component id="allReadsLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="allReadsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="uniqueReadsLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="uniqueReadsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="uniqueSequencesAbsLabel" alignment="1" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="uniqueSequencesLabel" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="mappedReadsLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="mappedReadsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="nonMappedReads" min="-2" max="-2" attributes="0"/>
-                  <Component id="nonMappedReadsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="nErrorMappingsLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="nErrorMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="bestMatchMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
                   <Component id="bestMatchMappingsLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="bestMatchMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="perfectMappingsLabel" min="-2" max="-2" attributes="1"/>
                   <Component id="perfectMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="perfectPercentage" alignment="3" min="-2" pref="16" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="perfectPercentage" min="-2" pref="16" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="bmPercentage" alignment="3" min="-2" pref="16" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                  <Component id="bmPercentage" min="-2" pref="16" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="nerrorPercentage" alignment="3" min="-2" pref="17" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                  <Component id="nerrorPercentage" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace pref="18" max="32767" attributes="0"/>
               <Component id="progressbar" min="-2" pref="16" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -134,25 +118,15 @@
     </Component>
     <Component class="javax.swing.JLabel" name="allReadsLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Reads:"/>
+        <Property name="text" type="java.lang.String" value="Unique Mappings:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="uniqueReadsLabel">
+    <Component class="javax.swing.JLabel" name="uniqueSequencesLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Unique:"/>
+        <Property name="text" type="java.lang.String" value="Unique Seq:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="mappedReadsLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Mapped:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="nonMappedReads">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Non-mapped:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="allReadsAbsLabel">
+    <Component class="javax.swing.JLabel" name="numUniqueMappingsAbsLabel">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="11"/>
       </Properties>
@@ -167,22 +141,12 @@
         <Property name="text" type="java.lang.String" value="Best-Match:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="nErrorMappingsLabel">
+    <Component class="javax.swing.JLabel" name="numMappingsLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Mappings:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="uniqueReadsAbsLabel">
-      <Properties>
-        <Property name="horizontalAlignment" type="int" value="11"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="mappedReadsAbsLabel">
-      <Properties>
-        <Property name="horizontalAlignment" type="int" value="11"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="nonMappedReadsAbsLabel">
+    <Component class="javax.swing.JLabel" name="uniqueSequencesAbsLabel">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="11"/>
       </Properties>
@@ -197,7 +161,7 @@
         <Property name="horizontalAlignment" type="int" value="11"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="nErrorMappingsAbsLabel">
+    <Component class="javax.swing.JLabel" name="numMappingsAbsLabel">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="11"/>
       </Properties>

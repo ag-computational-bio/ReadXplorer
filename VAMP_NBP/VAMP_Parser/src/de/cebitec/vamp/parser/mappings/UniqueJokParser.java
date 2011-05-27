@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * number of equal sequences found during the filtering step.
  * @author ddoppmeier
  */
-public class UniqueJokParser implements MappingParserI {
+public class UniqueJokParser implements MappingParserI, Observer {
 
     private static String name = "Unique Reads Jok Output Parser";
     private static String[] fileExtension = new String[]{"out"};
@@ -34,6 +34,7 @@ public class UniqueJokParser implements MappingParserI {
     private HashMap<Integer, Integer> gapOrderIndex;
     private ArrayList<Observer> observers;
     private String errorMsg;
+    private int noUniqueMappings;
 
     public UniqueJokParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
@@ -44,15 +45,17 @@ public class UniqueJokParser implements MappingParserI {
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
+        mappingContainer.registerObserver(this);
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
-
             int lineno = 0;
             int start;
             int stop;
             int errors;
+            this.noUniqueMappings = 0;
+            int noUniqueSeq = 0;
             String line = null;
             while ((line = br.readLine()) != null) { //reads the input file line per line
                 lineno++;
@@ -110,7 +113,7 @@ public class UniqueJokParser implements MappingParserI {
                     }
                     // split the readname into name and counting information
                     String[] parts = readname.split("#");
-                    int count = Integer.parseInt(parts[parts.length - 1]); //check for uniqueness
+                    int count = Integer.parseInt(parts[parts.length - 1]); //check for uniqueness & catch format exception
 
                     if (start >= stop) {
                         this.sendErrorMsg("Start bigger than stop in "
@@ -163,12 +166,14 @@ public class UniqueJokParser implements MappingParserI {
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                     mapping.setCount(count);
 
-//                        int seqID = readnameToSequenceID.get(readname);
-//                        mappingContainer.addParsedMapping(mapping, seqID);
+                    mappingContainer.addParsedMapping(mapping, ++noUniqueSeq); //since all duplicate reads have been filtered before
                 } else {
                     this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
                 }
             }
+
+            mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
+            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
             br.close();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
@@ -319,6 +324,13 @@ public class UniqueJokParser implements MappingParserI {
     public void notifyObservers() {
         for (Observer observer : this.observers){
             observer.update(this.errorMsg);
+        }
+    }
+
+    @Override
+    public void update(Object args) {
+        if (args instanceof Boolean && (Boolean) args == true) {
+            ++this.noUniqueMappings;
         }
     }
 

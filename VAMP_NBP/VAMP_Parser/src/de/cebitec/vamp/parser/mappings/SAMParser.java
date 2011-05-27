@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author jstraube
  */
-public class SAMParser implements MappingParserI {
+public class SAMParser implements MappingParserI, Observer {
 
     private static String name = "SAM Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam"};
@@ -32,6 +32,7 @@ public class SAMParser implements MappingParserI {
     private int errors = 0;
     private HashMap<String, String> mappedRefAndReadPlusGaps = new HashMap<String, String>();
     private HashMap<String, Integer> seqToIDMap;
+    private int noUniqueMappings;
 
     private ArrayList<Observer> observers;
     private String errorMsg;
@@ -52,13 +53,15 @@ public class SAMParser implements MappingParserI {
         int flag = 0;
         String readSeqwithoutGaps = null;
         String cigar = null;
-        int noUniqueReads = 0;
+        int noUniqueSeq = 0;
+        this.noUniqueMappings = 0;
         int start;
         int stop;
 
         String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
+        mappingContainer.registerObserver(this);
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -196,7 +199,7 @@ public class SAMParser implements MappingParserI {
                             if (this.seqToIDMap.containsKey(readSeq)) {
                                 seqID = this.seqToIDMap.get(readSeq);
                             } else {
-                                seqID = ++noUniqueReads;
+                                seqID = ++noUniqueSeq;
                                 this.seqToIDMap.put(readSeq, seqID);
                             } //int seqID = readnameToSequenceID.get(readname);
                             mappingContainer.addParsedMapping(mapping, seqID);
@@ -209,6 +212,8 @@ public class SAMParser implements MappingParserI {
             }
             this.seqToIDMap = null; //release resources
             br.close();
+            mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
+            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (IOException ex) {
@@ -622,5 +627,12 @@ public class SAMParser implements MappingParserI {
     private void sendErrorMsg(final String errorMsg){
         this.errorMsg = errorMsg;
         this.notifyObservers();
+    }
+
+    @Override
+    public void update(Object args) {
+        if (args instanceof Boolean && (Boolean) args == true){
+            ++this.noUniqueMappings;
+        }
     }
 }
