@@ -116,6 +116,7 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         trackStatisticsPanel.setTrackName(((TrackViewer) e.getSource()).getTrackCon().getAssociatedTrackName());
+                            trackStatisticsPanel.setTrackConnector(((TrackViewer) e.getSource()).getTrackCon());
                     }
 
                     @Override

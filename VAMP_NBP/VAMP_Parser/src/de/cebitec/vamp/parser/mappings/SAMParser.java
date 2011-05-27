@@ -73,7 +73,8 @@ public class SAMParser implements MappingParserI {
                 if (!line.startsWith("@")) {
 
                     String[] readSeqLine = line.split("\\s+");
-                    if (readSeqLine.length <= 11) { // if the length is not correct the read is not parsed
+                        //this is too strict for sam format
+                  //  if (readSeqLine.length <= 11) { // if the length is not correct the read is not parsed
                         readname = readSeqLine[0];
                         try {
                             flag = Integer.parseInt(readSeqLine[1]);
@@ -204,9 +205,6 @@ public class SAMParser implements MappingParserI {
                         } else {
                             this.sendErrorMsg("The current read in line " + lineno + "is not a mapped sequence or contains corrupt data: ".concat(line));
                         }
-                    } else {
-                        this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
-                    }
                 }
             }
             this.seqToIDMap = null; //release resources
@@ -220,7 +218,11 @@ public class SAMParser implements MappingParserI {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
     }
-    //Why do you do this??
+
+    /*
+     * This method calculates the order of the gap infact that for a gap we dont include a new position to reference genome
+     *  but we notice the number of gaps to one position of the ref genome
+     */
 
     private int getOrderForGap(int gapPos) {
         if (!gapOrderIndex.containsKey(gapPos)) {

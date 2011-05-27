@@ -120,7 +120,8 @@ public class BlockComponent extends JComponent implements ActionListener {
         JTextField j = new JTextField();
         int start = b.getMapping().getStart();
         int stop = b.getMapping().getStop();
-        String readSequence = parentViewer.getRefGen().getSequence().substring(start, stop);
+        //string first pos is zero
+        String readSequence = parentViewer.getRefGen().getSequence().substring(start-1, stop);
         j.setText(readSequence);
         j.selectAll();
         j.copy();

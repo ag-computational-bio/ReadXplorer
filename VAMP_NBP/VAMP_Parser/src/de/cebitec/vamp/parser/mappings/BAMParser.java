@@ -159,8 +159,9 @@ public class BAMParser implements MappingParserI {
 //                            + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
 //                            + "Please make sure you are referencing the correct read data set!");
 //                }
-
+                //TODO: calc reads for stats bam parser
                 // Reads with an error already skip this part because of "continue" statements
+                //!!Thats wrong you can have one read mapped on different positions
                 ++noReads;
                 DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction, cigar);
                 List<ParsedDiff> diffs = result.getDiffs();
