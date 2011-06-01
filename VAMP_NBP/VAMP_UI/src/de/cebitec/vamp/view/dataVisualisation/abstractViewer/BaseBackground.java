@@ -26,7 +26,7 @@ public class BaseBackground extends JComponent{
     protected void paintComponent(Graphics graphics) {
       
         super.paintComponent(graphics);
-        System.out.println(bases);
+        //System.out.println(bases);
 //        switch (bases) {
 //            case 'a':  graphics.setColor(ColorProperties.BACKGROUND_A);
 //            case 'c': graphics.setColor(ColorProperties.BACKGROUND_C);

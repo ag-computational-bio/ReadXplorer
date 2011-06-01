@@ -18,6 +18,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -50,7 +52,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
     private int currentLogMousePos;
-
+     int lastPhysPos=0;
     private boolean printMouseOver;
     private BasePanel basePanel;
 
@@ -258,9 +260,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     
     private void setPanMode(int position){
         if(isPanning){
-           int logi= transformToLogicalCoord(position);
-            bounds.setCurrentLogPos(logi);
-            updateLogicalBounds(bounds);
+           int logi= transformToLogicalCoordForPannig(position);
+      //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
              boundsManager.navigatorBarUpdated(logi);
         }
     }
@@ -305,7 +306,46 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @return logical position corresponding to the pixel
      */
     protected int transformToLogicalCoord(int physPos){
+     //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "boundsLeft "+ bounds.getLogLeft()+"right"+ bounds.getLogRight());
         return (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
+    
+    }
+
+        /**
+     * Compute the logical position for any given physical position
+     * @param physPos horizontal position of a pixel
+     * @return logical position corresponding to the pixel
+     */
+    protected int transformToLogicalCoordForPannig(int physPos){
+       
+        int pos ;
+        int currentLog = bounds.getCurrentLogPos();
+        int leftbound = bounds.getLogLeft();
+        int rightBound =  bounds.getLogRight();
+        pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
+         int lb = leftbound-((rightBound-leftbound)/2);
+        //we want to go to smaller positions
+        if(lastPhysPos>physPos){
+            lastPhysPos = physPos;
+            //mouse on the right side of currentLog
+                pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + lb);
+           } else {
+              lastPhysPos = physPos;
+               //mouse on the right side of currentLog
+             if (currentLog<pos){
+                   pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + leftbound);
+             // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "rightside plus "+pos);
+            }else{
+                pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + rightBound);
+               //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "leftside plus "+pos);
+            }
+
+                }
+        if(pos <=0){
+            pos = 1;
+        }
+        return pos;
+
     }
 
     /**
