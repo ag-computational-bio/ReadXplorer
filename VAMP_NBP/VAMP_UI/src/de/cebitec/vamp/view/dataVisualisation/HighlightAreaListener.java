@@ -102,6 +102,7 @@ public class HighlightAreaListener extends MouseAdapter {
             int x = (int) (Math.round(e.getX()/baseWidth)*baseWidth);
             int xPos = x <= this.startX ? x : this.startX;
             int yPos = this.baseLineY - 7;
+            this.fwdStrand = e.getY() <= this.baseLineY;
             yPos = e.getY() <= this.baseLineY ? yPos - this.offsetY : yPos + this.offsetY;
 
             this.setHighlightRectangle(new Rectangle(xPos, yPos, Math.abs(x - this.startX), HEIGHT));

@@ -626,7 +626,7 @@ public class MultiTrackConnector implements ITrackConnector {
         try {
             while (genomeSize > fromDiff) {
                 //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
-                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVALL);
+                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
                 fetch.setLong(1, trackID);
                 fetch.setLong(2, fromMapping);
                 fetch.setLong(3, toMapping);

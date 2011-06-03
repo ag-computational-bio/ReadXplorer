@@ -12,6 +12,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 //import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.MySQLStatements;
+import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -580,25 +581,7 @@ public class TrackConnector implements ITrackConnector{
     public String getAssociatedTrackName() {
         return associatedTrackName;
     }
-
-    private Character revCompl(char base) {
-        if (base == 'A') {
-            return 'T';
-        } else if (base == 'C') {
-            return 'G';
-        } else if (base == 'G') {
-            return 'C';
-        } else if (base == 'T') {
-            return 'A';
-        } else if (base == 'N') {
-            return base;
-        } else if (base == '_') {
-            return base;
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown char {0} for base", base);
-            return ' ';
-        }
-    }
+    
 
     private void addValues(HashMap<Integer, Integer[]> map, byte direction, int coverage, int count, int position, char base, boolean isGenomeGap) {
         if (!map.containsKey(position)) {
@@ -608,7 +591,7 @@ public class TrackConnector implements ITrackConnector{
         }
 
         if (direction == -1) {
-            base = revCompl(base);
+            base = SequenceUtils.complementDNA(base);
         }
 
         Integer[] values = map.get(position);
@@ -650,13 +633,10 @@ public class TrackConnector implements ITrackConnector{
     }
 
     private boolean isSNP(Integer[] data, int index, int threshold) {
-        boolean isSnp = false;
-
         if (data[index] >= threshold) {
-            isSnp = true;
+            return true;
         }
-
-        return isSnp;
+        return false;
     }
 
     private Snp createSNP(Integer[] data, int index, int position, int positionVariation) {
@@ -696,8 +676,8 @@ public class TrackConnector implements ITrackConnector{
 
             if (percentage > overallPercentage) {
                 for (int i = A_COV; i < data.length; i++) {
-                    if (isSNP(data, i, absThreshold)) {
-                        snps.add(createSNP(data, i, position, percentage));
+                    if (this.isSNP(data, i, absThreshold)) {
+                        snps.add(this.createSNP(data, i, position, percentage));
                     }
                 }
             }
@@ -740,31 +720,33 @@ public class TrackConnector implements ITrackConnector{
     public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
         ArrayList<Snp> snps = new ArrayList<Snp>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
+        final int diffIntervalSize = 50;
+        final int mappingIntervalSize = 200;
         int fromDiff = 1;
-        int toDiff = 50;
+        int toDiff = diffIntervalSize;
         int fromMapping = 1;
-        int toMapping = 200;
+        int toMapping = mappingIntervalSize;
         try {
             while (genomeSize > fromDiff) {
             //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
-                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVALL);
+                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
                 fetch.setLong(1, trackID);
-                 fetch.setLong(2, fromMapping);
+                fetch.setLong(2, fromMapping);
                 fetch.setLong(3, toMapping);
                 fetch.setLong(4, fromDiff);
                 fetch.setLong(5, toDiff);
-               fetch.setLong(6, trackID);
+                fetch.setLong(6, trackID);
 
-                fromDiff += 50;
-                toDiff += 50;
+                fromDiff += diffIntervalSize;
+                toDiff += diffIntervalSize;
                 if (toDiff > genomeSize) {
                     toDiff = genomeSize;
                 }
 
-                if(fromDiff >200){
-                    fromMapping = fromDiff -200;
+                if(fromDiff > mappingIntervalSize){
+                    fromMapping = fromDiff - mappingIntervalSize;
                 }
-                toMapping = toDiff + 200;
+                toMapping = toDiff + mappingIntervalSize;
                  if (toMapping > genomeSize) {
                     toMapping = genomeSize;
                 }
@@ -784,12 +766,12 @@ public class TrackConnector implements ITrackConnector{
                     }
                     int cov = forwardCov + reverseCov;
 
-                    addValues(covData, direction, cov, replicates, position, base, isGenomeGap);
+                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap);
 
                 }
           }
 
-            snps.addAll(filterSnps(covData, percentageThreshold, absThreshold));
+            snps.addAll(this.filterSnps(covData, percentageThreshold, absThreshold));
 
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);

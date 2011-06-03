@@ -146,9 +146,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     private void adjustPaintingAreaInfo(){
         paintingAreaInfo.setForwardHigh(verticalMargin);
-        paintingAreaInfo.setReverseHigh(this.getSize().height-1 -verticalMargin);
+        paintingAreaInfo.setReverseHigh(this.getHeight()-1 -verticalMargin);
         paintingAreaInfo.setPhyLeft(horizontalMargin);
-        paintingAreaInfo.setPhyRight(this.getSize().width-1 - horizontalMargin);
+        paintingAreaInfo.setPhyRight(this.getWidth()-1 - horizontalMargin);        
 
         // if existant, leave space for sequence viewer
         if(this.seqBar != null){
@@ -262,7 +262,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         if(isPanning){
            int logi= transformToLogicalCoordForPannig(position);
       //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
-             boundsManager.navigatorBarUpdated(logi);
+            boundsManager.navigatorBarUpdated(logi);
         }
     }
 
@@ -274,7 +274,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * Compute the space that is currently assigned for one base of the genome
      */
     private void calcBaseWidth(){
-        basewidth = (double) paintingAreaInfo.getPhyWidt() / bounds.getLogWidth();
+        basewidth = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
     }
 
     /**
@@ -354,7 +354,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * current width of this panel
      */
     private void recalcCorrelatioFactor(){
-        correlationFactor =  (double) paintingAreaInfo.getPhyWidt() / bounds.getLogWidth();
+        correlationFactor =  (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
     }
 
     /**
@@ -511,7 +511,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     @Override
     public Dimension getPaintingAreaDimension(){
-        return new Dimension(paintingAreaInfo.getPhyWidt(), paintingAreaInfo.getCompleteHeight());
+        return new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight());
     }
 
     public PaintingAreaInfo getPaintingAreaInfo(){

@@ -17,8 +17,12 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
 
     /**
      * Create an AdjustmentPanel used for managing the displayed area of listeners.
-     * @param bounds Information about the area, that should be shown after
-     * initialisation
+     * @param navigatorMin 
+     * @param navigatorMax 
+     * @param positionInit 
+     * @param zoomInit 
+     * @param hasZoomslider 
+     * @param hasScrollbar 
      */
     public AdjustmentPanel(int navigatorMin, int navigatorMax, int positionInit, int zoomInit, boolean hasScrollbar, boolean hasZoomslider){
         super();

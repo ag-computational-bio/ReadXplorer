@@ -42,7 +42,7 @@ public class BlockComponent extends JComponent implements ActionListener {
     private int phyRight;
     private float percentSandBPerCovUnit;
     private float minSaturationAndBrightness;
-    private String nameofRead = "";
+//    private String nameofRead = "";
 //    private static String COPY_READNAME = "Copy readname"; //no readnames are stored anymore: RUN domain excluded
     private static String COPY_SEQUENCE = "Copy sequence";
     private static String EXIT_POPUP = "Exit popup menu";
@@ -53,8 +53,8 @@ public class BlockComponent extends JComponent implements ActionListener {
         this.b = b;
         this.height = height;
         this.parentViewer = parentViewer;
-        absLogBlockStart = b.getAbsStart();
-        absLogBlockStop = b.getAbsStop();
+        this.absLogBlockStart = b.getAbsStart();
+        this.absLogBlockStop = b.getAbsStop();
         this.minSaturationAndBrightness = minSaturationAndBrightness;
         this.percentSandBPerCovUnit = percentSandBPerCovUnit;
         this.gapManager = gapManager;

@@ -316,7 +316,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         labelWidth += 30;
 
         // pixels available per base
-        double pxPerBp = (double) parentViewer.getPaintingAreaInfo().getPhyWidt() / parentViewer.getBoundsInfo().getLogWidth();
+        double pxPerBp = (double) parentViewer.getPaintingAreaInfo().getPhyWidth() / parentViewer.getBoundsInfo().getLogWidth();
 
         if (10 * pxPerBp > labelWidth) {
             markingWidth = 10;
