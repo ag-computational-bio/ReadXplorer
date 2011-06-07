@@ -183,13 +183,7 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_STATICS).executeUpdate();
-            try{
-            con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS).execute();
-            con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ).execute();
-            }catch(Exception ex){
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Columns already exist");
-            }
+            con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
 //           con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
 //            con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
 //            con.prepareStatement(H2SQLStatements.INDEX_SEQUENCE).executeUpdate();
@@ -220,7 +214,7 @@ public class ProjectConnector {
             con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
 //           con.prepareStatement(SQLStatements.SETUP_RUN).execute();
-//            con.prepareStatement(SQLStatements.SETUP_STATICS).execute();
+//            con.prepareStatement(SQLStatements.SETUP_STATISTICS).execute();
 //            con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();
 //            con.prepareStatement(SQLStatements.SETUP_READS).execute();
 
@@ -689,32 +683,25 @@ public class ProjectConnector {
     public long addRefGenome(ParsedReference reference) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName());
 
-        if (adapter.equalsIgnoreCase("mysql")) {
+        try {
+            con.setAutoCommit(false);
 
-            try {
-                con.setAutoCommit(false);
+            if (adapter.equalsIgnoreCase("mysql")) {
                 this.lockReferenceDomainIndices();
                 this.disableReferenceIndices();
+            }
 
-                this.storeGenome(reference);
-                this.storeFeatures(reference);
+            this.storeGenome(reference);
+            this.storeFeatures(reference);
 
+            if (adapter.equalsIgnoreCase("mysql")) {
                 this.enableReferenceIndices();
                 this.unlockTables();
-                con.setAutoCommit(true);
-            } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
             }
-        } else {
-            try {
 
-                con.setAutoCommit(false);
-                this.storeGenome(reference);
-                this.storeFeatures(reference);
-                con.setAutoCommit(true);
-            } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-            }
+            con.setAutoCommit(true);
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName());
@@ -791,7 +778,8 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
     }
 
-    private void storeTrack(ParsedTrack track, long refGenID, long runID) {
+    
+    private void storeTrack(ParsedTrack track, long refGenID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
         try {
             PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
@@ -811,7 +799,7 @@ public class ProjectConnector {
             insertTrack.setLong(2, refGenID);
             insertTrack.setString(3, track.getDescription());
             insertTrack.setTimestamp(4, track.getTimestamp());
-            insertTrack.setLong(5, runID);
+            //insertTrack.setLong(5, runID);
             insertTrack.execute();
 
             insertTrack.close();
@@ -825,60 +813,29 @@ public class ProjectConnector {
     }
 
 
-    private void storeTrackH2(ParsedTrack track, long refGenID, long runID) {
+    private void storeStatistics(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        
-        try {
-            PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
-            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_ID);
-
-            // get latest id for track
-            long id = 0;
-            ResultSet rs = latestID.executeQuery();
-            if (rs.next()) {
-                id = rs.getLong("LATEST_ID");
-            }
-            id++;
-            track.setID(id);
-
-            // store track in table
-            insertTrack.setLong(1, id);
-            insertTrack.setLong(2, refGenID);
-            insertTrack.setString(3, track.getDescription());
-            insertTrack.setTimestamp(4, track.getTimestamp());
-//            insertTrack.setLong(5, runID);
-            insertTrack.execute();
-
-            insertTrack.close();
-            latestID.close();
-
-        } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
-    }
-
-        private void storeStatics(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        int mappings = 0;
+        int numMappings = 0;
         int perfectmappings = 0;
         int bmmappings = 0;
-        int noUniqueSeq = 0;
-        int noUniqueMappings= 0;
+        int numUniqueSeq = 0;
+        int numUniqueMappings= 0;
+        int numReads = 0;
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
-            mappings = mappingInfos.get(1);
+            numMappings = mappingInfos.get(1);
             perfectmappings = mappingInfos.get(2);
             bmmappings = mappingInfos.get(3);
-            noUniqueSeq = mappingInfos.get(4);
-            noUniqueMappings =  mappingInfos.get(5);
+            numUniqueMappings = mappingInfos.get(4);
+            numUniqueSeq = mappingInfos.get(5);
+            numReads = mappingInfos.get(6);
+            
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the list");
         }
         try {
-            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
-            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATICS_ID);
+            PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
+            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
 
             // get latest id for track
             long id = 0;
@@ -889,19 +846,20 @@ public class ProjectConnector {
             id++;
 
             // store track in table
-            insertStatics.setLong(1, id);
-            insertStatics.setLong(2, track.getID());
-            insertStatics.setInt(3, mappings);
-            insertStatics.setInt(4, perfectmappings);
-            insertStatics.setInt(5, bmmappings);
-            insertStatics.setInt(6, noUniqueMappings);
-            insertStatics.setInt(7, coveragePerf);
-            insertStatics.setInt(8, coverageBM);
-            insertStatics.setInt(9, coverageComplete);
-            insertStatics.setInt(10, noUniqueSeq);
-            insertStatics.execute();
+            insertStatistics.setLong(1, id);
+            insertStatistics.setLong(2, track.getID());
+            insertStatistics.setInt(3, numMappings);
+            insertStatistics.setInt(4, perfectmappings);
+            insertStatistics.setInt(5, bmmappings);
+            insertStatistics.setInt(6, numUniqueMappings);
+            insertStatistics.setInt(7, coveragePerf);
+            insertStatistics.setInt(8, coverageBM);
+            insertStatistics.setInt(9, coverageComplete);
+            insertStatistics.setInt(10, numUniqueSeq);
+            insertStatistics.setInt(11, numReads);
+            insertStatistics.execute();
 
-            insertStatics.close();
+            insertStatistics.close();
             latestID.close();
 
         } catch (SQLException ex) {
@@ -1062,6 +1020,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting diff data");
     }
 
+    
     private void lockTrackDomainTables() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start locking track domain tables...");
         try {
@@ -1074,33 +1033,27 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done locking track domain tables");
     }
 
-    public Long addTrack(ParsedTrack track, long runID, long refGenID) throws StorageException {
-
+    
+    public Long addTrack(ParsedTrack track, long refGenID) throws StorageException {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
+        
         if (adapter.equalsIgnoreCase("mysql")) {
-
             this.lockTrackDomainTables();
             this.disableTrackDomainIndices();
+        }
+        this.storeTrack(track, refGenID);
+        this.storeCoverage(track);
+        this.storeStatistics(track);
+        this.storeMappings(track);
+        this.storeDiffs(track);
 
-            this.storeTrack(track, refGenID, runID);
-            this.storeCoverage(track);
-            this.storeStatics(track);
-            this.storeMappings(track);
-            this.storeDiffs(track);
-
+        if (adapter.equalsIgnoreCase("mysql")) {
             this.enableTrackDomainIndices();
             this.unlockTables();
-        } else {
-
-            this.storeTrackH2(track, refGenID, runID);
-            this.storeCoverage(track);
-            this.storeStatics(track);
-            this.storeMappings(track);
-            this.storeDiffs(track);
-            track.clear();
-
         }
+
+        track.clear();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
 
         return track.getID();

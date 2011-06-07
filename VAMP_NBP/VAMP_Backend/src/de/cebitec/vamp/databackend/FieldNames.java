@@ -29,7 +29,7 @@ public class FieldNames {
     public final static String TABLE_TRACKS = "TRACK";
 //    public final static String TABLE_RUN = "RUN";
 //    public final static String TABLE_READS = "READNAME";
-    public final static String TABLE_STATICS = "STATICS";
+    public final static String TABLE_STATISTICS = "STATISTICS";
 
 
     ////////////////////////  fields of tables  ////////////////////////////////
@@ -99,7 +99,7 @@ public class FieldNames {
 
     // mapping table fields
     public final static String MAPPING_ID = "ID";
-    public final static String MAPPING_SEQUENCE = "SEQUENCE_ID";
+    public final static String MAPPING_SEQUENCE_ID = "SEQUENCE_ID";
     public final static String MAPPING_START = "START";
     public final static String MAPPING_STOP = "STOP";
     public final static String MAPPING_NUM_OF_ERRORS = "NUM_OF_ERRORS";
@@ -127,16 +127,28 @@ public class FieldNames {
 //    public final static String READ_NAME = "NAME";
 //    public final static String READ_SEQUENCE = "SEQUENCE_ID";
 
-   // statics table fields
-    public final static String STATICS_ID = "ID";
-    public final static String STATICS_TRACK = "TRACK_ID";
-    public final static String STATICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
-    public final static String STATICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
-//    public final static String STATICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
-    public final static String STATICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
-    public final static String STATICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
-    public final static String STATICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
-    public final static String STATICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
+    // statistics table fields
+    public final static String STATISTICS_ID = "ID";
+    public final static String STATISTICS_TRACK_ID = "TRACK_ID";
+    public final static String STATISTICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
+    public final static String STATISTICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
+    public final static String STATISTICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
+//    public final static String STATISTICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
+    public final static String STATISTICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
+    public final static String STATISTICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
+    public final static String STATISTICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
+    public final static String STATISTICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
+    public final static String STATISTICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
+    public final static String STATISTICS_NUMBER_READS = "NUMBER_OF_READS";
+    
+    // unique mappings = count all distinct mapping ids
+    // unique sequences = num mapped seq = count all distinct seq ids
+    // num mappings = count ALL mapping ids
+    // num reads = extra calculation: count all reads during import process
+    /*
+     * Num reads cannot be determined afterwards, because neither unique sequences 
+     * (might contain different reads with same sequence), nor number of mappings
+     * (might contain more than 1 mapping per read!)
+     */
+    
 }

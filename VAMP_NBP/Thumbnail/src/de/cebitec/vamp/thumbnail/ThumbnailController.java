@@ -287,7 +287,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         //Set initial Slider-value based on Coverage if autoSlider is true
         if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosofTrack(currentFeature.getStart(), currentFeature.getStop());
+            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(currentFeature.getStart(), currentFeature.getStop());
             int max = 0;
             int cnt = 0;
             int avg = 0;

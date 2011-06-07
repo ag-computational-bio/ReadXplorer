@@ -1,6 +1,5 @@
 package de.cebitec.vamp.databackend.connector;
 
-import de.cebitec.vamp.databackend.H2SQLStatements;
 import de.cebitec.vamp.databackend.SQLStatements;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -63,18 +62,18 @@ public class RunConnector {
     public int getNumberOfReads() {
         int num = 0;
 
-        try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK);
-            fetch.setLong(1, this.runID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_READS_FOR_TRACK);
+//            fetch.setLong(1, this.runID);
+//
+//            ResultSet rs = fetch.executeQuery();
+//            if (rs.next()) {
+//                num = rs.getInt("NUM");
+//            }
+//
+//        } catch (SQLException ex) {
+//            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
         return num;
     }
@@ -84,7 +83,7 @@ public class RunConnector {
         int num = 0;
 
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_MAPPINGS_FOR_TRACK_CALCULATE);
             fetch.setLong(1, this.runID);
 
             ResultSet rs = fetch.executeQuery();
@@ -103,7 +102,7 @@ public class RunConnector {
     public int getNumberOfUniqueSequences() {
         int num = 0;
         try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK);
             fetch.setLong(1, this.runID);
 
             ResultSet rs = fetch.executeQuery();
@@ -117,14 +116,7 @@ public class RunConnector {
         return num;
     }
 
-    /**
-     *
-     * @return
-     * @deprecated Since the RUN domain is excluded, the database only contains reads
-     * which have already been mapped. Instead use the following method:
-     * @see TrackConnector#getNumOfMappedSequencesCalculate()
-     */
-    @Deprecated
+
     public int getNumberOfUniqueSequencesCalculate() {
         int num = 0;
         try {
@@ -140,22 +132,5 @@ public class RunConnector {
         }
 
         return num;
-    }
-
-    @Deprecated
-    public void updateTableStatics(int numOfReads, int numOfUniqueSeq) {
-        try {
-            con.setAutoCommit(false);
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_STATIC_VALUES);
-            fetch.setInt(1, numOfReads);
-            fetch.setInt(2, numOfUniqueSeq);
-            fetch.setLong(3, trackID);
-            fetch.execute();
-            con.commit();
-            con.setAutoCommit(true);
-        } catch (SQLException ex) {
-            Logger.getLogger(RunConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 }

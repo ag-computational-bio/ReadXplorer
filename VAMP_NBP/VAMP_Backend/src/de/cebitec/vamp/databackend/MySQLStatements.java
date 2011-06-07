@@ -9,6 +9,9 @@ package de.cebitec.vamp.databackend;
  * This class contains the statements which are only used by the MySQL Database
  */
 public class MySQLStatements {
+    
+    //////////////////  statements for table creation  /////////////////////////
+    
     public final static String SETUP_REFERENCE_GENOME =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_REF_GEN+" " +
             "(" +
@@ -19,6 +22,7 @@ public class MySQLStatements {
             FieldNames.REF_GEN_TIMESTAMP+" DATETIME NOT NULL" +
             ") ";
 
+    
     public final static String SETUP_DIFFS =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_DIFF+" " +
             "(" +
@@ -32,6 +36,7 @@ public class MySQLStatements {
             "INDEX ("+FieldNames.DIFF_MAPPING_ID+") " +
             ") ";
 
+    
     public final static String SETUP_COVERAGE =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_COVERAGE+" "+
             "(" +
@@ -53,6 +58,7 @@ public class MySQLStatements {
             "INDEX ("+FieldNames.COVERAGE_POSITION+", "+FieldNames.COVERAGE_TRACK+") " +
             ") ";
 
+    
     public final static String SETUP_FEATURES =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_FEATURES+" " +
             "(" +
@@ -68,11 +74,12 @@ public class MySQLStatements {
             "INDEX ("+FieldNames.FEATURE_REFGEN+") " +
             ") ";
 
+    
     public final static String SETUP_MAPPINGS =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_MAPPINGS+" " +
             "(" +
             FieldNames.MAPPING_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
-            FieldNames.MAPPING_SEQUENCE+ " BIGINT UNSIGNED NOT NULL, "+
+            FieldNames.MAPPING_SEQUENCE_ID+ " BIGINT UNSIGNED NOT NULL, "+
             FieldNames.MAPPING_TRACK+" BIGINT UNSIGNED NOT NULL, "+
             FieldNames.MAPPING_START+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_STOP+" BIGINT UNSIGNED NOT NULL, " +
@@ -82,9 +89,10 @@ public class MySQLStatements {
             FieldNames.MAPPING_BEST_MAPPING+" TINYINT UNSIGNED NOT NULL, " +
             " INDEX ("+FieldNames.MAPPING_START+"), " +
             " INDEX ("+FieldNames.MAPPING_STOP+"), " +
-            " INDEX ("+FieldNames.MAPPING_SEQUENCE+") " +
+            " INDEX ("+FieldNames.MAPPING_SEQUENCE_ID+") " +
             ") ";
 
+    
     public final static String SETUP_TRACKS =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_TRACKS+" " +
             "( " +
@@ -96,6 +104,31 @@ public class MySQLStatements {
             "INDEX ("+FieldNames.TRACK_REFGEN+") " +
             ") ";
 
+//    public final static String SETUP_RUN =
+//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_RUN+" " +
+//            "( " +
+//            FieldNames.RUN_ID+" BIGINT PRIMARY KEY, " +
+//            FieldNames.RUN_DESCRIPTION+" VARCHAR (100) NOT NULL, " +
+//            FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL"+
+//            ")";
+
+//    public final static String SETUP_SEQUENCE =
+//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_SEQUENCE+" " +
+//            "(" +
+//            FieldNames.SEQUENCE_ID+" BIGINT PRIMARY KEY, " +
+//            FieldNames.SEQUENCE_RUN+" BIGINT UNSIGNED NOT NULL, " +
+//            "INDEX ("+FieldNames.SEQUENCE_RUN+") " +
+//            ") ";
+
+//    public final static String SETUP_READS =
+//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_READS+" " +
+//            "( " +
+//            FieldNames.READ_ID+" BIGINT PRIMARY KEY, " +
+//            FieldNames.READ_NAME+" VARCHAR (100) NOT NULL, " +
+//            FieldNames.READ_SEQUENCE+" BIGINT UNSIGNED NOT NULL, " +
+//            "INDEX ("+FieldNames.READ_SEQUENCE+") " +
+//            ")";
+
 
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT " +
@@ -104,7 +137,7 @@ public class MySQLStatements {
                 "M."+FieldNames.MAPPING_COUNT+", "+
                 "M."+FieldNames.MAPPING_DIRECTION+", "+
                 "M."+FieldNames.MAPPING_NUM_OF_ERRORS+", "+
-                "M."+FieldNames.MAPPING_SEQUENCE+", "+
+                "M."+FieldNames.MAPPING_SEQUENCE_ID+", "+
                 "M."+FieldNames.MAPPING_START+", "+
                 "M."+FieldNames.MAPPING_STOP+", "+
                 "M."+FieldNames.MAPPING_TRACK+", "+
@@ -120,7 +153,7 @@ public class MySQLStatements {
                     FieldNames.MAPPING_COUNT+", "+
                     FieldNames.MAPPING_DIRECTION+", "+
                     FieldNames.MAPPING_NUM_OF_ERRORS+", "+
-                    FieldNames.MAPPING_SEQUENCE+", "+
+                    FieldNames.MAPPING_SEQUENCE_ID+", "+
                     FieldNames.MAPPING_START+", "+
                     FieldNames.MAPPING_STOP+", "+
                     FieldNames.MAPPING_TRACK+" "+
@@ -135,23 +168,6 @@ public class MySQLStatements {
                 FieldNames.TABLE_DIFF+" AS D " +
             "on " +
                 "M."+FieldNames.MAPPING_ID+" = D."+FieldNames.DIFF_MAPPING_ID;
-
-        public final static String FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE =
-            "SELECT " +
-                "COUNT(M."+FieldNames.MAPPING_ID+") as NUM " +
-            " FROM "+
-                FieldNames.TABLE_MAPPINGS+" as M " +
-            "WHERE "+
-                "M."+FieldNames.MAPPING_TRACK+" = ? ";
-
-    public final static String FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE =
-            "SELECT " +
-                "COUNT(M."+FieldNames.MAPPING_ID+") as NUM " +
-            " FROM "+
-                FieldNames.TABLE_MAPPINGS+ " as M "+
-            "WHERE "+
-                "M."+FieldNames.MAPPING_TRACK +" = ? and "+
-                "M."+FieldNames.MAPPING_NUM_OF_ERRORS+" = 0 ";
 
 
     public final static String FETCH_SNP_DATA_FOR_TRACK =
@@ -185,6 +201,5 @@ public class MySQLStatements {
             "WHERE " +
                 "C."+FieldNames.COVERAGE_TRACK+" = ? AND " +
                 "C."+FieldNames.COVERAGE_POSITION+" = A."+FieldNames.DIFF_POSITION;
-
-
+    
 }

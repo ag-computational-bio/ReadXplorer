@@ -134,7 +134,7 @@ public class AlignmentViewer extends AbstractViewer {
 
     private void createAndShowNewLayout(int from, int to){
         Collection<PersistantMapping> mappings = trackConnector.getMappings(from, to);
-        HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosofTrack(from, to);
+        HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
         this.findMinAndMaxCount(mappings); //for currently shown mappings
         this.findMaxCoverage(coverage);
         this.setViewerHeight();
