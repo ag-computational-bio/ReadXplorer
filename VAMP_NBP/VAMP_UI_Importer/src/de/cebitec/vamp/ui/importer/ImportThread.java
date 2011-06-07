@@ -142,7 +142,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void storeTrack(ParsedTrack track, TrackJob trackJob) throws StorageException{
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
 
-        Long trackID = ProjectConnector.getInstance().addTrack(track, trackJob.getID(), trackJob.getRefGen().getID());
+        Long trackID = ProjectConnector.getInstance().addTrack(track, trackJob.getRefGen().getID());
         trackJob.setPersistant(trackID);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
