@@ -75,7 +75,11 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 if (selectedRows.length > 0) {
                     int correctedRow = jTable1.convertRowIndexToModel(selectedRows[0]);
                     PersistantFeature feature = (PersistantFeature) jTable1.getModel().getValueAt(correctedRow, 0);
-                    boundsManager.navigatorBarUpdated(feature.getStart());
+                    if (feature.getStrand() == 1){
+                        boundsManager.navigatorBarUpdated(feature.getStart());
+                    } else {
+                        boundsManager.navigatorBarUpdated(feature.getStop());
+                    }
                 }
             }
         });
@@ -120,30 +124,32 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jumpPositionLabel = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jumpTextfield = new javax.swing.JTextField();
         jumpButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
         filterProperties = new javax.swing.JPanel();
         jumpFilterLabel = new javax.swing.JLabel();
         filterText = new javax.swing.JTextField();
         filterForLabel = new javax.swing.JLabel();
         radioProduct = new javax.swing.JRadioButton();
         radioEC = new javax.swing.JRadioButton();
+        radioFeatureButton = new javax.swing.JRadioButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Navigation"));
         setPreferredSize(new java.awt.Dimension(190, 500));
 
-        jumpPositionLabel.setText("Position:");
+        jumpPositionLabel.setText("Jump to Position:");
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        jumpTextfield.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                jumpTextfieldActionPerformed(evt);
             }
         });
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+        jumpTextfield.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTextField1KeyTyped(evt);
+                jumpTextfieldKeyTyped(evt);
             }
         });
 
@@ -154,8 +160,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         });
 
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jScrollPane1.setViewportView(jTable1);
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         filterProperties.setBorder(javax.swing.BorderFactory.createTitledBorder("FilterProperties"));
 
@@ -164,7 +169,6 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         filterForLabel.setText("Filter for:");
 
         buttonGroup1.add(radioProduct);
-        radioProduct.setSelected(true);
         radioProduct.setText("Product");
         radioProduct.setActionCommand("product");
         radioProduct.addActionListener(new java.awt.event.ActionListener() {
@@ -182,6 +186,15 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         });
 
+        buttonGroup1.add(radioFeatureButton);
+        radioFeatureButton.setSelected(true);
+        radioFeatureButton.setText("Feature");
+        radioFeatureButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioFeatureButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout filterPropertiesLayout = new javax.swing.GroupLayout(filterProperties);
         filterProperties.setLayout(filterPropertiesLayout);
         filterPropertiesLayout.setHorizontalGroup(
@@ -191,28 +204,48 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addComponent(filterForLabel)
                     .addComponent(jumpFilterLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(filterPropertiesLayout.createSequentialGroup()
-                        .addComponent(filterText, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
-                        .addGap(5, 5, 5))
-                    .addGroup(filterPropertiesLayout.createSequentialGroup()
+                        .addComponent(radioFeatureButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioProduct)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioEC)
-                        .addContainerGap())))
+                        .addComponent(radioEC))
+                    .addComponent(filterText)))
         );
         filterPropertiesLayout.setVerticalGroup(
             filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(filterPropertiesLayout.createSequentialGroup()
-                .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jumpFilterLabel)
-                    .addComponent(filterText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(filterText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jumpFilterLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(filterForLabel)
                     .addComponent(radioProduct)
-                    .addComponent(radioEC))
+                    .addComponent(radioEC)
+                    .addComponent(radioFeatureButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jScrollPane1.setViewportView(jTable1);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+                .addComponent(filterProperties, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -221,45 +254,43 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jumpPositionLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jumpTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jumpButton))
-            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
-            .addComponent(filterProperties, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jumpPositionLabel)
+                    .addComponent(jumpTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jumpButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(116, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+    private void jumpTextfieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jumpTextfieldKeyTyped
         //jumpList.setSelectedValue(null, false);
         //DefaultListSelectionModel model = (DefaultListSelectionModel) jumpList.getSelectionModel();
         //model.clearSelection();
-}//GEN-LAST:event_jTextField1KeyTyped
+}//GEN-LAST:event_jumpTextfieldKeyTyped
 
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
-        if (isValidInput(jTextField1.getText())) {
-            jumpPosition = Integer.parseInt(jTextField1.getText());
+        if (isValidInput(jumpTextfield.getText())) {
+            jumpPosition = Integer.parseInt(jumpTextfield.getText());
             boundsManager.navigatorBarUpdated(jumpPosition);
         } else {
             JOptionPane.showMessageDialog(this, "Please enter a valid position!", "Invalid Position", JOptionPane.ERROR_MESSAGE);
         }
 }//GEN-LAST:event_jumpButtonActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void jumpTextfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpTextfieldActionPerformed
         jumpButtonActionPerformed(evt);
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_jumpTextfieldActionPerformed
 
     private void radioProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioProductActionPerformed
         clearFilter();
@@ -268,6 +299,10 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private void radioECActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioECActionPerformed
         clearFilter();
     }//GEN-LAST:event_radioECActionPerformed
+
+    private void radioFeatureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFeatureButtonActionPerformed
+        clearFilter();
+    }//GEN-LAST:event_radioFeatureButtonActionPerformed
 
     private boolean isValidInput(String s) {
         try {
@@ -286,13 +321,15 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private javax.swing.JLabel filterForLabel;
     private javax.swing.JPanel filterProperties;
     private javax.swing.JTextField filterText;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JButton jumpButton;
     private javax.swing.JLabel jumpFilterLabel;
     private javax.swing.JLabel jumpPositionLabel;
+    private javax.swing.JTextField jumpTextfield;
     private javax.swing.JRadioButton radioEC;
+    private javax.swing.JRadioButton radioFeatureButton;
     private javax.swing.JRadioButton radioProduct;
     // End of variables declaration//GEN-END:variables
 
@@ -318,18 +355,22 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     }
 
     /*
-     * Uses regular expression to filter all matching entries in Product- or EC-Column.
+     * Uses regular expression to filter all matching entries in Feature, Product- or EC-Column.
      */
     private void updateFilter() {
         RowFilter<TableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
+            if (radioFeatureButton.isSelected()){
+                rf = RowFilter.regexFilter(filterText.getText(), 0);
+            } else
             if (radioProduct.isSelected()) {
                 rf = RowFilter.regexFilter(filterText.getText(), 1);
-            }
+            } else
             if (radioEC.isSelected()) {
                 rf = RowFilter.regexFilter(filterText.getText(), 2);
             }
+
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
@@ -350,8 +391,8 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
    
     void clearFilter() {
-        filterText.setText("");
-        updateFilter();
+        this.filterText.setText("");
+        this.updateFilter();
     }
 
     private class FeatureNameSorter implements Comparator<PersistantFeature> {
@@ -362,11 +403,11 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             String name2 = o2.getLocus();
 
             // null string is always "bigger" than anything else
-            if (name1 == null && name1 != null) {
+            if (name1 == null && name2 != null) {
                 return 1;
             } else if (name1 != null && name2 == null) {
                 return -1;
-            } else if (name1 == name2) {
+            } else if (name1 == name2) { //== comparison desired here 4 nullcheck
                 // both are null
                 return 0;
             } else {

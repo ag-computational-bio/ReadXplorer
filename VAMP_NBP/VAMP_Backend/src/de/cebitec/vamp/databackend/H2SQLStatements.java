@@ -411,7 +411,7 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                 "S."+FieldNames.STATICS_TRACK+" = ?";
 
 
-    public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVALL =
+    public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
             "SELECT A."+FieldNames.DIFF_POSITION+", " +
                     "A."+FieldNames.DIFF_CHAR+", " +
                     "A."+FieldNames.MAPPING_DIRECTION+", " +

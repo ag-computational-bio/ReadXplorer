@@ -87,7 +87,7 @@ public class PaintingAreaInfo {
         recalcWidth();
     }
 
-    public int getPhyWidt() {
+    public int getPhyWidth() {
         return phyWidth;
     }
 
@@ -104,8 +104,8 @@ public class PaintingAreaInfo {
         return reverseHigh;
     }
 
-    public void setReverseHigh(int revserHigh) {
-        this.reverseHigh = revserHigh;
+    public void setReverseHigh(int reverseHigh) {
+        this.reverseHigh = reverseHigh;
         updateAvailableReverseHeight();
         updateCompleteHeight();
     }

@@ -16,7 +16,7 @@ public class FieldNames {
     /**
      * NOTE: All commands belonging to the RUN domain have been commented out,
      * because the run domain has been excluded from VAMP!!!!
-     * This includes the Run, Unique_Sequence and Readname tables!
+     * This includes the Run, Unique_Sequence and Readname tables! service provider?
      */
 
     // names for various database tables

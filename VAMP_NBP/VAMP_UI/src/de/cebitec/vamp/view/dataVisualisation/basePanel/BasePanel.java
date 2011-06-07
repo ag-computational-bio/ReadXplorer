@@ -30,7 +30,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private MousePositionListener viewController;
     private List<MousePositionListener> currentMousePosListeners;
     private JPanel centerPanel;
-    private AdjustmentPanel adjustmentPanel;
+    private AdjustmentPanel adjustmentPanelHorizontal;
     private Component topPanel;
 
     public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
@@ -63,9 +63,9 @@ public class BasePanel extends JPanel implements MousePositionListener {
     }
 
     private void shutdownInfoPanelAndAdjustmentPanel(){
-        if(adjustmentPanel != null){
-            centerPanel.remove(adjustmentPanel);
-            adjustmentPanel = null;
+        if(adjustmentPanelHorizontal != null){
+            centerPanel.remove(adjustmentPanelHorizontal);
+            adjustmentPanelHorizontal = null;
         }
 
         if(rightPanel != null){
@@ -99,6 +99,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
         boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
+        
         if(viewer instanceof ReferenceViewer){
               JPanel p = new JPanel();
               p.add(new JLabel(" "));
@@ -108,8 +109,8 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.updateSize();
     }
 
-    public void setAdjustmentPanel(AdjustmentPanel adjustmentPanel){
-        this.adjustmentPanel = adjustmentPanel;
+    public void setHorizontalAdjustmentPanel(AdjustmentPanel adjustmentPanel){
+        this.adjustmentPanelHorizontal = adjustmentPanel;
         centerPanel.add(adjustmentPanel, BorderLayout.NORTH);
         this.updateSize();
     }

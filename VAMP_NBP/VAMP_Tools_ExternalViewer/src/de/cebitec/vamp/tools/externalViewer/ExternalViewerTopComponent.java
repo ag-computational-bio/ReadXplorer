@@ -7,6 +7,7 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import java.awt.CardLayout;
 import java.util.logging.Logger;
+import javax.swing.JScrollPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -28,6 +29,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
     private TrackConnector trackConnector;
     private BasePanel alignmentBasePanel;
+    private JScrollPane alignmentScrollPane;
     private BasePanel logoBasePanel;
     private CardLayout cards;
 
@@ -91,7 +93,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
                 .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(seqlogoButton)
                     .addComponent(alignmentButton))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
             .addGroup(switchPanelLayout.createSequentialGroup()
                 .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
                 .addGap(24, 24, 24))
@@ -105,7 +107,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
                 .addComponent(alignmentButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(252, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         add(switchPanel, java.awt.BorderLayout.WEST);
@@ -129,6 +131,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
         logoBasePanel.getViewer().setActive(false);
         alignmentBasePanel.getViewer().setActive(true);
+        alignmentBasePanel.getViewer().setActive(true); //to ensure size calculation is performed correctly
         cards.show(cardPanel, ALIGNMENTCARD);
 }//GEN-LAST:event_alignmentButtonActionPerformed
 
@@ -188,15 +191,17 @@ public final class ExternalViewerTopComponent extends TopComponent {
         ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        alignmentBasePanel = factory.getDetailTrackBasePanel(trackConnector);
-        alignmentBasePanel.getViewer().setActive(false);
-        logoBasePanel = factory.getSequenceLogoBasePanel(trackConnector);
-        logoBasePanel.getViewer().setActive(true);
+        this.alignmentBasePanel = factory.getDetailTrackBasePanel(this.trackConnector);
+        this.alignmentBasePanel.getViewer().setActive(false);
+        this.alignmentScrollPane = new JScrollPane(this.alignmentBasePanel);
+        this.logoBasePanel = factory.getSequenceLogoBasePanel(this.trackConnector);
+        this.logoBasePanel.getViewer().setActive(true);
 
-        cards = (CardLayout) cardPanel.getLayout();
-        cardPanel.add(alignmentBasePanel, ALIGNMENTCARD);
-        cardPanel.add(logoBasePanel, LOGOCARD);
-        cards.show(cardPanel, LOGOCARD);
+        this.cards = (CardLayout) this.cardPanel.getLayout();
+        
+        this.cardPanel.add(this.alignmentScrollPane, ALIGNMENTCARD);
+        this.cardPanel.add(this.logoBasePanel, LOGOCARD);
+        this.cards.show(this.cardPanel, LOGOCARD);
     }
 
     @Override

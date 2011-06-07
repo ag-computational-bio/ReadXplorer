@@ -13,4 +13,7 @@ public class Properties {
 
     public static final String VAMP_FILECHOOSER_DIRECTORY = "VampFileChooser.Directory";
     public static final String VAMP_DATABASE_DIRECTORY = "Vamp.Database.Directory";
+    
+    public static final String MATEPAIR_DISTANCE = "Matepair.Distance";
+    public static final String MATEPAIR_DEVIATION = "Matepair.Deviation";
 }
