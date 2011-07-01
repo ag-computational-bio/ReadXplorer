@@ -87,9 +87,10 @@ public interface ITrackConnector {
      * identifies SNPs.
      * @param percentageThreshold
      * @param absThreshold
+     * @param is454 
      * @return
      */
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
+    public List<Snp> findSNPs(int percentageThreshold, int absThreshold, boolean is454);
 
     public double getPercentRefGenPerfectCovered();
 

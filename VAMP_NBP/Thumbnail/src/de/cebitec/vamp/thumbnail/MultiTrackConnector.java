@@ -616,7 +616,7 @@ public class MultiTrackConnector implements ITrackConnector {
      * from the table mapping we have to do this so that we dont miss any mapping that have a diff in this 50 positions
      */
     @Override
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
+    public List<Snp> findSNPs(int percentageThreshold, int absThreshold, boolean is454) {
         ArrayList<Snp> snps = new ArrayList<Snp>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
         int fromDiff = 1;

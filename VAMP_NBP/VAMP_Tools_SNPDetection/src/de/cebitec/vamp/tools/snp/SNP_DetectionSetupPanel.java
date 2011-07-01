@@ -58,7 +58,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
             ph.start();
 
-            snps = con.findSNPs(percent, num);
+            snps = con.findSNPs(percent, num, false);
             return snps;
         }
 

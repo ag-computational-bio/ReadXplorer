@@ -685,6 +685,61 @@ public class TrackConnector implements ITrackConnector{
         }
         return snps;
     }
+    
+    
+    private List<Snp> filterSnps454(Map<Integer, Integer[]> map, int overallPercentage, int absThreshold) {
+        ArrayList<Snp> snps = new ArrayList<Snp>();
+
+        Iterator<Integer> positions = map.keySet().iterator();
+        while (positions.hasNext()) {
+            int position = positions.next();
+            Integer[] data = map.get(position);
+            double complete = data[COV];
+            double diffCov = data[DIFF_COV];
+            int percentage = (int) (diffCov / complete * 100);
+            //boolean continuousCoverage = isCoverageContinuous(position, complete, map);
+            //Filterschritt: mindestens 3 reads muessen abweichen (zusaetzlich, falls nur wenige 
+            // reads an der Stelle mappen) && continuousCoverage && (diffCov > 3)
+            if ((percentage > overallPercentage) && (diffCov > 3)) {
+                for (int i = A_COV; i < data.length; i++) {
+                    if (this.isSNP(data, i, absThreshold)) {
+                        snps.add(this.createSNP(data, i, position, percentage));
+                    }
+                }
+            }
+        }
+        return snps;
+    }
+    
+    /*
+     * pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
+     * stetige Readabdeckung
+     */
+    private boolean isCoverageContinuous(int position, double coverage, Map<Integer, Integer[]> map){
+        boolean isContinous = true;
+        int refLength = 12000;
+        for(int i=1; i<5 && isContinous; i++){
+            int leftPosition = position-i;
+            int rightPosition = position+i;
+            
+            //nach links gucken
+            if(leftPosition >= 1){            
+                double deviation = (Math.abs(map.get(leftPosition)[COV] - coverage))/coverage;               
+                if(deviation >= 0.5 ){
+                    isContinous = false;
+                }
+            }
+                 
+            //nach rechts gucken
+            if((rightPosition <= refLength)){
+                double deviation = (Math.abs(map.get(rightPosition)[COV] - coverage))/coverage;
+                if(deviation >= 0.5){
+                    isContinous = false;
+                }
+            }
+        }
+        return isContinous;
+    }
 
 //    @Override
 //    public List<Read> findReads(String read) {
@@ -717,7 +772,7 @@ public class TrackConnector implements ITrackConnector{
      * from the table mapping we have to do this so that we dont miss any mapping that have a diff in this 50 positions
      */
     @Override
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
+    public List<Snp> findSNPs(int percentageThreshold, int absThreshold, boolean is454) {
         ArrayList<Snp> snps = new ArrayList<Snp>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
         final int diffIntervalSize = 50;
@@ -770,8 +825,11 @@ public class TrackConnector implements ITrackConnector{
 
                 }
           }
-
-            snps.addAll(this.filterSnps(covData, percentageThreshold, absThreshold));
+            if(is454){
+                snps.addAll(this.filterSnps454(covData, percentageThreshold, absThreshold));
+            } else {
+                snps.addAll(this.filterSnps(covData, percentageThreshold, absThreshold));
+            }
 
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);

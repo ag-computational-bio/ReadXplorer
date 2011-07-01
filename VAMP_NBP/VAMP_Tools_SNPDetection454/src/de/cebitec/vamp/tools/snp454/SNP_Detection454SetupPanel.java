@@ -61,9 +61,9 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
         protected List<Snp> doInBackground() {
             CentralLookup.getDefault().add(this);
 
-  //          ph.start();
+//            ph.start();
 
-            //snps = con.findSNPs(percent, num);
+            snps = con.findSNPs(percent, num, true);
             return snps;
         }
 
@@ -71,7 +71,7 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
         protected void done() {
             CentralLookup.getDefault().remove(this);
 
-     //       ph.finish();
+//            ph.finish();
         }
 
     }
