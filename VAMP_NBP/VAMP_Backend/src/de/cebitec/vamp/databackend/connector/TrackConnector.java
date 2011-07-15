@@ -3,7 +3,6 @@ package de.cebitec.vamp.databackend.connector;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.FieldNames;
-import de.cebitec.vamp.databackend.H2SQLStatements;
 import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
@@ -11,6 +10,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 //import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.GenericSQLQueries;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -231,80 +231,100 @@ public class TrackConnector implements ITrackConnector{
 
     @Override
     public int getNumOfReads(){
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
     
 
     @Override
     public int getNumOfReadsCalculate() {
-        //return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, con, trackID);
+        //return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, con, trackID);
         return 0; //TODO: implement calc number of reads
     }
 
     @Override
     public int getNumOfUniqueSequences(){
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfUniqueSequencesCalculate() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfUniqueBmMappings() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfUniqueBmMappingsCalculate() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
 
 
     @Override
     public int getNumOfMappings() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfMappingsCalculate() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfUniqueMappings(){
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
     
     @Override
     public int getNumOfUniqueMappingsCalculate(){
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfPerfectSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfUniqueSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfUniquePerfectSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_PERFECT_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     
     @Override
     public int getNumOfPerfectUniqueMappings() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     
     @Override
     public int getNumOfPerfectUniqueMappingsCalculate() {
-        return SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
     
     
     @Override
     public double getPercentRefGenPerfectCovered() {
-        double absValue = SQLStatements.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
         return absValue / genomeSize * 100;
     }
     
     
     @Override
     public double getPercentRefGenPerfectCoveredCalculate() {
-        double absValue = SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
         return absValue / genomeSize * 100;
 
     }
@@ -312,28 +332,28 @@ public class TrackConnector implements ITrackConnector{
     
     @Override
     public double getPercentRefGenBmCovered() {
-        double absValue = SQLStatements.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
         return absValue / genomeSize * 100;
     }
 
     
     @Override
     public double getPercentRefGenBmCoveredCalculate() {
-        double absValue = SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
         return absValue / genomeSize * 100;
     }
 
     
     @Override
     public double getPercentRefGenNErrorCovered() {
-        double absValue = SQLStatements.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
         return absValue / genomeSize * 100;
     }
 
     
     @Override
     public double getPercentRefGenNErrorCoveredCalculate() {
-        double absValue = SQLStatements.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_COVERED, con, trackID);
         return absValue / genomeSize * 100;
     }
     
@@ -363,10 +383,13 @@ public class TrackConnector implements ITrackConnector{
         return positionMap;
     }
 
+    
+    
 
     @Override
     public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings, 
-            int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete, int numReads) {
+            int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete, int numReads, 
+            int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
             PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
@@ -394,6 +417,10 @@ public class TrackConnector implements ITrackConnector{
             insertStatistics.setInt(9, covComplete);
             insertStatistics.setInt(10, numUniqueSeq);
             insertStatistics.setInt(11, numReads);
+            insertStatistics.setInt(12, numSeqPairs);
+            insertStatistics.setInt(13, numPerfectSeqPairs);
+            insertStatistics.setInt(14, numUniqueSeqPairs);
+            insertStatistics.setInt(15, numUniquePerfectSeqPairs);
             insertStatistics.execute();
 
             insertStatistics.close();
@@ -630,7 +657,7 @@ public class TrackConnector implements ITrackConnector{
 
             ResultSet rs = fetch.executeQuery();
             if (rs.next()) {
-                refGenID = rs.getInt(FieldNames.TRACK_REFGEN);
+                refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -657,6 +684,26 @@ public class TrackConnector implements ITrackConnector{
     @Override
     public CoverageThread getThread() {
         return this.thread;
+    }
+
+    @Override
+    public int getNumOfSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getNumOfPerfectSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getNumOfUniqueSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getNumOfUniquePerfectSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

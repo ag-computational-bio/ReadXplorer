@@ -27,11 +27,12 @@ public class TrackParser implements TrackParserI {
         MappingParserI mappingp = trackJob.getParser();
         mappingp.registerObserver(observer);
 //        ParsedMappingContainer mappings = mappingp.parseInput(trackJob, readnameToSequenceID, sequenceString);
-        ParsedMappingContainer mappings = mappingp.parseInput(trackJob, sequenceString);
+        ParsedMappingContainer mappings = null;
+        mappings = mappingp.parseInput(trackJob, sequenceString);
 
         // release resources
 //        readnameToSequenceID = null;
-        mappingp = null;
+//        mappingp = null; //TODO: woanders leeren
 
         // compute the coverage for all mappings
         CoverageContainer coverageContainer = new CoverageContainer(mappings);

@@ -167,6 +167,7 @@ public class UniqueJokParser implements MappingParserI, Observer {
                     mapping.setCount(count);
 
                     mappingContainer.addParsedMapping(mapping, ++noUniqueSeq); //since all duplicate reads have been filtered before
+                    this.processReadname(count, readname); //TODO: correct this!!!! parser not up to date!
                 } else {
                     this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
                 }
@@ -341,5 +342,10 @@ public class UniqueJokParser implements MappingParserI, Observer {
     private void sendErrorMsg(final String errorMsg) {
         this.errorMsg = errorMsg;
         this.notifyObservers();
+    }
+
+    @Override
+    public void processReadname(int seqID, String readName) {
+        //nothing to do here
     }
 }

@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author ddoppmeier
  */
-public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener{
+public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener {
 
     private List<TrackJob> tracks;
     public final static long serialVersionUID = 774292377;

@@ -34,7 +34,7 @@ public final class GeneticCodesStore {
     };
 
     private static final String[][] START_CODONS = {
-/*1*/       { "TTG", "CTG", "ATG" },
+/*1*/       { "ATG", "GTG", "TTG" },
 /*2*/       { "ATT", "ATC", "ATA", "ATG", "GTG" },
 /*3*/       { "ATA", "ATG" },
 /*4*/       { "TTA", "TTG", "CTG", "ATT", "ATC", "ATA", "ATG", "GTG" },

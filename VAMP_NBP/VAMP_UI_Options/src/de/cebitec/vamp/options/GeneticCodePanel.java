@@ -7,6 +7,8 @@ package de.cebitec.vamp.options;
 import org.openide.util.NbPreferences;
 import de.cebitec.vamp.util.GeneticCodesStore;
 import de.cebitec.vamp.util.Properties;
+import java.util.ArrayList;
+import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 
 /**
@@ -18,6 +20,7 @@ import javax.swing.ListSelectionModel;
 final class GeneticCodePanel extends javax.swing.JPanel {
 
     private final GeneticCodeOptionsPanelController controller;
+    private AbstractListModel listModel;
 
     GeneticCodePanel(GeneticCodeOptionsPanelController controller) {
         this.controller = controller;
@@ -36,10 +39,38 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         chooseCodeLabel = new javax.swing.JLabel();
         geneticCodeScrolPane = new javax.swing.JScrollPane();
         geneticCodeList = new javax.swing.JList();
+        customCodonField = new javax.swing.JTextField();
+        addButton = new javax.swing.JButton();
+        customCodonLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        rmCustomCodonField = new javax.swing.JTextField();
+        removeButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(chooseCodeLabel, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.chooseCodeLabel.text")); // NOI18N
 
         geneticCodeScrolPane.setViewportView(geneticCodeList);
+
+        customCodonField.setText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.addButton.text")); // NOI18N
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(customCodonLabel, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.jLabel1.text")); // NOI18N
+
+        rmCustomCodonField.setText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.rmCustomCodonField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.removeButton.text")); // NOI18N
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -49,7 +80,21 @@ final class GeneticCodePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
-                    .addComponent(chooseCodeLabel))
+                    .addComponent(chooseCodeLabel)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(customCodonLabel)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(customCodonField, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(rmCustomCodonField, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(removeButton)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -59,9 +104,27 @@ final class GeneticCodePanel extends javax.swing.JPanel {
                 .addComponent(chooseCodeLabel)
                 .addGap(18, 18, 18)
                 .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addButton)
+                    .addComponent(customCodonField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(customCodonLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(removeButton)
+                    .addComponent(rmCustomCodonField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        this.addCodonsToList();
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_removeButtonActionPerformed
 
     void load() {
         this.geneticCodeList.setSelectedIndex(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.GENETIC_CODE_INDEX, "0")));
@@ -80,9 +143,15 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
     private javax.swing.JLabel chooseCodeLabel;
+    private javax.swing.JTextField customCodonField;
+    private javax.swing.JLabel customCodonLabel;
     private javax.swing.JList geneticCodeList;
     private javax.swing.JScrollPane geneticCodeScrolPane;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton removeButton;
+    private javax.swing.JTextField rmCustomCodonField;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -93,7 +162,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
         final String[] identifiers = GeneticCodesStore.getGeneticCodeIdentifiers();
         final String[][] geneticCodes = GeneticCodesStore.getStartCodons();
-        final String[] geneticCodesData = new String[identifiers.length];
+        final ArrayList<String> geneticCodesData = new ArrayList<String>();
         
         String[] startCodons;
         String startCodonsConcat;
@@ -104,21 +173,52 @@ final class GeneticCodePanel extends javax.swing.JPanel {
                 startCodonsConcat = startCodonsConcat.concat(startCodons[j].concat(", "));
             }
             startCodonsConcat = startCodonsConcat.substring(0, startCodonsConcat.length()-2);
-            geneticCodesData[i] = startCodonsConcat.concat(")</b> - <i>").concat(identifiers[i]).concat("</i></html>");
+            geneticCodesData.add(startCodonsConcat.concat(")</b> - <i>").concat(identifiers[i]).concat("</i></html>"));
         }
         
-        this.geneticCodeList.setModel(new javax.swing.AbstractListModel() {
-            String[] geneticCodesDataModel = geneticCodesData.clone();
+        this.geneticCodeList.setModel(new GeneticCodeListModel(geneticCodesData));
+    }
 
-            @Override
-            public int getSize() { 
-                return this.geneticCodesDataModel.length;
-            }
+    private void addCodonsToList() {
+        String codons = this.customCodonField.getText();
+        boolean isInputValid = this.checkInput(codons);
+        ((GeneticCodeListModel) this.geneticCodeList.getModel()).addElement(codons);
+        this.validate();
+        //TODO: store new codons in file
+    }
 
-            @Override
-            public Object getElementAt(int i) { 
-                return this.geneticCodesDataModel[i];
-            }
-        });
+    private boolean checkInput(String codonString) {
+        return true;
+    }
+    
+    /**
+     * Interal class representing the table model for start codons.
+     * Implements all methods needed for handling some geneticCodesData.
+     */
+    private class GeneticCodeListModel extends AbstractListModel {
+        
+        private ArrayList<String> geneticCodesDataModel;
+        
+        public GeneticCodeListModel(ArrayList<String> geneticCodesData){
+            this.geneticCodesDataModel = geneticCodesData;
+        }
+
+        @Override
+        public int getSize() {
+            return this.geneticCodesDataModel.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            return this.geneticCodesDataModel.get(i);
+        }
+
+        /**
+         * Adds an element at the end of the array.
+         * @param newCodonString String to add
+         */
+        public void addElement(String newCodonString) {
+            this.geneticCodesDataModel.add(newCodonString);
+        }
     }
 }

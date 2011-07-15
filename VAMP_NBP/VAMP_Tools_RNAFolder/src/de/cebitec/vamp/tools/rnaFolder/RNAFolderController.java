@@ -5,7 +5,6 @@ import de.cebitec.vamp.tools.rnaFolder.rnamovies.RNAMovies;
 import de.cebitec.vamp.view.dialogMenus.RNAFolderI;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.WindowManager;
 
@@ -30,6 +29,9 @@ public class RNAFolderController implements RNAFolderI {
         try { //new header because RNA movies cannot cope with spaces
             String rnaMoviesHeader = header.replace(" ", "_");
             String foldedSequence = RNAFoldCaller.callRNAFolder(sequenceToFold, rnaMoviesHeader);
+//            String foldedSequence = ">tRNA-like structure from turnip yellow mosaic virus\n"+
+//"UUAGCUCGCCAGUUAGCGAGGUCUGUCCCCACACGACAGAUAAUCGGGUGCAACUCCCGCCCCUUUUCCGAGGGUCAUCGGAACCA\n"+
+//"....(((((......)))))(((((((.......)))))))....(((.((.......)))))..((((((......))))))... (-27.80)";
             //String foldingEnergy = foldedSequence.substring(foldedSequence.indexOf(" ")+1);
             foldedSequence = foldedSequence.substring(0, foldedSequence.lastIndexOf("(")-1);
             RNAMovies rnaMovies = new RNAMovies();

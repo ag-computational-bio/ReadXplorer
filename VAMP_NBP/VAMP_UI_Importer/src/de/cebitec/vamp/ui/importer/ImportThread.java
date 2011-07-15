@@ -28,6 +28,9 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
+import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
+import de.cebitec.vamp.parser.mappings.JokSeqPairParser;
+import org.openide.util.Lookup;
 
 /**
  * Thread handling the import of data.
@@ -37,24 +40,26 @@ import org.openide.windows.InputOutput;
 public class ImportThread extends SwingWorker<Object, Object> implements Observer {
 
     private InputOutput io;
-    private List<ReferenceJob> gens;
-    private List<TrackJob> tracksRun;
+    private List<ReferenceJob> references;
+    private List<TrackJob> tracksJobs;
+    private List<SeqPairJobContainer> seqPairJobs;
     private HashMap<TrackJob, Boolean> validTracksRun;
     private ProgressHandle ph;
     private int workunits;
 
-    public ImportThread(List<ReferenceJob> gens, List<TrackJob> tracksRun) {
+    public ImportThread(List<ReferenceJob> refJobs, List<TrackJob> trackJobs, List<SeqPairJobContainer> seqPairJobs) {
         super();
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(ImportThread.class, "ImportThread.output.name"), false);
-        this.tracksRun = tracksRun;
-        this.gens = gens;
+        this.tracksJobs = trackJobs;
+        this.references = refJobs;
+        this.seqPairJobs = seqPairJobs;
         this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.name"));
-        this.workunits = gens.size() + 2 * tracksRun.size();
+        this.workunits = refJobs.size() + 2 * trackJobs.size() + 2 * seqPairJobs.size();
 
-        validTracksRun = new HashMap<TrackJob, Boolean>();
+        this.validTracksRun = new HashMap<TrackJob, Boolean>();
     }
 
-    private ParsedReference parseRefGen(ReferenceJob refGenJob) throws ParsingException {
+    private ParsedReference parseRefJob(ReferenceJob refGenJob) throws ParsingException {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
 
         ReferenceParserI parser = refGenJob.getParser();
@@ -109,7 +114,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     }
 
 
-    private void storeRefGen(ParsedReference refGenome, ReferenceJob refGenJob) throws StorageException {
+    private void storeRefGenome(ParsedReference refGenome, ReferenceJob refGenJob) throws StorageException {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
 
         long refGenID = ProjectConnector.getInstance().addRefGenome(refGenome);
@@ -139,14 +144,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 //        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing run data from source \"{0}runID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), runID});
 //    }
 
-    private void storeTrack(ParsedTrack track, TrackJob trackJob) throws StorageException{
+    
+    private void storeTrack(ParsedTrack track, TrackJob trackJob, boolean seqPairs) throws StorageException{
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
 
-        Long trackID = ProjectConnector.getInstance().addTrack(track, trackJob.getRefGen().getID());
+        Long trackID = ProjectConnector.getInstance().addTrack(track, trackJob.getRefGen().getID(), seqPairs);
         trackJob.setPersistant(trackID);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
     }
+
 
     private void setValidTracksRun(List<TrackJob> trackJobs, boolean valid){
         for(Iterator<TrackJob> it = trackJobs.iterator(); it.hasNext(); ){
@@ -164,34 +171,34 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         }
     }
 
-    private boolean isValidTrackwithoutRun(TrackJob trackJob) {
-        if (!validTracksRun.containsKey(trackJob)) {
-            // track is not dependent on previous run oder refGen, so it is not registered
-            return true;
-        } else if (validTracksRun.containsKey(trackJob) && validTracksRun.get(trackJob) == true) {
-            // if it is registered, it must be a valid one
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    private boolean isValidTrackwithoutRun(TrackJob trackJob) {
+//        if (!validTracksRun.containsKey(trackJob)) {
+//            // track is not dependent on previous run oder refGen, so it is not registered
+//            return true;
+//        } else if (validTracksRun.containsKey(trackJob) && validTracksRun.get(trackJob) == true) {
+//            // if it is registered, it must be a valid one
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
-    private void processRefGenJobs(){
-        if(!gens.isEmpty()){
+    private void processRefGenomeJobs(){
+        if(!references.isEmpty()){
             io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.ref") + ":");
 
-            for(Iterator<ReferenceJob> it = gens.iterator(); it.hasNext(); ){
+            for(Iterator<ReferenceJob> it = references.iterator(); it.hasNext(); ){
                 ReferenceJob r = it.next();
                 ph.progress(workunits++);
 
                 try {
                     // parsing
-                    ParsedReference refGen = parseRefGen(r);
+                    ParsedReference refGen = parseRefJob(r);
                     io.getOut().println("\""+r.getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
 
                     // storing
                     try {
-                        storeRefGen(refGen, r);
+                        storeRefGenome(refGen, r);
                         io.getOut().println("\""+r.getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.stored"));
                     } catch (StorageException ex) {
                         // if something went wrong, mark all dependent track jobs
@@ -262,40 +269,117 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 //        }
 //    }
 
-    private void processTrackJobs(){
-        if(!tracksRun.isEmpty()){
+    /**
+     * Processes track jobs (parsing and storing) and also handles sequence pair/paired end data parsing
+     * and storing.
+     */
+    private void processTrackJobs() {
+        if (!tracksJobs.isEmpty()) {
             io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.track") + ":");
-            for(Iterator<TrackJob> it = tracksRun.iterator(); it.hasNext(); ){
+
+            for (Iterator<TrackJob> it = tracksJobs.iterator(); it.hasNext();) {
                 TrackJob t = it.next();
                 ph.progress(workunits++);
 
-                // only import this track if no problems occured with dependencies
-                    try {
-
-                        //parsing
-                        ParsedTrack track = this.parseTrack(t);
-                        io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
-
-                        //storing
-                        try {
-                            this.storeTrack(track, t);
-                            io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.stored"));
-                        } catch (StorageException ex) {
-                        // something went wrong
-                            io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
-                            Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } catch (ParsingException ex) {
-                        // something went wrong
-                        io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
-                        Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+                //parsing track
+                this.parseSingleTrack(t);
+                
                 it.remove();
             }
         }
     }
+    
+    
+    private void processSeqPairJobs(){
+                               
+        if(!seqPairJobs.isEmpty()){
+            
+            //handle processing of sequence pair track jobs AFTER both belonging tracks are stored!
+            //because now all mapping ids are set!
+            
+            io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.seqPairs") + ":");
 
+            for(Iterator<SeqPairJobContainer> it = seqPairJobs.iterator(); it.hasNext(); ){
+                SeqPairJobContainer seqPairJobContainer = it.next();
+                ph.progress(workunits++);
+                
+                int distance = seqPairJobContainer.getDistance();
+                if (distance > 0) {
+                    //parsing tracks
+                    ParsedTrack track1 = this.parseSingleTrack(seqPairJobContainer.getTrackJob1());
+                    ParsedTrack track2 = this.parseSingleTrack(seqPairJobContainer.getTrackJob2());
+
+                    final ISeqPairClassifier seqPairCalculator = Lookup.getDefault().lookup(ISeqPairClassifier.class);
+                    if (seqPairCalculator != null) {
+                        seqPairCalculator.setData(track1, track2, distance, seqPairJobContainer.getDeviation(), seqPairJobContainer.getOrientation());
+                        String description = seqPairJobContainer.getTrackJob1().getFile().getName() + " and " + seqPairJobContainer.getTrackJob2().getFile().getName();
+
+                        try { //storing sequence pairs data
+                            this.storeSeqPairs(seqPairCalculator.calculateSeqPairs(), description);
+                            io.getOut().println("\"" + description + " sequence pair data infos \" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.stored"));
+                        } catch (StorageException ex) {
+                            // something went wrong
+                            io.getOut().println("\"" + description + " sequence pair data infos \" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
+                            Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                        track1.clear();
+                        track2.clear();
+                    }
+                } else 
+                if (distance <= 0){
+                    this.showErrorMsg(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.error"));
+                }
+
+                it.remove();
+                
+            }
+        }
+    }
+        
+
+    /**
+     * Parses a trackJob.
+     * @param trackJob job to parse
+     * @return returns the trackJob if everything went fine, otherwise <code>null</code>
+     */
+    private ParsedTrack parseSingleTrack(TrackJob trackJob) {
+
+        // only import this track if no problems occured with dependencies
+        try {
+
+            //parsing track
+            ParsedTrack track = this.parseTrack(trackJob);
+            boolean seqPairs = false;
+            if (trackJob.getParser() instanceof JokSeqPairParser){
+                track.setReadnameToSeqIdMap(((JokSeqPairParser) trackJob.getParser()).getSeqIDToReadNameMap());
+                ((JokSeqPairParser) trackJob.getParser()).resetSeqIdToReadnameMap();
+                seqPairs = true;
+            }
+            io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
+            
+            
+            //storing track
+            try {
+                this.storeTrack(track, trackJob, seqPairs);
+                io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.stored"));
+            } catch (StorageException ex) {
+                // something went wrong
+                io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
+                Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return track;
+
+            
+        } catch (ParsingException ex) {
+            // something went wrong
+            io.getOut().println(ex.getMessage());
+            io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
+        }
+        return null;
+    }
+        
+    
     @Override
     protected Object doInBackground() {
         CentralLookup.getDefault().add(this);
@@ -310,13 +394,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         workunits = 0;
 
         ph.progress(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.ref") + "...", workunits);
-        processRefGenJobs();
+        this.processRefGenomeJobs();
 
 //        ph.progress(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.readtrack") + "...", workunits);
 //        processTrackRUNJobs();
         // track jobs have to be imported last, because they may depend upon previously imported genomes, runs
         ph.progress(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.track") + "...", workunits);
-        processTrackJobs();
+        this.processTrackJobs();
+        this.processSeqPairJobs();
         validTracksRun.clear();
 
         return null;
@@ -348,4 +433,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         this.io.getOut().println("\""+errorMsg);
     }
 
+    
+    private void storeSeqPairs(ParsedSeqPairContainer seqPairContainer, String description) throws StorageException {
+        
+        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing sequence pair data for track data from source \"{0}\"", description);
+        ProjectConnector.getInstance().addSeqPairData(seqPairContainer);
+        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing sequence pair data for track data from source \"{0}\"", description);
+    
+    }
 }

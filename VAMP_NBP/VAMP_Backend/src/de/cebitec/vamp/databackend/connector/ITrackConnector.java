@@ -50,10 +50,27 @@ public interface ITrackConnector {
     public int getNumOfUniqueBmMappings();
 
     public int getNumOfUniqueBmMappingsCalculate();
+    
+    public int getNumOfSeqPairs();
+    
+    public int getNumOfSeqPairsCalculate();
+    
+    public int getNumOfPerfectSeqPairs();
+    
+    public int getNumOfPerfectSeqPairsCalculate();
+    
+    public int getNumOfUniqueSeqPairs();
+    
+    public int getNumOfUniqueSeqPairsCalculate();
 
+    public int getNumOfUniquePerfectSeqPairs();
+    
+    public int getNumOfUniquePerfectSeqPairsCalculate();
+    
     public void setStatistics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
                             int numPerfectMappings, int numBestMatchMappings, double coveragePerf,
-                            double coverageBM, double coverageComplete, int numReads);
+                            double coverageBM, double coverageComplete, int numReads, int numSeqPairs, 
+                            int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs);
 
     //public long getRunId();
     public long getTrackID();

@@ -9,7 +9,7 @@ import java.sql.Timestamp;
  *
  * @author jstraube
  */
-public class TrackJob implements Job{
+public class TrackJob implements Job {
 
     private File file;
     private String description;
@@ -27,7 +27,7 @@ public class TrackJob implements Job{
      * @param parser the parser to use for parsing
      * @param timestamp the timestamp when it was created
      */
-    public TrackJob(Long trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp){
+    public TrackJob(Long trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp) {
         this.trackID = trackID;
         this.file = file;
         this.description = description;
@@ -36,7 +36,12 @@ public class TrackJob implements Job{
         this.refGen = refGen;
     }
 
-    public MappingParserI getParser(){
+    public TrackJob(Long trackID, File file, String description, ReferenceJob refGen,
+            MappingParserI parser, Timestamp timestamp, int distance, int deviation) {
+        this(trackID, file, description, refGen, parser, timestamp);
+    }
+
+    public MappingParserI getParser() {
         return parser;
     }
 
@@ -45,9 +50,10 @@ public class TrackJob implements Job{
         return description;
     }
 
-        public ReferenceJob getRefGen() {
+    public ReferenceJob getRefGen() {
         return refGen;
     }
+
     @Override
     public File getFile() {
         return file;
@@ -58,12 +64,12 @@ public class TrackJob implements Job{
     }
 
     @Override
-    public Timestamp getTimestamp(){
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
     @Override
-    public Long getID(){
+    public Long getID() {
         return trackID;
     }
 
@@ -71,14 +77,14 @@ public class TrackJob implements Job{
     public String getName() {
         return getDescription();
     }
-
+    
     @Override
-    public String toString(){
-        return description+":"+timestamp;
+    public String toString() {
+        return description + ":" + timestamp;
     }
 
     public void setPersistant(Long trackID) {
         this.trackID = trackID;
     }
-
+    
 }

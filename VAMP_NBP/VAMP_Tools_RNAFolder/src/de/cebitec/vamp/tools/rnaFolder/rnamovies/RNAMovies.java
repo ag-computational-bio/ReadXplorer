@@ -19,6 +19,7 @@ import java.util.Enumeration;
 //import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.InputStream;
 import java.io.IOException;
@@ -221,25 +222,29 @@ public class RNAMovies extends JPanel implements ActionContainer {
         List<PairTable> pairs;
         Structure struc = null;
 
-        if(!enumer.hasMoreElements())
+        if(!enumer.hasMoreElements()) {
             throw new IllegalArgumentException("No Movie Data found!");
-        else
+        } else {
             name = ((String)enumer.nextElement()).trim();
+        }
 
-        if(name.equals(""))
+        if(name.equals("")) {
             throw new IllegalArgumentException("No Movie Data found!");
+        }
 
-        if(name.charAt(0) == '>')
+        if(name.charAt(0) == '>') {
             dcse = false;
-        else if(name.charAt(0) == '<')
+        } else if(name.charAt(0) == '<') {
             dcse = true;
-        else
+        } else {
             throw new IllegalArgumentException("Data Format Error: Missing '>' or '<' character!");
+        }
 
-        if(!enumer.hasMoreElements())
+        if(!enumer.hasMoreElements()) {
             throw new IllegalArgumentException("No Movie Data found!");
-        else
+        } else {
             sequence = ((String)enumer.nextElement()).trim();
+        }
 
         length = sequence.length();
 
@@ -249,13 +254,15 @@ public class RNAMovies extends JPanel implements ActionContainer {
         sizes = new ArrayList<Dimension>(350);
         while(enumer.hasMoreElements()) {
 
-            if(struc != null)
+            if(struc != null) {
                 old_length = struc.length();
+            }
 
             if(dcse) {
                 structure = ((String)enumer.nextElement());
-                if(!enumer.hasMoreElements())
+                if(!enumer.hasMoreElements()) {
                     throw new IllegalArgumentException("Error in DCSE structure: missing helix numbering.");
+                }
                 helices = ((String)enumer.nextElement());
                 struc = new Structure(sequence, structure, helices);
             } else {
@@ -263,30 +270,35 @@ public class RNAMovies extends JPanel implements ActionContainer {
                 struc = new Structure(sequence, structure);
             }
 
-            if(old_length != -1 && old_length > struc.length())
+            if(old_length != -1 && old_length > struc.length()) {
                 throw new IllegalArgumentException("Length of structures in descending order not allowed!");
+            }
 
             pairs.add(struc.getPairTable());
             frames.add(struc.getNormalizedCoordinates(SCALE, SCALE, 0, 0));
             sizes.add(new Dimension(struc.getWidth(SCALE), struc.getHeight(SCALE)));
-            if(struc.getWidth(SCALE) > w)
+            if(struc.getWidth(SCALE) > w) {
                 w = struc.getWidth(SCALE);
-            if(struc.getHeight(SCALE) > h)
+            }
+            if(struc.getHeight(SCALE) > h) {
                 h = struc.getHeight(SCALE);
+            }
         }
 
-        if(frames.isEmpty())
+        if(frames.isEmpty()) {
             throw new IllegalArgumentException("No Movie Data found!");
+        }
 
         if(center) {
             maxSize = new Dimension(w, h);
-            for(i = 0; i < frames.size(); i++)
+            for(i = 0; i < frames.size(); i++) {
                 ShapeOps.center(frames.get(i), sizes.get(i), maxSize);
+            }
         }
 
         title_end = name.indexOf(' ');
         mp.setMovie(frames, pairs, name.substring(1, title_end == -1 ? name.length() : title_end), sequence, w, h,gui);
-        log.info(frames.size() + " Structures loaded.");
+        log.log(Level.INFO, "{0} Structures loaded.", frames.size());
     }
 
 //    /**

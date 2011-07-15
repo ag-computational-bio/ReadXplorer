@@ -87,6 +87,10 @@
                 <package>de.cebitec.vamp.tools.rnaFolder.rnamovies.configuration</package>
                 <package>de.cebitec.vamp.tools.rnaFolder.rnamovies.util</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>
