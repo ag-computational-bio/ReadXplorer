@@ -62,6 +62,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(customCodonLabel, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.removeButton.text")); // NOI18N
+        removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.removeButton.toolTipText")); // NOI18N
         removeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeButtonActionPerformed(evt);
