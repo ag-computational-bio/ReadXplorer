@@ -154,7 +154,7 @@ public class BasePanelFactory {
         viewer.setupLegend(new LegendLabel(viewer), this.getDetailViewLegend());
 
         // add panels to basepanel and add scrollbars
-        b.setViewer(viewer);
+        b.setViewerInScrollpane(viewer);
         b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 

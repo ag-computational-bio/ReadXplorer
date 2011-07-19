@@ -7,7 +7,6 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import java.awt.CardLayout;
 import java.util.logging.Logger;
-import javax.swing.JScrollPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -29,7 +28,6 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
     private TrackConnector trackConnector;
     private BasePanel alignmentBasePanel;
-    private JScrollPane alignmentScrollPane;
     private BasePanel logoBasePanel;
     private CardLayout cards;
 
@@ -193,13 +191,12 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
         this.alignmentBasePanel = factory.getDetailTrackBasePanel(this.trackConnector);
         this.alignmentBasePanel.getViewer().setActive(false);
-        this.alignmentScrollPane = new JScrollPane(this.alignmentBasePanel);
         this.logoBasePanel = factory.getSequenceLogoBasePanel(this.trackConnector);
         this.logoBasePanel.getViewer().setActive(true);
 
         this.cards = (CardLayout) this.cardPanel.getLayout();
         
-        this.cardPanel.add(this.alignmentScrollPane, ALIGNMENTCARD);
+        this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
         this.cardPanel.add(this.logoBasePanel, LOGOCARD);
         this.cards.show(this.cardPanel, LOGOCARD);
     }
