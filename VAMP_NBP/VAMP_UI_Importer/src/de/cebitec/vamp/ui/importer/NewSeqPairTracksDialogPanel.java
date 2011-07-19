@@ -155,6 +155,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         jLabel2.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.jLabel2.text")); // NOI18N
 
         buttonGroup1.add(orientation1Button);
+        orientation1Button.setSelected(true);
         orientation1Button.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.orientation1Button.text")); // NOI18N
         orientation1Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

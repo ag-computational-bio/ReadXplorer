@@ -1313,7 +1313,6 @@ public class ProjectConnector {
             long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SEQUENCE_PAIR_ID, con);
             long seqPairId = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SEQUENCE_PAIR_PAIR_ID, con);
             PreparedStatement insertSeqPair = con.prepareStatement(SQLStatements.INSERT_SEQ_PAIR);
-            long interimId;
             long interimPairId;
             
             // start storing the sequence pair data
@@ -1322,12 +1321,12 @@ public class ProjectConnector {
             Iterator seqPairIterator = seqPairMap.keySet().iterator();
             while (seqPairIterator.hasNext()) {
                 ParsedSeqPairMapping seqPair = seqPairMap.get((Pair<Long, Long>) seqPairIterator.next());
-                interimId = seqPair.getId();
                 interimPairId = seqPair.getSequencePairID();
-                seqPair.setID(interimId+id); //Shifts ids
                 seqPair.setSequencePairID(interimPairId+seqPairId);
+                //if seq pairs are needed later on we have to set:
+                //seqPair.setID(id);
 
-                insertSeqPair.setLong(1, seqPair.getId()); //table index, unique for pos of seq pair
+                insertSeqPair.setLong(1, id++); //table index, unique for pos of seq pair
                 insertSeqPair.setLong(2, seqPair.getSequencePairID()); //same for all positions of this sequence pair
                 insertSeqPair.setLong(3, seqPair.getMappingId1()); //id of fst mapping
                 insertSeqPair.setLong(4, seqPair.getMappingId2()); // id of scnd mapping
@@ -1339,7 +1338,6 @@ public class ProjectConnector {
                     insertSeqPair.executeBatch();
                     batchCounter = 0;
                 }
-                seqPairId++;
                 batchCounter++;
             }
             insertSeqPair.executeBatch();

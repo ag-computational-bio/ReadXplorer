@@ -29,6 +29,7 @@ public class RNAFolderController implements RNAFolderI {
         try { //new header because RNA movies cannot cope with spaces
             String rnaMoviesHeader = header.replace(" ", "_");
             String foldedSequence = RNAFoldCaller.callRNAFolder(sequenceToFold, rnaMoviesHeader);
+            //for testing purposes in offline mode:
 //            String foldedSequence = ">tRNA-like structure from turnip yellow mosaic virus\n"+
 //"UUAGCUCGCCAGUUAGCGAGGUCUGUCCCCACACGACAGAUAAUCGGGUGCAACUCCCGCCCCUUUUCCGAGGGUCAUCGGAACCA\n"+
 //"....(((((......)))))(((((((.......)))))))....(((.((.......)))))..((((((......))))))... (-27.80)";
