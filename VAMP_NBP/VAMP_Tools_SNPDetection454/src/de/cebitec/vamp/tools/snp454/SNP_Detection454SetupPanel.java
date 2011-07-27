@@ -11,7 +11,7 @@
 package de.cebitec.vamp.tools.snp454;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,36 +34,35 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     private ITrackConnector con;
-    private List<Snp> snps;
+    private List<Snp454> snps;
     
     public static final String PROP_SNPS_LOADED = "snpsLoaded";
 
     /** Creates new form SNP_Detection454SetupPanel */
     public SNP_Detection454SetupPanel() {
         initComponents();
-        snps = new ArrayList<Snp>();
+        snps = new ArrayList<Snp454>();
     }
     
-    //TODO: nur dafuer da dass hier was angezeigt wird. ma noch selber zusammen bauen
-    private class SnpWorker extends SwingWorker<List<Snp>, Object> {
+    private class Snp454Worker extends SwingWorker<List<Snp454>, Object> {
 
         private int percent;
         private int num;
         private ProgressHandle ph;
 
-        SnpWorker(int percent, int num) {
+        Snp454Worker(int percent, int num) {
             this.percent = percent;
             this.num = num;
-//            this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(SnpWorker.class, "MSG_SNPWorker.progress.name"));
+            this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(Snp454Worker.class, "MSG_SNP454Worker.progress.name"));
         }
 
         @Override
-        protected List<Snp> doInBackground() {
+        protected List<Snp454> doInBackground() {
             CentralLookup.getDefault().add(this);
 
-//            ph.start();
+            ph.start();
 
-            snps = con.findSNPs(percent, num, true);
+            snps = con.findSNPs454(percent, num);
             return snps;
         }
 
@@ -71,7 +70,7 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
         protected void done() {
             CentralLookup.getDefault().remove(this);
 
-//            ph.finish();
+            ph.finish();
         }
 
     }
@@ -85,21 +84,22 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         perVar = new javax.swing.JSpinner();
         absNum = new javax.swing.JTextField();
         searchButton = new javax.swing.JButton();
-
-        jTextField1.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jTextField1.text")); // NOI18N
-        jTextField1.setToolTipText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jTextField1.toolTipText")); // NOI18N
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jLabel1.text")); // NOI18N
 
         jLabel2.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jLabel2.text")); // NOI18N
 
+        perVar.setValue(45);
+
         absNum.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        absNum.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         absNum.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.absNum.text")); // NOI18N
 
         searchButton.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.searchButton.text")); // NOI18N
@@ -109,42 +109,50 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
             }
         });
 
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jTextArea1.text")); // NOI18N
+        jScrollPane1.setViewportView(jTextArea1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(absNum)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(8, 8, 8)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(absNum, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
                             .addComponent(perVar, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)))
                     .addComponent(searchButton))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addGap(22, 22, 22))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
                             .addComponent(perVar, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
-                            .addComponent(absNum, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(absNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addComponent(searchButton))
-                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE))
+                        .addComponent(searchButton)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -155,8 +163,8 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
             final int num = Integer.parseInt(absN);
             final int percent = (Integer) perVar.getValue();
 
-            RequestProcessor rp = new RequestProcessor("SNP Threads", 2);
-            final Task snpTask = rp.post(new SnpWorker(percent, num));
+            RequestProcessor rp = new RequestProcessor("SNP454 Threads", 2);
+            final Task snpTask = rp.post(new Snp454Worker(percent, num));
             snpTask.addTaskListener(new TaskListener() {
 
                 @Override
@@ -168,7 +176,7 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
             });
             searchButton.setEnabled(false);
         } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(SNP_Detection454SetupPanel.class, "MSG_SNP_DetectionSetupPanel454.error"), NotifyDescriptor.ERROR_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(SNP_Detection454SetupPanel.class, "MSG_SNP_Detection454SetupPanel.error"), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
         }
 
@@ -191,12 +199,13 @@ public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
     private javax.swing.JTextField absNum;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JSpinner perVar;
     private javax.swing.JButton searchButton;
     // End of variables declaration//GEN-END:variables
 
-public List<Snp> getSnps() {
+public List<Snp454> getSnps() {
         return snps;
     }
 

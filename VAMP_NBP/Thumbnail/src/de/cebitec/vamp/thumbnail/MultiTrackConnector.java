@@ -1,5 +1,6 @@
 package de.cebitec.vamp.thumbnail;
 
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.FieldNames;
@@ -616,7 +617,7 @@ public class MultiTrackConnector implements ITrackConnector {
      * from the table mapping we have to do this so that we dont miss any mapping that have a diff in this 50 positions
      */
     @Override
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold, boolean is454) {
+    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
         ArrayList<Snp> snps = new ArrayList<Snp>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
         int fromDiff = 1;
@@ -991,4 +992,193 @@ public class MultiTrackConnector implements ITrackConnector {
 
         return num;
     }
+
+    @Override
+    public List<Snp454> findSNPs454(int percentageThreshold, int absThreshold) {
+       ArrayList<Snp454> snps = new ArrayList<Snp454>();
+        HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
+        final int diffIntervalSize = 50;
+        final int mappingIntervalSize = 200;
+        int fromDiff = 1;
+        int toDiff = diffIntervalSize;
+        int fromMapping = 1;
+        int toMapping = mappingIntervalSize;
+        try {
+            while (genomeSize > fromDiff) {
+            //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
+                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
+                fetch.setLong(1, trackID);
+                fetch.setLong(2, fromMapping);
+                fetch.setLong(3, toMapping);
+                fetch.setLong(4, fromDiff);
+                fetch.setLong(5, toDiff);
+                fetch.setLong(6, trackID);
+
+                fromDiff += diffIntervalSize;
+                toDiff += diffIntervalSize;
+                if (toDiff > genomeSize) {
+                    toDiff = genomeSize;
+                }
+
+                if(fromDiff > mappingIntervalSize){
+                    fromMapping = fromDiff - mappingIntervalSize;
+                }
+                toMapping = toDiff + mappingIntervalSize;
+                 if (toMapping > genomeSize) {
+                    toMapping = genomeSize;
+                }
+                ResultSet rs = fetch.executeQuery();
+
+                while (rs.next()) {
+                    int position = rs.getInt(FieldNames.DIFF_POSITION);
+                    char base = rs.getString(FieldNames.DIFF_CHAR).charAt(0);
+                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                    int replicates = rs.getInt("mult_count");
+                    int forwardCov = rs.getInt(FieldNames.COVERAGE_BM_FW_MULT);
+                    int reverseCov = rs.getInt(FieldNames.COVERAGE_BM_RV_MULT);
+                    int type = rs.getInt(FieldNames.DIFF_TYPE);
+                    boolean isGenomeGap = false;
+                    if (type == 0) {
+                        isGenomeGap = true;
+                    }
+                    int cov = forwardCov + reverseCov;
+
+                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap);
+
+                }
+          }
+//            if(is454){
+              snps.addAll(this.filterSnps454(covData, percentageThreshold, absThreshold));
+//            } else {
+//                snps.addAll(this.filterSnps(covData, percentageThreshold, absThreshold));
+//            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        return snps;
+    }
+    
+     private List<Snp454> filterSnps454(Map<Integer, Integer[]> map, int overallPercentage, int absThreshold) {
+        ArrayList<Snp454 > snps = new ArrayList<Snp454>();
+        Iterator<Integer> positions = map.keySet().iterator();
+        while (positions.hasNext()) {
+            int position = positions.next();
+            Integer[] data = map.get(position);
+            double complete = data[COV];
+            double diffCov = data[DIFF_COV];
+            int percentage = (int) ((diffCov / complete) * 100);
+            boolean continuousCoverage = isCoverageContinuous(position, complete);
+            //Filterschritt: mindestens 3 reads muessen abweichen (zusaetzlich, falls nur wenige 
+            // reads an der Stelle mappen) && continuousCoverage && (diffCov > 3)
+            if ((percentage > overallPercentage) && (complete > 3) && continuousCoverage) {
+                //pruefen, ob fuer jede basenabweichung der threshold erreicht ist, wenn ja = SNP 
+                for (int i = A_COV; i < data.length; i++) {
+                    if (this.isSNP(data, i, absThreshold)) {
+                        snps.add(this.createSNP454(data, i, position, percentage));
+                    }
+                }
+            }
+        }
+        return snps;
+    }
+    
+    /*
+     * pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
+     * stetige Readabdeckung
+     */
+    private boolean isCoverageContinuous(int position, double coverage){
+        boolean isContinous = true;
+        try {
+            //Die Coverage der naechsten 5 Basen links und rechts des SNPs wird verglichen
+            int fromPos = ((position - 5) < 0) ? 0 : (position - 5);
+            int toPos = ((position + 5)  > this.genomeSize) ? this.genomeSize : (position + 5);
+            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
+            fetch.setLong(3, trackID);
+            fetch.setLong(1, fromPos);
+            fetch.setLong(2, toPos);
+            
+             ResultSet rs = fetch.executeQuery();
+
+             
+             while (rs.next()) {
+                int covPosition = rs.getInt(FieldNames.COVERAGE_POSITION);
+                int forwardCov = rs.getInt(FieldNames.COVERAGE_BM_FW_MULT);
+                int reverseCov = rs.getInt(FieldNames.COVERAGE_BM_RV_MULT);
+                int neighbourCov = forwardCov + reverseCov;
+                double deviation = (Math.abs(neighbourCov - coverage))/coverage;               
+                if(deviation >= 0.5 ){
+                    isContinous = false;
+                } 
+             }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return isContinous;
+    }
+    
+    private Snp454 createSNP454(Integer[] data, int index, int position, int positionVariation) {
+        String base = "";
+        if (index == A_COV || index == A_GAP) {
+            base = "A";
+        } else if (index == C_COV || index == C_GAP) {
+            base = "C";
+        } else if (index == G_COV || index == G_GAP) {
+            base = "G";
+        } else if (index == T_COV || index == T_GAP) {
+            base = "T";
+        } else if (index == N_COV || index == N_GAP) {
+            base = "N";
+        } else if (index == _COV) {
+            base = "-";
+        } else {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
+        }
+        
+        String sequence = this.getRefGenSequence();
+        String refBase = String.valueOf(sequence.charAt(position));
+        double count = data[index];
+        int percentage = (int) (count / ((double) data[COV]) * 100);
+        return new Snp454((int) count, position, base, percentage, positionVariation, refBase);
+
+    }
+    
+    /**
+     * Ermittlung der Gensequenz, um Referenzbase bei SNPs zu ermitteln
+     * @return Sequenz des Referenzgens
+     */
+    private String getRefGenSequence() {
+        int refGenID = 0;
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMEID_FOR_TRACK);
+            fetch.setLong(1, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                refGenID = rs.getInt(FieldNames.TRACK_REFGEN);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String refGenSequence = "";
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
+            fetch.setLong(1, refGenID);
+            ResultSet rs = fetch.executeQuery();
+
+            if(rs.next()){
+                refGenSequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return refGenSequence;
+    }
+
+    
 }

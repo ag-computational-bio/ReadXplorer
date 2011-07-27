@@ -4,7 +4,7 @@
  */
 package de.cebitec.vamp.tools.snp454;
 
-import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
@@ -88,7 +88,7 @@ public final class SNP_Detection454TopComponent extends TopComponent {
             @Override
             @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
-                resultPanel.addSNPs((List<Snp>) evt.getNewValue());
+                resultPanel.addSNPs((List<Snp454>) evt.getNewValue());
                 ((CardLayout) snpDetectionPanel.getLayout()).show(snpDetectionPanel, "results");
             }
         });
@@ -122,11 +122,11 @@ public final class SNP_Detection454TopComponent extends TopComponent {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.PREFERRED_SIZE, 621, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

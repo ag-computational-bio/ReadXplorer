@@ -10,7 +10,7 @@
  */
 package de.cebitec.vamp.tools.snp454;
 
-import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +27,13 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
-    private List<Snp> snps;
+    private List<Snp454> snps;
 
     /** Creates new form SNP_Detection454ResultPanel */
     public SNP_Detection454ResultPanel() {
         initComponents();
         
-        snps = new ArrayList<Snp>();
+        snps = new ArrayList<Snp454>();
         DefaultListSelectionModel model = (DefaultListSelectionModel) jTable1.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
 
@@ -63,14 +63,14 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Position", "Base", "Count", "%", "% variation at position"
+                "Position", "Base", "Refence Base", "Count", "%", "% variation at position"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -84,9 +84,10 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(jTable1);
         jTable1.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title0")); // NOI18N
         jTable1.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title1")); // NOI18N
-        jTable1.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title2")); // NOI18N
-        jTable1.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title3")); // NOI18N
-        jTable1.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title4")); // NOI18N
+        jTable1.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title5")); // NOI18N
+        jTable1.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title2")); // NOI18N
+        jTable1.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title3")); // NOI18N
+        jTable1.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.jTable1.columnModel.title4")); // NOI18N
 
         exportSNPsButton.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454ResultPanel.class, "SNP_Detection454ResultPanel.exportSNPsButton.text")); // NOI18N
         exportSNPsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -111,7 +112,7 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resultProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -121,7 +122,8 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportSNPsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportSNPsButtonActionPerformed
-      //TODO: Tabelle exportieren
+       NewExportDialog ed = new NewExportDialog(null, true, this.snps);
+        ed.setVisible(true);
     }//GEN-LAST:event_exportSNPsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -131,16 +133,17 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
     private javax.swing.JProgressBar resultProgressBar;
     // End of variables declaration//GEN-END:variables
 
-public void addSNPs(List<Snp> snps) {
+public void addSNPs(List<Snp454> snps) {
         this.snps = snps;
-        for (Snp snp : snps) {
+        for (Snp454 snp : snps) {
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            Object[] rowData = new Object[5];
+            Object[] rowData = new Object[6];
             rowData[0] = snp.getPosition();
             rowData[1] = snp.getBase();
-            rowData[2] = snp.getCount();
-            rowData[3] = snp.getPercentage();
-            rowData[4] = snp.getVariationPercentag();
+            rowData[2] = snp.getRefBase();
+            rowData[3] = snp.getCount();
+            rowData[4] = snp.getPercentage();
+            rowData[5] = snp.getVariationPercentag();
             model.addRow(rowData);
         }
     }
