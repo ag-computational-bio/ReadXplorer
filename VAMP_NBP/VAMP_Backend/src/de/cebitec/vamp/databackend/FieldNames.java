@@ -30,6 +30,7 @@ public class FieldNames {
     public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
     public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
+    public final static String TABLE_SNP = "SNP";
 //    public final static String TABLE_RUN = "RUN";
 //    public final static String TABLE_READS = "READNAME";
     public final static String TABLE_STATISTICS = "STATISTICS";
@@ -37,6 +38,13 @@ public class FieldNames {
 
     ////////////////////////  tables fields  ////////////////////////////////
 
+        // snp table fields
+    public final static String SNP_ID = "ID";
+    public final static String SNP_TRACK_ID = "TRACK_ID";
+    public final static String SNP_COVERAGE = "COVERAGE";
+    public final static String SNP_FREQUENCY = "FREQUENCY";
+    public final static String SNP_TYPE = "TYPE";
+    
     // reference genome table fields
     public final static String REF_GEN_ID ="ID";
     public final static String REF_GEN_NAME = "NAME";

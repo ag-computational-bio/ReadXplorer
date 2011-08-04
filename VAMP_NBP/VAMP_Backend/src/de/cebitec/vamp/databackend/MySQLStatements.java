@@ -22,6 +22,16 @@ public class MySQLStatements {
             FieldNames.REF_GEN_TIMESTAMP+" DATETIME NOT NULL" +
             ") ";
 
+    public final static String SETUP_SNPS =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SNP + " "
+            + "("
+            + FieldNames.SNP_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SNP_COVERAGE + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.SNP_FREQUENCY + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.SNP_TYPE + " VARCHAR(1) NOT NULL , "
+            + "INDEX (" + FieldNames.SNP_ID + "), "
+            + "INDEX (" + FieldNames.SNP_TRACK_ID + ") "
+            + ")";
     
     public final static String SETUP_DIFFS =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_DIFF+" " +
