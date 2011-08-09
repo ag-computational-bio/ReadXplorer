@@ -58,7 +58,6 @@ public class BAMParser implements MappingParserI, Observer {
         String readSeq = null;
         String readSeqwithoutGaps = null;
         String cigar = null;
-        String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
         noUniqueMappings = 0;
         int noUniqueReads = 0;
@@ -94,9 +93,6 @@ public class BAMParser implements MappingParserI, Observer {
                 cigar = first.getCigarString();
                 readSeqwithoutGaps = first.getReadString().toLowerCase();
                 //   System.out.println("rSeq " + readname + "flag " + flag + "refName " + refName + "read " + readSeqwithoutGaps);
-                if (refSeqfulllength == null) {
-                    refSeqfulllength = sequenceString;
-                }
                 errors = 0;
 
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")) {
@@ -106,7 +102,7 @@ public class BAMParser implements MappingParserI, Observer {
                     stop = start + readSeqwithoutGaps.length() - 1;
                 }
                 
-                refSeqwithoutgaps = refSeqfulllength.substring(start - 1, stop).toLowerCase();
+                refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
 
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")) {
 

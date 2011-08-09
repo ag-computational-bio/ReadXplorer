@@ -67,4 +67,23 @@ public class GenericSQLQueries {
         return ++id;
     }
 
+    
+    public static String generateAddColumnString(String table, String column){
+        return "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
+                + table
+                + " AND COLUMN_NAME =" + column + ")"
+                + " BEGIN "
+                + "ALTER TABLE "
+                + table
+                + " ADD COLUMN "
+                + column + " BIGINT UNSIGNED "
+                + " END";
+    }
+    
+    public static String genAddColumnString2(String table, String column) {
+        return "ALTER TABLE "
+                + table
+                + " ADD COLUMN "
+                + column + " BIGINT UNSIGNED ";
+    }
 }

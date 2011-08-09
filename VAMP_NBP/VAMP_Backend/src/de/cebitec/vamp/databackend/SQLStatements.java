@@ -46,6 +46,11 @@ public class SQLStatements {
             + FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS +" BIGINT UNSIGNED NOT NULL  "
             + ") ";
 
+    /**
+     * Only needed as long as older databases are floating around and did not
+     * already drop this table which was replaced by STATISTICS.
+     */
+    public static final String DROP_TABLE_STATICS = "DROP TABLE IF EXISTS STATICS";
 
     //////////////////  statements for data insertion  /////////////////////////
 
@@ -644,7 +649,7 @@ public class SQLStatements {
 
     public static final String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT " +
-                "COUNT(DISTINCT M."+FieldNames.MAPPING_ID+") as NUM " +
+                "COUNT(M."+FieldNames.MAPPING_ID+") as NUM " +
             "FROM "+
                 FieldNames.TABLE_MAPPINGS + " as M " +
             "WHERE "+
@@ -941,5 +946,5 @@ public class SQLStatements {
    
    public static final String GET_LATEST_SEQUENCE_PAIR_PAIR_ID =
             "SELECT MAX("+FieldNames.SEQ_PAIR_PAIR_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_SEQ_PAIRS;
-    
+   
 }

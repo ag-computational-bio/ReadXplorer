@@ -213,7 +213,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         try {
             gaps = trackConnector.getExtendedReferenceGapsForIntervalOrderedByMappingID(lowerBound, upperBound);
         } catch (Exception ex) {
-            System.err.print("trackConnector couldnt initialse gaps" + ex);
+            System.err.print("trackConnector couldn't initialize gaps" + ex);
             //TOTO: error an nutzer geben
         }
         this.fillGapManager();

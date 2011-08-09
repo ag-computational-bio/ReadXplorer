@@ -50,8 +50,8 @@ public class StartCodonFilter implements RegionFilterI {
         regions.clear();
 
         if(this.atLeastOneCodonSelected()){
-            // extends intervall to search to the left and right,
-            // to find start/stop codons that overlap this intervalls boundaries
+            // extends interval to search to the left and right,
+            // to find start/stop codons that overlap current interval boundaries
             int offset = 3;
             int start = absStart - offset;
             int stop = absStop+2;
@@ -117,7 +117,7 @@ public class StartCodonFilter implements RegionFilterI {
     }
 
     @Override
-    public void setIntervall(int start, int stop) {
+    public void setInterval(int start, int stop) {
         this.absStart = start;
         this.absStop = stop;
     }

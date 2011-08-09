@@ -203,10 +203,10 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        alignmentBasePanel.close();
-        alignmentBasePanel = null;
-        logoBasePanel.close();
-        logoBasePanel = null;
+        this.alignmentBasePanel.close();
+        this.logoBasePanel.close();
+        this.alignmentBasePanel = null;
+        this.logoBasePanel = null;
     }
 
     void writeProperties(java.util.Properties p) {

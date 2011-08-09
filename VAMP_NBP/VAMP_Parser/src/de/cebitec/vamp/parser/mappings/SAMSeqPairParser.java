@@ -10,7 +10,7 @@ import java.util.HashMap;
  *
  * @author Rolf Hilker
  */
-public class SAMSeqPairParser extends JokParser implements PairedDataParserI {
+public class SAMSeqPairParser extends JokParser implements SequencePairParserI {
 
     private HashMap<String, Integer> seqIDToReadNameMap;
 
@@ -29,5 +29,10 @@ public class SAMSeqPairParser extends JokParser implements PairedDataParserI {
     @Override
     public HashMap<String, Integer> getSeqIDToReadNameMap() {
         return this.seqIDToReadNameMap;
+    }
+    
+    @Override
+    public void resetSeqIdToReadnameMap(){
+        this.seqIDToReadNameMap = new HashMap<String, Integer>();
     }
 }

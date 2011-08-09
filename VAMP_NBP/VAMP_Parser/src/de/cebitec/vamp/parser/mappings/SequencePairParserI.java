@@ -7,8 +7,10 @@ import java.util.HashMap;
  *
  * @author Rolf Hilker
  */
-public interface PairedDataParserI {
+public interface SequencePairParserI {
 
     public HashMap<String, Integer> getSeqIDToReadNameMap();
+    
+    public void resetSeqIdToReadnameMap();
 
 }

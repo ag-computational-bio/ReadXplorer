@@ -1,7 +1,10 @@
 package de.cebitec.vamp.view;
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.view.login.LogoutAction;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -21,7 +24,7 @@ import org.openide.windows.WindowManager;
 public class Installer extends ModuleInstall {
     
     private static final long serialVersionUID = 1L;
-    private static final String VAMP_VERSION = "1.5";
+    private static final String VAMP_VERSION = "1.5.1";
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 
     @Override
@@ -81,7 +84,8 @@ public class Installer extends ModuleInstall {
             return Boolean.FALSE;
         }
         else {
-            // TODO call LogoutAcion instead
+            LogoutAction logoutAction = new LogoutAction(CentralLookup.getDefault().lookup(LoginCookie.class));
+            logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
 
             // close remaining windows
             for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){

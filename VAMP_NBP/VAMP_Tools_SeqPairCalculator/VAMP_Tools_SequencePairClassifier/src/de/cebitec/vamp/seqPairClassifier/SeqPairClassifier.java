@@ -49,7 +49,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
     
     /**
      * Empty constructor, because nothing to do yet. 
-     * But don't forget to set data before calling calculateSeqPairs().
+     * But don't forget to set data before calling classifySeqPairs().
      */
     public SeqPairClassifier(){
         //set data later
@@ -97,12 +97,12 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 //        ParsedMappingContainer mappingContainer1 = parser1.parseInput(this.trackJob1, "");
 //        ParsedMappingContainer mappingContainer2 = parser2.parseInput(this.trackJob2, "");
 //
-//        this.calculateSeqPairs(mappingContainer1, mappingContainer2);
+//        this.classifySeqPairs(mappingContainer1, mappingContainer2);
     }
 
     
     @Override
-    public ParsedSeqPairContainer calculateSeqPairs() {
+    public ParsedSeqPairContainer classifySeqPairs() {
         
         
         this.seqPairContainer = new ParsedSeqPairContainer();

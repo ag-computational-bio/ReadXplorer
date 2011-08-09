@@ -96,7 +96,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 //        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID(), trackJob.getID()).getReadnameToSeqIDMapping();
 
         // XXX does this work for all import methods???
-        // TODO: somehow get the information if sequenceString is neccessary
         String sequenceString = null;
         try {
             Long id = trackJob.getRefGen().getID();
@@ -309,13 +308,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                     ParsedTrack track1 = this.parseSingleTrack(seqPairJobContainer.getTrackJob1());
                     ParsedTrack track2 = this.parseSingleTrack(seqPairJobContainer.getTrackJob2());
 
-                    final ISeqPairClassifier seqPairCalculator = Lookup.getDefault().lookup(ISeqPairClassifier.class);
-                    if (seqPairCalculator != null) {
-                        seqPairCalculator.setData(track1, track2, distance, seqPairJobContainer.getDeviation(), seqPairJobContainer.getOrientation());
+                    final ISeqPairClassifier seqPairClassifier = Lookup.getDefault().lookup(ISeqPairClassifier.class);
+                    if (seqPairClassifier != null) {
+                        seqPairClassifier.setData(track1, track2, distance, seqPairJobContainer.getDeviation(), seqPairJobContainer.getOrientation());
                         String description = seqPairJobContainer.getTrackJob1().getFile().getName() + " and " + seqPairJobContainer.getTrackJob2().getFile().getName();
 
                         try { //storing sequence pairs data
-                            this.storeSeqPairs(seqPairCalculator.calculateSeqPairs(), description);
+                            this.storeSeqPairs(seqPairClassifier.classifySeqPairs(), description);
                             io.getOut().println("\"" + description + " sequence pair data infos \" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.stored"));
                         } catch (StorageException ex) {
                             // something went wrong
@@ -352,6 +351,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             ParsedTrack track = this.parseTrack(trackJob);
             boolean seqPairs = false;
             if (trackJob.getParser() instanceof JokSeqPairParser){
+                //TODO: implement seq pair support for all parsers!
                 track.setReadnameToSeqIdMap(((JokSeqPairParser) trackJob.getParser()).getSeqIDToReadNameMap());
                 ((JokSeqPairParser) trackJob.getParser()).resetSeqIdToReadnameMap();
                 seqPairs = true;

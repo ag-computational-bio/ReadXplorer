@@ -13,6 +13,7 @@ import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -95,6 +96,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
                 repaint();
             }
         });
+        this.setViewerSize();
     }
 
     private void setColors(Preferences pref) {
@@ -594,6 +596,15 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public String toString(){
         return getName();
+    }
+    
+    /**
+     * Sets the initial size of the track viewer.
+     */
+    private void setViewerSize() {
+        
+        this.setPreferredSize(new Dimension(1, 300));
+        this.revalidate();
     }
     
 }

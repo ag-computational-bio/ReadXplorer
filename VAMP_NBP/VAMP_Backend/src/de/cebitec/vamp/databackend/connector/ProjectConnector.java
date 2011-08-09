@@ -199,6 +199,10 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
             con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIRS).execute();
             con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIRS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_REPLICATES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT).executeUpdate();
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
             
 //           con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
@@ -207,6 +211,7 @@ public class ProjectConnector {
 //           con.prepareStatement(H2SQLStatements.SETUP_READS).execute();
 //           con.prepareStatement(H2SQLStatements.INDEX_READS).executeUpdate();
 
+            this.checkDBStructure();
 
             con.commit();
             con.setAutoCommit(true);
@@ -230,18 +235,87 @@ public class ProjectConnector {
             con.prepareStatement(MySQLStatements.SETUP_FEATURES).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS); 
+            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS).execute(); 
+            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
+            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).execute();
 //           con.prepareStatement(SQLStatements.SETUP_RUN).execute();
 //            con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();
 //            con.prepareStatement(SQLStatements.SETUP_READS).execute();
-
+            
+            this.checkDBStructure();
 
             con.commit();
             con.setAutoCommit(true);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished creating tables and indices if not existent before");
 
         } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
+        }
+    }
+    
+    
+    /**
+     * Any additional columns which were added to existing tables in newer 
+     * VAMP versions should be checked by this method to ensure correct database 
+     * structure and avoiding errors when SQL statements request one of these
+     * columns, which are not existent in older databases.
+     */
+    private void checkDBStructure() {
+        
+        //remove statics table (replaced by statistics table)
+        try {
+            con.prepareStatement(SQLStatements.DROP_TABLE_STATICS).execute();
+        } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
+        }
+            
+        //stats table
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUMBER_READS)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }    
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+    }
+    
+    /**
+     * Checks if a rollback is needed or if the SQLException originated from a
+     * duplicate column name error.
+     * @param ex SQL exception to check
+     */
+    private void checkRollback(SQLException ex) {
+        if (!ex.getMessage().contains("Duplicate column name")) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
     }
@@ -817,6 +891,7 @@ public class ProjectConnector {
 
             // start storing the mappings
             int batchCounter = 1;
+            //sequence ids can be the same in different tracks, track id has to be checked then
             Iterator<Integer> sequenceIDIterator = track.getParsedMappingContainer().getMappedSequenceIDs().iterator();
             while (sequenceIDIterator.hasNext()) { //sequence ids aller unterschiedlichen readsequenzen = unique reads
                 int sequenceID = sequenceIDIterator.next();
@@ -834,7 +909,7 @@ public class ProjectConnector {
                     insertMapping.setByte(6, m.getDirection());
                     insertMapping.setInt(7, m.getErrors());
                     insertMapping.setInt(8, sequenceID); // mappings der gleichen seq an anderer stelle enthalten sie auch +
-                    insertMapping.setLong(9, track.getID()); //gleichen count //TODO: get latest seqId from DB!!!
+                    insertMapping.setLong(9, track.getID()); //gleichen count
 
                     insertMapping.addBatch();
 
@@ -1350,4 +1425,5 @@ public class ProjectConnector {
     
     //TODO: delete seqpairs
     //TODO: seqpair queries
+
 }

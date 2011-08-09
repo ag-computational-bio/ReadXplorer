@@ -124,10 +124,32 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.centerScrollpane = new JScrollPane(this.viewer);
         this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
+        this.centerScrollpane.setVisible(true);
+        this.viewer.setVisible(true);
         
         this.addPlaceholder();
         this.updateSize();
         
+    }
+    
+    /**
+     * Adds a viewer in a scrollpane allowing for vertical scrolling and vertical zooming.
+     * Horizontal scrolling is only available by "setHorizontalAdjustmentPanel".
+     * @param viewer viewer to set
+     * @param verticalZoom vertical zoom slider
+     */
+    public void setViewerInScrollpane(AbstractViewer viewer, JSlider verticalZoom){
+        this.viewer = viewer;
+        verticalZoom.setOrientation(JSlider.VERTICAL);
+        this.boundsManager.addBoundsListener(viewer);
+        this.currentMousePosListeners.add(viewer);
+        this.centerScrollpane = new JScrollPane(this.viewer);
+        this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
+        this.centerPanel.add(verticalZoom, BorderLayout.WEST);
+        
+        this.addPlaceholder();
+        this.updateSize();
     }
     
     /**

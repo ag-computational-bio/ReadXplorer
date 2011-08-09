@@ -50,7 +50,7 @@ public class BasePanelFactory {
 
         this.refGen = refGen;
         BasePanel b = new BasePanel(boundsManager, viewController);
-        viewController.addMousePositionListener((MousePositionListener) b);
+        viewController.addMousePositionListener(b);
 
         // create viewer
         ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGen);
@@ -89,6 +89,8 @@ public class BasePanelFactory {
         // add panels to basepanel
         b.setTopInfoPanel(cil);
         b.setViewer(trackV, slider);
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        //b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
         return b;

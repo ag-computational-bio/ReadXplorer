@@ -3,6 +3,7 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.view.Installer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -32,11 +33,8 @@ public final class LoginWizardAction implements ActionListener{
         Boolean loggedIn = cl.lookup(LoginCookie.class) != null ? Boolean.TRUE : Boolean.FALSE;
 
         if (loggedIn){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-            // TODO: find a way to do an automatic logout below
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.warning.doubleLogin"), NotifyDescriptor.WARNING_MESSAGE));
-            return;
+            LogoutAction logoutAction = new LogoutAction(cl.lookup(LoginCookie.class));
+            logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
         }
 
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());

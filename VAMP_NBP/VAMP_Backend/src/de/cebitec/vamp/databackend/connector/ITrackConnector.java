@@ -77,7 +77,7 @@ public interface ITrackConnector {
 
     public String getAssociatedTrackName();
 
-        /**
+    /**
      * Returns all unique reads containing the given sequence.
      * Sequence cannot be longer than the readlength.
      * TODO: should also return all positions of the reads

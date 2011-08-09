@@ -26,6 +26,6 @@ public interface ISeqPairClassifier {
      * data for storing the sequence pairs.
      * @return seq pair container
      */
-    public ParsedSeqPairContainer calculateSeqPairs();
+    public ParsedSeqPairContainer classifySeqPairs();
 
 }

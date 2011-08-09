@@ -51,6 +51,8 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
         trackStatisticsPanel = new de.cebitec.vamp.ui.visualisation.track.TrackStatisticsPanel();
 
         setLayout(new java.awt.BorderLayout());
+
+        trackStatisticsPanel.setMinimumSize(new java.awt.Dimension(157, 200));
         add(trackStatisticsPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -106,7 +108,7 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
             setVisible(false);
         }
         else{
-            if (!isVisible()) setVisible(true);
+            if (!isVisible()){ setVisible(true); }
             for (TrackViewer trackViewer : result.allInstances()) {
                 trackStatisticsPanel.setTrackConnector(trackViewer.getTrackCon());
                 trackStatisticsPanel.setTrackName(trackViewer.getTrackCon().getAssociatedTrackName());

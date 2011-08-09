@@ -612,5 +612,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.calcBaseWidth();
         return this.basewidth;
     }
+    
+    public Dimension getBasePanelSize(){
+        return this.basePanel.getSize();
+    }
 
   }

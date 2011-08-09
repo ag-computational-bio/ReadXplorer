@@ -284,14 +284,14 @@ public class SeqPairClassifierTest {
     }
 
     /**
-     * Test of calculateSeqPairs method, of class SeqPairClassifier.
+     * Test of classifySeqPairs method, of class SeqPairClassifier.
      */
     @Test
     public void testClassifySeqPairs() throws Exception {
         System.out.println("calculateSeqPairs");
         short orientation = 0; // 0 = fr, 1 = rf, 2 = ff/rr
         SeqPairClassifier seqPaircalc = new SeqPairClassifier(fwdTrack, revTrack, 500, 10, orientation);
-        ParsedSeqPairContainer result = seqPaircalc.calculateSeqPairs();
+        ParsedSeqPairContainer result = seqPaircalc.classifySeqPairs();
         HashMap<Pair<Long, Long>, ParsedSeqPairMapping> pairs = result.getParsedSeqPairs();
         List<Pair<Long,Long>> list = result.getMappingToPairIdList();
         

@@ -169,7 +169,7 @@ public class H2SQLStatements {
             ") ";
     
     
-    public final static String INDEX_SEQ_PAIRS_PIVOT =
+    public final static String INDEX_SEQ_PAIR_PIVOT =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPING_TO_SEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
             + "("+FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID+", "+FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID+" ) ";
 

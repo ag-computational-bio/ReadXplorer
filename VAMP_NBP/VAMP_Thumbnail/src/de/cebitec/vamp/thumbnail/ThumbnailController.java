@@ -550,6 +550,10 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             }
         });
         popUp.add(showThumbnail);
+        if (viewer.getTrackCount() < 1){
+            addListItem.setEnabled(false);
+            showThumbnail.setEnabled(false);
+        }
     }
 
     @Override
