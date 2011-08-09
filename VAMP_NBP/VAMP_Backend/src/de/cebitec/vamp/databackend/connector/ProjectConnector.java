@@ -75,6 +75,18 @@ public class ProjectConnector {
     private char substitution = 'S';
     private char deletion = 'D';
     private char insertion = 'I';
+    private HashMap<Long, Long[]> tmpSnpID;
+    private static final int BASE_A = 0;
+    private static final int BASE_C = 1;
+    private static final int BASE_G = 2;
+    private static final int BASE_T = 3;
+    private static final int BASE_N = 4;
+    private static final int BASE_GAP = 5;
+    private static final int GAP_A = 6;
+    private static final int GAP_C = 7;
+    private static final int GAP_G = 8;
+    private static final int GAP_T = 9;
+    private static final int GAP_N = 10;
 
     private ProjectConnector() {
         trackConnectors = new HashMap<Long, TrackConnector>();
@@ -864,13 +876,56 @@ public class ProjectConnector {
                     while (diffsIt.hasNext()) {
 
                         batchCounter++;
-
+                        
                         ParsedDiff d = diffsIt.next();
+                        // get SnpID for position for base
+                        long snpID = 0;
+                        Long[] baseSnpID = tmpSnpID.get(d.getPosition());
+                        if(baseSnpID != null) {
+                            switch (d.getBase()) {
+                                case 'A':
+                                    if(baseSnpID[BASE_A] != null) {
+                                        snpID = baseSnpID[BASE_A];
+                                    }
+                                    break;
+                                case 'C':
+                                    if(baseSnpID[BASE_C] != null) {
+                                        snpID = baseSnpID[BASE_C];
+                                    }
+                                    break;
+                                case 'G':
+                                    if(baseSnpID[BASE_G] != null) {
+                                        snpID = baseSnpID[BASE_G];
+                                    }
+                                    break;
+                                case 'T':
+                                    if (d.getPosition() == 347239) {
+                                        Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(baseSnpID[BASE_T]));
+                                    }
+                                    if(baseSnpID[BASE_T] != null) {
+                                        snpID = baseSnpID[BASE_T];
+                                    }
+                                    break;
+                                case 'N':
+                                    if(baseSnpID[BASE_N] != null) {
+                                        snpID = baseSnpID[BASE_N];
+                                    }
+                                    break;
+                                case '_':
+                                    if(baseSnpID[BASE_GAP] != null) {
+                                        snpID = baseSnpID[BASE_GAP];
+                                    }
+                                    break;
+                            }
+                        }
+
+                        
                         insertDiff.setLong(1, diffID++);
                         insertDiff.setLong(2, m.getID());
                         insertDiff.setString(3, Character.toString(d.getBase()));
                         insertDiff.setLong(4, d.getPosition());
                         insertDiff.setByte(5, diff);
+                        insertDiff.setLong(6, snpID);
 
                         insertDiff.addBatch();
 
@@ -886,12 +941,47 @@ public class ProjectConnector {
                         batchCounter++;
 
                         ParsedReferenceGap g = gapIt.next();
+                        
+                                                // get SnpID for position for base
+                        long snpID = 0;
+                        Long[] baseSnpID = tmpSnpID.get(g.getAbsPos());
+                        if(baseSnpID != null) {
+                            switch (g.getBase()) {
+                                case 'A':
+                                    if(baseSnpID[GAP_A] != null) {
+                                        snpID = baseSnpID[GAP_A];
+                                    }
+                                    break;
+                                case 'C':
+                                    if(baseSnpID[GAP_C] != null) {
+                                        snpID = baseSnpID[GAP_C];
+                                    }
+                                    break;
+                                case 'G':
+                                    if(baseSnpID[GAP_G] != null) {
+                                        snpID = baseSnpID[GAP_G];
+                                    }
+                                    break;
+                                case 'T':
+                                    if(baseSnpID[GAP_T] != null) {
+                                        snpID = baseSnpID[GAP_T];
+                                    }
+                                    break;
+                                case 'N':
+                                    if(baseSnpID[GAP_N] != null) {
+                                        snpID = baseSnpID[GAP_N];
+                                    }
+                                    break;
+                            }
+                        }
+                        
                         insertGap.setLong(1, diffID++);
                         insertGap.setLong(2, m.getID());
                         insertGap.setString(3, Character.toString(g.getBase()));
                         insertGap.setLong(4, g.getAbsPos());
                         insertGap.setByte(5, gap);
                         insertGap.setInt(6, g.getOrder());
+                        insertGap.setLong(7, snpID);
 
                         insertGap.addBatch();
 
@@ -961,6 +1051,7 @@ public class ProjectConnector {
         this.storeCoverage(track);
         this.storeStatistics(track);
         this.storeMappings(track);
+        tmpSnpID = new HashMap<Long, Long[]>();
         this.storePositionTable(track);
         this.storeDiffs(track);
 
@@ -1319,6 +1410,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
 
         try {
+            int diff = 0;
             PreparedStatement latestSnpID = con.prepareStatement(SQLStatements.GET_LATEST_SNP_ID);
             PreparedStatement insertSnp = con.prepareStatement(SQLStatements.INSERT_SNP);
 
@@ -1334,29 +1426,27 @@ public class ProjectConnector {
 
             // go through positionTable
             Iterator positionIterator = track.getCoverageContainer().getPositionTable().entrySet().iterator();
-            while (positionIterator.hasNext()) {
 
-                batchCounter++;
+            while (positionIterator.hasNext()) {
 
                 Map.Entry e = (Map.Entry) positionIterator.next();
                 Long position = (Long) e.getKey();
                 int positionInt = position.intValue();
                 Integer[] values = (Integer[]) e.getValue();
 
-                // coverage
-                int forwCov = track.getCoverageContainer().getBestMappingForwardCoverage(positionInt);
-                int revCov = track.getCoverageContainer().getBestMappingReverseCoverage(positionInt);
-                int cov = forwCov + revCov;
-
-
+                
+                
+                // get coverage
+                double forwCov = track.getCoverageContainer().getBestMappingForwardCoverage(positionInt);
+                double revCov = track.getCoverageContainer().getBestMappingReverseCoverage(positionInt);
+                double cov = forwCov + revCov;
 
                 // add diffs, getting the number of matches at position x; set type of diff
                 // i=0..5 is ACGTN_GAP (DIFFS); i=6..10 is ACGTN (GAP)
-
-
                 for (int i = 0; i < values.length; i++) {
                     char type = ' ';
-                    if (values[i] != 0) {
+                    diff = diff + values[i];
+                    if (values[i] != 0 && cov != 0) {
                         if (i >= 0 && i <= 4) {
                             type = substitution;
                         } else if (i == 5) {
@@ -1364,42 +1454,53 @@ public class ProjectConnector {
                         } else {
                             type = insertion;
                         }
-                    }
-                    double frequency = values[i] / cov * 100;
-                    if (frequency != 100) {
-                        insertSnp.setLong(1, snpID);
-                        insertSnp.setLong(2, track.getID());
-                        insertSnp.setInt(3, cov);
-                        insertSnp.setDouble(4, frequency);
-                        insertSnp.setString(5, String.valueOf(type));
+                        
+                        double frequency = values[i] / cov * 100;
+                        
+                        if (frequency != 100.0) {
+                            insertSnp.setLong(1, snpID);
+                            insertSnp.setLong(2, track.getID());
+                            insertSnp.setInt(3, (int) cov);
+                            insertSnp.setInt(4, (int) frequency);
+                            insertSnp.setString(5, String.valueOf(type));
+                            
+                            insertSnp.addBatch();
 
-                        insertSnp.addBatch();
-
-                        if (batchCounter == DIFF_BATCH_SIZE) {
-                            insertSnp.executeBatch();
-                            batchCounter = 0;
+                            if (batchCounter == DIFF_BATCH_SIZE) {
+                                insertSnp.executeBatch();
+                                batchCounter = 0;
+                            }
+                            
+                            if (!tmpSnpID.containsKey(position)) {
+                                Long[] baseSnpID = new Long[11];      
+                                tmpSnpID.put(position, baseSnpID);
+                            }
+                            
+                            // save SnpID for position for base where i=0..5 is 
+                            // ACGTN_GAP (DIFFS); i=6..10 is ACGTN (GAP)
+                            // for insert in Diff_Table
+                            Long[] baseSnpID = tmpSnpID.get(position);
+                            baseSnpID[i] = snpID;
+                            
+                            
+                            batchCounter++;
+                            snpID++;
                         }
                     }
-                    snpID++;
                 }
+
+
+            }
+
+            insertSnp.executeBatch();
+            insertSnp.close();
+
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
-        insertSnp.executeBatch();
-
-        insertSnp.close();
-
-    }
-    
-    catch (SQLException ex
-
-    
-        ) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-    }
-
-    Logger.getLogger (
-
-this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
+        Logger.getLogger(
+                this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
 
 
     }

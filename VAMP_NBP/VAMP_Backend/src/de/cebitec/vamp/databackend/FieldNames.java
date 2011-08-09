@@ -59,6 +59,7 @@ public class FieldNames {
     public final static String DIFF_CHAR = "BASE";
     public final static String DIFF_TYPE = "TYPE";
     public final static String DIFF_ORDER = "GAP_ORDER";
+    public final static String DIFF_SNP_ID = "SNP_ID";
 
 //    // source table fields
 //    public final static String SEQUENCE_ID = "ID";

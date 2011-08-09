@@ -108,9 +108,10 @@ public class SQLStatements {
             + FieldNames.DIFF_CHAR + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + " "
+            + FieldNames.DIFF_ORDER + ", "
+            + FieldNames.DIFF_SNP_ID + " "
             + ") "
-            + "VALUES (?,?,?,?,?, null)";
+            + "VALUES (?,?,?,?,?, null,?)";
     public final static String INSERT_GAP =
             "INSERT INTO " + FieldNames.TABLE_DIFF + " "
             + "("
@@ -119,9 +120,10 @@ public class SQLStatements {
             + FieldNames.DIFF_CHAR + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + " "
+            + FieldNames.DIFF_ORDER + ", "
+            + FieldNames.DIFF_SNP_ID + " "
             + ") "
-            + "VALUES (?,?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?,?,?)";
     public final static String INSERT_COVERAGE =
             "INSERT INTO " + FieldNames.TABLE_COVERAGE + " "
             + "("
@@ -217,42 +219,42 @@ public class SQLStatements {
      */
     public final static String DELETE_DIFFS_FROM_TRACK =
             "DELETE FROM "
-            + FieldNames.TABLE_DIFF + " "
+                + FieldNames.TABLE_DIFF + " "
             + "WHERE "
-            + FieldNames.DIFF_MAPPING_ID
+                + FieldNames.DIFF_MAPPING_ID
             + " IN "
             + "( "
             + "SELECT "
-            + FieldNames.MAPPING_ID + " "
+                + FieldNames.MAPPING_ID + " "
             + "FROM " + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE " + FieldNames.MAPPING_TRACK + " = ? "
             + ")";
     public final static String DELETE_MAPPINGS_FROM_TRACK =
             "DELETE FROM "
-            + FieldNames.TABLE_MAPPINGS + " "
+                + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE "
-            + FieldNames.MAPPING_TRACK + " = ? ";
+                + FieldNames.MAPPING_TRACK + " = ? ";
     public final static String DELETE_COVERAGE_FROM_TRACK =
             "DELETE FROM "
-            + FieldNames.TABLE_COVERAGE + " "
+                + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
-            + FieldNames.COVERAGE_TRACK + " = ?";
+                + FieldNames.COVERAGE_TRACK + " = ?";
     public final static String DELETE_TRACK =
             "DELETE FROM "
-            + FieldNames.TABLE_TRACKS + " "
+                + FieldNames.TABLE_TRACKS + " "
             + "WHERE "
-            + FieldNames.TRACK_ID + " = ? ";
+                + FieldNames.TRACK_ID + " = ? ";
     public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete matepairs
             "DELETE FROM "
-            + FieldNames.TABLE_SEQ_PAIRS + " "
+                + FieldNames.TABLE_SEQ_PAIRS + " "
             + "WHERE "
-            + FieldNames.SEQ_PAIR_MAPPING1_ID
+                + FieldNames.SEQ_PAIR_MAPPING1_ID
             + " OR "
-            + FieldNames.SEQ_PAIR_MAPPING2_ID
+                + FieldNames.SEQ_PAIR_MAPPING2_ID
             + " IN "
             + "( "
             + "SELECT "
-            + FieldNames.MAPPING_ID + " "
+                + FieldNames.MAPPING_ID + " "
             + "FROM " + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE " + FieldNames.MAPPING_TRACK + " = ? "
             + ")";
@@ -286,14 +288,14 @@ public class SQLStatements {
 //                FieldNames.RUN_ID+" = ?";
     public final static String DELETE_FEATURES_FROM_GENOME =
             "DELETE FROM "
-            + FieldNames.TABLE_FEATURES + " "
+                + FieldNames.TABLE_FEATURES + " "
             + "WHERE "
-            + FieldNames.FEATURE_REFGEN + " = ?";
+                + FieldNames.FEATURE_REFGEN + " = ?";
     public final static String DELETE_GENOME =
             "DELETE FROM "
-            + FieldNames.TABLE_REF_GEN + " "
+                + FieldNames.TABLE_REF_GEN + " "
             + "WHERE "
-            + FieldNames.REF_GEN_ID + " = ?";
+                + FieldNames.REF_GEN_ID + " = ?";
     // statements to fetch data from database
 //    public final static String FETCH_READNAME_SEQUENCEID_MAPPING =
 //            "SELECT " +
@@ -314,118 +316,118 @@ public class SQLStatements {
 //                FieldNames.TABLE_RUN+" AS R ";
     public final static String FETCH_GENOMES =
             "SELECT "
-            + "R." + FieldNames.REF_GEN_ID + ", "
-            + "R." + FieldNames.REF_GEN_NAME + ", "
-            + "R." + FieldNames.REF_GEN_DESCRIPTION + ", "
-            + "R." + FieldNames.REF_GEN_SEQUENCE + ",  "
-            + "R." + FieldNames.REF_GEN_TIMESTAMP + " "
+                + "R." + FieldNames.REF_GEN_ID + ", "
+                + "R." + FieldNames.REF_GEN_NAME + ", "
+                + "R." + FieldNames.REF_GEN_DESCRIPTION + ", "
+                + "R." + FieldNames.REF_GEN_SEQUENCE + ",  "
+                + "R." + FieldNames.REF_GEN_TIMESTAMP + " "
             + "FROM "
-            + FieldNames.TABLE_REF_GEN + " AS R ";
+                + FieldNames.TABLE_REF_GEN + " AS R ";
     public final static String FETCH_TRACKS =
             "SELECT "
-            + "T." + FieldNames.TRACK_ID + ", "
-            + "T." + FieldNames.TRACK_DESCRIPTION + ", "
-            + "T." + FieldNames.TRACK_TIMESTAMP + ", "
-            + "T." + FieldNames.TRACK_REFERENCE_ID + " " +//", " +
-            //"T."+FieldNames.TRACK_RUN+" " +
+                + "T." + FieldNames.TRACK_ID + ", "
+                + "T." + FieldNames.TRACK_DESCRIPTION + ", "
+                + "T." + FieldNames.TRACK_TIMESTAMP + ", "
+                + "T." + FieldNames.TRACK_REFERENCE_ID + " " +//", " +
+                //"T."+FieldNames.TRACK_RUN+" " +
             "FROM "
-            + FieldNames.TABLE_TRACKS + " AS T ";
+                + FieldNames.TABLE_TRACKS + " AS T ";
     public final static String FETCH_SINGLE_GENOME =
             "SELECT "
-            + FieldNames.REF_GEN_ID + ", "
-            + FieldNames.REF_GEN_NAME + ", "
-            + FieldNames.REF_GEN_DESCRIPTION + ", "
-            + FieldNames.REF_GEN_SEQUENCE + ", "
-            + FieldNames.REF_GEN_TIMESTAMP + " "
+                + FieldNames.REF_GEN_ID + ", "
+                + FieldNames.REF_GEN_NAME + ", "
+                + FieldNames.REF_GEN_DESCRIPTION + ", "
+                + FieldNames.REF_GEN_SEQUENCE + ", "
+                + FieldNames.REF_GEN_TIMESTAMP + " "
             + "FROM "
-            + FieldNames.TABLE_REF_GEN + " "
+                + FieldNames.TABLE_REF_GEN + " "
             + "WHERE "
-            + FieldNames.REF_GEN_ID + " = ?";
+                + FieldNames.REF_GEN_ID + " = ?";
     public final static String FETCH_FEATURES_FOR_INTERVAL_FROM_GENOME =
             "SELECT "
-            + FieldNames.FEATURE_ECNUM + ", "
-            + FieldNames.FEATURE_ID + ", "
-            + FieldNames.FEATURE_LOCUS + ", "
-            + FieldNames.FEATURE_PRODUCT + ", "
-            + FieldNames.FEATURE_START + ", "
-            + FieldNames.FEATURE_STOP + ", "
-            + FieldNames.FEATURE_STRAND + ", "
-            + FieldNames.FEATURE_TYPE + " "
+                + FieldNames.FEATURE_ECNUM + ", "
+                + FieldNames.FEATURE_ID + ", "
+                + FieldNames.FEATURE_LOCUS + ", "
+                + FieldNames.FEATURE_PRODUCT + ", "
+                + FieldNames.FEATURE_START + ", "
+                + FieldNames.FEATURE_STOP + ", "
+                + FieldNames.FEATURE_STRAND + ", "
+                + FieldNames.FEATURE_TYPE + " "
             + "FROM "
-            + FieldNames.TABLE_FEATURES + " "
+                + FieldNames.TABLE_FEATURES + " "
             + "WHERE "
-            + FieldNames.FEATURE_REFGEN + " = ? and "
-            + FieldNames.FEATURE_STOP + " >= ? and "
-            + FieldNames.FEATURE_START + " <= ? ";
+                + FieldNames.FEATURE_REFGEN + " = ? and "
+                + FieldNames.FEATURE_STOP + " >= ? and "
+                + FieldNames.FEATURE_START + " <= ? ";
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
             "(SELECT "
-            + FieldNames.COVERAGE_POSITION + ", "
-            + FieldNames.COVERAGE_BM_FW_MULT + ", "
-            + FieldNames.COVERAGE_BM_FW_NUM + ", "
-            + FieldNames.COVERAGE_BM_RV_MULT + ", "
-            + FieldNames.COVERAGE_BM_RV_NUM + ", "
-            + FieldNames.COVERAGE_N_FW_MULT + ", "
-            + FieldNames.COVERAGE_N_FW_NUM + ", "
-            + FieldNames.COVERAGE_N_RV_MULT + ", "
-            + FieldNames.COVERAGE_N_RV_NUM + ", "
-            + FieldNames.COVERAGE_ZERO_FW_MULT + ", "
-            + FieldNames.COVERAGE_ZERO_FW_NUM + ", "
-            + FieldNames.COVERAGE_ZERO_RV_MULT + ", "
-            + FieldNames.COVERAGE_ZERO_RV_NUM + " "
+                + FieldNames.COVERAGE_POSITION + ", "
+                + FieldNames.COVERAGE_BM_FW_MULT + ", "
+                + FieldNames.COVERAGE_BM_FW_NUM + ", "
+                + FieldNames.COVERAGE_BM_RV_MULT + ", "
+                + FieldNames.COVERAGE_BM_RV_NUM + ", "
+                + FieldNames.COVERAGE_N_FW_MULT + ", "
+                + FieldNames.COVERAGE_N_FW_NUM + ", "
+                + FieldNames.COVERAGE_N_RV_MULT + ", "
+                + FieldNames.COVERAGE_N_RV_NUM + ", "
+                + FieldNames.COVERAGE_ZERO_FW_MULT + ", "
+                + FieldNames.COVERAGE_ZERO_FW_NUM + ", "
+                + FieldNames.COVERAGE_ZERO_RV_MULT + ", "
+                + FieldNames.COVERAGE_ZERO_RV_NUM + " "
             + "FROM "
-            + FieldNames.TABLE_COVERAGE + " "
+                + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
-            + FieldNames.COVERAGE_POSITION + " between ? and ? and "
-            + FieldNames.COVERAGE_TRACK + " = ? )";
+                + FieldNames.COVERAGE_POSITION + " between ? and ? and "
+                + FieldNames.COVERAGE_TRACK + " = ? )";
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT "
-            + "M." + FieldNames.MAPPING_ID + ", "
-            + "M." + FieldNames.MAPPING_BEST_MAPPING + ", "
-            + "M." + FieldNames.MAPPING_COUNT + ", "
-            + "M." + FieldNames.MAPPING_DIRECTION + ", "
-            + "M." + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
-            + "M." + FieldNames.MAPPING_SEQUENCE_ID + ", "
-            + "M." + FieldNames.MAPPING_START + ", "
-            + "M." + FieldNames.MAPPING_STOP + ", "
-            + "M." + FieldNames.MAPPING_TRACK + ", "
-            + "D." + FieldNames.DIFF_CHAR + ", "
-            + "D." + FieldNames.DIFF_ORDER + ", "
-            + "D." + FieldNames.DIFF_POSITION + ", "
-            + "D." + FieldNames.DIFF_TYPE + " "
+                + "M." + FieldNames.MAPPING_ID + ", "
+                + "M." + FieldNames.MAPPING_BEST_MAPPING + ", "
+                + "M." + FieldNames.MAPPING_COUNT + ", "
+                + "M." + FieldNames.MAPPING_DIRECTION + ", "
+                + "M." + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+                + "M." + FieldNames.MAPPING_SEQUENCE_ID + ", "
+                + "M." + FieldNames.MAPPING_START + ", "
+                + "M." + FieldNames.MAPPING_STOP + ", "
+                + "M." + FieldNames.MAPPING_TRACK + ", "
+                + "D." + FieldNames.DIFF_CHAR + ", "
+                + "D." + FieldNames.DIFF_ORDER + ", "
+                + "D." + FieldNames.DIFF_POSITION + ", "
+                + "D." + FieldNames.DIFF_TYPE + " "
             + "FROM "
-            + "("
-            + "SELECT "
-            + FieldNames.MAPPING_ID + ", "
-            + FieldNames.MAPPING_BEST_MAPPING + ", "
-            + FieldNames.MAPPING_COUNT + ", "
-            + FieldNames.MAPPING_DIRECTION + ", "
-            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
-            + FieldNames.MAPPING_SEQUENCE_ID + ", "
-            + FieldNames.MAPPING_START + ", "
-            + FieldNames.MAPPING_STOP + ", "
-            + FieldNames.MAPPING_TRACK + " "
-            + "FROM "
-            + FieldNames.TABLE_MAPPINGS + " "
-            + "WHERE "
-            + FieldNames.MAPPING_TRACK + " = ? and  "
-            + FieldNames.MAPPING_STOP + " >= ? and "
-            + FieldNames.MAPPING_START + " <= ? "
-            + ") AS M "
-            + "LEFT JOIN "
-            + "("
-            + "SELECT "
-            + FieldNames.DIFF_CHAR + ", "
-            + FieldNames.DIFF_ORDER + ", "
-            + FieldNames.DIFF_POSITION + ", "
-            + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_MAPPING_ID + " "
-            + "FROM "
-            + FieldNames.TABLE_DIFF + " "
-            + "WHERE "
-            + FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "
-            + ") AS D "
-            + "on "
-            + "M." + FieldNames.MAPPING_ID + " = D." + FieldNames.DIFF_MAPPING_ID;
+                + "("
+                + "SELECT "
+                    + FieldNames.MAPPING_ID + ", "
+                    + FieldNames.MAPPING_BEST_MAPPING + ", "
+                    + FieldNames.MAPPING_COUNT + ", "
+                    + FieldNames.MAPPING_DIRECTION + ", "
+                    + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+                    + FieldNames.MAPPING_SEQUENCE_ID + ", "
+                    + FieldNames.MAPPING_START + ", "
+                    + FieldNames.MAPPING_STOP + ", "
+                    + FieldNames.MAPPING_TRACK + " "
+                + "FROM "
+                    + FieldNames.TABLE_MAPPINGS + " "
+                + "WHERE "
+                    + FieldNames.MAPPING_TRACK + " = ? and  "
+                    + FieldNames.MAPPING_STOP + " >= ? and "
+                    + FieldNames.MAPPING_START + " <= ? "
+                + ") AS M "
+                + "LEFT JOIN "
+                + "("
+                    + "SELECT "
+                        + FieldNames.DIFF_CHAR + ", "
+                        + FieldNames.DIFF_ORDER + ", "
+                        + FieldNames.DIFF_POSITION + ", "
+                        + FieldNames.DIFF_TYPE + ", "
+                        + FieldNames.DIFF_MAPPING_ID + " "
+                    + "FROM "
+                        + FieldNames.TABLE_DIFF + " "
+                    + "WHERE "
+                        + FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "
+                    + ") AS D "
+                    + "on "
+                    + "M." + FieldNames.MAPPING_ID + " = D." + FieldNames.DIFF_MAPPING_ID;
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
             "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
@@ -438,9 +440,9 @@ public class SQLStatements {
             + FieldNames.COVERAGE_TRACK + " = ? ";
     public final static String FETCH_COVERAGE_FOR_TRACK =
             "SELECT "
-            + FieldNames.COVERAGE_POSITION + ", "
-            + FieldNames.COVERAGE_N_FW_MULT + " + " + FieldNames.COVERAGE_N_RV_MULT
-            + " as " + FieldNames.COVERAGE_N_MULT
+                + FieldNames.COVERAGE_POSITION + ", "
+                + FieldNames.COVERAGE_N_FW_MULT + " + " + FieldNames.COVERAGE_N_RV_MULT
+                + " as " + FieldNames.COVERAGE_N_MULT
             + " FROM "
             + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
@@ -458,36 +460,36 @@ public class SQLStatements {
             + FieldNames.TRACK_REFERENCE_ID + " = ? ";
     public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
             "SELECT A." + FieldNames.DIFF_POSITION + ", "
-            + "A." + FieldNames.DIFF_CHAR + ", "
-            + "A." + FieldNames.MAPPING_DIRECTION + ", "
-            + "A." + FieldNames.DIFF_TYPE + ", "
-            + "A.mult_count, "
-            + "C." + FieldNames.COVERAGE_BM_FW_MULT + ", "
-            + "C." + FieldNames.COVERAGE_BM_RV_MULT + " "
+                + "A." + FieldNames.DIFF_CHAR + ", "
+                + "A." + FieldNames.MAPPING_DIRECTION + ", "
+                + "A." + FieldNames.DIFF_TYPE + ", "
+                + "A.mult_count, "
+                + "C." + FieldNames.COVERAGE_BM_FW_MULT + ", "
+                + "C." + FieldNames.COVERAGE_BM_RV_MULT + " "
             + "FROM "
-            + "(SELECT "
-            + FieldNames.DIFF_POSITION + ", "
-            + FieldNames.DIFF_CHAR + ", "
-            + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.MAPPING_DIRECTION + ", "
-            + "SUM(" + FieldNames.MAPPING_COUNT + ") as mult_count  "
-            + "FROM "
-            + FieldNames.TABLE_MAPPINGS + " AS M "
-            + "left join " + FieldNames.TABLE_DIFF + " AS D "
-            + "on D." + FieldNames.DIFF_MAPPING_ID + " = M." + FieldNames.MAPPING_ID + " "
+                + "(SELECT "
+                    + FieldNames.DIFF_POSITION + ", "
+                    + FieldNames.DIFF_CHAR + ", "
+                    + FieldNames.DIFF_TYPE + ", "
+                    + FieldNames.MAPPING_DIRECTION + ", "
+                    + "SUM(" + FieldNames.MAPPING_COUNT + ") as mult_count  "
+                + "FROM "
+                    + FieldNames.TABLE_MAPPINGS + " AS M "
+                    + "left join " + FieldNames.TABLE_DIFF + " AS D "
+                    + "on D." + FieldNames.DIFF_MAPPING_ID + " = M." + FieldNames.MAPPING_ID + " "
+                + "WHERE "
+                    + "M." + FieldNames.MAPPING_TRACK + " = ? and M." + FieldNames.MAPPING_BEST_MAPPING + " = 1 and M."
+                    + FieldNames.MAPPING_START + " BETWEEN ? AND ? and D." + FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "
+                + "GROUP BY "
+                    + "D." + FieldNames.DIFF_POSITION + ", "
+                    + "D." + FieldNames.DIFF_CHAR + ", "
+                    + "M." + FieldNames.MAPPING_DIRECTION + " ,"
+                    + "D." + FieldNames.DIFF_TYPE + ""
+                    + ") as A , "
+                    + FieldNames.TABLE_COVERAGE + " AS C "
             + "WHERE "
-            + "M." + FieldNames.MAPPING_TRACK + " = ? and M." + FieldNames.MAPPING_BEST_MAPPING + " = 1 and M."
-            + FieldNames.MAPPING_START + " BETWEEN ? AND ? and D." + FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "
-            + "GROUP BY "
-            + "D." + FieldNames.DIFF_POSITION + ", "
-            + "D." + FieldNames.DIFF_CHAR + ", "
-            + "M." + FieldNames.MAPPING_DIRECTION + " ,"
-            + "D." + FieldNames.DIFF_TYPE + ""
-            + ") as A , "
-            + FieldNames.TABLE_COVERAGE + " AS C "
-            + "WHERE "
-            + "C." + FieldNames.COVERAGE_TRACK + " = ? AND "
-            + "C." + FieldNames.COVERAGE_POSITION + " = A." + FieldNames.DIFF_POSITION;
+                + "C." + FieldNames.COVERAGE_TRACK + " = ? AND "
+                + "C." + FieldNames.COVERAGE_POSITION + " = A." + FieldNames.DIFF_POSITION;
     public final static String GET_LATEST_STATISTICS_ID =
             "SELECT "
             + "MAX(" + FieldNames.STATISTICS_ID + ") AS LATEST_ID "

@@ -180,10 +180,11 @@ public class CoverageContainer {
     }
 
     public void savePositions(ParsedMapping s) {
+        if(s.isBestMapping()) {
         List<ParsedDiff> diffs = s.getDiffs();
         List<ParsedReferenceGap> gaps = s.getGenomeGaps();
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getNumOfDiffs()));
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getGenomeGaps().size()));
+        // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getNumOfDiffs()));
+        // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getGenomeGaps().size()));
         // saves diffs
         for (int i = 0; i < s.getNumOfDiffs(); i++) {
            
@@ -220,6 +221,7 @@ public class CoverageContainer {
                     break;
                 case '_':
                     bases[BASE_GAP] = bases[BASE_GAP] + 1;
+                    break;
             }
 
         }
@@ -258,6 +260,7 @@ public class CoverageContainer {
             }
 
         }
+    }
     }
 
     public HashMap<Long, Integer[]> getPositionTable() {

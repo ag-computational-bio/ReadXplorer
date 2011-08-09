@@ -25,7 +25,7 @@ public class H2SQLStatements {
             + FieldNames.SNP_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.SNP_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.SNP_COVERAGE + " MEDIUMINT UNSIGNED NOT NULL, "
-            + FieldNames.SNP_FREQUENCY + " DOUBLE UNSIGNED NOT NULL, "
+            + FieldNames.SNP_FREQUENCY + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.SNP_TYPE + " VARCHAR(1) NOT NULL"
             + ")";
     public final static String INDEX_SNP =
@@ -47,7 +47,8 @@ public class H2SQLStatements {
             + FieldNames.DIFF_CHAR + " VARCHAR (1) NOT NULL, "
             + FieldNames.DIFF_POSITION + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.DIFF_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.DIFF_ORDER + " BIGINT UNSIGNED "
+            + FieldNames.DIFF_ORDER + " BIGINT UNSIGNED, "
+            + FieldNames.DIFF_SNP_ID + " BIGINT UNSIGNED NOT NULL "
             + ") ";
     //in h2 you can ask if the index exists in mysql this did not work
     public final static String INDEX_DIFF =
