@@ -197,12 +197,12 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIRS).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIRS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_REPLICATES).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT).executeUpdate();
+//            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIRS).execute();
+//            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIRS).executeUpdate();
+//            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
+//            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_REPLICATES).executeUpdate();
+//            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
+//            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT).executeUpdate();
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
             
 //           con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
@@ -235,9 +235,9 @@ public class ProjectConnector {
             con.prepareStatement(MySQLStatements.SETUP_FEATURES).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS).execute(); 
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
+//            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS).execute(); 
+//            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
+//            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).execute();
 //           con.prepareStatement(SQLStatements.SETUP_RUN).execute();
 //            con.prepareStatement(SQLStatements.SETUP_SEQUENCE).executeUpdate();

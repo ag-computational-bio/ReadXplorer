@@ -307,7 +307,7 @@ public class AlignmentViewer extends AbstractViewer {
         if (biggerStrandCoverage > biggestCoverage){
             biggestCoverage = biggerStrandCoverage * 2; //to cover both halves
         }
-        int newHeight = this.layerHeight * biggestCoverage;
+        int newHeight = (int) (this.layerHeight * biggestCoverage * 1.5); //1.5 = factor for possible empty spacings between alignments
         final int spacer = 120;
         this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));
         this.revalidate();
