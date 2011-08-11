@@ -8,9 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Filters for startcodons in two ways: First for all
- * available startcodons in a specified region and second
- * for all startcodons of a given frame for a specified region.
+ * Filters for a given pattern in two ways: First for all
+ * available occurrences of the pattern in a given interval of a given DNA sequence 
+ * and second for the next occurrence of the pattern along a DNA sequence, such
+ * as a whole genome sequence.
  *
  * @author ddoppmeier, rhilker
  */
@@ -35,38 +36,45 @@ public class PatternFilter implements RegionFilterI {
         //this.frameCurrFeature = StartCodonFilter.INIT; //because this is not a frame value
     }
 
+    /**
+     * Identifies the currently set pattern in a given interval of the reference
+     * sequence stored in this objet.
+     * @return A list of the positions where the pattern matched along the interval.
+     */
     private List<Region> findPatternInInterval() {
 
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
 
-            int offset = 3;
-            int start = absStart - offset;
-            int stop = absStop+2;
+            int offset = this.pattern.toString().length();
+            int start = this.absStart - offset;
+            int stop = this.absStop + this.pattern.toString().length()-1;
 
             if(start < 0 ){
                 offset -= Math.abs(start);
                 start = 0;
             }
-            if(stop > refGen.getSequence().length()){
-                stop = refGen.getSequence().length();
+            if(stop > this.refGen.getSequence().length()){
+                stop = this.refGen.getSequence().length();
             }
 
-            this.sequence = refGen.getSequence().substring(start, stop);
+            this.sequence = this.refGen.getSequence().substring(start, stop);
 //            boolean isFeatureSelected = this.frameCurrFeature != INIT;
-            this.matchPattern(sequence, this.pattern, true, offset);//, isFeatureSelected);
-            this.matchPattern(sequence, this.patternRev, false, offset);//, isFeatureSelected);
+            this.matchPattern(this.sequence, this.pattern, true, offset);//, isFeatureSelected);
+            this.matchPattern(this.sequence, this.patternRev, false, offset);//, isFeatureSelected);
         }
         return this.matchedPatterns;
 
     }
 
     /**
-     * Identifies all positions of the pattern in the whole reference genome sequence.
-     * @return list of identified hit regions
+     * Identifies next (closest) occurrence from either forward or reverse strand of a pattern 
+     * in the current reference genome.
+     * @return the position of the next occurrence of the pattern
      */
     public int findNextOccurrence() {
 
         int from = -1;
+        int from2 = -1;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
 
             int start = this.absStop;
@@ -82,24 +90,22 @@ public class PatternFilter implements RegionFilterI {
             
             //at first search from current position till end of sequence on both frames
             from = this.matchNextOccurrence(seq, this.pattern);
-            if (from == -1){ //try to find occurrence on rev strand
-                from = this.matchNextOccurrence(seq, this.patternRev);
-            }
+            from2 = this.matchNextOccurrence(seq, this.patternRev);
             
             //then search from 0 to current position on both frames
-            if (from == -1 && start > 0){
+            if (from == -1 && from2 == -1 && start > 0){
                 seq = refGen.getSequence().substring(0, start);
                 start = 0;
                 
                 from = this.matchNextOccurrence(seq, this.pattern);
-                if (from == -1){ //try to find occurrence on rev strand
-                    from = this.matchNextOccurrence(seq, this.patternRev);
-                } else {
-                from += start;
-                }
-            } else {
-                from += start;
+                from2 = this.matchNextOccurrence(seq, this.patternRev);
             }
+            
+            if (from < from2 && from != -1 || from2 == -1 && from > from2) {
+                return from + start; //2.631.133
+            } else if (from2 != -1) {
+                return from2 + start;
+            } else { /* both are -1*/ }
         }
         return from;
     }
@@ -111,8 +117,8 @@ public class PatternFilter implements RegionFilterI {
      * @param p pattern to search for
      * @param isForwardStrand if pattern is fwd or rev
      * @param offset offset needed for storing the correct region positions
-     * @param restricted determining if the visualization should be restricted to a certain frame
      */
+     //* @param restricted determining if the visualization should be restricted to a certain frame
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand,
             int offset) { //, boolean restricted){
         // match forward
@@ -134,14 +140,11 @@ public class PatternFilter implements RegionFilterI {
 //        }
     }
     
-        /**
-     * Identifies pattern "p" in the given "sequence" and stores positive results
-     * in this class' region list.
+    /**
+     * Identifies the next occurrence of pattern "p" in the given "sequence" and 
+     * returns its position.
      * @param sequence the sequence to analyse
      * @param p pattern to search for
-     * @param isForwardStrand if pattern is fwd or rev
-     * @param offset offset needed for storing the correct region positions
-     * @param restricted determining if the visualization should be restricted to a certain frame
      */
     private int matchNextOccurrence(String sequence, Pattern p) {
 
@@ -172,6 +175,8 @@ public class PatternFilter implements RegionFilterI {
         this.pattern = Pattern.compile(pattern);
         this.patternRev = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(pattern)));
     }
+    
+    
 //    public int getFrameCurrFeature() {
 //        return this.frameCurrFeature;
 //    }

@@ -8,6 +8,7 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dialogMenus.StandardMenuEvent;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -50,11 +51,12 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     /** Creates new form JumpPanel */
     public JumpPanel() {
         this.initComponents();
+        this.completeComponents();
         this.setMinimumSize(new Dimension(50, 50));
         this.setPreferredSize(new Dimension(288, 500));
         this.setSize(new Dimension(288, 500));
         jumpPosition = 1;
-        filterText.getDocument().addDocumentListener(new DocumentListener() {
+        filterTextfield.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -135,7 +137,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         featureGroundPanel = new javax.swing.JPanel();
         filterProperties = new javax.swing.JPanel();
         jumpFilterLabel = new javax.swing.JLabel();
-        filterText = new javax.swing.JTextField();
+        filterTextfield = new javax.swing.JTextField();
         filterForLabel = new javax.swing.JLabel();
         radioProduct = new javax.swing.JRadioButton();
         radioEC = new javax.swing.JRadioButton();
@@ -172,7 +174,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
         jumpFilterLabel.setText("Filter:");
 
-        filterText.setMinimumSize(jumpTextfield.getPreferredSize());
+        filterTextfield.setMinimumSize(jumpTextfield.getPreferredSize());
 
         filterForLabel.setText("Filter for:");
 
@@ -219,7 +221,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                         .addComponent(radioProduct)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioEC))
-                    .addComponent(filterText, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                    .addComponent(filterTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
                 .addContainerGap())
         );
         filterPropertiesLayout.setVerticalGroup(
@@ -227,7 +229,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             .addGroup(filterPropertiesLayout.createSequentialGroup()
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jumpFilterLabel)
-                    .addComponent(filterText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(filterTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(filterForLabel)
@@ -397,7 +399,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private javax.swing.JTable featureTable;
     private javax.swing.JLabel filterForLabel;
     private javax.swing.JPanel filterProperties;
-    private javax.swing.JTextField filterText;
+    private javax.swing.JTextField filterTextfield;
     private javax.swing.JButton jumpButton;
     private javax.swing.JLabel jumpFilterLabel;
     private javax.swing.JTextField jumpTextfield;
@@ -438,13 +440,13 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         //If current expression doesn't parse, don't update.
         try {
             if (radioFeatureButton.isSelected()){
-                rf = RowFilter.regexFilter(filterText.getText(), 0);
+                rf = RowFilter.regexFilter(filterTextfield.getText(), 0);
             } else
             if (radioProduct.isSelected()) {
-                rf = RowFilter.regexFilter(filterText.getText(), 1);
+                rf = RowFilter.regexFilter(filterTextfield.getText(), 1);
             } else
             if (radioEC.isSelected()) {
-                rf = RowFilter.regexFilter(filterText.getText(), 2);
+                rf = RowFilter.regexFilter(filterTextfield.getText(), 2);
             }
 
         } catch (java.util.regex.PatternSyntaxException e) {
@@ -467,10 +469,21 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
    
     void clearFilter() {
-        this.filterText.setText("");
+        this.filterTextfield.setText("");
         this.updateFilter();
     }
 
+    /**
+     * Loads the copy, paste, cut, select all right click menus for all 
+     * text fields beloning to this panel.
+     */
+    private void completeComponents() {
+        this.jumpTextfield.addMouseListener(new StandardMenuEvent());
+        this.searchPatternField.addMouseListener(new StandardMenuEvent());
+        this.filterTextfield.addMouseListener(new StandardMenuEvent());
+    }
+
+    
     private class FeatureNameSorter implements Comparator<PersistantFeature> {
 
         @Override

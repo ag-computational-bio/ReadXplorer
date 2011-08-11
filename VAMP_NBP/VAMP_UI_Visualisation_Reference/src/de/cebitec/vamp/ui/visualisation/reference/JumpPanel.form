@@ -131,7 +131,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="radioEC" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="filterText" pref="205" max="32767" attributes="1"/>
+                          <Component id="filterTextfield" pref="205" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -142,7 +142,7 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jumpFilterLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="filterText" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="filterTextfield" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -162,7 +162,7 @@
                 <Property name="text" type="java.lang.String" value="Filter:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="filterText">
+            <Component class="javax.swing.JTextField" name="filterTextfield">
               <Properties>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection component="jumpTextfield" name="preferredSize" type="property"/>
