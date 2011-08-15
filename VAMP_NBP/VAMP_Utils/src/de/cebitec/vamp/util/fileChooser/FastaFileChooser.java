@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.util.fileChooser;
 
 import java.io.BufferedWriter;
@@ -20,7 +15,6 @@ public class FastaFileChooser extends VampFileChooser {
 
     /**
      * Creates a new file chooser for saving a sequence in fasta format.
-     * @param option
      * @param fileExtension
      * @param sequence
      */

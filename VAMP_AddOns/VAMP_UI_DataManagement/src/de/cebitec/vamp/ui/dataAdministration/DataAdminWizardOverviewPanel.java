@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.dataAdministration;
 
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
 import java.awt.Component;
 import java.util.List;
@@ -58,7 +58,7 @@ public class DataAdminWizardOverviewPanel implements WizardDescriptor.Panel<Wiza
     @SuppressWarnings("unchecked")
     public void readSettings(WizardDescriptor settings) {
         List<ReferenceJob> ref2del = (List<ReferenceJob>) settings.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
-        List<TrackJobs> track2del = (List<TrackJobs>) settings.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
+        List<TrackJob> track2del = (List<TrackJob>) settings.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
 
         component.showGenereateOverview(ref2del, track2del);
     }

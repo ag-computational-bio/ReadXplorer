@@ -6,12 +6,17 @@ import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import javax.swing.JMenuItem;
-import org.openide.util.Lookup;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.text.JTextComponent;
 import org.openide.util.NbBundle;
 
 /**
@@ -21,6 +26,8 @@ import org.openide.util.NbBundle;
  */
 public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
+    private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    
     public MenuItemFactory() {
         //nothing to do here
     }
@@ -38,7 +45,6 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
                 @Override//
                 public void actionPerformed(ActionEvent e) {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                     clipboard.setContents(new StringSelection(sequenceToCopy), MenuItemFactory.this);
                 }
             });
@@ -51,6 +57,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @param sequence the sequence to store as fasta
      * @param feature the feature whose sequence is to be converted to fasta
      *                it contains the header information, but not the sequence
+     * @return jmenuitem for storing a sequence in fasta format
      */
     public JMenuItem getStoreFastaItem(final String sequence, final PersistantFeature feature){
         return this.initStoreFastaItem(sequence, feature, -1, -1);
@@ -63,6 +70,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @param sequence the sequence to store as fasta
      * @param seqStart the startpoint of the sequence
      * @param seqStop the endpoint of the sequence
+     * @return jmenuitem for storing a sequence in fasta format
      */
     public JMenuItem getStoreFastaItem(final String sequence, final int seqStart, final int seqStop){
         return this.initStoreFastaItem(sequence, null, seqStart, seqStop);
@@ -114,10 +122,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for calculating a possible folding of the selected DNA
      * sequence with RNAFold.
      * The sequence to fold has to be known already!
+     * @param rnaFolderControl instance of an rnafoldercontroller
      * @param sequenceToFold the DNA/RNA sequence to fold with RNAFold
-     * @param refName name of the reference
-     * @param start start position of the sequence
-     * @param stop stop position of the sequence
+     * @param header header string used for describing the folded rna
      * @return the menu item for RNA folding
      */
     public JMenuItem getRNAFoldItem(final RNAFolderI rnaFolderControl, final String sequenceToFold, final String header) {
@@ -133,6 +140,104 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
             return rNAFoldItem;
     }
+    
+    /**
+     * @param parentText the JTextComponent whose text is to be copied
+     * @return A JMenuItem for copying text from a JTextComponent.
+     */
+    public JMenuItem getCopyTextfieldItem(final JTextComponent parentText) {
+        
+        final JMenuItem copyItem = new JMenuItem("Copy");
+        copyItem.setAccelerator(KeyStroke.getKeyStroke("ctrl C"));
+        copyItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                StringSelection textToCopy = new StringSelection(parentText.getSelectedText());
+                clipboard.setContents(textToCopy, MenuItemFactory.this);
+            }
+        });
+        return copyItem;
+    }
+    
+    /**
+     * @param parentText the JTextComponent whose text is to be copied
+     * @return A JMenuItem for selecting all text from a JTextComponent.
+     */
+    public JMenuItem getSelectAllItem(final JTextComponent parentText) {
+        
+        final JMenuItem selectAllItem = new JMenuItem("Select All");
+        selectAllItem.setAccelerator(KeyStroke.getKeyStroke("ctrl A"));
+                
+        selectAllItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                parentText.selectAll();
+            }
+        });
+        return selectAllItem;
+    }
+    
+    /**
+     * @param parentText the JTextComponent whose text is to be copied
+     * @return A JMenuItem for pasting text into a JTextComponent.
+     */
+    public JMenuItem getPasteItem(final JTextComponent parentText) {
+        
+        final JMenuItem pasteItem = new JMenuItem("Paste");
+        pasteItem.setAccelerator(KeyStroke.getKeyStroke("ctrl V"));
+        pasteItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                parentText.setText(getClipboardContents());
+            }
+        });
+        return pasteItem;
+    }
+
+    /**
+     * @param parentText the JTextComponent whose text is to be copied
+     * @return A JMenuItem for cutting text from a JTextComponent.
+     */
+    public JMenuItem getCutItem(final JTextComponent parentText) {
+        
+        final JMenuItem cutItem = new JMenuItem("Cut");
+        cutItem.setAccelerator(KeyStroke.getKeyStroke("ctrl X"));
+        cutItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                StringSelection textToCopy = new StringSelection(parentText.getSelectedText());
+                clipboard.setContents(textToCopy, MenuItemFactory.this);
+                parentText.replaceSelection("");
+            }
+        });
+        return cutItem;
+    }
+    
+    /**
+     * @return Any text found in the clipboard. If none is found, 
+     * an empty String is returned.
+     */
+    public String getClipboardContents() {
+        String result = "";
+        Transferable contents = clipboard.getContents(null);
+        final boolean hasTransferableText = (contents != null)
+                && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        if (hasTransferableText) {
+            try {
+                result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+            } catch (UnsupportedFlavorException ex) {
+                JOptionPane.showMessageDialog(this, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return result;
+    }
+    
 
     @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {

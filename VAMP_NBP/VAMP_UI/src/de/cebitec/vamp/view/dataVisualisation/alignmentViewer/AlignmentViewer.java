@@ -11,9 +11,11 @@ import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.JPanel;
 
@@ -21,10 +23,10 @@ import javax.swing.JPanel;
  *
  * @author ddoppmeier
  */
-public class AlignmentViewer  extends AbstractViewer {
+public class AlignmentViewer extends AbstractViewer {
 
     private static final long serialVersionUID = 234765253;
-
+    
     private static int height = 500;
     private TrackConnector trackConnector;
     private LayoutI layout;
@@ -32,10 +34,13 @@ public class AlignmentViewer  extends AbstractViewer {
     private int blockHeight;
     private int layerHeight;
     private MappingExcusePanel mappingExcuse;
-    private ZoomLevelExcusePanel zoomExceuse;
+    private ZoomLevelExcusePanel zoomExcuse;
 
-    private int minCountInIntervall;
-    private int maxCountInIntervall;
+//    private int minCountInInterval;
+    private int maxCountInInterval;
+    private int fwdMappingsInInterval;
+    private int revMappingsInInterval;
+    private int maxCoverageInInterval;
     private float minSaturationAndBrightness;
     private float maxSaturationAndBrightness;
     private float percentSandBPerCovUnit;
@@ -44,12 +49,12 @@ public class AlignmentViewer  extends AbstractViewer {
         super(boundsInfoManager, basePanel, refGen);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
-        setInDrawingMode(false);
+        this.setInDrawingMode(false);
         this.showSequenceBar(true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
         mappingExcuse = new MappingExcusePanel();
-        zoomExceuse = new ZoomLevelExcusePanel();
+        zoomExcuse = new ZoomLevelExcusePanel();
         minSaturationAndBrightness = 0.3f;
         maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
@@ -94,15 +99,14 @@ public class AlignmentViewer  extends AbstractViewer {
                 }
 
                 // setup the layout of mappings
-                createAndShowNewLayout(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
-                getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
-                
+                this.createAndShowNewLayout(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+                this.getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
             } else {
                 this.placeExcusePanel(mappingExcuse);
             }
 
         } else {
-            this.placeExcusePanel(zoomExceuse);
+            this.placeExcusePanel(zoomExcuse);
         }
     }
 
@@ -130,25 +134,56 @@ public class AlignmentViewer  extends AbstractViewer {
 
     private void createAndShowNewLayout(int from, int to){
         Collection<PersistantMapping> mappings = trackConnector.getMappings(from, to);
-        this.findMinAndMaxCount(mappings);
+        HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
+        this.findMinAndMaxCount(mappings); //for currently shown mappings
+        this.findMaxCoverage(coverage);
+        this.setViewerHeight();
         layout = new Layout(from, to, mappings);
         this.addBlocks(layout);
     }
 
+    /**
+     * Determines the (min and) max count of mappings on a given set of mappings.
+     * Minimum count is currently disabled as it was not needed.
+     * @param mappings 
+     */
     private void findMinAndMaxCount(Collection<PersistantMapping> mappings){
-        minCountInIntervall = Integer.MAX_VALUE;
-        maxCountInIntervall = Integer.MIN_VALUE;
+//        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
+        this.maxCountInInterval = Integer.MIN_VALUE;
+        this.fwdMappingsInInterval = 0;
 
         for(PersistantMapping m : mappings){
-            if(m.getCoverage() < minCountInIntervall){
-                minCountInIntervall = m.getCoverage();
+            int coverage = m.getCoverage();
+//            if(coverage < minCountInInterval){
+//                minCountInInterval = coverage;
+//            }
+            if(coverage > maxCountInInterval){
+                maxCountInInterval = coverage;
             }
-            if(m.getCoverage() > maxCountInIntervall){
-                maxCountInIntervall = m.getCoverage();
+            if (m.isForwardStrand()){
+                ++this.fwdMappingsInInterval;
             }
         }
+        this.revMappingsInInterval = mappings.size() - this.fwdMappingsInInterval;
 
-        percentSandBPerCovUnit = (maxSaturationAndBrightness - minSaturationAndBrightness) / maxCountInIntervall;
+        percentSandBPerCovUnit = (maxSaturationAndBrightness - minSaturationAndBrightness) / maxCountInInterval;
+    }
+    
+    /**
+     * Determines maximum coverage in the currently displayed interval.
+     * @param coverage  coverage hashmap of positions for current interval
+     */
+    private void findMaxCoverage(HashMap<Integer, Integer> coverage) {
+        this.maxCoverageInInterval = Integer.MIN_VALUE;
+
+        int coverageAtPos;
+        for (Integer position : coverage.keySet()) {
+
+            coverageAtPos = coverage.get(position);
+            if (coverageAtPos > this.maxCoverageInInterval) {
+                this.maxCoverageInInterval = coverageAtPos;
+            }
+        }
     }
 
     private void addBlocks(LayoutI layout){
@@ -188,7 +223,7 @@ public class AlignmentViewer  extends AbstractViewer {
     }
 
     @Override
-    protected void paintComponent(Graphics graphics){
+    protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
 
@@ -252,13 +287,30 @@ public class AlignmentViewer  extends AbstractViewer {
         // if currentPosition is a gap, the following bases to the right marks the same position!
         // situation may occur, that on startup no layout is computed but this methode is called, although
         if(layout != null && layout.getGenomeGapManager().hasGapAt(position)){
-             width = width * (layout.getGenomeGapManager().getNumOfGapsAt(position)+1);
+             width *= (layout.getGenomeGapManager().getNumOfGapsAt(position)+1);
         }
         return width;
     }
 
     public PersistantReference getRefGen(){
         return refGen;
+    }
+
+    
+    /**
+     * Adapts the height of the alignment viewer according to the content currently displayed.
+     */
+    private void setViewerHeight() {
+        
+        int biggestCoverage = this.maxCoverageInInterval / 2;
+        int biggerStrandCoverage = fwdMappingsInInterval > revMappingsInInterval ? fwdMappingsInInterval : revMappingsInInterval;
+        if (biggerStrandCoverage > biggestCoverage){
+            biggestCoverage = biggerStrandCoverage * 2; //to cover both halves
+        }
+        int newHeight = (int) (this.layerHeight * biggestCoverage * 1.5); //1.5 = factor for possible empty spacings between alignments
+        final int spacer = 120;
+        this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));
+        this.revalidate();
     }
 
 }

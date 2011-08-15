@@ -44,6 +44,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private static final long serialVersionUID = 1L;
     private InstanceContent content = new InstanceContent();
     private Lookup localLookup;
+    private ReferenceViewer referenceViewer;
 
     public AppPanelTopComponent() {
         initComponents();
@@ -80,12 +81,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -95,7 +94,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
     /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
+     * @return default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
@@ -214,6 +213,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         BasePanel bp = (BasePanel) refGenPanel;
         ReferenceViewer rv = (ReferenceViewer) bp.getViewer();
         content.add(rv);
+        this.referenceViewer = rv;
 
         content.add(new CloseRefGenCookie() {
 
@@ -243,6 +243,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // add the trackPanel
         visualPanel.add(trackPanel);
         visualPanel.updateUI();
+        this.referenceViewer.increaseTrackCount();
 
         // search for opened tracks, if there are none open the track statistics window
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()){
@@ -263,6 +264,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             public boolean close() {
                 getLookup().lookup(ViewController.class).closeTrackPanel(trackPanel);
                 content.remove(this);
+                referenceViewer.decreaseTrackCount();
                 return true;
             }
 

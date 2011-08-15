@@ -91,7 +91,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
                 .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(seqlogoButton)
                     .addComponent(alignmentButton))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
             .addGroup(switchPanelLayout.createSequentialGroup()
                 .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
                 .addGap(24, 24, 24))
@@ -105,7 +105,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
                 .addComponent(alignmentButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(252, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         add(switchPanel, java.awt.BorderLayout.WEST);
@@ -129,6 +129,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
         logoBasePanel.getViewer().setActive(false);
         alignmentBasePanel.getViewer().setActive(true);
+        alignmentBasePanel.getViewer().setActive(true); //to ensure size calculation is performed correctly
         cards.show(cardPanel, ALIGNMENTCARD);
 }//GEN-LAST:event_alignmentButtonActionPerformed
 
@@ -188,23 +189,24 @@ public final class ExternalViewerTopComponent extends TopComponent {
         ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        alignmentBasePanel = factory.getDetailTrackBasePanel(trackConnector);
-        alignmentBasePanel.getViewer().setActive(false);
-        logoBasePanel = factory.getSequenceLogoBasePanel(trackConnector);
-        logoBasePanel.getViewer().setActive(true);
+        this.alignmentBasePanel = factory.getDetailTrackBasePanel(this.trackConnector);
+        this.alignmentBasePanel.getViewer().setActive(false);
+        this.logoBasePanel = factory.getSequenceLogoBasePanel(this.trackConnector);
+        this.logoBasePanel.getViewer().setActive(true);
 
-        cards = (CardLayout) cardPanel.getLayout();
-        cardPanel.add(alignmentBasePanel, ALIGNMENTCARD);
-        cardPanel.add(logoBasePanel, LOGOCARD);
-        cards.show(cardPanel, LOGOCARD);
+        this.cards = (CardLayout) this.cardPanel.getLayout();
+        
+        this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
+        this.cardPanel.add(this.logoBasePanel, LOGOCARD);
+        this.cards.show(this.cardPanel, LOGOCARD);
     }
 
     @Override
     public void componentClosed() {
-        alignmentBasePanel.close();
-        alignmentBasePanel = null;
-        logoBasePanel.close();
-        logoBasePanel = null;
+        this.alignmentBasePanel.close();
+        this.logoBasePanel.close();
+        this.alignmentBasePanel = null;
+        this.logoBasePanel = null;
     }
 
     void writeProperties(java.util.Properties p) {

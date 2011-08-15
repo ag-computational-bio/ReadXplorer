@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
 /**
- * This interface defines listeners for changes in the viewer's controll panel
+ * This interface defines listeners for changes in the viewer's control panel
  * @author ddoppmeier
  */
 public interface AdjustmentPanelListenerI {

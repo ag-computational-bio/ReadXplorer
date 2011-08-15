@@ -18,7 +18,7 @@ public class ReferenceJob implements Job{
     private ReferenceParserI parser;
     private String description;
     private Timestamp timestamp;
-    private List<TrackJobs> trackswithoutRunjob;
+    private List<TrackJob> trackswithoutRunjob;
 
     public ReferenceJob(Long id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp){
         this.id = id;
@@ -28,14 +28,14 @@ public class ReferenceJob implements Job{
         this.description = description;
         this.timestamp = timestamp;
    
-        trackswithoutRunjob = new ArrayList<TrackJobs>();
+        trackswithoutRunjob = new ArrayList<TrackJob>();
     }
 
-    public void registerTrackWithoutRunJob(TrackJobs t){
+    public void registerTrackWithoutRunJob(TrackJob t){
         trackswithoutRunjob.add(t);
     }
 
-    public void unregisterTrackwithoutRunJob(TrackJobs t) {
+    public void unregisterTrackwithoutRunJob(TrackJob t) {
         while (trackswithoutRunjob.contains(t)) {
             trackswithoutRunjob.remove(t);
         }
@@ -49,7 +49,7 @@ public class ReferenceJob implements Job{
         }
     }
 
-    public List<TrackJobs> getDependentTrackswithoutRunjob() {
+    public List<TrackJob> getDependentTrackswithoutRunjob() {
         return trackswithoutRunjob;
     }
 

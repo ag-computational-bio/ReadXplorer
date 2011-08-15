@@ -3,9 +3,12 @@ package de.cebitec.vamp.parser.common;
 import java.util.HashSet;
 
 /**
+ * Since the RUN domain has been excluded a PersistantRun is not needed anymore!
+ * Should be deprecated as long as it is not needed for anything else.
  *
  * @author ddoppmeier
  */
+@Deprecated
 public class ParsedReadname {
 
     private HashSet<String> reads;

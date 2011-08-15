@@ -25,14 +25,14 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jComboBox1" alignment="1" pref="274" max="32767" attributes="0"/>
+                  <Component id="jComboBox1" alignment="1" pref="276" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="mappingFileField" pref="211" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="descriptionField" alignment="0" pref="274" max="32767" attributes="0"/>
-                  <Component id="refGenBox" alignment="0" pref="274" max="32767" attributes="0"/>
+                  <Component id="descriptionField" alignment="0" pref="276" max="32767" attributes="0"/>
+                  <Component id="refGenBox" alignment="0" pref="276" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>

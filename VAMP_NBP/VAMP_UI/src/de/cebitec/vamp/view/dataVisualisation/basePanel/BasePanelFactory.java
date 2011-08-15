@@ -50,7 +50,7 @@ public class BasePanelFactory {
 
         this.refGen = refGen;
         BasePanel b = new BasePanel(boundsManager, viewController);
-        viewController.addMousePositionListener((MousePositionListener) b);
+        viewController.addMousePositionListener(b);
 
         // create viewer
         ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGen);
@@ -60,7 +60,7 @@ public class BasePanelFactory {
 
         // add panels to basepanel
         b.setViewer(genomeViewer);
-        b.setAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
 
         return b;
     }
@@ -89,6 +89,8 @@ public class BasePanelFactory {
         // add panels to basepanel
         b.setTopInfoPanel(cil);
         b.setViewer(trackV, slider);
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        //b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
         return b;
@@ -153,8 +155,9 @@ public class BasePanelFactory {
         // create a legend
         viewer.setupLegend(new LegendLabel(viewer), this.getDetailViewLegend());
 
-        b.setViewer(viewer);
-        b.setAdjustmentPanel(this.createAdjustmentPanel(true, false));
+        // add panels to basepanel and add scrollbars
+        b.setViewerInScrollpane(viewer);
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
@@ -172,7 +175,7 @@ public class BasePanelFactory {
 
         // add panels to basepanel
         b.setViewer(viewer);
-        b.setAdjustmentPanel(this.createAdjustmentPanel(true, false));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
@@ -182,11 +185,11 @@ public class BasePanelFactory {
     private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider){
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
-        AdjustmentPanel controll = new AdjustmentPanel(1, refGen.getSequence().length(),
+        AdjustmentPanel control = new AdjustmentPanel(1, refGen.getSequence().length(),
                 bounds.getCurrentLogPos(), bounds.getZoomValue(),  hasScrollbar, hasSlider);
-        controll.addAdjustmentListener(boundsManager);
-        boundsManager.addSynchronousNavigator(controll);
-        return controll;
+        control.addAdjustmentListener(boundsManager);
+        boundsManager.addSynchronousNavigator(control);
+        return control;
     }
 
     private JPanel getTitlePanel(String title){

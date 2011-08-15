@@ -57,7 +57,7 @@ public class Layout implements LayoutI {
             gapNo += num;
             i++;
         }
-        absStop = absStop - gapNo;
+        absStop -= gapNo;
     }
 
     private void createBlocks(Collection<PersistantMapping> mappings){

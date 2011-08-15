@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.databackend.connector;
 
-import de.cebitec.vamp.api.objects.Read;
+//import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
@@ -26,56 +21,92 @@ public interface ITrackConnector {
 
     public Collection<PersistantMapping> getMappings(int from, int to);
 
-    public void addCoverageRequest(CoverageRequest request) ;
+    public void addCoverageRequest(CoverageRequest request);
 
-    public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) ;
+    public Collection<PersistantDiff> getDiffsForInterval(int from, int to);
 
-    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to);
+    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervalOrderedByMappingID(int from, int to);
 
-    public int getNumOfMappedSequences();
+    public int getNumOfReads();
 
-    public int getNumOfMappedSequencesCalculate();
+    public int getNumOfReadsCalculate();
+
+    public int getNumOfMappings();
+
+    public int getNumOfMappingsCalculate();
+
+    public int getNumOfUniqueMappings();
+
+    public int getNumOfUniqueMappingsCalculate();
+
+    public int getNumOfUniqueSequences();
+
+    public int getNumOfUniqueSequencesCalculate();
+
+    public int getNumOfPerfectUniqueMappings();
+
+    public int getNumOfPerfectUniqueMappingsCalculate();
 
     public int getNumOfUniqueBmMappings();
 
     public int getNumOfUniqueBmMappingsCalculate();
+    
+    public int getNumOfSeqPairs();
+    
+    public int getNumOfSeqPairsCalculate();
+    
+    public int getNumOfPerfectSeqPairs();
+    
+    public int getNumOfPerfectSeqPairsCalculate();
+    
+    public int getNumOfUniqueSeqPairs();
+    
+    public int getNumOfUniqueSeqPairsCalculate();
 
-    public int getNumOfUniqueMappings() ;
+    public int getNumOfUniquePerfectSeqPairs();
+    
+    public int getNumOfUniquePerfectSeqPairsCalculate();
+    
+    public void setStatistics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
+                            int numPerfectMappings, int numBestMatchMappings, double coveragePerf,
+                            double coverageBM, double coverageComplete, int numReads, int numSeqPairs, 
+                            int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs);
 
-    public int getNumOfUniqueMappingsCalculate();
+    //public long getRunId();
+    public long getTrackID();
 
-    public void setStatics(int mappings, int perfectMappings, int bmMappings,int mappedSeq, double coveragePerf, double coverageBM, double coverageComplete,int numOfReads, int numOfUniqueSeq);
+    public String getAssociatedTrackName();
 
-     public int getNumOfPerfectUniqueMappings();
+    /**
+     * Returns all unique reads containing the given sequence.
+     * Sequence cannot be longer than the readlength.
+     * TODO: should also return all positions of the reads
+     * @param sequence the sequence to search for
+     * @return
+     */
+//     public List<Read> findSequence(String sequence) ;
 
-     public int getNumOfPerfectUniqueMappingsCalculate();
+    //public List<Read> findReads(String read) ;
 
-     public long getRunId();
+    /**
+     * identifies SNPs.
+     * @param percentageThreshold
+     * @param absThreshold
+     * @return
+     */
+    public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
 
-     public long getTrackID();
+    public double getPercentRefGenPerfectCovered();
 
-     public String getAssociatedTrackName() ;
+    public double getPercentRefGenPerfectCoveredCalculate();
 
-     public List<Read> findReads(String read) ;
+    public double getPercentRefGenBmCovered();
 
-     public List<Snp> findSNPs(int percentageThreshold, int absThreshold) ;
+    public double getPercentRefGenBmCoveredCalculate();
 
-     public double getPercentRefGenPerfectCovered();
+    public double getPercentRefGenNErrorCovered();
 
-     public double getPercentRefGenPerfectCoveredCalculate() ;
+    public double getPercentRefGenNErrorCoveredCalculate();
 
-     public double getPercentRefGenBmCovered() ;
-
-     public double getPercentRefGenBmCoveredCalculate();
-
-     public double getPercentRefGenNErrorCovered() ;
-
-     public double getPercentRefGenNErrorCoveredCalculate() ;
-
-     public HashMap<Integer,Integer> getCoverageInfosofTrack(int from , int to);
-
-
-
-
-
+    public HashMap<Integer, Integer> getCoverageInfosOfTrack(int from, int to);
 }

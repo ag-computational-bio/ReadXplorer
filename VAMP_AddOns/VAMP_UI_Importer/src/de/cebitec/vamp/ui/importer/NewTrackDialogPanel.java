@@ -59,7 +59,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         }
     }
 
-    public File gettMappingFile(){
+    public File getMappingFile(){
         return mappingFile;
     }
 

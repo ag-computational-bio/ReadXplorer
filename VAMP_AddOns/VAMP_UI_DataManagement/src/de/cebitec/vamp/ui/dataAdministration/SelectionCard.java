@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.dataAdministration;
 
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -31,7 +31,7 @@ public class SelectionCard extends javax.swing.JPanel {
         });
     }
 
-    public void setSelectableJobs(List<ReferenceJob> refJobs, List<TrackJobs> trackJobs){
+    public void setSelectableJobs(List<ReferenceJob> refJobs, List<TrackJob> trackJobs){
         refGenView.setReferenceJobs(refJobs);
         mappingView.setTrackJobs(trackJobs);
     }
@@ -40,7 +40,7 @@ public class SelectionCard extends javax.swing.JPanel {
         return refGenView.getJobs2del();
     }
 
-    public List<TrackJobs> getTrack2DelJobs(){
+    public List<TrackJob> getTrack2DelJobs(){
         return mappingView.getJobs2Del();
     }
 

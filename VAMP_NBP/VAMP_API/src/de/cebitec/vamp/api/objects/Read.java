@@ -1,17 +1,16 @@
-
 package de.cebitec.vamp.api.objects;
 
-/**
- *
- * @author jstraube
- */
+
 /*
  * This object represents the data to use to get informations
  * about reads that match to different positions
+ * Since the run domain is excluded and reads are not stored anymore this class is deprecated.
  *
+ * @author jstraube
  */
+@Deprecated
 public class Read {
-    private String readname;
+    private String readname; //TODO: maybe change to readID?
     private int position;
     private int errors;
     private int isBestMapping;

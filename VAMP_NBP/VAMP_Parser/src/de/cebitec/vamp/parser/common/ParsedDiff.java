@@ -31,10 +31,10 @@ public class ParsedDiff {
             return false;
         }
         final ParsedDiff other = (ParsedDiff) obj;
-        if (this.position != other.position) {
+        if (this.position != other.getPosition()) {
             return false;
         }
-        if (this.base != other.base) {
+        if (this.base != other.getBase()) {
             return false;
         }
         return true;

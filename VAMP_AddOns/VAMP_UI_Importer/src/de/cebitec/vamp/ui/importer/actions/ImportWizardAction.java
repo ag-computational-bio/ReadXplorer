@@ -3,10 +3,11 @@ package de.cebitec.vamp.ui.importer.actions;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.ImportThread;
 import de.cebitec.vamp.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.vamp.ui.importer.ImportWizardOverviewPanel;
+import de.cebitec.vamp.ui.importer.SeqPairJobContainer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
@@ -29,6 +30,9 @@ public final class ImportWizardAction implements ActionListener {
     public static final String PROP_CAN_IMPORT = "canImport";
     public static final String PROP_REFJOBLIST = "referenceJob";
     public static final String PROP_TRACKJOBLIST = "trackJobList";
+    public static final String PROP_SEQPAIRJOBLIST = "seqPairJobList";
+    public static final String PROP_SEQPAIRDIST = "seqPairDistance";
+    public static final String PROP_SEQPAIRDEVIATION = "seqPairDeviation";
 
     public ImportWizardAction(LoginCookie context) {
         this.context = context;
@@ -53,9 +57,11 @@ public final class ImportWizardAction implements ActionListener {
         if (!cancelled) {
             // do something
             List<ReferenceJob> refJobs = (List<ReferenceJob>) wizardDescriptor.getProperty(PROP_REFJOBLIST);
-            List<TrackJobs> trackJobs = (List<TrackJobs>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
+            List<TrackJob> trackJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
+             //since sequence pair jobs have their own parser it can be distinguished later
+            List<SeqPairJobContainer> seqPairJobs = (List<SeqPairJobContainer>) wizardDescriptor.getProperty(PROP_SEQPAIRJOBLIST);
 
-            ImportThread i = new ImportThread(refJobs, trackJobs);
+            ImportThread i = new ImportThread(refJobs, trackJobs, seqPairJobs);
             RequestProcessor rp = new RequestProcessor("Import Threads", 2);
             rp.post(i);
         }

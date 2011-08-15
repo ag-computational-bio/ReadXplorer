@@ -4,7 +4,7 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,13 +27,13 @@ import org.openide.windows.InputOutput;
 public class DeletionThread extends SwingWorker<Object, Object>{
 
     private List<ReferenceJob> gens;
-    private List<TrackJobs> tracks;
+    private List<TrackJob> tracks;
     private Set<ReferenceJob> invalidGens;
     private InputOutput io;
     private ProgressHandle ph;
     private int workunits;
 
-    public DeletionThread(List<ReferenceJob> gens, List<TrackJobs> tracks){
+    public DeletionThread(List<ReferenceJob> gens, List<TrackJob> tracks){
         super();
         this.gens = gens;
         this.tracks = tracks;
@@ -63,8 +63,8 @@ public class DeletionThread extends SwingWorker<Object, Object>{
         if(!tracks.isEmpty()){
             io.getOut().println(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.deletion.start.track") + ":");
             ph.progress(NbBundle.getMessage(DeletionThread.class, "MSG_DeletionThread.progress.track"), workunits);
-            for(Iterator<TrackJobs> it = tracks.iterator(); it.hasNext(); ){
-                TrackJobs t = it.next();
+            for(Iterator<TrackJob> it = tracks.iterator(); it.hasNext(); ){
+                TrackJob t = it.next();
                 ph.progress(++workunits);
                 try {
                     ProjectConnector.getInstance().deleteTrack(t.getID());

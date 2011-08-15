@@ -13,6 +13,7 @@ import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -32,7 +33,7 @@ import org.openide.util.NbPreferences;
  * Display the coverage for a sequenced track related to a reference genome
  * @author ddoppmeier
  */
-public class TrackViewer extends AbstractViewer implements CoverageThreadListener{
+public class TrackViewer extends AbstractViewer implements CoverageThreadListener {
 
     private static final long serialVersionUID = 572406471;
 
@@ -67,8 +68,9 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     /**
      * Create a new panel to show coverage information
-     * @param bounds area that is shown upon initialisation
-     * @param viewerController controller that manages updates
+     * @param boundsManager manager for component bounds
+     * @param basePanel 
+     * @param refGen reference genome
      * @param trackCon database connection to one track, that is displayed
      */
     public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, ITrackConnector trackCon){
@@ -84,7 +86,20 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         nFw = new GeneralPath();
         nRv = new GeneralPath();
 
-        Preferences pref = NbPreferences.forModule(Object.class);
+        final Preferences pref = NbPreferences.forModule(Object.class);
+        this.setColors(pref);
+
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                TrackViewer.this.setColors(pref);
+                repaint();
+            }
+        });
+        this.setViewerSize();
+    }
+
+    private void setColors(Preferences pref) {
         boolean uniformColouration = pref.getBoolean("uniformDesired", false);
         if (uniformColouration){
             String colourRGB = pref.get("uniformColour", "");
@@ -99,37 +114,10 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             String perfectColour = pref.get("perfectMatchColour", "");
             String commonColour = pref.get("commonMatchColour", "");
 
-            if (!bestColour.isEmpty()) bmC = new Color(Integer.parseInt(bestColour));
-            if (!perfectColour.isEmpty()) zC = new Color(Integer.parseInt(perfectColour));
-            if (!commonColour.isEmpty()) nC = new Color(Integer.parseInt(commonColour));
+            if (!bestColour.isEmpty()) { bmC = new Color(Integer.parseInt(bestColour)); }
+            if (!perfectColour.isEmpty()) { zC = new Color(Integer.parseInt(perfectColour)); }
+            if (!commonColour.isEmpty()) { nC = new Color(Integer.parseInt(commonColour)); }
         }
-
-        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
-            @Override
-            public void preferenceChange(PreferenceChangeEvent evt) {
-                boolean uniformDesired = NbPreferences.forModule(Object.class).getBoolean("uniformDesired", false);
-
-                if (uniformDesired) {
-                    String colourRGB = NbPreferences.forModule(Object.class).get("uniformColour", "");
-                    if (!colourRGB.isEmpty()) {
-                        bmC = new Color(Integer.parseInt(colourRGB));
-                        nC = new Color(Integer.parseInt(colourRGB));
-                        zC = new Color(Integer.parseInt(colourRGB));
-                    }
-                }
-                else {
-                    String bestColour = NbPreferences.forModule(Object.class).get("bestMatchColour", "");
-                    String perfectColour = NbPreferences.forModule(Object.class).get("perfectMatchColour", "");
-                    String commonColour = NbPreferences.forModule(Object.class).get("commonMatchColour", "");
-
-                    if (!bestColour.isEmpty()) bmC = new Color(Integer.parseInt(bestColour));
-                    if (!perfectColour.isEmpty()) zC = new Color(Integer.parseInt(perfectColour));
-                    if (!commonColour.isEmpty()) nC = new Color(Integer.parseInt(commonColour));
-                }
-                
-                repaint();
-            }
-        });
     }
 
     @Override
@@ -608,6 +596,15 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public String toString(){
         return getName();
+    }
+    
+    /**
+     * Sets the initial size of the track viewer.
+     */
+    private void setViewerSize() {
+        
+        this.setPreferredSize(new Dimension(1, 300));
+        this.revalidate();
     }
     
 }

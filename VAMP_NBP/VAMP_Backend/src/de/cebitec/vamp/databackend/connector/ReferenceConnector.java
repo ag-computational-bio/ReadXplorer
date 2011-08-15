@@ -94,9 +94,9 @@ public class ReferenceConnector {
                 Long id = rs.getLong(FieldNames.TRACK_ID);
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
-                Long refGenomeID = rs.getLong(FieldNames.TRACK_REFGEN);
-                Long runID = rs.getLong(FieldNames.TRACK_RUN);
-                list.add(new PersistantTrack(id, description, date, refGenomeID, runID));
+                Long refGenomeID = rs.getLong(FieldNames.TRACK_REFERENCE_ID);
+//                Long runID = rs.getLong(FieldNames.TRACK_RUN);
+                list.add(new PersistantTrack(id, description, date, refGenomeID));//, runID));
             }
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);

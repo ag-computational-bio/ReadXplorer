@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
-    private int currentPosition;
+    private int currentHorizontalPosition;
     private int zoomfactor;
     private PersistantReference currentRefGen;
 
@@ -21,10 +21,10 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     public BoundsInfoManager(PersistantReference refGen){
         this.currentRefGen = refGen;
-        boundListeners = new ArrayList<LogicalBoundsListener>();
-        syncedNavigators = new ArrayList<SynchronousNavigator>();
-        zoomfactor = 1;
-        currentPosition = 1;
+        this.boundListeners = new ArrayList<LogicalBoundsListener>();
+        this.syncedNavigators = new ArrayList<SynchronousNavigator>();
+        this.zoomfactor = 1;
+        this.currentHorizontalPosition = 1;
     }
 
     public void addBoundsListener(LogicalBoundsListener a){
@@ -40,7 +40,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     public void addSynchronousNavigator(SynchronousNavigator navi){
         syncedNavigators.add(navi);
-        navi.setCurrentScrollValue(currentPosition);
+        navi.setCurrentScrollValue(currentHorizontalPosition);
         navi.setCurrentZoomValue(zoomfactor);
     }
 
@@ -50,7 +50,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
         }
     }
 
-    private void updateListeners(){
+    private void updateLogicalListeners(){
 
         for(LogicalBoundsListener a : boundListeners){
             a.updateLogicalBounds(computeBounds(a.getPaintingAreaDimension()));
@@ -59,7 +59,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     private void updateSynchronousNavigators(){
         for(SynchronousNavigator n : syncedNavigators){
-            n.setCurrentScrollValue(currentPosition);
+            n.setCurrentScrollValue(currentHorizontalPosition);
             n.setCurrentZoomValue(zoomfactor);
         }
     }
@@ -72,10 +72,15 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
         return computeBounds(d);
     }
 
+    /**
+     * Compute the horizontal bounds in connection to the reference sequence.
+     * @param d 
+     * @return BoundsInfo object containing current bounds
+     */
     private BoundsInfo computeBounds(Dimension d){
         int logWidth = (int) (d.getWidth() * 0.1 * zoomfactor);
 
-        BoundsInfo tmpBound = new BoundsInfo(1, currentRefGen.getSequence().length(), currentPosition, zoomfactor);
+        BoundsInfo tmpBound = new BoundsInfo(1, currentRefGen.getSequence().length(), currentHorizontalPosition, zoomfactor);
         tmpBound.setLogWidth(logWidth);
         return tmpBound;
     }
@@ -83,14 +88,14 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
     @Override
     public void zoomLevelUpdated(int sliderValue) {
         this.zoomfactor = sliderValue;
-        updateSynchronousNavigators();
-        updateListeners();
+        this.updateSynchronousNavigators();
+        this.updateLogicalListeners();
     }
 
     @Override
     public void navigatorBarUpdated(int scrollbarValue) {
-        this.currentPosition = scrollbarValue;
-        updateSynchronousNavigators();
-        updateListeners();
+        this.currentHorizontalPosition = scrollbarValue;
+        this.updateSynchronousNavigators();
+        this.updateLogicalListeners();
     }
 }

@@ -3,8 +3,12 @@ package de.cebitec.vamp.parser.common;
 import java.util.List;
 
 /**
+ * Container for a parsed mapping. It contains all data a mapping should have.
+ * ID, start, stop (start is always the smaller value), direction (1 for fwd and -1 for rev), 
+ * errors, diffs, gaps, bestmapping and count. Also the read sequence can be stored here, 
+ * but should be removed when not needed anymore.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ParsedMapping {
 
@@ -18,6 +22,15 @@ public class ParsedMapping {
     private boolean bestMapping;
     private int count;
 
+    /**
+     * Standard constructor for a parsed mapping.
+     * @param start start of the mapping
+     * @param stop end of the mapping
+     * @param direction direction of the mapping: 1 for fwd and -1 for rev
+     * @param diffs the list of diffs between the reference and the mapping
+     * @param gaps list of gaps between the reference and the mapping
+     * @param errors number of errors
+     */
     public ParsedMapping(int start, int stop, byte direction, List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps, int errors){
         this.start = start;
         this.stop = stop;
@@ -25,16 +38,16 @@ public class ParsedMapping {
         this.diffs = diffs;
         this.gaps = gaps;
         this.errors = errors;
-        bestMapping = false;
-        count = 1;
+        this.bestMapping = false;
+        this.count = 1;
     }
 
     public void setIsBestmapping(boolean b){
-        bestMapping = b;
+        this.bestMapping = b;
     }
 
     public boolean isBestMapping(){
-        return bestMapping;
+        return this.bestMapping;
     }
 
     public int getCount(){
@@ -45,46 +58,53 @@ public class ParsedMapping {
         count++;
     }
 
+    /**
+     * @return Start position of this mapping. Always the smaller value among start and stop.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * @return Stop position of this mapping. Always the larger value among start and stop.
+     */
     public int getStop() {
         return stop;
     }
 
+    /**
+     * @return direction of the mapping: 1 for fwd and -1 for rev
+     */
     public byte getDirection(){
         return direction;
     }
 
+    
     public List<ParsedDiff> getDiffs(){
         return diffs;
     }
 
+    
     public boolean hasDiffs(){
-        if(diffs.isEmpty()){
-            return false;
-        } else {
-            return true;
-        }
+        return !diffs.isEmpty();
     }
 
+    
     public List<ParsedReferenceGap> getGenomeGaps(){
         return gaps;
     }
 
+    
     public boolean hasGenomeGaps(){
-        if(gaps.isEmpty()){
-            return false;
-        } else {
-            return true;
-        }
+        return !gaps.isEmpty();
     }
 
+    
     public int getErrors(){
         return errors;
     }
 
+    
     public int getNumOfDiffs(){
         return this.getDiffs().size();
     }
@@ -98,25 +118,25 @@ public class ParsedMapping {
             return false;
         }
         final ParsedMapping other = (ParsedMapping) obj;
-        if (this.start != other.start) {
+        if (this.start != other.getStart()) {
             return false;
         }
-        if (this.stop != other.stop) {
+        if (this.stop != other.getStop()) {
             return false;
         }
-        if (this.direction != other.direction) {
+        if (this.direction != other.getDirection()) {
             return false;
         }
-        if (this.errors != other.errors) {
+        if (this.errors != other.getErrors()) {
             return false;
         }
-        if (this.diffs != other.diffs && (this.diffs == null || !this.diffs.equals(other.diffs))) {
+        if (this.diffs != other.getDiffs() && (this.diffs == null || !this.diffs.equals(other.getDiffs()))) {
             return false;
         }
-        if (this.gaps != other.gaps && (this.gaps == null || !this.gaps.equals(other.gaps))) {
+        if (this.gaps != other.getGenomeGaps() && (this.gaps == null || !this.gaps.equals(other.getGenomeGaps()))) {
             return false;
         }
-        if (this.bestMapping != other.bestMapping) {
+        if (this.bestMapping != other.isBestMapping()) {
             return false;
         }
         return true;
@@ -135,14 +155,17 @@ public class ParsedMapping {
         return hash;
     }
 
+    
     public void setID(long mappingID) {
         this.id = mappingID;
     }
 
+    
     public long getID(){
         return id;
     }
 
+    
     public void setCount(int count){
         this.count = count;
     }

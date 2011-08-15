@@ -211,16 +211,16 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         gapManager = new GenomeGapManager(lowerBound, upperBound);
 
         try {
-            gaps = trackConnector.getExtendedReferenceGapsForIntervallOrderedByMappingID(lowerBound, upperBound);
+            gaps = trackConnector.getExtendedReferenceGapsForIntervalOrderedByMappingID(lowerBound, upperBound);
         } catch (Exception ex) {
-            System.err.print("trackConnector couldnt initialse gaps" + ex);
+            System.err.print("trackConnector couldn't initialize gaps" + ex);
             //TOTO: error an nutzer geben
         }
         this.fillGapManager();
         this.getSequenceBar().setGenomeGapManager(gapManager);
         this.adjustAbsStop();
 
-        this.diffs = trackConnector.getDiffsForIntervall(lowerBound, upperBound);
+        this.diffs = trackConnector.getDiffsForInterval(lowerBound, upperBound);
         this.setUpLogoData();
         if (logoData.getMaxFoundCoverage() != 0) {
             this.createLogoBlocks();
@@ -491,7 +491,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             gapNo += num;
             i++;
         }
-        upperBound = upperBound - gapNo;
+        upperBound -= gapNo;
         this.getBoundsInfo().correctLogRight(upperBound);
     }
 
@@ -607,7 +607,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         int tmp = (int) mouseAreaLeft.getPhysWidth();
         // if currentPosition is a gap, the following bases to the right marks the same position!
         if (isInDrawingMode() && gapManager.hasGapAt(position)) {
-            tmp = tmp * (gapManager.getNumOfGapsAt(position) + 1);
+            tmp *= (gapManager.getNumOfGapsAt(position) + 1);
         }
         return tmp;
     }

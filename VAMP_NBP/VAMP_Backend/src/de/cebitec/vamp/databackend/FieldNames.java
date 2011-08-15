@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend;
 
 /**
+ * Contains all field names for data base requests.
  *
  * @author ddoppmeier
  */
@@ -12,20 +13,29 @@ public class FieldNames {
     private FieldNames() {
     }
 
+    /**
+     * NOTE: All commands belonging to the RUN domain have been commented out,
+     * because the run domain has been excluded from VAMP!!!!
+     * This includes the Run, Unique_Sequence and Readname tables! service provider?
+     */
+
     // names for various database tables
     public final static String TABLE_REF_GEN = "REFERENCE";
     public final static String TABLE_DIFF = "DIFF";
-    public final static String TABLE_SEQUENCE = "UNIQUE_SEQUENCE";
+//    public final static String TABLE_SEQUENCE = "UNIQUE_SEQUENCE";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
     public final static String TABLE_MAPPINGS = "MAPPING";
     public final static String TABLE_TRACKS = "TRACK";
-    public final static String TABLE_RUN = "RUN";
-    public final static String TABLE_READS = "READNAME";
-    public final static String TABLE_STATICS = "STATICS";
+    public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
+    public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
+    public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
+//    public final static String TABLE_RUN = "RUN";
+//    public final static String TABLE_READS = "READNAME";
+    public final static String TABLE_STATISTICS = "STATISTICS";
 
 
-    ////////////////////////  fields of tables  ////////////////////////////////
+    ////////////////////////  tables fields  ////////////////////////////////
 
     // reference genome table fields
     public final static String REF_GEN_ID ="ID";
@@ -42,9 +52,9 @@ public class FieldNames {
     public final static String DIFF_TYPE = "TYPE";
     public final static String DIFF_ORDER = "GAP_ORDER";
 
-    // source table fields
-    public final static String SEQUENCE_ID = "ID";
-    public final static String SEQUENCE_RUN = "RUN_ID";
+//    // source table fields
+//    public final static String SEQUENCE_ID = "ID";
+//    public final static String SEQUENCE_RUN = "RUN_ID";
 
     // coverage table fields
     public final static String COVERAGE_ID = "ID";
@@ -72,13 +82,13 @@ public class FieldNames {
     public final static String COVERAGE_N_FW_NUM_TRACK_2 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_2";
     public final static String COVERAGE_N_RV_MULT_TRACK_2 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_2";
     public final static String COVERAGE_N_RV_NUM_TRACK_2 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_2";
-    public final static String COVERAGE_N_MULT=     "COMPLETE_REDUNDANT_TRACK";
+    public final static String COVERAGE_N_MULT =                "COMPLETE_REDUNDANT_TRACK";
     public final static String COVERAGE_N_FW_MULT_TRACK_DIFF =     "COMPLETE_FORWARD_REDUNDANT_TRACK_DIFF";
     public final static String COVERAGE_N_FW_NUM_TRACK_DIFF =      "COMPLETE_FORWARD_NON_REDUNDANT_DIFF";
     public final static String COVERAGE_N_RV_MULT_TRACK_DIFF =     "COMPLETE_REVERSE_REDUNDANT__DIFF";
     public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
 
-    
+
     // feature table fields
     public final static String FEATURE_ID = "ID";
     public final static String FEATURE_REFGEN = "REFERENCE_ID";
@@ -92,7 +102,7 @@ public class FieldNames {
 
     // mapping table fields
     public final static String MAPPING_ID = "ID";
-    public final static String MAPPING_SEQUENCE = "SEQUENCE_ID";
+    public final static String MAPPING_SEQUENCE_ID = "SEQUENCE_ID";
     public final static String MAPPING_START = "START";
     public final static String MAPPING_STOP = "STOP";
     public final static String MAPPING_NUM_OF_ERRORS = "NUM_OF_ERRORS";
@@ -103,32 +113,59 @@ public class FieldNames {
 
     // track table fields
     public final static String TRACK_ID = "ID";
-    public final static String TRACK_REFGEN = "REFERENCE_ID";
+    public final static String TRACK_REFERENCE_ID = "REFERENCE_ID";
+    public static final String TRACK_SEQUENCE_PAIR_ID = "SEQUENCE_PAIR_ID";
     public final static String TRACK_DESCRIPTION = "DESCRIPTION";
     public final static String TRACK_TIMESTAMP = "CREATIONTIME";
-    public final static String TRACK_RUN = "RUN_ID";
+    //public final static String TRACK_RUN = "RUN_ID";
+    
+    //paired data table fields (mate pairs and paired end data
+    public static final String SEQ_PAIR_ID = "ID";
+    public static final String SEQ_PAIR_PAIR_ID = "PAIR_ID"; //one pair can be seen at diff. positions
+    public static final String SEQ_PAIR_MAPPING1_ID = "MAPPING1_ID";
+    public static final String SEQ_PAIR_MAPPING2_ID = "MAPPING2_ID";
+    public static final String SEQ_PAIR_TYPE = "TYPE";
+    
+    // paired data replicates table fields
+    public final static String SEQ_PAIR_MAPPING_ID = "MAPPING_ID";
+    public static final String SEQ_PAIR_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
+    
+    //paired data to mapping connection table
+    public static final String SEQ_PAIR_PIVOT_MAPPING_ID = "MAPPING_ID";
+    public static final String SEQ_PAIR_PIVOT_SEQ_PAIR_ID = "SEQ_PAIR_ID";
 
 
-    // run table fields
-    public final static String RUN_ID = "ID";
-    public final static String RUN_DESCRIPTION = "DESCRIPTION";
-    public final static String RUN_TIMESTAMP = "CREATIONTIME";
+//    // run table fields
+//    public final static String RUN_ID = "ID";
+//    public final static String RUN_DESCRIPTION = "DESCRIPTION";
+//    public final static String RUN_TIMESTAMP = "CREATIONTIME";
+//
+//    // read table fields
+//    public final static String READ_ID = "ID";
+//    public final static String READ_NAME = "NAME";
+//    public final static String READ_SEQUENCE = "SEQUENCE_ID";
 
-    // read table fields
-    public final static String READ_ID = "ID";
-    public final static String READ_NAME = "NAME";
-    public final static String READ_SEQUENCE = "SEQUENCE_ID";
-
-   // statics table fields
-    public final static String STATICS_ID = "ID";
-    public final static String STATICS_TRACK = "TRACK_ID";
-    public final static String STATICS_NUMBER_OF_READS = "NUMBER_OF_READS";
-    public final static String STATICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
-    public final static String STATICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
-    public final static String STATICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
-    public final static String STATICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
-    public final static String STATICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
-    public final static String STATICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
+    // statistics table fields
+    public final static String STATISTICS_ID = "ID";
+    public final static String STATISTICS_TRACK_ID = "TRACK_ID";
+    public final static String STATISTICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
+    public final static String STATISTICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
+    public final static String STATISTICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
+//    public final static String STATISTICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
+    public final static String STATISTICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
+    public final static String STATISTICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
+    public final static String STATISTICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
+    public final static String STATISTICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
+    public final static String STATISTICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
+    public final static String STATISTICS_NUMBER_READS = "NUMBER_OF_READS";
+    public final static String STATISTICS_NUM_SEQUENCE_PAIRS = "NUM_SEQPAIRS";
+    public final static String STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS = "NUM_PERFECT_SEQPAIRS";
+    public final static String STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS = "NUM_UNIQUE_SEQPAIRS";
+    public final static String STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS = "NUM_UNIQUE_PERFECT_SEQPAIRS";
+    
+    // unique mappings = count all distinct mapping ids
+    // unique sequences = num mapped seq = count all distinct seq ids
+    // num mappings = count ALL mapping ids
+    // num reads = extra calculation: count all reads during import process, also possible later
+    
 }

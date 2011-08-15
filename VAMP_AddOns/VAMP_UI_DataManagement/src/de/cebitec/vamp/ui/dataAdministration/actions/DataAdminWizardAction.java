@@ -5,7 +5,7 @@ import de.cebitec.vamp.ui.dataAdministration.DataAdminWizardOverviewPanel;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.TrackJobs;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.dataAdministration.DeletionThread;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -51,7 +51,7 @@ public final class DataAdminWizardAction implements ActionListener {
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
             List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
-            List<TrackJobs> tracks2del = (List<TrackJobs>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
+            List<TrackJob> tracks2del = (List<TrackJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
 
             DeletionThread dt = new DeletionThread(refs2del, tracks2del);
             RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);

@@ -25,6 +25,7 @@ public class ColorProperties {
     public static Color MOUSEOVER = new Color(127, 127, 127);
     public static Color CURRENT_POSITION = new Color(127, 127, 127);
     public static Color START_CODON = new Color(255, 0, 0, 80);
+    public static Color PATTERN = new Color(12, 37, 211, 80);
     public static Color TITLE_BACKGROUND = Color.gray;
     public static Color LEGEND_BACKGROUND = Color.white;
     // genome viewer specific colors
