@@ -283,30 +283,30 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             this.checkRollback(ex);
         }
-        try {
-            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS)).execute();
-        } catch (SQLException ex) {
-            this.checkRollback(ex);
-        }
-        try {
-            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS)).execute();
-        } catch (SQLException ex) {
-            this.checkRollback(ex);
-        }
-        try {
-            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS)).execute();
-        } catch (SQLException ex) {
-            this.checkRollback(ex);
-        }    
-        try {
-            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS)).execute();
-        } catch (SQLException ex) {
-            this.checkRollback(ex);
-        }
+//        try {
+//            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+//                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS)).execute();
+//        } catch (SQLException ex) {
+//            this.checkRollback(ex);
+//        }
+//        try {
+//            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+//                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS)).execute();
+//        } catch (SQLException ex) {
+//            this.checkRollback(ex);
+//        }
+//        try {
+//            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+//                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS)).execute();
+//        } catch (SQLException ex) {
+//            this.checkRollback(ex);
+//        }    
+//        try {
+//            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+//                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS)).execute();
+//        } catch (SQLException ex) {
+//            this.checkRollback(ex);
+//        }
     }
     
     /**

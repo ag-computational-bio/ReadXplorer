@@ -2,6 +2,7 @@ package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.mappings.ISeqPairClassifier;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
 import java.awt.Dialog;

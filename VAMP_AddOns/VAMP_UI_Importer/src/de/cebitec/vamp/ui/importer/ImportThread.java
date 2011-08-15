@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.parser.mappings.ISeqPairClassifier;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.ReferenceJob;
