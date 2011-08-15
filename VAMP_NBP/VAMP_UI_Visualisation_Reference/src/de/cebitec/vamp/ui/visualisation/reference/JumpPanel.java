@@ -346,13 +346,14 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
     private void searchPatternButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternButtonActionPerformed
         
-        if (this.isValidSearchInput(this.searchPatternField.getText())){
+        String pattern = this.searchPatternField.getText().toLowerCase();
+        if (this.isValidSearchInput(pattern)){
             int newPos;
             
-            if (this.searchPattern != null && this.searchPattern.equals(this.searchPatternField.getText())){
+            if (this.searchPattern != null && this.searchPattern.equals(pattern)){
                newPos = this.viewer.getSequenceBar().findNextPatternOccurrence(); 
             } else {
-                this.searchPattern = this.searchPatternField.getText();
+                this.searchPattern = pattern;
                 newPos = this.viewer.getSequenceBar().setPattern(this.searchPattern);
             }                
             
@@ -389,7 +390,6 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
      * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
      */
     private boolean isValidSearchInput(String s){
-        s = s.toLowerCase();
         return s.matches("[acgt]+");
     }
     
