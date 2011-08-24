@@ -94,18 +94,39 @@ public class ExcelExporter implements ExporterI {
         int row = 0;
 
         addColumn(sheet, "LABEL", "Position", 0, row);
-        addColumn(sheet, "LABEL", "Base", 1, row);
-        addColumn(sheet, "LABEL", "Count", 2, row);
-        addColumn(sheet, "LABEL", "%", 3, row);
-        addColumn(sheet, "LABEL", "% variation at position", 4, row);
+        addColumn(sheet, "LABEL", "Track", 1, row);
+        addColumn(sheet, "LABEL", "Base", 2, row);
+        addColumn(sheet, "LABEL", "Reference", 3, row);
+        addColumn(sheet, "LABEL", "A", 4 , row);
+        addColumn(sheet, "LABEL", "C", 5 , row);
+        addColumn(sheet, "LABEL", "G", 6 , row);
+        addColumn(sheet, "LABEL", "T", 7 , row);
+        addColumn(sheet, "LABEL", "N", 8 , row);
+        addColumn(sheet, "LABEL", "_", 9 , row);
+        addColumn(sheet, "LABEL", "Coverage", 10 , row);
+        addColumn(sheet, "LABEL", "Frequency", 11 , row);
+        addColumn(sheet, "LABEL", "Type", 12 , row);
         row++;
 
         for (Snp snp : snps) {
             addColumn(sheet, "INTEGER", snp.getPosition(), 0, row);
             addColumn(sheet, "STRING", snp.getBase(), 1, row);
-            addColumn(sheet, "INTEGER", snp.getCount(), 2, row);
-            addColumn(sheet, "INTEGER", snp.getPercentage(), 3, row);
-            addColumn(sheet, "INTEGER", snp.getVariationPercentag(), 4, row);
+            //addColumn(sheet, "INTEGER", snp.getCount(), 2, row);
+            //addColumn(sheet, "INTEGER", snp.getPercentage(), 3, row);
+            //addColumn(sheet, "INTEGER", snp.getVariationPercentag(), 4, row);
+            addColumn(sheet, "STRING", snp.getPosition(), 0, row);
+            addColumn(sheet, "INTEGER", snp.getTrack(), 1, row);
+            addColumn(sheet, "STRING", snp.getBase().toUpperCase(), 2, row);
+            addColumn(sheet, "STRING", snp.getRefBase().toUpperCase(), 3, row);
+            addColumn(sheet, "INTEGER", snp.getARate(), 4, row);
+            addColumn(sheet, "INTEGER", snp.getCRate(), 5, row);
+            addColumn(sheet, "INTEGER", snp.getGRate(), 6, row);
+            addColumn(sheet, "INTEGER", snp.getTRate(), 7, row);
+            addColumn(sheet, "INTEGER", snp.getNRate(), 8, row);
+            addColumn(sheet, "INTEGER", snp.getGapRate(), 9, row);
+            addColumn(sheet, "INTEGER", snp.getCoverage(), 10, row);
+            addColumn(sheet, "INTEGER", snp.getFrequency(), 11, row);
+            addColumn(sheet, "STRING", snp.getType(), 12, row);
             row++;
         }
     }

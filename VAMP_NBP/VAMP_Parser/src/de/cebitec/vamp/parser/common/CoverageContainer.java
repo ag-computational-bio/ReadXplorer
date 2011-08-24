@@ -1,5 +1,6 @@
 package de.cebitec.vamp.parser.common;
 
+import de.cebitec.vamp.util.SequenceUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,7 +22,7 @@ public class CoverageContainer {
     private static final int NUM_OF_CASES = 3;
     private static final int FIELDS_PER_CASE = 4; //2 for fwd (all & without duplicates), and 2 rev
     // snp table
-    private HashMap<Long, Integer[]> positionTable;
+    private HashMap<String, Integer[]> positionTable;
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
     private static final int BASE_G = 2;
@@ -33,6 +34,7 @@ public class CoverageContainer {
     private static final int GAP_G = 8;
     private static final int GAP_T = 9;
     private static final int GAP_N = 10;
+    private static final int DIFFS = 11;
     private int coverageArrayLength;
 
     /**
@@ -41,7 +43,7 @@ public class CoverageContainer {
      */
     public CoverageContainer(ParsedMappingContainer mappings) {
         coverage = new HashMap<Integer, Integer[]>();
-        positionTable = new HashMap<Long, Integer[]>();
+        positionTable = new HashMap<String, Integer[]>();
         coverageArrayLength = NUM_OF_CASES * FIELDS_PER_CASE;
         this.computeCoverage(mappings);
     }
@@ -178,92 +180,129 @@ public class CoverageContainer {
     public void clear() {
         coverage.clear();
     }
-
+    
     public void savePositions(ParsedMapping s) {
-        if(s.isBestMapping()) {
-        List<ParsedDiff> diffs = s.getDiffs();
-        List<ParsedReferenceGap> gaps = s.getGenomeGaps();
-        // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getNumOfDiffs()));
-        // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getGenomeGaps().size()));
-        // saves diffs
-        for (int i = 0; i < s.getNumOfDiffs(); i++) {
-           
-            ParsedDiff diff = diffs.get(i);
-            long position = diff.getPosition();
-            char base = diff.getBase();
+        
+        if (s.isBestMapping()) {
+            List<ParsedDiff> diffs = s.getDiffs();
+            List<ParsedReferenceGap> gaps = s.getGenomeGaps();
+            // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getNumOfDiffs()));
+            // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getGenomeGaps().size()));
+            // saves diffs
+            for (int i = 0; i < s.getNumOfDiffs(); i++) {
 
-            // init positionTable if not done yet
-            if (!positionTable.containsKey(position)) {
-                Integer[] bases = new Integer[11];
-                for (int j = 0; j < bases.length; j++) {
-                    bases[j] = 0;
+                ParsedDiff diff = diffs.get(i);
+                long positionInt = diff.getPosition();
+                String position = String.valueOf(positionInt);
+                char base = diff.getBase();
+                if (s.getDirection() == -1) {
+                    base = SequenceUtils.complementDNA(base);
                 }
-                positionTable.put(position, bases);
-            }
-
-            // increase occurence of bases at position
-            Integer[] bases = positionTable.get(position);
-            switch (base) {
-                case 'A':
-                    bases[BASE_A] = bases[BASE_A] + 1;
-                    break;
-                case 'C':
-                    bases[BASE_C] = bases[BASE_C] + 1;
-                    break;
-                case 'G':
-                    bases[BASE_G] = bases[BASE_G] + 1;
-                    break;
-                case 'T':
-                    bases[BASE_T] = bases[BASE_T] + 1;
-                    break;
-                case 'N':
-                    bases[BASE_N] = bases[BASE_N] + 1;
-                    break;
-                case '_':
-                    bases[BASE_GAP] = bases[BASE_GAP] + 1;
-                    break;
-            }
-
-        }
-        for (int i = 0; i < gaps.size(); i++) {
-            ParsedReferenceGap gap = gaps.get(i);
-            long position = gap.getAbsPos();
-            char base = gap.getBase();
-
-            // init positionTable if not done yet
-            if (!positionTable.containsKey(position)) {
-                Integer[] bases = new Integer[11];
-                for (int j = 0; j < bases.length; j++) {
-                    bases[j] = 0;
+                
+                // init positionTable if not done yet
+                if (!positionTable.containsKey(position)) {
+                    Integer[] bases = new Integer[12];
+                    for (int j = 0; j < bases.length; j++) {
+                        bases[j] = 0;
+                    }
+                    positionTable.put(position, bases);
                 }
-                positionTable.put(position, bases);
-            }
 
-            // increase occurence of bases at position
-            Integer[] bases = positionTable.get(position);
-            switch (base) {
-                case 'A':
-                    bases[GAP_A] = bases[GAP_A] + 1;
-                    break;
-                case 'C':
-                    bases[GAP_C] = bases[GAP_C] + 1;
-                    break;
-                case 'G':
-                    bases[GAP_G] = bases[GAP_G] + 1;
-                    break;
-                case 'T':
-                    bases[GAP_T] = bases[GAP_T] + 1;
-                    break;
-                case 'N':
-                    bases[GAP_N] = bases[GAP_N] + 1;
-                    break;
-            }
+                // increase occurence of bases at position
+                Integer[] bases = positionTable.get(position);
+                switch (base) {
+                    case 'A':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[BASE_A] = bases[BASE_A] + 1;
+                        break;
+                    case 'C':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[BASE_C] = bases[BASE_C] + 1;
+                        break;
+                    case 'G':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[BASE_G] = bases[BASE_G] + 1;
+                        break;
+                    case 'T':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[BASE_T] = bases[BASE_T] + 1;
+                        break;
+                    case 'N':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[BASE_N] = bases[BASE_N] + 1;
+                        break;
+                    case '_':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[BASE_GAP] = bases[BASE_GAP] + 1;
+                        break;
+                }
 
+            }
+            for (int i = 0; i < gaps.size(); i++) {
+                ParsedReferenceGap gap = gaps.get(i);
+                long positionInt = gap.getAbsPos();
+                String position = String.valueOf(positionInt);
+                char base = gap.getBase();
+                int order = gap.getOrder();
+                if (s.getDirection() == -1) {
+                    base = SequenceUtils.complementDNA(base);
+                }
+                char value = 'a';
+                for (int j = 0; j <= order; j++) {
+                    if (value > 'a'){
+                        position = position.substring(0,position.length()-2);
+                    }
+                    position = position + "_" +  value;
+                    value ++;
+                }
+
+                // init positionTable if not done yet
+                if (!positionTable.containsKey(position)) {
+                    Integer[] bases = new Integer[12];
+                    for (int j = 0; j < bases.length; j++) {
+                        bases[j] = 0;
+                    }
+                    positionTable.put(position, bases);
+                }
+
+                // increase occurence of bases at position
+                Integer[] bases = positionTable.get(position);
+                switch (base) {
+                    case 'A':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[GAP_A] = bases[GAP_A] + 1;
+                        break;
+                    case 'C':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[GAP_C] = bases[GAP_C] + 1;
+                        break;
+                    case 'G':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[GAP_G] = bases[GAP_G] + 1;
+                        break;
+                    case 'T':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[GAP_T] = bases[GAP_T] + 1;
+                        break;
+                    case 'N':
+                        bases[DIFFS] = bases[DIFFS] + 1;
+                        bases[GAP_N] = bases[GAP_N] + 1;
+                        break;
+                }
+
+            }
         }
     }
-    }
 
-    public HashMap<Long, Integer[]> getPositionTable() {
+    public HashMap<String, Integer[]> getPositionTable() {
         return this.positionTable;
+    }
+    
+    public boolean positionCovered(int position) {
+        boolean covered = false;
+        if(coverage.containsKey(position)) {
+            covered = true;
+        }
+        return covered;
     }
 }

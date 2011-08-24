@@ -1,5 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
+import de.cebitec.vamp.api.objects.NewSnp;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;

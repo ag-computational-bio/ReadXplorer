@@ -19,17 +19,29 @@ public class H2SQLStatements {
      * This includes the Run, Unique_Sequence and Readname tables!
      */
     //////////////////  statements for table creation  /////////////////////////
-    public final static String SETUP_SNPS =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SNP + " "
+    
+    public final static String SETUP_POSITIONS =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_POSITIONS + " "
             + "("
-            + FieldNames.SNP_ID + " BIGINT PRIMARY KEY, "
-            + FieldNames.SNP_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SNP_COVERAGE + " MEDIUMINT UNSIGNED NOT NULL, "
-            + FieldNames.SNP_FREQUENCY + " MEDIUMINT UNSIGNED NOT NULL, "
-            + FieldNames.SNP_TYPE + " VARCHAR(1) NOT NULL"
+            + FieldNames.POSITIONS_SNP_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.POSITIONS_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_POSITION + " VARCHAR(200) NOT NULL, "
+            + FieldNames.POSITIONS_BASE + " VARCHAR(1) NOT NULL, "
+            + FieldNames.POSITIONS_REF_BASE + " VARCHAR(1) NOT NULL, "
+            + FieldNames.POSITIONS_A + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_C + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_G + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_T + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_N + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_GAP + " MEDIUMINT UNSIGNED, "
+            + FieldNames.POSITIONS_COVERAGE + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_FREQUENCY + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_TYPE + " VARCHAR(1) NOT NULL"
             + ")";
-    public final static String INDEX_SNP =
-            "CREATE INDEX IF NOT EXISTS INDEXDIFF ON " + FieldNames.TABLE_SNP + "(" + FieldNames.SNP_ID + ", " + FieldNames.SNP_TRACK_ID + ") ";
+    
+    public final static String INDEX_POSITIONS =
+            "CREATE INDEX IF NOT EXISTS INDEXDIFF ON " + FieldNames.TABLE_POSITIONS + "(" + FieldNames.POSITIONS_SNP_ID + ", " + FieldNames.POSITIONS_TRACK_ID + ") ";
+    
     public final static String SETUP_REFERENCE_GENOME =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REF_GEN
             + " ("

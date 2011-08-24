@@ -22,6 +22,7 @@ public class SQLStatements {
      * This includes the Run, Unique_Sequence and Readname tables!
      */
     //////////////////  statements for table creation  /////////////////////////
+    
     public final static String SETUP_STATISTICS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
             + "( "
@@ -42,16 +43,28 @@ public class SQLStatements {
             + FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS + " BIGINT UNSIGNED NOT NULL  "
             + ") ";
     //////////////////  statements for data insertion  /////////////////////////
-    public final static String INSERT_SNP =
-            "INSERT INTO " + FieldNames.TABLE_SNP + " "
+    
+    public final static String INSERT_POSITION =
+            "INSERT INTO " + FieldNames.TABLE_POSITIONS + " "
             + "("
-            + FieldNames.SNP_ID + ", "
-            + FieldNames.SNP_TRACK_ID + ", "
-            + FieldNames.SNP_COVERAGE + ", "
-            + FieldNames.SNP_FREQUENCY + ", "
-            + FieldNames.SNP_TYPE + " "
+            + FieldNames.POSITIONS_SNP_ID + ", "
+            + FieldNames.POSITIONS_TRACK_ID + ", "
+            + FieldNames.POSITIONS_POSITION + ", "
+            + FieldNames.POSITIONS_BASE + ", "
+            + FieldNames.POSITIONS_REF_BASE + ", "
+            + FieldNames.POSITIONS_A + ", "
+            + FieldNames.POSITIONS_C + ", "
+            + FieldNames.POSITIONS_G + ", "
+            + FieldNames.POSITIONS_T + ", "
+            + FieldNames.POSITIONS_N + ", "
+            + FieldNames.POSITIONS_GAP + ", "
+            + FieldNames.POSITIONS_COVERAGE + ", "
+            + FieldNames.POSITIONS_FREQUENCY + ", "
+            + FieldNames.POSITIONS_TYPE + " "
             + ") "
-            + "VALUES (?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+    
     public final static String INSERT_REFGENOME =
             "INSERT INTO " + FieldNames.TABLE_REF_GEN + " "
             + "("
@@ -62,6 +75,7 @@ public class SQLStatements {
             + FieldNames.REF_GEN_TIMESTAMP + " "
             + ") "
             + "VALUES (?,?,?,?,?)";
+    
     public final static String INSERT_FEATURE =
             "INSERT INTO " + FieldNames.TABLE_FEATURES + " "
             + "("
@@ -76,6 +90,7 @@ public class SQLStatements {
             + FieldNames.FEATURE_STRAND + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?)";
+    
     public final static String INSERT_TRACK =
             "INSERT INTO " + FieldNames.TABLE_TRACKS + " "
             + "("
@@ -86,6 +101,7 @@ public class SQLStatements {
             //FieldNames.TRACK_RUN+" " +
             ") "
             + "VALUES (?,?,?,?)";//,?)";
+    
     public final static String INSERT_MAPPING =
             "INSERT INTO " + FieldNames.TABLE_MAPPINGS + " "
             + "("
@@ -100,6 +116,7 @@ public class SQLStatements {
             + FieldNames.MAPPING_TRACK + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?)";
+    
     public final static String INSERT_DIFF =
             "INSERT INTO " + FieldNames.TABLE_DIFF + " "
             + "("
@@ -112,6 +129,7 @@ public class SQLStatements {
             + FieldNames.DIFF_SNP_ID + " "
             + ") "
             + "VALUES (?,?,?,?,?, null,?)";
+    
     public final static String INSERT_GAP =
             "INSERT INTO " + FieldNames.TABLE_DIFF + " "
             + "("
@@ -124,6 +142,7 @@ public class SQLStatements {
             + FieldNames.DIFF_SNP_ID + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?)";
+    
     public final static String INSERT_COVERAGE =
             "INSERT INTO " + FieldNames.TABLE_COVERAGE + " "
             + "("
@@ -144,6 +163,7 @@ public class SQLStatements {
             + FieldNames.COVERAGE_N_RV_NUM + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    
     public static final String INSERT_SEQ_PAIR =
             "INSERT INTO " + FieldNames.TABLE_SEQ_PAIRS
             + " ("
@@ -154,6 +174,7 @@ public class SQLStatements {
             + FieldNames.SEQ_PAIR_TYPE + ", "
             + ") "
             + "VALUES (?,?,?,?,?) ";
+    
     public static final String INSERT_SEQ_PAIR_REPLICATE =
             "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ("
@@ -161,6 +182,7 @@ public class SQLStatements {
             + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES + ", "
             + ") "
             + "VALUES (?,?) ";
+    
     public static final String INSERT_SEQ_PAIR_PIVOT =
             "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_PIVOT
             + " ("
@@ -194,6 +216,7 @@ public class SQLStatements {
     /**
      * Insert statistics data of one track into statistics table.
      */
+    
     public final static String INSERT_STATISTICS =
             "INSERT INTO " + FieldNames.TABLE_STATISTICS + " "
             + "("
@@ -217,6 +240,7 @@ public class SQLStatements {
     /**
      * Delete the track data.
      */
+    
     public final static String DELETE_DIFFS_FROM_TRACK =
             "DELETE FROM "
                 + FieldNames.TABLE_DIFF + " "
@@ -229,21 +253,25 @@ public class SQLStatements {
             + "FROM " + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE " + FieldNames.MAPPING_TRACK + " = ? "
             + ")";
+    
     public final static String DELETE_MAPPINGS_FROM_TRACK =
             "DELETE FROM "
                 + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE "
                 + FieldNames.MAPPING_TRACK + " = ? ";
+    
     public final static String DELETE_COVERAGE_FROM_TRACK =
             "DELETE FROM "
                 + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
                 + FieldNames.COVERAGE_TRACK + " = ?";
+    
     public final static String DELETE_TRACK =
             "DELETE FROM "
                 + FieldNames.TABLE_TRACKS + " "
             + "WHERE "
                 + FieldNames.TRACK_ID + " = ? ";
+    
     public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete matepairs
             "DELETE FROM "
                 + FieldNames.TABLE_SEQ_PAIRS + " "
@@ -286,11 +314,13 @@ public class SQLStatements {
 //                FieldNames.TABLE_RUN+" " +
 //            "WHERE "+
 //                FieldNames.RUN_ID+" = ?";
+    
     public final static String DELETE_FEATURES_FROM_GENOME =
             "DELETE FROM "
                 + FieldNames.TABLE_FEATURES + " "
             + "WHERE "
                 + FieldNames.FEATURE_REFGEN + " = ?";
+    
     public final static String DELETE_GENOME =
             "DELETE FROM "
                 + FieldNames.TABLE_REF_GEN + " "
@@ -314,6 +344,7 @@ public class SQLStatements {
 //                "R."+FieldNames.RUN_TIMESTAMP +" "+
 //            "FROM "+
 //                FieldNames.TABLE_RUN+" AS R ";
+    
     public final static String FETCH_GENOMES =
             "SELECT "
                 + "R." + FieldNames.REF_GEN_ID + ", "
@@ -323,6 +354,7 @@ public class SQLStatements {
                 + "R." + FieldNames.REF_GEN_TIMESTAMP + " "
             + "FROM "
                 + FieldNames.TABLE_REF_GEN + " AS R ";
+    
     public final static String FETCH_TRACKS =
             "SELECT "
                 + "T." + FieldNames.TRACK_ID + ", "
@@ -332,6 +364,7 @@ public class SQLStatements {
                 //"T."+FieldNames.TRACK_RUN+" " +
             "FROM "
                 + FieldNames.TABLE_TRACKS + " AS T ";
+    
     public final static String FETCH_SINGLE_GENOME =
             "SELECT "
                 + FieldNames.REF_GEN_ID + ", "
@@ -343,6 +376,7 @@ public class SQLStatements {
                 + FieldNames.TABLE_REF_GEN + " "
             + "WHERE "
                 + FieldNames.REF_GEN_ID + " = ?";
+    
     public final static String FETCH_FEATURES_FOR_INTERVAL_FROM_GENOME =
             "SELECT "
                 + FieldNames.FEATURE_ECNUM + ", "
@@ -359,6 +393,7 @@ public class SQLStatements {
                 + FieldNames.FEATURE_REFGEN + " = ? and "
                 + FieldNames.FEATURE_STOP + " >= ? and "
                 + FieldNames.FEATURE_START + " <= ? ";
+    
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
             "(SELECT "
                 + FieldNames.COVERAGE_POSITION + ", "
@@ -379,6 +414,7 @@ public class SQLStatements {
             + "WHERE "
                 + FieldNames.COVERAGE_POSITION + " between ? and ? and "
                 + FieldNames.COVERAGE_TRACK + " = ? )";
+    
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT "
                 + "M." + FieldNames.MAPPING_ID + ", "
@@ -428,6 +464,7 @@ public class SQLStatements {
                     + ") AS D "
                     + "on "
                     + "M." + FieldNames.MAPPING_ID + " = D." + FieldNames.DIFF_MAPPING_ID;
+    
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
             "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
@@ -438,6 +475,7 @@ public class SQLStatements {
             + "WHERE "
             + FieldNames.COVERAGE_POSITION + " between ? and ? and "
             + FieldNames.COVERAGE_TRACK + " = ? ";
+    
     public final static String FETCH_COVERAGE_FOR_TRACK =
             "SELECT "
                 + FieldNames.COVERAGE_POSITION + ", "
@@ -447,6 +485,7 @@ public class SQLStatements {
             + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
             + FieldNames.COVERAGE_TRACK + " = ?  and " + FieldNames.COVERAGE_POSITION + " between ? and ?";
+    
     public final static String FETCH_TRACKS_FOR_GENOME =
             "SELECT "
             + FieldNames.TRACK_ID + ", "
@@ -458,6 +497,7 @@ public class SQLStatements {
             + FieldNames.TABLE_TRACKS + " "
             + "WHERE "
             + FieldNames.TRACK_REFERENCE_ID + " = ? ";
+    
     public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
             "SELECT A." + FieldNames.DIFF_POSITION + ", "
                 + "A." + FieldNames.DIFF_CHAR + ", "
@@ -787,6 +827,53 @@ public class SQLStatements {
 //            FieldNames.TABLE_MAPPINGS+ " AS M , " + FieldNames.TABLE_READS+ " AS R " +
 //           "WHERE  R." +
 //           FieldNames.READ_NAME + "= ?  AND M."+FieldNames.MAPPING_SEQUENCE_ID + " = R." +FieldNames.READ_SEQUENCE+" AND M." +FieldNames.MAPPING_TRACK+" = ? " ;
+    public final static String FETCH_SNP_IDS_FOR_TRACK =
+            "SELECT * FROM " + FieldNames.TABLE_POSITIONS + " WHERE " + FieldNames.POSITIONS_TRACK_ID + " = ?"; 
+    
+    public final static String FETCH_DIFFS_HAVING_SNP_ID =
+            "SELECT "
+            + FieldNames.DIFF_MAPPING_ID + ","
+            + FieldNames.DIFF_CHAR + ","
+            + FieldNames.DIFF_POSITION + ","
+            + FieldNames.DIFF_TYPE + ","
+            + FieldNames.DIFF_ORDER + " "
+            + "FROM "
+            + FieldNames.TABLE_DIFF + " "
+            + "WHERE "
+            + FieldNames.DIFF_SNP_ID + " = ?";
+    
+    public final static String FETCH_SNPS =
+            "SELECT * "
+            + "FROM "
+            + FieldNames.TABLE_POSITIONS + " "
+            + "WHERE "
+            + FieldNames.POSITIONS_TYPE 
+            + " != 'M' AND "
+            + FieldNames.POSITIONS_FREQUENCY 
+            + " >= ? AND SELECT CASE WHEN "
+            + FieldNames.POSITIONS_REF_BASE
+            + " = 'A' THEN GREATEST("
+            + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + ") >= ? "
+            + "WHEN "
+            + FieldNames.POSITIONS_REF_BASE
+            + " = 'C' THEN GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + ") >= ? "
+            + "WHEN "
+            + FieldNames.POSITIONS_REF_BASE
+            + " = 'G' THEN GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_T + ") >= ? "
+            + "ELSE GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + ") >= ? END";
+    
+    public final static String GET_DIRECTION_OF_MAPPING =
+            "SELECT "
+            + FieldNames.MAPPING_DIRECTION + " "
+            + "FROM "
+            + FieldNames.TABLE_MAPPINGS + " "
+            + "WHERE "
+            + FieldNames.MAPPING_ID + " = ?";
+
+    
     public final static String GET_LATEST_COVERAGE_ID =
             "SELECT MAX(" + FieldNames.COVERAGE_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_COVERAGE;
 //    public final static String GET_LATEST_SEQUENCE_ID =
@@ -796,7 +883,8 @@ public class SQLStatements {
 //            "SELECT MAX("+FieldNames.READ_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_READS;
 //
 //    public final static String GET_LATEST_RUN_ID =
-//            "SELECT MAX("+FieldNames.RUN_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_RUN;
+//            "SELECT MAX("+FieldNames.RUN_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_RUN
+    
     public final static String GET_LATEST_REFERENCE_ID =
             "SELECT MAX(" + FieldNames.REF_GEN_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_REF_GEN;
     public final static String GET_LATEST_FEATURE_ID =
@@ -812,5 +900,5 @@ public class SQLStatements {
     public static final String GET_LATEST_SEQUENCE_PAIR_PAIR_ID =
             "SELECT MAX(" + FieldNames.SEQ_PAIR_PAIR_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_SEQ_PAIRS;
     public final static String GET_LATEST_SNP_ID =
-            "SELECT MAX(" + FieldNames.SNP_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_SNP;
+            "SELECT MAX(" + FieldNames.POSITIONS_SNP_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_POSITIONS;
 }

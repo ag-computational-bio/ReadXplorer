@@ -7,9 +7,11 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.vamp.api.objects.NewSnp;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingWorker;
@@ -59,6 +61,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             ph.start();
 
             snps = con.findSNPs(percent, num);
+            
             return snps;
         }
 
