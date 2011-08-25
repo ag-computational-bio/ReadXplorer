@@ -111,58 +111,81 @@ public class TrackConnector implements ITrackConnector{
     public Collection<PersistantMapping> getMappings(int from, int to) {
         HashMap<Integer, PersistantMapping> mappings = new HashMap<Integer, PersistantMapping>();
 
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
-            fetch.setLong(1, trackID);
-            fetch.setInt(2, from);
-            fetch.setInt(3, to);
-            fetch.setInt(4, from);
-            fetch.setInt(5, to);
-            
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                // mapping data
-                int mappingID = rs.getInt(FieldNames.MAPPING_ID);
-                int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
-                int mappingTrack = rs.getInt(FieldNames.MAPPING_TRACK);
-                int start = rs.getInt(FieldNames.MAPPING_START);
-                int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                boolean isForwardStrand = (direction == 1 ? true : false);
-                int count = rs.getInt(FieldNames.MAPPING_COUNT);
-                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                int bestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
-                boolean isBestMapping = (bestMapping == 1 ? true : false);
-                PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+        if (from < to) {
+            try {
+                
+                //determine readlength
+                //TODO: ensure this is only calculated when track id or db changed!
+                PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
+                fetchReadlength.setLong(1, trackID);
+                ResultSet rsReadlength = fetchReadlength.executeQuery();
 
-                // add new mapping if not exists
-                if (!mappings.containsKey(m.getId())) {
-                    mappings.put(m.getId(), m);
+                int readlength = 1000;
+                final int spacer = 10;
+                if (rsReadlength.next()){
+                    int start = rsReadlength.getInt(FieldNames.MAPPING_START);
+                    int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
+                    readlength = stop - start + spacer;
                 }
+                fetchReadlength.close();
+                
+                
+                //mapping processing
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
+                fetch.setLong(1, from - readlength);
+                fetch.setLong(2, to);
+                fetch.setLong(3, from);
+                fetch.setLong(4, to + readlength);
+                fetch.setLong(5, trackID);
+                fetch.setLong(6, from);
+                fetch.setLong(7, to);
 
-                // diff data
-                String baseString = rs.getString(FieldNames.DIFF_CHAR);
-                int position = rs.getInt(FieldNames.DIFF_POSITION);
-                int type = rs.getInt(FieldNames.DIFF_TYPE);
-                int gapOrder = rs.getInt(FieldNames.DIFF_ORDER);
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+                    // mapping data
+                    int mappingID = rs.getInt(FieldNames.MAPPING_ID);
+                    int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
+                    int mappingTrack = rs.getInt(FieldNames.MAPPING_TRACK);
+                    int start = rs.getInt(FieldNames.MAPPING_START);
+                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                    boolean isForwardStrand = (direction == 1 ? true : false);
+                    int count = rs.getInt(FieldNames.MAPPING_COUNT);
+                    int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    int bestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
+                    boolean isBestMapping = (bestMapping == 1 ? true : false);
+                    PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
 
-                // diff data may be null, if mapping has no diffs
-                if (baseString != null) {
-                    char base = baseString.charAt(0);
-                    if (type == 1) {
-                        PersistantDiff d = new PersistantDiff(position, base, isForwardStrand, count);
-                        mappings.get(m.getId()).addDiff(d);
-                    } else if (type == 0) {
-                        PersistantReferenceGap g = new PersistantReferenceGap(position, base, gapOrder, isForwardStrand, count);
-                        mappings.get(m.getId()).addGenomeGap(g);
-                    } else {
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown type for diff in database {0}", type);
+                    // add new mapping if not exists
+                    if (!mappings.containsKey(m.getId())) {
+                        mappings.put(m.getId(), m);
+                    }
+
+                    // diff data
+                    String baseString = rs.getString(FieldNames.DIFF_CHAR);
+                    int position = rs.getInt(FieldNames.DIFF_POSITION);
+                    int type = rs.getInt(FieldNames.DIFF_TYPE);
+                    int gapOrder = rs.getInt(FieldNames.DIFF_ORDER);
+
+                    // diff data may be null, if mapping has no diffs
+                    if (baseString != null) {
+                        char base = baseString.charAt(0);
+                        if (type == 1) {
+                            PersistantDiff d = new PersistantDiff(position, base, isForwardStrand, count);
+                            mappings.get(m.getId()).addDiff(d);
+                        } else if (type == 0) {
+                            PersistantReferenceGap g = new PersistantReferenceGap(position, base, gapOrder, isForwardStrand, count);
+                            mappings.get(m.getId()).addGenomeGap(g);
+                        } else {
+                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown type for diff in database {0}", type);
+                        }
                     }
                 }
-            }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                fetch.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return mappings.values();
     }
@@ -176,27 +199,29 @@ public class TrackConnector implements ITrackConnector{
     public Collection<PersistantDiff> getDiffsForInterval(int from, int to) {
         
         ArrayList<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_IN_TRACK_FOR_INTERVAL);
-            fetch.setInt(1, from);
-            fetch.setInt(2, to);
-            fetch.setLong(3, trackID);
+        if (from < to) {
+            try {
 
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                int position = rs.getInt(FieldNames.DIFF_POSITION);
-                char base = rs.getString(FieldNames.DIFF_CHAR).charAt(0);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                boolean isForwardStrand = (direction == 1 ? true : false);
-                int count = rs.getInt(FieldNames.MAPPING_COUNT);
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_IN_TRACK_FOR_INTERVAL);
+                fetch.setInt(1, from);
+                fetch.setInt(2, to);
+                fetch.setLong(3, trackID);
 
-                diffs.add(new PersistantDiff(position, base, isForwardStrand, count));
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+                    int position = rs.getInt(FieldNames.DIFF_POSITION);
+                    char base = rs.getString(FieldNames.DIFF_CHAR).charAt(0);
+                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                    boolean isForwardStrand = (direction == 1 ? true : false);
+                    int count = rs.getInt(FieldNames.MAPPING_COUNT);
+
+                    diffs.add(new PersistantDiff(position, base, isForwardStrand, count));
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         
         return diffs;
     }
@@ -205,26 +230,28 @@ public class TrackConnector implements ITrackConnector{
     public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervalOrderedByMappingID(int from, int to) {
    
         Collection<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
-        try {
-            PreparedStatement fetchGaps = con.prepareStatement(SQLStatements.FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL);
-            fetchGaps.setInt(1, from);
-            fetchGaps.setInt(2, to);
-            fetchGaps.setLong(3, trackID);
+        if (from < to) {
+            try {
+                PreparedStatement fetchGaps = con.prepareStatement(SQLStatements.FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL);
+                fetchGaps.setInt(1, from);
+                fetchGaps.setInt(2, to);
+                fetchGaps.setLong(3, trackID);
 
-            ResultSet rs = fetchGaps.executeQuery();
-            while (rs.next()) {
-                char base = rs.getString(FieldNames.DIFF_CHAR).charAt(0);
-                int position = rs.getInt(FieldNames.DIFF_POSITION);
-                int order = rs.getInt(FieldNames.DIFF_ORDER);
-                boolean isForwardStrand = (rs.getByte(FieldNames.MAPPING_DIRECTION) == 1 ? true : false);
-                int count = rs.getInt(FieldNames.MAPPING_COUNT);
+                ResultSet rs = fetchGaps.executeQuery();
+                while (rs.next()) {
+                    char base = rs.getString(FieldNames.DIFF_CHAR).charAt(0);
+                    int position = rs.getInt(FieldNames.DIFF_POSITION);
+                    int order = rs.getInt(FieldNames.DIFF_ORDER);
+                    boolean isForwardStrand = (rs.getByte(FieldNames.MAPPING_DIRECTION) == 1 ? true : false);
+                    int count = rs.getInt(FieldNames.MAPPING_COUNT);
 
-                gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count));
+                    gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count));
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }       
 
         return gaps;
     }
@@ -364,21 +391,23 @@ public class TrackConnector implements ITrackConnector{
         HashMap<Integer, Integer> positionMap = new HashMap<Integer, Integer>();
         int coverage;
         int position;
-        try {
+        if (from < to) {
+            try {
 
-            fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
+                fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
 
-            fetch.setLong(1, trackID);
-            fetch.setLong(2, from);
-            fetch.setLong(3, to);
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                position = rs.getInt(FieldNames.COVERAGE_POSITION);
-                coverage = rs.getInt(FieldNames.COVERAGE_N_MULT);
-                positionMap.put(position, coverage);
+                fetch.setLong(1, trackID);
+                fetch.setLong(2, from);
+                fetch.setLong(3, to);
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+                    position = rs.getInt(FieldNames.COVERAGE_POSITION);
+                    coverage = rs.getInt(FieldNames.COVERAGE_N_MULT);
+                    positionMap.put(position, coverage);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return positionMap;
     }

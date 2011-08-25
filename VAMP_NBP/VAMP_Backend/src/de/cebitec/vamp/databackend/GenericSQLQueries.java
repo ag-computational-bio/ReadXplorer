@@ -80,10 +80,29 @@ public class GenericSQLQueries {
                 + " END";
     }
     
+    /**
+     * Adds a new column with an Integer value to the table
+     * @param table table
+     * @param column column to add
+     * @return SQL command
+     */
     public static String genAddColumnString2(String table, String column) {
         return "ALTER TABLE "
                 + table
                 + " ADD COLUMN "
                 + column + " BIGINT UNSIGNED ";
+    }
+    
+    /**
+     * Adds a new column with a varchar 20 value to the table.
+     * @param table table
+     * @param column column to add
+     * @return SQL command
+     */
+    public static String genAddColumnString3(String table, String column) {
+        return "ALTER TABLE "
+                + table
+                + " ADD COLUMN "
+                + column + " VARCHAR(20) ";
     }
 }

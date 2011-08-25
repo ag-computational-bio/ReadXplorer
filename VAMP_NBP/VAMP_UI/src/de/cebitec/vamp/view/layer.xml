@@ -43,6 +43,7 @@
         <folder name="Edit_hidden"/>
         <folder name="GoTo_hidden"/>
         <folder name="View_hidden"/>
+        <folder name="Window_hidden"/>
     </folder>
     <folder name="Toolbars">
         <folder name="File_hidden"/>

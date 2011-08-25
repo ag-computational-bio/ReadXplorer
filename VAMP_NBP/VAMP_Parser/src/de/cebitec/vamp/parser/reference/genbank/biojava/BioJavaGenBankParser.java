@@ -32,7 +32,7 @@ import org.biojavax.bio.seq.io.RichStreamReader;
  */
 public class BioJavaGenBankParser implements ReferenceParserI{
 
-    private static String[] fileExtension = new String[]{"gbk", "gb"};
+    private static String[] fileExtension = new String[]{"gbk", "gb", "genbank"};
     private static String parserName = "BioJava GenBank";
     private static String fileDescription = "GenBank file";
 
@@ -75,6 +75,7 @@ public class BioJavaGenBankParser implements ReferenceParserI{
                     int stop = 0;
                     int strand = 0;
                     String ecNumber = null;
+                    String geneName = null;
 
                     parsedType = f.getType();
                     start = f.getLocation().getMin();
@@ -101,6 +102,8 @@ public class BioJavaGenBankParser implements ReferenceParserI{
                             product = value;
                         } else if(name.equals("EC_number")){
                             ecNumber = value;
+                        } else if (name.equals("gene")){
+                            geneName = value;
                         }
 
                     }
@@ -133,7 +136,7 @@ public class BioJavaGenBankParser implements ReferenceParserI{
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown feature {0}", parsedType);
                     }
 
-                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber));
+                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName));
 
                 }
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");

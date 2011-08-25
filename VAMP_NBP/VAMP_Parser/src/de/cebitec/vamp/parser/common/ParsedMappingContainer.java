@@ -48,7 +48,7 @@ public class ParsedMappingContainer implements Observable, Observer {
     public ParsedMappingGroup getParsedMappingGroupBySeqID(int sequenceID){
         return mappings.get(sequenceID);
     }
-    
+
     public HashMap<Integer,Integer> getMappingInformations() {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
         int numberOfBM = 0;

@@ -35,7 +35,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>8.14.1</specification-version>
+                        <specification-version>8</specification-version>
                     </run-dependency>
                 </dependency>
             </module-dependencies>

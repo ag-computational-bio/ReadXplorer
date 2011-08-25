@@ -2,6 +2,7 @@ package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
+import java.awt.Dimension;
 
 /**
  *
@@ -17,6 +18,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     /** Creates new form CoverageInfoPanel */
     public CoverageInfoLabel() {
         initComponents();
+        this.setInitialSize();
     }
 
     /** This method is called from within the constructor to
@@ -400,6 +402,15 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         bmCovLabel.setText("Track 1 cov.:");
         complCovLabel.setText("Track 2 cov.:");
         doubleTrackHackBoolean = true;
+    }
+    
+    /**
+     * Sets the initial size of the track viewer.
+     */
+    private void setInitialSize() {
+        
+        this.setPreferredSize(new Dimension(1, this.getPreferredSize().height));
+        this.revalidate();
     }
 
 }

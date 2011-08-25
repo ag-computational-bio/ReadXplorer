@@ -203,9 +203,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     /**
      * Sets all Sliders based on synch-Value
-     * @param synch Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
+     * @param sync Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
      */
-    private void sliderSynchronisation(boolean synch) {
+    private void sliderSynchronisation(boolean sync) {
         //synchronize all Sliders for all RefrenceViewer's ThumbnailViewTopComponents
         for (ReferenceViewer oneViewer : refThumbTopComponents.keySet()) {
             if (selectedFeatures.containsKey(oneViewer)) {
@@ -216,7 +216,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                             JPanel panel = (JPanel) bp.getComponent(0);
                             if (panel != null) {
                                 CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent(1);
-                                if (synch) {
+                                if (sync) {
                                     slider.addChangeListener(zoomChangeListener);
                                     zoomChangeListener.addMapValue((TrackViewer) panel.getComponent(0), slider);
                                 } else {

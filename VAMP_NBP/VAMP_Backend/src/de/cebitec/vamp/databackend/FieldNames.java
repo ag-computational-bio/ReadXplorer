@@ -99,6 +99,7 @@ public class FieldNames {
     public final static String FEATURE_PRODUCT = "PRODUCT";
     public final static String FEATURE_ECNUM = "EC_NUM";
     public final static String FEATURE_STRAND = "STRAND";
+    public static final String FEATURE_GENE = "GENE";
 
     // mapping table fields
     public final static String MAPPING_ID = "ID";

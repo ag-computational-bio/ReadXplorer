@@ -3,7 +3,6 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.Installer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -12,11 +11,12 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
-import org.h2.jdbc.JdbcSQLException;
+import javax.swing.JFrame;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.windows.WindowManager;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can copy-paste the code below wherever you need.
@@ -63,6 +63,9 @@ public final class LoginWizardAction implements ActionListener{
                         return true;
                     }
                 });
+                //add database path to main window title
+                JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
+                mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
             } catch (SQLException ex) {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
                 nd.setTitle(NbBundle.getBundle(LoginWizardAction.class).getString("MSG_LoginWizardAction.sqlError"));
