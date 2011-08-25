@@ -87,7 +87,8 @@ public class H2SQLStatements {
             FieldNames.FEATURE_LOCUS+" VARCHAR (1000), " +
             FieldNames.FEATURE_PRODUCT+" VARCHAR (2000), " +
             FieldNames.FEATURE_ECNUM+" VARCHAR (20), " +
-            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL " +
+            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
+            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
             ") ";
 
     

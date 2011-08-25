@@ -72,8 +72,9 @@ public class ReferenceConnector {
                 int stop = rs.getInt(FieldNames.FEATURE_STOP);
                 int strand = rs.getInt(FieldNames.FEATURE_STRAND);
                 int type = rs.getInt(FieldNames.FEATURE_TYPE);
+                String gene = rs.getString(FieldNames.FEATURE_GENE);
 
-                features.add(new PersistantFeature(id, ecnum, locus, product, start, stop, strand, type));
+                features.add(new PersistantFeature(id, ecnum, locus, product, start, stop, strand, type, gene));
             }
 
         } catch (SQLException ex) {

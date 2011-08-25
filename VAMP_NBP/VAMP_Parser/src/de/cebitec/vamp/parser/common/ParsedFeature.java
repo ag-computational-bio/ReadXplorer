@@ -13,8 +13,22 @@ public class ParsedFeature {
     private String locusTag;
     private String product;
     private String ecNumber;
+    private String geneName;
 
-    public ParsedFeature(int type, int start, int stop, int strand, String locusTag, String product, String ecNumber){
+    /**
+     * Contains all available information about a persistant feature
+     * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA, FeatureType.SOURCE,
+                   FeatureType.T_RNA, FeatureType.MISC_RNA, FeatureType.MI_RNA, FeatureType.GENE,
+                   FeatureType.M_RNA
+     * @param start start position
+     * @param stop stop position
+     * @param strand -1 for reverse and 1 for forward strand
+     * @param locusTag locus information
+     * @param product description of the protein product
+     * @param ecNumber ec number
+     * @param geneName name of the gene, if it exists (e.g. "dnaA")
+     */
+    public ParsedFeature(int type, int start, int stop, int strand, String locusTag, String product, String ecNumber, String geneName){
         this.type = type; // if type is null, 0 is assumed, which is equal to FeatureType.UNDEFINED
         this.start = start;
         this.stop = stop;
@@ -22,6 +36,7 @@ public class ParsedFeature {
         this.locusTag = locusTag;
         this.product = product;
         this.ecNumber = ecNumber;
+        this.geneName = geneName;
     }
 
     public boolean hasEcNumber(){
@@ -34,6 +49,14 @@ public class ParsedFeature {
 
     public String getEcNumber() {
         return ecNumber;
+    }
+    
+    public boolean hasGeneName() {
+        return this.geneName != null ? true : false;
+    }
+
+    public String getGeneName() {
+        return this.geneName;
     }
 
     public boolean hasLocusTag(){

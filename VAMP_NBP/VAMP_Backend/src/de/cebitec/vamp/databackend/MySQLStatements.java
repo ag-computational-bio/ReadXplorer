@@ -71,6 +71,7 @@ public class MySQLStatements {
             FieldNames.FEATURE_PRODUCT+" VARCHAR(1000), " +
             FieldNames.FEATURE_ECNUM+" VARCHAR (20), " +
             FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
+            FieldNames.FEATURE_GENE+" VARCHAR (20), " +
             "INDEX ("+FieldNames.FEATURE_REFGEN+") " +
             ") ";
 

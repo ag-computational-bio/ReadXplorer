@@ -8,7 +8,6 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
@@ -90,7 +89,6 @@ public class BasePanelFactory {
         b.setTopInfoPanel(cil);
         b.setViewer(trackV, slider);
         b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
-        //b.setViewer(trackV, slider);
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
         return b;
@@ -149,7 +147,7 @@ public class BasePanelFactory {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
-        // create a trackviewer
+        // create an alignmentviewer
         AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGen, connector);
 
         // create a legend

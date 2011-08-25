@@ -310,7 +310,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 //                    potUnorSmallPairList.add(potPotUnorSmallPair);
 
                     }
-
+            
                     /* Determines order of insertion of pairs. If one id is contained
                      * in an earlier list, then it is ignored in all other lists! */
                     for (ParsedSeqPairMapping pairMapping : potSmallPairList) {

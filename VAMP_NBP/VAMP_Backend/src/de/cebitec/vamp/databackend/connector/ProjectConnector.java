@@ -307,6 +307,14 @@ public class ProjectConnector {
 //        } catch (SQLException ex) {
 //            this.checkRollback(ex);
 //        }
+        
+         //add column GENE for features
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString3(
+                    FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
     }
     
     /**
@@ -675,6 +683,7 @@ public class ProjectConnector {
                 insertFeature.setString(7, f.getProduct());
                 insertFeature.setString(8, f.getEcNumber());
                 insertFeature.setInt(9, f.getStrand());
+                insertFeature.setString(10, f.getGeneName());
                 insertFeature.addBatch();
                 id++;
                 if (batchCounter == FEATURE_BATCH_SIZE) {
@@ -1021,10 +1030,10 @@ public class ProjectConnector {
     }
     
     /**
-     * Locks all tables involved when adding mate pair data in mysql fashion.
+     * Locks all tables involved when adding seq pair data in mysql fashion.
      */
-    private void lockMatePairDomainTables() {
-        this.lockDomainTables(MySQLStatements.LOCK_TABLE_SEQUENCE_PAIRS_DOMAIN, "mate pair");
+    private void lockSeqPairDomainTables() {
+        this.lockDomainTables(MySQLStatements.LOCK_TABLE_SEQUENCE_PAIRS_DOMAIN, "seq pair");
     }
     
     /**
@@ -1261,12 +1270,15 @@ public class ProjectConnector {
             deleteMappings.setLong(1, trackID);
             PreparedStatement deleteCoverage = con.prepareStatement(SQLStatements.DELETE_COVERAGE_FROM_TRACK);
             deleteCoverage.setLong(1, trackID);
+            PreparedStatement deleteStatistics = con.prepareStatement(SQLStatements.DELETE_STATISTIC_FROM_TRACK);
+            deleteStatistics.setLong(1, trackID);
             PreparedStatement deleteTrack = con.prepareStatement(SQLStatements.DELETE_TRACK);
             deleteTrack.setLong(1, trackID);
 
             deleteDiffs.execute();
             deleteMappings.execute();
             deleteCoverage.execute();
+            deleteStatistics.execute();
             deleteTrack.execute();
 
             con.commit();
@@ -1274,6 +1286,7 @@ public class ProjectConnector {
             deleteDiffs.close();
             deleteMappings.close();
             deleteCoverage.close();
+            deleteStatistics.close();
             deleteTrack.close();
 
             con.setAutoCommit(true);
@@ -1365,7 +1378,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing sequence pair data for track data");
         
         if (adapter.equalsIgnoreCase("mysql")) {
-            this.lockMatePairDomainTables();
+            this.lockSeqPairDomainTables();
             this.disableSeqPairDomainIndices();
         }
 

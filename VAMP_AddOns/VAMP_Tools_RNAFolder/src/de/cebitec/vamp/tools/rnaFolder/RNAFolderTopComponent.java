@@ -76,7 +76,7 @@ public final class RNAFolderTopComponent extends TopComponent {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        Export exportAction = new Export((MoviePane) this.rnaTabbedPane.getSelectedComponent());
+        Export exportAction = new Export((MoviePane) this.rnaTabbedPane.getSelectedComponent(), this.rnaTabbedPane.getTitleAt(this.rnaTabbedPane.getSelectedIndex()));
         exportAction.actionPerformed(evt);
     }//GEN-LAST:event_exportButtonActionPerformed
 
@@ -88,6 +88,7 @@ public final class RNAFolderTopComponent extends TopComponent {
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
+     * @return the single RNAFolderTopComponent instance
      */
     public static synchronized RNAFolderTopComponent getDefault() {
         if (instance == null) {
@@ -98,6 +99,7 @@ public final class RNAFolderTopComponent extends TopComponent {
 
     /**
      * Obtain the RNAFolderTopComponent instance. Never call {@link #getDefault} directly!
+     * @return the single RNAFolderTopComponent instance
      */
     public static synchronized RNAFolderTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);

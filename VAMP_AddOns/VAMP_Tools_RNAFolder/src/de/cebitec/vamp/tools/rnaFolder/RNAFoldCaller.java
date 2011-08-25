@@ -70,10 +70,10 @@ public class RNAFoldCaller {
                     if (root == null) {
                         throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.RemoteError") + e.toString());
                     }
-                    String description = root.getLastChild().getFirstChild().getNodeValue();
+                    //String description = root.getLastChild().getFirstChild().getNodeValue();
                     statuscode = Integer.parseInt(root.getFirstChild().getFirstChild().getNodeValue());
                     // print error to parent
-                    throw new RNAFoldException("(" + statuscode + " - " + description + ")");
+                    //throw new RNAFoldException("(" + statuscode + " - " + description + ")");
                 }
             }
 

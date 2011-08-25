@@ -57,6 +57,7 @@ import java.util.logging.Logger;
 public class Export extends MovieAction {
     
     private File lastDir = null;
+    private String header;
     
 //    //global variables needed for coordinate transformations
 //    private double xTrans = 0.0;
@@ -65,9 +66,10 @@ public class Export extends MovieAction {
     
     private static final Logger log = Logger.getLogger(Export.class.toString());
     
-    public Export(MoviePane moviePane){//    public Export(RNAMovies movies) {
+    public Export(MoviePane moviePane, String header){//    public Export(RNAMovies movies) {
         super("Export...", "");
         this.movies = moviePane; //this.movies = movies;
+        this.header = this.prepareHeader(header);
     }
     
     @Override
@@ -97,6 +99,7 @@ public class Export extends MovieAction {
         }
         idx = 1; //since in VAMP we only want the fst frame //idx = movies.isRunning() ? 1 : movies.getFrameIdx() + 1;
         final int factor = 5; //to achieve satisfactory image resolution by default
+        chooser.setSelectedFile(new File(this.header));
         chooser.setAccessory(new ExportAccessory(chooser,idx, idx, movie.numFrames(),movie.getMaxWidth()*factor,movie.getMaxHeight()*factor));
         chooser.setFileFilter(new PNGFilter());
         chooser.setFileFilter(new JPGFilter());
@@ -449,6 +452,22 @@ public class Export extends MovieAction {
         ios.flush();
         writer.dispose();
         ios.close();
+    }
+
+    /**
+     * Guarantees that the header is usable as a filename and does not produce
+     * an error.
+     * @param header header string to be used as filename
+     * @return header usable as filename
+     */
+    private String prepareHeader(String header) {
+        if (header.contains(">>")){
+            header = header.replace(">>", "fwd");
+        } else
+        if (header.contains("<<")){
+            header = header.replace("<<", "rev");
+        }
+        return header;
     }
     
 //    private static class SVGFilter extends FileFilter {

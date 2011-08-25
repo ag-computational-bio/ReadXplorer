@@ -84,7 +84,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 if (selectedRows.length > 0) {
                     int correctedRow = featureTable.convertRowIndexToModel(selectedRows[0]);
                     PersistantFeature feature = (PersistantFeature) featureTable.getModel().getValueAt(correctedRow, 0);
-                    if (feature.getStrand() == 1){
+                    if (feature.getStrand() == 1) {
                         boundsManager.navigatorBarUpdated(feature.getStart());
                     } else {
                         boundsManager.navigatorBarUpdated(feature.getStop());
@@ -142,6 +142,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         radioProduct = new javax.swing.JRadioButton();
         radioEC = new javax.swing.JRadioButton();
         radioFeatureButton = new javax.swing.JRadioButton();
+        radioGene = new javax.swing.JRadioButton();
         tableScrollPane = new javax.swing.JScrollPane();
         featureTable = new javax.swing.JTable();
         searchPatternField = new javax.swing.JTextField();
@@ -205,6 +206,15 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         });
 
+        buttonGroup1.add(radioGene);
+        radioGene.setText("Gene");
+        radioGene.setActionCommand("ec");
+        radioGene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioGeneActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout filterPropertiesLayout = new javax.swing.GroupLayout(filterProperties);
         filterProperties.setLayout(filterPropertiesLayout);
         filterPropertiesLayout.setHorizontalGroup(
@@ -220,8 +230,10 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioProduct)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioEC))
-                    .addComponent(filterTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                        .addComponent(radioEC)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioGene))
+                    .addComponent(filterTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
                 .addContainerGap())
         );
         filterPropertiesLayout.setVerticalGroup(
@@ -235,7 +247,8 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addComponent(filterForLabel)
                     .addComponent(radioProduct)
                     .addComponent(radioEC)
-                    .addComponent(radioFeatureButton))
+                    .addComponent(radioFeatureButton)
+                    .addComponent(radioGene))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -245,15 +258,15 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
-            .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, 327, Short.MAX_VALUE)
+            .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
         );
         featureGroundPanelLayout.setVerticalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(featureGroundPanelLayout.createSequentialGroup()
-                .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE))
+                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
         );
 
         searchPatternField.addActionListener(new java.awt.event.ActionListener() {
@@ -285,8 +298,8 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addComponent(searchPatternButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jumpTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
-                    .addComponent(searchPatternField, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE))
+                    .addComponent(jumpTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                    .addComponent(searchPatternField, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))
                 .addContainerGap())
             .addComponent(featureGroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -345,26 +358,30 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     }//GEN-LAST:event_searchPatternFieldKeyTyped
 
     private void searchPatternButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternButtonActionPerformed
-        
+
         String pattern = this.searchPatternField.getText().toLowerCase();
-        if (this.isValidSearchInput(pattern)){
+        if (this.isValidSearchInput(pattern)) {
             int newPos;
-            
-            if (this.searchPattern != null && this.searchPattern.equals(pattern)){
-               newPos = this.viewer.getSequenceBar().findNextPatternOccurrence(); 
+
+            if (this.searchPattern != null && this.searchPattern.equals(pattern)) {
+                newPos = this.viewer.getSequenceBar().findNextPatternOccurrence();
             } else {
                 this.searchPattern = pattern;
                 newPos = this.viewer.getSequenceBar().setPattern(this.searchPattern);
-            }                
-            
+            }
+
             if (newPos > -1) {
                 this.boundsManager.navigatorBarUpdated(newPos);
             }
-            
+
         } else {
             JOptionPane.showMessageDialog(this, "Please enter a valid DNA string!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_searchPatternButtonActionPerformed
+
+private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioGeneActionPerformed
+    this.clearFilter();
+}//GEN-LAST:event_radioGeneActionPerformed
 
     /**
      * Cecks if the input string is a valid number in the range of the reference genome.
@@ -383,16 +400,15 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             return false;
         }
     }
-    
+
     /**
      * Cecks if the input string is a valid DNA string.
      * @param s input string to check
      * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
      */
-    private boolean isValidSearchInput(String s){
+    private boolean isValidSearchInput(String s) {
         return s.matches("[acgt]+");
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel featureGroundPanel;
@@ -405,6 +421,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private javax.swing.JTextField jumpTextfield;
     private javax.swing.JRadioButton radioEC;
     private javax.swing.JRadioButton radioFeatureButton;
+    private javax.swing.JRadioButton radioGene;
     private javax.swing.JRadioButton radioProduct;
     private javax.swing.JButton searchPatternButton;
     private javax.swing.JTextField searchPatternField;
@@ -419,17 +436,16 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
     private void fillFeatureList() {
         List<PersistantFeature> feat = refGenCon.getFeaturesForRegion(0, refGen.getSequence().length());
-        if (!feat.isEmpty()){
-            Collections.sort(feat, new FeatureNameSorter());
-            PersistantFeature[] featureData = feat.toArray(new PersistantFeature[0]);
 
-            //Create new Model for Table
-            featureTable.setModel(new FeatureTableModel(featureData));
-            featureTable.setRowSorter(new TableRowSorter<TableModel>(featureTable.getModel()));
-            featureTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-            updateFilter();
-        }
-        
+        Collections.sort(feat, new FeatureNameSorter());
+        PersistantFeature[] featureData = feat.toArray(new PersistantFeature[0]);
+
+        //Create new Model for Table
+        featureTable.setModel(new FeatureTableModel(featureData));
+        featureTable.setRowSorter(new TableRowSorter<TableModel>(featureTable.getModel()));
+        featureTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+        updateFilter();
+
     }
 
     /*
@@ -439,14 +455,14 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         RowFilter<TableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
-            if (radioFeatureButton.isSelected()){
+            if (radioFeatureButton.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 0);
-            } else
-            if (radioProduct.isSelected()) {
+            } else if (radioGene.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 1);
-            } else
-            if (radioEC.isSelected()) {
+            } else if (radioProduct.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 2);
+            } else if (radioEC.isSelected()){
+                rf = RowFilter.regexFilter(filterTextfield.getText(), 3);
             }
 
         } catch (java.util.regex.PatternSyntaxException e) {
@@ -467,7 +483,6 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         }
     }
 
-   
     void clearFilter() {
         this.filterTextfield.setText("");
         this.updateFilter();
@@ -483,7 +498,6 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         this.filterTextfield.addMouseListener(new StandardMenuEvent());
     }
 
-    
     private class FeatureNameSorter implements Comparator<PersistantFeature> {
 
         @Override
@@ -504,8 +518,8 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         }
     }
-    
-    public void setGenomeViewer(AbstractViewer viewer){
+
+    public void setGenomeViewer(AbstractViewer viewer) {
         this.viewer = viewer;
     }
 }

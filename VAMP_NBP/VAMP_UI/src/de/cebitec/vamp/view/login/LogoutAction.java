@@ -3,8 +3,10 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.view.Installer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -40,6 +42,9 @@ public final class LogoutAction implements ActionListener {
             if (ProjectConnector.getInstance().isConnected()){
                 ProjectConnector.getInstance().disconnect();
             }
+            //reset main window title
+            JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
+            mainFrame.setTitle(mainFrame.getTitle().substring(0, mainFrame.getTitle().indexOf('-')-1));
             CentralLookup.getDefault().remove(context);
         }
     }

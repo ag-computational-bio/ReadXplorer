@@ -150,7 +150,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         paintingAreaInfo.setPhyLeft(horizontalMargin);
         paintingAreaInfo.setPhyRight(this.getWidth()-1 - horizontalMargin);        
 
-        // if existant, leave space for sequence viewer
+        // if existent, leave space for sequence viewer
         if(this.seqBar != null){
             int y1 = this.getSize().height / 2 - seqBar.getSize().height / 2;
             int y2 = this.getSize().height / 2 + seqBar.getSize().height / 2;

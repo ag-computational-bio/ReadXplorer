@@ -76,9 +76,10 @@ public class SQLStatements {
             FieldNames.FEATURE_LOCUS+", " +
             FieldNames.FEATURE_PRODUCT+", " +
             FieldNames.FEATURE_ECNUM+", " +
-            FieldNames.FEATURE_STRAND+" "+
+            FieldNames.FEATURE_STRAND+", "+
+            FieldNames.FEATURE_GENE+" "+
             ") " +
-            "VALUES (?,?,?,?,?,?,?,?,?)";
+            "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
     public final static String INSERT_TRACK =
             "INSERT INTO "+FieldNames.TABLE_TRACKS+" " +
@@ -261,7 +262,7 @@ public class SQLStatements {
             "DELETE FROM "+
                 FieldNames.TABLE_COVERAGE+" " +
             "WHERE "+
-                FieldNames.COVERAGE_TRACK+" = ?";
+                FieldNames.COVERAGE_TRACK+" = ? ";
 
     
     public final static String DELETE_TRACK =
@@ -271,7 +272,14 @@ public class SQLStatements {
                 FieldNames.TRACK_ID+" = ? ";
     
     
-    public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete matepairs
+    public final static String DELETE_STATISTIC_FROM_TRACK =
+            "DELETE FROM "+
+                FieldNames.TABLE_STATISTICS+" " +
+            "WHERE " + 
+                FieldNames.STATISTICS_TRACK_ID+ " = ? ";
+    
+    
+    public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete seqpairs
             "DELETE FROM "+
                 FieldNames.TABLE_SEQ_PAIRS +" " +
             "WHERE " +
@@ -394,13 +402,15 @@ public class SQLStatements {
                 FieldNames.FEATURE_START+", "+
                 FieldNames.FEATURE_STOP+", "+
                 FieldNames.FEATURE_STRAND+", "+
-                FieldNames.FEATURE_TYPE+" " +
+                FieldNames.FEATURE_TYPE+", " +
+                FieldNames.FEATURE_GENE+" " +
             "FROM "+
                 FieldNames.TABLE_FEATURES+" " +
             "WHERE "+
                 FieldNames.FEATURE_REFGEN+" = ? and " +
                 FieldNames.FEATURE_STOP+" >= ? and " +
                 FieldNames.FEATURE_START+" <= ? ";
+    //TODO: improve with between here too!
 
 
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
@@ -440,8 +450,7 @@ public class SQLStatements {
                 "D."+FieldNames.DIFF_ORDER+", "+
                 "D."+FieldNames.DIFF_POSITION+", "+
                 "D."+FieldNames.DIFF_TYPE+" "+
-            "FROM " +
-                "(" +
+            "FROM (" +
                 "SELECT " +
                     FieldNames.MAPPING_ID+", "+
                     FieldNames.MAPPING_BEST_MAPPING+", "+
@@ -452,15 +461,27 @@ public class SQLStatements {
                     FieldNames.MAPPING_START+", "+
                     FieldNames.MAPPING_STOP+", "+
                     FieldNames.MAPPING_TRACK+" "+
-                "FROM "+
-                    FieldNames.TABLE_MAPPINGS +" "+
-                "WHERE " +
-                    FieldNames.MAPPING_TRACK+" = ? and  " +
-                    FieldNames.MAPPING_STOP+" >= ? and " +
-                    FieldNames.MAPPING_START+" <= ? " +
+                "FROM ( "+
+                    "SELECT " +
+                        FieldNames.MAPPING_ID+", "+
+                        FieldNames.MAPPING_BEST_MAPPING+", "+
+                        FieldNames.MAPPING_COUNT+", "+
+                        FieldNames.MAPPING_DIRECTION+", "+
+                        FieldNames.MAPPING_NUM_OF_ERRORS+", "+
+                        FieldNames.MAPPING_SEQUENCE_ID+", "+
+                        FieldNames.MAPPING_START+", "+
+                        FieldNames.MAPPING_STOP+", "+
+                        FieldNames.MAPPING_TRACK+" "+
+                   "FROM " +
+                        FieldNames.TABLE_MAPPINGS +" "+
+                    "WHERE " +
+                        FieldNames.MAPPING_START + " BETWEEN ? AND ? and " +
+                        FieldNames.MAPPING_STOP + " BETWEEN ? AND ? " +
+                    ") AS MM " +
+                    "WHERE " +
+                    FieldNames.MAPPING_TRACK+" = ? " +
                 ") AS M " +
-            "LEFT JOIN " +
-               "("
+            "LEFT JOIN ("
                + "SELECT "+
                FieldNames.DIFF_CHAR+", "+
                FieldNames.DIFF_ORDER+", "+
@@ -606,7 +627,7 @@ public class SQLStatements {
                 "D."+FieldNames.DIFF_TYPE+" = 1 and " +
                 "D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" and " +
                 "M."+FieldNames.MAPPING_TRACK+" = ?";
-
+    
 //    public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN =
 //            "SELECT " +
 //                "COUNT(S."+FieldNames.SEQUENCE_ID+") as NUM " +
@@ -946,5 +967,15 @@ public class SQLStatements {
    
    public static final String GET_LATEST_SEQUENCE_PAIR_PAIR_ID =
             "SELECT MAX("+FieldNames.SEQ_PAIR_PAIR_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_SEQ_PAIRS;
+   
+   public static final String GET_CURRENT_READLENGTH = 
+           "SELECT " + 
+                FieldNames.MAPPING_STOP + ", " +
+                FieldNames.MAPPING_START + " " +
+           "FROM " + 
+                FieldNames.TABLE_MAPPINGS +
+           " WHERE " +
+                FieldNames.MAPPING_TRACK + " = ? " +
+           " LIMIT 1 ";
    
 }

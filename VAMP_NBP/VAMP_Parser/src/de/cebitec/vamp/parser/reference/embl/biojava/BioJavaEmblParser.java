@@ -82,6 +82,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
                     int stop = 0;
                     int strand = 0;
                     String ecNumber = null;
+                    String geneName = null;
 
                     parsedType = f.getType();
                     start = f.getLocation().getMin();
@@ -125,6 +126,8 @@ public class BioJavaEmblParser implements ReferenceParserI {
                             product = value;
                         } else if(name.equals("EC_number")){
                             ecNumber = value;
+                        } else if(name.equals("gene")){
+                            geneName = value;
                         }
                     }
 
@@ -156,7 +159,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
                         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Found unknown feature {0}", parsedType);
                     }
 
-                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber));
+                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName));
 
                 }
                 }

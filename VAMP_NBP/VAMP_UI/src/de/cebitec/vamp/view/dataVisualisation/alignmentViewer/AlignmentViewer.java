@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 public class AlignmentViewer extends AbstractViewer {
 
     private static final long serialVersionUID = 234765253;
-    
     private static int height = 500;
     private TrackConnector trackConnector;
     private LayoutI layout;
@@ -35,7 +34,6 @@ public class AlignmentViewer extends AbstractViewer {
     private int layerHeight;
     private MappingExcusePanel mappingExcuse;
     private ZoomLevelExcusePanel zoomExcuse;
-
 //    private int minCountInInterval;
     private int maxCountInInterval;
     private int fwdMappingsInInterval;
@@ -44,8 +42,8 @@ public class AlignmentViewer extends AbstractViewer {
     private float minSaturationAndBrightness;
     private float maxSaturationAndBrightness;
     private float percentSandBPerCovUnit;
-    
-    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector){
+
+    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
@@ -67,34 +65,33 @@ public class AlignmentViewer extends AbstractViewer {
 
     @Override
     public void changeToolTipText(int logPos) {
-
     }
 
     @Override
     public void boundsChangedHook() {
 
-        if(isInMaxZoomLevel() && isActive()){
+        if (isInMaxZoomLevel() && isActive()) {
             setInDrawingMode(true);
         } else {
             setInDrawingMode(false);
         }
-     
+
         this.setupComponents();
     }
 
-    private void setupComponents(){
+    private void setupComponents() {
         this.removeAll();
 
-        if(isInMaxZoomLevel()){
+        if (isInMaxZoomLevel()) {
             // at least sufficient horizontal zoom level to show bases
 
-            if(isInDrawingMode()){
-                if(this.hasLegend()){
+            if (isInDrawingMode()) {
+                if (this.hasLegend()) {
                     this.add(this.getLegendLabel());
                     this.add(this.getLegendPanel());
                 }
                 // if a sequence viewer was set for this panel, add/show it
-                if(this.hasSequenceBar()){
+                if (this.hasSequenceBar()) {
                     this.add(this.getSequenceBar());
                 }
 
@@ -110,20 +107,20 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
 
-    private void placeExcusePanel(JPanel p){
+    private void placeExcusePanel(JPanel p) {
         // has to be checked for null because, this method may be called upon
         // initialization of this object (depending on behaviour of AbstractViewer)
         // BEFORE the panels are initialized!
-        if(p != null){
+        if (p != null) {
             int tmpWidth = p.getPreferredSize().width;
-            int x = this.getSize().width/2 - tmpWidth/2;
-            if(x<0){
+            int x = this.getSize().width / 2 - tmpWidth / 2;
+            if (x < 0) {
                 x = 0;
             }
 
             int tmpHeight = p.getPreferredSize().height;
-            int y = this.getSize().height /2 - tmpHeight / 2;
-            if(y<0){
+            int y = this.getSize().height / 2 - tmpHeight / 2;
+            if (y < 0) {
                 y = 0;
             }
             p.setBounds(x, y, tmpWidth, tmpHeight);
@@ -132,7 +129,7 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
 
-    private void createAndShowNewLayout(int from, int to){
+    private void createAndShowNewLayout(int from, int to) {
         Collection<PersistantMapping> mappings = trackConnector.getMappings(from, to);
         HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
         this.findMinAndMaxCount(mappings); //for currently shown mappings
@@ -140,6 +137,7 @@ public class AlignmentViewer extends AbstractViewer {
         this.setViewerHeight();
         layout = new Layout(from, to, mappings);
         this.addBlocks(layout);
+
     }
 
     /**
@@ -147,20 +145,20 @@ public class AlignmentViewer extends AbstractViewer {
      * Minimum count is currently disabled as it was not needed.
      * @param mappings 
      */
-    private void findMinAndMaxCount(Collection<PersistantMapping> mappings){
+    private void findMinAndMaxCount(Collection<PersistantMapping> mappings) {
 //        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
         this.maxCountInInterval = Integer.MIN_VALUE;
         this.fwdMappingsInInterval = 0;
 
-        for(PersistantMapping m : mappings){
+        for (PersistantMapping m : mappings) {
             int coverage = m.getCoverage();
 //            if(coverage < minCountInInterval){
 //                minCountInInterval = coverage;
 //            }
-            if(coverage > maxCountInInterval){
+            if (coverage > maxCountInInterval) {
                 maxCountInInterval = coverage;
             }
-            if (m.isForwardStrand()){
+            if (m.isForwardStrand()) {
                 ++this.fwdMappingsInInterval;
             }
         }
@@ -168,7 +166,7 @@ public class AlignmentViewer extends AbstractViewer {
 
         percentSandBPerCovUnit = (maxSaturationAndBrightness - minSaturationAndBrightness) / maxCountInInterval;
     }
-    
+
     /**
      * Determines maximum coverage in the currently displayed interval.
      * @param coverage  coverage hashmap of positions for current interval
@@ -186,7 +184,7 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
 
-    private void addBlocks(LayoutI layout){
+    private void addBlocks(LayoutI layout) {
         int layerCounter;
         int countingStep;
 
@@ -194,15 +192,15 @@ public class AlignmentViewer extends AbstractViewer {
         layerCounter = 1;
         countingStep = 1;
         Iterator<LayerI> it = layout.getForwardIterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             LayerI b = it.next();
             Iterator<BlockI> blockIt = b.getBlockIterator();
-            while(blockIt.hasNext()){
+            while (blockIt.hasNext()) {
                 BlockI block = blockIt.next();
                 this.createJBlock(block, layerCounter);
             }
 
-            layerCounter+= countingStep;
+            layerCounter += countingStep;
         }
 
 
@@ -210,15 +208,15 @@ public class AlignmentViewer extends AbstractViewer {
         layerCounter = -1;
         countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
-        while(itRev.hasNext()){
+        while (itRev.hasNext()) {
             LayerI b = itRev.next();
             Iterator<BlockI> blockIt = b.getBlockIterator();
-            while(blockIt.hasNext()){
+            while (blockIt.hasNext()) {
                 BlockI block = blockIt.next();
                 this.createJBlock(block, layerCounter);
             }
 
-            layerCounter+= countingStep;
+            layerCounter += countingStep;
         }
     }
 
@@ -227,21 +225,21 @@ public class AlignmentViewer extends AbstractViewer {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
 
-        if(isInDrawingMode()){
+        if (isInDrawingMode()) {
             g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
             drawBaseLines(g);
         }
     }
 
-    private void createJBlock(BlockI block, int layerCounter){
+    private void createJBlock(BlockI block, int layerCounter) {
         BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, minSaturationAndBrightness, percentSandBPerCovUnit);
 
         // negative layer counter means reverse strand
         int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
         int yPosition = lower - layerCounter * layerHeight;
-        if(layerCounter < 0 ){
+        if (layerCounter < 0) {
             // reverse/negative layer
-            yPosition -= jb.getHeight() /2;
+            yPosition -= jb.getHeight() / 2;
         } else {
             // forward/positive layer
             yPosition -= jb.getHeight() / 2;
@@ -251,16 +249,16 @@ public class AlignmentViewer extends AbstractViewer {
         this.add(jb);
     }
 
-    private void drawBaseLines(Graphics2D graphics){
+    private void drawBaseLines(Graphics2D graphics) {
         PaintingAreaInfo info = getPaintingAreaInfo();
         graphics.drawLine(info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow());
         graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
     }
 
     @Override
-    public int transformToLogicalCoord(int physPos){
+    public int transformToLogicalCoord(int physPos) {
         int logPos = super.transformToLogicalCoord(physPos);
-        if(isInDrawingMode()){
+        if (isInDrawingMode()) {
             int gapsSmaller = layout.getGenomeGapManager().getAccumulatedGapsSmallerThan(logPos);
             logPos -= gapsSmaller;
         }
@@ -269,10 +267,10 @@ public class AlignmentViewer extends AbstractViewer {
     }
 
     @Override
-    public double transformToPhysicalCoord(int logPos){
+    public double transformToPhysicalCoord(int logPos) {
 
         // if this viewer is operating in detail view mode, adjust logPos
-        if(layout != null && isInDrawingMode()){
+        if (layout != null && isInDrawingMode()) {
             int gapsSmaller = layout.getGenomeGapManager().getNumOfGapsSmaller(logPos);
             logPos += gapsSmaller;
         }
@@ -280,31 +278,30 @@ public class AlignmentViewer extends AbstractViewer {
     }
 
     @Override
-    public int getWidthOfMouseOverlay(int position){
+    public int getWidthOfMouseOverlay(int position) {
         PhysicalBaseBounds mouseAreaLeft = getPhysBoundariesForLogPos(position);
 
         int width = (int) mouseAreaLeft.getPhysWidth();
         // if currentPosition is a gap, the following bases to the right marks the same position!
         // situation may occur, that on startup no layout is computed but this methode is called, although
-        if(layout != null && layout.getGenomeGapManager().hasGapAt(position)){
-             width *= (layout.getGenomeGapManager().getNumOfGapsAt(position)+1);
+        if (layout != null && layout.getGenomeGapManager().hasGapAt(position)) {
+            width *= (layout.getGenomeGapManager().getNumOfGapsAt(position) + 1);
         }
         return width;
     }
 
-    public PersistantReference getRefGen(){
+    public PersistantReference getRefGen() {
         return refGen;
     }
 
-    
     /**
      * Adapts the height of the alignment viewer according to the content currently displayed.
      */
     private void setViewerHeight() {
-        
+
         int biggestCoverage = this.maxCoverageInInterval / 2;
         int biggerStrandCoverage = fwdMappingsInInterval > revMappingsInInterval ? fwdMappingsInInterval : revMappingsInInterval;
-        if (biggerStrandCoverage > biggestCoverage){
+        if (biggerStrandCoverage > biggestCoverage) {
             biggestCoverage = biggerStrandCoverage * 2; //to cover both halves
         }
         int newHeight = (int) (this.layerHeight * biggestCoverage * 1.5); //1.5 = factor for possible empty spacings between alignments
@@ -312,5 +309,4 @@ public class AlignmentViewer extends AbstractViewer {
         this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));
         this.revalidate();
     }
-
 }
