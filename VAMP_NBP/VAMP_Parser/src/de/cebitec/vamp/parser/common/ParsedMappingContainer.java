@@ -10,14 +10,15 @@ import java.util.List;
 
 /**
  * Container for all mappings belonging to one track. Contains statistics as well
- * as a HashMap with all mappings.
+ * as a all mappings.
  *
  * @author ddoppmeier
  */
 public class ParsedMappingContainer implements Observable, Observer {
-    private int noOfMappings = 0;
+    private int numOfMappings = 0;
     private int numUniqueSeq ;
     private int numUniqueMappings;
+    private int numReads;
     private boolean hasNewRead;
     private HashMap<Integer, ParsedMappingGroup> mappings;
     private ArrayList<Observer> observers;
@@ -31,7 +32,7 @@ public class ParsedMappingContainer implements Observable, Observer {
     }
 
     public void addParsedMapping(ParsedMapping mapping, int sequenceID){
-        noOfMappings++;
+        numOfMappings++;
         if(!mappings.containsKey(sequenceID)){
             ParsedMappingGroup mappingGroup = new ParsedMappingGroup();
             mappingGroup.registerObserver(this); //need this to check for new reads
@@ -52,10 +53,12 @@ public class ParsedMappingContainer implements Observable, Observer {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
         int numberOfBM = 0;
         int numberOfPerfect = 0;
-        //is the number of unique Mapped Sequences
-        int numberOfMappedSeq = mappings.size();
         //the number of created Mappings by the mapper
         int numberOfMappings = 0;
+        int numSeqPairs = 0;
+        int numPerfSeqPairs = 0;
+        int numUniqueSeqPairs = 0;
+        int numUniquePerfSeqPairs = 0;
 
         Collection<ParsedMappingGroup> groups = mappings.values();
         Iterator<ParsedMappingGroup> it = groups.iterator();
@@ -79,9 +82,13 @@ public class ParsedMappingContainer implements Observable, Observer {
         mappingInfos.put(1, numberOfMappings);
         mappingInfos.put(2, numberOfPerfect);
         mappingInfos.put(3, numberOfBM);
-        mappingInfos.put(4, numberOfMappedSeq);
-        mappingInfos.put(5, numUniqueMappings);
-        mappingInfos.put(6, numUniqueSeq);
+        mappingInfos.put(4, numUniqueMappings);
+        mappingInfos.put(5, numUniqueSeq);
+        mappingInfos.put(6, numReads);
+        mappingInfos.put(7, numSeqPairs);
+        mappingInfos.put(8, numPerfSeqPairs);
+        mappingInfos.put(9, numUniqueSeqPairs);
+        mappingInfos.put(10, numUniquePerfSeqPairs);
 
         return mappingInfos;
     }
@@ -96,6 +103,10 @@ public class ParsedMappingContainer implements Observable, Observer {
 
     public void setNumberOfUniqueSeq(int numUniqueSeq) {
         this.numUniqueSeq = numUniqueSeq;
+    }
+
+    public void setNumberOfReads(int numberOfReads) {
+        this.numReads = numberOfReads;
     }
 
     @Override

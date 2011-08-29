@@ -34,7 +34,7 @@ public final class GeneticCodesStore {
     };
 
     private static final String[][] START_CODONS = {
-/*1*/       { "TTG", "CTG", "ATG" },
+/*1*/       { "ATG", "GTG", "TTG" },
 /*2*/       { "ATT", "ATC", "ATA", "ATG", "GTG" },
 /*3*/       { "ATA", "ATG" },
 /*4*/       { "TTA", "TTG", "CTG", "ATT", "ATC", "ATA", "ATG", "GTG" },
@@ -105,5 +105,34 @@ public final class GeneticCodesStore {
      */
     public static String[][] getStartCodons(){
         return GeneticCodesStore.START_CODONS.clone();
+    }
+    
+    /**
+     * @return The size of the genetic code array.
+     */
+    public static int getGeneticCodesStoreSize(){
+        return GeneticCodesStore.IDENTIFIERS.length;
+    }
+    
+    /**
+     * Parses custom codons of a line defined by the "wantedIndex" into an array of Strings. 
+     * Each codon is one entry in the resulting array.
+     * @param wantedIndex index of the line containing the wanted codons
+     * @param customCodonString string containing the codons inbetween '(' & ')' and
+     * seperated by a ',', e.g. (AGT, AGG)
+     * @return array containing the wanted codons
+     */
+    public static String[] parseCustomCodons(int wantedIndex, String customCodonString) {
+        int index = GeneticCodesStore.getGeneticCodesStoreSize()+1;
+        while (index++ <= wantedIndex){
+            customCodonString = customCodonString.substring(customCodonString.indexOf("\n")+1, customCodonString.length());
+        }        
+        int startIndex = customCodonString.startsWith("\n") ? 2 : 1;
+        String codons = customCodonString.substring(startIndex, customCodonString.indexOf(')'));
+        String[] splittedCodons = codons.split(",");
+        for (int i = 0; i < splittedCodons.length; ++i) {
+            splittedCodons[i] = splittedCodons[i].toUpperCase().trim(); //to assure correct format
+        }
+        return splittedCodons;
     }
 }

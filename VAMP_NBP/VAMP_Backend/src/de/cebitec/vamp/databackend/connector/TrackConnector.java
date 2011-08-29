@@ -3,7 +3,7 @@ package de.cebitec.vamp.databackend.connector;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.FieldNames;
-import de.cebitec.vamp.databackend.H2SQLStatements;
+
 import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
@@ -12,7 +12,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 //import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.api.objects.Snp454;
-import de.cebitec.vamp.databackend.MySQLStatements;
+import de.cebitec.vamp.databackend.GenericSQLQueries;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -114,7 +114,7 @@ public class TrackConnector implements ITrackConnector{
         HashMap<Integer, PersistantMapping> mappings = new HashMap<Integer, PersistantMapping>();
 
         try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
             fetch.setLong(1, trackID);
             fetch.setInt(2, from);
             fetch.setInt(3, to);
@@ -125,7 +125,7 @@ public class TrackConnector implements ITrackConnector{
             while (rs.next()) {
                 // mapping data
                 int mappingID = rs.getInt(FieldNames.MAPPING_ID);
-                int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE);
+                int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
                 int mappingTrack = rs.getInt(FieldNames.MAPPING_TRACK);
                 int start = rs.getInt(FieldNames.MAPPING_START);
                 int stop = rs.getInt(FieldNames.MAPPING_STOP);
@@ -175,7 +175,7 @@ public class TrackConnector implements ITrackConnector{
     }
 
     @Override
-    public Collection<PersistantDiff> getDiffsForIntervall(int from, int to) {
+    public Collection<PersistantDiff> getDiffsForInterval(int from, int to) {
         
         ArrayList<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
         try {
@@ -204,7 +204,7 @@ public class TrackConnector implements ITrackConnector{
     }
 
     @Override
-    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to) {
+    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervalOrderedByMappingID(int from, int to) {
    
         Collection<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
         try {
@@ -233,264 +233,169 @@ public class TrackConnector implements ITrackConnector{
 
     @Override
     public int getNumOfReads(){
-        int num = 0;
-
-        try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if(rs.next()){
-                num = rs.getInt("NUM");
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
+    
 
     @Override
-        public int getNumOfReadsCalculate(){
-        int num = 0;
-
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE);
-            fetch.setLong(1, this.trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if(rs.next()){
-                num = rs.getInt("NUM");
-            }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+    public int getNumOfReadsCalculate() {
+        //return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, con, trackID);
+        return 0; //TODO: implement calc number of reads
     }
 
     @Override
     public int getNumOfUniqueSequences(){
-        int num = 0;
-        try {
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if(rs.next()){
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
-
-    /**
-     * Updates the values for number of reads and number of unique sequences
-     * in the statics table of the database.
-     * @param numOfReads calculated total number of reads
-     * @param numOfUniqueSeq calculated total number of unique sequences
-     */
     @Override
-    public void updateTableStatics(int numOfReads, int numOfUniqueSeq){
-      try {
-            con.setAutoCommit(false);
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.UPDATE_STATIC_VALUES);
-            fetch.setInt(1, numOfReads);
-            fetch.setInt(2, numOfUniqueSeq);
-            fetch.setLong(3, trackID);
-            fetch.execute();
-            con.commit();
-            con.setAutoCommit(true);
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-//    @Override //doesnt exist anymore in ITrackConnector
-//    public int getNumOfMappedSequences() {
-//        int num = 0;
-//        PreparedStatement fetch;
-//        try {
-//            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-//                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK);
-//            } else {
-//                fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK);
-//            }
-//            fetch.setLong(1, trackID);
-//
-//            ResultSet rs = fetch.executeQuery();
-//            if (rs.next()) {
-//                num = rs.getInt("NUM");
-//            }
-//        } catch (SQLException ex) {
-//            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//        return num;
-//    }
-
-    @Override
-        public int getNumOfUniqueSequencesCalculate() {
-        int num = 0;
-        PreparedStatement fetch;
-        try {
-
-            fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+    public int getNumOfUniqueSequencesCalculate() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfUniqueBmMappings() {
-
-        int numOfBmMappings = 0;
-        PreparedStatement fetch;
-        try {
-            if (con.getMetaData().getDatabaseProductName().contains("MySQL")) {
-
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK);
-            } else {
-                fetch = con.prepareStatement(H2SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK);
-            }
-            fetch.setLong(1, trackID);
-
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                numOfBmMappings = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return numOfBmMappings;
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
-        public int getNumOfUniqueBmMappingsCalculate() {
-
-        int numOfBmMappings = 0;
-        PreparedStatement fetch;
-        try {
-
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE);
-
-            fetch.setLong(1, trackID);
-
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                numOfBmMappings = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return numOfBmMappings;
+    public int getNumOfUniqueBmMappingsCalculate() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
 
 
     @Override
     public int getNumOfMappings() {
-        int num = 0;
-        PreparedStatement fetch;
-        try {
-       
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
-        public int getNumOfMappingsCalculate() {
-        int num = 0;
-        PreparedStatement fetch;
-        try {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE);//FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE);
-                fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+    public int getNumOfMappingsCalculate() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
 
     @Override
     public int getNumOfUniqueMappings(){
-        int num = 0;
-        PreparedStatement fetch;
-        try {
-            fetch = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
     
     @Override
     public int getNumOfUniqueMappingsCalculate(){
-        int num = 0;
-        PreparedStatement fetch;
-        try {
-                fetch = con.prepareStatement(MySQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE);
-            fetch.setLong(1, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfPerfectSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfUniqueSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    @Override
+    public int getNumOfUniquePerfectSeqPairs(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_PERFECT_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
 
+    
+    @Override
+    public int getNumOfPerfectUniqueMappings() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
+
+    
+    @Override
+    public int getNumOfPerfectUniqueMappingsCalculate() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    
+    @Override
+    public double getPercentRefGenPerfectCovered() {
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        return absValue / genomeSize * 100;
+    }
+    
+    
+    @Override
+    public double getPercentRefGenPerfectCoveredCalculate() {
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
+        return absValue / genomeSize * 100;
+
+    }
+
+    
+    @Override
+    public double getPercentRefGenBmCovered() {
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        return absValue / genomeSize * 100;
+    }
+
+    
+    @Override
+    public double getPercentRefGenBmCoveredCalculate() {
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
+        return absValue / genomeSize * 100;
+    }
+
+    
+    @Override
+    public double getPercentRefGenNErrorCovered() {
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        return absValue / genomeSize * 100;
+    }
+
+    
+    @Override
+    public double getPercentRefGenNErrorCoveredCalculate() {
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_COVERED, con, trackID);
+        return absValue / genomeSize * 100;
+    }
+    
+    
+    @Override
+    public HashMap<Integer, Integer> getCoverageInfosOfTrack(int from, int to) {
+        PreparedStatement fetch;
+        HashMap<Integer, Integer> positionMap = new HashMap<Integer, Integer>();
+        int coverage;
+        int position;
+        try {
+
+            fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
+
+            fetch.setLong(1, trackID);
+            fetch.setLong(2, from);
+            fetch.setLong(3, to);
             ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
+            while (rs.next()) {
+                position = rs.getInt(FieldNames.COVERAGE_POSITION);
+                coverage = rs.getInt(FieldNames.COVERAGE_N_MULT);
+                positionMap.put(position, coverage);
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return num;
+        return positionMap;
     }
 
-
+    
+    
 
     @Override
-    public void setStatics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete) {
+    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings, 
+            int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete, int numReads, 
+            int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
-            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
-            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATICS_ID);
+            PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
+            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
 
             // get latest id for track
             long id = 0;
@@ -500,22 +405,27 @@ public class TrackConnector implements ITrackConnector{
             }
             id++;
             int covPerf = (int) (coveragePerf / 100 * genomeSize);
-             int covBM = (int) (coverageBM / 100 * genomeSize);
-              int covComplete = (int) (coverageComplete/ 100 * genomeSize);
+            int covBM = (int) (coverageBM / 100 * genomeSize);
+            int covComplete = (int) (coverageComplete/ 100 * genomeSize);
             // store track in table
-            insertStatics.setLong(1, id);
-            insertStatics.setLong(2, trackID);
-            insertStatics.setInt(3, numMappings);
-            insertStatics.setInt(4, numPerfectMappings);
-            insertStatics.setInt(5, numBestMatchMappings);
-            insertStatics.setInt(6, numUniqueMappings);
-            insertStatics.setInt(7, covPerf);
-            insertStatics.setInt(8, covBM);
-            insertStatics.setInt(9, covComplete);
-            insertStatics.setInt(10, numUniqueSeq);
-            insertStatics.execute();
+            insertStatistics.setLong(1, id);
+            insertStatistics.setLong(2, trackID);
+            insertStatistics.setInt(3, numMappings);
+            insertStatistics.setInt(4, numPerfectMappings);
+            insertStatistics.setInt(5, numBestMatchMappings);
+            insertStatistics.setInt(6, numUniqueMappings);
+            insertStatistics.setInt(7, covPerf);
+            insertStatistics.setInt(8, covBM);
+            insertStatistics.setInt(9, covComplete);
+            insertStatistics.setInt(10, numUniqueSeq);
+            insertStatistics.setInt(11, numReads);
+            insertStatistics.setInt(12, numSeqPairs);
+            insertStatistics.setInt(13, numPerfectSeqPairs);
+            insertStatistics.setInt(14, numUniqueSeqPairs);
+            insertStatistics.setInt(15, numUniquePerfectSeqPairs);
+            insertStatistics.execute();
 
-            insertStatics.close();
+            insertStatistics.close();
             latestID.close();
 
         } catch (SQLException ex) {
@@ -525,48 +435,6 @@ public class TrackConnector implements ITrackConnector{
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
 
         }
-
-    @Override
-    public int getNumOfPerfectUniqueMappings() {
-        int num = 0;
-        PreparedStatement fetch;
-
-        try {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK);
-            
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
-    }
-
-    @Override
-        public int getNumOfPerfectUniqueMappingsCalculate() {
-        int num = 0;
-        PreparedStatement fetch;
-
-        try {
-                fetch = con.prepareStatement(MySQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE);
-
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                num = rs.getInt("NUM");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return num;
-    }
 
 //    @Override
 //    public long getRunId() {
@@ -748,7 +616,7 @@ public class TrackConnector implements ITrackConnector{
             //Die Coverage der naechsten 5 Basen links und rechts des SNPs wird verglichen
             int fromPos = ((position - 5) < 0) ? 0 : (position - 5);
             int toPos = ((position + 5)  > this.genomeSize) ? this.genomeSize : (position + 5);
-            PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
             fetch.setLong(3, trackID);
             fetch.setLong(1, fromPos);
             fetch.setLong(2, toPos);
@@ -816,7 +684,7 @@ public class TrackConnector implements ITrackConnector{
         try {
             while (genomeSize > fromDiff) {
             //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
-                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
                 fetch.setLong(1, trackID);
                 fetch.setLong(2, fromMapping);
                 fetch.setLong(3, toMapping);
@@ -880,7 +748,7 @@ public class TrackConnector implements ITrackConnector{
         try {
             while (genomeSize > fromDiff) {
             //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
-                PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
                 fetch.setLong(1, trackID);
                 fetch.setLong(2, fromMapping);
                 fetch.setLong(3, toMapping);
@@ -943,7 +811,7 @@ public class TrackConnector implements ITrackConnector{
 
             ResultSet rs = fetch.executeQuery();
             if (rs.next()) {
-                refGenID = rs.getInt(FieldNames.TRACK_REFGEN);
+                refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -978,7 +846,7 @@ public class TrackConnector implements ITrackConnector{
 
             ResultSet rs = fetch.executeQuery();
             if (rs.next()) {
-                refGenID = rs.getInt(FieldNames.TRACK_REFGEN);
+                refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -1001,169 +869,28 @@ public class TrackConnector implements ITrackConnector{
     }
 
     @Override
-    public double getPercentRefGenPerfectCovered() {
-        double percentage = 0;
-        double absValue = 0;
-        PreparedStatement fetch;
-        try {
-                fetch = con.prepareStatement(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME);
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                absValue = rs.getInt("COVERED");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        percentage = absValue / genomeSize * 100;
-        return percentage;
-
-    }
-    @Override
- public double getPercentRefGenPerfectCoveredCalculate() {
-        double percentage = 0;
-        double absValue = 0;
-        PreparedStatement fetch;
-        try {   
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK);
-
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                absValue = rs.getInt("COVERED");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        percentage = absValue / genomeSize * 100;
-        return percentage;
-
-    }
-
-
-    @Override
-    public double getPercentRefGenBmCovered() {
-        double percentage = 0;
-        double absValue = 0;
-        PreparedStatement fetch;
-        try {
-    
-                fetch = con.prepareStatement(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME);
-
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                absValue = rs.getInt("COVERED");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      
-        percentage = absValue / genomeSize * 100;
-        return percentage;
-    }
-
-    @Override
-        public double getPercentRefGenBmCoveredCalculate() {
-        double percentage = 0;
-        double absValue = 0;
-        PreparedStatement fetch;
-        try {
-                fetch = con.prepareStatement(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK);
-
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                absValue = rs.getInt("COVERED");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        percentage = absValue / genomeSize * 100;
-        return percentage;
-    }
-
-    @Override
-    public double getPercentRefGenNErrorCovered() {
-        double percentage = 0;
-        double absValue = 0;
-        PreparedStatement fetch;
-        try {
-
-                fetch = con.prepareStatement(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME);
-            
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                absValue = rs.getInt("COVERED");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        percentage = absValue / genomeSize * 100;
-        return percentage;
-    }
-
-    @Override
-        public double getPercentRefGenNErrorCoveredCalculate() {
-        double percentage = 0;
-        double absValue = 0;
-        PreparedStatement fetch;
-        try {
-
-          fetch = con.prepareStatement(SQLStatements.FETCH_NUM_COVERED_POSITIONS);
-
-            fetch.setLong(1, trackID);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                absValue = rs.getInt("COVERED");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        percentage = absValue / genomeSize * 100;
-        return percentage;
-    }
-
-    @Override
-        public HashMap<Integer,Integer> getCoverageInfosofTrack(int from , int to){
-            PreparedStatement fetch;
-            HashMap<Integer,Integer> positionMap = new HashMap<Integer,Integer>();
-            int coverage;
-            int position;
-        try {
-
-          fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
-
-            fetch.setLong(1, trackID);
-            fetch.setLong(2, from);
-            fetch.setLong(3, to);
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                position = rs.getInt(FieldNames.COVERAGE_POSITION);
-                coverage = rs.getInt(FieldNames.COVERAGE_N_MULT);
-                positionMap.put(position,coverage);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return positionMap;
-        }
-
-    @Override
     public CoverageThread getThread() {
         return this.thread;
+    }
+
+    @Override
+    public int getNumOfSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getNumOfPerfectSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getNumOfUniqueSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getNumOfUniquePerfectSeqPairsCalculate() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

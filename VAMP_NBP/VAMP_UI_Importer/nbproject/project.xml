@@ -104,7 +104,10 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>de.cebitec.vamp.ui.importer</package>
+                <package>de.cebitec.vamp.ui.importer.actions</package>
+            </public-packages>
         </data>
     </configuration>
 </project>

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 
 /**
@@ -32,6 +33,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private JPanel centerPanel;
     private AdjustmentPanel adjustmentPanelHorizontal;
     private Component topPanel;
+    private JScrollPane centerScrollpane;
 
     public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
         super();
@@ -100,12 +102,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
         
-        if(viewer instanceof ReferenceViewer){
-              JPanel p = new JPanel();
-              p.add(new JLabel(" "));
-              p.setLayout(new FlowLayout(FlowLayout.LEFT));
-            centerPanel.add(p, BorderLayout.WEST);
-        }
+        this.addPlaceholder();
         this.updateSize();
     }
 
@@ -113,6 +110,36 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.adjustmentPanelHorizontal = adjustmentPanel;
         centerPanel.add(adjustmentPanel, BorderLayout.NORTH);
         this.updateSize();
+    }
+    
+    /**
+     * Adds a viewer in a scrollpane allowing for vertical scrolling.
+     * Horizontal scrolling is only available by "setHorizontalAdjustmentPanel".
+     * @param viewer viewer to set
+     */
+    public void setViewerInScrollpane(AbstractViewer viewer){
+        this.viewer = viewer;
+        this.boundsManager.addBoundsListener(viewer);
+        this.currentMousePosListeners.add(viewer);
+        this.centerScrollpane = new JScrollPane(this.viewer);
+        this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
+        
+        this.addPlaceholder();
+        this.updateSize();
+        
+    }
+    
+    /**
+     * Adds a placeholder in case this viewer is a ReferenceViewer
+     */
+    private void addPlaceholder() {
+        if (viewer instanceof ReferenceViewer) {
+            JPanel p = new JPanel();
+            p.add(new JLabel(" "));
+            p.setLayout(new FlowLayout(FlowLayout.LEFT));
+            centerPanel.add(p, BorderLayout.WEST);
+        }
     }
 
     public void setTopInfoPanel(MousePositionListener infoPanel){

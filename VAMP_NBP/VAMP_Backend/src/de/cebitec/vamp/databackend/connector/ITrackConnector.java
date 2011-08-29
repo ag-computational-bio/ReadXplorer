@@ -24,24 +24,12 @@ public interface ITrackConnector {
 
     public void addCoverageRequest(CoverageRequest request);
 
-    public Collection<PersistantDiff> getDiffsForIntervall(int from, int to);
+    public Collection<PersistantDiff> getDiffsForInterval(int from, int to);
 
-    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to);
+    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervalOrderedByMappingID(int from, int to);
 
-    public void updateTableStatics(int numOfReads, int numOfUniqueSeq);
-
-    /**
-     * @return
-     * @deprecated Since the RUN domain has been excluded from vamp
-     */
-    @Deprecated
     public int getNumOfReads();
 
-    /**
-     * @return 
-     * @deprecated Since the RUN domain has been excluded from vamp
-     */
-    @Deprecated
     public int getNumOfReadsCalculate();
 
     public int getNumOfMappings();
@@ -63,10 +51,27 @@ public interface ITrackConnector {
     public int getNumOfUniqueBmMappings();
 
     public int getNumOfUniqueBmMappingsCalculate();
+    
+    public int getNumOfSeqPairs();
+    
+    public int getNumOfSeqPairsCalculate();
+    
+    public int getNumOfPerfectSeqPairs();
+    
+    public int getNumOfPerfectSeqPairsCalculate();
+    
+    public int getNumOfUniqueSeqPairs();
+    
+    public int getNumOfUniqueSeqPairsCalculate();
 
-    public void setStatics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
+    public int getNumOfUniquePerfectSeqPairs();
+    
+    public int getNumOfUniquePerfectSeqPairsCalculate();
+    
+    public void setStatistics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
                             int numPerfectMappings, int numBestMatchMappings, double coveragePerf,
-                            double coverageBM, double coverageComplete);
+                            double coverageBM, double coverageComplete, int numReads, int numSeqPairs, 
+                            int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs);
 
     //public long getRunId();
     public long getTrackID();
@@ -107,5 +112,5 @@ public interface ITrackConnector {
 
     public double getPercentRefGenNErrorCoveredCalculate();
 
-    public HashMap<Integer, Integer> getCoverageInfosofTrack(int from, int to);
+    public HashMap<Integer, Integer> getCoverageInfosOfTrack(int from, int to);
 }

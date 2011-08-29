@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -37,9 +38,9 @@ public class JokParser implements MappingParserI, Observer {
     private String errorMsg;
     private int noUniqueMappings;
 
+
     public JokParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
-        this.seqToIDMap = new HashMap<String, Integer>();
         this.observers = new ArrayList<Observer>();
     }
 
@@ -48,6 +49,7 @@ public class JokParser implements MappingParserI, Observer {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.registerObserver(this);
+        this.seqToIDMap = new HashMap<String, Integer>();
         //  ParsedRun run = new ParsedRun("");
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -95,13 +97,21 @@ public class JokParser implements MappingParserI, Observer {
                     }
                     String readSeq = tokens[4];
                     String refSeq = tokens[5];
-                    int errors = Integer.parseInt(tokens[6]);
+                    int errors;
+                    try {
+                        errors = Integer.parseInt(tokens[6]);
+                    } catch (NumberFormatException e) {
+                        this.sendErrorMsg("Value for current errors in "
+                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number. "
+                                + "Found error: " + tokens[2]);
+                        continue;
+                    }
                     // check tokens
                     // report empty mappings saruman should not be producing anymore
                     if (readname == null || readname.isEmpty()) {
                         this.sendErrorMsg("Could not read readname in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found read name: " + readname);
+                                + "Found read name: '" + readname + "'");
                         continue;
 
                     }
@@ -120,13 +130,13 @@ public class JokParser implements MappingParserI, Observer {
                     if (readSeq == null || readSeq.isEmpty()) {
                         this.sendErrorMsg("Read sequence could not be parsed in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found: " + readSeq + tokens.length);
+                                + "Found: '" + readSeq +"'");
                         continue;
                     }
                     if (refSeq == null || refSeq.isEmpty()) {
                         this.sendErrorMsg("Reference sequence could not be parsed in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found: " + refSeq);
+                                + "Found: '" + refSeq + "'");
                         continue;
                     }
                     if (readSeq.length() != refSeq.length() && !refSeq.equals(("*"))) {
@@ -145,7 +155,7 @@ public class JokParser implements MappingParserI, Observer {
 //                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
 //                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
 //                                + "Please make sure you are referencing the correct read data set!");
-//                        readErroneous = true;
+//                        continue;
 //                    }
 
 
@@ -169,8 +179,9 @@ public class JokParser implements MappingParserI, Observer {
                         this.seqToIDMap.put(readSeq, seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
+                    this.processReadname(seqID, readname);
                 } else {
-                    this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
+                    this.sendErrorMsg("The current read in line " + lineno + " is missing some data: ".concat(line));
                 }
             }
 //            Iterator<Integer> it = readnameToSequenceID.values().iterator();
@@ -180,19 +191,19 @@ public class JokParser implements MappingParserI, Observer {
 //                s.add(i);
 //            }
 //            // it.remove();
-//            //Data for statics no of reads and number of unique reads
-//            int noOfReads = readnameToSequenceID.keySet().size();
-//            int noOfUniqueSeq = s.size();
 
             mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
-            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
+            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq); // = mappingContainer.mappings.size()
 //            s.clear();
-//            readnameToSequenceID.clear();
             br.close();
+            
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueSeq});
-
+            
         } catch (IOException ex) {
             throw new ParsingException(ex);
+        }
+        if (mappingContainer.getMappedSequenceIDs().isEmpty()){ //if track does not contain any reads
+            throw new ParsingException(NbBundle.getMessage(JokParser.class, "Parser.Empty.Track.Error"));
         }
 
         this.seqToIDMap = null; //release resources
@@ -200,6 +211,7 @@ public class JokParser implements MappingParserI, Observer {
         return mappingContainer;
     }
 
+    
     private int getOrderForGap(int gapPos) {
         if (!gapOrderIndex.containsKey(gapPos)) {
             gapOrderIndex.put(gapPos, 0);
@@ -212,6 +224,7 @@ public class JokParser implements MappingParserI, Observer {
         return order;
     }
 
+    
     private DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
         List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
         List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
@@ -349,5 +362,11 @@ public class JokParser implements MappingParserI, Observer {
             ++this.noUniqueMappings;
         }
     }
+
+    @Override
+    public void processReadname(final int seqID, final String readName) {
+//        //TODO: count reads
+    }
+    
     
 }

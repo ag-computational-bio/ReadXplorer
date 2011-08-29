@@ -25,7 +25,9 @@ public class RNAFoldCaller {
      * Calls http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html with the given string
      * and returns the result string of the program.
      * @param selSequence the sequence to start RNA folder with
-     * @throws MalformedURLException
+     * @param header header string for the query
+     * @return the resulting folded rna string
+     * @throws RNAFoldException
      */
     @SuppressWarnings("SleepWhileHoldingLock")
     public static String callRNAFolder(String selSequence, String header) throws RNAFoldException {

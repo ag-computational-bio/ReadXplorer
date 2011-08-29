@@ -1,12 +1,15 @@
 package de.cebitec.vamp.tools.rnaFolder;
 
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.MoviePane;
+import de.cebitec.vamp.tools.rnaFolder.rnamovies.actions.Export;
 import de.cebitec.vamp.util.TabWithCloseX;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.JTabbedPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
@@ -21,6 +24,8 @@ public final class RNAFolderTopComponent extends TopComponent {
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "RNAFolderTopComponent";
+    
+    List<MoviePane> rnaMovieList = new ArrayList<MoviePane>();
 
     public RNAFolderTopComponent() {
         initComponents();
@@ -40,23 +45,43 @@ public final class RNAFolderTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        rnaTabbedPane = new javax.swing.JTabbedPane();
+        rnaTabbedPane = new JTabbedPaneWithNewRemoveAction();
+        exportButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+
+        org.openide.awt.Mnemonics.setLocalizedText(exportButton, org.openide.util.NbBundle.getMessage(RNAFolderTopComponent.class, "RNAFolderTopComponent.exportButton.text")); // NOI18N
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(exportButton)
+                .addContainerGap())
             .addComponent(rnaTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(rnaTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(exportButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rnaTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+        Export exportAction = new Export((MoviePane) this.rnaTabbedPane.getSelectedComponent());
+        exportAction.actionPerformed(evt);
+    }//GEN-LAST:event_exportButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton exportButton;
     private javax.swing.JTabbedPane rnaTabbedPane;
     // End of variables declaration//GEN-END:variables
     /**
@@ -97,12 +122,15 @@ public final class RNAFolderTopComponent extends TopComponent {
 
     @Override
     public void componentOpened() {
-        //Nothing to do right now
+        if (this.rnaMovieList.isEmpty()){
+            this.exportButton.setEnabled(false);
+        }
     }
 
     @Override
     public void componentClosed() {
         this.rnaTabbedPane.removeAll();
+        this.exportButton.setEnabled(false);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -143,5 +171,41 @@ public final class RNAFolderTopComponent extends TopComponent {
         this.requestActive();
         this.validate();
         rnaMovie.zoomFit();
+        this.updateExportButton();
+    }
+
+    /**
+     * Checks whether the export button should be activated or not.
+     */
+    private void updateExportButton() {
+        if (this.rnaTabbedPane.getTabCount() > 0){
+            this.exportButton.setEnabled(true);
+        } else {
+            this.exportButton.setEnabled(false);
+        }
+    }
+    
+    /**
+     * Tabbed pane with additional functionality. When a tab is closed with remove(index)
+     * it also removes the corresponding movie from the movie list.
+     */
+    private class JTabbedPaneWithNewRemoveAction extends JTabbedPane {
+        
+        /**
+         * Removes the tab and component which corresponds to the specified index.
+         * Additionally removes the closed rnaMovie from the list of movies.
+         *
+         * @param index the index of the component to remove from the 
+         *          <code>tabbedpane</code>
+         * @exception IndexOutOfBoundsException if index is out of range 
+         *            (index < 0 || index >= tab count)
+         * @see #addTab
+         * @see #removeTabAt  
+         */
+        @Override
+        public void remove(int index) {
+            removeTabAt(index);
+            RNAFolderTopComponent.this.updateExportButton();            
+        }
     }
 }

@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
+import org.openide.util.NbBundle;
 
 /**
  * 
@@ -33,6 +34,7 @@ public class BAMParser implements MappingParserI, Observer {
     private int errors = 0;
     private HashMap<String, String> mappedRefAndReadPlusGaps = new HashMap<String, String>();
     private HashMap<String, Integer> seqToIDMap;
+    private ArrayList<String> readnames;
 
     private ArrayList<Observer> observers;
     private String errorMsg;
@@ -42,6 +44,7 @@ public class BAMParser implements MappingParserI, Observer {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
         this.seqToIDMap = new HashMap<String, Integer>();
         this.observers = new ArrayList<Observer>();
+        this.readnames = new ArrayList<String>();
     }
 
     @Override
@@ -59,6 +62,7 @@ public class BAMParser implements MappingParserI, Observer {
         String refSeqwithoutgaps = null;
         noUniqueMappings = 0;
         int noUniqueReads = 0;
+        int counterUnmapped = 0;
 
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.registerObserver(this);
@@ -66,8 +70,12 @@ public class BAMParser implements MappingParserI, Observer {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings Parser from file \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());
-        SAMRecordIterator itor = sam.iterator();
-
+        SAMRecordIterator itor;
+        try {
+            itor = sam.iterator();
+        } catch (RuntimeException e){
+            throw new ParsingException(e.getMessage() + ". !! Track will be empty, thus not be stored !!");
+        }
         while (itor.hasNext()) {
             SAMRecord first = itor.next();
             flag = first.getFlags();
@@ -175,9 +183,12 @@ public class BAMParser implements MappingParserI, Observer {
                     this.seqToIDMap.put(readSeq, seqID);
                 } //readnameToSequenceID.get(readname);
                 mappingContainer.addParsedMapping(mapping, seqID);
+                this.processReadname(seqID, readname);
                 if (!itor.hasNext()) {
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Iterator has no more data from \"{0}\"", trackJob.getFile().getAbsolutePath());
                 }
+            } else {
+                ++counterUnmapped;
             }
         }
 //        HashSet<Integer> s = new HashSet<Integer>();
@@ -195,7 +206,16 @@ public class BAMParser implements MappingParserI, Observer {
 
         mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);//TODO: check if counting is correct here
         mappingContainer.setNumberOfUniqueSeq(noUniqueReads);
+        mappingContainer.setNumberOfReads(this.readnames.size());
         this.seqToIDMap = null; //release resources
+        this.readnames = null;
+        
+        if (mappingContainer.getMappedSequenceIDs().isEmpty()) { //if track does not contain any reads
+            throw new ParsingException(NbBundle.getMessage(JokParser.class, "Parser.Empty.Track.Error"));
+        }
+        if (counterUnmapped > 0){
+            this.sendErrorMsg("Number of unmapped reads in file: "+counterUnmapped);
+        }
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
@@ -330,7 +350,7 @@ public class BAMParser implements MappingParserI, Observer {
                     //deletion of the read
                     numberofDeletion = Integer.parseInt(subSeq2Val);
 
-                    refpos = refpos + numberofDeletion;
+                    refpos += numberofDeletion;
 
                     while (numberofDeletion > 0) {
                         if (readSeq.length() != readPos) {
@@ -340,7 +360,7 @@ public class BAMParser implements MappingParserI, Observer {
                         }
                         numberofDeletion--;
                         newreadSeq = readSeq;
-                        readPos = readPos + 1;
+                        readPos += 1;
                         //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
                     }
 
@@ -348,7 +368,7 @@ public class BAMParser implements MappingParserI, Observer {
                     //insertion of the  read
                     numberOfInsertions = Integer.parseInt(subSeq2Val);
 
-                    readPos = readPos + numberOfInsertions;
+                    readPos += numberOfInsertions;
                     while (numberOfInsertions > 0) {
 
                         if (refpos != refSeq.length()) {
@@ -358,14 +378,14 @@ public class BAMParser implements MappingParserI, Observer {
                         }
                         newRefSeqwithGaps = refSeq;
                         numberOfInsertions--;
-                        refpos = refpos + 1;
+                        refpos += 1;
 
                         //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                     }
                 } else if (c == 'M') {
                     //for match/mismatch thr positions just move forward
-                    readPos = readPos + Integer.parseInt(subSeq2Val);
-                    refpos = refpos + Integer.parseInt(subSeq2Val);
+                    readPos += Integer.parseInt(subSeq2Val);
+                    refpos += Integer.parseInt(subSeq2Val);
                     newRefSeqwithGaps = refSeq;
                     newreadSeq = readSeq;
                 } else if (c == 'S') {
@@ -374,7 +394,7 @@ public class BAMParser implements MappingParserI, Observer {
                         newreadSeq = newreadSeq.substring(0, readSeq.length() - Integer.parseInt(subSeq2Val));
                     } else {
                         //soft clipping of the first bases
-                        readPos = readPos + Integer.parseInt(subSeq2Val);
+                        readPos += Integer.parseInt(subSeq2Val);
                         softclipped = Integer.parseInt(subSeq2Val);
                     }
                 }
@@ -553,6 +573,15 @@ public class BAMParser implements MappingParserI, Observer {
     public void update(Object args) {
         if (args instanceof Boolean && (Boolean) args == true) {
             ++this.noUniqueMappings;
+        }
+    }
+
+    
+    @Override
+    public void processReadname(int seqID, String readName) {
+        //count reads
+        if (!this.readnames.contains(readName)){
+            this.readnames.add(readName);
         }
     }
 }

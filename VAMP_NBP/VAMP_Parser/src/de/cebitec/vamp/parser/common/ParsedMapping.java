@@ -4,9 +4,9 @@ import java.util.List;
 
 /**
  * Container for a parsed mapping. It contains all data a mapping should have.
- * ID, start, stop, direction, errors, diffs, gaps, bestmapping and count.
- * Also the read sequence can be stored here, but should be removed when not needed
- * anymore.
+ * ID, start, stop (start is always the smaller value), direction (1 for fwd and -1 for rev), 
+ * errors, diffs, gaps, bestmapping and count. Also the read sequence can be stored here, 
+ * but should be removed when not needed anymore.
  *
  * @author ddoppmeier, rhilker
  */
@@ -27,7 +27,7 @@ public class ParsedMapping {
      * @param start start of the mapping
      * @param stop end of the mapping
      * @param direction direction of the mapping: 1 for fwd and -1 for rev
-     * @param diffs the list of diffs between the reference and the mapping //TODO: maybe treat diffs and gaps the same way
+     * @param diffs the list of diffs between the reference and the mapping
      * @param gaps list of gaps between the reference and the mapping
      * @param errors number of errors
      */
@@ -58,46 +58,53 @@ public class ParsedMapping {
         count++;
     }
 
+    /**
+     * @return Start position of this mapping. Always the smaller value among start and stop.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * @return Stop position of this mapping. Always the larger value among start and stop.
+     */
     public int getStop() {
         return stop;
     }
 
+    /**
+     * @return direction of the mapping: 1 for fwd and -1 for rev
+     */
     public byte getDirection(){
         return direction;
     }
 
+    
     public List<ParsedDiff> getDiffs(){
         return diffs;
     }
 
+    
     public boolean hasDiffs(){
-        if(diffs.isEmpty()){
-            return false;
-        } else {
-            return true;
-        }
+        return !diffs.isEmpty();
     }
 
+    
     public List<ParsedReferenceGap> getGenomeGaps(){
         return gaps;
     }
 
+    
     public boolean hasGenomeGaps(){
-        if(gaps.isEmpty()){
-            return false;
-        } else {
-            return true;
-        }
+        return !gaps.isEmpty();
     }
 
+    
     public int getErrors(){
         return errors;
     }
 
+    
     public int getNumOfDiffs(){
         return this.getDiffs().size();
     }
@@ -148,14 +155,17 @@ public class ParsedMapping {
         return hash;
     }
 
+    
     public void setID(long mappingID) {
         this.id = mappingID;
     }
 
+    
     public long getID(){
         return id;
     }
 
+    
     public void setCount(int count){
         this.count = count;
     }
