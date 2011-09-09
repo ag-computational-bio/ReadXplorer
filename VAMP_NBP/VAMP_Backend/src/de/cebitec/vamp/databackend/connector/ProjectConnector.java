@@ -1,5 +1,6 @@
 package de.cebitec.vamp.databackend.connector;
 
+import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.FieldNames;
 import de.cebitec.vamp.databackend.GenericSQLQueries;
 import de.cebitec.vamp.databackend.H2SQLStatements;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -883,16 +885,16 @@ public class ProjectConnector {
                         
                         ParsedDiff d = diffsIt.next();
                         // get SnpID for position
-                        long snpID = 0;
-                        if (tmpSnpID.get(d.getPosition()) != null) {
-                            snpID = tmpSnpID.get(d.getPosition());
-                        }
+//                        long snpID = 0;
+//                        if (tmpSnpID.get(d.getPosition()) != null) {
+//                            snpID = tmpSnpID.get(d.getPosition());
+//                        }
                         insertDiff.setLong(1, diffID++);
                         insertDiff.setLong(2, m.getID());
                         insertDiff.setString(3, Character.toString(d.getBase()));
                         insertDiff.setLong(4, d.getPosition());
                         insertDiff.setByte(5, diff);
-                        insertDiff.setLong(6, snpID);
+                        //insertDiff.setLong(6, snpID);
 
                         insertDiff.addBatch();
 
@@ -910,10 +912,10 @@ public class ProjectConnector {
                         ParsedReferenceGap g = gapIt.next();
                         
                         // get SnpID for position
-                        long snpID = 0;
-                        if (tmpSnpID.get(g.getAbsPos()) != null) {
-                            snpID = tmpSnpID.get(g.getAbsPos());
-                        }
+//                        long snpID = 0;
+//                        if (tmpSnpID.get(g.getAbsPos()) != null) {
+//                            snpID = tmpSnpID.get(g.getAbsPos());
+//                        }
                         
                         insertGap.setLong(1, diffID++);
                         insertGap.setLong(2, m.getID());
@@ -921,7 +923,7 @@ public class ProjectConnector {
                         insertGap.setLong(4, g.getAbsPos());
                         insertGap.setByte(5, gap);
                         insertGap.setInt(6, g.getOrder());
-                        insertGap.setLong(7, snpID);
+                        //insertGap.setLong(7, snpID);
 
                         insertGap.addBatch();
 
@@ -1388,7 +1390,6 @@ public class ProjectConnector {
                     String key = String.valueOf(e.getKey());
                     Long position = Long.parseLong(key);
                     int positionInt = position.intValue();
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, key);
 
 
                     // get coverage
@@ -1447,7 +1448,7 @@ public class ProjectConnector {
                         insertPosition.addBatch();
 
                         // save SnpID for position for insert in diff table
-                        tmpSnpID.put(position, snpID);
+                        //tmpSnpID.put(position, snpID);
 
                         batchCounter++;
                         snpID++;
@@ -1472,15 +1473,6 @@ public class ProjectConnector {
                     String absPosition = key.substring(0, key.length() - 2);
                     Long position = Long.parseLong(absPosition);
                     int positionInt = position.intValue();
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, key);
-                    
-                    
-                    if(key.equals("2235803_a")) {
-                        String hier = "bla";
-                    }
-                    
-                    //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "key: " + String.valueOf(key));
-                    //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "position: " + String.valueOf(absPosition));
                     
                     // get coverage from adjacent positions
                     double forwCov1 = track.getCoverageContainer().getBestMappingForwardCoverage(positionInt);
@@ -1608,6 +1600,47 @@ public class ProjectConnector {
             return baseInt;
              
         }
+        
+        
+        public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
+        ArrayList<Snp> snps = new ArrayList<Snp>();
+        // actually opened tracks
+        Set<Long> keys = trackConnectors.keySet();
+        try {
+            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
+            fetchSNP.setInt(1, percentageThreshold);
+            fetchSNP.setInt(2, absThreshold);
+            fetchSNP.setInt(3, absThreshold);
+            fetchSNP.setInt(4, absThreshold);
+            fetchSNP.setInt(5, absThreshold);
+            
+            ResultSet rs = fetchSNP.executeQuery();
+            while (rs.next()) {
+                String position = rs.getString(FieldNames.POSITIONS_POSITION);
+                int track = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
+                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
+                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
+                int aRate = rs.getInt(FieldNames.POSITIONS_A);
+                int cRate = rs.getInt(FieldNames.POSITIONS_C);
+                int gRate = rs.getInt(FieldNames.POSITIONS_G);
+                int tRate = rs.getInt(FieldNames.POSITIONS_T);
+                int nRate = rs.getInt(FieldNames.POSITIONS_N);
+                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
+                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
+                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
+                char type = rs.getString(FieldNames.POSITIONS_TYPE).charAt(0);
+                if (keys.contains((long) track)) {
+                    snps.add(new Snp(position, track, base, refBase, aRate, cRate, gRate,
+                            tRate, nRate, gapRate, coverage, frequency, type));
+                }
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //schreiben(snps);
+        return snps;
+    }
     
     //TODO: delete seqpairs
     //TODO: seqpair queries

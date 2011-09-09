@@ -95,7 +95,7 @@ public interface ITrackConnector {
      * @param absThreshold
      * @return
      */
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
+    //public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
     
     //public List<NewSnp> findSNPs2(int percentageThreshold, int absThreshold);
 

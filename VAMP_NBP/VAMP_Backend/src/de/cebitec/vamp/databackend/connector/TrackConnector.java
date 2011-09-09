@@ -766,110 +766,110 @@ public class TrackConnector implements ITrackConnector{
 //        schreiben(snps);
 //        return snps;
 //    }
-    @Override
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
-        ArrayList<Snp> snps = new ArrayList<Snp>();
-        try {
-            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
-            fetchSNP.setInt(1, percentageThreshold);
-            fetchSNP.setInt(2, absThreshold);
-            fetchSNP.setInt(3, absThreshold);
-            fetchSNP.setInt(4, absThreshold);
-            fetchSNP.setInt(5, absThreshold);
-            
-            ResultSet rs = fetchSNP.executeQuery();
-            while (rs.next()) {
-                String position = rs.getString(FieldNames.POSITIONS_POSITION);
-                int track = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
-                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
-                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
-                int aRate = rs.getInt(FieldNames.POSITIONS_A);
-                int cRate = rs.getInt(FieldNames.POSITIONS_C);
-                int gRate = rs.getInt(FieldNames.POSITIONS_G);
-                int tRate = rs.getInt(FieldNames.POSITIONS_T);
-                int nRate = rs.getInt(FieldNames.POSITIONS_N);
-                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
-                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
-                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
-                char type = rs.getString(FieldNames.POSITIONS_TYPE).charAt(0);
-                
-                snps.add(new Snp(position, track, base, refBase, aRate, cRate, gRate,
-                        tRate, nRate, gapRate, coverage, frequency, type));
-                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        schreiben(snps);
-        return snps;
-    }
-    
-    private Integer[] countDiffs (Integer[] diffs, char base, byte diffType, byte direction) {
-
-        Integer[] addDiff = diffs;
-        addDiff[DIFF_COV] += 1;
-        if (direction == -1) {
-            base = SequenceUtils.complementDNA(base);
-        }
-        if (diffType == 1) {
-            if (base == 'A') {
-                addDiff[A_COV] += 1;
-            } else if (base == 'C') {
-                addDiff[C_COV] += 1;
-            } else if (base == 'G') {
-                addDiff[G_COV] += 1;
-            } else if (base == 'T') {
-                addDiff[T_COV] += 1;
-            } else if (base == 'N') {
-                addDiff[N_COV] += 1;
-            } else if (base == '_') {
-                addDiff[_COV] += 1;
-            } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown diff base {0}", base);
-            }
-
-        } else {
-            if (base == 'A') {
-                addDiff[A_GAP] += 1;
-            } else if (base == 'C') {
-                addDiff[C_GAP] += 1;
-            } else if (base == 'G') {
-                addDiff[G_GAP] += 1;
-            } else if (base == 'T') {
-                addDiff[T_GAP] += 1;
-            } else if (base == 'N') {
-                addDiff[N_GAP] += 1;
-            } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown genome gap base {0}", base);
-            }
-        }
-        
-        return addDiff;
-    }
-    
-    private char getBase(int index) {
-   
-        char base = ' ';
-        
-        if (index == A_COV || index == A_GAP) {
-            base = 'A';
-        } else if (index == C_COV || index == C_GAP) {
-            base = 'C';
-        } else if (index == G_COV || index == G_GAP) {
-            base = 'G';
-        } else if (index == T_COV || index == T_GAP) {
-            base = 'T';
-        } else if (index == N_COV || index == N_GAP) {
-            base = 'N';
-        } else if (index == _COV) {
-            base = '-';
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
-        }
-        
-        return base;
-        
-    }
+//    @Override
+//    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
+//        ArrayList<Snp> snps = new ArrayList<Snp>();
+//        try {
+//            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
+//            fetchSNP.setInt(1, percentageThreshold);
+//            fetchSNP.setInt(2, absThreshold);
+//            fetchSNP.setInt(3, absThreshold);
+//            fetchSNP.setInt(4, absThreshold);
+//            fetchSNP.setInt(5, absThreshold);
+//            
+//            ResultSet rs = fetchSNP.executeQuery();
+//            while (rs.next()) {
+//                String position = rs.getString(FieldNames.POSITIONS_POSITION);
+//                int track = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
+//                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
+//                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
+//                int aRate = rs.getInt(FieldNames.POSITIONS_A);
+//                int cRate = rs.getInt(FieldNames.POSITIONS_C);
+//                int gRate = rs.getInt(FieldNames.POSITIONS_G);
+//                int tRate = rs.getInt(FieldNames.POSITIONS_T);
+//                int nRate = rs.getInt(FieldNames.POSITIONS_N);
+//                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
+//                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
+//                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
+//                char type = rs.getString(FieldNames.POSITIONS_TYPE).charAt(0);
+//                
+//                snps.add(new Snp(position, track, base, refBase, aRate, cRate, gRate,
+//                        tRate, nRate, gapRate, coverage, frequency, type));
+//                
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        //schreiben(snps);
+//        return snps;
+//    }
+//    
+//    private Integer[] countDiffs (Integer[] diffs, char base, byte diffType, byte direction) {
+//
+//        Integer[] addDiff = diffs;
+//        addDiff[DIFF_COV] += 1;
+//        if (direction == -1) {
+//            base = SequenceUtils.complementDNA(base);
+//        }
+//        if (diffType == 1) {
+//            if (base == 'A') {
+//                addDiff[A_COV] += 1;
+//            } else if (base == 'C') {
+//                addDiff[C_COV] += 1;
+//            } else if (base == 'G') {
+//                addDiff[G_COV] += 1;
+//            } else if (base == 'T') {
+//                addDiff[T_COV] += 1;
+//            } else if (base == 'N') {
+//                addDiff[N_COV] += 1;
+//            } else if (base == '_') {
+//                addDiff[_COV] += 1;
+//            } else {
+//                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown diff base {0}", base);
+//            }
+//
+//        } else {
+//            if (base == 'A') {
+//                addDiff[A_GAP] += 1;
+//            } else if (base == 'C') {
+//                addDiff[C_GAP] += 1;
+//            } else if (base == 'G') {
+//                addDiff[G_GAP] += 1;
+//            } else if (base == 'T') {
+//                addDiff[T_GAP] += 1;
+//            } else if (base == 'N') {
+//                addDiff[N_GAP] += 1;
+//            } else {
+//                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unkown genome gap base {0}", base);
+//            }
+//        }
+//        
+//        return addDiff;
+//    }
+//    
+//    private char getBase(int index) {
+//   
+//        char base = ' ';
+//        
+//        if (index == A_COV || index == A_GAP) {
+//            base = 'A';
+//        } else if (index == C_COV || index == C_GAP) {
+//            base = 'C';
+//        } else if (index == G_COV || index == G_GAP) {
+//            base = 'G';
+//        } else if (index == T_COV || index == T_GAP) {
+//            base = 'T';
+//        } else if (index == N_COV || index == N_GAP) {
+//            base = 'N';
+//        } else if (index == _COV) {
+//            base = '-';
+//        } else {
+//            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
+//        }
+//        
+//        return base;
+//        
+//    }
 
     
     private int getRefGenLength() {

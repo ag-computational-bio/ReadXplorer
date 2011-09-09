@@ -125,10 +125,9 @@ public class SQLStatements {
             + FieldNames.DIFF_CHAR + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + ", "
-            + FieldNames.DIFF_SNP_ID + " "
+            + FieldNames.DIFF_ORDER + " "
             + ") "
-            + "VALUES (?,?,?,?,?, null,?)";
+            + "VALUES (?,?,?,?,?, null)";
     
     public final static String INSERT_GAP =
             "INSERT INTO " + FieldNames.TABLE_DIFF + " "
@@ -138,10 +137,9 @@ public class SQLStatements {
             + FieldNames.DIFF_CHAR + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + ", "
-            + FieldNames.DIFF_SNP_ID + " "
+            + FieldNames.DIFF_ORDER + " "
             + ") "
-            + "VALUES (?,?,?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?,?)";
     
     public final static String INSERT_COVERAGE =
             "INSERT INTO " + FieldNames.TABLE_COVERAGE + " "

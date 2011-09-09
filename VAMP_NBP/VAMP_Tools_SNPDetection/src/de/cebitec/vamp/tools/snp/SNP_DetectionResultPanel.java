@@ -15,6 +15,8 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -53,6 +55,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         jTable1 = new javax.swing.JTable();
         jProgressBar1 = new javax.swing.JProgressBar();
         exportButton = new javax.swing.JButton();
+        alignmentButton = new javax.swing.JButton();
 
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -103,6 +106,13 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             }
         });
 
+        alignmentButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.alignmentButton.text")); // NOI18N
+        alignmentButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alignmentButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -110,9 +120,12 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                    .addComponent(exportButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE))
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(alignmentButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(exportButton))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -123,7 +136,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(exportButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(exportButton)
+                    .addComponent(alignmentButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -134,8 +149,13 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         ed.setVisible(true);
 }//GEN-LAST:event_exportButtonActionPerformed
 
+    private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
+        SNP_Phylogenie sp = new SNP_Phylogenie(snps);
+    }//GEN-LAST:event_alignmentButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton alignmentButton;
     private javax.swing.JButton exportButton;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -144,10 +164,12 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
     public void addSNPs(List<Snp> snps) {
         this.snps = snps;
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         for (Snp snp : snps) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            
             Object[] rowData = new Object[13];
-            rowData[0] = snp.getPosition();
+            Integer position = Integer.parseInt(snp.getPosition());
+            rowData[0] = position;
             rowData[1] = snp.getTrack();
             rowData[2] = snp.getBase().toUpperCase();
             rowData[3] = snp.getRefBase().toUpperCase();
@@ -162,6 +184,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             rowData[12] = snp.getType();
             model.addRow(rowData);
         }
+        
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        jTable1.setRowSorter(sorter);
+        sorter.setModel(model);
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
@@ -172,7 +198,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         DefaultListSelectionModel model = (DefaultListSelectionModel) jTable1.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = jTable1.convertRowIndexToModel(selectedView);
-        int position = (Integer) jTable1.getModel().getValueAt(selectedModel, 0);
+        //int position = (Integer) jTable1.getModel().getValueAt(selectedModel, 0);
+        String pos = (String) jTable1.getModel().getValueAt(selectedModel, 0);
+        int position = Integer.parseInt(pos);
         bim.navigatorBarUpdated(position);
     }
 

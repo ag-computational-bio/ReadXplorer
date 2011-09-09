@@ -514,42 +514,42 @@ public class MultiTrackConnector implements ITrackConnector {
 //        return snps;
 //    }
 
-        @Override
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
-        ArrayList<Snp> snps = new ArrayList<Snp>();
-        try {
-            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNP_IDS_FOR_TRACK);
-            fetchSNP.setInt(1, percentageThreshold);
-            fetchSNP.setInt(2, absThreshold);
-            fetchSNP.setInt(3, absThreshold);
-            fetchSNP.setInt(4, absThreshold);
-            fetchSNP.setInt(5, absThreshold);
-            
-            ResultSet rs = fetchSNP.executeQuery();
-            while (rs.next()) {
-                String position = rs.getString(FieldNames.POSITIONS_POSITION);
-                int track = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
-                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
-                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
-                int aRate = rs.getInt(FieldNames.POSITIONS_A);
-                int cRate = rs.getInt(FieldNames.POSITIONS_C);
-                int gRate = rs.getInt(FieldNames.POSITIONS_G);
-                int tRate = rs.getInt(FieldNames.POSITIONS_T);
-                int nRate = rs.getInt(FieldNames.POSITIONS_N);
-                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
-                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
-                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
-                char type = rs.getString(FieldNames.POSITIONS_TYPE).charAt(0);
-                
-                snps.add(new Snp(position, track, base, refBase, aRate, cRate, gRate,
-                        tRate, nRate, gapRate, coverage, frequency, type));
-                
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return snps;
-    }
+//        @Override
+//    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
+//        ArrayList<Snp> snps = new ArrayList<Snp>();
+//        try {
+//            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNP_IDS_FOR_TRACK);
+//            fetchSNP.setInt(1, percentageThreshold);
+//            fetchSNP.setInt(2, absThreshold);
+//            fetchSNP.setInt(3, absThreshold);
+//            fetchSNP.setInt(4, absThreshold);
+//            fetchSNP.setInt(5, absThreshold);
+//            
+//            ResultSet rs = fetchSNP.executeQuery();
+//            while (rs.next()) {
+//                String position = rs.getString(FieldNames.POSITIONS_POSITION);
+//                int track = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
+//                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
+//                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
+//                int aRate = rs.getInt(FieldNames.POSITIONS_A);
+//                int cRate = rs.getInt(FieldNames.POSITIONS_C);
+//                int gRate = rs.getInt(FieldNames.POSITIONS_G);
+//                int tRate = rs.getInt(FieldNames.POSITIONS_T);
+//                int nRate = rs.getInt(FieldNames.POSITIONS_N);
+//                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
+//                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
+//                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
+//                char type = rs.getString(FieldNames.POSITIONS_TYPE).charAt(0);
+//                
+//                snps.add(new Snp(position, track, base, refBase, aRate, cRate, gRate,
+//                        tRate, nRate, gapRate, coverage, frequency, type));
+//                
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return snps;
+//    }
         
     private int getRefGenLength() {
         int refGenID = 0;

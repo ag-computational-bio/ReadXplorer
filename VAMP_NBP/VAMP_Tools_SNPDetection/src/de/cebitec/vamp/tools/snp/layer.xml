@@ -11,7 +11,7 @@
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
-                <attr name="type" stringvalue="de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer"/>
+                <attr name="type" stringvalue="de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer"/>
             </file>
         </folder>
         <folder name="Window">

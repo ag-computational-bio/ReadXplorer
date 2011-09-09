@@ -2,7 +2,9 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.api.objects.NewSnp;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
 import java.awt.event.ContainerEvent;
@@ -17,6 +19,7 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.util.Lookup;
 
 /**
  * Top component which displays SNP detection tabs.
@@ -63,15 +66,20 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * @param trackViewer instance used for this panels panels.
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(TrackViewer trackViewer){
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer){
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
         SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
         final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
 
-        // assign the trackviewer
-        setupPanel.setCon(trackViewer.getTrackCon());
-        resultPanel.setBoundsInfoManager(trackViewer.getBoundsInformationManager());
+        // assign the ProjectConnector
+        setupPanel.setCon(ProjectConnector.getInstance());
+        //setupPanel.setCon(trackViewer.getTrackCon());
+//        ReferenceViewer viewer = Lookup.getDefault().lookup(ReferenceViewer.class);
+//        if (viewer != null){
+//            resultPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
+//        }
+        resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
 
         // listen on changes of the search
         setupPanel.addPropertyChangeListener(SNP_DetectionSetupPanel.PROP_SNPS_LOADED, new PropertyChangeListener() {
@@ -198,9 +206,14 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         return PREFERRED_ID;
     }
 
-    public void openDetectionTab(TrackViewer trackViewer){
-        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
+//    public void openDetectionTab(TrackViewer trackViewer){
+//        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
+//        snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
+//    }
+
+    public void openDetectionTab(ReferenceViewer referenceViewer){
+        snpTabs.addTab("SNP Detection for opened Tabs", getSnpDetectionPanel(referenceViewer));
         snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
     }
-
+    
 }
