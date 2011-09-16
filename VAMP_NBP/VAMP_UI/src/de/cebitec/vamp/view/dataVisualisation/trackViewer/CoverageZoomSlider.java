@@ -1,6 +1,5 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

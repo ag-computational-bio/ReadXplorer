@@ -5,8 +5,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- *
- * @author ddoppmei
+ * @author ddoppmei, rhilker
+ * 
+ * A container for blocks. The blocks are added in a sorted fashion.
  */
 public class BlockContainer {
     
@@ -16,6 +17,10 @@ public class BlockContainer {
         sortedMappings = new TreeMap<Integer, TreeSet<BlockI>>();
     }
 
+    /**
+     * Adds a block to the container. The block order is sorted according to start position.
+     * @param block block to add
+     */
     public void addBlock(BlockI block){
         int start = block.getAbsStart();
         if(!sortedMappings.containsKey(start)){
@@ -60,9 +65,9 @@ public class BlockContainer {
                 } else {
                     // stop position are identical, too
                     // use mapping id to distinguish and order
-                    if(o1.getMapping().getId() < o2.getMapping().getId()){
+                    if(o1.getPersistantObject().getId() < o2.getPersistantObject().getId()){
                         return -1;
-                    } else if(o1.getMapping().getId() > o2.getMapping().getId()){
+                    } else if(o1.getPersistantObject().getId() > o2.getPersistantObject().getId()){
                         return 1;
                     } else {
                         return 0;

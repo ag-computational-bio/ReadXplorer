@@ -67,10 +67,16 @@ public interface ITrackConnector {
     
     public int getNumOfUniquePerfectSeqPairsCalculate();
     
-    public void setStatistics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
+    public int getNumOfSingleMappings();
+    
+    public int getNumOfSingleMappingsCalculate();
+    
+    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
                             int numPerfectMappings, int numBestMatchMappings, double coveragePerf,
-                            double coverageBM, double coverageComplete, int numReads, int numSeqPairs, 
-                            int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs);
+                            double coverageBM, double coverageComplete, int numReads);
+    
+    public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, 
+            int numUniqueSeqPairs, int numUniquePerfectSeqPairs, int numSingleReads);
 
     //public long getRunId();
     public long getTrackID();

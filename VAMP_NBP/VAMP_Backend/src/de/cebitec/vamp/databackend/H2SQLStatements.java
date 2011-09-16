@@ -152,14 +152,14 @@ public class H2SQLStatements {
     public static final String SETUP_SEQ_PAIR_REPLICATES = 
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_REPLICATES +
             " (" +
-            FieldNames.SEQ_PAIR_MAPPING_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
+            FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
             FieldNames.SEQ_PAIR_NUM_OF_REPLICATES+" SMALLINT UNSIGNED NOT NULL, " +
             ") ";
     
     
     public final static String INDEX_SEQ_PAIR_REPLICATES =
             "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIR_REPLICATES ON " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
-            + "("+FieldNames.SEQ_PAIR_MAPPING_ID+" ) ";
+            + "("+FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+" ) ";
    
     
     public static final String SETUP_SEQ_PAIR_PIVOT = 

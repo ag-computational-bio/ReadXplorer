@@ -16,7 +16,7 @@ public class ParsedTrack {
     private CoverageContainer coverageContainer;
     private String description;
     private Timestamp timestamp;
-    private long id;
+    private int id;
 
     public ParsedTrack(String description, ParsedMappingContainer mappings, CoverageContainer coverageContainer){
         this.readNameToSeqIDMap = new HashMap<String, Integer>();
@@ -45,11 +45,11 @@ public class ParsedTrack {
         return timestamp;
     }
 
-    public long getID() {
+    public int getID() {
         return id;
     }
 
-    public void setID(long id){
+    public void setID(int id){
         this.id = id;
     }
 

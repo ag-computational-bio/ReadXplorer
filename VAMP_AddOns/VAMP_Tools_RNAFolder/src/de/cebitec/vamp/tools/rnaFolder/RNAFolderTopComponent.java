@@ -33,6 +33,7 @@ public final class RNAFolderTopComponent extends TopComponent {
         this.rnaTabbedPane.
         setName(NbBundle.getMessage(RNAFolderTopComponent.class, "CTL_RNAFolderTopComponent"));
         setToolTipText(NbBundle.getMessage(RNAFolderTopComponent.class, "HINT_RNAFolderTopComponent"));
+        //this.openAtTabPosition(this.get);
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
     }

@@ -65,7 +65,13 @@ public class ParsedSeqPairMapping {
     }
 
     /**
-     * @return <code>true</code> if distance and orientation between sequences is perfect
+     * @return      PERFECT_PAIR = 0,
+     *              DISTANCE_TOO_LARGE_PAIR = 1,
+     *              DISTANCE_TOO_SMALL_PAIR = 2,
+     *              ORIENTATION_WRONG_PAIR = 3,
+     *              ORIENTATION_AND_DIST_TOO_LARGE_PAIR = 4,
+     *              ORIENTATION_AND_DIST_TOO_SMALL_PAIR = 5,
+     *              UNPAIRED_PAIR = 6
      */
     public byte getType(){
         return this.type;

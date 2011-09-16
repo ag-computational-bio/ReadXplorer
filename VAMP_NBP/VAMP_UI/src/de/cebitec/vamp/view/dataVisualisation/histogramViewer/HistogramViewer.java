@@ -61,6 +61,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         super(boundsInfoManager, basePanel, refGen);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
+        this.setInDrawingMode(false);
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
 
@@ -81,7 +82,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         bases.add("n");
         bases.add("readgap");
 
-        this.showSequenceBar(true);
+        this.showSequenceBar(true, true);
     }
 
     @Override
@@ -214,7 +215,8 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             gaps = trackConnector.getExtendedReferenceGapsForIntervalOrderedByMappingID(lowerBound, upperBound);
         } catch (Exception ex) {
             System.err.print("trackConnector couldn't initialize gaps" + ex);
-            //TOTO: error an nutzer geben
+            gaps = new ArrayList<PersistantReferenceGap>();
+            //TODO: error an nutzer geben
         }
         this.fillGapManager();
         this.getSequenceBar().setGenomeGapManager(gapManager);

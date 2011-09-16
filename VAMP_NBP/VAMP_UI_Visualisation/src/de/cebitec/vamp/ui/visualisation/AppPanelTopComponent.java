@@ -35,7 +35,7 @@ import org.openide.util.lookup.InstanceContent;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.view//AppPanel//EN", autostore = false)
-public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI{
+public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI {
 
     private static AppPanelTopComponent instance;
     /** path to the icon used by the component and its open action */
@@ -45,6 +45,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private InstanceContent content = new InstanceContent();
     private Lookup localLookup;
     private ReferenceViewer referenceViewer;
+    private ArrayList<TrackViewer> trackViewerList;
 
     public AppPanelTopComponent() {
         initComponents();
@@ -53,9 +54,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         localLookup = new AbstractLookup(content);
         associateLookup(localLookup);
+        this.trackViewerList = new ArrayList<TrackViewer>();
     }
 
-    private void clearLookup(){
+    private void clearLookup() {
         Collection<? extends Object> allCookies = getLookup().lookupAll(Object.class);
 
         for (Object cookie : allCookies) {
@@ -88,11 +90,11 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
+
     /**
      * @return default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
@@ -106,7 +108,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     }
 
     /**
-     * Obtain the AppPanelTopComponent instance. Never call {@link #getDefault} directly!
+     * @return Obtain the AppPanelTopComponent instance. Never call {@link #getDefault} directly!
      */
     public static synchronized AppPanelTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
@@ -133,11 +135,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     public void componentOpened() {
         ViewController vc = new ViewController(this);
         vc.openRefGen();
-        if (vc.hasRefGen()){
+        if (vc.hasRefGen()) {
             setName(vc.getDisplayName());
             content.add(vc);
-        }
-        else{
+        } else {
             this.close();
         }
     }
@@ -153,13 +154,13 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // if last Viewer close Navigator
         boolean lastViewer = true;
         // XXX this is not working everytime, but how can there be opened tc's when you cannot see them in the GUI???
-        for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){
-            if (tc instanceof ApplicationFrameI && !tc.equals(this)){
+        for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
+            if (tc instanceof ApplicationFrameI && !tc.equals(this)) {
                 lastViewer = false;
                 break;
             }
         }
-        if (lastViewer){
+        if (lastViewer) {
             WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
             WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
             WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").close();
@@ -167,7 +168,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         }
     }
 
-   
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
@@ -199,7 +199,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     }
 
     // ===================== AppFrameI stuff ============================== //
-
     @Override
     public void showRefGenPanel(JPanel refGenPanel) {
         visualPanel.add(refGenPanel);
@@ -246,16 +245,17 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         this.referenceViewer.increaseTrackCount();
 
         // search for opened tracks, if there are none open the track statistics window
-        if (getLookup().lookupAll(TrackViewer.class).isEmpty()){
+        if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
         }
 
         // put the panel's TrackViewer in lookup so it can be accessed
-        BasePanel bp = (BasePanel) trackPanel;
+        BasePanel basePanel = (BasePanel) trackPanel;
         // make sure the multiple track viewers do not cause a mess in the lookup
-        if (!(bp.getViewer() instanceof MultipleTrackViewer)){
-            TrackViewer tv = (TrackViewer) bp.getViewer();
-            content.add(tv);
+        if (!(basePanel.getViewer() instanceof MultipleTrackViewer)) {
+            TrackViewer trackViewer = (TrackViewer) basePanel.getViewer();
+            this.content.add(trackViewer);
+            this.trackViewerList.add(trackViewer);
         }
 
         CloseTrackCookie closeTrackCookie = new CloseTrackCookie() {
@@ -273,7 +273,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
                 return trackPanel.getName();
             }
         };
-        
+
         content.add(closeTrackCookie);
 //        all.add(new WeakReference<JPanel>(trackPanel));
     }
@@ -289,14 +289,44 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         content.remove(tv);
 
         // if this was the last trackPanel close the track statistics window
-        if (getLookup().lookupAll(TrackViewer.class).isEmpty()){
+        if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
         }
     }
+    
+    /*
+     * Overriding these two methods ensures that only displayed components are updated
+     * and thus increases performance of the viewers.
+     */
+    @Override
+    public void componentShowing() {
+        if (referenceViewer != null) {
+            this.referenceViewer.setActive(true);
+            this.changeActiveTrackStatus(true);
+        }
+    }
 
+    @Override
+    public void componentHidden() {
+        if (referenceViewer != null) {
+            this.referenceViewer.setActive(false);
+            this.changeActiveTrackStatus(false);
+        }
+    }
+
+    /**
+     * Updates the status of all track viewers belonging to this top component.
+     * @param isActive true, if track viewers should be active, false, if not.
+     */
+    private void changeActiveTrackStatus(boolean isActive) {
+        for (TrackViewer viewer : this.trackViewerList) {
+            viewer.setActive(isActive);
+        }
+    }
+    
+    
     // ==================== Experimental track closing stuff ==================== //
-  
-    private List<Reference<JPanel>> all =  Collections.synchronizedList(new ArrayList<Reference<JPanel>>());
+    private List<Reference<JPanel>> all = Collections.synchronizedList(new ArrayList<Reference<JPanel>>());
 
     public List<Action> allTrackCloseActions() {
         List<Action> result = new ArrayList<Action>();
@@ -318,7 +348,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         //Our action should not hold a strong reference to the TopComponent -
         //if it is closed, it should get garbage collected.  If a menu
         //item holds a reference to the component, then it won't be
-
         private final Reference<JPanel> tc;
         private final Reference<ViewController> vc;
 
@@ -345,5 +374,4 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             return comp != null;
         }
     }
-
 }

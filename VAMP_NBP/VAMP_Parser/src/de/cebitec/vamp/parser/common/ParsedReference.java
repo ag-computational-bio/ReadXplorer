@@ -17,7 +17,7 @@ public class ParsedReference {
     private String name;
     private FeatureFilter filter;
     private Timestamp timestamp;
-    private long id;
+    private int id;
 
     public Timestamp getTimestamp() {
         return timestamp;
@@ -79,11 +79,11 @@ public class ParsedReference {
         return features;
     }
 
-    public void setID(long id) {
+    public void setID(int id) {
         this.id = id;
     }
 
-    public long getID(){
+    public int getID(){
         return id;
     }
 

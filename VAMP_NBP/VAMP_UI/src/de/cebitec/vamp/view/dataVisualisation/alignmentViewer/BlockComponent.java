@@ -6,12 +6,12 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -31,10 +31,10 @@ import javax.swing.JTextField;
 public class BlockComponent extends JComponent implements ActionListener {
 
     private static final long serialVersionUID = 1324672345;
-    private BlockI b;
+    private BlockI block;
     private int length;
     private int height;
-    private AlignmentViewer parentViewer;
+    private AbstractViewer parentViewer;
     private GenomeGapManager gapManager;
     private int absLogBlockStart;
     private int absLogBlockStop;
@@ -44,17 +44,15 @@ public class BlockComponent extends JComponent implements ActionListener {
     private float minSaturationAndBrightness;
 //    private String nameofRead = "";
 //    private static String COPY_READNAME = "Copy readname"; //no readnames are stored anymore: RUN domain excluded
-    private static String COPY_SEQUENCE = "Copy sequence";
-    private static String EXIT_POPUP = "Exit popup menu";
+    private static String COPY_SEQUENCE = "Copy reference sequence";
     private JPopupMenu p = new JPopupMenu();
-    private Point mousePoint = new Point();
 
-    public BlockComponent(BlockI b, final AlignmentViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
-        this.b = b;
+    public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
+        this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
-        this.absLogBlockStart = b.getAbsStart();
-        this.absLogBlockStop = b.getAbsStop();
+        this.absLogBlockStart = block.getAbsStart();
+        this.absLogBlockStop = block.getAbsStop();
         this.minSaturationAndBrightness = minSaturationAndBrightness;
         this.percentSandBPerCovUnit = percentSandBPerCovUnit;
         this.gapManager = gapManager;
@@ -76,10 +74,9 @@ public class BlockComponent extends JComponent implements ActionListener {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-               mousePoint = e.getLocationOnScreen();
-               p.setLocation(mousePoint);
-               p.setVisible(true);
-
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    p.show(BlockComponent.this, e.getX(), e.getY());
+                }
             }
 
             @Override
@@ -106,7 +103,7 @@ public class BlockComponent extends JComponent implements ActionListener {
     }
 
 //    public void setReadname() { //no readnames are stored anymore: RUN domain excluded
-//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(b.getMapping().getSequenceID());
+//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(b.getPersistantObject().getSequenceID());
 //        JTextField j = new JTextField();
 //        for (String name : names) {
 //            nameofRead = name;
@@ -118,10 +115,10 @@ public class BlockComponent extends JComponent implements ActionListener {
 
     public void setSequence() {
         JTextField j = new JTextField();
-        int start = b.getMapping().getStart();
-        int stop = b.getMapping().getStop();
+        int start = ((PersistantMapping) block.getPersistantObject()).getStart();
+        int stop = ((PersistantMapping) block.getPersistantObject()).getStop();
         //string first pos is zero
-        String readSequence = parentViewer.getRefGen().getSequence().substring(start-1, stop);
+        String readSequence = parentViewer.getReference().getSequence().substring(start-1, stop);
         j.setText(readSequence);
         j.selectAll();
         j.copy();
@@ -129,7 +126,7 @@ public class BlockComponent extends JComponent implements ActionListener {
 
     private String getText() {
         StringBuilder sb = new StringBuilder();
-        PersistantMapping mapping = b.getMapping();
+        PersistantMapping mapping = ((PersistantMapping) block.getPersistantObject());
 
         sb.append("<html>");
         sb.append("<table>");
@@ -150,7 +147,9 @@ public class BlockComponent extends JComponent implements ActionListener {
     }
 
     private void setPopupMenu() {
-//        JMenuItem copyName = new JMenuItem(); //no readnames are stored anymore: RUN domain excluded
+
+        
+        //        JMenuItem copyName = new JMenuItem(); //no readnames are stored anymore: RUN domain excluded
 //        copyName.addActionListener(this);
 //        copyName.setActionCommand(COPY_READNAME);
 //        copyName.setText("Copy readname");
@@ -161,14 +160,14 @@ public class BlockComponent extends JComponent implements ActionListener {
         copySequence.setText("Copy sequence");
         copySequence.setToolTipText("Attention! You copy the genome sequence");
         
-        JMenuItem exit = new JMenuItem();
-        exit.addActionListener(this);
-        exit.setActionCommand(EXIT_POPUP);
-        exit.setText("Exit");
+//        JMenuItem exit = new JMenuItem();
+//        exit.addActionListener(this);
+//        exit.setActionCommand(EXIT_POPUP);
+//        exit.setText("Exit");
         
  //       p.add(copyName); //no readnames are stored anymore: RUN domain excluded
         p.add(copySequence);
-        p.add(exit);
+//        p.add(exit);
     }
 
     //no readnames are stored anymore: RUN domain excluded
@@ -233,7 +232,7 @@ public class BlockComponent extends JComponent implements ActionListener {
         graphics.setColor(determineBlockColor());
         graphics.fillRect(0, 0, length, height);
 
-        Iterator<Brick> it = b.getBrickIterator();
+        Iterator<Brick> it = block.getBrickIterator();
         // only count Bricks, that are no genome gaps.
         //Used for determining location of brick in viewer
         int brickCount = 0;
@@ -288,8 +287,12 @@ public class BlockComponent extends JComponent implements ActionListener {
         }
     }
 
+    /**
+     * Determines the color, brithness and saturation of a block.
+     * @return 
+     */
     private Color determineBlockColor() {
-        PersistantMapping m = b.getMapping();
+        PersistantMapping m = ((PersistantMapping) block.getPersistantObject());
         Color tmp;
         if (m.getErrors() == 0) {
             tmp = ColorProperties.BLOCK_MATCH;
@@ -401,11 +404,11 @@ public class BlockComponent extends JComponent implements ActionListener {
 //        } //no readnames are stored anymore: RUN domain excluded
         if (e.getActionCommand().equals(COPY_SEQUENCE)) {
             this.setSequence();
-            p.setVisible(false);
+//            p.setVisible(false);
         }
-        if(e.getActionCommand().equals(EXIT_POPUP)){
-            p.setVisible(false);
-        }
+//        if(e.getActionCommand().equals(EXIT_POPUP)){
+//            p.setVisible(false);
+//        }
     }
     
 }

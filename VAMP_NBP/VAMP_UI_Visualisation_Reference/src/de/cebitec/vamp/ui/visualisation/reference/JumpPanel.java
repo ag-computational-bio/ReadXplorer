@@ -444,6 +444,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         featureTable.setModel(new FeatureTableModel(featureData));
         featureTable.setRowSorter(new TableRowSorter<TableModel>(featureTable.getModel()));
         featureTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+        //TODO check all column widths
         updateFilter();
 
     }

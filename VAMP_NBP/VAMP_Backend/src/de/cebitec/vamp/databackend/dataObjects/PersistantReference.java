@@ -10,13 +10,13 @@ import java.sql.Timestamp;
  */
 public class PersistantReference {
 
-    private Long id;
+    private int id;
     private String name;
     private String description;
     private String sequence;
     private Timestamp timestamp;
 
-    public PersistantReference(Long id, String name, String description, String sequence, Timestamp timestamp){
+    public PersistantReference(int id, String name, String description, String sequence, Timestamp timestamp){
         this.id = id;
         this.name = name;
         this.description = description;
@@ -28,7 +28,7 @@ public class PersistantReference {
         return description;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

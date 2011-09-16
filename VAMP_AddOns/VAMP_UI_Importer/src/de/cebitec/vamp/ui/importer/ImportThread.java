@@ -34,9 +34,9 @@ import de.cebitec.vamp.parser.mappings.JokSeqPairParser;
 import org.openide.util.Lookup;
 
 /**
+ * @author ddoppmeier, rhilker
+ * 
  * Thread handling the import of data.
- *
- * @author ddoppmeier
  */
 public class ImportThread extends SwingWorker<Object, Object> implements Observer {
 
@@ -99,7 +99,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         // XXX does this work for all import methods???
         String sequenceString = null;
         try {
-            Long id = trackJob.getRefGen().getID();
+            int id = trackJob.getRefGen().getID();
             sequenceString = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGen().getSequence();
         } catch (Exception ex) {
             Logger.getLogger(ImportThread.class.getName()).log(Level.WARNING, "Could not get the ref genome\"{0}\"{1}", new Object[]{trackJob.getFile().getAbsolutePath(), ex});
@@ -117,7 +117,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void storeRefGenome(ParsedReference refGenome, ReferenceJob refGenJob) throws StorageException {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
 
-        long refGenID = ProjectConnector.getInstance().addRefGenome(refGenome);
+        int refGenID = ProjectConnector.getInstance().addRefGenome(refGenome);
         refGenJob.setPersistant(refGenID);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
@@ -148,7 +148,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void storeTrack(ParsedTrack track, TrackJob trackJob, boolean seqPairs) throws StorageException{
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
 
-        Long trackID = ProjectConnector.getInstance().addTrack(track, trackJob.getRefGen().getID(), seqPairs);
+        int trackID = ProjectConnector.getInstance().addTrack(track, trackJob.getRefGen().getID(), seqPairs);
         trackJob.setPersistant(trackID);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -270,8 +270,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 //    }
 
     /**
-     * Processes track jobs (parsing and storing) and also handles sequence pair/paired end data parsing
-     * and storing.
+     * Processes track jobs (parsing and storing).
      */
     private void processTrackJobs() {
         if (!tracksJobs.isEmpty()) {
@@ -299,6 +298,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             
             io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.seqPairs") + ":");
 
+            final ISeqPairClassifier seqPairClassifier = Lookup.getDefault().lookup(ISeqPairClassifier.class);
+            boolean seqPairImport = seqPairClassifier != null;
+            
             for(Iterator<SeqPairJobContainer> it = seqPairJobs.iterator(); it.hasNext(); ){
                 SeqPairJobContainer seqPairJobContainer = it.next();
                 ph.progress(workunits++);
@@ -309,8 +311,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                     ParsedTrack track1 = this.parseSingleTrack(seqPairJobContainer.getTrackJob1());
                     ParsedTrack track2 = this.parseSingleTrack(seqPairJobContainer.getTrackJob2());
 
-                    final ISeqPairClassifier seqPairClassifier = Lookup.getDefault().lookup(ISeqPairClassifier.class);
-                    if (seqPairClassifier != null) {
+                    if (seqPairImport) {
                         seqPairClassifier.setData(track1, track2, distance, seqPairJobContainer.getDeviation(), seqPairJobContainer.getOrientation());
                         String description = seqPairJobContainer.getTrackJob1().getFile().getName() + " and " + seqPairJobContainer.getTrackJob2().getFile().getName();
 
@@ -322,6 +323,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             io.getOut().println("\"" + description + " sequence pair data infos \" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
                             Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        
+                        ProjectConnector.getInstance().setSeqPairIdsForTrackIds(track1.getID(), track2.getID());
                         
                         track1.clear();
                         track2.clear();

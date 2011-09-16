@@ -15,6 +15,8 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Utilities;
 
 /**
+ * @author ddopmmeier, rhilker
+ * 
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.externalViewer//ExternalViewer//EN", autostore = false)
@@ -28,11 +30,15 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
     private TrackConnector trackConnector;
     private BasePanel alignmentBasePanel;
-    private BasePanel logoBasePanel;
+    private BasePanel histogramBasePanel;
+    private BasePanel seqPairBasePanel;
     private CardLayout cards;
 
-    private static String LOGOCARD = "logo";
+    private static String HISTOGRAMCARD = "logo";
     private static String ALIGNMENTCARD = "alignment";
+    private static String SEQPAIRCARD = "sequencePair";
+    
+    private String selectedViewer;
 
     public ExternalViewerTopComponent() {
         initComponents();
@@ -50,18 +56,19 @@ public final class ExternalViewerTopComponent extends TopComponent {
     private void initComponents() {
 
         switchPanel = new javax.swing.JPanel();
-        seqlogoButton = new javax.swing.JButton();
+        histogramButton = new javax.swing.JButton();
         alignmentButton = new javax.swing.JButton();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        colorHistogramBox = new javax.swing.JCheckBox();
+        sequencePairButton = new javax.swing.JButton();
         viewerPanel = new javax.swing.JPanel();
         cardPanel = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(seqlogoButton, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.seqlogoButton.text")); // NOI18N
-        seqlogoButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(histogramButton, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.histogramButton.text")); // NOI18N
+        histogramButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                seqlogoButtonActionPerformed(evt);
+                histogramButtonActionPerformed(evt);
             }
         });
 
@@ -72,13 +79,20 @@ public final class ExternalViewerTopComponent extends TopComponent {
             }
         });
 
-        jCheckBox1.setFont(new java.awt.Font("Dialog", 1, 10));
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.jCheckBox1.text")); // NOI18N
-        jCheckBox1.setMinimumSize(new java.awt.Dimension(50, 22));
-        jCheckBox1.setPreferredSize(new java.awt.Dimension(100, 22));
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        colorHistogramBox.setFont(new java.awt.Font("Dialog", 1, 10));
+        org.openide.awt.Mnemonics.setLocalizedText(colorHistogramBox, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.colorHistogramBox.text")); // NOI18N
+        colorHistogramBox.setMinimumSize(new java.awt.Dimension(50, 22));
+        colorHistogramBox.setPreferredSize(new java.awt.Dimension(100, 22));
+        colorHistogramBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                colorHistogramBoxActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(sequencePairButton, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.sequencePairButton.text")); // NOI18N
+        sequencePairButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sequencePairButtonActionPerformed(evt);
             }
         });
 
@@ -88,24 +102,27 @@ public final class ExternalViewerTopComponent extends TopComponent {
             switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(switchPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(seqlogoButton)
-                    .addComponent(alignmentButton))
-                .addContainerGap(52, Short.MAX_VALUE))
+                .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(histogramButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(alignmentButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(sequencePairButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(54, Short.MAX_VALUE))
             .addGroup(switchPanelLayout.createSequentialGroup()
-                .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
-                .addGap(24, 24, 24))
+                .addComponent(colorHistogramBox, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                .addGap(46, 46, 46))
         );
         switchPanelLayout.setVerticalGroup(
             switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(switchPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(seqlogoButton)
+                .addComponent(histogramButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sequencePairButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(200, Short.MAX_VALUE))
+                .addComponent(colorHistogramBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(171, Short.MAX_VALUE))
         );
 
         add(switchPanel, java.awt.BorderLayout.WEST);
@@ -120,31 +137,44 @@ public final class ExternalViewerTopComponent extends TopComponent {
         add(viewerPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void seqlogoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seqlogoButtonActionPerformed
-        logoBasePanel.getViewer().setActive(true);
-        alignmentBasePanel.getViewer().setActive(false);
-        cards.show(cardPanel, LOGOCARD);
-}//GEN-LAST:event_seqlogoButtonActionPerformed
+    private void histogramButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramButtonActionPerformed
+        this.selectedViewer = HISTOGRAMCARD;
+        this.changeViewerStatus(this.selectedViewer, true);
+        this.changeViewerStatus(ALIGNMENTCARD, false);
+        this.changeViewerStatus(SEQPAIRCARD, false);
+        cards.show(cardPanel, HISTOGRAMCARD);
+}//GEN-LAST:event_histogramButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
-        logoBasePanel.getViewer().setActive(false);
-        alignmentBasePanel.getViewer().setActive(true);
-        alignmentBasePanel.getViewer().setActive(true); //to ensure size calculation is performed correctly
+        this.selectedViewer = ALIGNMENTCARD;
+        this.changeViewerStatus(HISTOGRAMCARD, false);
+        this.changeViewerStatus(this.selectedViewer, true);
+        this.changeViewerStatus(SEQPAIRCARD, false);
+        //alignmentBasePanel.getViewer().setActive(true); //to ensure size calculation is performed correctly
         cards.show(cardPanel, ALIGNMENTCARD);
 }//GEN-LAST:event_alignmentButtonActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        HistogramViewer vi = (HistogramViewer) logoBasePanel.getViewer();
-        vi.isColored(jCheckBox1.isSelected());
+    private void colorHistogramBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorHistogramBoxActionPerformed
+        HistogramViewer vi = (HistogramViewer) histogramBasePanel.getViewer();
+        vi.isColored(colorHistogramBox.isSelected());
         vi.boundsChangedHook();
         vi.repaint();
-}//GEN-LAST:event_jCheckBox1ActionPerformed
+}//GEN-LAST:event_colorHistogramBoxActionPerformed
+
+private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequencePairButtonActionPerformed
+        this.selectedViewer = SEQPAIRCARD;
+        this.changeViewerStatus(HISTOGRAMCARD, false);
+        this.changeViewerStatus(ALIGNMENTCARD, false);
+        this.changeViewerStatus(this.selectedViewer, true);
+        this.cards.show(cardPanel, SEQPAIRCARD);
+}//GEN-LAST:event_sequencePairButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton alignmentButton;
     private javax.swing.JPanel cardPanel;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JButton seqlogoButton;
+    private javax.swing.JCheckBox colorHistogramBox;
+    private javax.swing.JButton histogramButton;
+    private javax.swing.JButton sequencePairButton;
     private javax.swing.JPanel switchPanel;
     private javax.swing.JPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
@@ -189,24 +219,31 @@ public final class ExternalViewerTopComponent extends TopComponent {
         ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        this.alignmentBasePanel = factory.getDetailTrackBasePanel(this.trackConnector);
-        this.alignmentBasePanel.getViewer().setActive(false);
-        this.logoBasePanel = factory.getSequenceLogoBasePanel(this.trackConnector);
-        this.logoBasePanel.getViewer().setActive(true);
-
+        this.seqPairBasePanel = factory.getSeqPairBasePanel(this.trackConnector);
+        this.changeViewerStatus(SEQPAIRCARD, false);
+        this.alignmentBasePanel = factory.getAlignmentViewBasePanel(this.trackConnector);
+        this.changeViewerStatus(ALIGNMENTCARD, false);
+        this.histogramBasePanel = factory.getHistogrammViewerBasePanel(this.trackConnector);
+        this.changeViewerStatus(HISTOGRAMCARD, true);
+        this.selectedViewer = HISTOGRAMCARD;
+        
         this.cards = (CardLayout) this.cardPanel.getLayout();
         
+        this.cardPanel.add(this.seqPairBasePanel, SEQPAIRCARD);
         this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
-        this.cardPanel.add(this.logoBasePanel, LOGOCARD);
-        this.cards.show(this.cardPanel, LOGOCARD);
+        this.cardPanel.add(this.histogramBasePanel, HISTOGRAMCARD);
+        this.cards.show(this.cardPanel, HISTOGRAMCARD);
+        
     }
 
     @Override
     public void componentClosed() {
         this.alignmentBasePanel.close();
-        this.logoBasePanel.close();
+        this.histogramBasePanel.close();
+        this.seqPairBasePanel.close();
         this.alignmentBasePanel = null;
-        this.logoBasePanel = null;
+        this.histogramBasePanel = null;
+        this.seqPairBasePanel = null;
     }
 
     void writeProperties(java.util.Properties p) {
@@ -236,5 +273,45 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
     public void setTrackConnector(TrackConnector trackConnector){
         this.trackConnector = trackConnector;
+    }
+    
+    
+    /*
+     * Overriding these two methods ensures that only displayed components are updated
+     * and thus increases performance of the viewers.
+     */
+    @Override
+    public void componentShowing(){
+        changeViewerStatus(getActiveViewer(), true);
+    }
+    
+    @Override
+    public void componentHidden(){
+        changeViewerStatus(getActiveViewer(), false);
+    }
+    
+    /**
+     * @return the property representing the currently active viewer
+     */
+    public String getActiveViewer(){
+        return this.selectedViewer;
+    }  
+    
+
+    /**
+     * Update the viewer status of the selectedViewer
+     * @param selectedViewer the viewer whose status is to be changed
+     * @param activated true, if the viewer should be activated, false, if not
+     */
+    public void changeViewerStatus(String selectedViewer, boolean activated) {
+        if (selectedViewer.equals(HISTOGRAMCARD)) {
+            this.histogramBasePanel.getViewer().setActive(activated);
+        }
+        if (selectedViewer.equals(ALIGNMENTCARD)) {
+            this.alignmentBasePanel.getViewer().setActive(activated);
+        }
+        if (selectedViewer.equals(SEQPAIRCARD)) {
+            this.seqPairBasePanel.getViewer().setActive(activated);
+        }
     }
 }

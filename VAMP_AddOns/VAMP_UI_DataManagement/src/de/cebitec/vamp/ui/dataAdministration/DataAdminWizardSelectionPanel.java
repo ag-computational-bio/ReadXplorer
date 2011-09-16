@@ -90,7 +90,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
     private Map<String, List<? extends Job>> getDeletableReferencesAndTracks(){
         List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
         List<TrackJob> trackJobs = new ArrayList<TrackJob>();
-        HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
+        HashMap<Integer, ReferenceJob> indexedGens = new HashMap<Integer, ReferenceJob>();
 
         List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
         for(Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext(); ){

@@ -10,6 +10,7 @@ import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.ISeqPairClassifier;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.Properties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,18 +25,13 @@ import org.openide.util.lookup.ServiceProvider;
  * each sequence pair mapping and returns which sequence pairs could be mapped successfully,
  * which do not have a sequence in the correct distance or/and orientation and which cannot be assigned
  * to at least one position. Thus it covers all possible pairing cases.
+ * 
+ * TODO: identify when pair goes across end of genome! but only if circular referece genome!
  *
  * @author Rolf Hilker
  */
 @ServiceProvider(service = ISeqPairClassifier.class)
 public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observable {
-
-    public static final byte TYPE_PERFECT = 0;
-    public static final byte TYPE_DIST_LARGE = 1;
-    public static final byte TYPE_DIST_SMALL = 2;
-    public static final byte TYPE_ORIENT_WRONG = 3;
-    public static final byte TYPE_OR_DIST_LARGE = 4;
-    public static final byte TYPE_OR_DIST_SMALL = 5;
     
     private ArrayList<Observer> observers;
     private ParsedTrack track1;
@@ -106,6 +102,8 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
         
         
         this.seqPairContainer = new ParsedSeqPairContainer();
+        this.seqPairContainer.setTrackId1(this.track1.getID());
+        this.seqPairContainer.setTrackId2(this.track2.getID());
         HashMap<String, Integer> idToNameMap1 = this.track1.getReadnameToSeqIdMap();
         HashMap<String, Integer> idToNameMap2 = this.track2.getReadnameToSeqIdMap();
         Iterator<String> it1 = idToNameMap1.keySet().iterator();
@@ -168,6 +166,9 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
          * 2 = ff -r1(1)-> -r2(1)-> (stop1<start2) oder <-r2(-1)- <-r1(-1)- (stop2 < start1)
          */
         
+        int count = 0;
+        int overall = 0;
+        
         while(it1.hasNext()){ //block for one readname
             currReadname = it1.next();
             seqID1 = idToNameMap1.get(currReadname);
@@ -201,26 +202,31 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
                         } else {
                             currDist = Math.abs(start2 - stop1);
                         }
+                        
+                        System.out.println("curr dist: " +currDist);
+                        ++count;
+                        overall += currDist;
+                        System.out.println("Overall dist: "+overall/count);
 
                         if (currDist <= this.maxDist && currDist >= this.minDist) {
                             ///////////////////////////// found a perfect pair! /////////////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, SeqPairClassifier.TYPE_PERFECT);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR);
                             ++nbPerfectPairs;
                         } else if (currDist < this.maxDist) { //both reads of pair mapped, but distance in reference is different
                             ///////////////////////////// imperfect pair, distance too small /////////////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, SeqPairClassifier.TYPE_DIST_SMALL);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR);
                         } else { //////////////// imperfect pair, distance too large //////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, SeqPairClassifier.TYPE_DIST_LARGE);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_DIST_LARGE_PAIR);
                         }
                     } else { //////////////////////////// inversion of one read ////////////////////////////////
                         currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
 
                         if (currDist <= this.maxDist && currDist >= this.minDist) {////distance fits, orientation not ///////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, SeqPairClassifier.TYPE_ORIENT_WRONG);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR);
                         } else if (currDist < this.maxDist) {///// orientation wrong & distance too small //////////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, SeqPairClassifier.TYPE_OR_DIST_SMALL);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR);
                         } else { //////////////// orientation wrong & distance too large //////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, SeqPairClassifier.TYPE_OR_DIST_LARGE);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_LARGE_PAIR);
                         }
                     }
                 } else {
@@ -254,22 +260,22 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
                                     if (currDist <= this.maxDist && currDist >= this.minDist) { //distance fits
                                         ///////////////////////////// found a perfect pair! /////////////////////////////////
                                         if (parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) {
-                                            this.addPairedMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_PERFECT);
+                                            this.addPairedMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR);
                                             ++nbPerfectPairs;
                                             omitIdList.add(parsedMappingA.getID());
                                             omitIdList.add(parsedMappingB.getID());
                                             break; //jump to next mapping1
                                         } else {//////////////// store potential perfect pair //////////////////////////
-                                            potPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_PERFECT));
+                                            potPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR));
                                         }
                                     } else //////////////// distance too small, potential pair //////////////////////////
                                     if (currDist < this.maxDist) {
                                         if (largestSmallerDist < currDist && parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) { //best mappings
                                             largestSmallerDist = currDist;
-                                            potSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_DIST_SMALL));
+                                            potSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR));
                                         } else if (largestPotSmallerDist < currDist) { //at least one common mapping in potential pair
                                             largestPotSmallerDist = currDist;
-                                            potPotSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_DIST_SMALL));
+                                            potPotSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR));
                                         }
                                     } else {//////////////// distance too small or large //////////////////////////
                                         //TODO: something to do??
@@ -279,17 +285,17 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 
                                     if (currDist <= this.maxDist && currDist >= this.minDist) { ////distance fits, orientation not ///////////
                                         if (parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) { //best mappings
-                                            unorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_ORIENT_WRONG));
+                                            unorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR));
                                         } else {
-                                            potUnorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_ORIENT_WRONG));
+                                            potUnorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR));
                                         }
                                     } else if (currDist < this.maxDist && largestSmallerDist < currDist) {///// orientation wrong & distance too small //////////////////////////////
                                         if (largestUnorSmallerDist < currDist && parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) { //best mappings
                                             largestUnorSmallerDist = currDist;
-                                            unorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_OR_DIST_SMALL));
+                                            unorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR));
                                         } else if (largestPotUnorSmallerDist < currDist) {
                                             largestPotUnorSmallerDist = currDist;
-                                            potUnorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, SeqPairClassifier.TYPE_OR_DIST_SMALL));
+                                            potUnorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR));
                                         }
                                     } else { //////////////// orientation wrong & distance too large //////////////////////////
                                         //TODO: something to do??
@@ -385,6 +391,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
             }
         }
         this.seqPairContainer.setNumOfSeqPairs(interimSeqPairId);
+        this.seqPairContainer.setNumOfSingleMappings(this.seqPairContainer.getMappingToPairIdList().size());
         return seqPairContainer;
               
 
@@ -392,19 +399,19 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 //                            if (currDist <= this.maxDist && currDist >= this.minDist) {
 //                                ///////////////////////////// found a perfect pair! /////////////////////////////////
 //                                if(parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()){
-//                                    this.addPairedMapping(parsedMappingA, parsedMappingB, interimSeqPairId, SeqPairClassifier.TYPE_PERFECT);
+//                                    this.addPairedMapping(parsedMappingA, parsedMappingB, interimSeqPairId, Properties.TYPE_PERFECT);
 //                                    ++nbPerfectPairs;
 //                                    blockedIDList.add(parsedMappingA.getID());
 //                                    blockedIDList.add(parsedMappingB.getID());
 //                                    break; //jump to next mapping1
 //                                } else {//////////////// store potential perfect pair //////////////////////////
-//                                    potPairList.add(new ParsedSeqPairMapping(parsedMappingA, parsedMappingB, interimSeqPairId, SeqPairClassifier.TYPE_PERFECT));
+//                                    potPairList.add(new ParsedSeqPairMapping(parsedMappingA, parsedMappingB, interimSeqPairId, Properties.TYPE_PERFECT));
 //                                }
 //                            } else //////////////// distance too small, potential pair //////////////////////////
 //                            if (currDist < this.maxDist && largestSmallerDist < currDist) {
 //                                if(parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()){
 //                                    largestSmallerDist = currDist;
-//                                    potSmallPair = new ParsedSeqPairMapping(parsedMappingA, parsedMappingB, interimSeqPairId, SeqPairClassifier.TYPE_DIST_SMALL);
+//                                    potSmallPair = new ParsedSeqPairMapping(parsedMappingA, parsedMappingB, interimSeqPairId, Properties.TYPE_DIST_SMALL);
 //                                } else {
 //                                    
 //                                }
@@ -416,7 +423,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 //                            currDist = start1 < start2 ? start2 - stop1 : start1 - stop2;
 //
 //                            if (currDist <= this.maxDist && currDist >= this.minDist) { ////distance fits, orientation not ///////////
-//                                potPairList.add(new ParsedSeqPairMapping(parsedMappingA, parsedMappingB, interimSeqPairId, SeqPairClassifier.TYPE_ORIENT_WRONG));
+//                                potPairList.add(new ParsedSeqPairMapping(parsedMappingA, parsedMappingB, interimSeqPairId, Properties.TYPE_ORIENT_WRONG));
 //                            } else if (currDist < this.maxDist && largestSmallerDist < currDist) {///// orientation wrong & distance too small //////////////////////////////
 //                                largestSmallerDist = currDist;
 //                            } else { //////////////// orientation wrong & distance too large //////////////////////////
@@ -465,7 +472,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 //                                
 //                                if (currDist <= this.maxDist && currDist >= this.minDist) {
 //                                    ///////////////////////////// found a perfect pair! /////////////////////////////////
-//                                    this.addPairedMapping(parsedMappingA, parsedMappingB, interimSeqPairId, SeqPairClassifier.TYPE_PERFECT);
+//                                    this.addPairedMapping(parsedMappingA, parsedMappingB, interimSeqPairId, Properties.TYPE_PERFECT);
 //                                    ++nbPerfectPairs;
 //                                    
 //                                } else //////////////// distance too small, potential pair //////////////////////////
@@ -479,7 +486,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
 //                                currDist = start1 < start2 ? start2 - stop1 : start1 - stop2;
 //                                
 //                                if (currDist <= this.maxDist && currDist >= this.minDist) { ////distance fits, orientation not ///////////
-//                                   this.addPairedMapping(parsedMappingA, parsedMappingB, interimSeqPairId, SeqPairClassifier.TYPE_ORIENT_WRONG); 
+//                                   this.addPairedMapping(parsedMappingA, parsedMappingB, interimSeqPairId, Properties.TYPE_ORIENT_WRONG); 
 //                                } else 
 //                                if (currDist < this.maxDist && largestSmallerDist < currDist) {///// orientation wrong & distance too small //////////////////////////////
 //                                    largestSmallerDist = currDist;

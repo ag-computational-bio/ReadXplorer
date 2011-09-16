@@ -260,7 +260,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     /**
      * Create a GeneralPath that represents the coverage
-     * @param orientation if -1, coverage is drawn from buttom to top, if 1 otherwise
+     * @param orientation if -1, coverage is drawn from bottom to top, if 1 otherwise
      * @param values the values for the currently displayed range
      * @return GeneralPath representing the coverage
      */
@@ -278,7 +278,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             int right = transformToLogicalCoord(d + 1) -1;
 
             // physical coordinate d and d+1 may cover the same base, depending on zoomlevel,
-            // if not compute max of range of balues represented at position d
+            // if not compute max of range of values represented at position d
             int value;
             if(right > left){
 

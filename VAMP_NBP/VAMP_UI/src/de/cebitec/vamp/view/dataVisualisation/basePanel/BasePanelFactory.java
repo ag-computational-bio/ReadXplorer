@@ -12,6 +12,7 @@ import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
@@ -143,7 +144,7 @@ public class BasePanelFactory {
     }
 
 
-    public BasePanel getDetailTrackBasePanel(TrackConnector connector){
+    public BasePanel getAlignmentViewBasePanel(TrackConnector connector){
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
@@ -151,7 +152,7 @@ public class BasePanelFactory {
         AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGen, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), this.getDetailViewLegend());
+        viewer.setupLegend(new LegendLabel(viewer), this.getAlignmentViewLegend());
 
         // add panels to basepanel and add scrollbars
         b.setViewerInScrollpane(viewer);
@@ -161,7 +162,7 @@ public class BasePanelFactory {
         return b;
     }
 
-    public BasePanel getSequenceLogoBasePanel(TrackConnector connector){
+    public BasePanel getHistogrammViewerBasePanel(TrackConnector connector){
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
@@ -169,7 +170,7 @@ public class BasePanelFactory {
         HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGen, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), getSequenceLogoLegend());
+        viewer.setupLegend(new LegendLabel(viewer), getHistogramViewerLegend());
 
         // add panels to basepanel
         b.setViewer(viewer);
@@ -179,7 +180,30 @@ public class BasePanelFactory {
         return b;
 
     }
+    
+    /**
+     * @param connector track connector of first track of two sequence pair tracks
+     * @return A viewer for sequence pair data
+     */
+    public BasePanel getSeqPairBasePanel(TrackConnector connector){
+        BasePanel b = new BasePanel(boundsManager, viewController);
+        viewController.addMousePositionListener(b);
 
+        // create a sequence pair viewer
+        SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGen, connector);
+
+        // create a legend
+        viewer.setupLegend(new LegendLabel(viewer), this.getSeqPairViewerLegend());
+
+        // add panels to basepanel and add scrollbars
+        b.setViewerInScrollpane(viewer);
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
+
+        return b;
+    }
+
+    
     private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider){
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
@@ -232,8 +256,8 @@ public class BasePanelFactory {
             protected void paintComponent(Graphics g){
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g;
-                GradientPaint blacktowhite = new GradientPaint(0,0,Color.BLACK, this.getSize().width-1, 0,Color.WHITE);
-                g2.setPaint(blacktowhite);
+                GradientPaint whiteToBlack = new GradientPaint(0,0,Color.WHITE, this.getSize().width-1, 0,Color.BLACK);
+                g2.setPaint(whiteToBlack);
                 g2.fill(new Rectangle2D.Double(0, 0, this.getSize().width, this.getSize().height));
                 g2.setPaint(null);
                 g2.setColor(Color.black);
@@ -277,7 +301,7 @@ public class BasePanelFactory {
         return legend;
     }
 
-    private JPanel getSequenceLogoLegend(){
+    private JPanel getHistogramViewerLegend(){
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -293,7 +317,7 @@ public class BasePanelFactory {
         return legend;
     }
 
-    private JPanel getDetailViewLegend(){
+    private JPanel getAlignmentViewLegend(){
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -301,8 +325,21 @@ public class BasePanelFactory {
         legend.add(getLegendEntry(ColorProperties.PERFECT_MATCH, "Perfect Match"));
         legend.add(getLegendEntry(ColorProperties.BEST_MATCH, "Best Match"));
         legend.add(getLegendEntry(ColorProperties.N_ERROR_COLOR, "Ordinary Match"));
-        legend.add(getGradientEntry("Coverage"));
+        legend.add(getGradientEntry("Low to high coverage"));
         legend.add(getLegendEntry(ColorProperties.ALIGNMENT_A, "Diff."));
+
+        return legend;
+    }
+    
+        private JPanel getSeqPairViewerLegend(){
+        JPanel legend = new JPanel();
+        legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
+        legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
+
+        legend.add(getLegendEntry(ColorProperties.BLOCK_PERFECT, "Perfect seq. pair"));
+        legend.add(getLegendEntry(ColorProperties.BLOCK_DIST_LARGE, "Distorted seq. pair"));
+        legend.add(getLegendEntry(ColorProperties.BLOCK_UNPAIRED, "Single mapping"));
+        legend.add(getGradientEntry("Perfect to best to common mappings"));
 
         return legend;
     }

@@ -19,6 +19,6 @@ public interface Job {
 
     public Timestamp getTimestamp();
 
-    public Long getID();
+    public int getID();
 
 }

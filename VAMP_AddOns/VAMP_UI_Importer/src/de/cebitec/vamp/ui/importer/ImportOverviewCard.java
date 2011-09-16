@@ -19,7 +19,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList) {
+    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList, List<SeqPairJobContainer> seqPairJobList) {
         overviewTextArea.setText("");
 
         if(!refGenJobList.isEmpty()){
@@ -40,6 +40,17 @@ public class ImportOverviewCard extends javax.swing.JPanel {
                 TrackJob r = it.next();
                 overviewTextArea.append(r.getFile().getAbsolutePath()+"\n");
                 overviewTextArea.append("\t"+r.getDescription()+"\n");
+            }
+        }
+        
+        if(!seqPairJobList.isEmpty()){
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.seqPairs") + ":\n");
+            for(Iterator<SeqPairJobContainer> it = seqPairJobList.iterator(); it.hasNext(); ){
+                SeqPairJobContainer seqPairCont = it.next();
+                overviewTextArea.append(seqPairCont.getTrackJob1().getFile().getAbsolutePath()+"\n");
+                overviewTextArea.append("\t"+seqPairCont.getTrackJob1().getDescription()+"\n");
+                overviewTextArea.append(seqPairCont.getTrackJob2().getFile().getAbsolutePath()+"\n");
+                overviewTextArea.append("\t"+seqPairCont.getTrackJob2().getDescription()+"\n");
             }
         }
     }

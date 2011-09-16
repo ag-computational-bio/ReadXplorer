@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.MappingExcusePanel;
 import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -32,7 +31,6 @@ public class AlignmentViewer extends AbstractViewer {
     private PersistantReference refGen;
     private int blockHeight;
     private int layerHeight;
-    private MappingExcusePanel mappingExcuse;
     private ZoomLevelExcusePanel zoomExcuse;
 //    private int minCountInInterval;
     private int maxCountInInterval;
@@ -48,14 +46,14 @@ public class AlignmentViewer extends AbstractViewer {
         this.refGen = refGen;
         this.trackConnector = trackConnector;
         this.setInDrawingMode(false);
-        this.showSequenceBar(true);
+        this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
-        mappingExcuse = new MappingExcusePanel();
         zoomExcuse = new ZoomLevelExcusePanel();
         minSaturationAndBrightness = 0.3f;
         maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
+        this.setActive(false);
     }
 
     @Override
@@ -98,8 +96,6 @@ public class AlignmentViewer extends AbstractViewer {
                 // setup the layout of mappings
                 this.createAndShowNewLayout(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
                 this.getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
-            } else {
-                this.placeExcusePanel(mappingExcuse);
             }
 
         } else {
@@ -184,6 +180,12 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
 
+    /**
+     * After creating a layout this method creates all visual components which
+     * represent the layout. Thus it creates all block components. 
+     * Each block component depicts one mapping.
+     * @param layout the layout containing all information about the mappings to paint
+     */
     private void addBlocks(LayoutI layout) {
         int layerCounter;
         int countingStep;
@@ -231,6 +233,12 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
 
+    /**
+     * Creates a new block component vertically in the current layer and horizontally
+     * covering it's aligned genome positions.
+     * @param block the block to create a jblock (block component) for
+     * @param layerCounter determines in which layer the block should be painted
+     */
     private void createJBlock(BlockI block, int layerCounter) {
         BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, minSaturationAndBrightness, percentSandBPerCovUnit);
 

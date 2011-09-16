@@ -29,7 +29,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
     public static final String PROP_HAS_JOBS = "hasJobs";
     public static final String PROP_JOB_SELECTED = "jobSelected";
 
-    private long trackID = 0;
+    private int trackID = 0;
 
     /** Creates new form SetupImportCard */
     public ImportSetupCard() {
@@ -198,8 +198,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 else if (dialogPane instanceof NewSeqPairTracksDialogPanel){
                     NewSeqPairTracksDialogPanel seqPairPane = (NewSeqPairTracksDialogPanel) dialogPane;
                     ReferenceJob refJob = seqPairPane.getReferenceJob();
-                    TrackJob trackJob1 = new TrackJob(trackID++, seqPairPane.getMappingFile1(), seqPairPane.getDescription(), refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
-                    TrackJob trackJob2 = new TrackJob(trackID++, seqPairPane.getMappingFile2(), seqPairPane.getDescription(), refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob1 = new TrackJob(trackID++, seqPairPane.getMappingFile1(), seqPairPane.getDescription()+" Track 1", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob2 = new TrackJob(trackID++, seqPairPane.getMappingFile2(), seqPairPane.getDescription()+" Track 2", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
                     refJob.registerTrackWithoutRunJob(trackJob1);
                     refJob.registerTrackWithoutRunJob(trackJob2);                    
                     this.seqPairTrackJobsView.add(new SeqPairJobContainer(trackJob1, trackJob2, 

@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.common;
 
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.Properties;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,11 +13,13 @@ import java.util.List;
  */
 public class ParsedSeqPairContainer {
     
-    //have to be calculated after parsing
-    private long numOfPerfectSPs;
-    private long numUniquePerfectSPs;
-    private long numOfSeqPairs = 0;
-    private long numOfUniqueSPs = 0;
+    private int trackId1;
+    private int trackId2;
+    private long numOfPerfectSPs = 0;
+    private long numUniquePerfectSPs = 0; //counted here
+    private long numOfSeqPairs = 0; //counted here
+    private long numOfUniqueSPs = 0; //container size at the end of classification
+    private long numOfSingleMappings = 0; //container size at the end of classification
     private String description;
     
     private HashMap<Pair<Long, Long>, ParsedSeqPairMapping> parsedSeqPairs;
@@ -29,18 +32,20 @@ public class ParsedSeqPairContainer {
     }
 
     /*
-     * MappingGroup = alle Mappings mit selber Sequenz, aber untersch. pos
-     * Mapping = zu einer sequenz und einer pos
-     * bei 3 mappings in group für id 1 hieße das: 3 pos im genom, wenn selbes bei read2 auch dann
-     * teste also erst auf perfektes mapping und wenn keins da, dann: speichere alle mapping ids zu pair id
-     * wenn eins oder mehrere da dann nur die zusätzlichen mapping ids zur pairid speichern
-     * 
+     * Adds all mappings to a MappingGroup with same pair id, 
+     * but different mapping positions
+     * Mapping = is unique to a sequence and position
      */
     public void addParsedSeqPair(Pair<Long, Long> mappingIDs, ParsedSeqPairMapping parsedSeqPair) {
         if(!this.parsedSeqPairs.containsKey(mappingIDs)){
-            this.parsedSeqPairs.put(mappingIDs, parsedSeqPair);            
+            this.parsedSeqPairs.put(mappingIDs, parsedSeqPair);   
+            if (parsedSeqPair.getType() == Properties.TYPE_PERFECT_PAIR) {
+                ++this.numUniquePerfectSPs;
+                ++this.numOfPerfectSPs;
+            }        
         } else {
             this.parsedSeqPairs.get(mappingIDs).addReplicate();
+            ++this.numOfPerfectSPs;
         }
         ++this.numOfSeqPairs;
     }
@@ -60,6 +65,7 @@ public class ParsedSeqPairContainer {
 
     
     public void setNumOfPerfectSPs(long numOfPerfectSPs) {
+        System.out.println("old num perf sps: " + this.numOfPerfectSPs + ", new: "+numOfPerfectSPs);
         this.numOfPerfectSPs = numOfPerfectSPs;
     }
 
@@ -70,6 +76,7 @@ public class ParsedSeqPairContainer {
 
     
     public void setNumUniquePerfectSPs(long numUniquePerfectSPs) {
+        System.out.println("old: " + this.numUniquePerfectSPs + ", new: "+numUniquePerfectSPs);
         this.numUniquePerfectSPs = numUniquePerfectSPs;
     }
 
@@ -102,6 +109,18 @@ public class ParsedSeqPairContainer {
     public HashMap<Pair<Long, Long>, ParsedSeqPairMapping> getParsedSeqPairs() {
         return parsedSeqPairs;
     }
+
+    
+    public long getNumOfSingleMappings() {
+        return this.numOfSingleMappings;
+    }
+
+    
+    public void setNumOfSingleMappings(long numOfSingleMappings) {
+        this.numOfSingleMappings = numOfSingleMappings;
+    }
+    
+    
     
     /**
      * @return The mapping list of all mapping ids to their corresponding 
@@ -123,5 +142,23 @@ public class ParsedSeqPairContainer {
     public void clear(){
         parsedSeqPairs.clear();
     }
+
+    public int getTrackId1() {
+        return trackId1;
+    }
+
+    public void setTrackId1(int trackId1) {
+        this.trackId1 = trackId1;
+    }
+
+    public int getTrackId2() {
+        return trackId2;
+    }
+
+    public void setTrackId2(int trackId2) {
+        this.trackId2 = trackId2;
+    }
+    
+    
     
 }

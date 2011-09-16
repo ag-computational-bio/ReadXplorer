@@ -44,7 +44,10 @@ public final class LogoutAction implements ActionListener {
             }
             //reset main window title
             JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
-            mainFrame.setTitle(mainFrame.getTitle().substring(0, mainFrame.getTitle().indexOf('-')-1));
+            if (mainFrame.getTitle().indexOf('-') > -1){
+                mainFrame.setTitle(mainFrame.getTitle().substring(0, mainFrame.getTitle().indexOf('-')-1));
+            }
+            
             CentralLookup.getDefault().remove(context);
         }
     }

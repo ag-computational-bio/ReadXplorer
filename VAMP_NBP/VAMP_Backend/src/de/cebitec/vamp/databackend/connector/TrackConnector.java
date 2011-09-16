@@ -11,6 +11,8 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 //import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.GenericSQLQueries;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,9 +30,9 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
-public class TrackConnector implements ITrackConnector{
+public class TrackConnector implements ITrackConnector {
 
     /* !!!!!!!!!!!!
      * Note that all parts belonging to the RUN domain have been commented out!
@@ -80,7 +82,7 @@ public class TrackConnector implements ITrackConnector{
     }
 
     private void startCoverageThread(List<PersistantTrack> tracks){
-        List<Long> trackIds = new ArrayList<Long>(tracks.size());
+        List<Integer> trackIds = new ArrayList<Integer>(tracks.size());
         for (PersistantTrack track : tracks) {
             trackIds.add(track.getId());
         }
@@ -109,7 +111,7 @@ public class TrackConnector implements ITrackConnector{
 
     @Override
     public Collection<PersistantMapping> getMappings(int from, int to) {
-        HashMap<Integer, PersistantMapping> mappings = new HashMap<Integer, PersistantMapping>();
+        HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
 
         if (from < to) {
             try {
@@ -328,7 +330,11 @@ public class TrackConnector implements ITrackConnector{
     public int getNumOfUniquePerfectSeqPairs(){
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_PERFECT_SEQ_PAIRS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
     }
-
+    
+    @Override
+    public int getNumOfSingleMappings(){
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SINGLE_MAPPINGS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
+    }
     
     @Override
     public int getNumOfPerfectUniqueMappings() {
@@ -411,15 +417,13 @@ public class TrackConnector implements ITrackConnector{
         }
         return positionMap;
     }
-
     
     
-
     @Override
-    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings, 
-            int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete, int numReads, 
-            int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
+    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq, 
+            int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM, 
+            double coverageComplete, int numReads) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics");
         try {
             PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
@@ -430,10 +434,12 @@ public class TrackConnector implements ITrackConnector{
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
+            latestID.close();
             id++;
+
             int covPerf = (int) (coveragePerf / 100 * genomeSize);
             int covBM = (int) (coverageBM / 100 * genomeSize);
-            int covComplete = (int) (coverageComplete/ 100 * genomeSize);
+            int covComplete = (int) (coverageComplete / 100 * genomeSize);
             // store track in table
             insertStatistics.setLong(1, id);
             insertStatistics.setLong(2, trackID);
@@ -446,22 +452,50 @@ public class TrackConnector implements ITrackConnector{
             insertStatistics.setInt(9, covComplete);
             insertStatistics.setInt(10, numUniqueSeq);
             insertStatistics.setInt(11, numReads);
-            insertStatistics.setInt(12, numSeqPairs);
-            insertStatistics.setInt(13, numPerfectSeqPairs);
-            insertStatistics.setInt(14, numUniqueSeqPairs);
-            insertStatistics.setInt(15, numUniquePerfectSeqPairs);
             insertStatistics.execute();
-
             insertStatistics.close();
-            latestID.close();
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track statistics");
 
+    }
+    
+    @Override
+    public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs, 
+            int numUniquePerfectSeqPairs, int numSingleMappings) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
+        try {
+            PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.ADD_SEQPAIR_STATISTICS);
+            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
+
+            // get latest id for track
+            long id = 0;
+            ResultSet rs = latestID.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("LATEST_ID");
+            }
+            latestID.close();
+            id++;
+
+            addSeqPairStats.setLong(1, id);
+            addSeqPairStats.setInt(2, numSeqPairs);
+            addSeqPairStats.setInt(3, numPerfectSeqPairs);
+            addSeqPairStats.setInt(4, numUniqueSeqPairs);
+            addSeqPairStats.setInt(5, numUniquePerfectSeqPairs);
+            addSeqPairStats.setInt(6, numSingleMappings);
+            addSeqPairStats.execute();
+            addSeqPairStats.close();
+
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair statistics");
+
+    }
 
 //    @Override
 //    public long getRunId() {
@@ -717,22 +751,243 @@ public class TrackConnector implements ITrackConnector{
 
     @Override
     public int getNumOfSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return -1; //TODO: implement seq pair stats calculate
     }
 
     @Override
     public int getNumOfPerfectSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return -1;
     }
 
     @Override
     public int getNumOfUniqueSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return -1;
     }
 
     @Override
     public int getNumOfUniquePerfectSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+       return -1;
+    }
+    
+    @Override 
+    public int getNumOfSingleMappingsCalculate(){
+        return -1;
+    }
+
+    public Collection<PersistantSeqPairGroup> getSeqPairMappings(int from, int to, int trackID2) {
+        HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<Long, PersistantSeqPairGroup>();
+        if (from < to) {
+
+            try {
+
+                //determine readlength
+                //TODO: ensure this is only calculated when track id or db changed!
+                PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
+                fetchReadlength.setLong(1, trackID);
+                ResultSet rsReadlength = fetchReadlength.executeQuery();
+
+                int readlength = 1000;
+                final int spacer = 10;
+                if (rsReadlength.next()) {
+                    int start = rsReadlength.getInt(FieldNames.MAPPING_START);
+                    int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
+                    readlength = stop - start + spacer;
+                }
+                fetchReadlength.close();
+
+                //sequence pair processing
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL);
+                fetch.setLong(1, from - readlength);
+                fetch.setLong(2, to);
+                fetch.setLong(3, from);
+                fetch.setLong(4, to + readlength);
+                fetch.setLong(5, trackID);
+                fetch.setLong(6, trackID2);
+
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+
+                    // mapping data
+                    int mappingID = rs.getInt("MAPPING_ID");
+                    int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
+                    int mappingTrack = rs.getInt(FieldNames.MAPPING_TRACK);
+                    int start = rs.getInt(FieldNames.MAPPING_START);
+                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                    int count = rs.getInt("MAPPING_REP");
+                    int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    int bestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
+                    boolean isBestMapping = (bestMapping == 1 ? true : false);
+                    long seqPairID = rs.getLong("ORIG_PAIR_ID");
+                    long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING1_ID);
+                    long mapping2Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
+                    byte seqPairType = rs.getByte(FieldNames.SEQ_PAIR_TYPE);
+                    int seqPairReplicates = rs.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
+                    PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+                    
+                     // add new seqPair if not exists
+                    if (!seqPairs.containsKey(seqPairID)) {
+                        PersistantSeqPairGroup newGroup = new PersistantSeqPairGroup();
+                        newGroup.setSeqPairId(seqPairID);
+                        seqPairs.put(seqPairID, newGroup);
+                    }
+                    seqPairs.get(seqPairID).addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
+
+                   
+
+                }
+
+                fetch.close();
+                
+                //single mapping processing
+                PreparedStatement fetchSingleReads = con.prepareStatement(SQLStatements.FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL);
+                fetchSingleReads.setLong(1, from - readlength);
+                fetchSingleReads.setLong(2, to);
+                fetchSingleReads.setLong(3, from);
+                fetchSingleReads.setLong(4, to + readlength);
+                fetchSingleReads.setLong(5, trackID);
+                fetchSingleReads.setLong(6, trackID2);
+
+                ResultSet rs2 = fetchSingleReads.executeQuery();
+                while (rs2.next()) {
+
+                    // mapping data
+                    int mappingID = rs2.getInt(FieldNames.MAPPING_ID);
+                    int sequenceID = rs2.getInt(FieldNames.MAPPING_SEQUENCE_ID);
+                    int mappingTrack = rs2.getInt(FieldNames.MAPPING_TRACK);
+                    int start = rs2.getInt(FieldNames.MAPPING_START);
+                    int stop = rs2.getInt(FieldNames.MAPPING_STOP);
+                    byte direction = rs2.getByte(FieldNames.MAPPING_DIRECTION);
+                    int count = rs2.getInt(FieldNames.MAPPING_COUNT);
+                    int errors = rs2.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    int bestMapping = rs2.getInt(FieldNames.MAPPING_BEST_MAPPING);
+                    boolean isBestMapping = (bestMapping == 1 ? true : false);
+                    long seqPairID = rs2.getLong(FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID);
+                    PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+                    
+                     // add to seqPair container
+                    if (!seqPairs.containsKey(seqPairID)) {
+                        PersistantSeqPairGroup newGroup = new PersistantSeqPairGroup();
+                        newGroup.setSeqPairId(seqPairID);
+                        seqPairs.put(seqPairID, newGroup);
+                    }
+                    seqPairs.get(seqPairID).addPersistantMapping(mapping, Properties.TYPE_UNPAIRED_PAIR, -1, -1, -1);
+
+                }
+
+                fetchSingleReads.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+
+
+        return seqPairs.values();
+    }
+
+    /**
+     * @return The sequence pair id belonging to the track connectors track id.
+     */
+    public int getSeqPairToTrackID() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_SEQ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
+    }
+    
+    /**
+     * @param seqPairId the sequence pair id to get the second track id for
+     * @return the second track id of a sequence pair beyond this track connectors track id
+     */
+    public int getTrackIdToSeqPairId(int seqPairId) {
+        int num = 0;
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACK_ID_TO_SEQ_PAIR_ID);
+            fetch.setLong(1, seqPairId);
+            fetch.setLong(2, trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            if (rs.next()) {
+                num = rs.getInt(FieldNames.TRACK_ID);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLStatements.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return num;
+    }
+
+    /**
+     * Returns all mappings belonging to a sequence pair
+     * @param seqPairId sequence id to search for
+     * @return all data belonging to this sequence pair id (all mappings and pair replicates)
+     */
+    public PersistantSeqPairGroup getMappingsForSeqPairId(long seqPairId) {
+
+        PersistantSeqPairGroup seqPairData = new PersistantSeqPairGroup();
+        seqPairData.setSeqPairId(seqPairId);
+        try {
+
+            //sequence pair processing
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID);
+            fetch.setLong(1, seqPairId);
+
+            ResultSet rs = fetch.executeQuery();
+            while (rs.next()) {
+        
+                // mapping data
+                long mappingId = rs.getLong(FieldNames.MAPPING_ID);
+                int start = rs.getInt(FieldNames.MAPPING_START);
+                int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                int count = rs.getInt("MAPPING_REPLICATES");
+                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                int bestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
+                boolean isBestMapping = (bestMapping == 1 ? true : false);
+                long seqPairID = rs.getLong(FieldNames.SEQ_PAIR_PAIR_ID);
+                long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING1_ID);
+                long mapping2Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
+                byte seqPairType = rs.getByte(FieldNames.SEQ_PAIR_TYPE);
+                int seqPairReplicates = rs.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
+                
+                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, direction, count, errors, -1, isBestMapping);
+                seqPairData.addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
+                System.out.println("input id: "+seqPairId + ", output id: "+seqPairID);
+
+            }
+
+            fetch.close();
+
+            //single mapping processing
+            PreparedStatement fetchSingleReads = con.prepareStatement(SQLStatements.FETCH_SINGLE_MAPPINGS_FOR_SEQ_PAIR_ID);
+            fetchSingleReads.setLong(1, seqPairId);
+
+            rs = fetchSingleReads.executeQuery();
+            while (rs.next()) {
+                        
+                // mapping data
+                int start = rs.getInt(FieldNames.MAPPING_START);
+                int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                int count = rs.getInt(FieldNames.MAPPING_COUNT);
+                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                int bestMapping = rs.getInt(FieldNames.MAPPING_BEST_MAPPING);
+                boolean isBestMapping = (bestMapping == 1 ? true : false);
+                long seqPairID = rs.getLong(FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID);
+                long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID);
+                PersistantMapping mapping = new PersistantMapping((int) mapping1Id, start, stop, -1, direction, count, errors, -1, isBestMapping);
+
+                seqPairData.addPersistantMapping(mapping, Properties.TYPE_UNPAIRED_PAIR, -1, -1, -1);
+                System.out.println("input id: "+seqPairId + ", output id single: "+seqPairID);
+
+
+            }
+
+            fetchSingleReads.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return seqPairData;
+        
     }
 
 }

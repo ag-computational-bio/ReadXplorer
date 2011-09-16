@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class MultiTrackConnector implements ITrackConnector {
 
@@ -82,7 +82,7 @@ public class MultiTrackConnector implements ITrackConnector {
     }
 
     private void startCoverageThread(List<PersistantTrack> tracks) {
-        List<Long> trackIds = new ArrayList<Long>(tracks.size());
+        List<Integer> trackIds = new ArrayList<Integer>(tracks.size());
         for (PersistantTrack track : tracks) {
             trackIds.add(track.getId());
         }
@@ -110,7 +110,7 @@ public class MultiTrackConnector implements ITrackConnector {
 //    }
     @Override
     public Collection<PersistantMapping> getMappings(int from, int to) {
-        HashMap<Integer, PersistantMapping> mappings = new HashMap<Integer, PersistantMapping>();
+        HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
 
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
@@ -232,12 +232,12 @@ public class MultiTrackConnector implements ITrackConnector {
 
 
     @Override
-    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings,
-            int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete, int numReads,
-            int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs, int numUniquePerfectSeqPairs) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
+    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq, 
+            int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM, 
+            double coverageComplete, int numReads) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics");
         try {
-            PreparedStatement insertStatics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
+            PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
 
             // get latest id for track
@@ -246,31 +246,66 @@ public class MultiTrackConnector implements ITrackConnector {
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
+            latestID.close();
             id++;
+
             int covPerf = (int) (coveragePerf / 100 * genomeSize);
             int covBM = (int) (coverageBM / 100 * genomeSize);
             int covComplete = (int) (coverageComplete / 100 * genomeSize);
             // store track in table
-            insertStatics.setLong(1, id);
-            insertStatics.setLong(2, trackID);
-            insertStatics.setInt(3, numMappings);
-            insertStatics.setInt(4, numPerfectMappings);
-            insertStatics.setInt(5, numBestMatchMappings);
-            insertStatics.setInt(6, numUniqueMappings);
-            insertStatics.setInt(7, covPerf);
-            insertStatics.setInt(8, covBM);
-            insertStatics.setInt(9, covComplete);
-            insertStatics.setInt(10, numUniqueSeq);
-            insertStatics.execute();
-
-            insertStatics.close();
-            latestID.close();
+            insertStatistics.setLong(1, id);
+            insertStatistics.setLong(2, trackID);
+            insertStatistics.setInt(3, numMappings);
+            insertStatistics.setInt(4, numPerfectMappings);
+            insertStatistics.setInt(5, numBestMatchMappings);
+            insertStatistics.setInt(6, numUniqueMappings);
+            insertStatistics.setInt(7, covPerf);
+            insertStatistics.setInt(8, covBM);
+            insertStatistics.setInt(9, covComplete);
+            insertStatistics.setInt(10, numUniqueSeq);
+            insertStatistics.setInt(11, numReads);
+            insertStatistics.execute();
+            insertStatistics.close();
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track statistics");
+
+    }
+    
+    @Override
+    public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs, 
+            int numUniquePerfectSeqPairs, int numSingleMappings) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
+        try {
+            PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.ADD_SEQPAIR_STATISTICS);
+            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
+
+            // get latest id for track
+            long id = 0;
+            ResultSet rs = latestID.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("LATEST_ID");
+            }
+            latestID.close();
+            id++;
+
+            addSeqPairStats.setLong(1, id);
+            addSeqPairStats.setInt(2, numSeqPairs);
+            addSeqPairStats.setInt(3, numPerfectSeqPairs);
+            addSeqPairStats.setInt(4, numUniqueSeqPairs);
+            addSeqPairStats.setInt(5, numUniquePerfectSeqPairs);
+            addSeqPairStats.setInt(6, numSingleMappings);
+            addSeqPairStats.execute();
+            addSeqPairStats.close();
+
+        } catch (SQLException ex) {
+            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair statistics");
 
     }
 
@@ -647,23 +682,33 @@ public class MultiTrackConnector implements ITrackConnector {
     
     @Override
     public int getNumOfSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0; //TODO: implement seq pair stats calculate
     }
 
    
     @Override
     public int getNumOfPerfectSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     @Override
     public int getNumOfUniqueSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     @Override
     public int getNumOfUniquePerfectSeqPairsCalculate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
+    }
+    
+    @Override
+    public int getNumOfSingleMappings(){
+        return 0;
+    }
+    
+    @Override 
+    public int getNumOfSingleMappingsCalculate(){
+        return 0;
     }
     
     @Override

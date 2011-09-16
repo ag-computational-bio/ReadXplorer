@@ -42,7 +42,7 @@ public class ReferenceViewer extends AbstractViewer {
         refGenC = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
         featureStats = new HashMap<Integer, Integer>();
         this.refGen = refGen;
-        this.showSequenceBar(true);
+        this.showSequenceBar(true, true);
         this.labelMargin = 3;
         this.setViewerSize();
     }
