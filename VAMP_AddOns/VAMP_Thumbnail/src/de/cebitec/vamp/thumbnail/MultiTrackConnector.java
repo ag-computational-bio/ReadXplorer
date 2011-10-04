@@ -452,7 +452,6 @@ public class MultiTrackConnector implements ITrackConnector {
 //    @Override
 //    public List<Read> findReads(String read) {
 //        ArrayList<Read> reads = new ArrayList<Read>();
-//        //TODO: replace by sequence search!!!
 //        try {
 //            //PreparedStatement fetch = con.prepareStatement(H2SQLStatements.FETCH_READ_POSITION_BY_READNAME);
 //            fetch.setString(1, read);

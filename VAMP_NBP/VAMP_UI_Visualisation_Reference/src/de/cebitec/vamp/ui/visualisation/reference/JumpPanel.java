@@ -354,7 +354,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     }//GEN-LAST:event_searchPatternFieldActionPerformed
 
     private void searchPatternFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchPatternFieldKeyTyped
-        // TODO add your handling code here:
+        // add your handling code here:
     }//GEN-LAST:event_searchPatternFieldKeyTyped
 
     private void searchPatternButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternButtonActionPerformed
@@ -443,8 +443,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         //Create new Model for Table
         featureTable.setModel(new FeatureTableModel(featureData));
         featureTable.setRowSorter(new TableRowSorter<TableModel>(featureTable.getModel()));
-        featureTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-        //TODO check all column widths
+        featureTable.getColumnModel().getColumn(2).setPreferredWidth(150);
         updateFilter();
 
     }

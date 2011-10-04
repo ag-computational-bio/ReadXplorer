@@ -29,7 +29,7 @@ public class GenericSQLQueries {
      * @return the value calculated for the given sqlStatement
      */
     public static int getIntegerFromDB(String sqlStatement, String identifier, Connection con, long trackID){
-        int num = 0;
+        int num = -1;
         try {
             PreparedStatement fetch = con.prepareStatement(sqlStatement);
             fetch.setLong(1, trackID);

@@ -1,7 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.databackend.dataObjects.PersistantObject;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
 import de.cebitec.vamp.util.Properties;
@@ -73,8 +72,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         this.absLogBlockStart = block.getAbsStart();
         this.absLogBlockStop = block.getAbsStop();
         this.minSatAndBright = minSaturationAndBrightness;
-        this.determineType();
-
+        this.pairType = this.determineSeqPairType(this.block);
         // component boundaries //
         PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(absLogBlockStart);
         this.phyLeft = (int) bounds.getLeftPhysBound();
@@ -259,35 +257,6 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     }
 
-    /**
-     * Determines the type of the sequence pair which is represented by this block
-     */
-    private void determineType() {
-        PersistantObject persObject = block.getPersistantObject();
-
-        if (persObject instanceof PersistantSequencePair) {
-            PersistantSequencePair seqPair = ((PersistantSequencePair) block.getPersistantObject());
-            int type = seqPair.getSeqPairType();
-            if (type == Properties.TYPE_PERFECT_PAIR) {
-                pairType = "Perfect Pair";
-            } else if (type == Properties.TYPE_DIST_SMALL_PAIR) {
-                pairType = "Smaller pair";
-            } else if (type == Properties.TYPE_DIST_LARGE_PAIR) {
-                pairType = "Enlarged Pair";
-            } else if (type == Properties.TYPE_ORIENT_WRONG_PAIR) {
-                pairType = "Wrong Orientation Pair";
-            } else if (type == Properties.TYPE_OR_DIST_SMALL_PAIR) {
-                pairType = "Smaller Wrong Orientation Pair";
-            } else if (type == Properties.TYPE_OR_DIST_LARGE_PAIR) {
-                pairType = "Larger Wrong Orientation Pair";
-                //TODO: check again if unpaired is possible in pair
-            }
-        } else {
-            pairType = "Not in an ordinary Pair";
-        }
-
-    }
-
     public int getPhyStart() {
         return phyLeft;
     }
@@ -325,6 +294,19 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      */
     private void createPopup(MouseEvent e) {
         this.seqPairPopup = new SeqPairPopup(this.parentViewer, this.pairType, this.pairColors, this.block.getSeqPairId());
+    }
+
+    /**
+     * Determines the type string of the main sequence pair
+     * @param block the block containing the sequence pair
+     * @return the type string 
+     */
+    private String determineSeqPairType(BlockPair block) {
+        String type = "Not a sequence pair object";
+        if (block.getPersistantObject() instanceof PersistantSequencePair){
+            type = PersistantSequencePair.determineType(((PersistantSequencePair) block.getPersistantObject()).getSeqPairType());
+        }
+        return type;
     }
 
 }

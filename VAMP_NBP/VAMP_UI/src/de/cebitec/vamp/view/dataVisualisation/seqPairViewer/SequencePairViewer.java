@@ -118,7 +118,7 @@ public class SequencePairViewer extends AbstractViewer {
 //        HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
 //        HashMap<Integer, Integer> coverage2 = trackConnector2.getCoverageInfosOfTrack(from, to);
 //        this.findMinAndMaxCount(seqPairs); //for currently shown mappings
-//        this.findMaxCoverage(coverage); //TODO: update counts here?
+//        this.findMaxCoverage(coverage); //TODO: update counts here? at the moment not needed
         layout = new LayoutPairs(from, to, seqPairs);
         this.addBlocks(layout);
         this.setViewerHeight();

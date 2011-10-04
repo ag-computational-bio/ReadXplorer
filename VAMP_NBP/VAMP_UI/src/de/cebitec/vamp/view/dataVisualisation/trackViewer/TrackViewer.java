@@ -60,7 +60,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     // colors for the pathes
     private static Color bmC = ColorProperties.BEST_MATCH;
     private static Color zC = ColorProperties.PERFECT_MATCH;
-    private static Color nC = ColorProperties.N_ERROR_COLOR;
+    private static Color nC = ColorProperties.COMMON_MATCH;
 
     public static final String PROP_TRACK_CLICKED = "track clicked";
     public static final String PROP_TRACK_ENTERED = "track entered";

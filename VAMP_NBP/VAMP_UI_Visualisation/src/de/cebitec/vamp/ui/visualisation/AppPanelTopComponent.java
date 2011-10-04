@@ -153,7 +153,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
         // if last Viewer close Navigator
         boolean lastViewer = true;
-        // XXX this is not working everytime, but how can there be opened tc's when you cannot see them in the GUI???
         for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
             if (tc instanceof ApplicationFrameI && !tc.equals(this)) {
                 lastViewer = false;
@@ -204,7 +203,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.add(refGenPanel);
         visualPanel.updateUI();
 
-        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();//TODO: wieso null pointer?
+        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
         WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
         WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").open();
 

@@ -42,10 +42,15 @@ public class ParsedSeqPairContainer {
             if (parsedSeqPair.getType() == Properties.TYPE_PERFECT_PAIR) {
                 ++this.numUniquePerfectSPs;
                 ++this.numOfPerfectSPs;
-            }        
+            }
+            ++this.numOfUniqueSPs;
         } else {
             this.parsedSeqPairs.get(mappingIDs).addReplicate();
-            ++this.numOfPerfectSPs;
+            if (parsedSeqPair.getType() == Properties.TYPE_PERFECT_PAIR) {
+                --this.numUniquePerfectSPs;
+                ++this.numOfPerfectSPs;
+            }
+            --this.numOfUniqueSPs;
         }
         ++this.numOfSeqPairs;
     }
@@ -57,21 +62,11 @@ public class ParsedSeqPairContainer {
     public void addMappingToPairId(Pair<Long, Long> mappingToPairId){
         this.mappingToPairIDList.add(mappingToPairId);
     }
-    
-    
-    public void setNumOfSeqPairs(long numOfMatePairs) {
-        this.numOfSeqPairs = numOfMatePairs;
-    }
 
     
     public void setNumOfPerfectSPs(long numOfPerfectSPs) {
         System.out.println("old num perf sps: " + this.numOfPerfectSPs + ", new: "+numOfPerfectSPs);
         this.numOfPerfectSPs = numOfPerfectSPs;
-    }
-
-    
-    public void setNumOfUniqueSPs(long numOfUniqueSPs) {
-        this.numOfUniqueSPs = numOfUniqueSPs;
     }
 
     

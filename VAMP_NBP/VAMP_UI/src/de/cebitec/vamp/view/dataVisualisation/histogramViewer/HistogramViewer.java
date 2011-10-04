@@ -29,6 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.openide.util.NbBundle;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -37,6 +40,7 @@ import javax.swing.SwingUtilities;
 public class HistogramViewer extends AbstractViewer implements CoverageThreadListener {
 
     private static final long serialVersionUID = 234765253;
+    private InputOutput io;
     private List<String> bases;
     private static int height = 500;
     private TrackConnector trackConnector;
@@ -59,6 +63,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
 
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
+        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
         this.setInDrawingMode(false);
@@ -214,9 +219,8 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         try {
             gaps = trackConnector.getExtendedReferenceGapsForIntervalOrderedByMappingID(lowerBound, upperBound);
         } catch (Exception ex) {
-            System.err.print("trackConnector couldn't initialize gaps" + ex);
+            this.io.getOut().println(NbBundle.getBundle(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.gap.error")+ ": " + ex));
             gaps = new ArrayList<PersistantReferenceGap>();
-            //TODO: error an nutzer geben
         }
         this.fillGapManager();
         this.getSequenceBar().setGenomeGapManager(gapManager);

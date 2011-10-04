@@ -117,7 +117,7 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
 
     @Override
     public void componentClosed() {
-        result.removeLookupListener(this);
+        result.removeLookupListener(this);        
     }
 
     void writeProperties(java.util.Properties p) {

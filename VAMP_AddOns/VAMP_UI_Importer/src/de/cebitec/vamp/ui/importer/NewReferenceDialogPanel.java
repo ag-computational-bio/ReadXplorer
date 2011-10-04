@@ -8,9 +8,9 @@ package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
-import de.cebitec.vamp.parser.reference.embl.biojava.BioJavaEmblParser;
-import de.cebitec.vamp.parser.reference.fasta.FastaReferenceParser;
-import de.cebitec.vamp.parser.reference.genbank.biojava.BioJavaGenBankParser;
+import de.cebitec.vamp.parser.reference.BioJavaEmblParser;
+import de.cebitec.vamp.parser.reference.FastaReferenceParser;
+import de.cebitec.vamp.parser.reference.BioJavaGenBankParser;
 import java.awt.Component;
 import java.io.File;
 import java.util.logging.Level;

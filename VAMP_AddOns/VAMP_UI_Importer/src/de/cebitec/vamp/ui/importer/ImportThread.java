@@ -30,7 +30,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
-import de.cebitec.vamp.parser.mappings.JokSeqPairParser;
+import de.cebitec.vamp.parser.mappings.SequencePairParserI;
 import org.openide.util.Lookup;
 
 /**
@@ -64,6 +64,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
 
         ReferenceParserI parser = refGenJob.getParser();
+        parser.registerObserver(this);
         FeatureFilter filter = new FeatureFilter();
         filter.addBlacklistRule(new FilterRuleSource());
         ParsedReference refGenome = parser.parseReference(refGenJob, filter);
@@ -96,7 +97,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
 //        HashMap<String, Integer> readnameToSeqIDmap = ProjectConnector.getInstance().getRunConnector(trackJob.getID(), trackJob.getID()).getReadnameToSeqIDMapping();
 
-        // XXX does this work for all import methods???
         String sequenceString = null;
         try {
             int id = trackJob.getRefGen().getID();
@@ -219,6 +219,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         setValidTracksRun(r.getDependentTrackswithoutRunjob(), false);
                     }
                     Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (OutOfMemoryError ex){
+                    io.getOut().println("\""+r.getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.outOfMemory") + "!");
                 }
 
                 it.remove();
@@ -301,7 +303,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             final ISeqPairClassifier seqPairClassifier = Lookup.getDefault().lookup(ISeqPairClassifier.class);
             boolean seqPairImport = seqPairClassifier != null;
             
-            for(Iterator<SeqPairJobContainer> it = seqPairJobs.iterator(); it.hasNext(); ){
+            for (Iterator<SeqPairJobContainer> it = seqPairJobs.iterator(); it.hasNext(); ){
                 SeqPairJobContainer seqPairJobContainer = it.next();
                 ph.progress(workunits++);
                 
@@ -328,6 +330,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         
                         track1.clear();
                         track2.clear();
+                        System.gc();
                     }
                 } else 
                 if (distance <= 0){
@@ -354,12 +357,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             //parsing track
             ParsedTrack track = this.parseTrack(trackJob);
             boolean seqPairs = false;
-            if (trackJob.getParser() instanceof JokSeqPairParser){
-                //TODO: implement seq pair support for all parsers!
-                track.setReadnameToSeqIdMap(((JokSeqPairParser) trackJob.getParser()).getSeqIDToReadNameMap());
-                ((JokSeqPairParser) trackJob.getParser()).resetSeqIdToReadnameMap();
+            if (trackJob.getParser() instanceof SequencePairParserI){
+                track.setReadnameToSeqIdMap(((SequencePairParserI) trackJob.getParser()).getSeqIDToReadNameMap());
+                ((SequencePairParserI) trackJob.getParser()).resetSeqIdToReadnameMap();
                 seqPairs = true;
             }
+            
             io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
             
             

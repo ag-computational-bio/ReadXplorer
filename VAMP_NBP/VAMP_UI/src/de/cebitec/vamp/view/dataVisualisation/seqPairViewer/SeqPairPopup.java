@@ -75,21 +75,21 @@ public class SeqPairPopup extends JPopupMenu {
             JPanel seqPairInfoPanel = new JPanel();
             seqPairMappingInfoPanel = new JPanel();
             seqPairMappingInfoPanel.setLayout(new BoxLayout(seqPairMappingInfoPanel, BoxLayout.Y_AXIS));
-            seqPairMappingInfoPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));//createLoweredBevelBorder());
+            seqPairMappingInfoPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             contentPanel.add(seqPairInfoPanel);
             contentPanel.add(seqPairMappingInfoPanel);
             
-            String hex = Integer.toHexString(this.pairColors.get(0).getRGB());
-            //TODO: color of non visible pairs needs to be calculated!!!
+            seqPair = seqPairs.get(i);
+            int type = seqPair.getSeqPairType();
+            String hex = Integer.toHexString(PersistantSequencePair.determineSeqPairColor(type).getRGB());
             hex = hex.substring(2, hex.length());
             
-            seqPair = seqPairs.get(i);
             long distance = Math.abs(seqPair.getStop()-seqPair.getStart());
             JLabel seqPairLabel = new JLabel("<html>".concat(NbBundle.getMessage(BlockComponentPair.class, "SeqPair")).
                     concat(" ").concat(String.valueOf(i + 1)).concat("<br>").
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Type")).
                     concat("</b> <font bgcolor=").concat(hex).concat("> ").
-                    concat(this.pairType).concat("</font><br> ").
+                    concat(PersistantSequencePair.determineType(type)).concat("</font><br> ").
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Replicates")).
                     concat(" ").concat(String.valueOf(seqPair.getSeqPairReplicates())).concat("<br> ").
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Distance")).

@@ -308,11 +308,25 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             this.checkRollback(ex);
         }
-        
-         //add column GENE for features
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+
+        //add column GENE for features
         try {
             con.prepareStatement(GenericSQLQueries.genAddColumnString3(
                     FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE)).execute();
+        } catch (SQLException ex) {
+            this.checkRollback(ex);
+        }
+        
+        //add sequence pair id column in tracks if not existent
+        try {
+            con.prepareStatement(GenericSQLQueries.genAddColumnString2(
+                    FieldNames.TABLE_TRACKS, FieldNames.TRACK_SEQUENCE_PAIR_ID)).execute();
         } catch (SQLException ex) {
             this.checkRollback(ex);
         }
@@ -1520,24 +1534,25 @@ public class ProjectConnector {
     public void setSeqPairIdsForTrackIds(long track1Id, long track2Id){
         
         try {
-            int seqPairId = 0;
+            Integer seqPairId = 1; //not 0, because 0 is the value when a track is not a sequence pair track!
             PreparedStatement getLatestSeqPairId = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID);
 
             ResultSet rs = getLatestSeqPairId.executeQuery();
             if (rs.next()) {
                 seqPairId = rs.getInt("LATEST_ID");
+                if (seqPairId == null || seqPairId == 0){
+                    seqPairId = 1;
+                }
             }
             
             PreparedStatement setSeqPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID);
             
             setSeqPairIds.setInt(1, seqPairId);
             setSeqPairIds.setLong(2, track1Id);
-            setSeqPairIds.addBatch();
+            setSeqPairIds.execute();
             
             setSeqPairIds.setInt(1, seqPairId);
             setSeqPairIds.setLong(2, track2Id);
-            setSeqPairIds.addBatch();
-            
             setSeqPairIds.execute();
             
             setSeqPairIds.close();

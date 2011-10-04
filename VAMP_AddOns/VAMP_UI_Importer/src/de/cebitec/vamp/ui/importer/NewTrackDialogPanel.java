@@ -212,7 +212,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialogPanel.class); // TODO is the class correct?
+        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
 
         String path = prefs2.get("RefGenome.Filepath", null);
         if(path!=null){
@@ -230,7 +230,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                 mappingFile = file;
                 mappingFileField.setText(mappingFile.getAbsolutePath());
                 descriptionField.setText(mappingFile.getName());
-                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class); // TODO is the class correct?
+                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
                 prefs.put("RefGenome.Filepath", mappingFile.getAbsolutePath());
                 try {
                     prefs.flush();

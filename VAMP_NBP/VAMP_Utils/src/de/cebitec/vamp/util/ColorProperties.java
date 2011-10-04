@@ -16,7 +16,7 @@ public class ColorProperties {
 
     // track panel specific colors
     public static final Color BEST_MATCH = new Color(244, 225, 49);
-    public static final Color N_ERROR_COLOR = new Color(180, 41, 36);
+    public static final Color COMMON_MATCH = new Color(180, 41, 36);
     public static final Color PERFECT_MATCH = new Color(38, 180, 36);
 
     // global colors

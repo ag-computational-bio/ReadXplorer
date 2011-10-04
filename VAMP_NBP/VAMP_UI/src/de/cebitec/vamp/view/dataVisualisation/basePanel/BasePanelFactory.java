@@ -296,7 +296,7 @@ public class BasePanelFactory {
 
         legend.add(getLegendEntry(ColorProperties.PERFECT_MATCH, "Perfect match cov."));
         legend.add(getLegendEntry(ColorProperties.BEST_MATCH, "Best match cov."));
-        legend.add(getLegendEntry(ColorProperties.N_ERROR_COLOR, "Complete cov."));
+        legend.add(getLegendEntry(ColorProperties.COMMON_MATCH, "Complete cov."));
 
         return legend;
     }
@@ -324,7 +324,7 @@ public class BasePanelFactory {
 
         legend.add(getLegendEntry(ColorProperties.PERFECT_MATCH, "Perfect Match"));
         legend.add(getLegendEntry(ColorProperties.BEST_MATCH, "Best Match"));
-        legend.add(getLegendEntry(ColorProperties.N_ERROR_COLOR, "Ordinary Match"));
+        legend.add(getLegendEntry(ColorProperties.COMMON_MATCH, "Ordinary Match"));
         legend.add(getGradientEntry("Low to high coverage"));
         legend.add(getLegendEntry(ColorProperties.ALIGNMENT_A, "Diff."));
 

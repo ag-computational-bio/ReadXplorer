@@ -153,7 +153,7 @@ public final class RNAFolderTopComponent extends TopComponent {
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
 
     @Override

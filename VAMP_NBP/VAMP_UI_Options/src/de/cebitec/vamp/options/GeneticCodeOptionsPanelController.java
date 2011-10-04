@@ -32,10 +32,6 @@ public final class GeneticCodeOptionsPanelController extends OptionsPanelControl
     public void applyChanges() {
         getPanel().store();
         changed = false;
-        //TODO: should resize
-//        Mode mod = win.findMode("explorer");
-//        System.out.println("Bound: " + mod.getBounds().toString());
-//        mod.setBounds(new Rectangle(0, 0, 1000, mod.getBounds().height));
     }
 
     @Override

@@ -54,28 +54,31 @@ public class StartCodonFilter implements RegionFilterI {
             // to find start/stop codons that overlap current interval boundaries
             int offset = 3;
             int start = absStart - offset;
-            int stop = absStop+2;
+            int stop = absStop + 2;
 
-            if(start < 0 ){
-                offset -= Math.abs(start);
-                start = 0;
-            }
-            if(stop > refGen.getSequence().length()){
-                stop = refGen.getSequence().length();
-            }
+            if (stop > 0) {
+                if (start < 0) {
+                    offset -= Math.abs(start);
+                    start = 0;
+                }
+                if (stop > refGen.getSequence().length()) {
+                    stop = refGen.getSequence().length();
+                }
 
-            sequence = refGen.getSequence().substring(start, stop);
-            boolean isFeatureSelected = this.frameCurrFeature != INIT;
+                sequence = refGen.getSequence().substring(start, stop);
+                boolean isFeatureSelected = this.frameCurrFeature != INIT;
 
-            int index = 0;
-            for (int i=0; i<this.selectedCodons.size(); ++i){
-                if (this.selectedCodons.get(i)){
-                    this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
-                    this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
-                } else {
-                    index +=2;
+                int index = 0;
+                for (int i = 0; i < this.selectedCodons.size(); ++i) {
+                    if (this.selectedCodons.get(i)) {
+                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
+                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
+                    } else {
+                        index += 2;
+                    }
                 }
             }
+
         }
 
     }

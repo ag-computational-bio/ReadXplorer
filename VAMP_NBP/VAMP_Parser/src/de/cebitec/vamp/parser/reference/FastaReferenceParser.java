@@ -1,12 +1,13 @@
-package de.cebitec.vamp.parser.reference.fasta;
+package de.cebitec.vamp.parser.reference;
 
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.reference.ReferenceParserI;
+import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +22,8 @@ public class FastaReferenceParser implements ReferenceParserI {
     private static String parsername = "Fasta Reference Parser";
     private static String[] fileExtension = new String[]{"fas", "fasta", "fna"};
     private static String fileDescription = "Fasta File";
+    private ArrayList<Observer> observers = new ArrayList<Observer>();
+    private String errorMsg;
 
     /*
      * parses the containing sequences to one long sequence
@@ -39,7 +42,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setName(referenceJob.getName());
             refGenome.setTimestamp(referenceJob.getTimestamp());
             String line = null;
-           
+
             while ((line = in.readLine()) != null) {
                 if (!line.startsWith(">")) {
                     sBuilder.append(line);
@@ -50,7 +53,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setSequence(sBuilder.substring(0).toLowerCase());
 
         } catch (Exception ex) {
-            throw new ParsingException(ex);
+            this.sendErrorMsg(ex.getMessage());
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished reading file  \"{0}" + "\"" + "genome length:" + "{1}", new Object[]{referenceJob.getFile(), sBuilder.length()});
@@ -74,5 +77,31 @@ public class FastaReferenceParser implements ReferenceParserI {
     @Override
     public String getInputFileDescription() {
         return fileDescription;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : this.observers) {
+            observer.update(this.errorMsg);
+        }
+    }
+
+    /**
+     * Method setting and sending the error msg to all observers.
+     * @param errorMsg the error msg to send
+     */
+    private void sendErrorMsg(final String errorMsg) {
+        this.errorMsg = errorMsg;
+        this.notifyObservers();
     }
 }

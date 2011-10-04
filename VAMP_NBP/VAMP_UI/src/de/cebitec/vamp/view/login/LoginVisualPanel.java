@@ -160,6 +160,12 @@ public final class LoginVisualPanel extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(passwordLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.passwordLabel.text")); // NOI18N
 
+        databaseField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                databaseFieldActionPerformed(evt);
+            }
+        });
+
         org.openide.awt.Mnemonics.setLocalizedText(dbTypeLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.dbTypeLabel.text")); // NOI18N
 
         dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "h2", "MySQL" }));
@@ -188,15 +194,16 @@ public final class LoginVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(saveDataCheckBox)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(userLabel)
-                                    .addComponent(databaseLabel)
-                                    .addComponent(passwordLabel)
-                                    .addComponent(urlLabel)))
-                            .addComponent(dbTypeLabel))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(databaseLabel)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(27, 27, 27)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(userLabel)
+                                        .addComponent(passwordLabel)))
+                                .addComponent(dbTypeLabel))
+                            .addComponent(urlLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(passwordField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
@@ -222,9 +229,9 @@ public final class LoginVisualPanel extends JPanel {
                     .addComponent(urlLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(databaseLabel)
                     .addComponent(databaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dbChooseButton))
+                    .addComponent(dbChooseButton)
+                    .addComponent(databaseLabel))
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(userLabel)
@@ -290,6 +297,10 @@ public final class LoginVisualPanel extends JPanel {
             databaseField.setText(file.getAbsolutePath());
         }
 }//GEN-LAST:event_dbChooseButtonActionPerformed
+
+    private void databaseFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_databaseFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_databaseFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField databaseField;

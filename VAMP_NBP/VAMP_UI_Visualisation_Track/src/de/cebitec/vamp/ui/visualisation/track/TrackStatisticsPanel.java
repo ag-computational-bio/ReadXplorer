@@ -362,13 +362,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 boolean recalculated = false;
                 
                 int numSeqPairs = trackCon.getNumOfSeqPairs();
-                if (numSeqPairs == -2){
+                if (numSeqPairs == -1){
 //                        TrackStatisticsPanel.this.remove(numSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numSeqPairsAbsLabel);
                     numSeqPairsLabel.setVisible(false);
                     numSeqPairsAbsLabel.setVisible(false);
                 } else {
-                    if (numSeqPairs == -1) {
+                    if (numSeqPairs == -2) {
                         numSeqPairs = trackCon.getNumOfSeqPairsCalculate();
                         recalculated = true;
                     }
@@ -378,13 +378,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
                 
                 int numPerfectSeqPairs = trackCon.getNumOfPerfectSeqPairs();
-                if (numPerfectSeqPairs == -2){
+                if (numPerfectSeqPairs == -1){
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
                     numPerfSeqPairsLabel.setVisible(false);
                     numPerfSeqPairsAbsLabel.setVisible(false);
                 } else {
-                    if (numPerfectSeqPairs == -1) {
+                    if (numPerfectSeqPairs == -2) {
                         numPerfectSeqPairs = trackCon.getNumOfPerfectSeqPairsCalculate();
                         recalculated = true;
                     }
@@ -394,13 +394,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
                 
                 int numUniqueSeqPairs = trackCon.getNumOfUniqueSeqPairs();
-                if (numUniqueSeqPairs == -2){
+                if (numUniqueSeqPairs == -1){
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
                     numUniqSeqPairsLabel.setVisible(false);
                     numUniqSeqPairsAbsLabel.setVisible(false);
                 } else {
-                    if (numUniqueSeqPairs == -1) {
+                    if (numUniqueSeqPairs == -2) {
                         numUniqueSeqPairs = trackCon.getNumOfUniqueSeqPairsCalculate();
                         recalculated = true;
                     }
@@ -410,13 +410,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
 
                 int numUniquePerfectSeqPairs = trackCon.getNumOfUniquePerfectSeqPairs();
-                if (numUniquePerfectSeqPairs == -2){
+                if (numUniquePerfectSeqPairs == -1){
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
                     numPerfUniqSeqPairsLabel.setVisible(false);
                     numPerfUniqSeqPairsAbsLabel.setVisible(false);
                 } else {
-                    if (numUniquePerfectSeqPairs == -1) {
+                    if (numUniquePerfectSeqPairs == -2) {
                         numUniquePerfectSeqPairs = trackCon.getNumOfUniquePerfectSeqPairsCalculate();
                         recalculated = true;
                     }
@@ -426,13 +426,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
                 
                 int numSingleMappings = trackCon.getNumOfSingleMappings();
-                if (numSingleMappings == -2){
+                if (numSingleMappings == -1){
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsAbsLabel);
                         singleMappingsLabel.setVisible(false);
                         singleMappings.setVisible(false);
                 } else {
-                    if (numSingleMappings == -1) {
+                    if (numSingleMappings == -2) {
                         numSingleMappings = trackCon.getNumOfSingleMappingsCalculate();
                         recalculated = true;
                     }
@@ -442,7 +442,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
                 
                 int numOfMappings = trackCon.getNumOfMappings();
-                if(numOfMappings == 0){
+                if (numOfMappings == -1){
                    numOfMappings = trackCon.getNumOfMappingsCalculate();
                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating statistic information");
                    recalculated = true;
@@ -450,14 +450,14 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 numMappingsAbsLabel.setText(String.valueOf(numOfMappings));
 
                 int numUniqueMappings = trackCon.getNumOfUniqueMappings();
-                if (numUniqueMappings == 0) {
+                if (numUniqueMappings == -1) {
                     numUniqueMappings = trackCon.getNumOfUniqueMappingsCalculate();
                     recalculated = true;
                 }
                 numUniqueMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
 
                 int numUniqueSequences = trackCon.getNumOfUniqueSequences();
-                if (numUniqueSequences == 0) {
+                if (numUniqueSequences == -1) {
                     numUniqueSequences = trackCon.getNumOfUniqueSequencesCalculate();
                     recalculated = true;
                 }
@@ -466,40 +466,40 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 numberReadsAbsLabel.setVisible(false);
                 numberReadsLabel.setVisible(false);
                 int numReads = trackCon.getNumOfReads();
-                if (numReads == 0) {
+                if (numReads == -1) {
                     numberReadsAbsLabel.setText("Not available"); //TODO: num of reads only for sam & bam parsers
                 } else {
                     numberReadsAbsLabel.setText(String.valueOf(numReads));
                 }
                 
                 int numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappings();
-                if(numOfPerfectMappings == 0){
-                    numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();//TODO: decide whether unique or not!
+                if (numOfPerfectMappings == -1){
+                    numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText(String.valueOf(numOfPerfectMappings));
 
                 int numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappings();
-                if(numOfBestMatchMappings == 0){
+                if (numOfBestMatchMappings == -1){
                     numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappingsCalculate();
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText(String.valueOf(numOfBestMatchMappings));
 
                 double percentagePerfectCovered = trackCon.getPercentRefGenPerfectCovered();
-                if(percentagePerfectCovered ==0){
+                if (percentagePerfectCovered == -1){
                     percentagePerfectCovered = trackCon.getPercentRefGenPerfectCoveredCalculate();
                     recalculated = true;
                 }
                 
                 double percentageBMCovered = trackCon.getPercentRefGenBmCovered();
-                if(percentageBMCovered == 0){
+                if (percentageBMCovered == -1){
                     percentageBMCovered = trackCon.getPercentRefGenBmCoveredCalculate();
                     recalculated = true;
                 }
                 
                 double percentageNErrorCovered = trackCon.getPercentRefGenNErrorCovered();
-                if(percentageNErrorCovered == 0){
+                if (percentageNErrorCovered == -1){
                     percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
                     recalculated = true;
                 }

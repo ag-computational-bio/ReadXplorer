@@ -32,7 +32,7 @@ public final class LoginWizardAction implements ActionListener{
         // check if user is already logged in
         Boolean loggedIn = cl.lookup(LoginCookie.class) != null ? Boolean.TRUE : Boolean.FALSE;
 
-        if (loggedIn){
+        if (loggedIn){ //logout from other db
             LogoutAction logoutAction = new LogoutAction(cl.lookup(LoginCookie.class));
             logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
         }

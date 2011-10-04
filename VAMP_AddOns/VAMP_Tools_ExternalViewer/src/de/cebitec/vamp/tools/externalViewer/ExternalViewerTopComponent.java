@@ -219,8 +219,13 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        this.seqPairBasePanel = factory.getSeqPairBasePanel(this.trackConnector);
-        this.changeViewerStatus(SEQPAIRCARD, false);
+        if (this.trackConnector.getSeqPairToTrackID() > 0) {
+            this.seqPairBasePanel = factory.getSeqPairBasePanel(this.trackConnector);
+            this.changeViewerStatus(SEQPAIRCARD, false);
+            this.cardPanel.add(this.seqPairBasePanel, SEQPAIRCARD);
+        } else {
+            this.sequencePairButton.setEnabled(false);
+        }
         this.alignmentBasePanel = factory.getAlignmentViewBasePanel(this.trackConnector);
         this.changeViewerStatus(ALIGNMENTCARD, false);
         this.histogramBasePanel = factory.getHistogrammViewerBasePanel(this.trackConnector);
@@ -229,7 +234,6 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         
         this.cards = (CardLayout) this.cardPanel.getLayout();
         
-        this.cardPanel.add(this.seqPairBasePanel, SEQPAIRCARD);
         this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
         this.cardPanel.add(this.histogramBasePanel, HISTOGRAMCARD);
         this.cards.show(this.cardPanel, HISTOGRAMCARD);
@@ -240,10 +244,12 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
     public void componentClosed() {
         this.alignmentBasePanel.close();
         this.histogramBasePanel.close();
-        this.seqPairBasePanel.close();
         this.alignmentBasePanel = null;
         this.histogramBasePanel = null;
-        this.seqPairBasePanel = null;
+        if (this.seqPairBasePanel != null){
+            this.seqPairBasePanel.close();
+            this.seqPairBasePanel = null;
+        }
     }
 
     void writeProperties(java.util.Properties p) {
@@ -310,7 +316,7 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (selectedViewer.equals(ALIGNMENTCARD)) {
             this.alignmentBasePanel.getViewer().setActive(activated);
         }
-        if (selectedViewer.equals(SEQPAIRCARD)) {
+        if (this.seqPairBasePanel != null && selectedViewer.equals(SEQPAIRCARD)) {
             this.seqPairBasePanel.getViewer().setActive(activated);
         }
     }

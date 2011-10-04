@@ -21,17 +21,19 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="saveDataCheckBox" alignment="1" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="userLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="databaseLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="passwordLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  <Component id="urlLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="databaseLabel" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Component id="userLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="passwordLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
+                              <Component id="dbTypeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="dbTypeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="urlLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -66,9 +68,9 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="databaseLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="databaseField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="dbChooseButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="databaseLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -117,6 +119,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="databaseField">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="databaseFieldActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="userField">
     </Component>

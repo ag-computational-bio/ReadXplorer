@@ -887,10 +887,12 @@ public class TrackConnector implements ITrackConnector {
     }
 
     /**
-     * @return The sequence pair id belonging to the track connectors track id.
+     * @return The sequence pair id belonging to the track connectors track id or <code>0</code> if this
+     * track is not a sequence pair track.
      */
-    public int getSeqPairToTrackID() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_SEQ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
+    public Integer getSeqPairToTrackID() {
+        int value = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_SEQ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
+        return value;
     }
     
     /**
@@ -950,7 +952,6 @@ public class TrackConnector implements ITrackConnector {
                 
                 PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, direction, count, errors, -1, isBestMapping);
                 seqPairData.addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
-                System.out.println("input id: "+seqPairId + ", output id: "+seqPairID);
 
             }
 
