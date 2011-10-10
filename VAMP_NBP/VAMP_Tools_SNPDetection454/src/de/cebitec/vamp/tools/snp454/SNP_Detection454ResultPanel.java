@@ -18,6 +18,8 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -135,8 +137,8 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
 
 public void addSNPs(List<Snp454> snps) {
         this.snps = snps;
-        for (Snp454 snp : snps) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        for (Snp454 snp : snps) {            
             Object[] rowData = new Object[6];
             rowData[0] = snp.getPosition();
             rowData[1] = snp.getBase();
@@ -146,6 +148,9 @@ public void addSNPs(List<Snp454> snps) {
             rowData[5] = snp.getVariationPercentag();
             model.addRow(rowData);
         }
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        jTable1.setRowSorter(sorter);
+        sorter.setModel(model);
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {

@@ -416,6 +416,7 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                     "A."+FieldNames.DIFF_CHAR+", " +
                     "A."+FieldNames.MAPPING_DIRECTION+", " +
                     "A."+FieldNames.DIFF_TYPE+", " +
+                    "A."+FieldNames.DIFF_ORDER+", " +
                     "A.mult_count, " +
                     "C."+FieldNames.COVERAGE_BM_FW_MULT+", " +
                     "C."+FieldNames.COVERAGE_BM_RV_MULT+" " +
@@ -424,6 +425,7 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                     FieldNames.DIFF_POSITION+", "+
                     FieldNames.DIFF_CHAR+", "+
                     FieldNames.DIFF_TYPE+", "+
+                    FieldNames.DIFF_ORDER+", " +
                     FieldNames.MAPPING_DIRECTION+", " +
                     "SUM("+FieldNames.MAPPING_COUNT+") as mult_count  "+
 		"FROM "+
@@ -435,6 +437,7 @@ public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
                     FieldNames.MAPPING_START+" BETWEEN ? AND ? and D."+FieldNames.DIFF_POSITION+" BETWEEN ? AND ? " +
 		"GROUP BY " +
                     "D."+FieldNames.DIFF_POSITION+", "+
+                    "D."+FieldNames.DIFF_ORDER+", "+
                     "D."+FieldNames.DIFF_CHAR+", " +
                     "M."+FieldNames.MAPPING_DIRECTION+" ,"+
                     "D."+FieldNames.DIFF_TYPE+"" +

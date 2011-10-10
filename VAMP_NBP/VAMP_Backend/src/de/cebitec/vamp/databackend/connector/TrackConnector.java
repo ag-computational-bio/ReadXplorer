@@ -45,19 +45,24 @@ public class TrackConnector implements ITrackConnector{
     private int genomeSize;
     private CoverageThread thread;
     private Connection con;
+    /*Coverage at Position*/
     private static int COV = 0;
+    /*Number of Diffs at Position (more than one per read possible)*/
     private static int DIFF_COV = 1;
-    private static int A_COV = 2;
-    private static int C_COV = 3;
-    private static int G_COV = 4;
-    private static int T_COV = 5;
-    private static int N_COV = 6;
-    private static int _COV = 7;
-    private static int A_GAP = 8;
-    private static int C_GAP = 9;
-    private static int G_GAP = 10;
-    private static int T_GAP = 11;
-    private static int N_GAP = 12;
+    private static int SNP_COV = 2;
+    private static int A_COV = 3;
+    private static int C_COV = 4;
+    private static int G_COV = 5;
+    private static int T_COV = 6;
+    private static int N_COV = 7;
+    private static int _COV = 8;
+    private static int A_GAP = 9;
+    private static int C_GAP = 10;
+    private static int G_GAP = 11;
+    private static int T_GAP = 12;
+    private static int N_GAP = 13;
+     /*Number of SNPs at Position (only one per read possible)*/
+    
 
     TrackConnector(PersistantTrack track) {
         associatedTrackName = track.getDescription();
@@ -584,9 +589,9 @@ public class TrackConnector implements ITrackConnector{
     }
     
 
-    private void addValues(HashMap<Integer, Integer[]> map, byte direction, int coverage, int count, int position, char base, boolean isGenomeGap) {
+    private void addValues(HashMap<Integer, Integer[]> map, byte direction, int coverage, int count, int position, char base, boolean isGenomeGap, int order) {
         if (!map.containsKey(position)) {
-            Integer[] data = new Integer[13];
+            Integer[] data = new Integer[14];
             Arrays.fill(data, 0);
             map.put(position, data);
         }
@@ -598,6 +603,11 @@ public class TrackConnector implements ITrackConnector{
         Integer[] values = map.get(position);
         values[COV] = coverage;
         values[DIFF_COV] += count;
+        
+        if(order == 0) {
+            values[SNP_COV] += count;
+        }
+
         if (!isGenomeGap) {
             if (base == 'A') {
                 values[A_COV] += count;
@@ -664,7 +674,7 @@ public class TrackConnector implements ITrackConnector{
 
     }
     
-    private Snp454 createSNP454(Integer[] data, int index, int position, int positionVariation, String sequence) {
+    private Snp454 createSNP454(double count, int index, int position, int percentage, int positionVariation, String sequence) {
         String base = "";
         if (index == A_COV || index == A_GAP) {
             base = "A";
@@ -681,10 +691,11 @@ public class TrackConnector implements ITrackConnector{
         } else {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
         }
-
         String refBase = String.valueOf(sequence.charAt(position-1)).toUpperCase();
-        double count = data[index];
-        int percentage = (int) (count / ((double) data[COV]) * 100);
+        if(index == A_GAP || index == C_GAP || index == G_GAP || index == T_GAP || index == N_GAP) {
+            refBase = "-";
+        }        
+        
         return new Snp454((int) count, position, base, percentage, positionVariation, refBase);
 
     }
@@ -712,31 +723,42 @@ public class TrackConnector implements ITrackConnector{
         return snps;
     }
     
-    
-    private List<Snp454> filterSnps454(Map<Integer, Integer[]> map, int overallPercentage, int absThreshold) {
+    /**
+     * Filtert die SNPs fuer die 454 Daten. Die Coverage links und rechts des SNPs duerfen nicht auffaellig
+     * abweichen, mindestens 3 Reads an der Position muessen sich unterscheiden und wenn eine bestimmte
+     * Prozentzahl sich unterscheidet.
+     * @param map
+     * @param overallPercentage
+     * @param absThreshold
+     * @return 
+     */
+    private List<Snp454> filterSnps454(Map<Integer, Integer[]> map, int percentageThreshold, int absThreshold) {
         ArrayList<Snp454 > snps = new ArrayList<Snp454>();
         Iterator<Integer> positions = map.keySet().iterator();
+        String refSequence = this.getRefGenSequence();
         while (positions.hasNext()) {
             int position = positions.next();
             Integer[] data = map.get(position);
             double complete = data[COV];
-            double diffCov = data[DIFF_COV];
-            int percentage = (int) ((diffCov / complete) * 100);
-            boolean continuousCoverage = isCoverageContinuous(position, complete);
-            String refSequence = this.getRefGenSequence();
+            double snpCov = data[SNP_COV];
+            int positionVariation = (int) ((snpCov / complete) * 100);
+            
+            boolean continuousCoverage = isCoverageContinuous(position, complete);            
             //Filterschritt: mindestens 3 reads muessen abweichen (zusaetzlich, falls nur wenige 
             // reads an der Stelle mappen) && continuousCoverage && (diffCov > 3)
-            if ((percentage > overallPercentage) && (complete > 3) && continuousCoverage) {
+            if ((positionVariation >= percentageThreshold) && (complete > 3) && continuousCoverage) {
                 //pruefen, ob fuer jede basenabweichung der threshold erreicht ist, wenn ja = SNP 
                 for (int i = A_COV; i < data.length; i++) {
-                    if (this.isSNP(data, i, absThreshold)) {
-                        snps.add(this.createSNP454(data, i, position, percentage, refSequence));
+                    double count = data[i];
+                    int percentage = (int) (count / ((double) data[DIFF_COV]) * 100);
+                    if (count >= absThreshold) {
+                        snps.add(this.createSNP454(count, i, position, percentage, positionVariation, refSequence));
                     }
                 }
             }
         }
         return snps;
-    }
+    }    
     
     /*
      * pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
@@ -847,13 +869,14 @@ public class TrackConnector implements ITrackConnector{
                     int forwardCov = rs.getInt(FieldNames.COVERAGE_BM_FW_MULT);
                     int reverseCov = rs.getInt(FieldNames.COVERAGE_BM_RV_MULT);
                     int type = rs.getInt(FieldNames.DIFF_TYPE);
+                    int order = rs.getInt(FieldNames.DIFF_ORDER);
                     boolean isGenomeGap = false;
                     if (type == 0) {
                         isGenomeGap = true;
                     }
                     int cov = forwardCov + reverseCov;
 
-                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap);
+                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap, order);
 
                 }
           }
@@ -872,7 +895,7 @@ public class TrackConnector implements ITrackConnector{
         ArrayList<Snp454> snps = new ArrayList<Snp454>();
         HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
         final int diffIntervalSize = 50;
-        final int mappingIntervalSize = 200;
+        final int mappingIntervalSize = 550;
         int fromDiff = 1;
         int toDiff = diffIntervalSize;
         int fromMapping = 1;
@@ -901,6 +924,7 @@ public class TrackConnector implements ITrackConnector{
                  if (toMapping > genomeSize) {
                     toMapping = genomeSize;
                 }
+
                 ResultSet rs = fetch.executeQuery();
 
                 while (rs.next()) {
@@ -911,13 +935,14 @@ public class TrackConnector implements ITrackConnector{
                     int forwardCov = rs.getInt(FieldNames.COVERAGE_BM_FW_MULT);
                     int reverseCov = rs.getInt(FieldNames.COVERAGE_BM_RV_MULT);
                     int type = rs.getInt(FieldNames.DIFF_TYPE);
+                    int order = rs.getInt(FieldNames.DIFF_ORDER);
                     boolean isGenomeGap = false;
                     if (type == 0) {
                         isGenomeGap = true;
                     }
                     int cov = forwardCov + reverseCov;
 
-                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap);
+                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap, order);
 
                 }
           }
