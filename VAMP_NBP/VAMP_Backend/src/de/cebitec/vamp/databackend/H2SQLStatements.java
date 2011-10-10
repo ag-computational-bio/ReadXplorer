@@ -219,5 +219,8 @@ public class H2SQLStatements {
 
 
     //////// statements to fetch data from database ////////////////////////////
+                    "A."+FieldNames.DIFF_ORDER+", " +
+                    FieldNames.DIFF_ORDER+", " +
+                    "D."+FieldNames.DIFF_ORDER+", "+
 
 }
