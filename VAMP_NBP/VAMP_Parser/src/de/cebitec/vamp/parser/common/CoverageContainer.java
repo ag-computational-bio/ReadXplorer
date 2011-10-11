@@ -212,28 +212,28 @@ public class CoverageContainer {
                 Integer[] bases = positionTable.get(position);
                 switch (base) {
                     case 'A':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[BASE_A] = bases[BASE_A] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[BASE_A] = bases[BASE_A] + s.getCount();
                         break;
                     case 'C':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[BASE_C] = bases[BASE_C] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[BASE_C] = bases[BASE_C] + s.getCount();
                         break;
                     case 'G':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[BASE_G] = bases[BASE_G] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[BASE_G] = bases[BASE_G] + s.getCount();
                         break;
                     case 'T':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[BASE_T] = bases[BASE_T] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[BASE_T] = bases[BASE_T] + s.getCount();
                         break;
                     case 'N':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[BASE_N] = bases[BASE_N] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[BASE_N] = bases[BASE_N] + s.getCount();
                         break;
                     case '_':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[BASE_GAP] = bases[BASE_GAP] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[BASE_GAP] = bases[BASE_GAP] + s.getCount();
                         break;
                 }
 
@@ -269,24 +269,24 @@ public class CoverageContainer {
                 Integer[] bases = positionTable.get(position);
                 switch (base) {
                     case 'A':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[GAP_A] = bases[GAP_A] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[GAP_A] = bases[GAP_A] + s.getCount();
                         break;
                     case 'C':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[GAP_C] = bases[GAP_C] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[GAP_C] = bases[GAP_C] + s.getCount();
                         break;
                     case 'G':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[GAP_G] = bases[GAP_G] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[GAP_G] = bases[GAP_G] + s.getCount();
                         break;
                     case 'T':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[GAP_T] = bases[GAP_T] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[GAP_T] = bases[GAP_T] + s.getCount();
                         break;
                     case 'N':
-                        bases[DIFFS] = bases[DIFFS] + 1;
-                        bases[GAP_N] = bases[GAP_N] + 1;
+                        bases[DIFFS] = bases[DIFFS] + s.getCount();
+                        bases[GAP_N] = bases[GAP_N] + s.getCount();
                         break;
                 }
 

@@ -10,6 +10,7 @@ import de.cebitec.vamp.api.objects.NewSnp;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -67,7 +68,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false, false, false, false, false, false, false
@@ -168,8 +169,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         for (Snp snp : snps) {
             
             Object[] rowData = new Object[13];
-            Integer position = Integer.parseInt(snp.getPosition());
-            rowData[0] = position;
+            //Integer position = Integer.parseInt(snp.getPosition());
+            rowData[0] = snp.getPosition();
             rowData[1] = snp.getTrack();
             rowData[2] = snp.getBase().toUpperCase();
             rowData[3] = snp.getRefBase().toUpperCase();
@@ -188,6 +189,20 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
         jTable1.setRowSorter(sorter);
         sorter.setModel(model);
+        sorter.setComparator(0, new Comparator<String>(){
+            public int compare(String a, String b) {
+                if(a.contains("_")){
+                    a = a.substring(0, a.length() - 2);
+                }
+                if(b.contains("_")){
+                    b = b.substring(0, b.length() - 2);
+                }
+                Integer intA = Integer.parseInt(a);
+                Integer intB = Integer.parseInt(b);
+                 return intA.compareTo(intB);
+            }
+        }
+                );
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
@@ -200,6 +215,11 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         int selectedModel = jTable1.convertRowIndexToModel(selectedView);
         //int position = (Integer) jTable1.getModel().getValueAt(selectedModel, 0);
         String pos = (String) jTable1.getModel().getValueAt(selectedModel, 0);
+        
+        if(pos.contains("_")){
+            pos = pos.substring(0,pos.length()-2);
+        }
+        
         int position = Integer.parseInt(pos);
         bim.navigatorBarUpdated(position);
     }

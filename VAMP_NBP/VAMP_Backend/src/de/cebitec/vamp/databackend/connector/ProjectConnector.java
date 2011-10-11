@@ -1348,7 +1348,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair data");
     }
 
-    public void storePositionTable(ParsedTrack track) {
+    private void storePositionTable(ParsedTrack track) {
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -1414,6 +1414,7 @@ public class ProjectConnector {
                     }
                     
                     String refBase = String.valueOf(refSeq.charAt(positionInt-1));
+                    refBase = refBase.toUpperCase();
                     values[getBaseInt(refBase)] = (int) cov - values[11];
                     char type = ' ';
                     char base = ' ';
@@ -1488,8 +1489,9 @@ public class ProjectConnector {
                     double forwCov = (forwCov1 + forwCov2)/2;
                     double revCov = (revCov1 + revCov2)/2;
                     double cov = forwCov + revCov;
+                    double coverage = forwCov1 + revCov1;
 
-                    double frequency = values[11] / cov * 100;
+                    double frequency = values[11] / coverage * 100;
                     
                     insertPosition.setLong(1, snpID);
                     insertPosition.setLong(2, track.getID());
@@ -1504,7 +1506,7 @@ public class ProjectConnector {
                     insertPosition.setInt(11, 0);
                     insertPosition.setInt(12, (int) cov);
                     insertPosition.setInt(13, (int) frequency);
-                    insertPosition.setString(14, String.valueOf('I'));
+                    insertPosition.setString(14, String.valueOf(insertion));
 
                     insertPosition.addBatch();
                     
@@ -1570,7 +1572,7 @@ public class ProjectConnector {
         } else if (index == BASE_N || index == GAP_N) {
             base = 'N';
         } else if (index == BASE_GAP) {
-            base = '-';
+            base = '_';
         } else {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
         }

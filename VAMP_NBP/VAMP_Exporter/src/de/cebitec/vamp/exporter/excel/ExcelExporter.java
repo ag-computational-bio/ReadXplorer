@@ -109,8 +109,8 @@ public class ExcelExporter implements ExporterI {
         row++;
 
         for (Snp snp : snps) {
-            addColumn(sheet, "INTEGER", snp.getPosition(), 0, row);
-            addColumn(sheet, "STRING", snp.getBase(), 1, row);
+            //addColumn(sheet, "STRING", snp.getPosition(), 0, row);
+            //addColumn(sheet, "STRING", snp.getBase(), 1, row);
             //addColumn(sheet, "INTEGER", snp.getCount(), 2, row);
             //addColumn(sheet, "INTEGER", snp.getPercentage(), 3, row);
             //addColumn(sheet, "INTEGER", snp.getVariationPercentag(), 4, row);
