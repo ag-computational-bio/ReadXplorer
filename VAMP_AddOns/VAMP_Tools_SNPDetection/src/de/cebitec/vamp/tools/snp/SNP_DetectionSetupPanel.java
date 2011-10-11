@@ -7,9 +7,9 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingWorker;
@@ -30,6 +30,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private ITrackConnector con;
+    private ProjectConnector proCon;
     private List<Snp> snps;
 
     public static final String PROP_SNPS_LOADED = "snpsLoaded";
@@ -57,8 +58,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             CentralLookup.getDefault().add(this);
 
             ph.start();
-
-            snps = con.findSNPs(percent, num);
+            snps = proCon.findSNPs(percent, num);
             return snps;
         }
 
@@ -201,8 +201,13 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
         return snps;
     }
 
-    public void setCon(ITrackConnector con) {
-        this.con = con;
+//    public void setCon(ITrackConnector con) {
+//        this.con = con;
+//    }
+
+    public void setCon(ProjectConnector con) {
+        this.proCon = con;
     }
 
+    
 }

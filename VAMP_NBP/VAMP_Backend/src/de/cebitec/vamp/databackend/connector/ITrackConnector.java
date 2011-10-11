@@ -1,7 +1,6 @@
 package de.cebitec.vamp.databackend.connector;
 
 //import de.cebitec.vamp.api.objects.Read;
-import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
@@ -102,7 +101,7 @@ public interface ITrackConnector {
      * @param is454 
      * @return
      */
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
+    //public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
     
     public List<Snp454> findSNPs454(int percentageThreshold, int absThreshold);
 

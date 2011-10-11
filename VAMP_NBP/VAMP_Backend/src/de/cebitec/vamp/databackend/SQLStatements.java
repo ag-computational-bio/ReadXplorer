@@ -52,6 +52,26 @@ public class SQLStatements {
      * already drop this table which was replaced by STATISTICS.
      */
     public static final String DROP_TABLE_STATICS = "DROP TABLE IF EXISTS STATICS";
+    
+    public final static String INSERT_POSITION =
+            "INSERT INTO " + FieldNames.TABLE_POSITIONS + " "
+            + "("
+            + FieldNames.POSITIONS_SNP_ID + ", "
+            + FieldNames.POSITIONS_TRACK_ID + ", "
+            + FieldNames.POSITIONS_POSITION + ", "
+            + FieldNames.POSITIONS_BASE + ", "
+            + FieldNames.POSITIONS_REF_BASE + ", "
+            + FieldNames.POSITIONS_A + ", "
+            + FieldNames.POSITIONS_C + ", "
+            + FieldNames.POSITIONS_G + ", "
+            + FieldNames.POSITIONS_T + ", "
+            + FieldNames.POSITIONS_N + ", "
+            + FieldNames.POSITIONS_GAP + ", "
+            + FieldNames.POSITIONS_COVERAGE + ", "
+            + FieldNames.POSITIONS_FREQUENCY + ", "
+            + FieldNames.POSITIONS_TYPE + " "
+            + ") "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     //////////////////  statements for data insertion  /////////////////////////
 
@@ -1299,6 +1319,51 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
 //           "WHERE  R." +
 //           FieldNames.READ_NAME + "= ?  AND M."+FieldNames.MAPPING_SEQUENCE_ID + " = R." +FieldNames.READ_SEQUENCE+" AND M." +FieldNames.MAPPING_TRACK+" = ? " ;
 
+    public final static String FETCH_SNP_IDS_FOR_TRACK =
+            "SELECT * FROM " + FieldNames.TABLE_POSITIONS + " WHERE " + FieldNames.POSITIONS_TRACK_ID + " = ?"; 
+    
+    public final static String FETCH_DIFFS_HAVING_SNP_ID =
+            "SELECT "
+            + FieldNames.DIFF_MAPPING_ID + ","
+            + FieldNames.DIFF_CHAR + ","
+            + FieldNames.DIFF_POSITION + ","
+            + FieldNames.DIFF_TYPE + ","
+            + FieldNames.DIFF_ORDER + " "
+            + "FROM "
+            + FieldNames.TABLE_DIFF + " "
+            + "WHERE "
+            + FieldNames.DIFF_SNP_ID + " = ?";
+    
+    public final static String FETCH_SNPS =
+            "SELECT * "
+            + "FROM "
+            + FieldNames.TABLE_POSITIONS + " "
+            + "WHERE "
+            + FieldNames.POSITIONS_TYPE 
+            + " != 'M' AND "
+            + FieldNames.POSITIONS_FREQUENCY 
+            + " >= ? AND SELECT CASE WHEN "
+            + FieldNames.POSITIONS_REF_BASE
+            + " = 'A' THEN GREATEST("
+            + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + ") >= ? "
+            + "WHEN "
+            + FieldNames.POSITIONS_REF_BASE
+            + " = 'C' THEN GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + ") >= ? "
+            + "WHEN "
+            + FieldNames.POSITIONS_REF_BASE
+            + " = 'G' THEN GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_T + ") >= ? "
+            + "ELSE GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + ") >= ? END";
+    
+    public final static String GET_DIRECTION_OF_MAPPING =
+            "SELECT "
+            + FieldNames.MAPPING_DIRECTION + " "
+            + "FROM "
+            + FieldNames.TABLE_MAPPINGS + " "
+            + "WHERE "
+            + FieldNames.MAPPING_ID + " = ?";
 
     
     public final static String GET_LATEST_COVERAGE_ID =
@@ -1334,7 +1399,10 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
    public static final String GET_LATEST_SEQUENCE_PAIR_PAIR_ID =
             "SELECT MAX("+FieldNames.SEQ_PAIR_PAIR_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_SEQ_PAIRS;
    
-   public static final String GET_LATEST_TRACK_SEQUENCE_PAIR_ID =
+   public final static String GET_LATEST_SNP_ID =
+            "SELECT MAX(" + FieldNames.POSITIONS_SNP_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_POSITIONS;
+   
+   public static final String GET_LATEST_TRACK_SEQUENCE_PAIR_ID = 
             "SELECT MAX("+FieldNames.TRACK_SEQUENCE_PAIR_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_TRACKS;
    
    public static final String GET_CURRENT_READLENGTH = 

@@ -22,6 +22,25 @@ public class MySQLStatements {
             FieldNames.REF_GEN_TIMESTAMP+" DATETIME NOT NULL" +
             ") ";
 
+    public final static String SETUP_POSITIONS =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_POSITIONS + " "
+            + "("
+            + FieldNames.POSITIONS_SNP_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.POSITIONS_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_POSITION + " VARCHAR(200) NOT NULL, "
+            + FieldNames.POSITIONS_REF_BASE + " VARCHAR(1) NOT NULL, "
+            + FieldNames.POSITIONS_A + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_C + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_G + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_T + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_N + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_GAP + " MEDIUMINT UNSIGNED, "
+            + FieldNames.POSITIONS_COVERAGE + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_FREQUENCY + " MEDIUMINT UNSIGNED NOT NULL, "
+            + FieldNames.POSITIONS_TYPE + " VARCHAR(1) NOT NULL , "
+            + "INDEX (" + FieldNames.POSITIONS_SNP_ID + "), "
+            + "INDEX (" + FieldNames.POSITIONS_TRACK_ID + ") "
+            + ")";
     
     public final static String SETUP_DIFFS =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_DIFF+" " +
@@ -334,5 +353,8 @@ public class MySQLStatements {
             "WHERE " +
                 "C."+FieldNames.COVERAGE_TRACK+" = ? AND " +
                 "C."+FieldNames.COVERAGE_POSITION+" = A."+FieldNames.DIFF_POSITION;
+    
+    //public final static String FETCH_SNPS_FROM_SNP_TABLE =
+    //        "SELECT "
     
 }

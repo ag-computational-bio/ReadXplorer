@@ -1,8 +1,10 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.util.TabWithCloseX;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+
 import java.awt.CardLayout;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
@@ -36,7 +38,6 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         setName(NbBundle.getMessage(SNP_DetectionTopComponent.class, "CTL_SNP_DetectionTopComponent"));
         setToolTipText(NbBundle.getMessage(SNP_DetectionTopComponent.class, "HINT_SNP_DetectionTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-
         // add listener to close TopComponent when no tabs are shown
         snpTabs.addContainerListener(new ContainerListener() {
 
@@ -62,15 +63,20 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * @param trackViewer instance used for this panels panels.
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(TrackViewer trackViewer){
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer){
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
         SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
         final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
 
-        // assign the trackviewer
-        setupPanel.setCon(trackViewer.getTrackCon());
-        resultPanel.setBoundsInfoManager(trackViewer.getBoundsInformationManager());
+        // assign the ProjectConnector
+        setupPanel.setCon(ProjectConnector.getInstance());
+        //setupPanel.setCon(trackViewer.getTrackCon());
+//        ReferenceViewer viewer = Lookup.getDefault().lookup(ReferenceViewer.class);
+//        if (viewer != null){
+//            resultPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
+//        }
+        resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
 
         // listen on changes of the search
         setupPanel.addPropertyChangeListener(SNP_DetectionSetupPanel.PROP_SNPS_LOADED, new PropertyChangeListener() {
@@ -112,11 +118,11 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -197,9 +203,14 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         return PREFERRED_ID;
     }
 
-    public void openDetectionTab(TrackViewer trackViewer){
-        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
+//    public void openDetectionTab(TrackViewer trackViewer){
+//        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
+//        snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
+//    }
+
+    public void openDetectionTab(ReferenceViewer referenceViewer){
+        snpTabs.addTab("SNP Detection for opened Tabs", getSnpDetectionPanel(referenceViewer));
         snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
     }
-
+    
 }
