@@ -10,7 +10,7 @@ import java.util.HashMap;
  *
  * @author Rolf Hilker
  */
-public class BAMSeqPairParser extends BAMParser implements PairedDataParserI {
+public class BAMSeqPairParser extends BAMParser implements SequencePairParserI {
 
     private HashMap<String, Integer> seqIDToReadNameMap;
 
@@ -19,7 +19,8 @@ public class BAMSeqPairParser extends BAMParser implements PairedDataParserI {
     }
 
     @Override
-    public void processReadname(final int seqID, final String readName) {
+    public void processReadname(int seqID, String readName) {
+        readName = readName.substring(0, readName.length()-2);
         if (!this.seqIDToReadNameMap.containsKey(readName)){
             //since seqID will always be the same for all reads with identical sequence
             this.seqIDToReadNameMap.put(readName, seqID);
@@ -28,6 +29,11 @@ public class BAMSeqPairParser extends BAMParser implements PairedDataParserI {
 
     @Override
     public HashMap<String, Integer> getSeqIDToReadNameMap() {
-        return this.seqIDToReadNameMap;
+        return (HashMap<String, Integer>) this.seqIDToReadNameMap.clone();
+    }
+    
+    @Override
+    public void resetSeqIdToReadnameMap(){
+        this.seqIDToReadNameMap = new HashMap<String, Integer>();
     }
 }

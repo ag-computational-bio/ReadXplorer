@@ -8,13 +8,13 @@ import java.sql.Timestamp;
  */
 public class PersistantTrack {
 
-    private Long id;
+    private int id;
     private String description;
     private Timestamp date;
-    private Long refGenID;
+    private int refGenID;
  //   private Long runID; //excluded since RUN domain is excluded from VAMP
 
-    public PersistantTrack(Long id, String description, Timestamp date, Long refGenID){//, Long runID) {
+    public PersistantTrack(int id, String description, Timestamp date, int refGenID){//, Long runID) {
         this.id = id;
         this.description = description;
         this.date = date;
@@ -22,11 +22,11 @@ public class PersistantTrack {
 //        this.runID = runID;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public Long getRefGenID() {
+    public int getRefGenID() {
         return refGenID;
     }
 

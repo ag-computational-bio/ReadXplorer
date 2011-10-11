@@ -15,7 +15,7 @@ public class TrackJob implements Job {
     private String description;
     private Timestamp timestamp;
     private MappingParserI parser;
-    private Long trackID;
+    private int trackID;
     private ReferenceJob refGen;
 
     /**
@@ -27,7 +27,7 @@ public class TrackJob implements Job {
      * @param parser the parser to use for parsing
      * @param timestamp the timestamp when it was created
      */
-    public TrackJob(Long trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp) {
+    public TrackJob(int trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp) {
         this.trackID = trackID;
         this.file = file;
         this.description = description;
@@ -36,7 +36,7 @@ public class TrackJob implements Job {
         this.refGen = refGen;
     }
 
-    public TrackJob(Long trackID, File file, String description, ReferenceJob refGen,
+    public TrackJob(int trackID, File file, String description, ReferenceJob refGen,
             MappingParserI parser, Timestamp timestamp, int distance, int deviation) {
         this(trackID, file, description, refGen, parser, timestamp);
     }
@@ -69,7 +69,7 @@ public class TrackJob implements Job {
     }
 
     @Override
-    public Long getID() {
+    public int getID() {
         return trackID;
     }
 
@@ -83,7 +83,7 @@ public class TrackJob implements Job {
         return description + ":" + timestamp;
     }
 
-    public void setPersistant(Long trackID) {
+    public void setPersistant(int trackID) {
         this.trackID = trackID;
     }
     

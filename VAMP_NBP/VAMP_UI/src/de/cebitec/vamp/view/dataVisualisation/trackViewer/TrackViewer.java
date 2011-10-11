@@ -13,6 +13,7 @@ import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -59,7 +60,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     // colors for the pathes
     private static Color bmC = ColorProperties.BEST_MATCH;
     private static Color zC = ColorProperties.PERFECT_MATCH;
-    private static Color nC = ColorProperties.N_ERROR_COLOR;
+    private static Color nC = ColorProperties.COMMON_MATCH;
 
     public static final String PROP_TRACK_CLICKED = "track clicked";
     public static final String PROP_TRACK_ENTERED = "track entered";
@@ -95,6 +96,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
                 repaint();
             }
         });
+        this.setViewerSize();
     }
 
     private void setColors(Preferences pref) {
@@ -258,7 +260,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     /**
      * Create a GeneralPath that represents the coverage
-     * @param orientation if -1, coverage is drawn from buttom to top, if 1 otherwise
+     * @param orientation if -1, coverage is drawn from bottom to top, if 1 otherwise
      * @param values the values for the currently displayed range
      * @return GeneralPath representing the coverage
      */
@@ -276,7 +278,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             int right = transformToLogicalCoord(d + 1) -1;
 
             // physical coordinate d and d+1 may cover the same base, depending on zoomlevel,
-            // if not compute max of range of balues represented at position d
+            // if not compute max of range of values represented at position d
             int value;
             if(right > left){
 
@@ -594,6 +596,15 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public String toString(){
         return getName();
+    }
+    
+    /**
+     * Sets the initial size of the track viewer.
+     */
+    private void setViewerSize() {
+        
+        this.setPreferredSize(new Dimension(1, 300));
+        this.revalidate();
     }
     
 }

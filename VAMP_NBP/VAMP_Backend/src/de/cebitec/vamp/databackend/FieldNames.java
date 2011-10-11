@@ -3,7 +3,7 @@ package de.cebitec.vamp.databackend;
 /**
  * Contains all field names for data base requests.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class FieldNames {
 
@@ -99,6 +99,7 @@ public class FieldNames {
     public final static String FEATURE_PRODUCT = "PRODUCT";
     public final static String FEATURE_ECNUM = "EC_NUM";
     public final static String FEATURE_STRAND = "STRAND";
+    public static final String FEATURE_GENE = "GENE";
 
     // mapping table fields
     public final static String MAPPING_ID = "ID";
@@ -127,7 +128,7 @@ public class FieldNames {
     public static final String SEQ_PAIR_TYPE = "TYPE";
     
     // paired data replicates table fields
-    public final static String SEQ_PAIR_MAPPING_ID = "MAPPING_ID";
+    public final static String SEQ_PAIR_REPLICATE_PAIR_ID = "PAIR_ID";
     public static final String SEQ_PAIR_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
     
     //paired data to mapping connection table
@@ -162,6 +163,7 @@ public class FieldNames {
     public final static String STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS = "NUM_PERFECT_SEQPAIRS";
     public final static String STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS = "NUM_UNIQUE_SEQPAIRS";
     public final static String STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS = "NUM_UNIQUE_PERFECT_SEQPAIRS";
+    public static final String STATISTICS_NUM_SINGLE_MAPPINGS = "NUM_SINGLE_MAPPINGS";
     
     // unique mappings = count all distinct mapping ids
     // unique sequences = num mapped seq = count all distinct seq ids

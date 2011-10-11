@@ -29,7 +29,7 @@ public class GenericSQLQueries {
      * @return the value calculated for the given sqlStatement
      */
     public static int getIntegerFromDB(String sqlStatement, String identifier, Connection con, long trackID){
-        int num = 0;
+        int num = -1;
         try {
             PreparedStatement fetch = con.prepareStatement(sqlStatement);
             fetch.setLong(1, trackID);
@@ -67,4 +67,42 @@ public class GenericSQLQueries {
         return ++id;
     }
 
+    
+    public static String generateAddColumnString(String table, String column){
+        return "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
+                + table
+                + " AND COLUMN_NAME =" + column + ")"
+                + " BEGIN "
+                + "ALTER TABLE "
+                + table
+                + " ADD COLUMN "
+                + column + " BIGINT UNSIGNED "
+                + " END";
+    }
+    
+    /**
+     * Adds a new column with an Integer value to the table
+     * @param table table
+     * @param column column to add
+     * @return SQL command
+     */
+    public static String genAddColumnString2(String table, String column) {
+        return "ALTER TABLE "
+                + table
+                + " ADD COLUMN "
+                + column + " BIGINT UNSIGNED ";
+    }
+    
+    /**
+     * Adds a new column with a varchar 20 value to the table.
+     * @param table table
+     * @param column column to add
+     * @return SQL command
+     */
+    public static String genAddColumnString3(String table, String column) {
+        return "ALTER TABLE "
+                + table
+                + " ADD COLUMN "
+                + column + " VARCHAR(20) ";
+    }
 }

@@ -34,7 +34,6 @@ public class SAMParser implements MappingParserI, Observer {
     private HashMap<String, String> mappedRefAndReadPlusGaps = new HashMap<String, String>();
     private HashMap<String, Integer> seqToIDMap;
     private ArrayList<String> readnames;
-    
     private int noUniqueMappings;
     private ArrayList<Observer> observers;
     private String errorMsg;
@@ -115,7 +114,7 @@ public class SAMParser implements MappingParserI, Observer {
                     //   System.out.println("rSeq " + readname + "flag " + flag + "refName " + refName + "pos " + position + readSeqwithoutGaps);
                     //System.out.println("rSeq " + readname );
                     if (this.isMappedSequence(flag, start)) {
-                        
+
                         stop = 0;
                         errors = 0;
                         if (cigar.contains("D") || cigar.contains("I")) {
@@ -219,16 +218,16 @@ public class SAMParser implements MappingParserI, Observer {
             mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
-        } catch (IOException ex) {
-            throw new ParsingException(ex);
+        } catch (Exception e) {
+            this.sendErrorMsg(e.getMessage());
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
-        if (mappingContainer.getMappedSequenceIDs().isEmpty()){ //if track does not contain any reads
+        if (mappingContainer.getMappedSequenceIDs().isEmpty()) { //if track does not contain any reads
             throw new ParsingException(NbBundle.getMessage(JokParser.class, "Parser.Empty.Track.Error"));
         }
-        if (counterUnmapped > 0){
-            this.sendErrorMsg("Number of unmapped reads in file: "+counterUnmapped);
+        if (counterUnmapped > 0) {
+            this.sendErrorMsg("Number of unmapped reads in file: " + counterUnmapped);
         }
         return mappingContainer;
     }
@@ -644,11 +643,10 @@ public class SAMParser implements MappingParserI, Observer {
         }
     }
 
-    
     @Override
     public void processReadname(int seqID, String readName) {
         //count reads
-        if (!this.readnames.contains(readName)){
+        if (!this.readnames.contains(readName)) {
             this.readnames.add(readName);
         }
     }

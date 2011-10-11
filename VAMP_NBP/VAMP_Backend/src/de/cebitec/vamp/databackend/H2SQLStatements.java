@@ -87,7 +87,8 @@ public class H2SQLStatements {
             FieldNames.FEATURE_LOCUS+" VARCHAR (1000), " +
             FieldNames.FEATURE_PRODUCT+" VARCHAR (2000), " +
             FieldNames.FEATURE_ECNUM+" VARCHAR (20), " +
-            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL " +
+            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
+            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
             ") ";
 
     
@@ -151,14 +152,14 @@ public class H2SQLStatements {
     public static final String SETUP_SEQ_PAIR_REPLICATES = 
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_REPLICATES +
             " (" +
-            FieldNames.SEQ_PAIR_MAPPING_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
+            FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
             FieldNames.SEQ_PAIR_NUM_OF_REPLICATES+" SMALLINT UNSIGNED NOT NULL, " +
             ") ";
     
     
     public final static String INDEX_SEQ_PAIR_REPLICATES =
             "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIR_REPLICATES ON " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
-            + "("+FieldNames.SEQ_PAIR_MAPPING_ID+" ) ";
+            + "("+FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+" ) ";
    
     
     public static final String SETUP_SEQ_PAIR_PIVOT = 
@@ -169,7 +170,7 @@ public class H2SQLStatements {
             ") ";
     
     
-    public final static String INDEX_SEQ_PAIRS_PIVOT =
+    public final static String INDEX_SEQ_PAIR_PIVOT =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPING_TO_SEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
             + "("+FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID+", "+FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID+" ) ";
 
@@ -219,8 +220,5 @@ public class H2SQLStatements {
 
 
     //////// statements to fetch data from database ////////////////////////////
-                    "A."+FieldNames.DIFF_ORDER+", " +
-                    FieldNames.DIFF_ORDER+", " +
-                    "D."+FieldNames.DIFF_ORDER+", "+
 
 }

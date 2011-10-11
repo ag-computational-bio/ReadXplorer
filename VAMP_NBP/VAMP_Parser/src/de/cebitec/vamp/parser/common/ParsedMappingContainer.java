@@ -48,17 +48,13 @@ public class ParsedMappingContainer implements Observable, Observer {
     public ParsedMappingGroup getParsedMappingGroupBySeqID(int sequenceID){
         return mappings.get(sequenceID);
     }
-    
+
     public HashMap<Integer,Integer> getMappingInformations() {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
         int numberOfBM = 0;
         int numberOfPerfect = 0;
         //the number of created Mappings by the mapper
         int numberOfMappings = 0;
-        int numSeqPairs = 0;
-        int numPerfSeqPairs = 0;
-        int numUniqueSeqPairs = 0;
-        int numUniquePerfSeqPairs = 0;
 
         Collection<ParsedMappingGroup> groups = mappings.values();
         Iterator<ParsedMappingGroup> it = groups.iterator();
@@ -85,10 +81,6 @@ public class ParsedMappingContainer implements Observable, Observer {
         mappingInfos.put(4, numUniqueMappings);
         mappingInfos.put(5, numUniqueSeq);
         mappingInfos.put(6, numReads);
-        mappingInfos.put(7, numSeqPairs);
-        mappingInfos.put(8, numPerfSeqPairs);
-        mappingInfos.put(9, numUniqueSeqPairs);
-        mappingInfos.put(10, numUniquePerfSeqPairs);
 
         return mappingInfos;
     }

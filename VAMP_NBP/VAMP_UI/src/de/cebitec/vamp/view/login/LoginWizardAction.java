@@ -11,11 +11,12 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
-import org.h2.jdbc.JdbcSQLException;
+import javax.swing.JFrame;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.windows.WindowManager;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can copy-paste the code below wherever you need.
@@ -31,12 +32,9 @@ public final class LoginWizardAction implements ActionListener{
         // check if user is already logged in
         Boolean loggedIn = cl.lookup(LoginCookie.class) != null ? Boolean.TRUE : Boolean.FALSE;
 
-        if (loggedIn){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.info.doubleLogin"), NotifyDescriptor.INFORMATION_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-            // TODO: find a way to do an automatic logout below
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.warning.doubleLogin"), NotifyDescriptor.WARNING_MESSAGE));
-            return;
+        if (loggedIn){ //logout from other db
+            LogoutAction logoutAction = new LogoutAction(cl.lookup(LoginCookie.class));
+            logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
         }
 
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
@@ -65,6 +63,9 @@ public final class LoginWizardAction implements ActionListener{
                         return true;
                     }
                 });
+                //add database path to main window title
+                JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
+                mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
             } catch (SQLException ex) {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
                 nd.setTitle(NbBundle.getBundle(LoginWizardAction.class).getString("MSG_LoginWizardAction.sqlError"));

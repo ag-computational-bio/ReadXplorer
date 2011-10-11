@@ -9,8 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author ddoppmei
+ * 
+ * A block contains detailed information about one PersistantMapping.
  */
 public class Block implements BlockI{
 
@@ -20,6 +21,13 @@ public class Block implements BlockI{
     private GenomeGapManager gapManager;
     private ArrayList<Brick> bricks;
 
+    /**
+     * A block contains detailed information about one PersistantMapping.
+     * @param absStart start of the block (might be larger than start of mapping)
+     * @param absStop stop of the block (might be smaller than stop of mapping)
+     * @param mapping mapping whose detailed information is needed
+     * @param gapManager gap manager of the mapping
+     */
     public Block(int absStart, int absStop, PersistantMapping mapping, GenomeGapManager gapManager){
         this.absStart = absStart;
         this.absStop = absStop;
@@ -29,6 +37,9 @@ public class Block implements BlockI{
         this.createBricks();
     }
 
+    /**
+     * Each position in the block gets one brick.
+     */
     private void createBricks(){
         for(int i = absStart; i<= absStop; i++){
             if(gapManager.hasGapAt(i)){
@@ -123,7 +134,7 @@ public class Block implements BlockI{
     }
 
     @Override
-    public PersistantMapping getMapping(){
+    public PersistantMapping getPersistantObject(){
         return mapping;
     }
 
@@ -136,11 +147,13 @@ public class Block implements BlockI{
         return sb.toString();
     }
 
+    
     @Override
     public Iterator<Brick> getBrickIterator() {
         return bricks.iterator();
     }
 
+    
     @Override
     public int getNumOfBricks() {
         return bricks.size();

@@ -9,8 +9,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- *
  * @author ddoppmeier
+ * 
+ * Holds the details about gaps in the reference genome.
  */
 public class GenomeGapManager {
 

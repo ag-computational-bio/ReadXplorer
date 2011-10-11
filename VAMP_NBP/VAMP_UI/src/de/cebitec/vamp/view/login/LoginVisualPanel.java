@@ -16,6 +16,9 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
+/**
+ * @author ddopmeier?, jstraube?, rhilker
+ */
 public final class LoginVisualPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -31,10 +34,9 @@ public final class LoginVisualPanel extends JPanel {
 
     /** Creates new form LoginVisualPanel */
     public LoginVisualPanel() {
-        initComponents();
-
-        setLoginData();
-        dbChooseButton.setVisible(false);
+        this.initComponents();
+        this.setLoginData();
+        this.updateUIForH2();
     }
 
     @Override
@@ -158,9 +160,15 @@ public final class LoginVisualPanel extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(passwordLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.passwordLabel.text")); // NOI18N
 
+        databaseField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                databaseFieldActionPerformed(evt);
+            }
+        });
+
         org.openide.awt.Mnemonics.setLocalizedText(dbTypeLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.dbTypeLabel.text")); // NOI18N
 
-        dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "MySQL", "h2" }));
+        dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "h2", "MySQL" }));
         dbTypeBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dbTypeBoxActionPerformed(evt);
@@ -186,15 +194,16 @@ public final class LoginVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(saveDataCheckBox)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(userLabel)
-                                    .addComponent(databaseLabel)
-                                    .addComponent(passwordLabel)
-                                    .addComponent(urlLabel)))
-                            .addComponent(dbTypeLabel))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(databaseLabel)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(27, 27, 27)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(userLabel)
+                                        .addComponent(passwordLabel)))
+                                .addComponent(dbTypeLabel))
+                            .addComponent(urlLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(passwordField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
@@ -202,7 +211,7 @@ public final class LoginVisualPanel extends JPanel {
                             .addComponent(dbTypeBox, 0, 297, Short.MAX_VALUE)
                             .addComponent(urlField, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                                .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(dbChooseButton)))))
                 .addContainerGap())
@@ -220,9 +229,9 @@ public final class LoginVisualPanel extends JPanel {
                     .addComponent(urlLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(databaseLabel)
                     .addComponent(databaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dbChooseButton))
+                    .addComponent(dbChooseButton)
+                    .addComponent(databaseLabel))
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(userLabel)
@@ -240,14 +249,7 @@ public final class LoginVisualPanel extends JPanel {
     private void dbTypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbTypeBoxActionPerformed
         String db = dbTypeBox.getSelectedItem().toString();
         if (db.equalsIgnoreCase("h2")) {
-            userField.setVisible(false);
-            urlField.setVisible(false);
-            passwordField.setVisible(false);
-            userLabel.setVisible(false);
-            passwordLabel.setVisible(false);
-            urlLabel.setVisible(false);
-            dbChooseButton.setVisible(true);
-            databaseField.setText(defaultdatabaseh2);
+            this.updateUIForH2();
         } else {
             userField.setVisible(true);
             urlField.setVisible(true);
@@ -296,6 +298,10 @@ public final class LoginVisualPanel extends JPanel {
         }
 }//GEN-LAST:event_dbChooseButtonActionPerformed
 
+    private void databaseFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_databaseFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_databaseFieldActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField databaseField;
     private javax.swing.JLabel databaseLabel;
@@ -310,4 +316,19 @@ public final class LoginVisualPanel extends JPanel {
     private javax.swing.JTextField userField;
     private javax.swing.JLabel userLabel;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Updates the ui that only the database field and choose button are still active, since
+     * no login information is needed for the local h2 database.
+     */
+    private void updateUIForH2() {
+        userField.setVisible(false);
+        urlField.setVisible(false);
+        passwordField.setVisible(false);
+        userLabel.setVisible(false);
+        passwordLabel.setVisible(false);
+        urlLabel.setVisible(false);
+        dbChooseButton.setVisible(true);
+        databaseField.setText(defaultdatabaseh2);
+    }
 }
