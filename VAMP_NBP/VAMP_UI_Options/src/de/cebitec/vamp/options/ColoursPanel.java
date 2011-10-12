@@ -1,5 +1,6 @@
 package de.cebitec.vamp.options;
 
+import de.cebitec.vamp.util.ColorProperties;
 import java.awt.Color;
 import javax.swing.JColorChooser;
 import org.openide.DialogDescriptor;
@@ -11,10 +12,9 @@ final class ColoursPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private final ColoursOptionsPanelController controller;
 
-    // standard Colors TODO may be put them elsewhere?
-    private static final Color perfectMatchColour = new Color(38, 180, 36);
-    private static final Color bestMatchColour = new Color(244, 225, 49);
-    private static final Color commonMatchColour = new Color(180, 41, 36);
+    private static final Color perfectMatchColour =  ColorProperties.PERFECT_MATCH;
+    private static final Color bestMatchColour = ColorProperties.BEST_MATCH;
+    private static final Color commonMatchColour = ColorProperties.N_ERROR_COLOR;
 
     ColoursPanel(ColoursOptionsPanelController controller) {
         this.controller = controller;
@@ -98,19 +98,19 @@ final class ColoursPanel extends javax.swing.JPanel {
                             .addComponent(bestMatchLabel))
                         .addGap(46, 46, 46)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(commonMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
-                            .addComponent(bestMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
-                            .addComponent(perfectMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)))
+                            .addComponent(commonMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                            .addComponent(bestMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                            .addComponent(perfectMatchButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(uniformColorLabel)
                         .addGap(59, 59, 59)
-                        .addComponent(uniformColButton, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)))
+                        .addComponent(uniformColButton, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(uniformColorationCheckBox)
-                .addContainerGap(76, Short.MAX_VALUE))
+                .addContainerGap(111, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

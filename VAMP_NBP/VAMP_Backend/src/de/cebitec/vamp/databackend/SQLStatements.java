@@ -47,19 +47,19 @@ public class SQLStatements {
 //            "INDEX ("+FieldNames.READ_SEQUENCE+") " +
 //            ")";
 
-     public final static String SETUP_STATICS =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATICS + " "
+     public final static String SETUP_STATISTIC =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
             + "( "
-            + FieldNames.STATICS_ID + " BIGINT UNSIGNED PRIMARY KEY, "
-            + FieldNames.STATICS_TRACK + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_NUMBER_OF_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_NUMBER_OF_PERFECT_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_NUMBER_OF_BM_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_PERFECT_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_BM_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATICS_NUMBER_OF_UNIQUE_SEQ + " BIGINT UNSIGNED  "
+            + FieldNames.STATISTIC_ID + " BIGINT UNSIGNED PRIMARY KEY, "
+            + FieldNames.STATISTIC_TRACK + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_NUMBER_OF_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_NUMBER_OF_PERFECT_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_NUMBER_OF_BM_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_NUMBER_UNIQUE_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_PERFECT_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_BM_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_COMPLETE_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.STATISTIC_NUMBER_OF_UNIQUE_SEQ + " BIGINT UNSIGNED  "
             + ") ";
 
 
@@ -456,32 +456,6 @@ public class SQLStatements {
                 "D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" and " +
                 "M."+FieldNames.MAPPING_TRACK+" = ?";
 
-//    public final static String FETCH_NUM_OF_READS_FOR_RUN =
-//            "SELECT " +
-//                "COUNT(R."+FieldNames.READ_ID+") as NUM " +
-//            "FROM "+
-//                FieldNames.TABLE_READS+" as R , "+
-//                FieldNames.TABLE_SEQUENCE+" as S " +
-//            "WHERE "+
-//                "S."+FieldNames.SEQUENCE_RUN+" = ? and " +
-//                "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
-
-//    public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_RUN =
-//            "SELECT " +
-//                "COUNT(S."+FieldNames.SEQUENCE_ID+") as NUM " +
-//            "FROM "+
-//                FieldNames.TABLE_SEQUENCE+" as S " +
-//            "WHERE "+
-//                "S."+FieldNames.SEQUENCE_RUN+" = ?";
-
-
-//    public final static String FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE =
-//            "SELECT " +
-//                "SUM(M." + FieldNames.MAPPING_COUNT + ") as NUM " +
-//            "FROM " +
-//                FieldNames.TABLE_MAPPINGS + " as M " +
-//            "WHERE " +
-//                "M." + FieldNames.MAPPING_TRACK + " = ?";
     
     public static final String FETCH_NUM_OF_READS_FOR_TRACK_CALCULATE =
             "SELECT " +
@@ -497,11 +471,11 @@ public class SQLStatements {
 
     public static final String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK =
             "SELECT " +
-                FieldNames.STATICS_NUMBER_UNIQUE_MAPPINGS + " as NUM " +
+                FieldNames.STATISTIC_NUMBER_UNIQUE_MAPPINGS + " as NUM " +
             "FROM "+
-                FieldNames.TABLE_STATICS+ " as S " +
+                FieldNames.TABLE_STATISTICS+ " as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK + " = ?";
+                "S."+FieldNames.STATISTIC_TRACK + " = ?";
 
     public static final String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT " +
@@ -532,40 +506,30 @@ public class SQLStatements {
 
 
 
-//    public final static String FETCH_RUNID_FOR_TRACK =
-//            "SELECT "+
-//                "T."+FieldNames.TRACK_RUN+" " +
-//            "FROM "+
-//                FieldNames.TABLE_TRACKS+" as T " +
-//            "WHERE "+
-//                "T."+FieldNames.TRACK_ID+" = ?";
-
-
-
-         //Get values from table STATICS
+         //Get values from table STATISTIC
         public final static String FETCH_PERFECT_COVERAGE_OF_GENOME =
             "SELECT " +
-            FieldNames.STATICS_PERFECT_COVERAGE_OF_GENOME+" as COVERED "+
+            FieldNames.STATISTIC_PERFECT_COVERAGE_OF_GENOME+" as COVERED "+
             " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                FieldNames.TABLE_STATISTICS+" as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "S."+FieldNames.STATISTIC_TRACK+" = ?";
 
          public final static String FETCH_BM_COVERAGE_OF_GENOME =
             "SELECT " +
-            FieldNames.STATICS_BM_COVERAGE_OF_GENOME+" as COVERED "+
+            FieldNames.STATISTIC_BM_COVERAGE_OF_GENOME+" as COVERED "+
             " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                FieldNames.TABLE_STATISTICS+" as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "S."+FieldNames.STATISTIC_TRACK+" = ?";
 
          public final static String FETCH_COMPLETE_COVERAGE_OF_GENOME =
             "SELECT " +
-            FieldNames.STATICS_COMPLETE_COVERAGE_OF_GENOME+" as COVERED "+
+            FieldNames.STATISTIC_COMPLETE_COVERAGE_OF_GENOME+" as COVERED "+
             " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                FieldNames.TABLE_STATISTICS+" as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "S."+FieldNames.STATISTIC_TRACK+" = ?";
 
 //    public final static String FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK =
 //            "SELECT " +
@@ -577,28 +541,28 @@ public class SQLStatements {
 
     public final static String FETCH_NUM_MAPPINGS_FOR_TRACK =
             "SELECT " +
-            FieldNames.STATICS_NUMBER_OF_MAPPINGS+" as Num "+
+            FieldNames.STATISTIC_NUMBER_OF_MAPPINGS+" as Num "+
             " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                FieldNames.TABLE_STATISTICS+" as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "S."+FieldNames.STATISTIC_TRACK+" = ?";
 
     public final static String FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK =
             "SELECT " +
-            FieldNames.STATICS_NUMBER_OF_PERFECT_MAPPINGS+" as Num "+
+            FieldNames.STATISTIC_NUMBER_OF_PERFECT_MAPPINGS+" as Num "+
             " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                FieldNames.TABLE_STATISTICS+" as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "S."+FieldNames.STATISTIC_TRACK+" = ?";
 
 
     public final static String FETCH_NUM_BM_MAPPINGS_FOR_TRACK =
             "SELECT " +
-            FieldNames.STATICS_NUMBER_OF_BM_MAPPINGS+" as Num "+
+            FieldNames.STATISTIC_NUMBER_OF_BM_MAPPINGS+" as Num "+
             " FROM "+
-                FieldNames.TABLE_STATICS+" as S " +
+                FieldNames.TABLE_STATISTICS+" as S " +
             "WHERE "+
-                "S."+FieldNames.STATICS_TRACK+" = ?";
+                "S."+FieldNames.STATISTIC_TRACK+" = ?";
 
 
 
@@ -683,23 +647,6 @@ public class SQLStatements {
     public final static String ENABLE_TRACK_INDICES =
             "ALTER TABLE "+FieldNames.TABLE_TRACKS+" ENABLE KEYS";
 
-//    public final static String DISABLE_RUN_INDICES =
-//            "ALTER TABLE "+FieldNames.TABLE_RUN+" DISABLE KEYS";
-//
-//    public final static String ENABLE_RUN_INDICES =
-//            "ALTER TABLE "+FieldNames.TABLE_RUN+" ENABLE KEYS";
-
-//    public final static String DISABLE_SEQUENCE_INDICES =
-//            "ALTER TABLE "+FieldNames.TABLE_SEQUENCE+" DISABLE KEYS";
-//
-//    public final static String ENABLE_SEQUENCE_INDICES =
-//            "ALTER TABLE "+FieldNames.TABLE_SEQUENCE+" ENABLE KEYS";
-
-//    public final static String DISABLE_READNAMES_INDICES =
-//            "ALTER TABLE "+FieldNames.TABLE_READS+" DISABLE KEYS";
-//
-//    public final static String ENABLE_READNAMES_INDICES =
-//            "ALTER TABLE "+FieldNames.TABLE_READS+" ENABLE KEYS";
 
     public final static String ENABLE_REFERENCE_INDICES =
             "ALTER TABLE "+FieldNames.TABLE_REF_GEN+" ENABLE KEYS";
@@ -716,11 +663,6 @@ public class SQLStatements {
     public final static String UNLOCK_TABLES =
             "UNLOCK TABLES";
 
-//    public final static String LOCK_TABLE_RUN_DOMAIN =
-//            "LOCK TABLE " +
-//            FieldNames.TABLE_RUN+" WRITE, " +
-//            FieldNames.TABLE_SEQUENCE+" WRITE, " +
-//            FieldNames.TABLE_READS+" WRITE";
 
     public final static String LOCK_TABLE_REFERENCE_DOMAIN =
             "LOCK TABLE " +
@@ -732,7 +674,7 @@ public class SQLStatements {
             FieldNames.TABLE_COVERAGE + " WRITE, " +
             FieldNames.TABLE_TRACKS + " WRITE, " +
             FieldNames.TABLE_MAPPINGS + " WRITE, " +
-            FieldNames.TABLE_STATICS + " WRITE, " +
+            FieldNames.TABLE_STATISTICS + " WRITE, " +
             FieldNames.TABLE_DIFF + " WRITE";
 
     public final static String GET_LATEST_COVERAGE_ID =

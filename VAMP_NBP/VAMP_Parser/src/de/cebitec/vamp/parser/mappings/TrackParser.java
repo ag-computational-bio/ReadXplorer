@@ -7,6 +7,7 @@ import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Observer;
+import java.util.HashSet;
 //import java.util.HashMap;
 
 /**
@@ -26,17 +27,14 @@ public class TrackParser implements TrackParserI {
         // parse mapping files and store them in appropriate source objects
         MappingParserI mappingp = trackJob.getParser();
         mappingp.registerObserver(observer);
-//        ParsedMappingContainer mappings = mappingp.parseInput(trackJob, readnameToSequenceID, sequenceString);
         ParsedMappingContainer mappings = mappingp.parseInput(trackJob, sequenceString);
-
-        // release resources
-//        readnameToSequenceID = null;
         mappingp = null;
 
         // compute the coverage for all mappings
         CoverageContainer coverageContainer = new CoverageContainer(mappings);
 
         ParsedTrack track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
+        track.setIsStepwise(trackJob.isStepwise());
         track.setTimestamp(trackJob.getTimestamp());
 
         mappings = null;
@@ -44,7 +42,6 @@ public class TrackParser implements TrackParserI {
 
         return track;
     }
-
     @Override
     public ParsedRun parseMappingforReadData(TrackJob trackJob) throws ParsingException {
         MappingParserI mappingp = trackJob.getParser();

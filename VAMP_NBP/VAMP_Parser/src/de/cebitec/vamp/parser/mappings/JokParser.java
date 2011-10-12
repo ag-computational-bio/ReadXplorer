@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -44,13 +45,15 @@ public class JokParser implements MappingParserI, Observer {
     }
 
     @Override
-//    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.registerObserver(this);
-        //  ParsedRun run = new ParsedRun("");
+
+        String filepath = trackJob.getFile().getAbsolutePath();
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
+
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(JokParser.class,
+                "Parser.Parsing.Start", filepath));
 
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
@@ -76,12 +79,12 @@ public class JokParser implements MappingParserI, Observer {
                     } catch (NumberFormatException e) { //
                         if (!tokens[1].equals("*")) {
                             this.sendErrorMsg("Value for current start position in "
-                                    + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number or *. "
+                                    + filepath + " line " + lineno + " is not a number or *. "
                                     + "Found start: " + tokens[1]);
                         }
                         if (!tokens[2].equals("*")) {
                             this.sendErrorMsg("Value for current stop position in "
-                                    + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number or *. "
+                                    + filepath  + " line " + lineno + " is not a number or *. "
                                     + "Found stop: " + tokens[2]);
                         }
                         continue; //*'s are ignored = unmapped read
@@ -98,49 +101,48 @@ public class JokParser implements MappingParserI, Observer {
                     int errors = Integer.parseInt(tokens[6]);
                     // check tokens
                     // report empty mappings saruman should not be producing anymore
-                    if (readname == null || readname.isEmpty()) {
-                        this.sendErrorMsg("Could not read readname in "
-                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found read name: " + readname);
-                        continue;
+                if (readname == null || readname.isEmpty()) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorReadname",
+                            filepath, lineno, readname));
+                    continue;
+                }
 
-                    }
-                    if (start >= stop) {
-                        this.sendErrorMsg("Start bigger than stop in "
-                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found start: " + start + ", stop: " + stop);
-                        continue;
-                    }
-                    if (direction == 0) {
-                        this.sendErrorMsg("Could not parse direction in "
-                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Must be >> oder <<");
-                        continue;
-                    }
-                    if (readSeq == null || readSeq.isEmpty()) {
-                        this.sendErrorMsg("Read sequence could not be parsed in "
-                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found: " + readSeq + tokens.length);
-                        continue;
-                    }
-                    if (refSeq == null || refSeq.isEmpty()) {
-                        this.sendErrorMsg("Reference sequence could not be parsed in "
-                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Found: " + refSeq);
-                        continue;
-                    }
-                    if (readSeq.length() != refSeq.length() && !refSeq.equals(("*"))) {
-                        this.sendErrorMsg("Alignment sequences have different length in "
-                                + trackJob.getFile().getAbsolutePath() + " line " + lineno + "! "
-                                + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
-                        continue;
-                    }
-                    if (errors < 0 || errors > readSeq.length()) {
-                        this.sendErrorMsg("Error number has invalid value " + errors
-                                + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Must be bigger or equal to zero and smaller than alignment length.");
-                        continue;
-                    }
+                if (start >= stop) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorStartStop",
+                            filepath, lineno, start, stop));
+                    continue;
+                }
+                if (direction == 0) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorDirectionJok", filepath, lineno));
+                    continue;
+                }
+                if (readSeq == null || readSeq.isEmpty()) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorReadEmpty",
+                            filepath, lineno, readSeq));
+                    continue;
+                }
+                if (refSeq == null || refSeq.isEmpty()) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorRef",
+                            filepath, lineno, refSeq));
+                    continue;
+                }
+                if (readSeq.length() != refSeq.length()) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorReadLength",
+                            filepath, lineno, readSeq, refSeq));
+                    continue;
+                }
+                if (errors < 0 || errors > readSeq.length()) {
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                            "Parser.checkMapping.ErrorRead",
+                            errors, filepath, lineno));
+                    continue;
+                }
 //                    if (!readnameToSequenceID.containsKey(readname)) {
 //                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
 //                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
@@ -162,11 +164,26 @@ public class JokParser implements MappingParserI, Observer {
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                     int seqID;
-                    if (this.seqToIDMap.containsKey(readSeq)) {
-                        seqID = this.seqToIDMap.get(readSeq);
+                    String readwithoutGaps;
+                   // XXX:TODO check this
+                    if (readSeq.contains("_")) {
+                        StringBuilder sBuilder = new StringBuilder();
+                        String[] read = readSeq.split("_+");
+                        for (int i = 0; i < read.length; i++) {
+                            sBuilder.append(read[i]);
+                        }
+                        readwithoutGaps = sBuilder.substring(0);
+
+                    } else {
+                        readwithoutGaps = readSeq;
+                    }
+                    //Saruman turns only the read string by mapping so we can get the native read direction
+                    readwithoutGaps = (direction==-1 ? SequenceUtils.getReverseComplement(readwithoutGaps): readwithoutGaps);
+                    if (this.seqToIDMap.containsKey(readwithoutGaps)) {
+                        seqID = this.seqToIDMap.get(readwithoutGaps);
                     } else {
                         seqID = ++noUniqueSeq; //int seqID = readnameToSequenceID.get(readname);
-                        this.seqToIDMap.put(readSeq, seqID);
+                        this.seqToIDMap.put(readwithoutGaps, seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
                 } else {
@@ -189,14 +206,16 @@ public class JokParser implements MappingParserI, Observer {
 //            s.clear();
 //            readnameToSequenceID.clear();
             br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueSeq});
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO,  NbBundle.getMessage(JokParser.class,
+                    "Parser.Parsing.Finished",filepath));
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
         }
 
         this.seqToIDMap = null; //release resources
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(JokParser.class,
+                "Parser.Parsing.Successfully"));
         return mappingContainer;
     }
 

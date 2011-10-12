@@ -21,7 +21,7 @@ public class ParsedMappingContainer implements Observable, Observer {
     private boolean hasNewRead;
     private HashMap<Integer, ParsedMappingGroup> mappings;
     private ArrayList<Observer> observers;
-
+    private boolean lastMappingContainer=false;
     /**
      * Creates an empty mapping container.
      */
@@ -52,7 +52,7 @@ public class ParsedMappingContainer implements Observable, Observer {
         HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
         int numberOfBM = 0;
         int numberOfPerfect = 0;
-        //is the number of unique Mapped Sequences
+        //is the number of unique mapped sequences
         int numberOfMappedSeq = mappings.size();
         //the number of created Mappings by the mapper
         int numberOfMappings = 0;
@@ -122,5 +122,15 @@ public class ParsedMappingContainer implements Observable, Observer {
             this.notifyObservers();
         }
     }
+
+    public boolean isLastMappingContainer() {
+        return lastMappingContainer;
+    }
+
+    public void setLastMappingContainer(boolean lastMappingContainer) {
+        this.lastMappingContainer = lastMappingContainer;
+    }
+    
+    
 
 }

@@ -43,7 +43,6 @@ public class CoverageContainer {
             Iterator<ParsedMapping> mappingIt = g.getMappings().iterator();
             while(mappingIt.hasNext()){
                 this.addMapping(mappingIt.next());
-                //mappingIt.remove();
             }
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished computing the coverage");
@@ -81,7 +80,9 @@ public class CoverageContainer {
             }
             // increase the values in coverage array
             Integer[] cov = coverage.get(i);
+            //REDUNDANT
             cov[coverageIdx] = cov[coverageIdx] + s.getCount();
+            //NON_REDUNDANT
             cov[numIdx] = cov[numIdx] + 1;
         }
     }
@@ -95,7 +96,7 @@ public class CoverageContainer {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , true, true);
     }
     //number of unique mappings
-    public int getNumberOfBestMapppingsForward(int position){
+    public int getNumberOfBestMappingsForward(int position){
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , true, false);
     }
 
@@ -103,7 +104,7 @@ public class CoverageContainer {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , false, true);
     }
 
-    public int getNumberOfBestMapppingsReverse(int position){
+    public int getNumberOfBestMappingsReverse(int position){
         return this.getCoverageOfType(position, BEST_MAPPING_CASE , false, false);
     }
 

@@ -44,7 +44,6 @@ public class ProjectConnector {
      * Note that all parts belonging to the RUN domain have been commented out!
      * !!!!!!!!!!!!
      */
-
     private static ProjectConnector dbConnector;
     private Connection con;
     private String url;
@@ -60,9 +59,7 @@ public class ProjectConnector {
     private final static int COVERAGE_BATCH_SIZE = 100000;
     private final static int MAPPING_BATCH_SIZE = 100000;
     private final static int DIFF_BATCH_SIZE = 100000;
-    private int coveragePerf = 0;
-    private int coverageBM = 0;
-     private int coverageComplete = 0;
+
 
     private ProjectConnector() {
         trackConnectors = new HashMap<Long, TrackConnector>();
@@ -97,7 +94,7 @@ public class ProjectConnector {
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
                 Long refGenID = rs.getLong(FieldNames.TRACK_REFGEN);
- //               Long runID = rs.getLong(FieldNames.TRACK_RUN);
+                //               Long runID = rs.getLong(FieldNames.TRACK_RUN);
                 tracks.add(new PersistantTrack(id, description, date, refGenID));//, runID));
             }
 
@@ -142,7 +139,7 @@ public class ProjectConnector {
             this.setupDatabase();
         } else {
             this.adapter = adapter;
-            this.url = "jdbc:" + adapter + ":" + database+";FILE_LOCK=SERIALIZED;MULTI_THREADED=1";
+            this.url = "jdbc:" + adapter + ":" + database + ";FILE_LOCK=SERIALIZED;MULTI_THREADED=1;DB_CLOSE_ON_EXIT=FALSE ";
 
             this.connectH2DataBase(url);
             this.setupDatabaseH2();
@@ -183,12 +180,12 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.SETUP_STATICS).executeUpdate();
-            try{
-            con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS).execute();
-            con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ).execute();
-            }catch(Exception ex){
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO,"Columns already exist");
+            con.prepareStatement(H2SQLStatements.SETUP_STATISTICS).executeUpdate();
+            try {
+                con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_READS).execute();
+                con.prepareStatement(H2SQLStatements.ADD_COLUMN_TO_TABLE_STATICS_NUMBER_OF_UNIQUE_SEQ).execute();
+            } catch (Exception ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Columns already exist");
             }
 //           con.prepareStatement(H2SQLStatements.SETUP_RUN).execute();
 //            con.prepareStatement(H2SQLStatements.SETUP_SEQUENCE).executeUpdate();
@@ -286,7 +283,6 @@ public class ProjectConnector {
 //        }
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done locking run domain tables");
 //    }
-
     private void unlockTables() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start unlocking tables");
         try {
@@ -333,7 +329,6 @@ public class ProjectConnector {
 //
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
 //    }
-
 //    private void storeRunH2(ParsedRun run) throws StorageException {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing run data");
 //
@@ -365,7 +360,6 @@ public class ProjectConnector {
 //
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing run data");
 //    }
-
 //    private void storeSequences(ParsedRun run) {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing unique sequences");
 //
@@ -411,7 +405,6 @@ public class ProjectConnector {
 //
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing unique sequences");
 //    }
-
 //    private void storeReads(ParsedRun run) {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing readnames");
 //        try {
@@ -456,7 +449,6 @@ public class ProjectConnector {
 //        }
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done storing readnames");
 //    }
-
 //    public long addRun(ParsedRun run) throws StorageException {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing run \"{0}to {1}", new Object[]{run.getDescription(), adapter});
 //
@@ -499,7 +491,6 @@ public class ProjectConnector {
 //
 //        return run.getID();
 //    }
-
 //    private void disableRunIndices() {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start disabling run domain indexing");
 //        try {
@@ -524,7 +515,6 @@ public class ProjectConnector {
 //
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "disabled run data domain indexing");
 //    }
-
 //    private void enableRunIndices() {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling run data domain indexing");
 //        try {
@@ -549,7 +539,6 @@ public class ProjectConnector {
 //
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "enabled run data domain indexing");
 //    }
-
     private void disableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start disabling reference data domain indexing...");
         try {
@@ -658,7 +647,7 @@ public class ProjectConnector {
                     batchCounter = 1;
                     insertFeature.executeBatch();
                 }
-              //  it.remove();
+                //  it.remove();
             }
 
             insertFeature.executeBatch();
@@ -722,14 +711,11 @@ public class ProjectConnector {
     }
 
     private void storeCoverage(ParsedTrack track) {
-         coveragePerf = 0 ;
-         coverageBM = 0;
-         coverageComplete=0;
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing coverage information...");
         try {
             PreparedStatement insertCoverage = con.prepareStatement(SQLStatements.INSERT_COVERAGE);
             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_COVERAGE_ID);
-
+            PreparedStatement updateCoverage = con.prepareStatement(H2SQLStatements.UPDATE_COVERAGE);
             // get the latest used coverage id
             long id = 0;
             ResultSet rs = latestID.executeQuery();
@@ -746,41 +732,89 @@ public class ProjectConnector {
                 id++;
                 batchCounter++;
                 int pos = covsIt.next();
-                if(cov.getZeroErrorMappingsForwardCoverage(pos)+ cov.getZeroErrorMappingsReverseCoverage(pos)!= 0){
-                coveragePerf ++;
-                }
-                if(cov.getBestMappingForwardCoverage(pos)+ cov.getBestMappingReverseCoverage(pos)!= 0){
-                  coverageBM ++ ;
-                }
-                if(cov.getNErrorMappingsReverseCoverage(pos)+ cov.getNErrorMappingsForwardCoverage(pos)!= 0){
-                  coverageComplete++;
-                }
-                insertCoverage.setLong(1, id);
-                insertCoverage.setLong(2, track.getID());
-                insertCoverage.setInt(3, pos);
-                insertCoverage.setInt(4, cov.getBestMappingForwardCoverage(pos));
-                insertCoverage.setInt(5, cov.getNumberOfBestMapppingsForward(pos));
-                insertCoverage.setInt(6, cov.getBestMappingReverseCoverage(pos));
-                insertCoverage.setInt(7, cov.getNumberOfBestMapppingsReverse(pos));
-                insertCoverage.setInt(8, cov.getZeroErrorMappingsForwardCoverage(pos));
-                insertCoverage.setInt(9, cov.getNumberOfZeroErrorMappingsForward(pos));
-                insertCoverage.setInt(10, cov.getZeroErrorMappingsReverseCoverage(pos));
-                insertCoverage.setInt(11, cov.getNumberOfZeroErrorMappingsReverse(pos));
-                insertCoverage.setInt(12, cov.getNErrorMappingsForwardCoverage(pos));
-                insertCoverage.setInt(13, cov.getNumberOfNErrorMappingsForward(pos));
-                insertCoverage.setInt(14, cov.getNErrorMappingsReverseCoverage(pos));
-                insertCoverage.setInt(15, cov.getNumberOfNErrorMappingsReverse(pos));
-                insertCoverage.addBatch();
 
-                if (batchCounter == COVERAGE_BATCH_SIZE) {
-                    batchCounter = 0;
-                    insertCoverage.executeBatch();
+                if (track.isStepwise()) {
+                    PreparedStatement checkForCovPos = con.prepareStatement(H2SQLStatements.CHECK_COV_POS);
+                    checkForCovPos.setInt(1, pos);
+                    checkForCovPos.setLong(2, track.getID());
+                    int countCov = 0;
+                    ResultSet set = checkForCovPos.executeQuery();
+                    if (set.next()) {
+                        countCov = set.getInt("POS");
+                    }
+                    if (countCov > 0) {
+                        updateCoverage.setInt(1, cov.getBestMappingForwardCoverage(pos));
+                        updateCoverage.setInt(2, cov.getNumberOfBestMappingsForward(pos));
+                        updateCoverage.setInt(3, cov.getBestMappingReverseCoverage(pos));
+                        updateCoverage.setInt(4, cov.getNumberOfBestMappingsReverse(pos));
+                        updateCoverage.setInt(5, cov.getZeroErrorMappingsForwardCoverage(pos));
+                        updateCoverage.setInt(6, cov.getNumberOfZeroErrorMappingsForward(pos));
+                        updateCoverage.setInt(7, cov.getZeroErrorMappingsReverseCoverage(pos));
+                        updateCoverage.setInt(8, cov.getNumberOfZeroErrorMappingsReverse(pos));
+                        updateCoverage.setInt(9, cov.getNErrorMappingsForwardCoverage(pos));
+                        updateCoverage.setInt(10, cov.getNumberOfNErrorMappingsForward(pos));
+                        updateCoverage.setInt(11, cov.getNErrorMappingsReverseCoverage(pos));
+                        updateCoverage.setInt(12, cov.getNumberOfNErrorMappingsReverse(pos));
+                        updateCoverage.setLong(13, track.getID());
+                        updateCoverage.setInt(14, pos);
+                        updateCoverage.addBatch();
+
+                        if (batchCounter == COVERAGE_BATCH_SIZE) {
+                            batchCounter = 0;
+                            updateCoverage.executeBatch();
+                        }
+
+
+                    } else {
+                        insertCoverage.setLong(1, id);
+                        insertCoverage.setLong(2, track.getID());
+                        insertCoverage.setInt(3, pos);
+                        insertCoverage.setInt(4, cov.getBestMappingForwardCoverage(pos));
+                        insertCoverage.setInt(5, cov.getNumberOfBestMappingsForward(pos));
+                        insertCoverage.setInt(6, cov.getBestMappingReverseCoverage(pos));
+                        insertCoverage.setInt(7, cov.getNumberOfBestMappingsReverse(pos));
+                        insertCoverage.setInt(8, cov.getZeroErrorMappingsForwardCoverage(pos));
+                        insertCoverage.setInt(9, cov.getNumberOfZeroErrorMappingsForward(pos));
+                        insertCoverage.setInt(10, cov.getZeroErrorMappingsReverseCoverage(pos));
+                        insertCoverage.setInt(11, cov.getNumberOfZeroErrorMappingsReverse(pos));
+                        insertCoverage.setInt(12, cov.getNErrorMappingsForwardCoverage(pos));
+                        insertCoverage.setInt(13, cov.getNumberOfNErrorMappingsForward(pos));
+                        insertCoverage.setInt(14, cov.getNErrorMappingsReverseCoverage(pos));
+                        insertCoverage.setInt(15, cov.getNumberOfNErrorMappingsReverse(pos));
+                        insertCoverage.addBatch();
+                    }
+                    if (batchCounter == COVERAGE_BATCH_SIZE) {
+                        batchCounter = 0;
+                        insertCoverage.executeBatch();
+                    }
+                } else {
+                    insertCoverage.setLong(1, id);
+                    insertCoverage.setLong(2, track.getID());
+                    insertCoverage.setInt(3, pos);
+                    insertCoverage.setInt(4, cov.getBestMappingForwardCoverage(pos));
+                    insertCoverage.setInt(5, cov.getNumberOfBestMappingsForward(pos));
+                    insertCoverage.setInt(6, cov.getBestMappingReverseCoverage(pos));
+                    insertCoverage.setInt(7, cov.getNumberOfBestMappingsReverse(pos));
+                    insertCoverage.setInt(8, cov.getZeroErrorMappingsForwardCoverage(pos));
+                    insertCoverage.setInt(9, cov.getNumberOfZeroErrorMappingsForward(pos));
+                    insertCoverage.setInt(10, cov.getZeroErrorMappingsReverseCoverage(pos));
+                    insertCoverage.setInt(11, cov.getNumberOfZeroErrorMappingsReverse(pos));
+                    insertCoverage.setInt(12, cov.getNErrorMappingsForwardCoverage(pos));
+                    insertCoverage.setInt(13, cov.getNumberOfNErrorMappingsForward(pos));
+                    insertCoverage.setInt(14, cov.getNErrorMappingsReverseCoverage(pos));
+                    insertCoverage.setInt(15, cov.getNumberOfNErrorMappingsReverse(pos));
+                    insertCoverage.addBatch();
+                    if (batchCounter == COVERAGE_BATCH_SIZE) {
+                        batchCounter = 0;
+                        insertCoverage.executeBatch();
+                    }
                 }
             }
-           //System.out.println("perf " + coveragePerf + "covBM "+ coverageBM + "covCompl "+ coverageComplete);
+            //System.out.println("perf " + coveragePerf + "covBM "+ coverageBM + "covCompl "+ coverageComplete);
 
             insertCoverage.executeBatch();
-
+            updateCoverage.executeBatch();
+            updateCoverage.close();
             insertCoverage.close();
             latestID.close();
 
@@ -794,6 +828,8 @@ public class ProjectConnector {
     private void storeTrack(ParsedTrack track, long refGenID, long runID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
         try {
+             
+            
             PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_ID);
 
@@ -803,8 +839,12 @@ public class ProjectConnector {
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
-            id++;
-            track.setID(id);
+            rs.close();
+            
+           if (track.isFirstTrack() | !track.isStepwise()) {
+                id++;
+               
+          
 
             // store track in table
             insertTrack.setLong(1, id);
@@ -813,9 +853,10 @@ public class ProjectConnector {
             insertTrack.setTimestamp(4, track.getTimestamp());
             insertTrack.setLong(5, runID);
             insertTrack.execute();
-
             insertTrack.close();
             latestID.close();
+            }
+             track.setID(id);
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
@@ -824,12 +865,11 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
 
-
     private void storeTrackH2(ParsedTrack track, long refGenID, long runID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        
+
         try {
-            PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
+             
             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_ID);
 
             // get latest id for track
@@ -838,19 +878,20 @@ public class ProjectConnector {
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
-            id++;
-            track.setID(id);
+           if (track.isFirstTrack() || !track.isStepwise()) {
+                id++;
+                PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
+                // store track in table
+                insertTrack.setLong(1, id);
+                insertTrack.setLong(2, refGenID);
+                insertTrack.setString(3, track.getDescription());
+                insertTrack.setTimestamp(4, track.getTimestamp());
+                insertTrack.execute();
+                insertTrack.close();
+                 latestID.close();
+            }
 
-            // store track in table
-            insertTrack.setLong(1, id);
-            insertTrack.setLong(2, refGenID);
-            insertTrack.setString(3, track.getDescription());
-            insertTrack.setTimestamp(4, track.getTimestamp());
-//            insertTrack.setLong(5, runID);
-            insertTrack.execute();
-
-            insertTrack.close();
-            latestID.close();
+             track.setID(id);
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
@@ -859,59 +900,132 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
 
-        private void storeStatics(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
+    private void storeStatistics(ParsedTrack track) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing statistic information..");
         int mappings = 0;
-        int perfectmappings = 0;
-        int bmmappings = 0;
+        int perfectMappings = 0;
+        int bmMappings = 0;
         int noUniqueSeq = 0;
-        int noUniqueMappings= 0;
+        int noUniqueMappings = 0;
+        int coveragePerf = 0;
+        int coverageBM = 0;
+        int coverageComplete = 0;
+        long trackID = track.getID();
+        
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
             mappings = mappingInfos.get(1);
-            perfectmappings = mappingInfos.get(2);
-            bmmappings = mappingInfos.get(3);
-            noUniqueSeq = mappingInfos.get(4);
-            noUniqueMappings =  mappingInfos.get(5);
+            perfectMappings = mappingInfos.get(2);
+            bmMappings = mappingInfos.get(3);
+            
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the list");
         }
         try {
-            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
-            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATICS_ID);
+         
+            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATISTICS_ID);
+            
+            if(!track.isStepwise() || track.getParsedMappingContainer().isLastMappingContainer()){
+                PreparedStatement perfPos = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK);
+                PreparedStatement bmPos = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_BM_POSITIONS_FOR_TRACK);
+                PreparedStatement completePos = con.prepareStatement(H2SQLStatements.FETCH_NUM_OF_COMPLETE_POSITIONS_FOR_TRACK);
+                PreparedStatement numUniqueMappings = con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE);
+                PreparedStatement numOfUniqueSeq= con.prepareStatement(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE);
 
+                bmPos.setLong(1, trackID);
+                perfPos.setLong(1, trackID);
+                completePos.setLong(1, trackID);
+                numUniqueMappings.setLong(1, trackID);
+                numOfUniqueSeq.setLong(1, trackID);
+                
+                ResultSet rsPerf = perfPos.executeQuery();
+                if (rsPerf.next()) {
+                    coveragePerf = rsPerf.getInt("NUM");
+                }
+                perfPos.close();
+                
+                ResultSet rsBM = bmPos.executeQuery();
+                if (rsBM.next()) {
+                    coverageBM = rsBM.getInt("NUM");
+                }
+                bmPos.close();
+               
+                ResultSet rsComplete = completePos.executeQuery();
+                if (rsComplete.next()) {
+                    coverageComplete = rsComplete.getInt("NUM");
+                }
+                completePos.close();
+                
+                ResultSet uniqueM = numUniqueMappings.executeQuery();
+                if (uniqueM.next()) {
+                    noUniqueMappings = uniqueM.getInt("NUM");
+                }
+                numUniqueMappings.close();
+                
+              ResultSet uniqueSeq= numOfUniqueSeq.executeQuery();
+                if (uniqueSeq.next()) {
+                    noUniqueSeq = uniqueSeq.getInt("NUM");
+                }
+                numOfUniqueSeq.close();
+            }
             // get latest id for track
             long id = 0;
+            
             ResultSet rs = latestID.executeQuery();
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
-            id++;
-
-            // store track in table
-            insertStatics.setLong(1, id);
-            insertStatics.setLong(2, track.getID());
-            insertStatics.setInt(3, mappings);
-            insertStatics.setInt(4, perfectmappings);
-            insertStatics.setInt(5, bmmappings);
-            insertStatics.setInt(6, noUniqueMappings);
-            insertStatics.setInt(7, coveragePerf);
-            insertStatics.setInt(8, coverageBM);
-            insertStatics.setInt(9, coverageComplete);
-            insertStatics.setInt(10, noUniqueSeq);
-            insertStatics.execute();
-
-            insertStatics.close();
+            rs.close();
             latestID.close();
+            if (track.isStepwise() && !track.isFirstTrack()) {
 
+                PreparedStatement updateStatics = con.prepareStatement(H2SQLStatements.UPDATE_STATISTIC_VALUES_ALL);
+
+                updateStatics.setInt(1, mappings);
+                updateStatics.setInt(2, perfectMappings);
+                updateStatics.setInt(3, bmMappings);
+                updateStatics.setLong(4, trackID);
+                updateStatics.executeUpdate();
+                updateStatics.close();
+
+            }else{
+                   PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATISTICS);
+                id++;
+                // store track in table
+                insertStatics.setLong(1, id);
+                insertStatics.setLong(2, trackID);
+                insertStatics.setInt(3, mappings);
+                insertStatics.setInt(4, perfectMappings);
+                insertStatics.setInt(5, bmMappings);
+                insertStatics.setInt(6, noUniqueMappings);
+                insertStatics.setInt(7, coveragePerf);
+                insertStatics.setInt(8, coverageBM);
+                insertStatics.setInt(9, coverageComplete);
+                insertStatics.setInt(10, noUniqueSeq);
+                insertStatics.execute();
+
+                insertStatics.close();
+                
+            }
+            if(track.getParsedMappingContainer().isLastMappingContainer()){
+               PreparedStatement updateStatics = con.prepareStatement(H2SQLStatements.UPDATE_STATISTIC_VALUES_COV);
+                updateStatics.setInt(1, coveragePerf);
+                updateStatics.setInt(2, coverageBM);
+                updateStatics.setInt(3, coverageComplete);
+                updateStatics.setInt(4, noUniqueMappings);
+                updateStatics.setInt(5, noUniqueSeq);
+                updateStatics.setLong(6, trackID);
+                updateStatics.executeUpdate();
+                updateStatics.close();
+
+            }
+            
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing statistic information");
     }
-
-
 
     private void storeMappings(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing mapping data...");
@@ -926,6 +1040,7 @@ public class ProjectConnector {
                 mappingID = rs.getLong("LATEST_ID");
             }
             mappingID++;
+
 
             // start storing the mappings
             int batchCounter = 1;
@@ -957,7 +1072,7 @@ public class ProjectConnector {
 
                     mappingID++;
                     batchCounter++;
-  
+
                 }
 
             }
@@ -1006,7 +1121,7 @@ public class ProjectConnector {
 
                     // iterate diffs (non-gap variation)
                     Iterator<ParsedDiff> diffsIt = m.getDiffs().iterator();
-                    while(diffsIt.hasNext()) {
+                    while (diffsIt.hasNext()) {
 
                         batchCounter++;
 
@@ -1027,7 +1142,7 @@ public class ProjectConnector {
 
                     // iterate gaps
                     Iterator<ParsedReferenceGap> gapIt = m.getGenomeGaps().iterator();
-                    while( gapIt.hasNext()) {
+                    while (gapIt.hasNext()) {
                         batchCounter++;
 
                         ParsedReferenceGap g = gapIt.next();
@@ -1047,7 +1162,7 @@ public class ProjectConnector {
                     }
                 }
             }
-            
+
             insertDiff.executeBatch();
             insertGap.executeBatch();
 
@@ -1079,25 +1194,23 @@ public class ProjectConnector {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
         if (adapter.equalsIgnoreCase("mysql")) {
-
             this.lockTrackDomainTables();
             this.disableTrackDomainIndices();
 
             this.storeTrack(track, refGenID, runID);
             this.storeCoverage(track);
-            this.storeStatics(track);
             this.storeMappings(track);
             this.storeDiffs(track);
+            this.storeStatistics(track);
 
             this.enableTrackDomainIndices();
             this.unlockTables();
         } else {
-
-            this.storeTrackH2(track, refGenID, runID);
+            this.storeTrackH2(track, refGenID,runID);
             this.storeCoverage(track);
-            this.storeStatics(track);
             this.storeMappings(track);
             this.storeDiffs(track);
+            this.storeStatistics(track);
             track.clear();
 
         }
@@ -1181,7 +1294,6 @@ public class ProjectConnector {
 //        }
 //        return runConnectors.get(runID);
 //    }
-
     public TrackConnector getTrackConnector(PersistantTrack track) {
         // only return new object, if no suitable connector was created before
         long trackID = track.getId();
@@ -1190,7 +1302,7 @@ public class ProjectConnector {
         }
         return trackConnectors.get(trackID);
     }
-    
+
     public TrackConnector getTrackConnector(List<PersistantTrack> tracks) {
         // makes sure the track id is not already used
         long id = 9999;
@@ -1198,9 +1310,8 @@ public class ProjectConnector {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-            trackConnectors.put(id, new TrackConnector(id, tracks));
+        trackConnectors.put(id, new TrackConnector(id, tracks));
         if (!trackConnectors.containsKey(id)) {
-            
         }
         return trackConnectors.get(id);
     }
@@ -1231,7 +1342,6 @@ public class ProjectConnector {
 //
 //        return runs;
 //    }
-
     public List<PersistantReference> getGenomes() {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
@@ -1324,7 +1434,6 @@ public class ProjectConnector {
 //        }
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of run with id \"{0}\"", runID);
 //    }
-
     public void deleteGenome(long refGenID) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID);
         try {
@@ -1350,7 +1459,6 @@ public class ProjectConnector {
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
-
 //    public List<String> getReadNamesForSequenceID(int id) {
 //        List<String> names = new ArrayList<String>();
 //

@@ -17,6 +17,9 @@ public class TrackJob implements Job{
     private MappingParserI parser;
     private Long trackID;
     private ReferenceJob refGen;
+    private boolean stepwise=false;
+    private int start;
+    private int stop;
 
     /**
      * Creates a new track job along with its data.
@@ -79,6 +82,30 @@ public class TrackJob implements Job{
 
     public void setPersistant(Long trackID) {
         this.trackID = trackID;
+    }
+
+    public boolean isStepwise() {
+        return stepwise;
+    }
+
+    public void setIsStepwise(boolean isStepwise) {
+        this.stepwise = isStepwise;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public int getStop() {
+        return stop;
+    }
+
+    public void setStop(int stop) {
+        this.stop = stop;
     }
 
 }

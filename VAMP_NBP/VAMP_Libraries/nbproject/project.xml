@@ -275,6 +275,10 @@
                 <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/sam-1.43.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/sam-1.43.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/jxl.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jxl.jar</binary-origin>
             </class-path-extension>
@@ -293,10 +297,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/axis.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/axis.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/sam-1.27.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/sam-1.27.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>

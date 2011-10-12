@@ -10,10 +10,10 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.mappings.BAMParser;
+import de.cebitec.vamp.parser.mappings.SAMBAMParser;
 import de.cebitec.vamp.parser.mappings.JokParser;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
-import de.cebitec.vamp.parser.mappings.SAMParser;
+import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMParser(), new BAMParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMBAMParser(),new SamBamStepParser()};
     private MappingParserI currentParser;
 
     /** Creates new form NewTrackDialogPanel */

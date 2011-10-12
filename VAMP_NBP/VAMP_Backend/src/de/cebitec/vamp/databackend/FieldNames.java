@@ -29,7 +29,7 @@ public class FieldNames {
     public final static String TABLE_TRACKS = "TRACK";
 //    public final static String TABLE_RUN = "RUN";
 //    public final static String TABLE_READS = "READNAME";
-    public final static String TABLE_STATICS = "STATICS";
+    public final static String TABLE_STATISTICS = "STATICS";
 
 
     ////////////////////////  fields of tables  ////////////////////////////////
@@ -127,16 +127,16 @@ public class FieldNames {
 //    public final static String READ_NAME = "NAME";
 //    public final static String READ_SEQUENCE = "SEQUENCE_ID";
 
-   // statics table fields
-    public final static String STATICS_ID = "ID";
-    public final static String STATICS_TRACK = "TRACK_ID";
-    public final static String STATICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
-    public final static String STATICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
-//    public final static String STATICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
-    public final static String STATICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
-    public final static String STATICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
-    public final static String STATICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
-    public final static String STATICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
-    public final static String STATICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
+   // statistics table fields
+    public final static String STATISTIC_ID = "ID";
+    public final static String STATISTIC_TRACK = "TRACK_ID";
+    public final static String STATISTIC_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
+    public final static String STATISTIC_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
+    public final static String STATISTIC_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
+//    public final static String STATISTICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
+    public final static String STATISTIC_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
+    public final static String STATISTIC_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
+    public final static String STATISTIC_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
+    public final static String STATISTIC_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
+    public final static String STATISTIC_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
 }

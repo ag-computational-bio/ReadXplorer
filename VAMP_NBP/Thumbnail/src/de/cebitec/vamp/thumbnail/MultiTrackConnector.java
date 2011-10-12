@@ -366,8 +366,8 @@ public class MultiTrackConnector implements ITrackConnector {
     public void setStatics(int numMappings, int numUniqueMappings, int numUniqueSeq, int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM, double coverageComplete) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data");
         try {
-            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATICS);
-            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATICS_ID);
+            PreparedStatement insertStatics = con.prepareStatement(H2SQLStatements.INSERT_STATISTICS);
+            PreparedStatement latestID = con.prepareStatement(H2SQLStatements.GET_LATEST_STATISTICS_ID);
 
             // get latest id for track
             long id = 0;
