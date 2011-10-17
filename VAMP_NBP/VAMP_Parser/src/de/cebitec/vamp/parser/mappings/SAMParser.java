@@ -37,12 +37,15 @@ public class SAMParser implements MappingParserI, Observer {
     private int noUniqueMappings;
     private ArrayList<Observer> observers;
     private String errorMsg;
+    private String lastReadname;
+    private int readcount;
 
     public SAMParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
         this.seqToIDMap = new HashMap<String, Integer>();
         this.observers = new ArrayList<Observer>();
         this.readnames = new ArrayList<String>();
+        this.readcount = 0;
     }
 
     @Override
@@ -210,12 +213,17 @@ public class SAMParser implements MappingParserI, Observer {
                     } else {
                         ++counterUnmapped;
                     }
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "parsed line: "+lineno, trackJob.getFile().getAbsolutePath());
                 }
             }
-            this.seqToIDMap = null; //release resources
-            br.close();
             mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
             mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
+            //mappingContainer.setNumberOfReads(this.readnames.size());
+            mappingContainer.setNumberOfReads(this.readcount);
+            
+            this.seqToIDMap = null; //release resources
+            this.readnames = null;
+            br.close();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
         } catch (Exception e) {
@@ -645,9 +653,14 @@ public class SAMParser implements MappingParserI, Observer {
 
     @Override
     public void processReadname(int seqID, String readName) {
-        //count reads
-        if (!this.readnames.contains(readName)) {
-            this.readnames.add(readName);
+        //count reads without sorted sam file
+//        if (!this.readnames.contains(readName)) {
+//            this.readnames.add(readName);
+//        }
+        // count reads with sam file sorted by readname
+        if (!this.lastReadname.equals(readName)){
+            ++this.readcount;
         }
+        //TODO: fix readname count for all data...
     }
 }

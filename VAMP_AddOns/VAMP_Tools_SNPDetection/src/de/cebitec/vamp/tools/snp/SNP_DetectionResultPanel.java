@@ -143,7 +143,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
-        SNP_Phylogenie sp = new SNP_Phylogenie(snps);
+//        SNP_Phylogenie sp = new SNP_Phylogenie(snps);
     }//GEN-LAST:event_alignmentButtonActionPerformed
 
 
