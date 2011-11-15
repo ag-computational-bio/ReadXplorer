@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ * The dna sequence of all parsed mappings in this group is always identical, but
+ * positions and direction deviate.
+ * 
  * @author ddoppmeier
  */
 public class ParsedMappingGroup implements Observable {

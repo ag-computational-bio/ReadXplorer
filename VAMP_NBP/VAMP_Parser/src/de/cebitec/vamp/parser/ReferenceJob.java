@@ -10,9 +10,9 @@ import java.util.List;
  *
  * @author ddoppmeier
  */
-public class ReferenceJob implements Job{
+public class ReferenceJob implements Job {
 
-    private Long id;
+    private Integer id;
     private String name;
     private File file;
     private ReferenceParserI parser;
@@ -20,7 +20,7 @@ public class ReferenceJob implements Job{
     private Timestamp timestamp;
     private List<TrackJob> trackswithoutRunjob;
 
-    public ReferenceJob(Long id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp){
+    public ReferenceJob(Integer id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp){
         this.id = id;
         this.name = name;
         this.file = file;
@@ -85,12 +85,12 @@ public class ReferenceJob implements Job{
         }
     }
 
-    public void setPersistant(Long id){
+    public void setPersistant(int id){
         this.id = id;
     }
 
     @Override
-    public Long getID(){
+    public int getID(){
         return id;
     }
 

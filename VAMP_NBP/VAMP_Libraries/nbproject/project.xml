@@ -55,10 +55,6 @@
                 <package>jxl.read.biff</package>
                 <package>jxl.write</package>
                 <package>jxl.write.biff</package>
-                <package>net.sf.samtools</package>
-                <package>net.sf.samtools.apps</package>
-                <package>net.sf.samtools.example</package>
-                <package>net.sf.samtools.util</package>
                 <package>org.apache.axis</package>
                 <package>org.apache.axis.attachments</package>
                 <package>org.apache.axis.client</package>
@@ -269,6 +265,10 @@
                 <package>org.h2.upgrade</package>
                 <package>org.h2.util</package>
                 <package>org.h2.value</package>
+                  <package>net.sf.samtools</package>
+                  <package>net.sf.samtools.apps</package>
+                  <package>net.sf.samtools.example</package>
+                  <package>net.sf.samtools.util</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>

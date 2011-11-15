@@ -13,7 +13,7 @@ public class CoverageZoomSlider extends JSlider{
     private static final long serialVersionUID = 249753543;
 
     public CoverageZoomSlider(final TrackViewer trackViewer){
-        super(1,100,1);
+        super(1,100,1); //TODO: adjust to max coverage value in current view!
         trackViewer.verticalZoomLevelUpdated(this.getValue());
         this.addChangeListener(new ChangeListener() {
 

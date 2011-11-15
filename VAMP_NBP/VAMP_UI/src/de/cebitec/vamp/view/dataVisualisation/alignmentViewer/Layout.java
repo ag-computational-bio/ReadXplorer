@@ -7,8 +7,10 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- *
  * @author ddoppmei
+ * 
+ * A Layout holds all information to display for an alignment in different, non
+ * overlapping layers.
  */
 public class Layout implements LayoutI {
 
@@ -34,6 +36,10 @@ public class Layout implements LayoutI {
         this.layoutBlocks(reverseLayers, reverseBlockContainer);
     }
 
+    /**
+     * Handles and stores the genome gaps.
+     * @param mappings mappings covering current part of the genome
+     */
     private void storeGaps(Collection<PersistantMapping> mappings){
         gapManager = new GenomeGapManager(absStart, absStop);
         Iterator<PersistantMapping> it = mappings.iterator();
@@ -43,7 +49,7 @@ public class Layout implements LayoutI {
         }
 
         // gaps do extend the width of this layout
-        // so absStop has to be decreased, to fit to old with
+        // so absStop has to be decreased, to fit to old width
 
         // count the number of gaps occuring in visible area
         int width = absStop - absStart +1;
@@ -57,9 +63,13 @@ public class Layout implements LayoutI {
             gapNo += num;
             i++;
         }
-        absStop = absStop - gapNo;
+        absStop -= gapNo;
     }
 
+    /**
+     * Each mapping gets one block.
+     * @param mappings mappings in current interval
+     */
     private void createBlocks(Collection<PersistantMapping> mappings){
         Iterator<PersistantMapping> it = mappings.iterator();
         while(it.hasNext()){
@@ -85,6 +95,12 @@ public class Layout implements LayoutI {
         }
     }    
 
+    /**
+     * Fills each single layer until all blocks were added from the block container
+     * to the layer list
+     * @param layers list of layers to add the blocks to
+     * @param blocks block container to add to layers
+     */
     private void layoutBlocks(ArrayList<LayerI> layers, BlockContainer blocks){
         LayerI l;
         while(!blocks.isEmpty()){
@@ -94,6 +110,12 @@ public class Layout implements LayoutI {
         }
     }
 
+    /**
+     * Fills a single layer with as many blocks as possible, while obeying to the
+     * rule, that the blocks in one layer are not allowed to overlap.
+     * @param l single layer to fill with blocks
+     * @param blocks block container
+     */
     private void fillLayer(LayerI l, BlockContainer blocks ){
         BlockI block = blocks.getNextByPositionAndRemove(0);
         int counter = 0;

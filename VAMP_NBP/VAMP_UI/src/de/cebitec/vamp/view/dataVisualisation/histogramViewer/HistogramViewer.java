@@ -29,6 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.openide.util.NbBundle;
+import org.openide.windows.IOProvider;
+import org.openide.windows.InputOutput;
 
 /**
  *
@@ -37,6 +40,7 @@ import javax.swing.SwingUtilities;
 public class HistogramViewer extends AbstractViewer implements CoverageThreadListener {
 
     private static final long serialVersionUID = 234765253;
+    private InputOutput io;
     private List<String> bases;
     private static int height = 500;
     private TrackConnector trackConnector;
@@ -59,8 +63,10 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
 
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
+        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
+        this.setInDrawingMode(false);
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
 
@@ -81,7 +87,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         bases.add("n");
         bases.add("readgap");
 
-        this.showSequenceBar(true);
+        this.showSequenceBar(true, true);
     }
 
     @Override
@@ -211,16 +217,16 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         gapManager = new GenomeGapManager(lowerBound, upperBound);
 
         try {
-            gaps = trackConnector.getExtendedReferenceGapsForIntervallOrderedByMappingID(lowerBound, upperBound);
+            gaps = trackConnector.getExtendedReferenceGapsForIntervalOrderedByMappingID(lowerBound, upperBound);
         } catch (Exception ex) {
-            System.err.print("trackConnector couldnt initialse gaps" + ex);
-            //TOTO: error an nutzer geben
+            this.io.getOut().println(NbBundle.getBundle(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.gap.error")+ ": " + ex));
+            gaps = new ArrayList<PersistantReferenceGap>();
         }
         this.fillGapManager();
         this.getSequenceBar().setGenomeGapManager(gapManager);
         this.adjustAbsStop();
 
-        this.diffs = trackConnector.getDiffsForIntervall(lowerBound, upperBound);
+        this.diffs = trackConnector.getDiffsForInterval(lowerBound, upperBound);
         this.setUpLogoData();
         if (logoData.getMaxFoundCoverage() != 0) {
             this.createLogoBlocks();

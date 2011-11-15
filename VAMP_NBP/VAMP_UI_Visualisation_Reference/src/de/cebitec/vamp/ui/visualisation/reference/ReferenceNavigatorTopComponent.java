@@ -40,6 +40,7 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
     public void setRefViewer(ReferenceViewer viewer){
         jumpPanel.setReferenceGenome(viewer.getReference());
         jumpPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
+        jumpPanel.setGenomeViewer(viewer);
         codonSelector.setGenomeViewer(viewer);
     }
 
@@ -116,7 +117,7 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
 
     @Override
     public void componentClosed() {
-        result.removeLookupListener(this);
+        result.removeLookupListener(this);        
     }
 
     void writeProperties(java.util.Properties p) {

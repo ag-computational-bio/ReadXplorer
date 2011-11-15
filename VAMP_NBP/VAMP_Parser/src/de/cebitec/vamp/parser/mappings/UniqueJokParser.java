@@ -35,6 +35,7 @@ public class UniqueJokParser implements MappingParserI, Observer {
     private ArrayList<Observer> observers;
     private String errorMsg;
     private int noUniqueMappings;
+    private HashMap<String, Integer> seqToIDMap;
 
     public UniqueJokParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
@@ -46,6 +47,7 @@ public class UniqueJokParser implements MappingParserI, Observer {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.registerObserver(this);
+        this.seqToIDMap = new HashMap<String, Integer>();
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -166,7 +168,15 @@ public class UniqueJokParser implements MappingParserI, Observer {
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                     mapping.setCount(count);
 
-                    mappingContainer.addParsedMapping(mapping, ++noUniqueSeq); //since all duplicate reads have been filtered before
+                    int seqID;
+                    if (this.seqToIDMap.containsKey(readSeq)) {
+                        seqID = this.seqToIDMap.get(readSeq);
+                    } else {
+                        seqID = ++noUniqueSeq;
+                        this.seqToIDMap.put(readSeq, seqID);
+                    }
+                    mappingContainer.addParsedMapping(mapping, seqID);
+                    this.processReadname(seqID, readname);
                 } else {
                     this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
                 }
@@ -341,5 +351,10 @@ public class UniqueJokParser implements MappingParserI, Observer {
     private void sendErrorMsg(final String errorMsg) {
         this.errorMsg = errorMsg;
         this.notifyObservers();
+    }
+
+    @Override
+    public void processReadname(int seqID, String readName) {
+        //nothing to do here
     }
 }

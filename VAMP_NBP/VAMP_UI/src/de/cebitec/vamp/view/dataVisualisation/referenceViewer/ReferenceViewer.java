@@ -9,6 +9,7 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.HashMap;
@@ -34,14 +35,16 @@ public class ReferenceViewer extends AbstractViewer {
     public final static String PROP_FEATURE_STATISTICS_CHANGED = "feats changed";
     public final static String PROP_FEATURE_SELECTED = "feat selected";
     private int zoom;
+    private int trackCount = 0;
 
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen){
         super(boundsInfoManager, basePanel, refGen);
         refGenC = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
         featureStats = new HashMap<Integer, Integer>();
         this.refGen = refGen;
-        this.showSequenceBar(true);
+        this.showSequenceBar(true, true);
         this.labelMargin = 3;
+        this.setViewerSize();
     }
            
 
@@ -64,7 +67,11 @@ public class ReferenceViewer extends AbstractViewer {
             currentlySelectedFeature.setSelected(true);
         }
 
-        this.getSequenceBar().findCodons(); //update codons for current selection
+        //only recalculate if reading frame was switched
+        if (currentlySelectedFeature == null || this.getSequenceBar().getFrameCurrFeature() != this.determineFrame(currentlySelectedFeature.getPersistantFeature())){
+            this.getSequenceBar().findCodons(); //update codons for current selection
+        }
+        
         //this.repaint();
     }
 
@@ -161,6 +168,10 @@ public class ReferenceViewer extends AbstractViewer {
         return result;
     }
 
+    /**
+     * @param f feature whose frame has to be determined
+     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the feature
+     */
     public int determineFrame(PersistantFeature f){
         int frame = 0;
         int direction = f.getStrand();
@@ -237,6 +248,42 @@ public class ReferenceViewer extends AbstractViewer {
 
     public Feature getCurrentlySelectedFeature() {
         return this.currentlySelectedFeature;
+    }
+    
+    /**
+     * Sets the initial size of the reference viewer.
+     */
+    private void setViewerSize() {
+        
+        this.setPreferredSize(new Dimension(1, 300));
+        this.revalidate();
+    }
+
+    /**
+     * Increases count of corresponding tracks.
+     * If more information is needed implement listener model
+     * with possibility to get track viewers.
+     */
+    public void increaseTrackCount() {
+        ++this.trackCount;
+    }
+    
+    /**
+     * Decreases count of corresponding tracks.
+     * If more information is needed implement listener model
+     * with possibility to get track viewers.
+     */
+    public void decreaseTrackCount(){
+        if (this.trackCount > 0){
+            --this.trackCount;
+        } //nothing to do if it is already 0
+    }
+    
+    /**
+     * @return Number of corresponding tracks.
+     */
+    public int getTrackCount(){
+        return this.trackCount;
     }
 
 }

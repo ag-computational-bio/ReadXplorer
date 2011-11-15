@@ -16,10 +16,10 @@ public interface RegionFilterI {
     public List<Region> findRegions();
 
     /**
-     * Sets the intervall to use.
-     * @param start the leftmost position of the intervall
-     * @param stop the rightmost position of the intervall
+     * Sets the interval to use.
+     * @param start the leftmost position of the interval
+     * @param stop the rightmost position of the interval
      */
-    public void setIntervall(int start, int stop);
+    public void setInterval(int start, int stop);
 
 }

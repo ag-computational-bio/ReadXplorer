@@ -6,6 +6,7 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.openide.util.NbPreferences;
@@ -49,32 +50,35 @@ public class StartCodonFilter implements RegionFilterI {
         regions.clear();
 
         if(this.atLeastOneCodonSelected()){
-            // extends intervall to search to the left and right,
-            // to find start/stop codons that overlap this intervalls boundaries
+            // extends interval to search to the left and right,
+            // to find start/stop codons that overlap current interval boundaries
             int offset = 3;
             int start = absStart - offset;
-            int stop = absStop+2;
+            int stop = absStop + 2;
 
-            if(start < 0 ){
-                offset -= Math.abs(start);
-                start = 0;
-            }
-            if(stop > refGen.getSequence().length()){
-                stop = refGen.getSequence().length();
-            }
+            if (stop > 0) {
+                if (start < 0) {
+                    offset -= Math.abs(start);
+                    start = 0;
+                }
+                if (stop > refGen.getSequence().length()) {
+                    stop = refGen.getSequence().length();
+                }
 
-            sequence = refGen.getSequence().substring(start, stop);
-            boolean isFeatureSelected = this.frameCurrFeature != INIT;
+                sequence = refGen.getSequence().substring(start, stop);
+                boolean isFeatureSelected = this.frameCurrFeature != INIT;
 
-            int index = 0;
-            for (int i=0; i<this.selectedCodons.size(); ++i){
-                if (this.selectedCodons.get(i)){
-                    this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
-                    this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
-                } else {
-                    index +=2;
+                int index = 0;
+                for (int i = 0; i < this.selectedCodons.size(); ++i) {
+                    if (this.selectedCodons.get(i)) {
+                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
+                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
+                    } else {
+                        index += 2;
+                    }
                 }
             }
+
         }
 
     }
@@ -116,7 +120,7 @@ public class StartCodonFilter implements RegionFilterI {
     }
 
     @Override
-    public void setIntervall(int start, int stop) {
+    public void setInterval(int start, int stop) {
         this.absStart = start;
         this.absStop = stop;
     }
@@ -170,8 +174,14 @@ public class StartCodonFilter implements RegionFilterI {
      * Resets the set of start codons according to the currently selected genetic code.
      */
     public final void resetStartCodons() {
-        String[] startCodonsNew = GeneticCodesStore.getGeneticCode(NbPreferences.forModule(Object.class).get(
-                Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
+        Preferences pref = NbPreferences.forModule(Object.class);
+        String[] startCodonsNew;
+        int codeIndex = Integer.valueOf(pref.get(Properties.GENETIC_CODE_INDEX, "0"));
+        if (codeIndex < GeneticCodesStore.getGeneticCodesStoreSize()){
+            startCodonsNew = GeneticCodesStore.getGeneticCode(pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
+        } else {
+            startCodonsNew = GeneticCodesStore.parseCustomCodons(codeIndex, pref.get(Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD));
+        }
         this.startCodons = new Pattern[startCodonsNew.length*2];
         this.selectedCodons = new ArrayList<Boolean>();
         int index = 0;

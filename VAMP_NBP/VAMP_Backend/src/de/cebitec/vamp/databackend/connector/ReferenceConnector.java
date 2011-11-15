@@ -38,7 +38,7 @@ public class ReferenceConnector {
             ResultSet rs = fetch.executeQuery();
 
             if(rs.next()){
-                Long id = rs.getLong(FieldNames.REF_GEN_ID);
+                int id = rs.getInt(FieldNames.REF_GEN_ID);
                 String name = rs.getString(FieldNames.REF_GEN_NAME);
                 String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
                 String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
@@ -72,8 +72,9 @@ public class ReferenceConnector {
                 int stop = rs.getInt(FieldNames.FEATURE_STOP);
                 int strand = rs.getInt(FieldNames.FEATURE_STRAND);
                 int type = rs.getInt(FieldNames.FEATURE_TYPE);
+                String gene = rs.getString(FieldNames.FEATURE_GENE);
 
-                features.add(new PersistantFeature(id, ecnum, locus, product, start, stop, strand, type));
+                features.add(new PersistantFeature(id, ecnum, locus, product, start, stop, strand, type, gene));
             }
 
         } catch (SQLException ex) {
@@ -91,10 +92,10 @@ public class ReferenceConnector {
 
             ResultSet rs = fetch.executeQuery();
             while(rs.next()){
-                Long id = rs.getLong(FieldNames.TRACK_ID);
+                int id = rs.getInt(FieldNames.TRACK_ID);
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
-                Long refGenomeID = rs.getLong(FieldNames.TRACK_REFGEN);
+                int refGenomeID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
 //                Long runID = rs.getLong(FieldNames.TRACK_RUN);
                 list.add(new PersistantTrack(id, description, date, refGenomeID));//, runID));
             }

@@ -1,13 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.options;
 
+import javax.swing.event.ListSelectionEvent;
 import org.openide.util.NbPreferences;
 import de.cebitec.vamp.util.GeneticCodesStore;
 import de.cebitec.vamp.util.Properties;
+import java.util.ArrayList;
+import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
+import java.util.prefs.Preferences;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * @author Rolf Hilker
@@ -18,11 +19,14 @@ import javax.swing.ListSelectionModel;
 final class GeneticCodePanel extends javax.swing.JPanel {
 
     private final GeneticCodeOptionsPanelController controller;
+    private Preferences pref;
 
     GeneticCodePanel(GeneticCodeOptionsPanelController controller) {
         this.controller = controller;
+        this.pref = NbPreferences.forModule(Object.class);
         this.initComponents();
         this.initChooseCodeComboBox();
+        this.initListener();
     }
 
     /** This method is called from within the constructor to
@@ -36,10 +40,34 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         chooseCodeLabel = new javax.swing.JLabel();
         geneticCodeScrolPane = new javax.swing.JScrollPane();
         geneticCodeList = new javax.swing.JList();
+        customCodonField = new javax.swing.JTextField();
+        addButton = new javax.swing.JButton();
+        customCodonLabel = new javax.swing.JLabel();
+        removeButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(chooseCodeLabel, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.chooseCodeLabel.text")); // NOI18N
 
         geneticCodeScrolPane.setViewportView(geneticCodeList);
+
+        customCodonField.setText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonField.text")); // NOI18N
+        customCodonField.setToolTipText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonField.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.addButton.text")); // NOI18N
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(customCodonLabel, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(removeButton, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.removeButton.text")); // NOI18N
+        removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.removeButton.toolTipText")); // NOI18N
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -48,8 +76,16 @@ final class GeneticCodePanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE)
-                    .addComponent(chooseCodeLabel))
+                    .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+                    .addComponent(chooseCodeLabel)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(customCodonLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(customCodonField, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(removeButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -58,33 +94,83 @@ final class GeneticCodePanel extends javax.swing.JPanel {
                 .addGap(19, 19, 19)
                 .addComponent(chooseCodeLabel)
                 .addGap(18, 18, 18)
-                .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addButton)
+                    .addComponent(customCodonField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(customCodonLabel)
+                    .addComponent(removeButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    void load() {
-        this.geneticCodeList.setSelectedIndex(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.GENETIC_CODE_INDEX, "0")));
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        this.addCodonsToList();
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        this.removeCodonsFromList();
+    }//GEN-LAST:event_removeButtonActionPerformed
+
+    public void load() {
+        this.geneticCodeList.setSelectedIndex(Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0")));
     }
 
-    void store() {
-        // store modified settings
+    /**
+     * Store modified settings
+     */
+    public void store() {
+        if (geneticCodeList.getSelectedIndex() < GeneticCodesStore.getGeneticCodesStoreSize()) {
         // remember selected indices in geneticCodeList have to be conform with GeneticCodesStore order!
-        String identifier = GeneticCodesStore.getGeneticCodeIdentifiers()[geneticCodeList.getSelectedIndex()];
-        NbPreferences.forModule(Object.class).put(Properties.SEL_GENETIC_CODE, identifier);
-        NbPreferences.forModule(Object.class).put(Properties.GENETIC_CODE_INDEX, String.valueOf(geneticCodeList.getSelectedIndex()));
+            String identifier = GeneticCodesStore.getGeneticCodeIdentifiers()[geneticCodeList.getSelectedIndex()];
+            this.pref.put(Properties.SEL_GENETIC_CODE, identifier);
+            this.pref.put(Properties.GENETIC_CODE_INDEX, String.valueOf(geneticCodeList.getSelectedIndex()));        
+        } else {
+            //special about this case is that it starts with a "(" which can be used for distinguishing both cases
+            //the index is the other criterion
+            if (geneticCodeList.getSelectedValue() != null){
+                this.pref.put(Properties.SEL_GENETIC_CODE, String.valueOf(geneticCodeList.getSelectedValue()));
+                this.pref.put(Properties.GENETIC_CODE_INDEX, String.valueOf(geneticCodeList.getSelectedIndex()));
+            } else {
+                this.pref.put(Properties.SEL_GENETIC_CODE, "0");
+                this.pref.put(Properties.GENETIC_CODE_INDEX, "0"); 
+            }
+        }
     }
 
-    boolean valid() {
+    public boolean valid() {
         // checks whether form is consistent and complete
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addButton;
     private javax.swing.JLabel chooseCodeLabel;
+    private javax.swing.JTextField customCodonField;
+    private javax.swing.JLabel customCodonLabel;
     private javax.swing.JList geneticCodeList;
     private javax.swing.JScrollPane geneticCodeScrolPane;
+    private javax.swing.JButton removeButton;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Creates the necessary listeners.
+     */
+    private void initListener() {
+        
+        //listener for de/activating the remove button
+        this.geneticCodeList.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (GeneticCodePanel.this.geneticCodeList.getSelectedIndex() >= GeneticCodesStore.getGeneticCodesStoreSize()){
+                    GeneticCodePanel.this.removeButton.setEnabled(true);
+                } else {
+                    GeneticCodePanel.this.removeButton.setEnabled(false);
+                }
+            }
+        });
+    }
+    
     /**
      * Creates the content of the combo box containing the genetic codes.
      */
@@ -93,8 +179,9 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
         final String[] identifiers = GeneticCodesStore.getGeneticCodeIdentifiers();
         final String[][] geneticCodes = GeneticCodesStore.getStartCodons();
-        final String[] geneticCodesData = new String[identifiers.length];
+        final ArrayList<String> geneticCodesData = new ArrayList<String>();
         
+        //get standard codes and add to table
         String[] startCodons;
         String startCodonsConcat;
         for (int i=0; i<identifiers.length; ++i){
@@ -104,21 +191,176 @@ final class GeneticCodePanel extends javax.swing.JPanel {
                 startCodonsConcat = startCodonsConcat.concat(startCodons[j].concat(", "));
             }
             startCodonsConcat = startCodonsConcat.substring(0, startCodonsConcat.length()-2);
-            geneticCodesData[i] = startCodonsConcat.concat(")</b> - <i>").concat(identifiers[i]).concat("</i></html>");
+            geneticCodesData.add(startCodonsConcat.concat(")</b> - <i>").concat(identifiers[i]).concat("</i></html>"));
+        }
+        this.geneticCodeList.setModel(new GeneticCodeListModel(geneticCodesData));
+        
+        //get custom codes and add to table
+        String storedCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
+        while (storedCustomCodes.contains("\n")){
+            this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.indexOf("\n")));
+            storedCustomCodes = storedCustomCodes.substring(storedCustomCodes.indexOf("\n")+1);
+        }
+        if (storedCustomCodes.length() > 0){
+            this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.length()));
         }
         
-        this.geneticCodeList.setModel(new javax.swing.AbstractListModel() {
-            String[] geneticCodesDataModel = geneticCodesData.clone();
+    }
 
-            @Override
-            public int getSize() { 
-                return this.geneticCodesDataModel.length;
+    /**
+     * Adds a custom genetic code taken from the customCodonField to both,
+     * the gui list and the custom genetic codes storage.
+     * Input format: "(codon1, codon2, codon3, ...) - codeName" 
+     */
+    private void addCodonsToList() {
+        String newGeneticCode = this.customCodonField.getText();
+        if (!(newGeneticCode = this.checkInput(newGeneticCode)).equals("false")){
+            //store in custom genetic codes storage
+            String storedCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
+            if (storedCustomCodes.length() > 0){
+                this.pref.put(Properties.CUSTOM_GENETIC_CODES, storedCustomCodes+"\n"+newGeneticCode);
+            } else {
+                this.pref.put(Properties.CUSTOM_GENETIC_CODES, newGeneticCode);
             }
+            
+            //add to table
+            this.addGeneticCodeToTable(newGeneticCode);
+        } else {
+            this.customCodonField.setText("Wrong input format!");
+        }
+        this.validate();
+    }
 
-            @Override
-            public Object getElementAt(int i) { 
-                return this.geneticCodesDataModel[i];
+    /**
+     * Checks the input string for correct format.
+     * @param codonString input string containing the codons and the identifier
+     *      the identifier can be left empty
+     * @return codonString with uppercase codons and <code>false</code> if input is not valid
+     */
+    private String checkInput(String codonString) {
+        String uppercaseCodons = "(";
+        if (codonString.startsWith("(") && codonString.indexOf(')') > -1){
+            String codonPart = codonString.substring(1, codonString.indexOf(')'));
+            if (codonPart.length() == 0){
+                return "false";
             }
-        });
+            String[] splitted = codonPart.split(",");
+            String codon;
+            for (int i = 0; i < splitted.length; ++i) {
+                codon = splitted[i].toUpperCase().trim();
+                uppercaseCodons = uppercaseCodons.concat(codon).concat(", ");
+                while (codon.length() > 0) {
+                    if (codon.startsWith("A") || codon.startsWith("G") || codon.startsWith("C")
+                            || codon.startsWith("T")) {
+                        codon = codon.substring(1);
+                    } else {
+                        return "false";
+                    }
+                }
+            }
+            return uppercaseCodons.substring(0, uppercaseCodons.length()-2).
+                    concat(codonString.substring(codonString.indexOf(')'), codonString.length()));
+        } else {
+            return "false";
+        }
+    }
+
+    /**
+     * Adds a custom genetic code string to the gui table model.
+     * Input format: "(codon1, codon2, codon3, ...) - codeName"
+     * @param newGeneticCode string containing the custom genetic code to add
+     */
+    private void addGeneticCodeToTable(String newGeneticCode) {
+        String codons = "<html><b>" + newGeneticCode.substring(0, newGeneticCode.indexOf(")") + 1) + "</b>";
+        String identifier = "<i>" + newGeneticCode.substring(newGeneticCode.indexOf(")") + 1, newGeneticCode.length()) + "</i></html>";
+        ((GeneticCodeListModel) this.geneticCodeList.getModel()).addElement(codons + identifier);
+    }
+
+    /**
+     * Removes the selected custom genetic code from both,
+     * the gui list and the custom genetic codes storage.
+     */
+    private void removeCodonsFromList() {
+        
+        String origCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
+        String customCodes = origCustomCodes;
+        int codeIndex;
+        int index;
+        int endIndex = 0;
+        int lineBreakIndex = 0;
+        
+        //remove from storage
+        if ( (codeIndex = this.geneticCodeList.getSelectedIndex()) >= (index = GeneticCodesStore.getGeneticCodesStoreSize()) ){
+            
+            if (codeIndex == Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"))){ 
+                //reset genetic code to standard
+                this.pref.put(Properties.SEL_GENETIC_CODE, GeneticCodesStore.getGeneticCodeIdentifiers()[0]);
+                this.pref.put(Properties.GENETIC_CODE_INDEX, "0");
+            }
+            
+            while (index++ < codeIndex) {
+                lineBreakIndex = customCodes.indexOf("\n");
+                endIndex += lineBreakIndex+1;
+                customCodes = customCodes.substring(lineBreakIndex + 1, customCodes.length());
+            }
+            if (customCodes.indexOf("\n") > -1){
+                customCodes = customCodes.substring(customCodes.indexOf("\n"));
+            } else {
+                customCodes = "";
+            }
+            if (endIndex == 0){
+                ++endIndex;
+            }
+            this.pref.put(Properties.CUSTOM_GENETIC_CODES, origCustomCodes.substring(0, endIndex-1) + customCodes);
+
+            //remove from table model
+            ((GeneticCodeListModel) this.geneticCodeList.getModel()).removeElement(codeIndex);
+            this.geneticCodeList.setSelectedIndex(0);
+        }        
+    }
+    
+    /**
+     * Internal class representing the table model for start codons.
+     * Implements all methods needed for handling some geneticCodesData.
+     */
+    private class GeneticCodeListModel extends AbstractListModel {
+        
+        private ArrayList<String> geneticCodesDataModel;
+        
+        public GeneticCodeListModel(ArrayList<String> geneticCodesData){
+            this.geneticCodesDataModel = geneticCodesData;
+        }
+
+        @Override
+        public int getSize() {
+            return this.geneticCodesDataModel.size();
+        }
+
+        @Override
+        public Object getElementAt(int i) {
+            if (i >= this.getSize()){
+                return 0; //means standard codons
+            }
+            return this.geneticCodesDataModel.get(i);
+        }
+
+        /**
+         * Adds an element at the end of the array.
+         * @param newCodonString String to add
+         */
+        public void addElement(String newCodonString) {
+            this.geneticCodesDataModel.add(newCodonString);
+            int index = this.geneticCodesDataModel.size()-1;
+            this.fireContentsChanged(this, index, index);
+        }
+        
+        /**
+         * Removes an element from the data model array.
+         * @param index the index of the entry to remove
+         */
+        public void removeElement(int index){
+            this.geneticCodesDataModel.remove(index);
+            this.fireContentsChanged(this, index, index);
+        }
     }
 }

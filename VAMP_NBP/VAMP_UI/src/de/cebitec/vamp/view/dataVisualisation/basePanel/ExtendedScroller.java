@@ -31,7 +31,7 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 int newValue = ExtendedScroller.this.getValue();
-                if(newValue != currentValue){
+                if (newValue != currentValue) {
                     currentValue = newValue;
                     updateListeners();
                 }

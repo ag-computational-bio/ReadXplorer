@@ -9,11 +9,11 @@ import java.util.TreeSet;
  *
  * @author ddoppmeier
  */
-public class PersistantMapping {
+public class PersistantMapping implements PersistantObject {
 
     private int id;
     private int start;
-    private int readID;
+    private int trackId;
     private int stop;
     private boolean forwardStrand;
     private Map<Integer, PersistantDiff> diffs;
@@ -23,12 +23,12 @@ public class PersistantMapping {
     private int sequenceID;
     private boolean isBestMatch;
 
-    public PersistantMapping(int id, int start, int stop, int readID, byte direction, int count, int errors, int sequenceID, boolean isBestMapping){
+    public PersistantMapping(int id, int start, int stop, int trackId, byte direction, int count, int errors, int sequenceID, boolean isBestMapping){
         this.id = id;
         this.start = start;
         this.stop = stop;
         this.count = count;
-        this.readID = readID;
+        this.trackId = trackId;
         forwardStrand = (direction == 1 ?  true :  false);
         diffs = new HashMap<Integer, PersistantDiff>();
         gaps = new TreeMap<Integer, TreeSet<PersistantReferenceGap>>();
@@ -50,7 +50,8 @@ public class PersistantMapping {
         return gaps;
     }
 
-    public int getId() {
+    @Override
+    public long getId() {
         return id;
     }
 
@@ -58,8 +59,8 @@ public class PersistantMapping {
         return forwardStrand;
     }
 
-    public int getReadID() {
-        return readID;
+    public int getTrackId() {
+        return trackId;
     }
 
     public int getStart() {

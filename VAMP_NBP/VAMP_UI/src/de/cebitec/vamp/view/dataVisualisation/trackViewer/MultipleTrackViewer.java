@@ -9,7 +9,7 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
  *
  * @author jwinneba
  */
-public class MultipleTrackViewer extends TrackViewer{
+public class MultipleTrackViewer extends TrackViewer {
 
     private static final long serialVersionUID = 2L;
 

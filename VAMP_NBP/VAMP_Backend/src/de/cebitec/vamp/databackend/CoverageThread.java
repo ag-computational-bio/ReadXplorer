@@ -27,7 +27,7 @@ public class CoverageThread extends Thread {
     private double requestCounter;
     private double skippedCounter;
 
-    public CoverageThread(List<Long> trackIds){
+    public CoverageThread(List<Integer> trackIds){
         super();
         // do general stuff
         this.requestQueue = new ConcurrentLinkedQueue<CoverageRequest>();

@@ -12,10 +12,6 @@ final class ColoursPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private final ColoursOptionsPanelController controller;
 
-    private static final Color perfectMatchColour =  ColorProperties.PERFECT_MATCH;
-    private static final Color bestMatchColour = ColorProperties.BEST_MATCH;
-    private static final Color commonMatchColour = ColorProperties.N_ERROR_COLOR;
-
     ColoursPanel(ColoursOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
@@ -162,21 +158,21 @@ final class ColoursPanel extends javax.swing.JPanel {
         // read settings and initialize GUI
         String bestMatchRGB = NbPreferences.forModule(Object.class).get("bestMatchColour", "");
         if (bestMatchRGB.isEmpty()){
-            bestMatchButton.setBackground(bestMatchColour);
+            bestMatchButton.setBackground(ColorProperties.BEST_MATCH);
         }
         else {
             bestMatchButton.setBackground(new Color(Integer.parseInt(bestMatchRGB)));
         }
         String commonMatchRGB = NbPreferences.forModule(Object.class).get("commonMatchColour", "");
         if (commonMatchRGB.isEmpty()){
-            commonMatchButton.setBackground(commonMatchColour);
+            commonMatchButton.setBackground(ColorProperties.COMMON_MATCH);
         }
         else {
             commonMatchButton.setBackground(new Color(Integer.parseInt(commonMatchRGB)));
         }
         String perfectMatchRGB = NbPreferences.forModule(Object.class).get("perfectMatchColour", "");
         if (perfectMatchRGB.isEmpty()){
-            perfectMatchButton.setBackground(perfectMatchColour);
+            perfectMatchButton.setBackground(ColorProperties.PERFECT_MATCH);
         }
         else {
             perfectMatchButton.setBackground(new Color(Integer.parseInt(perfectMatchRGB)));

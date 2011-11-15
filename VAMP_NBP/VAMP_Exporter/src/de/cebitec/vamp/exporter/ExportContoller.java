@@ -2,6 +2,7 @@ package de.cebitec.vamp.exporter;
 
 import de.cebitec.vamp.exporter.excel.ExcelExporter;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp454;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -23,7 +24,8 @@ public class ExportContoller implements ActionListener {
     private String filename;
     private String contentType;
     private List<Snp> snps = new ArrayList<Snp>();
-    private ExcelExporter exporter = null;
+    private List<Snp454> snps454;
+    private ExporterI exporter = null;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -44,7 +46,8 @@ public class ExportContoller implements ActionListener {
 
     public enum EnumExportType {
 
-        EXCEL;
+        EXCEL,
+        SNP454;
 
         /**
          * Get the EnumExportType of a given name
@@ -69,8 +72,10 @@ public class ExportContoller implements ActionListener {
             switch (exportType) {
                 case EXCEL:
                     exporter = new ExcelExporter();
-                    exporter.setSNPs(snps);
+                    ((ExcelExporter)exporter).setSNPs(snps);
                     break;
+                case SNP454:
+                    exporter = new Snp454Exporter(this.snps454);
             }
         } catch (NoClassDefFoundError def) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Unknown exporter! Export failed!");
@@ -81,7 +86,7 @@ public class ExportContoller implements ActionListener {
             if (exporter.readyToExport()) {
                 try {
                      exportFile = exporter.writeFile(tempFile, filename);
-
+                     
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(this.getClass().getName()).log(Level.WARNING, " Export failed!", ex);
                 } catch (IOException ex) {
@@ -119,6 +124,10 @@ public class ExportContoller implements ActionListener {
 
     public void setName(String name){
         this.filename = name;
+    }
+    
+    public void setSnp454Data(List<Snp454> snps454) {
+        this.snps454 = snps454;
     }
 
 }

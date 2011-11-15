@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
 class FeatureTableModel extends AbstractTableModel {
 
     PersistantFeature[] featureData;
-    private String[] columnNames = {"Feature", "Product", "EC-Number"};
+    private String[] columnNames = {"Feature", "Gene", "Product", "EC-Number"};
     private Object[][] data;
 
     public FeatureTableModel(PersistantFeature[] featureData) {
@@ -25,11 +25,13 @@ class FeatureTableModel extends AbstractTableModel {
 
     private void fillData() {
         int counter = -1;
+        this.data = new Object[featureData.length][columnNames.length];
         for (PersistantFeature feature : this.featureData) {
             counter++;
             this.data[counter][0] = feature;
-            this.data[counter][1] = feature.getProduct();
-            this.data[counter][2] = feature.getEcNumber();
+            this.data[counter][1] = feature.getGeneName();
+            this.data[counter][2] = feature.getProduct();
+            this.data[counter][3] = feature.getEcNumber();
         }
     }
 
@@ -50,6 +52,9 @@ class FeatureTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
+        if (this.data.length == 0){
+            return null;
+        }
         return this.data[row][col];
     }
 

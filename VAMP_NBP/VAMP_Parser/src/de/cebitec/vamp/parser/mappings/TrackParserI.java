@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
@@ -28,7 +29,7 @@ public interface TrackParserI {
          * @throws ParsingException exectption if something went wrong during parsing process
          */
        public abstract ParsedTrack parseMappings(TrackJob trackJob, String sequenceString,
-               Observer observer) throws ParsingException;
+               Observer observer,CoverageContainer covContainer) throws ParsingException;
 
        /**
         * Method for parsing mapping data from a track job into a run data object (ParsedRun).

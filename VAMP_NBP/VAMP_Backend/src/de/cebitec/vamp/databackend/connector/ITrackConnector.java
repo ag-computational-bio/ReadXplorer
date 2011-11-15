@@ -2,6 +2,7 @@ package de.cebitec.vamp.databackend.connector;
 
 //import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
@@ -23,24 +24,12 @@ public interface ITrackConnector {
 
     public void addCoverageRequest(CoverageRequest request);
 
-    public Collection<PersistantDiff> getDiffsForIntervall(int from, int to);
+    public Collection<PersistantDiff> getDiffsForInterval(int from, int to);
 
-    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervallOrderedByMappingID(int from, int to);
+    public Collection<PersistantReferenceGap> getExtendedReferenceGapsForIntervalOrderedByMappingID(int from, int to);
 
-    public void updateTableStatics(int numOfReads, int numOfUniqueSeq);
-
-    /**
-     * @return
-     * @deprecated Since the RUN domain has been excluded from vamp
-     */
-    @Deprecated
     public int getNumOfReads();
 
-    /**
-     * @return 
-     * @deprecated Since the RUN domain has been excluded from vamp
-     */
-    @Deprecated
     public int getNumOfReadsCalculate();
 
     public int getNumOfMappings();
@@ -62,17 +51,40 @@ public interface ITrackConnector {
     public int getNumOfUniqueBmMappings();
 
     public int getNumOfUniqueBmMappingsCalculate();
+    
+    public int getNumOfSeqPairs();
+    
+    public int getNumOfSeqPairsCalculate();
+    
+    public int getNumOfPerfectSeqPairs();
+    
+    public int getNumOfPerfectSeqPairsCalculate();
+    
+    public int getNumOfUniqueSeqPairs();
+    
+    public int getNumOfUniqueSeqPairsCalculate();
 
-    public void setStatics( int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
+    public int getNumOfUniquePerfectSeqPairs();
+    
+    public int getNumOfUniquePerfectSeqPairsCalculate();
+    
+    public int getNumOfSingleMappings();
+    
+    public int getNumOfSingleMappingsCalculate();
+    
+    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeqbmMappings,
                             int numPerfectMappings, int numBestMatchMappings, double coveragePerf,
-                            double coverageBM, double coverageComplete);
+                            double coverageBM, double coverageComplete, int numReads);
+    
+    public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, 
+            int numUniqueSeqPairs, int numUniquePerfectSeqPairs, int numSingleReads);
 
     //public long getRunId();
     public long getTrackID();
 
     public String getAssociatedTrackName();
 
-        /**
+    /**
      * Returns all unique reads containing the given sequence.
      * Sequence cannot be longer than the readlength.
      * TODO: should also return all positions of the reads
@@ -87,9 +99,12 @@ public interface ITrackConnector {
      * identifies SNPs.
      * @param percentageThreshold
      * @param absThreshold
+     * @param is454 
      * @return
      */
     public List<Snp> findSNPs(int percentageThreshold, int absThreshold);
+    
+    public List<Snp454> findSNPs454(int percentageThreshold, int absThreshold);
 
     public double getPercentRefGenPerfectCovered();
 
@@ -103,5 +118,5 @@ public interface ITrackConnector {
 
     public double getPercentRefGenNErrorCoveredCalculate();
 
-    public HashMap<Integer, Integer> getCoverageInfosofTrack(int from, int to);
+    public HashMap<Integer, Integer> getCoverageInfosOfTrack(int from, int to);
 }

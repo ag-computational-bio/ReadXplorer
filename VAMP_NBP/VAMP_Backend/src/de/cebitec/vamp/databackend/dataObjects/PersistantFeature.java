@@ -16,8 +16,9 @@ public class PersistantFeature {
     private int stop;
     private int strand;
     private int type;
+    private String geneName;
 
-    public PersistantFeature(int id, String ecnum, String locus, String product, int start, int stop, int strand, int type) {
+    public PersistantFeature(int id, String ecnum, String locus, String product, int start, int stop, int strand, int type, String geneName) {
         this.id = id;
         this.ecNumber = ecnum;
         this.locus = locus;
@@ -26,6 +27,7 @@ public class PersistantFeature {
         this.stop = stop;
         this.strand = strand;
         this.type = type;
+        this.geneName = geneName;
     }
 
     public String getEcNumber() {
@@ -54,7 +56,7 @@ public class PersistantFeature {
 
     /**
      * Returns if the feature is located on the fwd or rev strand.
-     * @return
+     * @return 1 for fwd strand, -1 for rev strand
      */
     public int getStrand() {
         return strand;
@@ -62,6 +64,17 @@ public class PersistantFeature {
 
     public int getType() {
         return type;
+    }
+    
+    /**
+     * @return the gene name. Caution: may be null!
+     */
+    public String getGeneName() {
+        return this.geneName;
+    }
+    
+    public boolean hasGeneName() {
+        return this.geneName != null ? true : false;
     }
 
     @Override

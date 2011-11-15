@@ -4,8 +4,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author ddoppmeier
+ * 
+ * A brick represents one base or gap of a dna sequence and stores its type.
  */
 public class Brick {
 
@@ -25,22 +26,17 @@ public class Brick {
     public final static int UNDEF = 15;
 
     private int type;
-    private char causeForGenomeGap;
 
+    /**
+     * A brick represents one base or gap of a dna sequence and stores its type.
+     * @param type type of the base or gap
+     */
     public Brick(int type){
         this.type = type;
     }
 
     public int getType(){
         return type;
-    }
-
-    public void setCauseForGenomeGap(char c){
-        causeForGenomeGap = c;
-    }
-
-    public char getCauseForGenomeGap(){
-        return causeForGenomeGap;
     }
 
     @Override

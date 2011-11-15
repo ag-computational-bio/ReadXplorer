@@ -23,6 +23,7 @@ import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 
+
 /**
  *
  * @author jstraube
@@ -70,6 +71,7 @@ public class SamBamStepParser implements MappingParserI ,Observer{
    //     String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
+       mappingContainer.setFirstMappingContainer(trackJob.isFirstJob()) ;
         //TODO check why if there is too much output we get a java heap space exception 
        // mappingContainer.registerObserver(this);
 
@@ -104,22 +106,22 @@ public class SamBamStepParser implements MappingParserI ,Observer{
                     readname = first.getReadName();
                     start = first.getAlignmentStart();
                     cigar = first.getCigarString();
-                    readSeqwithoutGaps = first.getReadString();
+                    readSeqwithoutGaps = first.getReadString().toLowerCase();
                     
                             stop = 0;
                             errors = 0;
 
                             int length = sequenceString.length();
                             
-                            if (cigar.contains("D") || cigar.contains("I")|| cigar.contains("S")) {
+                            if (cigar.contains("D") || cigar.contains("I")|| cigar.contains("S")||cigar.contains("N")) {
                                 stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
-                                refSeqwithoutgaps = sequenceString.substring(start - 1, stop);
+                                refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
                                 String []refAndRead =  ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
                                 refSeq = refAndRead[0];
                                 readSeq = refAndRead[1];
                             } else {
                                  stop = start + readSeqwithoutGaps.length() - 1;
-                                refSeqwithoutgaps = sequenceString.substring(start - 1, stop);
+                                refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
                                 refSeq = refSeqwithoutgaps;
                                 readSeq = readSeqwithoutGaps;
                             }
@@ -176,7 +178,7 @@ public class SamBamStepParser implements MappingParserI ,Observer{
                             errors,filepath, lineno ));
                     continue;
                 }
-                if (!cigar.matches("[MHISD\\d]+")) {
+                if (!cigar.matches("[MHISDPXN=\\d]+")) {
                     this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class, 
                             "Parser.checkMapping.ErrorCigar", cigar,filepath,lineno));
                     continue;
@@ -191,7 +193,7 @@ public class SamBamStepParser implements MappingParserI ,Observer{
                             
                         
 
-                            
+                            readSeqwithoutGaps = first.getReadNegativeStrandFlag()  ?  SequenceUtils.getReverseComplement(readSeqwithoutGaps) : readSeqwithoutGaps;
                             int seqID;
                             if (this.seqToIDMap.containsKey(readSeqwithoutGaps)) {
                                 seqID = this.seqToIDMap.get(readSeqwithoutGaps);
@@ -208,10 +210,13 @@ public class SamBamStepParser implements MappingParserI ,Observer{
                                        shift++;
                                          record =itorAll.hasNext()? itorAll.next():null;
                                          if(record !=null){
-                                         String read =record.getReadString();
+                                           
+                                         String read =record.getReadString().toLowerCase();
+                                           read=record.getReadNegativeStrandFlag()  ?  SequenceUtils.getReverseComplement(read) : read;
                                            if (this.seqToIDMap.containsKey(read)) {
                                             end=end+1;
                                            }
+                                           
                                          }else{
                                                mappingContainer.setLastMappingContainer(true);
                                               break;
@@ -222,13 +227,12 @@ public class SamBamStepParser implements MappingParserI ,Observer{
                           this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
                                   "Parser.Parsing.CorruptData", lineno,first.getReadName()));
                         }
-                //    }
-                
+
             }
 
             
             this.seqToIDMap = null; //release resources
-          //  brall.close();
+
             
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SamBamStepParser.class,
                 "Parser.Parsing.Finished",filepath));
@@ -358,7 +362,7 @@ public class SamBamStepParser implements MappingParserI ,Observer{
         } catch (IOException ex) {
             this.sendErrorMsg("A parsing error occured during parsing process in "
                     + trackJob.getFile().getAbsolutePath());
-            this.sendErrorMsg(NbBundle.getMessage(SAMFileReader.class, "MSG_ImportThread.import.parsedReads"));
+            this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class, "MSG_ImportThread.import.parsedReads"));
             return run; // or better return something else?
         }
         run.setTimestamp(trackJob.getTimestamp());
@@ -400,6 +404,11 @@ public class SamBamStepParser implements MappingParserI ,Observer{
         if (args instanceof Boolean && (Boolean) args == true) {
             ++this.noUniqueMappings;
         }
+    }
+
+    @Override
+    public void processReadname(int seqID, String readName) {
+        //TODO:Readnames
     }
 
 }

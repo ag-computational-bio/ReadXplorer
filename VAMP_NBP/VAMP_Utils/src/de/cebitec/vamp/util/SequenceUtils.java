@@ -34,7 +34,7 @@ public final class SequenceUtils {
     }
 
     /**
-     * Complements a sequence String.
+     * Complements a sequence String. Requires only lower case characters!
      * @param sequence the string to complement
      * @return the complemented string
      */
@@ -55,6 +55,24 @@ public final class SequenceUtils {
         return complement;
     }
 
+    /**
+     * Complements a single DNA base. Needs upper case values.
+     * @param base base to complement
+     * @return the complemented base or a whitespace, if it encounters a value other than A,C,G,T,N,_.
+     */
+    public static Character complementDNA(final char base){
+
+        switch (base){
+            case 'A': return 'T';
+            case 'C': return 'G';
+            case 'T': return 'A';
+            case 'G': return 'C';
+            case 'N': return base;
+            case '_': return base;
+            default : return ' ';
+        }
+    }
+
 
     /**
      * Produces the reverse complement of a sequence.
@@ -70,6 +88,8 @@ public final class SequenceUtils {
         }
         return revCompSeq.toString();
     }
+
+
 
 
     /**

@@ -6,6 +6,7 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 import de.cebitec.vamp.util.GeneticCodesStore;
+import java.awt.Component;
 import java.util.prefs.PreferenceChangeListener;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
@@ -38,9 +39,16 @@ public class CodonSelector extends javax.swing.JPanel {
      * Used to check for boxes that are checked when a new viewer was selected.
      */
     private void checkBoxes(){
-        //atgCheckbox.setSelected(this.viewer.getSequenceBar().isATGCodonShown());
+        JCheckBox currentBox;
+        Component comp;
+        for (int i = 0; i < this.getComponentCount(); ++i) {
+            comp = this.getComponent(i);
+            if (comp instanceof JCheckBox){
+                currentBox = (JCheckBox) this.getComponent(i); //order needs to be correct
+                viewer.getSequenceBar().showCodons(i, currentBox.isSelected());
+            }
+        }
         //this.viewer.getSequenceBar().whichCodonsSelected();
-        //TODO: muss checken ob das hier noch gebraucht wird
     }
 
     /** This method is called from within the constructor to
@@ -108,7 +116,15 @@ public class CodonSelector extends javax.swing.JPanel {
      */
     private void updateComponents() {
 
-        String[] startCodons = GeneticCodesStore.getGeneticCode(this.pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
+        String[] startCodons;
+        int codeIndex = Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"));
+        if (codeIndex < GeneticCodesStore.getGeneticCodesStoreSize()){
+            startCodons = GeneticCodesStore.getGeneticCode(this.pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
+        } else {
+            startCodons = GeneticCodesStore.parseCustomCodons(codeIndex, this.pref.get(Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD));
+        }
+        
+        
         JCheckBox[] newBoxes = new JCheckBox[startCodons.length];
         for (int i = 0; i < startCodons.length; ++i) {
 
@@ -229,8 +245,6 @@ public class CodonSelector extends javax.swing.JPanel {
                     .addGroup(parGroup3))
             );
         }
-
-        //TODO: wenn schmaler als 3 boxen und neuer genetic code: parent size anpassen
     }
 
 //    /**

@@ -2,7 +2,8 @@ package de.cebitec.vamp.view.dataVisualisation;
 
 /**
  * This class stores information about a region that should be displayed for
- * example by an AbstractViewer
+ * example by an AbstractViewer. It stores left and right borders, current position,
+ * current width and zoom level and also maximal left and right values.
  * @author ddoppmeier
  */
 public class BoundsInfo {
