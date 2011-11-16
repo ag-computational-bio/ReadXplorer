@@ -1,6 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -10,7 +10,6 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
@@ -68,6 +67,8 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         final JPanel snpDetectionPanel = new JPanel();
         SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
         final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
+        //add reference sequence for amino acid mutation detection
+        resultPanel.setReferenceGenome(referenceViewer.getReference());
 
         // assign the ProjectConnector
         setupPanel.setCon(ProjectConnector.getInstance());
@@ -84,7 +85,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
             @Override
             @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
-                resultPanel.addSNPs((List<Snp>) evt.getNewValue());
+                resultPanel.addSNPs((SnpData) evt.getNewValue());
                 ((CardLayout) snpDetectionPanel.getLayout()).show(snpDetectionPanel, "results");
             }
         });

@@ -2,10 +2,10 @@ package de.cebitec.vamp.parser.common;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ParsedFeature {
-
+    
     private Integer type;
     private Integer start;
     private Integer stop;
@@ -22,7 +22,7 @@ public class ParsedFeature {
                    FeatureType.M_RNA
      * @param start start position
      * @param stop stop position
-     * @param strand -1 for reverse and 1 for forward strand
+     * @param strand SequenceUtils.STRAND_FWD for featues on forward and SequenceUtils.STRAND_REV on reverse strand
      * @param locusTag locus information
      * @param product description of the protein product
      * @param ecNumber ec number
@@ -91,6 +91,9 @@ public class ParsedFeature {
         }
     }
 
+    /**
+     * @return start of the feature. Always the smaller value among start and stop.
+     */
     public int getStart() {
         return start;
     }
@@ -103,6 +106,9 @@ public class ParsedFeature {
         }
     }
 
+    /**
+     * @return stop of the feature. Always the larger value among start and stop.
+     */
     public int getStop() {
         return stop;
     }

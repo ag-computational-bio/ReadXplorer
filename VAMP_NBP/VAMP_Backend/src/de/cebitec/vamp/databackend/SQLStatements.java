@@ -451,7 +451,27 @@ public class SQLStatements {
             "WHERE "+
                 FieldNames.FEATURE_REFGEN+" = ? and " +
                 FieldNames.FEATURE_STOP+" >= ? and " +
-                FieldNames.FEATURE_START+" <= ? ";
+                FieldNames.FEATURE_START+" <= ? " +
+            "ORDER BY " + FieldNames.FEATURE_START;
+    
+    
+        public final static String FETCH_FEATURES_FOR_CLOSED_INTERVAL_FROM_GENOME =
+            "SELECT " +
+                FieldNames.FEATURE_ECNUM+", "+
+                FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_LOCUS+", "+
+                FieldNames.FEATURE_PRODUCT+", "+
+                FieldNames.FEATURE_START+", "+
+                FieldNames.FEATURE_STOP+", "+
+                FieldNames.FEATURE_STRAND+", "+
+                FieldNames.FEATURE_TYPE+", " +
+                FieldNames.FEATURE_GENE+" " +
+            "FROM "+
+                FieldNames.TABLE_FEATURES+" " +
+            "WHERE "+
+                FieldNames.FEATURE_REFGEN + " = ? and " +
+                FieldNames.FEATURE_START + " between ? and ? and " +
+                FieldNames.FEATURE_STOP + " between ? and ? ";
 
 
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
@@ -1303,12 +1323,12 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
      */
     public static String FETCH_TRACK_ID_TO_SEQ_PAIR_ID =
             "SELECT "
-            + FieldNames.TRACK_ID + " "
+                + FieldNames.TRACK_ID + " "
             + "FROM "
-            + FieldNames.TABLE_TRACKS + " "
+                + FieldNames.TABLE_TRACKS + " "
             + "WHERE "
-            + FieldNames.TRACK_SEQUENCE_PAIR_ID + " = ? AND "
-            + FieldNames.TRACK_ID + " != ? ";
+                + FieldNames.TRACK_SEQUENCE_PAIR_ID + " = ? AND "
+                + FieldNames.TRACK_ID + " != ? ";
 
 
 //    public final static String FETCH_READ_POSITION_BY_READNAME =
@@ -1319,51 +1339,60 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
 //           "WHERE  R." +
 //           FieldNames.READ_NAME + "= ?  AND M."+FieldNames.MAPPING_SEQUENCE_ID + " = R." +FieldNames.READ_SEQUENCE+" AND M." +FieldNames.MAPPING_TRACK+" = ? " ;
 
+    
     public final static String FETCH_SNP_IDS_FOR_TRACK =
             "SELECT * FROM " + FieldNames.TABLE_POSITIONS + " WHERE " + FieldNames.POSITIONS_TRACK_ID + " = ?"; 
     
+    
     public final static String FETCH_DIFFS_HAVING_SNP_ID =
             "SELECT "
-            + FieldNames.DIFF_MAPPING_ID + ","
-            + FieldNames.DIFF_CHAR + ","
-            + FieldNames.DIFF_POSITION + ","
-            + FieldNames.DIFF_TYPE + ","
-            + FieldNames.DIFF_ORDER + " "
+                + FieldNames.DIFF_MAPPING_ID + ","
+                + FieldNames.DIFF_CHAR + ","
+                + FieldNames.DIFF_POSITION + ","
+                + FieldNames.DIFF_TYPE + ","
+                + FieldNames.DIFF_ORDER + " "
             + "FROM "
-            + FieldNames.TABLE_DIFF + " "
+                + FieldNames.TABLE_DIFF + " "
             + "WHERE "
-            + FieldNames.DIFF_SNP_ID + " = ?";
+                + FieldNames.DIFF_SNP_ID + " = ?";
     
+    
+    //track id query could be included if desired and performance can be improved
     public final static String FETCH_SNPS =
             "SELECT * "
             + "FROM "
-            + FieldNames.TABLE_POSITIONS + " "
-            + "WHERE "
-            + FieldNames.POSITIONS_TYPE 
-            + " != 'M' AND "
-            + FieldNames.POSITIONS_FREQUENCY 
-            + " >= ? AND SELECT CASE WHEN "
-            + FieldNames.POSITIONS_REF_BASE
-            + " = 'A' THEN GREATEST("
-            + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + ") >= ? "
-            + "WHEN "
-            + FieldNames.POSITIONS_REF_BASE
-            + " = 'C' THEN GREATEST("
-            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + ") >= ? "
-            + "WHEN "
-            + FieldNames.POSITIONS_REF_BASE
-            + " = 'G' THEN GREATEST("
-            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_T + ") >= ? "
-            + "ELSE GREATEST("
-            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + ") >= ? END";
+                + FieldNames.TABLE_POSITIONS 
+            + " WHERE ("
+                + FieldNames.POSITIONS_TYPE + " != 'M' AND "
+                + FieldNames.POSITIONS_FREQUENCY + " >= ? AND "
+                + "SELECT CASE WHEN "
+                    + FieldNames.POSITIONS_REF_BASE + " = 'A' "
+                + "THEN GREATEST("
+                    + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T 
+                + ") >= ? "
+                + "WHEN "
+                    + FieldNames.POSITIONS_REF_BASE + " = 'C' "
+                + "THEN GREATEST("
+                    + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T 
+                + ") >= ? "
+                + "WHEN "
+                    + FieldNames.POSITIONS_REF_BASE + " = 'G' "
+                + "THEN GREATEST("
+                    + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_T 
+                + ") >= ? "
+                + "ELSE GREATEST("
+                    + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G 
+                + ") >= ? END) "
+            + "ORDER BY " + FieldNames.POSITIONS_POSITION;
+    
     
     public final static String GET_DIRECTION_OF_MAPPING =
             "SELECT "
-            + FieldNames.MAPPING_DIRECTION + " "
+                + FieldNames.MAPPING_DIRECTION + " "
             + "FROM "
-            + FieldNames.TABLE_MAPPINGS + " "
+                + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE "
-            + FieldNames.MAPPING_ID + " = ?";
+                + FieldNames.MAPPING_ID + " = ?";
 
     
     public final static String GET_LATEST_COVERAGE_ID =

@@ -42,7 +42,7 @@ public class H2SQLStatements {
             + ")";
     
     public final static String INDEX_POSITIONS =
-            "CREATE INDEX IF NOT EXISTS INDEXDIFF ON " + FieldNames.TABLE_POSITIONS + "(" + FieldNames.POSITIONS_SNP_ID + ", " + FieldNames.POSITIONS_TRACK_ID + ") ";
+            "CREATE INDEX IF NOT EXISTS INDEXPOS ON " + FieldNames.TABLE_POSITIONS + "(" + FieldNames.POSITIONS_SNP_ID + ", " + FieldNames.POSITIONS_TRACK_ID + ") ";
     
     public final static String SETUP_REFERENCE_GENOME =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REF_GEN
@@ -53,6 +53,8 @@ public class H2SQLStatements {
             + FieldNames.REF_GEN_SEQUENCE + " CLOB NOT NULL, "
             + FieldNames.REF_GEN_TIMESTAMP + " DATETIME NOT NULL"
             + ") ";
+    
+    
     public final static String SETUP_DIFFS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_DIFF
             + " ("
@@ -63,9 +65,13 @@ public class H2SQLStatements {
             + FieldNames.DIFF_TYPE + " TINYINT UNSIGNED NOT NULL, "
             + FieldNames.DIFF_ORDER + " BIGINT UNSIGNED "
             + ") ";
+    
+    
     //in h2 you can ask if the index exists in mysql this did not work
     public final static String INDEX_DIFF =
             "CREATE INDEX IF NOT EXISTS INDEXDIFF ON " + FieldNames.TABLE_DIFF + "(" + FieldNames.DIFF_POSITION + ", " + FieldNames.DIFF_MAPPING_ID + ") ";
+    
+    
     public final static String SETUP_COVERAGE =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COVERAGE
             + " ("
@@ -85,8 +91,12 @@ public class H2SQLStatements {
             + FieldNames.COVERAGE_N_RV_MULT + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.COVERAGE_N_RV_NUM + " MEDIUMINT UNSIGNED NOT NULL"
             + ") ";
+    
+    
     public final static String INDEX_COVERAGE =
             "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_POSITION + ", " + FieldNames.COVERAGE_TRACK + ") ";
+   
+    
     public final static String SETUP_FEATURES =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
             + " ("

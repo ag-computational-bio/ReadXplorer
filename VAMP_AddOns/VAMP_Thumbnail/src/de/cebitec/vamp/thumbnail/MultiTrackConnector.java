@@ -1,6 +1,6 @@
 package de.cebitec.vamp.thumbnail;
 
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.FieldNames;
@@ -41,7 +41,7 @@ public class MultiTrackConnector implements ITrackConnector {
      * !!!!!!!!!!!!
      */
     private String associatedTrackName;
-    private long trackID;
+    private int trackID;
     //private long runID;
     private int genomeSize;
     private CoverageThread thread;
@@ -317,7 +317,7 @@ public class MultiTrackConnector implements ITrackConnector {
 //        return runID;
 //    }
     @Override
-    public long getTrackID() {
+    public int getTrackID() {
         return trackID;
     }
 
@@ -353,7 +353,7 @@ public class MultiTrackConnector implements ITrackConnector {
         }
 
         if (direction == -1) {
-            base = SequenceUtils.complementDNA(base);
+            base = SequenceUtils.getDnaComplement(base, "");
         }
 
         Integer[] values = map.get(position);

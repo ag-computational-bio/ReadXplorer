@@ -10,15 +10,11 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 //import de.cebitec.vamp.api.objects.Read;
-import de.cebitec.vamp.api.objects.Snp;
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import de.cebitec.vamp.databackend.GenericSQLQueries;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,7 +42,7 @@ public class TrackConnector implements ITrackConnector {
      */
 
     private String associatedTrackName;
-    private long trackID;  
+    private int trackID;  
     //private long runID;
     private int genomeSize;
     private CoverageThread thread;
@@ -69,6 +65,8 @@ public class TrackConnector implements ITrackConnector {
     private static int N_GAP = 13;
      /*Number of SNPs at Position (only one per read possible)*/
     
+    private static int FIXED_INTERVAL_LENGTH = 1000;
+    
 
     TrackConnector(PersistantTrack track) {
         associatedTrackName = track.getDescription();
@@ -82,7 +80,7 @@ public class TrackConnector implements ITrackConnector {
         startCoverageThread(tracks);
     }
 
-    TrackConnector(long id, List<PersistantTrack> tracks) {
+    TrackConnector(int id, List<PersistantTrack> tracks) {
         if (tracks.size() > 2){ throw new UnsupportedOperationException("More than two tracks not supported yet."); }
         this.trackID = id;
         con = ProjectConnector.getInstance().getConnection();
@@ -129,26 +127,26 @@ public class TrackConnector implements ITrackConnector {
                 
                 //determine readlength
                 //TODO: ensure this is only calculated when track id or db changed!
-                PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
-                fetchReadlength.setLong(1, trackID);
-                ResultSet rsReadlength = fetchReadlength.executeQuery();
-
-                int readlength = 1000;
-                final int spacer = 10;
-                if (rsReadlength.next()){
-                    int start = rsReadlength.getInt(FieldNames.MAPPING_START);
-                    int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
-                    readlength = stop - start + spacer;
-                }
-                fetchReadlength.close();
+//                PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
+//                fetchReadlength.setLong(1, trackID);
+//                ResultSet rsReadlength = fetchReadlength.executeQuery();
+//
+//                int readlength = 1000;
+//                final int spacer = 10;
+//                if (rsReadlength.next()){
+//                    int start = rsReadlength.getInt(FieldNames.MAPPING_START);
+//                    int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
+//                    readlength = stop - start + spacer;
+//                }
+//                fetchReadlength.close();
                 
                 
                 //mapping processing
                 PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
-                fetch.setLong(1, from - readlength);
+                fetch.setLong(1, from - FIXED_INTERVAL_LENGTH);
                 fetch.setLong(2, to);
                 fetch.setLong(3, from);
-                fetch.setLong(4, to + readlength);
+                fetch.setLong(4, to + FIXED_INTERVAL_LENGTH);
                 fetch.setLong(5, trackID);
                 fetch.setLong(6, from);
                 fetch.setLong(7, to);
@@ -514,7 +512,7 @@ public class TrackConnector implements ITrackConnector {
 //    }
 
     @Override
-    public long getTrackID(){
+    public int getTrackID(){
         return trackID;
     }
 
@@ -532,7 +530,7 @@ public class TrackConnector implements ITrackConnector {
         }
 
         if (direction == -1) {
-            base = SequenceUtils.complementDNA(base);
+            base = SequenceUtils.getDnaComplement(base, "");
         }
 
         Integer[] values = map.get(position);
@@ -873,27 +871,27 @@ public class TrackConnector implements ITrackConnector {
 
             try {
 
-                //determine readlength
-                //TODO: ensure this is only calculated when track id or db changed!
-                PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
-                fetchReadlength.setLong(1, trackID);
-                ResultSet rsReadlength = fetchReadlength.executeQuery();
-
-                int readlength = 1000;
-                final int spacer = 10;
-                if (rsReadlength.next()) {
-                    int start = rsReadlength.getInt(FieldNames.MAPPING_START);
-                    int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
-                    readlength = stop - start + spacer;
-                }
-                fetchReadlength.close();
+//                //determine readlength
+//                //TODO: ensure this is only calculated when track id or db changed!
+//                PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
+//                fetchReadlength.setLong(1, trackID);
+//                ResultSet rsReadlength = fetchReadlength.executeQuery();
+//
+//                int readlength = 1000;
+//                final int spacer = 10;
+//                if (rsReadlength.next()) {
+//                    int start = rsReadlength.getInt(FieldNames.MAPPING_START);
+//                    int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
+//                    readlength = stop - start + spacer;
+//                }
+//                fetchReadlength.close();
 
                 //sequence pair processing
                 PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL);
-                fetch.setLong(1, from - readlength);
+                fetch.setLong(1, from - FIXED_INTERVAL_LENGTH);
                 fetch.setLong(2, to);
                 fetch.setLong(3, from);
-                fetch.setLong(4, to + readlength);
+                fetch.setLong(4, to + FIXED_INTERVAL_LENGTH);
                 fetch.setLong(5, trackID);
                 fetch.setLong(6, trackID2);
 
@@ -934,10 +932,10 @@ public class TrackConnector implements ITrackConnector {
                 
                 //single mapping processing
                 PreparedStatement fetchSingleReads = con.prepareStatement(SQLStatements.FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL);
-                fetchSingleReads.setLong(1, from - readlength);
+                fetchSingleReads.setLong(1, from - FIXED_INTERVAL_LENGTH);
                 fetchSingleReads.setLong(2, to);
                 fetchSingleReads.setLong(3, from);
-                fetchSingleReads.setLong(4, to + readlength);
+                fetchSingleReads.setLong(4, to + FIXED_INTERVAL_LENGTH);
                 fetchSingleReads.setLong(5, trackID);
                 fetchSingleReads.setLong(6, trackID2);
 

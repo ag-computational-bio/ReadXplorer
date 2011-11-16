@@ -1,6 +1,5 @@
-package de.cebitec.seqPairClassifier;
+package de.cebitec.vamp.seqPairClassifier;
 
-import de.cebitec.vamp.seqPairClassifier.SeqPairClassifier;
 import java.util.HashMap;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
@@ -22,7 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- *
  * @author Rolf Hilker
  */
 public class SeqPairClassifierTest {

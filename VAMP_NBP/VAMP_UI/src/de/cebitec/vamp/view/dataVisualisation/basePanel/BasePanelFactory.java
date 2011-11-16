@@ -41,12 +41,12 @@ public class BasePanelFactory {
     private PersistantReference refGen;
     private ViewController viewController;
 
-    public BasePanelFactory(BoundsInfoManager boundsManager, ViewController viewController){
+    public BasePanelFactory(BoundsInfoManager boundsManager, ViewController viewController) {
         this.boundsManager = boundsManager;
         this.viewController = viewController;
     }
 
-    public BasePanel getGenomeViewerBasePanel(PersistantReference refGen){
+    public BasePanel getGenomeViewerBasePanel(PersistantReference refGen) {
 
         this.refGen = refGen;
         BasePanel b = new BasePanel(boundsManager, viewController);
@@ -65,12 +65,12 @@ public class BasePanelFactory {
         return b;
     }
 
-    public BasePanel getTrackBasePanel(PersistantTrack track,PersistantReference refGen){
-        
+    public BasePanel getTrackBasePanel(PersistantTrack track, PersistantReference refGen) {
+
         BasePanel b = new BasePanel(boundsManager, viewController);
         b.setName(track.getDescription());
         viewController.addMousePositionListener(b);
-        
+
         // create track viewer
         TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track);
         TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc);
@@ -78,7 +78,7 @@ public class BasePanelFactory {
 
         // create and set up legend
         trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
-        
+
         // create info label
         CoverageInfoLabel cil = new CoverageInfoLabel();
         trackV.setTrackInfoPanel(cil);
@@ -103,11 +103,10 @@ public class BasePanelFactory {
      * @param refGen reference the tracks belong to.
      * @return
      */
-    public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks,PersistantReference refGen){
-        if (tracks.size() > 2){
+    public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks, PersistantReference refGen) {
+        if (tracks.size() > 2) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
-        }
-        else if (tracks.size() == 2) {
+        } else if (tracks.size() == 2) {
             BasePanel b = new BasePanel(boundsManager, viewController);
             viewController.addMousePositionListener(b);
 
@@ -116,7 +115,7 @@ public class BasePanelFactory {
             MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon);
 
             // create and set up legend
-            trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
+            trackV.setupLegend(new LegendLabel(trackV), this.getDoubleTrackPanelLegend());
 
             // create info panel
             CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -129,22 +128,21 @@ public class BasePanelFactory {
             // add panels to basepanel
             b.setTopInfoPanel(cil);
             b.setViewer(trackV, slider);
+            b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+            
             String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
-
             b.setTitlePanel(this.getTitlePanel(title));
+            
             viewController.openTrack2(b);
             return b;
-        }
-        else if (tracks.size() == 1) {
+        } else if (tracks.size() == 1) {
             return getTrackBasePanel(tracks.get(0), refGen);
-        }
-        else {
+        } else {
             throw new UnknownError();
         }
     }
 
-
-    public BasePanel getAlignmentViewBasePanel(TrackConnector connector){
+    public BasePanel getAlignmentViewBasePanel(TrackConnector connector) {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
@@ -162,7 +160,7 @@ public class BasePanelFactory {
         return b;
     }
 
-    public BasePanel getHistogrammViewerBasePanel(TrackConnector connector){
+    public BasePanel getHistogrammViewerBasePanel(TrackConnector connector) {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
@@ -180,12 +178,12 @@ public class BasePanelFactory {
         return b;
 
     }
-    
+
     /**
      * @param connector track connector of first track of two sequence pair tracks
      * @return A viewer for sequence pair data
      */
-    public BasePanel getSeqPairBasePanel(TrackConnector connector){
+    public BasePanel getSeqPairBasePanel(TrackConnector connector) {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
@@ -203,25 +201,24 @@ public class BasePanelFactory {
         return b;
     }
 
-    
-    private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider){
+    private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider) {
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
         AdjustmentPanel control = new AdjustmentPanel(1, refGen.getSequence().length(),
-                bounds.getCurrentLogPos(), bounds.getZoomValue(),  hasScrollbar, hasSlider);
+                bounds.getCurrentLogPos(), bounds.getZoomValue(), hasScrollbar, hasSlider);
         control.addAdjustmentListener(boundsManager);
         boundsManager.addSynchronousNavigator(control);
         return control;
     }
 
-    private JPanel getTitlePanel(String title){
+    private JPanel getTitlePanel(String title) {
         JPanel p = new JPanel();
         p.add(new JLabel(title));
         p.setBackground(ColorProperties.TITLE_BACKGROUND);
         return p;
     }
 
-    private JPanel getLegendEntry(Color c, String description){
+    private JPanel getLegendEntry(Color c, String description) {
         JPanel entry = new JPanel(new FlowLayout(FlowLayout.LEADING));
         entry.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
@@ -236,32 +233,36 @@ public class BasePanelFactory {
         return entry;
     }
 
-    private class ColorPanel extends JPanel{
+    private class ColorPanel extends JPanel {
+
         private static final long serialVersionUID = 1L;
+
         @Override
-        public void paintComponent(Graphics g){
+        public void paintComponent(Graphics g) {
             super.paintComponent(g);
             g.setColor(Color.BLACK);
-            g.drawRect(0, 0, this.getSize().width-1, this.getSize().height-1);
+            g.drawRect(0, 0, this.getSize().width - 1, this.getSize().height - 1);
         }
     }
 
-    private JPanel getGradientEntry(String description){
+    private JPanel getGradientEntry(String description) {
         JPanel entry = new JPanel(new FlowLayout(FlowLayout.LEADING));
         entry.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        JPanel color = new JPanel(){
+        JPanel color = new JPanel() {
+
             private static final long serialVersionUID = 1234537;
+
             @Override
-            protected void paintComponent(Graphics g){
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g;
-                GradientPaint whiteToBlack = new GradientPaint(0,0,Color.WHITE, this.getSize().width-1, 0,Color.BLACK);
+                GradientPaint whiteToBlack = new GradientPaint(0, 0, Color.WHITE, this.getSize().width - 1, 0, Color.BLACK);
                 g2.setPaint(whiteToBlack);
                 g2.fill(new Rectangle2D.Double(0, 0, this.getSize().width, this.getSize().height));
                 g2.setPaint(null);
                 g2.setColor(Color.black);
-                g2.drawRect(0, 0, this.getSize().width-1, this.getSize().height-1);
+                g2.drawRect(0, 0, this.getSize().width - 1, this.getSize().height - 1);
             }
         };
         color.setSize(new Dimension(10, 10));
@@ -272,7 +273,7 @@ public class BasePanelFactory {
         return entry;
     }
 
-    private JPanel getGenomeViewerLegend(){
+    private JPanel getGenomeViewerLegend() {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -289,7 +290,7 @@ public class BasePanelFactory {
         return legend;
     }
 
-    private JPanel getTrackPanelLegend(){
+    private JPanel getTrackPanelLegend() {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -301,7 +302,19 @@ public class BasePanelFactory {
         return legend;
     }
 
-    private JPanel getHistogramViewerLegend(){
+    private JPanel getDoubleTrackPanelLegend() {
+        JPanel legend = new JPanel();
+        legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
+        legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
+
+        legend.add(getLegendEntry(ColorProperties.COMPLETE_COV, "Complete coverage"));
+        legend.add(getLegendEntry(ColorProperties.TRACK1_COLOR, "Track 1 coverage"));
+        legend.add(getLegendEntry(ColorProperties.TRACK2_COLOR, "Track 2 coverage"));
+
+        return legend;
+    }
+
+    private JPanel getHistogramViewerLegend() {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -317,7 +330,7 @@ public class BasePanelFactory {
         return legend;
     }
 
-    private JPanel getAlignmentViewLegend(){
+    private JPanel getAlignmentViewLegend() {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -330,8 +343,8 @@ public class BasePanelFactory {
 
         return legend;
     }
-    
-        private JPanel getSeqPairViewerLegend(){
+
+    private JPanel getSeqPairViewerLegend() {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);

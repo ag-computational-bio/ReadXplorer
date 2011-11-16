@@ -9,6 +9,7 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.lang.ref.Reference;
@@ -146,6 +147,12 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     @Override
     public void componentClosed() {
         // remove all viewers
+        Component[] comps = visualPanel.getComponents();
+        for (Component comp : comps){
+            if (comp instanceof BasePanel){
+                ((BasePanel) comp).getViewer().close();
+            }
+        }
         visualPanel.removeAll();
 
         // remove all cookies

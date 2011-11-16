@@ -21,7 +21,10 @@ public class CoverageContainer {
     private static final int N_ERROR_CASE = 2;
     private static final int NUM_OF_CASES = 3;
     private static final int FIELDS_PER_CASE = 4; //2 for fwd (all & without duplicates), and 2 rev
-    // snp table
+    /** 
+     * Snp table: Each position in the array stores how many occurences of a certain base where seen at that position.
+     * The index in the array is defined by the constants below. 
+     */
     private HashMap<String, Integer[]> positionTable;
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
@@ -35,7 +38,8 @@ public class CoverageContainer {
     private static final int GAP_T = 9;
     private static final int GAP_N = 10;
     private static final int DIFFS = 11;
-    private int coverageArrayLength;
+    
+    private final int coverageArrayLength;
 
     /**
      * Creates a new CoverageContainer and immediately computes the coverage.
@@ -53,32 +57,32 @@ public class CoverageContainer {
         Iterator<Integer> sequenceIDIt = mappings.getMappedSequenceIDs().iterator();
 
         // add all mappings to their mapping groups
+        ParsedMappingGroup group;
+        Iterator<ParsedMapping> mappingIt;
         while (sequenceIDIt.hasNext()) {
-            ParsedMappingGroup g = mappings.getParsedMappingGroupBySeqID(sequenceIDIt.next());
-            Iterator<ParsedMapping> mappingIt = g.getMappings().iterator();
+            group = mappings.getParsedMappingGroupBySeqID(sequenceIDIt.next());
+            mappingIt = group.getMappings().iterator();
             while (mappingIt.hasNext()) {
-                ParsedMapping s = mappingIt.next();
-                this.addMapping(s);
-                this.savePositions(s);
-                
-                //mappingIt.remove();
+                ParsedMapping mapping = mappingIt.next();
+                this.addMapping(mapping);
+                this.savePositions(mapping);
             }
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished computing the coverage");
     }
 
-    private void addMapping(ParsedMapping s) {
+    private void addMapping(ParsedMapping mapping) {
         
         // store best mapping coverage
-        if (s.isBestMapping()) {
-            this.increaseCoverage(s, BEST_MAPPING_CASE);
+        if (mapping.isBestMapping()) {
+            this.increaseCoverage(mapping, BEST_MAPPING_CASE);
         }
         // store zero error coverage
-        if (!s.hasDiffs()) {
-            this.increaseCoverage(s, ZERO_ERROR_CASE);
+        if (!mapping.hasDiffs()) {
+            this.increaseCoverage(mapping, ZERO_ERROR_CASE);
         }
         // store n error coverage
-        this.increaseCoverage(s, N_ERROR_CASE);
+        this.increaseCoverage(mapping, N_ERROR_CASE);
 
     }
 
@@ -177,120 +181,137 @@ public class CoverageContainer {
         return cov[baseIDX];
     }
 
+    /**
+     * Clears the coverage container.
+     */
     public void clear() {
         coverage.clear();
     }
     
-    public void savePositions(ParsedMapping s) {
+    /**
+     * Updates the position information for a new mapping in this container.
+     * @param mapping the mapping whose position count should be stored.
+     */
+    public void savePositions(ParsedMapping mapping) {
         
-        if (s.isBestMapping()) {
-            List<ParsedDiff> diffs = s.getDiffs();
-            List<ParsedReferenceGap> gaps = s.getGenomeGaps();
-            // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getNumOfDiffs()));
-            // Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(s.getGenomeGaps().size()));
-            // saves diffs
-            for (int i = 0; i < s.getNumOfDiffs(); i++) {
+        if (mapping.isBestMapping()) {
+            List<ParsedDiff> diffs = mapping.getDiffs();
+            List<ParsedReferenceGap> gaps = mapping.getGenomeGaps();
 
-                ParsedDiff diff = diffs.get(i);
-                long positionInt = diff.getPosition();
-                String position = String.valueOf(positionInt);
-                char base = diff.getBase();
-                if (s.getDirection() == -1) {
-                    base = SequenceUtils.complementDNA(base);
+            ParsedDiff diff;
+            ParsedReferenceGap gap;
+            long positionInt;
+            String position;
+            char base;
+            
+            // saves diffs
+            for (int i = 0; i < mapping.getNumOfDiffs(); i++) {
+                diff = diffs.get(i);
+                positionInt = diff.getPosition();
+                position = String.valueOf(positionInt);
+                base = diff.getBase();
+                if (mapping.getDirection() == -1) {
+                    base = SequenceUtils.getDnaComplement(base, "");
                 }
-                
-                // init positionTable if not done yet
+                // init positionTable if not done yet 
+                Integer[] bases;
                 if (!positionTable.containsKey(position)) {
-                    Integer[] bases = new Integer[12];
-                    for (int j = 0; j < bases.length; j++) {
+                    bases = new Integer[12];
+                    for (int j = 0; j < bases.length; ++j) {
                         bases[j] = 0;
                     }
                     positionTable.put(position, bases);
                 }
+                bases = positionTable.get(position);
 
                 // increase occurence of bases at position
-                Integer[] bases = positionTable.get(position);
                 switch (base) {
                     case 'A':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[BASE_A] = bases[BASE_A] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[BASE_A] += mapping.getCount();
                         break;
                     case 'C':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[BASE_C] = bases[BASE_C] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[BASE_C] += mapping.getCount();
                         break;
                     case 'G':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[BASE_G] = bases[BASE_G] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[BASE_G] += mapping.getCount();
                         break;
                     case 'T':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[BASE_T] = bases[BASE_T] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[BASE_T] += mapping.getCount();
                         break;
                     case 'N':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[BASE_N] = bases[BASE_N] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[BASE_N] += mapping.getCount();
                         break;
                     case '_':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[BASE_GAP] = bases[BASE_GAP] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[BASE_GAP] += mapping.getCount();
                         break;
                 }
-
             }
+            
+            //save gaps
             for (int i = 0; i < gaps.size(); i++) {
-                ParsedReferenceGap gap = gaps.get(i);
-                long positionInt = gap.getAbsPos();
-                String position = String.valueOf(positionInt);
-                char base = gap.getBase();
+                gap = gaps.get(i);
+                positionInt = gap.getAbsPos();
+                position = String.valueOf(positionInt);
+                base = gap.getBase();
                 int order = gap.getOrder();
-                if (s.getDirection() == -1) {
-                    base = SequenceUtils.complementDNA(base);
+                if (mapping.getDirection() == -1) {
+                    base = SequenceUtils.getDnaComplement(base, "");
                 }
                 char value = 'a';
                 for (int j = 0; j <= order; j++) {
-                    if (value > 'a'){
-                        position = position.substring(0,position.length()-2);
+                    if (value > 'a') {
+                        position = position.substring(0, position.length() - 2);
                     }
-                    position = position + "_" +  value;
-                    value ++;
+                    position = position + "_" + value; //TODO: for freq calc this has to be stored elsewhere, same pos differs now
+                    value++;
                 }
 
-                // init positionTable if not done yet
+                // init positionTable if not done yet 
+//                String posString = String.valueOf(positionInt);
+                Integer[] bases;
                 if (!positionTable.containsKey(position)) {
-                    Integer[] bases = new Integer[12];
-                    for (int j = 0; j < bases.length; j++) {
+                    bases = new Integer[12];
+                    for (int j = 0; j < bases.length; ++j) {
                         bases[j] = 0;
                     }
                     positionTable.put(position, bases);
                 }
 
-                // increase occurence of bases at position
-                Integer[] bases = positionTable.get(position);
-                switch (base) {
+                // increase occurence of gap bases at position
+                bases = positionTable.get(position);
+                if (mapping.getCount() == -1){
+                    int a=0;
+                }
+                switch (base) { //724960
                     case 'A':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_A] = bases[GAP_A] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[GAP_A] += mapping.getCount();
                         break;
                     case 'C':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_C] = bases[GAP_C] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[GAP_C] += mapping.getCount();
                         break;
                     case 'G':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_G] = bases[GAP_G] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[GAP_G] += mapping.getCount();
                         break;
                     case 'T':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_T] = bases[GAP_T] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[GAP_T] += mapping.getCount();
                         break;
                     case 'N':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_N] = bases[GAP_N] + s.getCount();
+                        bases[DIFFS] += mapping.getCount();
+                        bases[GAP_N] += mapping.getCount();
                         break;
                 }
 
-            }
+                }
         }
     }
 
@@ -298,11 +319,12 @@ public class CoverageContainer {
         return this.positionTable;
     }
     
+    /**
+     * @param position the current position to check
+     * @return true, if the current position is covered by mappings, false otherwise.
+     */
     public boolean positionCovered(int position) {
-        boolean covered = false;
-        if(coverage.containsKey(position)) {
-            covered = true;
-        }
-        return covered;
+        return coverage.containsKey(position);
     }
+
 }

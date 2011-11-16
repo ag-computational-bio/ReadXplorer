@@ -573,50 +573,51 @@ public class SAMParser implements MappingParserI, Observer {
 
     }
 
-    public boolean snpHasStretch(String genome, int snp) {
-        String beforeSNP = genome.substring(0, 1);
-
-        if (snp == 1) {
-            beforeSNP = genome.substring(snp - 1, snp);
-        }
-        if (snp == 2) {
-            beforeSNP = genome.substring(snp - 2, snp);
-        }
-        if (snp == 3) {
-            beforeSNP = genome.substring(snp - 3, snp);
-        }
-        if (snp >= 4) {
-            beforeSNP = genome.substring(snp - 4, snp);
-        }
-        System.out.println("before" + beforeSNP);
-        String afterSNP = genome.substring(snp, snp + 4);
-        System.out.println("afterSnp:" + afterSNP);
-        boolean hasStretch = false;
-        if (beforeSNP.matches("[atgc]{4,8}") || afterSNP.matches("[atgc]{4,8}")) {
-            hasStretch = true;
-        }
-        if (beforeSNP.matches("[atgc]{1,8}") && afterSNP.matches("[atgc]{3,8}")) {
-            System.out.println("1-3" + hasStretch);
-        }
-        if (beforeSNP.matches("[atgc]{3,8}")) {
-            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
-            System.out.println("charbefore " + charBefore);
-            String charAfter = afterSNP.substring(0, 1);
-            String regex = charBefore.concat("{1}");
-            if (charAfter.matches(regex)) {
-                System.out.println("3-1" + hasStretch);
-            }
-        }
-        if (afterSNP.matches("[atgc]{3,8}")) {
-            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
-            String regex = afterSNP.substring(0, 1).concat("{1}");
-            if (charBefore.matches(regex)) {
-                System.out.println("3-1" + hasStretch + " " + regex);
-            }
-        }
-        System.out.println(hasStretch);
-        return hasStretch;
-    }
+//TODO: what is this method 4?
+//    public boolean snpHasStretch(String genome, int snp) {
+//        String beforeSNP = genome.substring(0, 1);
+//
+//        if (snp == 1) {
+//            beforeSNP = genome.substring(snp - 1, snp);
+//        }
+//        if (snp == 2) {
+//            beforeSNP = genome.substring(snp - 2, snp);
+//        }
+//        if (snp == 3) {
+//            beforeSNP = genome.substring(snp - 3, snp);
+//        }
+//        if (snp >= 4) {
+//            beforeSNP = genome.substring(snp - 4, snp);
+//        }
+//        System.out.println("before" + beforeSNP);
+//        String afterSNP = genome.substring(snp, snp + 4);
+//        System.out.println("afterSnp:" + afterSNP);
+//        boolean hasStretch = false;
+//        if (beforeSNP.matches("[atgc]{4,8}") || afterSNP.matches("[atgc]{4,8}")) {
+//            hasStretch = true;
+//        }
+//        if (beforeSNP.matches("[atgc]{1,8}") && afterSNP.matches("[atgc]{3,8}")) {
+//            System.out.println("1-3" + hasStretch);
+//        }
+//        if (beforeSNP.matches("[atgc]{3,8}")) {
+//            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
+//            System.out.println("charbefore " + charBefore);
+//            String charAfter = afterSNP.substring(0, 1);
+//            String regex = charBefore.concat("{1}");
+//            if (charAfter.matches(regex)) {
+//                System.out.println("3-1" + hasStretch);
+//            }
+//        }
+//        if (afterSNP.matches("[atgc]{3,8}")) {
+//            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
+//            String regex = afterSNP.substring(0, 1).concat("{1}");
+//            if (charBefore.matches(regex)) {
+//                System.out.println("3-1" + hasStretch + " " + regex);
+//            }
+//        }
+//        System.out.println(hasStretch);
+//        return hasStretch;
+//    }
 
     @Override
     public void registerObserver(Observer observer) {

@@ -4,7 +4,7 @@
  */
 package de.cebitec.vamp.exporter;
 
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -19,7 +19,7 @@ import jxl.write.WriteException;
  *
  * @author msmith
  */
-public class Snp454Exporter implements ExporterI{
+public class Snp454Exporter implements ExporterI {
     
     private List<Snp454> snps;
     
@@ -73,13 +73,13 @@ public class Snp454Exporter implements ExporterI{
             writer.append("% variation at position");
             for(Snp454 snp : this.snps) {
                 writer.append("\n");
-                writer.append(Integer.toString(snp.getPosition()));
+                writer.append(snp.getPosition());
                 writer.append("\t");
                 writer.append(snp.getBase());
                 writer.append("\t");
                 writer.append(snp.getRefBase());
                 writer.append("\t");
-                writer.append(Integer.toString(snp.getCount()));
+                writer.append(Integer.toString(snp.getCoverage()));
                 writer.append("\t");
                 writer.append(Integer.toString(snp.getPercentage()));
                 writer.append("\t");

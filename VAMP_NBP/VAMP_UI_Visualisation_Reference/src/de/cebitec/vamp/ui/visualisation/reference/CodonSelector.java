@@ -1,16 +1,20 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
+import de.cebitec.common.sequencetools.GeneticCode;
+import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.vamp.util.CodonUtilities;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
-import de.cebitec.vamp.util.GeneticCodesStore;
 import java.awt.Component;
+import java.io.IOException;
 import java.util.prefs.PreferenceChangeListener;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -22,12 +26,23 @@ public class CodonSelector extends javax.swing.JPanel {
 
     private ReferenceViewer viewer;
     private Preferences pref;
+    
+    private int nbGeneticCodes;
+    
 
     /** Creates new form CodonSelector */
     public CodonSelector() {
+        try {
+            GeneticCodeFactory.initGeneticCodes();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        this.nbGeneticCodes = GeneticCodeFactory.getGeneticCodes().size();
+        
         this.initComponents();
         this.initListener();
         this.updateComponents();
+        
     }
 
     public void setGenomeViewer(ReferenceViewer viewer){
@@ -116,12 +131,13 @@ public class CodonSelector extends javax.swing.JPanel {
      */
     private void updateComponents() {
 
-        String[] startCodons;
+        String[] startCodons = new String[1];
         int codeIndex = Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"));
-        if (codeIndex < GeneticCodesStore.getGeneticCodesStoreSize()){
-            startCodons = GeneticCodesStore.getGeneticCode(this.pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
+        if (codeIndex < this.nbGeneticCodes){
+            GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(this.pref.get(Properties.SEL_GENETIC_CODE, "1")));
+            startCodons = code.getStartCodons().toArray(startCodons);
         } else {
-            startCodons = GeneticCodesStore.parseCustomCodons(codeIndex, this.pref.get(Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD));
+            startCodons = CodonUtilities.parseCustomCodons(codeIndex, this.pref.get(Properties.CUSTOM_GENETIC_CODES, "1"));
         }
         
         

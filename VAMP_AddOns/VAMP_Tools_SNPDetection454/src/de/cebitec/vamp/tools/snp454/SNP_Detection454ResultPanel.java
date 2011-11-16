@@ -1,19 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * SNP_Detection454ResultPanel.java
  *
  * Created on 03.06.2011, 15:16:53
  */
 package de.cebitec.vamp.tools.snp454;
 
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.SnpData;
+import de.cebitec.vamp.exporter.excel.SnpExcelFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -124,8 +123,8 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportSNPsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportSNPsButtonActionPerformed
-       NewExportDialog ed = new NewExportDialog(null, true, this.snps);
-        ed.setVisible(true);
+        evt.setSource(new SnpData(this.snps, new  HashMap<Integer,String>()));
+        SnpExcelFileChooser fileChooser = new SnpExcelFileChooser("xls", evt);
     }//GEN-LAST:event_exportSNPsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -143,7 +142,7 @@ public void addSNPs(List<Snp454> snps) {
             rowData[0] = snp.getPosition();
             rowData[1] = snp.getBase();
             rowData[2] = snp.getRefBase();
-            rowData[3] = snp.getCount();
+            rowData[3] = snp.getCoverage();
             rowData[4] = snp.getPercentage();
             rowData[5] = snp.getVariationPercentag();
             model.addRow(rowData);

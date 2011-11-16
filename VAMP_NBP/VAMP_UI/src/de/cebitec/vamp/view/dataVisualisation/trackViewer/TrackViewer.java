@@ -4,6 +4,7 @@ import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThreadListener;
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -158,11 +159,9 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             } else {
                 // fill and draw all coverage pathes
                 
-                Color complete = Color.BLUE;
-                
-                //Orange
-                Color track1 =  new Color(255,117,48);
-                Color track2 = Color.cyan;
+                Color complete = ColorProperties.COMPLETE_COV;
+                Color track1 = ColorProperties.TRACK1_COLOR;
+                Color track2 = ColorProperties.TRACK2_COLOR;
 
                 // n error mappings
                 g.setColor(track1);
@@ -487,6 +486,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public void close(){
         super.close();
+        ProjectConnector.getInstance().removeTrackConnector(trackCon.getTrackID());
         trackCon = null;
     }
 

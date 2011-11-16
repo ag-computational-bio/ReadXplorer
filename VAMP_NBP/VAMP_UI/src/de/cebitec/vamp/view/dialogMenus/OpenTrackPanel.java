@@ -26,7 +26,7 @@ public class OpenTrackPanel extends javax.swing.JPanel {
         initComponents();
     }
     
-    public OpenTrackPanel(long referenceID){
+    public OpenTrackPanel(int referenceID){
         refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(referenceID);
         initComponents();
     }

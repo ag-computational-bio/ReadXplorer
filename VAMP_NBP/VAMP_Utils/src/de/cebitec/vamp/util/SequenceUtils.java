@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.util;
 
 import java.util.logging.Level;
@@ -16,6 +11,14 @@ import java.util.logging.Logger;
  */
 public final class SequenceUtils {
 
+    /** Indicates that something is located on the forward strand (1). */
+    public static final int STRAND_FWD = 1;
+    /** Indicates that something is located on the reverse strand (-1). */
+    public static final int STRAND_REV = -1;
+    
+    /** String for tagging positions or anything else as not having a gene with "No gene".*/
+    public static final String NO_GENE = "No gene";
+    
     private SequenceUtils(){
         //do not instantiate
     }
@@ -55,24 +58,6 @@ public final class SequenceUtils {
         return complement;
     }
 
-    /**
-     * Complements a single DNA base. Needs upper case values.
-     * @param base base to complement
-     * @return the complemented base or a whitespace, if it encounters a value other than A,C,G,T,N,_.
-     */
-    public static Character complementDNA(final char base){
-
-        switch (base){
-            case 'A': return 'T';
-            case 'C': return 'G';
-            case 'T': return 'A';
-            case 'G': return 'C';
-            case 'N': return base;
-            case '_': return base;
-            default : return ' ';
-        }
-    }
-
 
     /**
      * Produces the reverse complement of a sequence.
@@ -83,7 +68,7 @@ public final class SequenceUtils {
         StringBuilder revCompSeq = new StringBuilder();
         for (int i=sequence.length()-1; i>=0; --i) {
             char base = sequence.charAt(i);
-            base = SequenceUtils.getComplement(base, sequence);
+            base = SequenceUtils.getDnaComplement(base, sequence);
             revCompSeq.append(base);
         }
         return revCompSeq.toString();
@@ -101,10 +86,10 @@ public final class SequenceUtils {
      * N = N
      * _ = _
      * @param base the base to complement
-     * @param sequence the sequence the base originates from
+     * @param sequence the sequence the base originates from or an empty string if the sequence is not accessible
      * @return the complemented base
      */
-    public static char getComplement(char base, String sequence) {
+    public static char getDnaComplement(char base, String sequence) {
         base = Character.toUpperCase(base);
         char comp = ' ';
         switch (base){

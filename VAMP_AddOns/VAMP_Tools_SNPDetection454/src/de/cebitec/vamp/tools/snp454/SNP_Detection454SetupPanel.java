@@ -11,7 +11,7 @@
 package de.cebitec.vamp.tools.snp454;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import java.util.ArrayList;
 import java.util.List;

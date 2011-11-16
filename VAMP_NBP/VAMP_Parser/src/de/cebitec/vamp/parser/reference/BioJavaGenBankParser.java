@@ -8,6 +8,7 @@ import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.SequenceUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -52,10 +53,10 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
             BufferedReader in = new BufferedReader(new FileReader(refGenJob.getFile()));
             Namespace ns = RichObjectFactory.getDefaultNamespace();
             SymbolTokenization dna = DNATools.getDNA().getTokenization("token");
-            RichSequenceFormat embl = new GenbankFormat();
+            RichSequenceFormat genbank = new GenbankFormat();
             RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
 
-            RichStreamReader it = new RichStreamReader(in,embl,dna,factory,ns);
+            RichStreamReader it = new RichStreamReader(in, genbank, dna, factory, ns);
 
             // take only the first sequence from file, if exists
             if (it.hasNext()){
@@ -88,9 +89,9 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
 
                     String strandString = RichLocation.Tools.enrich(f.getLocation()).getStrand().toString();
                     if (strandString.equals("-")){
-                        strand = -1;
+                        strand = SequenceUtils.STRAND_REV;
                     } else if (strandString.equals("+")){
-                        strand = 1;
+                        strand = SequenceUtils.STRAND_FWD;
                     } else {
                         this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": "
                                 + "Unknown strand found: " + strandString);

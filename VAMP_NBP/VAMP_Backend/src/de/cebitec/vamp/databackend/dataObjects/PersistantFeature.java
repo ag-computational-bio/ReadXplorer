@@ -7,7 +7,7 @@ package de.cebitec.vamp.databackend.dataObjects;
  * @author ddoppmeier
  */
 public class PersistantFeature {
-
+    
     private int id;
     private String ecNumber;
     private String locus;
@@ -18,6 +18,18 @@ public class PersistantFeature {
     private int type;
     private String geneName;
 
+    /**
+     * @param id id of the feature in db 
+     * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA, FeatureType.SOURCE,
+              FeatureType.T_RNA, FeatureType.MISC_RNA, FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA
+     * @param start start position
+     * @param stop stop position
+     * @param strand SequenceUtils.STRAND_FWD for featues on forward and SequenceUtils.STRAND_REV on reverse strand
+     * @param locus locus information
+     * @param product description of the protein product
+     * @param ecnum ec number
+     * @param geneName name of the gene, if it exists (e.g. "dnaA")
+     */
     public PersistantFeature(int id, String ecnum, String locus, String product, int start, int stop, int strand, int type, String geneName) {
         this.id = id;
         this.ecNumber = ecnum;
@@ -46,17 +58,23 @@ public class PersistantFeature {
         return product;
     }
 
+    /**
+     * @return start of the feature. Always the smaller value among start and stop.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * @return stop of the feature. Always the larger value among start and stop.
+     */
     public int getStop() {
         return stop;
     }
 
     /**
      * Returns if the feature is located on the fwd or rev strand.
-     * @return 1 for fwd strand, -1 for rev strand
+     * @return SequenceUtils.STRAND_FWD for featues on forward and SequenceUtils.STRAND_REV on reverse strand
      */
     public int getStrand() {
         return strand;

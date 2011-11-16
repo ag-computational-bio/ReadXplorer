@@ -1,7 +1,7 @@
 package de.cebitec.vamp.databackend.connector;
 
 //import de.cebitec.vamp.api.objects.Read;
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
@@ -79,7 +79,7 @@ public interface ITrackConnector {
             int numUniqueSeqPairs, int numUniquePerfectSeqPairs, int numSingleReads);
 
     //public long getRunId();
-    public long getTrackID();
+    public int getTrackID();
 
     public String getAssociatedTrackName();
 

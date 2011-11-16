@@ -1,13 +1,17 @@
 package de.cebitec.vamp.options;
 
+import de.cebitec.common.sequencetools.GeneticCode;
+import de.cebitec.common.sequencetools.GeneticCodeFactory;
 import javax.swing.event.ListSelectionEvent;
 import org.openide.util.NbPreferences;
-import de.cebitec.vamp.util.GeneticCodesStore;
 import de.cebitec.vamp.util.Properties;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 import java.util.prefs.Preferences;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionListener;
 
 /**
@@ -20,13 +24,21 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
     private final GeneticCodeOptionsPanelController controller;
     private Preferences pref;
+    List<GeneticCode> genCodes;
 
     GeneticCodePanel(GeneticCodeOptionsPanelController controller) {
+        try {
+            GeneticCodeFactory.initGeneticCodes();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        genCodes = GeneticCodeFactory.getGeneticCodes();
         this.controller = controller;
         this.pref = NbPreferences.forModule(Object.class);
         this.initComponents();
         this.initChooseCodeComboBox();
         this.initListener();
+        
     }
 
     /** This method is called from within the constructor to
@@ -120,10 +132,10 @@ final class GeneticCodePanel extends javax.swing.JPanel {
      * Store modified settings
      */
     public void store() {
-        if (geneticCodeList.getSelectedIndex() < GeneticCodesStore.getGeneticCodesStoreSize()) {
-        // remember selected indices in geneticCodeList have to be conform with GeneticCodesStore order!
-            String identifier = GeneticCodesStore.getGeneticCodeIdentifiers()[geneticCodeList.getSelectedIndex()];
-            this.pref.put(Properties.SEL_GENETIC_CODE, identifier);
+        if (geneticCodeList.getSelectedIndex() < genCodes.size()) {
+        // remember selected indices in geneticCodeList have to be conform with GeneticCodesToPropParser order!
+            int identifier = genCodes.get(geneticCodeList.getSelectedIndex()).getId();
+            this.pref.put(Properties.SEL_GENETIC_CODE, String.valueOf(identifier));
             this.pref.put(Properties.GENETIC_CODE_INDEX, String.valueOf(geneticCodeList.getSelectedIndex()));        
         } else {
             //special about this case is that it starts with a "(" which can be used for distinguishing both cases
@@ -132,7 +144,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
                 this.pref.put(Properties.SEL_GENETIC_CODE, String.valueOf(geneticCodeList.getSelectedValue()));
                 this.pref.put(Properties.GENETIC_CODE_INDEX, String.valueOf(geneticCodeList.getSelectedIndex()));
             } else {
-                this.pref.put(Properties.SEL_GENETIC_CODE, "0");
+                this.pref.put(Properties.SEL_GENETIC_CODE, "1");
                 this.pref.put(Properties.GENETIC_CODE_INDEX, "0"); 
             }
         }
@@ -162,7 +174,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if (GeneticCodePanel.this.geneticCodeList.getSelectedIndex() >= GeneticCodesStore.getGeneticCodesStoreSize()){
+                if (GeneticCodePanel.this.geneticCodeList.getSelectedIndex() >= genCodes.size()){
                     GeneticCodePanel.this.removeButton.setEnabled(true);
                 } else {
                     GeneticCodePanel.this.removeButton.setEnabled(false);
@@ -177,25 +189,27 @@ final class GeneticCodePanel extends javax.swing.JPanel {
     private void initChooseCodeComboBox() {
         this.geneticCodeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        final String[] identifiers = GeneticCodesStore.getGeneticCodeIdentifiers();
-        final String[][] geneticCodes = GeneticCodesStore.getStartCodons();
+        
         final ArrayList<String> geneticCodesData = new ArrayList<String>();
         
-        //get standard codes and add to table
-        String[] startCodons;
-        String startCodonsConcat;
-        for (int i=0; i<identifiers.length; ++i){
-            startCodons = geneticCodes[i];
-            startCodonsConcat = "<html><b>(";
-            for (int j=0; j<startCodons.length; ++j){
-                startCodonsConcat = startCodonsConcat.concat(startCodons[j].concat(", "));
+        //get standard codes and add to tableD
+        String codonsConcat;
+        for (GeneticCode genCode : genCodes){
+            codonsConcat = "<html><b>(Starts: ";
+            for (String codon : genCode.getStartCodons()){
+                codonsConcat = codonsConcat.concat(codon).concat(", ");
             }
-            startCodonsConcat = startCodonsConcat.substring(0, startCodonsConcat.length()-2);
-            geneticCodesData.add(startCodonsConcat.concat(")</b> - <i>").concat(identifiers[i]).concat("</i></html>"));
+            codonsConcat = codonsConcat.concat(" Stops: ");
+            for (String codon : genCode.getStopCodons()){
+                codonsConcat = codonsConcat.concat(codon).concat(", ");
+            }
+            codonsConcat = codonsConcat.substring(0, codonsConcat.length()-2);
+            geneticCodesData.add(codonsConcat.concat(")</b> - <i>").concat(genCode.getDescription()).concat("</i></html>"));
         }
         this.geneticCodeList.setModel(new GeneticCodeListModel(geneticCodesData));
         
         //get custom codes and add to table
+        //TODO: add stop codons, too
         String storedCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
         while (storedCustomCodes.contains("\n")){
             this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.indexOf("\n")));
@@ -290,11 +304,11 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         int lineBreakIndex = 0;
         
         //remove from storage
-        if ( (codeIndex = this.geneticCodeList.getSelectedIndex()) >= (index = GeneticCodesStore.getGeneticCodesStoreSize()) ){
+        if ( (codeIndex = this.geneticCodeList.getSelectedIndex()) >= (index = genCodes.size()) ){
             
             if (codeIndex == Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"))){ 
                 //reset genetic code to standard
-                this.pref.put(Properties.SEL_GENETIC_CODE, GeneticCodesStore.getGeneticCodeIdentifiers()[0]);
+                this.pref.put(Properties.SEL_GENETIC_CODE, String.valueOf(genCodes.get(0).getId()));
                 this.pref.put(Properties.GENETIC_CODE_INDEX, "0");
             }
             

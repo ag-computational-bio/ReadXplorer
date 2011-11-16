@@ -36,7 +36,7 @@ public class ReferenceViewer extends AbstractViewer {
     public final static String PROP_FEATURE_SELECTED = "feat selected";
     private int zoom;
     private int trackCount = 0;
-
+    
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen){
         super(boundsInfoManager, basePanel, refGen);
         refGenC = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
@@ -74,6 +74,15 @@ public class ReferenceViewer extends AbstractViewer {
         
         //this.repaint();
     }
+    
+    
+    @Override
+    public void close(){
+        super.close();
+        refGenC = null;
+        refGen = null;
+        featureStats.clear();
+    }
 
     @Override
     public int getMaximalHeight() {
@@ -85,7 +94,7 @@ public class ReferenceViewer extends AbstractViewer {
         // TODO compute this outside of EDT if too timeconsuming
         createFeatures();
 
-//        firePropertyChange(PROP_INTERVALL_CHANGED, null, getBoundsInfo());
+//        firePropertyChange(PROP_INTERVAL_CHANGED, null, getBoundsInfo());
     }
 
     private void createFeatures(){

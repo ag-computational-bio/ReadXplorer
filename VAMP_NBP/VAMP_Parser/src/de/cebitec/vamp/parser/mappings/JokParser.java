@@ -197,7 +197,7 @@ public class JokParser implements MappingParserI, Observer {
 //            s.clear();
             br.close();
             
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + "no of mappings" + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueSeq});
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing mapping data from \"{0}" + "\"" + " no of mappings " + "{1}", new Object[]{trackJob.getFile().getAbsolutePath(), noUniqueSeq});
             
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -240,7 +240,7 @@ public class JokParser implements MappingParserI, Observer {
                     Character base = readSeq.charAt(i);
                     base = Character.toUpperCase(base);
                     if (direction == -1) {
-                        base = SequenceUtils.getComplement(base, readSeq);
+                        base = SequenceUtils.getDnaComplement(base, readSeq);
                     }
 
                     ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, this.getOrderForGap(absPos));
@@ -252,7 +252,7 @@ public class JokParser implements MappingParserI, Observer {
                     char c = readSeq.charAt(i);
                     c = Character.toUpperCase(c);
                     if (direction == -1) {
-                        c = SequenceUtils.getComplement(c, readSeq);
+                        c = SequenceUtils.getDnaComplement(c, readSeq);
                     }
                     ParsedDiff d = new ParsedDiff(absPos, c);
                     diffs.add(d);

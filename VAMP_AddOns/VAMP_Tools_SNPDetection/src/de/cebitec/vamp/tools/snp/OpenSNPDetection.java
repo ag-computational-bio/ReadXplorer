@@ -1,14 +1,9 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import javax.swing.JList;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
-import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
 public final class OpenSNPDetection implements ActionListener {
