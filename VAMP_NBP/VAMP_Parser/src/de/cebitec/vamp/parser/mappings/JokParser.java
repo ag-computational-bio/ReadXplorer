@@ -65,7 +65,7 @@ public class JokParser implements MappingParserI, Observer {
                 lineno++;
 
                 // tokenize input line
-                String[] tokens = line.split("\\s", 8);
+                String[] tokens = line.split("\\t+", 8);
                 if (tokens.length == 7) { // if the length is not correct the read is not parsed
                     // cast tokens
                     String readname = tokens[0];
@@ -196,7 +196,7 @@ public class JokParser implements MappingParserI, Observer {
                     mappingContainer.addParsedMapping(mapping, seqID);
                     this.processReadname(seqID, readname);
                 } else {
-                    this.sendErrorMsg("The current read in line " + lineno + " is missing some data: ".concat(line));
+                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.MissingData", lineno, line));
                 }
             }
 //            Iterator<Integer> it = readnameToSequenceID.values().iterator();
