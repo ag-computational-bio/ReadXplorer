@@ -1,26 +1,15 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.4" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Container class="javax.swing.JPanel" name="snpDetectionPanelTemplate">
+    <Container class="javax.swing.JPanel" name="snpDetection454PanelTemplate">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_DeclarationPost" type="java.lang.String" value="private de.cebitec.vamp.tools.snp454.SNP_Detection454SetupPanel snpDetection454SetupPanelTemplate;&#xa;private de.cebitec.vamp.tools.snp454.SNP_Detection454ResultPanel snpDetection454ResultPanelTemplate;"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="snpDetection454SetupPanelTemplate = new SNP_Detection454SetupPanel();&#xa;snpDetection454ResultPanelTemplate = new SNP_Detection454ResultPanel();"/>
+        <AuxValue name="JavaCodeGenerator_LayoutCodePre" type="java.lang.String" value="snpDetection454PanelTemplate.add(snpDetection454SetupPanelTemplate, &quot;setup&quot;);&#xa;snpDetection454PanelTemplate.add(snpDetection454ResultPanelTemplate, &quot;results&quot;);"/>
+      </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignCardLayout"/>
-      <SubComponents>
-        <Component class="de.cebitec.vamp.tools.snp.SNP_DetectionSetupPanel" name="setupPanelTemplate">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
-              <CardConstraints cardName="setup"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="de.cebitec.vamp.tools.snp.SNP_DetectionResultPanel" name="resultPanelTemplate">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
-              <CardConstraints cardName="results"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-      </SubComponents>
     </Container>
   </NonVisualComponents>
   <AuxValues>
@@ -38,12 +27,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="snpTabs" alignment="0" pref="658" max="32767" attributes="0"/>
+          <Component id="snpTabs" alignment="0" min="-2" pref="621" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="snpTabs" alignment="0" pref="289" max="32767" attributes="0"/>
+          <Component id="snpTabs" alignment="0" min="-2" pref="212" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>

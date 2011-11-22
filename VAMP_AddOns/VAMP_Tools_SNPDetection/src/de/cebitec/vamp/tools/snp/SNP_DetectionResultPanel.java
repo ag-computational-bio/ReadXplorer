@@ -9,11 +9,14 @@ package de.cebitec.vamp.tools.snp;
 import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -50,8 +53,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jProgressBar1 = new javax.swing.JProgressBar();
         exportButton = new javax.swing.JButton();
+        alignmentButton = new javax.swing.JButton();
 
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -59,14 +62,14 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Position", "Base", "Count", "%", "% Variation  at Position"
+                "Pos", "Track", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Cov", "Freq", "Type"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -81,10 +84,18 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(jTable1);
         jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title0")); // NOI18N
-        jTable1.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title1")); // NOI18N
-        jTable1.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title2")); // NOI18N
-        jTable1.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title3")); // NOI18N
-        jTable1.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title4")); // NOI18N
+        jTable1.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title2_1")); // NOI18N
+        jTable1.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title1")); // NOI18N
+        jTable1.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title5")); // NOI18N
+        jTable1.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title6")); // NOI18N
+        jTable1.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title7")); // NOI18N
+        jTable1.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title8")); // NOI18N
+        jTable1.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title9")); // NOI18N
+        jTable1.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title10")); // NOI18N
+        jTable1.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title11")); // NOI18N
+        jTable1.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title3")); // NOI18N
+        jTable1.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title4")); // NOI18N
+        jTable1.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title12")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.text")); // NOI18N
         exportButton.setActionCommand(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.actionCommand")); // NOI18N
@@ -94,27 +105,33 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             }
         });
 
+        alignmentButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.alignmentButton.text")); // NOI18N
+        alignmentButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alignmentButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                    .addComponent(exportButton, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap(236, Short.MAX_VALUE)
+                .addComponent(alignmentButton)
+                .addGap(18, 18, 18)
+                .addComponent(exportButton)
                 .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(exportButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(exportButton)
+                    .addComponent(alignmentButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -125,26 +142,58 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         ed.setVisible(true);
 }//GEN-LAST:event_exportButtonActionPerformed
 
+    private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
+//        SNP_Phylogenie sp = new SNP_Phylogenie(snps);
+    }//GEN-LAST:event_alignmentButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton alignmentButton;
     private javax.swing.JButton exportButton;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 
     public void addSNPs(List<Snp> snps) {
         this.snps = snps;
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         for (Snp snp : snps) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            Object[] rowData = new Object[5];
+            
+            Object[] rowData = new Object[13];
+            //Integer position = Integer.parseInt(snp.getPosition());
             rowData[0] = snp.getPosition();
-            rowData[1] = snp.getBase();
-            rowData[2] = snp.getCount();
-            rowData[3] = snp.getPercentage();
-            rowData[4] = snp.getVariationPercentag();
+            rowData[1] = snp.getTrack();
+            rowData[2] = snp.getBase().toUpperCase();
+            rowData[3] = snp.getRefBase().toUpperCase();
+            rowData[4] = snp.getARate();
+            rowData[5] = snp.getCRate();
+            rowData[6] = snp.getGRate();
+            rowData[7] = snp.getTRate();
+            rowData[8] = snp.getNRate();
+            rowData[9] = snp.getGapRate();
+            rowData[10] = snp.getCoverage();
+            rowData[11] = snp.getFrequency();
+            rowData[12] = snp.getType();
             model.addRow(rowData);
         }
+        
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        jTable1.setRowSorter(sorter);
+        sorter.setModel(model);
+        sorter.setComparator(0, new Comparator<String>(){
+            public int compare(String a, String b) {
+                if(a.contains("_")){
+                    a = a.substring(0, a.length() - 2);
+                }
+                if(b.contains("_")){
+                    b = b.substring(0, b.length() - 2);
+                }
+                Integer intA = Integer.parseInt(a);
+                Integer intB = Integer.parseInt(b);
+                 return intA.compareTo(intB);
+            }
+        }
+                );
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
@@ -155,7 +204,14 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         DefaultListSelectionModel model = (DefaultListSelectionModel) jTable1.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = jTable1.convertRowIndexToModel(selectedView);
-        int position = (Integer) jTable1.getModel().getValueAt(selectedModel, 0);
+        //int position = (Integer) jTable1.getModel().getValueAt(selectedModel, 0);
+        String pos = (String) jTable1.getModel().getValueAt(selectedModel, 0);
+        
+        if(pos.contains("_")){
+            pos = pos.substring(0,pos.length()-2);
+        }
+        
+        int position = Integer.parseInt(pos);
         bim.navigatorBarUpdated(position);
     }
 

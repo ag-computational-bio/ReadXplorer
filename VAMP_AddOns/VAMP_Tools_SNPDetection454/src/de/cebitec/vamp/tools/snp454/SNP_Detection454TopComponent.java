@@ -1,10 +1,12 @@
-package de.cebitec.vamp.tools.snp;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package de.cebitec.vamp.tools.snp454;
 
-import de.cebitec.vamp.api.objects.Snp;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.util.TabWithCloseX;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
@@ -16,28 +18,35 @@ import javax.swing.JPanel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 
 /**
- * Top component which displays SNP detection tabs.
- *
- * @author jwinneba
+ * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.snp//SNP_Detection//EN", autostore = false)
-public final class SNP_DetectionTopComponent extends TopComponent {
-
+@ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.snp454//SNP_Detection454//EN",
+autostore = false)
+@TopComponent.Description(preferredID = "SNP_Detection454TopComponent",
+iconBase = "de/cebitec/vamp/tools/snp454/snpDetection.png",
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "output", openAtStartup = false)
+@ActionID(category = "Window", id = "de.cebitec.vamp.tools.snp454.SNP_Detection454TopComponent")
+@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.OpenActionRegistration(displayName = "#CTL_SNP_Detection454Action",
+preferredID = "SNP_Detection454TopComponent")
+public final class SNP_Detection454TopComponent extends TopComponent {
+    
     private static final long serialVersionUID = 1L;
-    private static SNP_DetectionTopComponent instance;
-    /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "de/cebitec/vamp/tools/snp/snpDetection.png";
+    private static SNP_Detection454TopComponent instance;
+    
     private static final String PREFERRED_ID = "SNP_DetectionTopComponent";
 
-    public SNP_DetectionTopComponent() {
+    public SNP_Detection454TopComponent() {
         initComponents();
-        setName(NbBundle.getMessage(SNP_DetectionTopComponent.class, "CTL_SNP_DetectionTopComponent"));
-        setToolTipText(NbBundle.getMessage(SNP_DetectionTopComponent.class, "HINT_SNP_DetectionTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setName(NbBundle.getMessage(SNP_Detection454TopComponent.class, "CTL_SNP_Detection454TopComponent"));
+        setToolTipText(NbBundle.getMessage(SNP_Detection454TopComponent.class, "HINT_SNP_Detection454TopComponent"));
+        
         // add listener to close TopComponent when no tabs are shown
         snpTabs.addContainerListener(new ContainerListener() {
 
@@ -54,7 +63,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
             }
         });
     }
-
+    
     /**
      * Creates a complete snp detection panel, that is used in the JTabbedPane.
      * The <code>TrackViewer</code> instance is used to set up the setup and
@@ -63,28 +72,23 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * @param trackViewer instance used for this panels panels.
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer){
+    private javax.swing.JPanel getSnpDetectionPanel(TrackViewer trackViewer){
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
-        SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
-        final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
+        SNP_Detection454SetupPanel setupPanel = new SNP_Detection454SetupPanel();
+        final SNP_Detection454ResultPanel resultPanel = new SNP_Detection454ResultPanel();
 
-        // assign the ProjectConnector
-        setupPanel.setCon(ProjectConnector.getInstance());
-        //setupPanel.setCon(trackViewer.getTrackCon());
-//        ReferenceViewer viewer = Lookup.getDefault().lookup(ReferenceViewer.class);
-//        if (viewer != null){
-//            resultPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
-//        }
-        resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
+        // assign the trackviewer
+        setupPanel.setCon(trackViewer.getTrackCon());
+        resultPanel.setBoundsInfoManager(trackViewer.getBoundsInformationManager());
 
         // listen on changes of the search
-        setupPanel.addPropertyChangeListener(SNP_DetectionSetupPanel.PROP_SNPS_LOADED, new PropertyChangeListener() {
+        setupPanel.addPropertyChangeListener(SNP_Detection454SetupPanel.PROP_SNPS_LOADED, new PropertyChangeListener() {
 
             @Override
             @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
-                resultPanel.addSNPs((List<Snp>) evt.getNewValue());
+                resultPanel.addSNPs((List<Snp454>) evt.getNewValue());
                 ((CardLayout) snpDetectionPanel.getLayout()).show(snpDetectionPanel, "results");
             }
         });
@@ -105,59 +109,59 @@ public final class SNP_DetectionTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        snpDetectionPanelTemplate = new javax.swing.JPanel();
-        setupPanelTemplate = new de.cebitec.vamp.tools.snp.SNP_DetectionSetupPanel();
-        resultPanelTemplate = new de.cebitec.vamp.tools.snp.SNP_DetectionResultPanel();
+        snpDetection454PanelTemplate = new javax.swing.JPanel();
         snpTabs = new javax.swing.JTabbedPane();
 
-        snpDetectionPanelTemplate.setLayout(new java.awt.CardLayout());
-        snpDetectionPanelTemplate.add(setupPanelTemplate, "setup");
-        snpDetectionPanelTemplate.add(resultPanelTemplate, "results");
+        snpDetection454SetupPanelTemplate = new SNP_Detection454SetupPanel();
+        snpDetection454ResultPanelTemplate = new SNP_Detection454ResultPanel();
+        snpDetection454PanelTemplate.setLayout(new java.awt.CardLayout());
+        snpDetection454PanelTemplate.add(snpDetection454SetupPanelTemplate, "setup");
+        snpDetection454PanelTemplate.add(snpDetection454ResultPanelTemplate, "results");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.PREFERRED_SIZE, 621, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.tools.snp.SNP_DetectionResultPanel resultPanelTemplate;
-    private de.cebitec.vamp.tools.snp.SNP_DetectionSetupPanel setupPanelTemplate;
-    private javax.swing.JPanel snpDetectionPanelTemplate;
+    private javax.swing.JPanel snpDetection454PanelTemplate;
+    private de.cebitec.vamp.tools.snp454.SNP_Detection454SetupPanel snpDetection454SetupPanelTemplate;
+    private de.cebitec.vamp.tools.snp454.SNP_Detection454ResultPanel snpDetection454ResultPanelTemplate;
     private javax.swing.JTabbedPane snpTabs;
     // End of variables declaration//GEN-END:variables
-    /**
+   /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized SNP_DetectionTopComponent getDefault() {
+    public static synchronized SNP_Detection454TopComponent getDefault() {
         if (instance == null) {
-            instance = new SNP_DetectionTopComponent();
+            instance = new SNP_Detection454TopComponent();
         }
         return instance;
     }
 
     /**
-     * Obtain the SNP_DetectionTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the SNP_Detection454TopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized SNP_DetectionTopComponent findInstance() {
+    public static synchronized SNP_Detection454TopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(SNP_DetectionTopComponent.class.getName()).warning(
+            Logger.getLogger(SNP_Detection454TopComponent.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof SNP_DetectionTopComponent) {
-            return (SNP_DetectionTopComponent) win;
+        if (win instanceof SNP_Detection454TopComponent) {
+            return (SNP_Detection454TopComponent) win;
         }
-        Logger.getLogger(SNP_DetectionTopComponent.class.getName()).warning(
+        Logger.getLogger(SNP_Detection454TopComponent.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();
@@ -203,14 +207,8 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         return PREFERRED_ID;
     }
 
-//    public void openDetectionTab(TrackViewer trackViewer){
-//        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
-//        snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
-//    }
-
-    public void openDetectionTab(ReferenceViewer referenceViewer){
-        snpTabs.addTab("SNP Detection for opened Tabs", getSnpDetectionPanel(referenceViewer));
+    public void openDetectionTab(TrackViewer trackViewer){
+        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
         snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
     }
-    
 }

@@ -1,15 +1,18 @@
 /*
- * SNP_DetectionSetupPanel.java
- *
- * Created on 23.02.2011, 16:08:09
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
-package de.cebitec.vamp.tools.snp;
+/*
+ * SNP_Detection454SetupPanel.java
+ *
+ * Created on 03.06.2011, 14:48:20
+ */
+package de.cebitec.vamp.tools.snp454;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.databackend.connector.ITrackConnector;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingWorker;
@@ -24,41 +27,42 @@ import org.openide.util.TaskListener;
 
 /**
  *
- * @author jwinneba
+ * @author msmith
  */
-public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
-
+public class SNP_Detection454SetupPanel extends javax.swing.JPanel {
+    
+    
     private static final long serialVersionUID = 1L;
     private ITrackConnector con;
-    private ProjectConnector proCon;
-    private List<Snp> snps;
-
+    private List<Snp454> snps;
+    
     public static final String PROP_SNPS_LOADED = "snpsLoaded";
 
-    /** Creates new form SNP_DetectionSetupPanel */
-    public SNP_DetectionSetupPanel() {
+    /** Creates new form SNP_Detection454SetupPanel */
+    public SNP_Detection454SetupPanel() {
         initComponents();
-        snps = new ArrayList<Snp>();
+        snps = new ArrayList<Snp454>();
     }
     
-    private class SnpWorker extends SwingWorker<List<Snp>, Object> {
+    private class Snp454Worker extends SwingWorker<List<Snp454>, Object> {
 
         private int percent;
         private int num;
         private ProgressHandle ph;
 
-        SnpWorker(int percent, int num) {
+        Snp454Worker(int percent, int num) {
             this.percent = percent;
             this.num = num;
-            this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(SnpWorker.class, "MSG_SNPWorker.progress.name"));
+            this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(Snp454Worker.class, "MSG_SNP454Worker.progress.name"));
         }
 
         @Override
-        protected List<Snp> doInBackground() {
+        protected List<Snp454> doInBackground() {
             CentralLookup.getDefault().add(this);
 
             ph.start();
-            snps = proCon.findSNPs(percent, num);
+
+            snps = con.findSNPs454(percent, num);
             return snps;
         }
 
@@ -80,35 +84,34 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        searchButton = new javax.swing.JButton();
-        jSpinner1 = new javax.swing.JSpinner();
+        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        perVar = new javax.swing.JSpinner();
         absNum = new javax.swing.JTextField();
+        searchButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
-        searchButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionSetupPanel.class, "SNP_DetectionSetupPanel.searchButton.text")); // NOI18N
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jLabel1.text")); // NOI18N
+
+        jLabel2.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jLabel2.text")); // NOI18N
+
+        perVar.setValue(45);
+
+        absNum.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        absNum.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        absNum.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.absNum.text")); // NOI18N
+
+        searchButton.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.searchButton.text")); // NOI18N
         searchButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchButtonActionPerformed(evt);
             }
         });
 
-        jSpinner1.setValue(60);
-
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionSetupPanel.class, "SNP_DetectionSetupPanel.jLabel2.text")); // NOI18N
-
-        jLabel3.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionSetupPanel.class, "SNP_DetectionSetupPanel.jLabel3.text")); // NOI18N
-
-        absNum.setFont(new java.awt.Font("Dialog", 1, 12));
-        absNum.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        absNum.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionSetupPanel.class, "SNP_DetectionSetupPanel.absNum.text")); // NOI18N
-
         jTextArea1.setColumns(20);
-        jTextArea1.setEditable(false);
         jTextArea1.setRows(5);
-        jTextArea1.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionSetupPanel.class, "SNP_DetectionSetupPanel.jTextArea1.text")); // NOI18N
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(SNP_Detection454SetupPanel.class, "SNP_Detection454SetupPanel.jTextArea1.text")); // NOI18N
         jScrollPane1.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -117,35 +120,40 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(absNum)
-                    .addComponent(searchButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(8, 8, 8)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(absNum, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                            .addComponent(perVar, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)))
+                    .addComponent(searchButton))
+                .addGap(22, 22, 22))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
+                            .addComponent(jLabel1)
+                            .addComponent(perVar, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(absNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel2)
+                            .addComponent(absNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(searchButton)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -153,10 +161,10 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
         String absN = absNum.getText();
         if(isValidNumer(absN)){
             final int num = Integer.parseInt(absN);
-            final int percent = (Integer) jSpinner1.getValue();
+            final int percent = (Integer) perVar.getValue();
 
-            RequestProcessor rp = new RequestProcessor("SNP Threads", 2);
-            final Task snpTask = rp.post(new SnpWorker(percent, num));
+            RequestProcessor rp = new RequestProcessor("SNP454 Threads", 2);
+            final Task snpTask = rp.post(new Snp454Worker(percent, num));
             snpTask.addTaskListener(new TaskListener() {
 
                 @Override
@@ -168,11 +176,11 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             });
             searchButton.setEnabled(false);
         } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(SNP_DetectionSetupPanel.class, "MSG_SNP_DetectionSetupPanel.error"), NotifyDescriptor.ERROR_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(SNP_Detection454SetupPanel.class, "MSG_SNP_Detection454SetupPanel.error"), NotifyDescriptor.ERROR_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
         }
 
-    }//GEN-LAST:event_searchButtonActionPerformed
+    }                                            
 
     private boolean isValidNumer(String num){
         try{
@@ -184,30 +192,25 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             }
         } catch (NumberFormatException ex){
             return false;
-        }
-    }
+        } 
+    }//GEN-LAST:event_searchButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField absNum;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JSpinner perVar;
     private javax.swing.JButton searchButton;
     // End of variables declaration//GEN-END:variables
 
-    public List<Snp> getSnps() {
+public List<Snp454> getSnps() {
         return snps;
     }
 
-//    public void setCon(ITrackConnector con) {
-//        this.con = con;
-//    }
-
-    public void setCon(ProjectConnector con) {
-        this.proCon = con;
+    public void setCon(ITrackConnector con) {
+        this.con = con;
     }
 
-    
 }

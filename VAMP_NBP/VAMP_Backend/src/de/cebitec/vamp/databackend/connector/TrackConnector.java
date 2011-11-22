@@ -16,6 +16,9 @@ import de.cebitec.vamp.databackend.GenericSQLQueries;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  *
@@ -592,36 +596,6 @@ public class TrackConnector implements ITrackConnector {
 
     }
 
-    private boolean isSNP(Integer[] data, int index, int threshold) {
-        if (data[index] >= threshold) {
-            return true;
-        }
-        return false;
-    }
-
-    private Snp createSNP(Integer[] data, int index, int position, int positionVariation) {
-        String base = "";
-        if (index == A_COV || index == A_GAP) {
-            base = "A";
-        } else if (index == C_COV || index == C_GAP) {
-            base = "C";
-        } else if (index == G_COV || index == G_GAP) {
-            base = "G";
-        } else if (index == T_COV || index == T_GAP) {
-            base = "T";
-        } else if (index == N_COV || index == N_GAP) {
-            base = "N";
-        } else if (index == _COV) {
-            base = "-";
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
-        }
-
-        double count = data[index];
-        int percentage = (int) (count / ((double) data[COV]) * 100);
-        return new Snp((int) count, position, base, percentage, positionVariation);
-
-    }
     
     private Snp454 createSNP454(double count, int index, int position, int percentage, int positionVariation, String sequence) {
         String base = "";
@@ -649,28 +623,6 @@ public class TrackConnector implements ITrackConnector {
 
     }
 
-    private List<Snp> filterSnps(Map<Integer, Integer[]> map, int overallPercentage, int absThreshold) {
-        ArrayList<Snp> snps = new ArrayList<Snp>();
-
-        Iterator<Integer> positions = map.keySet().iterator();
-        while (positions.hasNext()) {
-            int position = positions.next();
-            Integer[] data = map.get(position);
-            double complete = data[COV];
-            double diffCov = data[DIFF_COV];
-            int percentage = (int) (diffCov / complete * 100);
-
-            if (percentage > overallPercentage) {
-                for (int i = A_COV; i < data.length; i++) {
-                    if (this.isSNP(data, i, absThreshold)) {
-                        snps.add(this.createSNP(data, i, position, percentage));
-                    }
-                }
-            }
-
-        }
-        return snps;
-    }
     
     /**
      * Filtert die SNPs fuer die 454 Daten. Die Coverage links und rechts des SNPs duerfen nicht auffaellig
@@ -767,77 +719,6 @@ public class TrackConnector implements ITrackConnector {
 //        return reads;
 //    }
 
-    /*
-     * this methods searches for SNPs in the whole genome
-     * to prevent that there is a big join between the table diff and mapping
-     * we make some small mapping
-     * we take 50 entrys of the diff table and 400 (200 from the left and 200 from the right)
-     * from the table mapping we have to do this so that we dont miss any mapping that have a diff in this 50 positions
-     */
-    @Override
-    public List<Snp> findSNPs(int percentageThreshold, int absThreshold) {
-        ArrayList<Snp> snps = new ArrayList<Snp>();
-        HashMap<Integer, Integer[]> covData = new HashMap<Integer, Integer[]>();
-        final int diffIntervalSize = 50;
-        final int mappingIntervalSize = 200;
-        int fromDiff = 1;
-        int toDiff = diffIntervalSize;
-        int fromMapping = 1;
-        int toMapping = mappingIntervalSize;
-        try {
-            while (genomeSize > fromDiff) {
-            //    Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, "find Snps by genomeposition of the diff:"+fromDiff+"-"+toDiff+" mapping position "+fromMapping+"-"+toMapping);
-                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL);
-                fetch.setLong(1, trackID);
-                fetch.setLong(2, fromMapping);
-                fetch.setLong(3, toMapping);
-                fetch.setLong(4, fromDiff);
-                fetch.setLong(5, toDiff);
-                fetch.setLong(6, trackID);
-
-                fromDiff += diffIntervalSize;
-                toDiff += diffIntervalSize;
-                if (toDiff > genomeSize) {
-                    toDiff = genomeSize;
-                }
-
-                if(fromDiff > mappingIntervalSize){
-                    fromMapping = fromDiff - mappingIntervalSize;
-                }
-                toMapping = toDiff + mappingIntervalSize;
-                 if (toMapping > genomeSize) {
-                    toMapping = genomeSize;
-                }
-                ResultSet rs = fetch.executeQuery();
-
-                while (rs.next()) {
-                    int position = rs.getInt(FieldNames.DIFF_POSITION);
-                    char base = rs.getString(FieldNames.DIFF_CHAR).charAt(0);
-                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                    int replicates = rs.getInt("mult_count");
-                    int forwardCov = rs.getInt(FieldNames.COVERAGE_BM_FW_MULT);
-                    int reverseCov = rs.getInt(FieldNames.COVERAGE_BM_RV_MULT);
-                    int type = rs.getInt(FieldNames.DIFF_TYPE);
-                    int order = rs.getInt(FieldNames.DIFF_ORDER);
-                    boolean isGenomeGap = false;
-                    if (type == 0) {
-                        isGenomeGap = true;
-                    }
-                    int cov = forwardCov + reverseCov;
-
-                    this.addValues(covData, direction, cov, replicates, position, base, isGenomeGap, order);
-
-                }
-          }
-          snps.addAll(this.filterSnps(covData, percentageThreshold, absThreshold));
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
-        return snps;
-    }
     
     @Override
     public List<Snp454> findSNPs454(int percentageThreshold, int absThreshold) {
@@ -1215,6 +1096,7 @@ public class TrackConnector implements ITrackConnector {
             fetchSingleReads.close();
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         
         return seqPairData;
