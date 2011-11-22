@@ -22,7 +22,8 @@ public class ParsedMappingContainer implements Observable, Observer {
     private boolean hasNewRead;
     private HashMap<Integer, ParsedMappingGroup> mappings;
     private ArrayList<Observer> observers;
-
+    private boolean lastMappingContainer=false;
+    private boolean firstMappingContainer=false;
     /**
      * Creates an empty mapping container.
      */
@@ -125,5 +126,23 @@ public class ParsedMappingContainer implements Observable, Observer {
             this.notifyObservers();
         }
     }
+
+    public boolean isLastMappingContainer() {
+        return lastMappingContainer;
+    }
+
+    public void setLastMappingContainer(boolean lastMappingContainer) {
+        this.lastMappingContainer = lastMappingContainer;
+    }
+
+    public boolean isFirstMappingContainer() {
+        return firstMappingContainer;
+    }
+
+    public void setFirstMappingContainer(boolean firstMappingContainer) {
+        this.firstMappingContainer = firstMappingContainer;
+    }
+    
+    
 
 }

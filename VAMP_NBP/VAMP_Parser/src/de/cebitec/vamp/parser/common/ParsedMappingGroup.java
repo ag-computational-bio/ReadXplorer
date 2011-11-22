@@ -52,7 +52,7 @@ public class ParsedMappingGroup implements Observable {
             } else {
                 m.setIsBestmapping(false);
             }
-            // it.remove();
+          
         }
         bestMappingTagged = true;
     }

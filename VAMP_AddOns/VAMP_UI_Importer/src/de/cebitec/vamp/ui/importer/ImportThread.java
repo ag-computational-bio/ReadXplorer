@@ -6,8 +6,8 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
+import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedReference;
-import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.TrackParser;
@@ -30,6 +30,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
+import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import de.cebitec.vamp.parser.mappings.SequencePairParserI;
 import org.openide.util.Lookup;
 
@@ -47,6 +48,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private HashMap<TrackJob, Boolean> validTracksRun;
     private ProgressHandle ph;
     private int workunits;
+    private CoverageContainer covContainer ;
 
     public ImportThread(List<ReferenceJob> refJobs, List<TrackJob> trackJobs, List<SeqPairJobContainer> seqPairJobs) {
         super();
@@ -73,24 +75,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         return refGenome;
     }
 
-    /**
-     * 
-     * @param trackJob
-     * @return
-     * @throws ParsingException
-     * @deprecated Since the RUN domain has been excluded this method is not needed anymore!
-     */
-    @Deprecated
-    private ParsedRun parseRunfromTrack(TrackJob trackJob) throws ParsingException {
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing run data from mapping source \"{0}\"", trackJob.getFile().getAbsolutePath());
-        TrackParserI parser = new TrackParser();
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing parser: \"{0}\"", parser.toString());
-        ParsedRun run = parser.parseMappingforReadData(trackJob);
-
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished parising run data from mapping source \"{0}\"", trackJob.getFile().getAbsolutePath());
-        return run;
-    }
-
     
     private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0}trackjobID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
@@ -107,7 +91,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         TrackParserI parser = new TrackParser();
 //        ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap, sequenceString, this);
-        ParsedTrack track = parser.parseMappings(trackJob, sequenceString, this);
+        ParsedTrack track = parser.parseMappings(trackJob, sequenceString, this,covContainer);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished parsing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
         return track;
@@ -283,8 +267,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 ph.progress(workunits++);
 
                 //parsing track
-                this.parseSingleTrack(t);
-                
+               
+               if(t.getParser() instanceof SamBamStepParser){
+                   parseStepwiseTrack(t);
+            }else{
+                    parseSingleTrack(t);
+               }
+            
                 it.remove();
             }
         }
@@ -362,7 +351,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 ((SequencePairParserI) trackJob.getParser()).resetSeqIdToReadnameMap();
                 seqPairs = true;
             }
-            
+
             io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
             
             
@@ -386,7 +375,49 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         return null;
     }
         
-    
+    private void parseStepwiseTrack(TrackJob t) {
+        boolean isLastTrack = false;
+        //TODO:make stepsize changable for user
+        int start = 1;
+        int stepsize =  t.getStepSize();
+        int stop =stepsize;
+        while (!isLastTrack) {
+            //parsing
+            t.setStart(start);
+            t.setStop(stop);
+            t.setIsFirstJob(start== 1 ? true : false);
+            ParsedTrack track = null;
+            try {
+                track = this.parseTrack(t);
+                
+           covContainer =track.getCoverageContainer();
+        } catch (ParsingException ex) {
+            // something went wrong
+            io.getOut().println(ex.getMessage());
+            io.getOut().println("\"" + t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
+        }
+            track.setIsFirstTrack(start == 1 ? true : false);
+            isLastTrack = track.getParsedMappingContainer().isLastMappingContainer();
+            io.getOut().println("\"" + t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsedReads", start, stop));
+
+            //storing
+            try {
+                this.storeTrack(track, t, false);
+                io.getOut().println("\"" + t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.storedReads", start, stop));
+            } catch (StorageException ex) {
+                // something went wrong
+                io.getOut().println("\"" + t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
+                Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            stop += stepsize;
+            start += stepsize;
+        }
+
+
+
+    }
+
     @Override
     protected Object doInBackground() {
         CentralLookup.getDefault().add(this);
@@ -415,7 +446,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     }
 
     @Override
-    protected void done(){
+    protected void done() {
         super.done();
         ph.progress(workunits);
         io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.finished"));

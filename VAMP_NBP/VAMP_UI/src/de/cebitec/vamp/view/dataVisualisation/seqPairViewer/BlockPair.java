@@ -92,7 +92,7 @@ public class BlockPair implements BlockI {
         if (this.seqPairs.size() > 0){
             return this.seqPairs.get(0);
         } else {
-            return this.singleMappings.get(0);
+            return (PersistantObject) this.singleMappings.get(0);
         }
     }
 

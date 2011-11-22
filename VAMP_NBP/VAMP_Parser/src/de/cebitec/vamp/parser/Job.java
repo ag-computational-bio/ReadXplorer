@@ -13,8 +13,6 @@ public interface Job {
 
     public File getFile();
 
-//    public ParserI getParser();
-
     public String getDescription();
 
     public Timestamp getTimestamp();

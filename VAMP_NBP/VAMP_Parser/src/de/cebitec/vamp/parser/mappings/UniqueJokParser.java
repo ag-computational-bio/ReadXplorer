@@ -6,7 +6,6 @@ import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
@@ -282,42 +281,6 @@ public class UniqueJokParser implements MappingParserI, Observer {
     @Override
     public String[] getFileExtensions() {
         return fileExtension;
-    }
-
-    @Override
-    public ParsedRun parseInputForReadData(TrackJob trackJob) throws ParsingException {
-        ParsedRun run = new ParsedRun(fileDescription);
-        try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
-            BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
-
-            int lineno = 0;
-            String line = null;
-
-            while ((line = br.readLine()) != null) {
-                lineno++;
-                // tokenize input line
-                String[] tokens = line.split("\\t", 8);
-
-                // cast tokens
-                String readname = tokens[0];
-                String readSeq = tokens[4];
-                String editReadSeq = readSeq;
-                if (editReadSeq.contains("_")) {
-                    editReadSeq = editReadSeq.replaceAll("_", "");
-                }
-                editReadSeq = editReadSeq.toLowerCase();
-                run.addReadData(editReadSeq, readname);
-            }
-            br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
-
-        } catch (IOException ex) {
-            throw new ParsingException(ex);
-        }
-        run.setTimestamp(trackJob.getTimestamp());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed");
-        return run;
     }
 
     @Override

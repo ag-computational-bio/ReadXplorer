@@ -10,10 +10,10 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.mappings.BAMParser;
+import de.cebitec.vamp.parser.mappings.SAMBAMParser;
 import de.cebitec.vamp.parser.mappings.JokParser;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
-import de.cebitec.vamp.parser.mappings.SAMParser;
+import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -26,8 +26,14 @@ import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.NumberFormatter;
 
 /**
  *
@@ -38,15 +44,24 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMParser(), new BAMParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMBAMParser(),new SamBamStepParser()};
     private MappingParserI currentParser;
-
+    private int stepSize =0 ;
+    private static final int maxVal = 1000000000;
+    private static final int minVal = 10000;
+    private static final int step = 1000;
+    private static final int defaultVal = 300000;
     /** Creates new form NewTrackDialogPanel */
     public NewTrackDialogPanel() {
         refGenJobs = getRefGenJobs();
         initComponents();
         // choose the default parser. first entry is shown in combobox by default
         currentParser = parsers[0];
+        this.setStepwiseField(false);
+        stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal,maxVal , step));
+        JFormattedTextField txt = ((JSpinner.NumberEditor) stepSizeSpinner.getEditor()).getTextField();
+        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
     }
 
     @Override
@@ -73,6 +88,17 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
 
     public MappingParserI getParser(){
         return currentParser;
+    }
+    
+    public Integer getstepSize(){
+          stepSize= (Integer)stepSizeSpinner.getValue();
+
+        return stepSize;
+    }
+    
+    private void setStepwiseField(boolean setFields){
+        stepSizeLabel.setVisible(setFields);
+        stepSizeSpinner.setVisible(setFields);
     }
 
     public void setReferenceJobs(List<ReferenceJob> jobs){
@@ -129,6 +155,8 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         chooseButton = new javax.swing.JButton();
         descriptionField = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox(parsers);
+        stepSizeLabel = new javax.swing.JLabel();
+        stepSizeSpinner = new javax.swing.JSpinner();
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.jLabel1.text")); // NOI18N
 
@@ -164,25 +192,29 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             }
         });
 
+        stepSizeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.stepSizeLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(stepSizeLabel)
                     .addComponent(jLabel1)
                     .addComponent(refGenLabel)
                     .addComponent(mappingFileLabel)
                     .addComponent(descriptionLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jComboBox1, 0, 273, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.TRAILING, 0, 281, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(mappingFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chooseButton))
-                    .addComponent(descriptionField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
-                    .addComponent(refGenBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 273, Short.MAX_VALUE))
+                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                    .addComponent(refGenBox, 0, 281, Short.MAX_VALUE)
+                    .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -201,11 +233,15 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionLabel)
                     .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(28, 28, 28)
+                .addGap(2, 2, 2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(stepSizeLabel)
+                    .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refGenLabel)
                     .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -250,9 +286,9 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             mappingFile = null;
             mappingFileField.setText("");
             descriptionField.setText("");
+            setStepwiseField(newparser instanceof SamBamStepParser? true:false);
         }
 }//GEN-LAST:event_jComboBox1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseButton;
@@ -264,6 +300,8 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private javax.swing.JLabel mappingFileLabel;
     private javax.swing.JComboBox refGenBox;
     private javax.swing.JLabel refGenLabel;
+    private javax.swing.JLabel stepSizeLabel;
+    private javax.swing.JSpinner stepSizeSpinner;
     // End of variables declaration//GEN-END:variables
 
 }

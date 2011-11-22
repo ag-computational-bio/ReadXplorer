@@ -1,7 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.ParsedRun;
+import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Observer;
@@ -28,17 +28,6 @@ public interface TrackParserI {
          * @throws ParsingException exectption if something went wrong during parsing process
          */
        public abstract ParsedTrack parseMappings(TrackJob trackJob, String sequenceString,
-               Observer observer) throws ParsingException;
-
-       /**
-        * Method for parsing mapping data from a track job into a run data object (ParsedRun).
-        * 
-        * @param trackJob the track job to parse
-        * @return the parsed run containing the run data
-        * @throws ParsingException exception if the parsing encountered an error
-        * @deprecated Since the RUN domain has been excluded this method is not needed anymore!
-        */
-       @Deprecated
-    public ParsedRun parseMappingforReadData(TrackJob trackJob)throws ParsingException;
+               Observer observer,CoverageContainer covContainer) throws ParsingException;
 
 }

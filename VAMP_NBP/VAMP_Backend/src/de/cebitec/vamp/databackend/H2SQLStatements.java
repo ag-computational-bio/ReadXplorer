@@ -14,12 +14,6 @@ public class H2SQLStatements {
     private H2SQLStatements() {
     }
 
-    /**
-     * All commands belonging to the RUN domain have been commented out,
-     * because the run domain has been excluded from VAMP!!!!
-     * This includes the Run, Unique_Sequence and Readname tables!
-     */
-
     //////////////////  statements for table creation  /////////////////////////
     
     public final static String SETUP_POSITIONS =
@@ -92,7 +86,7 @@ public class H2SQLStatements {
             + FieldNames.COVERAGE_N_RV_NUM + " MEDIUMINT UNSIGNED NOT NULL"
             + ") ";
     
-    
+
     public final static String INDEX_COVERAGE =
             "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_POSITION + ", " + FieldNames.COVERAGE_TRACK + ") ";
    
@@ -222,51 +216,7 @@ public class H2SQLStatements {
             + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL "
             + ") ";
-    
-//    public final static String SETUP_RUN =
-//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_RUN+" " +
-//            "( " +
-//            FieldNames.RUN_ID+" BIGINT PRIMARY KEY, " +
-//            FieldNames.RUN_DESCRIPTION+" VARCHAR (100) NOT NULL, " +
-//            FieldNames.RUN_TIMESTAMP+" DATETIME NOT NULL "+
-//            ")";
-
-
-//    public final static String SETUP_SEQUENCE =
-//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_SEQUENCE+" " +
-//            "(" +
-//            FieldNames.SEQUENCE_ID+" BIGINT PRIMARY KEY, " +
-//            FieldNames.SEQUENCE_RUN+" BIGINT UNSIGNED NOT NULL " +
-//            ") ";
-//
-//        public final static String INDEX_SEQUENCE=
-//             "CREATE INDEX IF NOT EXISTS INDEXSEQUENCE ON "+FieldNames.TABLE_SEQUENCE+" ("+FieldNames.SEQUENCE_RUN+") ";
-
-//    public final static String SETUP_READS =
-//            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_READS+" " +
-//            "( " +
-//            FieldNames.READ_ID+" BIGINT PRIMARY KEY, " +
-//            FieldNames.READ_NAME+" VARCHAR (100) NOT NULL, " +
-//            FieldNames.READ_SEQUENCE+" BIGINT UNSIGNED NOT NULL " +
-//            ")";
-//
-//            public final static String INDEX_READS=
-//             "CREATE INDEX IF NOT EXISTS INDEXREADS ON "+FieldNames.TABLE_READS+" ("+FieldNames.READ_SEQUENCE+") ";
 
     //////////////////  statements for data insertion  /////////////////////////  
-
-    /*     public final static String ADD_COLUMN_TO_TABLE_STATISTICS_NUMBER_OF_UNIQUE_SEQ =
-    "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
-    + FieldNames.TABLE_STATISTICS
-    + " AND COLUMN_NAME =" + FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ + ")"
-    + " BEGIN "
-    + "ALTER TABLE "
-    + FieldNames.TABLE_STATISTICS
-    + " ADD COLUMN "
-    + FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ + " BIGINT UNSIGNED "+
-    " END";*/
-
-
-    //////// statements to fetch data from database ////////////////////////////
 
 }

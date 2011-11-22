@@ -38,7 +38,7 @@ public class CoverageContainer {
     private static final int GAP_T = 9;
     private static final int GAP_N = 10;
     private static final int DIFFS = 11;
-    
+
     private final int coverageArrayLength;
 
     /**
@@ -51,8 +51,9 @@ public class CoverageContainer {
         coverageArrayLength = NUM_OF_CASES * FIELDS_PER_CASE;
         this.computeCoverage(mappings);
     }
+    
 
-    private void computeCoverage(ParsedMappingContainer mappings) {
+    public void computeCoverage(ParsedMappingContainer mappings){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start computing the coverage");
         Iterator<Integer> sequenceIDIt = mappings.getMappedSequenceIDs().iterator();
 
@@ -100,7 +101,7 @@ public class CoverageContainer {
                 for (int j = 0; j < newCov.length; j++) {
                     newCov[j] = 0;
                 }
-                coverage.put(i, newCov);
+                coverage.put(i, newCov);            
             }
             // increase the values in coverage array
             Integer[] cov = coverage.get(i);
@@ -119,7 +120,7 @@ public class CoverageContainer {
     }
     //number of unique mappings
 
-    public int getNumberOfBestMapppingsForward(int position) {
+    public int getNumberOfBestMappingsForward(int position) {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, true, false);
     }
 
@@ -127,7 +128,7 @@ public class CoverageContainer {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, false, true);
     }
 
-    public int getNumberOfBestMapppingsReverse(int position) {
+    public int getNumberOfBestMappingsReverse(int position) {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, false, false);
     }
 
@@ -184,8 +185,9 @@ public class CoverageContainer {
     /**
      * Clears the coverage container.
      */
-    public void clear() {
+    public void clearCoverageContainer() {
         coverage.clear();
+        positionTable.clear();
     }
     
     /**
@@ -193,7 +195,7 @@ public class CoverageContainer {
      * @param mapping the mapping whose position count should be stored.
      */
     public void savePositions(ParsedMapping mapping) {
-        
+
         if (mapping.isBestMapping()) {
             List<ParsedDiff> diffs = mapping.getDiffs();
             List<ParsedReferenceGap> gaps = mapping.getGenomeGaps();
@@ -203,7 +205,7 @@ public class CoverageContainer {
             long positionInt;
             String position;
             char base;
-            
+
             // saves diffs
             for (int i = 0; i < mapping.getNumOfDiffs(); i++) {
                 diff = diffs.get(i);
@@ -252,7 +254,7 @@ public class CoverageContainer {
                         break;
                 }
             }
-            
+
             //save gaps
             for (int i = 0; i < gaps.size(); i++) {
                 gap = gaps.get(i);
@@ -285,9 +287,7 @@ public class CoverageContainer {
 
                 // increase occurence of gap bases at position
                 bases = positionTable.get(position);
-                if (mapping.getCount() == -1){
-                    int a=0;
-                }
+
                 switch (base) { //724960
                     case 'A':
                         bases[DIFFS] += mapping.getCount();
@@ -310,8 +310,7 @@ public class CoverageContainer {
                         bases[GAP_N] += mapping.getCount();
                         break;
                 }
-
-                }
+            }
         }
     }
 

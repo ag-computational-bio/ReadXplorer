@@ -29,20 +29,20 @@
                       </Group>
                       <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="commonMatchButton" alignment="1" pref="68" max="32767" attributes="0"/>
-                          <Component id="bestMatchButton" alignment="1" pref="68" max="32767" attributes="0"/>
-                          <Component id="perfectMatchButton" alignment="1" pref="68" max="32767" attributes="0"/>
+                          <Component id="commonMatchButton" alignment="1" pref="83" max="32767" attributes="0"/>
+                          <Component id="bestMatchButton" alignment="1" pref="83" max="32767" attributes="0"/>
+                          <Component id="perfectMatchButton" alignment="1" pref="83" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="uniformColorLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
-                      <Component id="uniformColButton" pref="88" max="32767" attributes="0"/>
+                      <Component id="uniformColButton" pref="89" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="jSeparator1" alignment="1" pref="230" max="32767" attributes="0"/>
+          <Component id="jSeparator1" alignment="1" pref="249" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="uniformColorationCheckBox" min="-2" max="-2" attributes="0"/>

@@ -10,7 +10,7 @@ import java.util.HashMap;
  *
  * @author Rolf Hilker
  */
-public class BAMSeqPairParser extends BAMParser implements SequencePairParserI {
+public class BAMSeqPairParser extends SAMBAMParser implements SequencePairParserI {
 
     private HashMap<String, Integer> seqIDToReadNameMap;
 

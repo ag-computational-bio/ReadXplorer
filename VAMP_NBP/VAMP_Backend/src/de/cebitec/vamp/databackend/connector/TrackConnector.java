@@ -317,7 +317,7 @@ public class TrackConnector implements ITrackConnector {
     
     @Override
     public int getNumOfUniqueMappingsCalculate(){
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SINGLETON_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
     
     @Override
@@ -359,14 +359,14 @@ public class TrackConnector implements ITrackConnector {
     
     @Override
     public double getPercentRefGenPerfectCovered() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
         return absValue / genomeSize * 100;
     }
     
     
     @Override
     public double getPercentRefGenPerfectCoveredCalculate() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
         return absValue / genomeSize * 100;
 
     }
@@ -374,28 +374,28 @@ public class TrackConnector implements ITrackConnector {
     
     @Override
     public double getPercentRefGenBmCovered() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
         return absValue / genomeSize * 100;
     }
 
     
     @Override
     public double getPercentRefGenBmCoveredCalculate() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_COVERED_POSITION_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
         return absValue / genomeSize * 100;
     }
 
     
     @Override
     public double getPercentRefGenNErrorCovered() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
         return absValue / genomeSize * 100;
     }
 
     
     @Override
     public double getPercentRefGenNErrorCoveredCalculate() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_COVERED, con, trackID);
+        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_NUM, con, trackID);
         return absValue / genomeSize * 100;
     }
     
@@ -434,18 +434,13 @@ public class TrackConnector implements ITrackConnector {
             double coverageComplete, int numReads) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics");
         try {
+            int hasTrack =GenericSQLQueries.getIntegerFromDB(SQLStatements.CHECK_FOR_TRACK_IN_STATS_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+            
+            if(hasTrack ==0){           
             PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
-            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
 
-            // get latest id for track
-            long id = 0;
-            ResultSet rs = latestID.executeQuery();
-            if (rs.next()) {
-                id = rs.getLong("LATEST_ID");
-            }
-            latestID.close();
+            int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID,con);
             id++;
-
             int covPerf = (int) (coveragePerf / 100 * genomeSize);
             int covBM = (int) (coverageBM / 100 * genomeSize);
             int covComplete = (int) (coverageComplete / 100 * genomeSize);
@@ -463,6 +458,29 @@ public class TrackConnector implements ITrackConnector {
             insertStatistics.setInt(11, numReads);
             insertStatistics.execute();
             insertStatistics.close();
+            }else{
+         PreparedStatement updateStatistics = con.prepareStatement(SQLStatements.UPDATE_STATISTICS);
+            int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID,con);
+            id++;
+            int covPerf = (int) (coveragePerf / 100 * genomeSize);
+            int covBM = (int) (coverageBM / 100 * genomeSize);
+            int covComplete = (int) (coverageComplete / 100 * genomeSize);
+            // store track in table
+            updateStatistics.setInt(1, numMappings);
+            updateStatistics.setInt(2, numPerfectMappings);
+            updateStatistics.setInt(3, numBestMatchMappings);
+            updateStatistics.setInt(4, numUniqueMappings);
+            updateStatistics.setInt(5, covPerf);
+            updateStatistics.setInt(6, covBM);
+            updateStatistics.setInt(7, covComplete);
+            updateStatistics.setInt(8, numUniqueSeq);
+            updateStatistics.setInt(9, numReads);
+            updateStatistics.setLong(10, trackID);
+            updateStatistics.executeUpdate();
+            updateStatistics.close();
+            }
+             
+
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);

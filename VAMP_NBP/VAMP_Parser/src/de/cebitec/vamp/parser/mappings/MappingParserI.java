@@ -28,14 +28,4 @@ public interface MappingParserI extends ParserI, Observable {
      */
     public void processReadname(final int seqID, final String readName);
 
-    /**
-     *
-     * @param trackJob
-     * @return
-     * @throws ParsingException
-     * @deprecated Since the RUN domain has been excluded this method is not needed anymore!
-     */
-    @Deprecated
-    public ParsedRun parseInputForReadData(TrackJob trackJob) throws ParsingException;
-    
 }

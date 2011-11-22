@@ -15,7 +15,6 @@ import javax.swing.SwingUtilities;
 public class TrackStatisticsPanel extends javax.swing.JPanel {
 
     private final static long serialVersionUID = 1239345;
-
     private ITrackConnector trackCon;
 
     /** Creates new form TrackNavigator */
@@ -24,7 +23,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 //        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use empty Constructor for this object! Standard constructor is only meant for GUI builder means");
     }
 
-    public TrackStatisticsPanel(ITrackConnector trackCon){
+    public TrackStatisticsPanel(ITrackConnector trackCon) {
         this.trackCon = trackCon;
         this.initComponents();
         this.hideSeqPairLabels();
@@ -36,12 +35,12 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
      * Use this method when switching to another track.
      * @param trackCon new track connector
      */
-    public void setTrackConnector(ITrackConnector trackCon){
+    public void setTrackConnector(ITrackConnector trackCon) {
         this.trackCon = trackCon;
         this.computeStats();
     }
 
-    public void setTrackName(String name){
+    public void setTrackName(String name) {
         nameLabel.setText(name);
     }
 
@@ -316,8 +315,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 .addContainerGap(163, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel allReadsLabel;
     private javax.swing.JLabel bestMatchMappingsAbsLabel;
@@ -353,16 +350,17 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel uniqueSequencesLabel;
     // End of variables declaration//GEN-END:variables
 
-    private void computeStats(){
+    private void computeStats() {
         Thread t = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 //RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId(),trackCon.getTrackID());
                 boolean recalculated = false;
-                
+                boolean recalcSeqPair = false;
+
                 int numSeqPairs = trackCon.getNumOfSeqPairs();
-                if (numSeqPairs == -1){
+                if (numSeqPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numSeqPairsAbsLabel);
                     numSeqPairsLabel.setVisible(false);
@@ -370,15 +368,15 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 } else {
                     if (numSeqPairs == -2) {
                         numSeqPairs = trackCon.getNumOfSeqPairsCalculate();
-                        recalculated = true;
+                        recalcSeqPair = true;
                     }
                     numSeqPairsLabel.setVisible(true);
                     numSeqPairsAbsLabel.setVisible(true);
                     numSeqPairsAbsLabel.setText(String.valueOf(numSeqPairs));
                 }
-                
+
                 int numPerfectSeqPairs = trackCon.getNumOfPerfectSeqPairs();
-                if (numPerfectSeqPairs == -1){
+                if (numPerfectSeqPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
                     numPerfSeqPairsLabel.setVisible(false);
@@ -386,15 +384,15 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 } else {
                     if (numPerfectSeqPairs == -2) {
                         numPerfectSeqPairs = trackCon.getNumOfPerfectSeqPairsCalculate();
-                        recalculated = true;
+                        recalcSeqPair = true;
                     }
                     numPerfSeqPairsLabel.setVisible(true);
                     numPerfSeqPairsAbsLabel.setVisible(true);
                     numPerfSeqPairsAbsLabel.setText(String.valueOf(numPerfectSeqPairs));
                 }
-                
+
                 int numUniqueSeqPairs = trackCon.getNumOfUniqueSeqPairs();
-                if (numUniqueSeqPairs == -1){
+                if (numUniqueSeqPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
                     numUniqSeqPairsLabel.setVisible(false);
@@ -402,7 +400,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 } else {
                     if (numUniqueSeqPairs == -2) {
                         numUniqueSeqPairs = trackCon.getNumOfUniqueSeqPairsCalculate();
-                        recalculated = true;
+                        recalcSeqPair = true;
                     }
                     numUniqSeqPairsLabel.setVisible(true);
                     numUniqSeqPairsAbsLabel.setVisible(true);
@@ -410,7 +408,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
 
                 int numUniquePerfectSeqPairs = trackCon.getNumOfUniquePerfectSeqPairs();
-                if (numUniquePerfectSeqPairs == -1){
+                if (numUniquePerfectSeqPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
                     numPerfUniqSeqPairsLabel.setVisible(false);
@@ -418,34 +416,34 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 } else {
                     if (numUniquePerfectSeqPairs == -2) {
                         numUniquePerfectSeqPairs = trackCon.getNumOfUniquePerfectSeqPairsCalculate();
-                        recalculated = true;
+                        recalcSeqPair = true;
                     }
                     numPerfUniqSeqPairsLabel.setVisible(true);
                     numPerfUniqSeqPairsAbsLabel.setVisible(true);
                     numPerfUniqSeqPairsAbsLabel.setText(String.valueOf(numUniquePerfectSeqPairs));
                 }
-                
+
                 int numSingleMappings = trackCon.getNumOfSingleMappings();
-                if (numSingleMappings == -1){
+                if (numSingleMappings == -1) {
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsAbsLabel);
-                        singleMappingsLabel.setVisible(false);
-                        singleMappings.setVisible(false);
+                    singleMappingsLabel.setVisible(false);
+                    singleMappings.setVisible(false);
                 } else {
                     if (numSingleMappings == -2) {
                         numSingleMappings = trackCon.getNumOfSingleMappingsCalculate();
-                        recalculated = true;
+                        recalcSeqPair = true;
                     }
                     singleMappingsLabel.setVisible(true);
                     singleMappings.setVisible(true);
                     singleMappings.setText(String.valueOf(numSingleMappings));
                 }
-                
+
                 int numOfMappings = trackCon.getNumOfMappings();
-                if (numOfMappings == -1){
-                   numOfMappings = trackCon.getNumOfMappingsCalculate();
-                   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating statistic information");
-                   recalculated = true;
+                if (numOfMappings == -1) {
+                    numOfMappings = trackCon.getNumOfMappingsCalculate();
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating statistic information");
+                    recalculated = true;
                 }
                 numMappingsAbsLabel.setText(String.valueOf(numOfMappings));
 
@@ -462,7 +460,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     recalculated = true;
                 }
                 uniqueSequencesAbsLabel.setText(String.valueOf(numUniqueSequences));
-                        
+
                 numberReadsAbsLabel.setVisible(false);
                 numberReadsLabel.setVisible(false);
                 int numReads = trackCon.getNumOfReads();
@@ -471,45 +469,47 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 } else {
                     numberReadsAbsLabel.setText(String.valueOf(numReads));
                 }
-                
+
                 int numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappings();
-                if (numOfPerfectMappings == -1){
+                if (numOfPerfectMappings == -1) {
                     numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText(String.valueOf(numOfPerfectMappings));
 
                 int numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappings();
-                if (numOfBestMatchMappings == -1){
+                if (numOfBestMatchMappings == -1) {
                     numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappingsCalculate();
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText(String.valueOf(numOfBestMatchMappings));
 
                 double percentagePerfectCovered = trackCon.getPercentRefGenPerfectCovered();
-                if (percentagePerfectCovered == -1){
+                if (percentagePerfectCovered == -1) {
                     percentagePerfectCovered = trackCon.getPercentRefGenPerfectCoveredCalculate();
                     recalculated = true;
                 }
-                
+
                 double percentageBMCovered = trackCon.getPercentRefGenBmCovered();
-                if (percentageBMCovered == -1){
+                if (percentageBMCovered == -1) {
                     percentageBMCovered = trackCon.getPercentRefGenBmCoveredCalculate();
                     recalculated = true;
                 }
-                
+
                 double percentageNErrorCovered = trackCon.getPercentRefGenNErrorCovered();
-                if (percentageNErrorCovered == -1){
+                if (percentageNErrorCovered == -1) {
                     percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
                     recalculated = true;
                 }
-                
-                
-                if (recalculated){
-                    trackCon.setStatistics(numOfMappings, numUniqueMappings, numUniqueSequences, 
-                        numOfPerfectMappings, numOfBestMatchMappings, percentagePerfectCovered, 
-                        percentageBMCovered, percentageNErrorCovered, numReads);
-                    trackCon.addSeqPairStatistics(numSeqPairs, numPerfectSeqPairs, numUniqueSeqPairs, 
+
+
+                if (recalculated) {
+                    trackCon.setStatistics(numOfMappings, numUniqueMappings, numUniqueSequences,
+                            numOfPerfectMappings, numOfBestMatchMappings, percentagePerfectCovered,
+                            percentageBMCovered, percentageNErrorCovered, numReads);
+                }
+                if (recalcSeqPair) {
+                    trackCon.addSeqPairStatistics(numSeqPairs, numPerfectSeqPairs, numUniqueSeqPairs,
                             numUniquePerfectSeqPairs, numSingleMappings);
                 }
 
@@ -522,7 +522,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 compPercentage.setText(nErrorCov);
                 statsFinished();
             }
-        }){
+        }) {
         };
         progressbar.setIndeterminate(true);
 
@@ -530,7 +530,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         t.start();
     }
 
-    private void statsFinished(){
+    private void statsFinished() {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -552,7 +552,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private void hideSeqPairLabels() {
         this.numberReadsLabel.setVisible(false);
         this.numberReadsAbsLabel.setVisible(false);
-        
+
         this.numSeqPairsLabel.setVisible(false);
         this.numSeqPairsAbsLabel.setVisible(false);
         this.numPerfSeqPairsLabel.setVisible(false);
@@ -562,5 +562,4 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         this.numPerfUniqSeqPairsLabel.setVisible(false);
         this.numPerfUniqSeqPairsAbsLabel.setVisible(false);
     }
-
 }

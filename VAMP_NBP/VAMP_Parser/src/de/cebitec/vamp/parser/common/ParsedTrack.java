@@ -17,6 +17,8 @@ public class ParsedTrack {
     private String description;
     private Timestamp timestamp;
     private int id;
+    private boolean isStepwise;
+    private boolean isFirstTrack;
 
     public ParsedTrack(String description, ParsedMappingContainer mappings, CoverageContainer coverageContainer){
         this.readNameToSeqIDMap = new HashMap<String, Integer>();
@@ -53,14 +55,21 @@ public class ParsedTrack {
         this.id = id;
     }
 
-    /**
-     * Needed additional information from sequence pair parsers.
-     * @param seqToIdMap mapping of readname to sequence id
-     */
-    public void setReadnameToSeqIdMap(HashMap<String, Integer> seqToIdMap){
-        this.readNameToSeqIDMap = seqToIdMap;
+    public boolean isStepwise() {
+        return isStepwise;
     }
 
+    public void setIsStepwise(boolean isStepwise) {
+        this.isStepwise = isStepwise;
+    }
+
+    public boolean isFirstTrack() {
+        return isFirstTrack;
+    }
+
+    public void setIsFirstTrack(boolean isFirstTrack) {
+        this.isFirstTrack = isFirstTrack;
+    }
     /**
      * @return the readname to sequence id map
      */
@@ -68,14 +77,23 @@ public class ParsedTrack {
         return this.readNameToSeqIDMap;
     }
 
+    
+    /**
+     * Needed additional information from sequence pair parsers.
+     * @param seqToIdMap mapping of readname to sequence id
+     */
+    public void setReadnameToSeqIdMap(HashMap<String, Integer> seqToIdMap){
+        this.readNameToSeqIDMap = seqToIdMap;
+    }
+    
     /**
      * Clears the mappings, coverage container and ReadnameToseqIDMap.
      * All other information persists!
      */
     public void clear(){
         this.mappings.clear();
-        this.coverageContainer.clear();
         this.readNameToSeqIDMap.clear();
+        coverageContainer.clearCoverageContainer();
     }
 
 }

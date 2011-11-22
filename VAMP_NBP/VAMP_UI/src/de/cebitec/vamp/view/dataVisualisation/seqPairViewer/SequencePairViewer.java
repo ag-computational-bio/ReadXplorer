@@ -206,7 +206,7 @@ public class SequencePairViewer extends AbstractViewer {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         Graphics2D g = (Graphics2D) graphics;
-
+        
         if (isInDrawingMode()) {
             g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
             drawBaseLines(g);

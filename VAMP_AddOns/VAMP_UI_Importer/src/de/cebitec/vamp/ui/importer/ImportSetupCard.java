@@ -2,6 +2,7 @@ package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import de.cebitec.vamp.parser.mappings.ISeqPairClassifier;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
@@ -209,6 +210,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
                     NewTrackDialogPanel ntdp = (NewTrackDialogPanel) dialogPane;
                     ReferenceJob refJob = ntdp.getReferenceJob();
                     TrackJob trackJob = new TrackJob(trackID++, ntdp.getMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
+                     trackJob.setIsStepwise((ntdp.getParser() instanceof SamBamStepParser? true:false));
+                     trackJob.setStepSize(ntdp.getstepSize());
                     refJob.registerTrackWithoutRunJob(trackJob);
                     trackJobView.add(trackJob);
                 }
