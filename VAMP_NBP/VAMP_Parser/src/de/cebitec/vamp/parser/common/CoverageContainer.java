@@ -35,6 +35,7 @@ public class CoverageContainer {
     private static final int GAP_T = 9;
     private static final int GAP_N = 10;
     private static final int DIFFS = 11;
+    private final int coverageArrayLength;
 
     /**
      * Creates a new CoverageContainer and immediately computes the coverage.
@@ -115,7 +116,7 @@ public class CoverageContainer {
     }
     //number of unique mappings
 
-    public int getNumberOfBestMapppingsForward(int position) {
+    public int getNumberOfBestMappingsForward(int position) {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, true, false);
     }
 
@@ -123,7 +124,7 @@ public class CoverageContainer {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, false, true);
     }
 
-    public int getNumberOfBestMapppingsReverse(int position) {
+    public int getNumberOfBestMappingsReverse(int position) {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, false, false);
     }
 
@@ -177,8 +178,9 @@ public class CoverageContainer {
         return cov[baseIDX];
     }
 
-    public void clear() {
+    public void clearCoverageContainer() {
         coverage.clear();
+        positionTable.clear();
     }
     
     public void savePositions(ParsedMapping s) {
@@ -269,24 +271,24 @@ public class CoverageContainer {
                 Integer[] bases = positionTable.get(position);
                 switch (base) {
                     case 'A':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_A] = bases[GAP_A] + s.getCount();
+                        bases[DIFFS] += s.getCount();
+                        bases[GAP_A] += s.getCount();
                         break;
                     case 'C':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_C] = bases[GAP_C] + s.getCount();
+                        bases[DIFFS] +=s.getCount();
+                        bases[GAP_C] += s.getCount();
                         break;
                     case 'G':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_G] = bases[GAP_G] + s.getCount();
+                        bases[DIFFS] += s.getCount();
+                        bases[GAP_G] += s.getCount();
                         break;
                     case 'T':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_T] = bases[GAP_T] + s.getCount();
+                        bases[DIFFS] += s.getCount();
+                        bases[GAP_T] +=s.getCount();
                         break;
                     case 'N':
-                        bases[DIFFS] = bases[DIFFS] + s.getCount();
-                        bases[GAP_N] = bases[GAP_N] + s.getCount();
+                        bases[DIFFS]+= s.getCount();
+                        bases[GAP_N] =s.getCount();
                         break;
                 }
 
@@ -305,4 +307,5 @@ public class CoverageContainer {
         }
         return covered;
     }
+
 }

@@ -91,7 +91,12 @@ public class ProjectConnector {
     private static final int GAP_T = 9;
     private static final int GAP_N = 10;
     private static final int DIFFS = 11;
-
+    private int mappings= 0;
+    private int perfectMappings=0;
+    private int bmMappings=0;
+    private int currentTrackID=-1;
+    private boolean isLastTrack=false;
+    
     private ProjectConnector() {
         trackConnectors = new HashMap<Long, TrackConnector>();
 //        runConnectors = new HashMap<Long, RunConnector>();
@@ -754,7 +759,7 @@ public class ProjectConnector {
     }
 
     private void storeCoverage(ParsedTrack track) {
-        if (!track.isStepwise() | track.getParsedMappingContainer().isLastMappingContainer()) {
+        if (!track.isStepwise() | isLastTrack) {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing coverage information...");
             try {
                 PreparedStatement insertCoverage = con.prepareStatement(SQLStatements.INSERT_COVERAGE);
@@ -795,7 +800,7 @@ public class ProjectConnector {
                 }
                 insertCoverage.executeBatch();
                 insertCoverage.close();
-                cov.clear();
+                
             } catch (SQLException ex) {
                 ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
             }
@@ -853,7 +858,7 @@ public class ProjectConnector {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the list");
         }
         try {
-            if (!track.isStepwise() | track.getParsedMappingContainer().isLastMappingContainer()) {
+            if (!track.isStepwise() | isLastTrack) {
                             // get latest id for track
             long id = -1;
             id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
@@ -1097,7 +1102,7 @@ public class ProjectConnector {
             this.lockTrackDomainTables();
             this.disableTrackDomainIndices();
         }
-
+        isLastTrack =track.getParsedMappingContainer().isLastMappingContainer();
         this.storeTrack(track, refGenID);
         this.storeCoverage(track);
         this.storeMappings(track);
@@ -1111,7 +1116,7 @@ public class ProjectConnector {
             this.unlockTables();
         }
 
-        if (!seqPairs) {
+        if (!seqPairs && isLastTrack) {
             track.clear();
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
@@ -1523,7 +1528,7 @@ public class ProjectConnector {
         try {
             Integer seqPairId = 1; //not 0, because 0 is the value when a track is not a sequence pair track!
             PreparedStatement getLatestSeqPairId = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID);
-
+            
             ResultSet rs = getLatestSeqPairId.executeQuery();
             if (rs.next()) {
                 seqPairId = rs.getInt("LATEST_ID");
@@ -1553,22 +1558,17 @@ public class ProjectConnector {
     //TODO: seqpair queries
                 
     private void storePositionTable(ParsedTrack track) {
-        
+         if (!track.isStepwise() | isLastTrack) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO,String.valueOf(currentTimestamp));
         try {
-            PreparedStatement latestSnpID = con.prepareStatement(SQLStatements.GET_LATEST_SNP_ID);
+            long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
             PreparedStatement getGenomeID = con.prepareStatement(SQLStatements.FETCH_GENOMEID_FOR_TRACK);
             PreparedStatement getRefSeq = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
             PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION);
             // get latest snpID used
-            long snpID = 0;
-            ResultSet rs = latestSnpID.executeQuery();
-            if (rs.next()) {
-                snpID = rs.getLong("LATEST_ID");
-            }
-            snpID++;
+
             int batchCounter = 0;
 
             // go through positionTable
@@ -1737,7 +1737,7 @@ public class ProjectConnector {
 
         Logger.getLogger(
                 this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
-
+         }
     }
     
     private char getType(int i) {

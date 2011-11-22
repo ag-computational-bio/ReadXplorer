@@ -93,6 +93,7 @@ public class ParsedTrack {
     public void clear(){
         this.mappings.clear();
         this.readNameToSeqIDMap.clear();
+        coverageContainer.clearCoverageContainer();
     }
 
 }
