@@ -1,5 +1,7 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import de.cebitec.vamp.api.objects.FeatureType;
+
 /**
  * A persistant feature. Containing background information about a feature, such as id,
  * ec number, locus, product, start and stop positions, strand and type.
@@ -15,7 +17,7 @@ public class PersistantFeature {
     private int start;
     private int stop;
     private int strand;
-    private int type;
+    private FeatureType type;
     private String geneName;
 
     /**
@@ -30,7 +32,8 @@ public class PersistantFeature {
      * @param ecnum ec number
      * @param geneName name of the gene, if it exists (e.g. "dnaA")
      */
-    public PersistantFeature(int id, String ecnum, String locus, String product, int start, int stop, int strand, int type, String geneName) {
+    public PersistantFeature(int id, String ecnum, String locus, String product, 
+                int start, int stop, int strand, FeatureType type, String geneName) {
         this.id = id;
         this.ecNumber = ecnum;
         this.locus = locus;
@@ -80,7 +83,7 @@ public class PersistantFeature {
         return strand;
     }
 
-    public int getType() {
+    public FeatureType getType() {
         return type;
     }
     

@@ -1,5 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
+import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.common.sequencetools.GeneticCode;
 import de.cebitec.common.sequencetools.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
@@ -192,7 +193,14 @@ public class SnpTranslator {
             
             //determine effect type of snp on the amino acid sequence
             SequenceComparison type = aminoRef == aminoSnp ? SequenceComparison.MATCH : SequenceComparison.SUBSTITUTION;
-            
+            if (type == SequenceComparison.SUBSTITUTION) {
+                if (AminoAcidProperties.getPropertyForAA(aminoRef).equals(AminoAcidProperties.getPropertyForAA(aminoSnp))) {
+                    type = SequenceComparison.NEUTRAL;
+                } else {
+                    type = SequenceComparison.MISSENSE;
+                }
+            }
+
             codonSnpList.add(new CodonSnp(tripletRef, tripletSnp, aminoRef, aminoSnp, type, id));
         }
         return codonSnpList;

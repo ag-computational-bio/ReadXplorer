@@ -193,7 +193,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                 try {
                     // parsing
-                    ParsedReference refGen = parseRefJob(r);
+                    ParsedReference refGen = this.parseRefJob(r);
                     io.getOut().println("\""+r.getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
 
                     // storing

@@ -5,6 +5,5 @@ and open the template in the editor.
 -->
 <!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN" "http://java.sun.com/products/javahelp/map_2_0.dtd">
 <map version="2.0">
-    <mapID target="de.cebitec.vamp.tools.snp.about" url="snp-about.html"/>
-    <mapID target="de.cebitec.vamp.tools.snp.snptable" url="snp-table.html"/>
+    <mapID target="de.cebitec.vamp.ui.importer.about" url="importer-about.html"/>
 </map>

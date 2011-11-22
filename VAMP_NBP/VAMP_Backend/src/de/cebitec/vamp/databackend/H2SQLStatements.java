@@ -97,20 +97,20 @@ public class H2SQLStatements {
             "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_POSITION + ", " + FieldNames.COVERAGE_TRACK + ") ";
    
     
-    public final static String SETUP_FEATURES =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
-            + " ("
-            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
-            + FieldNames.FEATURE_REFGEN + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_LOCUS + " VARCHAR (1000), "
-            + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
-            + FieldNames.FEATURE_ECNUM + " VARCHAR (20), " +
-            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
-            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
-            ") ";
+//    public final static String SETUP_FEATURES =
+//            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
+//            + " ("
+//            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
+//            + FieldNames.FEATURE_REFGEN + " BIGINT UNSIGNED NOT NULL, "
+//            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
+//            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
+//            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
+//            + FieldNames.FEATURE_LOCUS + " VARCHAR (1000), "
+//            + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
+//            + FieldNames.FEATURE_ECNUM + " VARCHAR (20), " +
+//            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
+//            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
+//            ") ";
     
     
     public final static String INDEX_FEATURES =
@@ -161,13 +161,13 @@ public class H2SQLStatements {
             + FieldNames.SEQ_PAIR_PAIR_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.SEQ_PAIR_MAPPING1_ID + " BIGINT UNSIGNED, "
             + FieldNames.SEQ_PAIR_MAPPING2_ID + " BIGINT UNSIGNED, "
-            + FieldNames.SEQ_PAIR_TYPE + " TINYINT NOT NULL, "
+            + FieldNames.SEQ_PAIR_TYPE + " TINYINT NOT NULL "
             + ") ";
     
     
     public final static String INDEX_SEQ_PAIRS =
             "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
-            + "(" + FieldNames.SEQ_PAIR_PAIR_ID + ", " + FieldNames.SEQ_PAIR_MAPPING1_ID + ", " + FieldNames.SEQ_PAIR_MAPPING2_ID + " ) ";
+            + " (" + FieldNames.SEQ_PAIR_PAIR_ID + ", " + FieldNames.SEQ_PAIR_MAPPING1_ID + ", " + FieldNames.SEQ_PAIR_MAPPING2_ID + " ) ";
     
     
     public static final String SETUP_SEQ_PAIR_REPLICATES =
@@ -195,6 +195,33 @@ public class H2SQLStatements {
             "CREATE INDEX IF NOT EXISTS INDEXMAPPING_TO_SEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
             + "(" + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + ", " + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
 
+    
+    /* I have decided against an id as primary key. */
+    public static final String SETUP_SUBFEATURES = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
+            + " ("
+            + FieldNames.SUBFEATURES_ID + " BIGINT UNSIGNED PRIMARY KEY, "
+            + FieldNames.SUBFEATURES_REF_GEN_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBFEATURES_FEATURE_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBFEATURES_START + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL "
+            + ") ";
+    
+    public static final String INDEX_SUBFEATURES = 
+            "CREATE INDEX IF NOT EXISTS INDEXSUBFEATURE ON " + FieldNames.TABLE_SUBFEATURES
+            + " (" + FieldNames.SUBFEATURES_REF_GEN_ID + ", " + FieldNames.SUBFEATURES_FEATURE_ID 
+            + ", " + FieldNames.SUBFEATURES_START + ", " + FieldNames.SUBFEATURES_STOP + " ) ";
+    
+    
+    public final static String SETUP_FEATURES =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
+            + " ("
+            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.FEATURE_REFGEN + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL "
+            + ") ";
     
 //    public final static String SETUP_RUN =
 //            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_RUN+" " +

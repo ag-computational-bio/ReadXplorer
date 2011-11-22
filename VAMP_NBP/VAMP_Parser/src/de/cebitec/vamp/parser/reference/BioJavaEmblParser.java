@@ -6,21 +6,21 @@ import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.parser.common.ParsedSubfeature;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RichObjectFactory;
-import org.biojavax.bio.BioEntry;
 import org.biojavax.bio.seq.RichFeature;
 import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
@@ -32,6 +32,7 @@ import org.biojavax.bio.seq.io.RichStreamReader;
 /**
  *
  * @author ddoppmeier
+ * @deprecated use BioJavaParser
  */
 public class BioJavaEmblParser implements ReferenceParserI {
 
@@ -61,14 +62,14 @@ public class BioJavaEmblParser implements ReferenceParserI {
             RichSequenceFormat embl = new EMBLFormat();
             RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
 
-            RichStreamReader it = new RichStreamReader(in, embl, dna, factory, ns);
+            RichStreamReader seqIter = new RichStreamReader(in, embl, dna, factory, ns);
 
             // take only the first sequence from file, if exists
-            while (it.hasNext()) {
-                RichSequence s = null;
+            while (seqIter.hasNext()) {
+                RichSequence seq = null;
                 try {
                     try {
-                        s = it.nextRichSequence();
+                        seq = seqIter.nextRichSequence();
                         this.sendErrorMsg("rich seq set");
                     } catch (Exception e) {
                         this.sendErrorMsg(e.getMessage());
@@ -79,10 +80,10 @@ public class BioJavaEmblParser implements ReferenceParserI {
                     refGenome.setDescription(refGenJob.getDescription());
                     refGenome.setName(refGenJob.getName());
                     refGenome.setTimestamp(refGenJob.getTimestamp());
-                    refGenome.setSequence(s.seqString());
+                    refGenome.setSequence(seq.seqString());
 
                     // iterate through all features
-                    Iterator<Feature> featIt = s.getFeatureSet().iterator();
+                    Iterator<Feature> featIt = seq.getFeatureSet().iterator();
                     while (featIt.hasNext()) {
                         RichFeature f = (RichFeature) featIt.next();
 
@@ -95,14 +96,77 @@ public class BioJavaEmblParser implements ReferenceParserI {
                         int strand = 0;
                         String ecNumber = null;
                         String geneName = null;
+                        List<ParsedSubfeature> exons = new ArrayList<ParsedSubfeature>();
 
                         parsedType = f.getType();
                         start = f.getLocation().getMin();
                         stop = f.getLocation().getMax();
-                        Iterator i = f.getLocation().blockIterator();
-                        while (i.hasNext()) {
+                        Iterator subFeatureIter = f.getLocation().blockIterator();
 
-                            String pos = i.next().toString();
+                        @SuppressWarnings("unchecked")
+                        Iterator<Note> noteIter = f.getRichAnnotation().getNoteSet().iterator();
+                        while (noteIter.hasNext()) {
+                            Note n = noteIter.next();
+                            String name = n.getTerm().getName();
+                            String value = n.getValue();
+
+                            if (name.equals("locus_tag")) {
+                                locusTag = value;
+                            } else if (name.equalsIgnoreCase("locus")) {
+                                locusTag = value;
+                            } else if (name.equalsIgnoreCase("name")) {
+                                locusTag = value;
+                            } else if (name.equals("product")) {
+                                product = value;
+                            } else if (name.equals("EC_number")) {
+                                ecNumber = value;
+                            } else if (name.equals("gene")) {
+                                geneName = value;
+                            }
+                        }
+
+                        /* if the type of the feature is unknown to vamp (see below),
+                         * an undefined type is used
+                         */
+                        FeatureType type = FeatureType.UNDEFINED;
+
+                        // look for known types
+                        if (parsedType.equalsIgnoreCase("CDS")) {
+                            type = FeatureType.CDS;
+                        } else if (parsedType.equalsIgnoreCase("repeat_unit")) {
+                            type = FeatureType.REPEAT_UNIT;
+                        } else if (parsedType.equalsIgnoreCase("rRNA")) {
+                            type = FeatureType.R_RNA;
+                        } else if (parsedType.equalsIgnoreCase("source")) {
+                            type = FeatureType.SOURCE;
+                        } else if (parsedType.equalsIgnoreCase("tRNA")) {
+                            type = FeatureType.T_RNA;
+                        } else if (parsedType.equalsIgnoreCase("misc_RNA")) {
+                            type = FeatureType.MISC_RNA;
+                        } else if (parsedType.equalsIgnoreCase("miRNA")) {
+                            type = FeatureType.MI_RNA;
+                        } else if (parsedType.equalsIgnoreCase("gene")) {
+                            type = FeatureType.GENE;
+                        } else if (parsedType.equalsIgnoreCase("mRNA")) {
+                            type = FeatureType.M_RNA;
+                        } else {
+                            this.sendErrorMsg(refGenJob.getFile().getAbsolutePath()
+                                    + ": Using unknown feature type for " + parsedType);
+                        }
+
+                        String strandString = RichLocation.Tools.enrich(f.getLocation()).getStrand().toString();
+                        if (strandString.equals("-")) {
+                            strand = -1;
+                        } else if (strandString.equals("+")) {
+                            strand = 1;
+                        } else {
+                            this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": "
+                                    + "Unknown strand found: " + strandString);
+                        }
+
+                        while (subFeatureIter.hasNext()) {
+
+                            String pos = subFeatureIter.next().toString();
                             /*for eukaryotic organism its important to see the single cds
                             for looking for introns
                             if we choose min and max we get the first pos of the first cds
@@ -114,69 +178,8 @@ public class BioJavaEmblParser implements ReferenceParserI {
                                 stop = Integer.parseInt(p[1]);
 
                             }
-
-                            String strandString = RichLocation.Tools.enrich(f.getLocation()).getStrand().toString();
-                            if (strandString.equals("-")) {
-                                strand = -1;
-                            } else if (strandString.equals("+")) {
-                                strand = 1;
-                            } else {
-                                this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": "
-                                        + "Unknown strand found: " + strandString);
-                            }
-
-                            @SuppressWarnings("unchecked")
-                            Iterator<Note> iter = f.getRichAnnotation().getNoteSet().iterator();
-                            while (iter.hasNext()) {
-                                Note n = iter.next();
-                                String name = n.getTerm().getName();
-                                String value = n.getValue();
-
-                                if (name.equals("locus_tag")) {
-                                    locusTag = value;
-                                } else if (name.equalsIgnoreCase("locus")) {
-                                    locusTag = value;
-                                } else if (name.equalsIgnoreCase("name")) {
-                                    locusTag = value;
-                                } else if (name.equals("product")) {
-                                    product = value;
-                                } else if (name.equals("EC_number")) {
-                                    ecNumber = value;
-                                } else if (name.equals("gene")) {
-                                    geneName = value;
-                                }
-                            }
-
-                            /* if the type of the feature is unknown to vamp (see below),
-                             * an undefined type is used
-                             */
-                            Integer type = FeatureType.UNDEFINED;
-
-                            // look for known types
-                            if (parsedType.equalsIgnoreCase("CDS")) {
-                                type = FeatureType.CDS;
-                            } else if (parsedType.equalsIgnoreCase("repeat_unit")) {
-                                type = FeatureType.REPEAT_UNIT;
-                            } else if (parsedType.equalsIgnoreCase("rRNA")) {
-                                type = FeatureType.R_RNA;
-                            } else if (parsedType.equalsIgnoreCase("source")) {
-                                type = FeatureType.SOURCE;
-                            } else if (parsedType.equalsIgnoreCase("tRNA")) {
-                                type = FeatureType.T_RNA;
-                            } else if (parsedType.equalsIgnoreCase("misc_RNA")) {
-                                type = FeatureType.MISC_RNA;
-                            } else if (parsedType.equalsIgnoreCase("miRNA")) {
-                                type = FeatureType.MI_RNA;
-                            } else if (parsedType.equalsIgnoreCase("gene")) {
-                                type = FeatureType.GENE;
-                            } else if (parsedType.equalsIgnoreCase("mRNA")) {
-                                type = FeatureType.M_RNA;
-                            } else {
-                                this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": "
-                                        + "Found unknown feature " + parsedType);
-                            }
-
-                            refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName));
+                            
+                            refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
 
                         }
                     }

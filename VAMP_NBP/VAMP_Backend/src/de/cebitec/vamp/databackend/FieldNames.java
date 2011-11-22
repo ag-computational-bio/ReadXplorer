@@ -25,6 +25,7 @@ public class FieldNames {
 //    public final static String TABLE_SEQUENCE = "UNIQUE_SEQUENCE";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
+    public static final String TABLE_FEATURE_DETAILS = "FEATURE_DETAILS";
     public final static String TABLE_MAPPINGS = "MAPPING";
     public final static String TABLE_TRACKS = "TRACK";
     public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
@@ -33,7 +34,23 @@ public class FieldNames {
     public final static String TABLE_POSITIONS = "POSITIONS";
 //    public final static String TABLE_RUN = "RUN";
 //    public final static String TABLE_READS = "READNAME";
-    public final static String TABLE_STATISTICS = "STATISTICS";
+    public final static String TABLE_STATISTICS = "STATISTICS";    
+    public static final String TABLE_SUBFEATURES = "SUBFEATURES";
+    
+    //SUBFEATUREs table fields, could be refactored if needed for other purposes (like introns -> subfeatures)
+    public static final String SUBFEATURES_ID = "ID";
+    public static final String SUBFEATURES_REF_GEN_ID = "REF_GEN_ID";
+    public static final String SUBFEATURES_FEATURE_ID = "FEATURE_ID";
+    public static final String SUBFEATURES_START = "START";
+    public static final String SUBFEATURES_STOP = "STOP";
+        
+    //feature detail table fields
+    public final static String FEATURE_DETAILS_ID = "ID";
+    public final static String FEATURE_DETAILS_LOCUS = "LOCUS_TAG";
+    public final static String FEATURE_DETAILS_PRODUCT = "PRODUCT";
+    public final static String FEATURE_DETAILS_ECNUM = "EC_NUM";
+    public final static String FEATURE_DETAILS_STRAND = "STRAND";
+    public static final String FEATURE_DETAILS_GENE = "GENE";
 
 
     ////////////////////////  tables fields  ////////////////////////////////
@@ -107,7 +124,7 @@ public class FieldNames {
     public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
 
 
-    // feature table fields
+    //all feature table fields
     public final static String FEATURE_ID = "ID";
     public final static String FEATURE_REFGEN = "REFERENCE_ID";
     public final static String FEATURE_TYPE = "TYPE";

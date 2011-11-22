@@ -3,12 +3,17 @@ package de.cebitec.vamp.util;
 /**
  * @author rhilker
  * 
- * 
+ * Enumeration for sequence comparisons. The different types can represent for 
+ * example if something matches, was substituted, inserted, or deleted. 
  */
 public enum SequenceComparison {
     
     /** getType() returns 'S' = To be used for substitutions. */
-    SUBSTITUTION (SequenceComparison.S),
+    SUBSTITUTION (SequenceComparison.S), 
+    /** getType() returns 'N' = To be used for neutral substitutions. */
+    NEUTRAL(SequenceComparison.N), 
+    /** getType() returns 'E' = To be used for missense substitutions. */
+    MISSENSE(SequenceComparison.E),
     /** getType() returns 'M' = To be used for matches. */
     MATCH (SequenceComparison.M),
     /** getType() returns 'D' = To be used for deletions. */
@@ -21,6 +26,10 @@ public enum SequenceComparison {
     
     /** 'S' = To be used for substitutions. */
     private static final char S = 'S';
+    /** 'N' = To be used for neutral substituions. */
+    private static final char N = 'N';
+    /** 'E' = To be used for missense substitutions. */
+    private static final char E = 'E';
     /** 'M' = To be used for matches. */
     private static final char M = 'M';
     /** 'D' = To be used for deletions. */
@@ -42,23 +51,26 @@ public enum SequenceComparison {
     }
     
     /**
-     * Returns the desired SequenceComparison for a given char.
-     * @param type the type of SequenceComparison to return. If the type is unknown
-     * SequenceComparison.MATCH is returned.
-     * @return 
+     * @param type the type of SequenceComparison to return. 
+     * @return The SequenceComparison for a given char. If the type is unknown 
+     * SequenceComparison.UNKNOWN is returned.
      */
     public static SequenceComparison getSequenceComparison(char type){
         switch (type){
-            case 'S' :
+            case SequenceComparison.S :
                 return SUBSTITUTION;
-            case 'M' :
+            case SequenceComparison.N :
+                return NEUTRAL;
+            case SequenceComparison.E :
+                return MISSENSE;
+            case SequenceComparison.M :
                 return MATCH;
-            case 'I' :
+            case SequenceComparison.I :
                 return INSERTION;
-            case 'D' :
+            case SequenceComparison.D :
                 return DELETION;
             default :
-                return MATCH;
+                return UNKNOWN;
         }
     }
     

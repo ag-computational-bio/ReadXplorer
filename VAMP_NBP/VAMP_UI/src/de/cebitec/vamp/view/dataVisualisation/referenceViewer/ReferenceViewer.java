@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
@@ -12,7 +13,7 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class ReferenceViewer extends AbstractViewer {
     private static int height = 250;
     private static int FRAMEHEIGHT = 20;
     private PersistantReference refGen;
-    private Map<Integer, Integer> featureStats;
+    private Map<FeatureType, Integer> featureStats;
     private Feature currentlySelectedFeature;
     private int labelMargin;
     private ReferenceConnector refGenC;
@@ -40,7 +41,7 @@ public class ReferenceViewer extends AbstractViewer {
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen){
         super(boundsInfoManager, basePanel, refGen);
         refGenC = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
-        featureStats = new HashMap<Integer, Integer>();
+        featureStats = new EnumMap<FeatureType, Integer>(FeatureType.class);
         this.refGen = refGen;
         this.showSequenceBar(true, true);
         this.labelMargin = 3;
@@ -119,7 +120,7 @@ public class ReferenceViewer extends AbstractViewer {
     }
 
     private void registerFeatureInStats(PersistantFeature f){
-        int type = f.getType();
+        FeatureType type = f.getType();
         if(!featureStats.containsKey(type)){
             featureStats.put(type, 0);
         }
@@ -251,7 +252,7 @@ public class ReferenceViewer extends AbstractViewer {
         }
     }
 
-    public Map<Integer, Integer> getFeatureStats() {
+    public Map<FeatureType, Integer> getFeatureStats() {
         return this.featureStats;
     }
 

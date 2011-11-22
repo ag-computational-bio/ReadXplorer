@@ -1,0 +1,334 @@
+package de.cebitec.vamp.parser.reference;
+
+import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedReference;
+import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.parser.common.ParsedSubfeature;
+import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.SequenceUtils;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Location;
+import org.biojavax.Namespace;
+import org.biojavax.Note;
+import org.biojavax.RichObjectFactory;
+import org.biojavax.bio.seq.RichFeature;
+import org.biojavax.bio.seq.RichLocation;
+import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.io.EMBLFormat;
+import org.biojavax.bio.seq.io.GenbankFormat;
+import org.biojavax.bio.seq.io.RichSequenceBuilderFactory;
+import org.biojavax.bio.seq.io.RichSequenceFormat;
+import org.biojavax.bio.seq.io.RichStreamReader;
+
+/**
+ *
+ * @author ddopmeier, rhilker
+ */
+public class BioJavaParser implements ReferenceParserI {
+    
+    /** Use this for initializing an embl parser. */
+    public static final int EMBL = 1;
+    /** Use this for initializing a genbank parser. */
+    public static final int GENBANK = 2;
+    
+     // Fileextension used by Filechooser to choose files to be parsed by this parser
+    private static final String[] fileExtensionEmbl = new String[]{"embl"};
+    private static final String[] fileExtensionGbk = new String[]{"gbk", "gb", "genbank"};
+    // name of this parser for use in ComboBoxes
+    private static final String parserNameEmbl = "BioJava EMBL";
+    private static final String parserNameGbk = "BioJava GenBank";
+    private static final String fileDescriptionEmbl = "EMBL file";
+    private static final String fileDescriptionGbk = "GenBank file";
+    
+    private String[] fileExtension;
+    private String parserName;
+    private String fileDescription;
+    
+    private final RichSequenceFormat seqFormat;
+    
+    private ArrayList<Observer> observers = new ArrayList<Observer>();
+    private String errorMsg;
+
+    /**
+     * A biojava parser can be initialized to parse embl or genbank files and parses
+     * them into a ParsedReference object.
+     * @param type the type of the parser, either BioJavaParser.EMBL or BioJavaParser.GENBANK
+     */
+    public BioJavaParser(int type) {
+        
+        if (type == BioJavaParser.EMBL){
+            this.fileExtension = fileExtensionEmbl;
+            this.parserName = parserNameEmbl;
+            this.fileDescription = fileDescriptionEmbl;
+            this.seqFormat = new EMBLFormat();
+            
+        } else { //for your info: if (type == BioJavaParser.GENBANK){
+            this.fileExtension = fileExtensionGbk;
+            this.parserName = parserNameGbk;
+            this.fileDescription = fileDescriptionGbk;
+            this.seqFormat = new GenbankFormat();
+        }
+        
+    }
+
+    @Override
+    public ParsedReference parseReference(ReferenceJob refGenJob, FeatureFilter filter) throws ParsingException {
+
+        ParsedReference refGenome = new ParsedReference();
+        refGenome.setFeatureFilter(filter);
+        //at first store all eonxs in one data structure and add them to the ref genome at the end
+        List<ParsedFeature> exons = new ArrayList<ParsedFeature>();
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
+        try {
+
+            BufferedReader in = new BufferedReader(new FileReader(refGenJob.getFile()));
+            Namespace ns = RichObjectFactory.getDefaultNamespace();
+            SymbolTokenization dna = DNATools.getDNA().getTokenization("token");
+            RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
+
+            RichStreamReader seqIter = new RichStreamReader(in, seqFormat, dna, factory, ns);
+
+            // take only the first sequence from file, if exists
+            while (seqIter.hasNext()) {
+                RichSequence seq = null;
+                try {
+                    seq = seqIter.nextRichSequence();
+                    this.sendErrorMsg("rich seq set");
+
+                    refGenome.setDescription(refGenJob.getDescription());
+                    refGenome.setName(refGenJob.getName());
+                    refGenome.setTimestamp(refGenJob.getTimestamp());
+                    refGenome.setSequence(seq.seqString());
+                    
+//                    List<ParsedFeature> lastGenes = new ArrayList<ParsedFeature>();
+
+                    // iterate through all features
+                    Iterator<Feature> featIt = seq.getFeatureSet().iterator();
+                    while (featIt.hasNext()) {
+                        RichFeature feature = (RichFeature) featIt.next();
+
+                        // attributes of feature that should be stored
+                        String parsedType = null;
+                        String locusTag = "unknown locus tag";
+                        String product = null;
+                        int start = 0;
+                        int stop = 0;
+                        int strand = 0;
+                        String ecNumber = null;
+                        String geneName = null;
+                        List<ParsedSubfeature> subfeatures = new ArrayList<ParsedSubfeature>();
+                        Location location = feature.getLocation();
+
+                        parsedType = feature.getType();
+                        start = location.getMin();
+                        stop = location.getMax();
+                        if (start >= stop) {
+                            this.sendErrorMsg("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath() 
+                                    + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
+                            continue;
+                        }
+                        try {
+                            strand = this.determineStrand(feature, refGenJob);
+                        } catch (IllegalStateException e) {
+                            this.sendErrorMsg(e.getMessage());
+                            continue;
+                        }
+
+                        //Determine feature tags
+                        Iterator<Note> noteIter = feature.getRichAnnotation().getNoteSet().iterator();
+                        while (noteIter.hasNext()) {
+                            Note note = noteIter.next();
+                            String name = note.getTerm().getName();
+                            String value = note.getValue();
+
+                            if (name.equals("locus_tag")) {
+                                locusTag = value;
+                            } else if (name.equalsIgnoreCase("locus")) {
+                                locusTag = value;
+                            } else if (name.equalsIgnoreCase("name") && locusTag.equals("unknown locus tag")) {
+                                locusTag = value;
+                            } else if (name.equals("product")) {
+                                product = value;
+                            } else if (name.equals("EC_number")) {
+                                ecNumber = value;
+                            } else if (name.equals("gene")) {
+                                geneName = value;
+                            }
+                        }
+
+                        /* 
+                         * If the type of the feature is unknown to vamp (see below),
+                         * an undefined type is used.
+                         */
+                        FeatureType type = FeatureType.UNDEFINED;
+
+                        // look for known types
+                        if (parsedType.equalsIgnoreCase("CDS")) {
+                            type = FeatureType.CDS;
+                        } else if (parsedType.equalsIgnoreCase("repeat_unit")) {
+                            type = FeatureType.REPEAT_UNIT;
+                        } else if (parsedType.equalsIgnoreCase("rRNA")) {
+                            type = FeatureType.R_RNA;
+                        } else if (parsedType.equalsIgnoreCase("source")) {
+                            type = FeatureType.SOURCE;
+                        } else if (parsedType.equalsIgnoreCase("tRNA")) {
+                            type = FeatureType.T_RNA;
+                        } else if (parsedType.equalsIgnoreCase("misc_RNA")) {
+                            type = FeatureType.MISC_RNA;
+                        } else if (parsedType.equalsIgnoreCase("miRNA")) {
+                            type = FeatureType.MI_RNA;
+                        } else if (parsedType.equalsIgnoreCase("gene")) {
+                            type = FeatureType.GENE;
+                        } else if (parsedType.equalsIgnoreCase("mRNA")) {
+                            type = FeatureType.M_RNA;
+                        } else if (parsedType.equalsIgnoreCase("exon")) {
+                            type = FeatureType.EXON;
+                            System.out.println("exon found"); //if exon is within range of lastGene = belongs to it
+                            
+                            exons.add(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures));
+                            continue;
+                            
+                        //since positions in genbank file are sorted this works.
+//                            boolean added = false;
+//                            for (ParsedFeature lastGene : lastGenes) {
+//                                if (lastGene.getStop() < start){ //remove genes out of range
+//                                    lastGenes.remove(lastGene);
+//                                } else if (lastGene.getStrand() == strand && lastGene.getStart() <= start 
+//                                        && lastGene.getStop() >= stop) {
+//                                    lastGene.addSubfeature(new ParsedSubfeature(start, stop));
+//                                    added = true;
+//                                    break;
+//                                }
+//                            }
+//                            if (!added){ //in this special case we directly add the feature now
+//                                refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures));
+//                                continue;
+//                            }
+                        } else {
+                            this.sendErrorMsg(refGenJob.getFile().getAbsolutePath()
+                                    + ": Using unknown feature type for " + parsedType);
+                        }
+                        
+
+                        /*
+                         * for eukaryotic organism its important to see the single cds/exons
+                         * to exclude introns
+                         * if we choose min and max we get the first pos of the first cds/exon
+                         * of one gene and the last position of the last cds/exon and we can't
+                         * see exon intron structure
+                         */
+                        //check feature for subfeatures
+                        if (location.toString().contains("join")) {
+                            Iterator subFeatureIter = location.blockIterator();
+                            int subStart = -1;
+                            int subStop = -1;
+                            while (subFeatureIter.hasNext()) {
+
+                                String pos = subFeatureIter.next().toString();
+                                //array always contains at least 2 entries
+                                String[] posArray = pos.split("\\..");
+                                subStart = Integer.parseInt(posArray[0]);
+                                subStop = Integer.parseInt(posArray[1]);
+                                subfeatures.add(new ParsedSubfeature(subStart, subStop));
+                            }
+                        }
+
+                        //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
+                        ParsedFeature currentFeature = new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures);
+                        refGenome.addFeature(currentFeature);
+//                        if (currentFeature.getType() == FeatureType.GENE){
+//                            lastGenes.add(currentFeature);
+//                        }
+
+                    }
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
+//            } else {
+//                this.sendErrorMsg("No sequence found in file "+refGenJob.getFile().getAbsolutePath());
+                } catch (Exception ex) {
+                    this.sendErrorMsg(ex.getMessage());
+                }
+
+            }
+
+        } catch (Exception ex) {
+            this.sendErrorMsg(ex.getMessage());
+        }
+        refGenome.addExons(exons);
+        return refGenome;
+    }
+    
+    /**
+     * Determines the strand of a feature.
+     * @param feature the feature whose strand is needed
+     * @param refGenJob the reference genome job this feature belongs to
+     * @return SequenceUtils.STRAND_REV (-1), SequenceUtils.STRAND_FWD (1) or 0, if the strand cannot be determined
+     */
+    private int determineStrand(RichFeature feature, ReferenceJob refGenJob) throws IllegalStateException {
+        String strandString = RichLocation.Tools.enrich(feature.getLocation()).getStrand().toString();
+        int strand = 0;
+        if (strandString.equals("-")) {
+            strand = SequenceUtils.STRAND_REV;
+        } else if (strandString.equals("+")) {
+            strand = SequenceUtils.STRAND_FWD;
+        } else {
+            throw new IllegalStateException(refGenJob.getFile().getAbsolutePath() 
+                    + ": Unknown strand found: " + strandString + ". Feature ignored.");
+        }
+        return strand;
+    }
+
+    @Override
+    public String getParserName() {
+        return parserName;
+    }
+
+    @Override
+    public String getInputFileDescription() {
+        return fileDescription;
+    }
+
+    @Override
+    public String[] getFileExtensions() {
+        return fileExtension;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : this.observers) {
+            observer.update(this.errorMsg);
+        }
+    }
+
+    /**
+     * Method setting and sending the error msg to all observers.
+     * @param errorMsg the error msg to send
+     */
+    private void sendErrorMsg(final String errorMsg) {
+        this.errorMsg = errorMsg;
+        this.notifyObservers();
+    }
+    
+}

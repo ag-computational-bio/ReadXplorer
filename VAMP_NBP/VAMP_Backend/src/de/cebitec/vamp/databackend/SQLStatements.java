@@ -1,5 +1,7 @@
 package de.cebitec.vamp.databackend;
 
+import java.lang.reflect.Field;
+
 /**
  *
  * @author ddoppmeier, rhilker
@@ -87,20 +89,24 @@ public class SQLStatements {
             "VALUES (?,?,?,?,?)";
 
     public final static String INSERT_FEATURE =
-            "INSERT INTO "+FieldNames.TABLE_FEATURES+" " +
+            "INSERT INTO " + FieldNames.TABLE_FEATURES + " " +
             "(" +
             FieldNames.FEATURE_ID+", " +
             FieldNames.FEATURE_REFGEN+", "+
             FieldNames.FEATURE_TYPE+", " +
             FieldNames.FEATURE_START+", " +
             FieldNames.FEATURE_STOP+", " +
-            FieldNames.FEATURE_LOCUS+", " +
-            FieldNames.FEATURE_PRODUCT+", " +
-            FieldNames.FEATURE_ECNUM+", " +
-            FieldNames.FEATURE_STRAND+", "+
-            FieldNames.FEATURE_GENE+" "+
             ") " +
-            "VALUES (?,?,?,?,?,?,?,?,?,?)";
+            "VALUES (?,?,?,?,?); " +
+            "INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS +" " +
+            "(" +
+            FieldNames.FEATURE_DETAILS_LOCUS+", " +
+            FieldNames.FEATURE_DETAILS_PRODUCT+", " +
+            FieldNames.FEATURE_DETAILS_ECNUM+", " +
+            FieldNames.FEATURE_DETAILS_STRAND+", "+
+            FieldNames.FEATURE_DETAILS_GENE+" "+
+            ") " +
+            "VALUES (?,?,?,?,?)";
 
     public final static String INSERT_TRACK =
             "INSERT INTO "+FieldNames.TABLE_TRACKS+" " +
@@ -437,41 +443,47 @@ public class SQLStatements {
 
     public final static String FETCH_FEATURES_FOR_INTERVAL_FROM_GENOME =
             "SELECT " +
-                FieldNames.FEATURE_ECNUM+", "+
-                FieldNames.FEATURE_ID+", "+
-                FieldNames.FEATURE_LOCUS+", "+
-                FieldNames.FEATURE_PRODUCT+", "+
+                FieldNames.TABLE_FEATURES+"."+FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_TYPE+", " +
                 FieldNames.FEATURE_START+", "+
                 FieldNames.FEATURE_STOP+", "+
-                FieldNames.FEATURE_STRAND+", "+
-                FieldNames.FEATURE_TYPE+", " +
-                FieldNames.FEATURE_GENE+" " +
-            "FROM "+
-                FieldNames.TABLE_FEATURES+" " +
-            "WHERE "+
+                FieldNames.FEATURE_DETAILS_ECNUM+", "+
+                FieldNames.FEATURE_DETAILS_LOCUS+", "+
+                FieldNames.FEATURE_DETAILS_PRODUCT+", "+
+                FieldNames.FEATURE_DETAILS_STRAND+", "+
+                FieldNames.FEATURE_DETAILS_GENE +
+            " FROM "+
+                FieldNames.TABLE_FEATURES+", " +
+                FieldNames.TABLE_FEATURE_DETAILS +
+            " WHERE "+
                 FieldNames.FEATURE_REFGEN+" = ? and " +
                 FieldNames.FEATURE_STOP+" >= ? and " +
-                FieldNames.FEATURE_START+" <= ? " +
-            "ORDER BY " + FieldNames.FEATURE_START;
+                FieldNames.FEATURE_START+" <= ? and " +
+                FieldNames.TABLE_FEATURES+"."+FieldNames.FEATURE_ID + " = " + 
+                    FieldNames.TABLE_FEATURE_DETAILS+"."+FieldNames.FEATURE_DETAILS_ID + 
+            " ORDER BY " + FieldNames.FEATURE_START;
     
     
         public final static String FETCH_FEATURES_FOR_CLOSED_INTERVAL_FROM_GENOME =
             "SELECT " +
-                FieldNames.FEATURE_ECNUM+", "+
-                FieldNames.FEATURE_ID+", "+
-                FieldNames.FEATURE_LOCUS+", "+
-                FieldNames.FEATURE_PRODUCT+", "+
+                FieldNames.TABLE_FEATURES+"."+FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_TYPE+", " +
                 FieldNames.FEATURE_START+", "+
                 FieldNames.FEATURE_STOP+", "+
-                FieldNames.FEATURE_STRAND+", "+
-                FieldNames.FEATURE_TYPE+", " +
-                FieldNames.FEATURE_GENE+" " +
-            "FROM "+
-                FieldNames.TABLE_FEATURES+" " +
-            "WHERE "+
+                FieldNames.FEATURE_DETAILS_ECNUM+", "+
+                FieldNames.FEATURE_DETAILS_LOCUS+", "+
+                FieldNames.FEATURE_DETAILS_PRODUCT+", "+
+                FieldNames.FEATURE_DETAILS_STRAND+", "+
+                FieldNames.FEATURE_DETAILS_GENE+
+            " FROM "+
+                FieldNames.TABLE_FEATURES+", " +
+                FieldNames.TABLE_FEATURE_DETAILS +
+            " WHERE "+
                 FieldNames.FEATURE_REFGEN + " = ? and " +
                 FieldNames.FEATURE_START + " between ? and ? and " +
-                FieldNames.FEATURE_STOP + " between ? and ? ";
+                FieldNames.FEATURE_STOP + " between ? and ? and " +
+                FieldNames.TABLE_FEATURES+"."+FieldNames.FEATURE_ID + " = " + 
+                    FieldNames.TABLE_FEATURE_DETAILS+"."+FieldNames.FEATURE_DETAILS_ID;
 
 
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
@@ -1444,4 +1456,107 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
                 FieldNames.MAPPING_TRACK + " = ? " +
            " LIMIT 1 ";
    
+   
+        public static final String FETCH_SUBFEATURES_FOR_GENOMIC_INTERVAL =
+            "SELECT " 
+                + FieldNames.SUBFEATURES_FEATURE_ID+", "
+                + FieldNames.SUBFEATURES_START+", "
+                + FieldNames.SUBFEATURES_STOP+" " +
+            "FROM "+
+                FieldNames.TABLE_SUBFEATURES+" " +
+            "WHERE "
+                + FieldNames.SUBFEATURES_REF_GEN_ID + " = ? and "
+                + FieldNames.SUBFEATURES_STOP+" >= ? and "
+                + FieldNames.SUBFEATURES_START+" <= ? " +
+            "ORDER BY " + FieldNames.FEATURE_START;
+    
+    
+        public static final String FETCH_SUBFEATURES_FOR_CLOSED_GENOMIC_INTERVAL =
+            "SELECT "
+                + FieldNames.SUBFEATURES_FEATURE_ID+", "
+                + FieldNames.SUBFEATURES_START+", "
+                + FieldNames.SUBFEATURES_STOP+" " +
+            "FROM "+
+                FieldNames.TABLE_SUBFEATURES+" " +
+            "WHERE "
+                + FieldNames.SUBFEATURES_REF_GEN_ID + " = ? and "
+                + FieldNames.SUBFEATURES_START + " between ? and ? and "
+                + FieldNames.SUBFEATURES_STOP + " between ? and ? ";
+        
+        //maybe not needed
+        public static final String FETCH_SUBFEATURES_FOR_FEATURE_ID = 
+                "SELECT "
+                    + FieldNames.SUBFEATURES_START + ", "
+                    + FieldNames.SUBFEATURES_STOP +
+                " FROM " 
+                    + FieldNames.TABLE_SUBFEATURES +
+                " WHERE "
+                    + FieldNames.SUBFEATURES_FEATURE_ID + " = ? ";
+        
+        
+        public final static String INSERT_SUBFEATURE =
+            "INSERT INTO " + FieldNames.TABLE_SUBFEATURES + " "
+            + "("
+                + FieldNames.SUBFEATURES_ID + ", "
+                + FieldNames.SUBFEATURES_REF_GEN_ID + ", "
+                + FieldNames.SUBFEATURES_FEATURE_ID + ", "
+                + FieldNames.SUBFEATURES_START + ", "
+                + FieldNames.SUBFEATURES_STOP + " "
+            + ") "
+            + "VALUES (?,?,?,?,?)";
+                
+        
+        public static final String GET_LATEST_SUBFEATURE_ID =
+            "SELECT MAX("+FieldNames.SUBFEATURES_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_SUBFEATURES;
+        
+        
+        public static final String COPY_TO_DETAILED_FEATURE_TABLE =
+                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("
+                    + FieldNames.FEATURE_ID + ", "
+                    + FieldNames.FEATURE_ECNUM + ", " 
+                    + FieldNames.FEATURE_LOCUS + ", " 
+                    + FieldNames.FEATURE_PRODUCT + ", " 
+                    + FieldNames.FEATURE_STRAND + ", " 
+                    + FieldNames.FEATURE_GENE + ") "
+                + " SELECT "
+                    + FieldNames.FEATURE_ID + ", "
+                    + FieldNames.FEATURE_ECNUM + ", " 
+                    + FieldNames.FEATURE_LOCUS + ", " 
+                    + FieldNames.FEATURE_PRODUCT + ", " 
+                    + FieldNames.FEATURE_STRAND + ", " 
+                    + FieldNames.FEATURE_GENE
+                + " FROM " 
+                    + FieldNames.TABLE_FEATURES +
+                " WHERE EXISTS ("
+                    + "SELECT * "
+                    + "FROM INFORMATION_SCHEMA.COLUMNS "
+                    + "WHERE TABLE_NAME = '" + FieldNames.TABLE_FEATURES + "' "
+                    + " AND COLUMN_NAME = '" + FieldNames.FEATURE_GENE + "' ) ";
+        
+        public static final String CHECK_FEATURE_TABLE = 
+                "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" 
+                    + FieldNames.TABLE_FEATURES + "' AND COLUMN_NAME = '"
+                    + FieldNames.FEATURE_PRODUCT + "' ";
+   
+        
+        public static final String ALTER_FEATURE_TABLE = 
+                "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_ECNUM + "; "
+                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_GENE + "; "
+                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_LOCUS + "; "
+                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_PRODUCT + "; "
+                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_STRAND + "; ";
+        
+        
+        public static final String SETUP_FEATURE_DETAILS =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURE_DETAILS
+            + " ("
+                + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
+                + FieldNames.FEATURE_LOCUS + " VARCHAR (1000), "
+                + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
+                + FieldNames.FEATURE_ECNUM + " VARCHAR (20), "
+                + FieldNames.FEATURE_STRAND + " TINYINT NOT NULL, "
+                + FieldNames.FEATURE_GENE + " VARCHAR (30) "
+            + ") ";
+                
+        
 }

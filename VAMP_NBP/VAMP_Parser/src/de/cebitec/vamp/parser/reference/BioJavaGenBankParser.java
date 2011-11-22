@@ -6,6 +6,7 @@ import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.parser.common.ParsedSubfeature;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -13,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.biojava.bio.seq.DNATools;
@@ -32,6 +34,7 @@ import org.biojavax.bio.seq.io.RichStreamReader;
 /**
  *
  * @author ddoppmei
+ * @deprecated use BioJavaParser
  */
 public class BioJavaGenBankParser implements ReferenceParserI, Observable {
 
@@ -56,20 +59,20 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
             RichSequenceFormat genbank = new GenbankFormat();
             RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
 
-            RichStreamReader it = new RichStreamReader(in, genbank, dna, factory, ns);
+            RichStreamReader seqIter = new RichStreamReader(in, genbank, dna, factory, ns);
 
             // take only the first sequence from file, if exists
-            if (it.hasNext()){
+            if (seqIter.hasNext()){
 
-                RichSequence s = it.nextRichSequence();
+                RichSequence seq = seqIter.nextRichSequence();
 
                 refGenome.setDescription(refGenJob.getDescription());
                 refGenome.setName(refGenJob.getName());
                 refGenome.setTimestamp(refGenJob.getTimestamp());
-                refGenome.setSequence(s.seqString());
+                refGenome.setSequence(seq.seqString());
 
                 // iterate through all features
-                Iterator<Feature> featIt = s.getFeatureSet().iterator();
+                Iterator<Feature> featIt = seq.getFeatureSet().iterator();
                 while (featIt.hasNext()){
                     RichFeature f = (RichFeature) featIt.next();
 
@@ -82,21 +85,13 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                     int strand = 0;
                     String ecNumber = null;
                     String geneName = null;
+                    List<ParsedSubfeature> exons = new ArrayList<ParsedSubfeature>();
 
                     parsedType = f.getType();
                     start = f.getLocation().getMin();
                     stop = f.getLocation().getMax();
-
-                    String strandString = RichLocation.Tools.enrich(f.getLocation()).getStrand().toString();
-                    if (strandString.equals("-")){
-                        strand = SequenceUtils.STRAND_REV;
-                    } else if (strandString.equals("+")){
-                        strand = SequenceUtils.STRAND_FWD;
-                    } else {
-                        this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": "
-                                + "Unknown strand found: " + strandString);
-                    }
-
+                    strand = this.determineStrand(f, refGenJob);
+                    
                     @SuppressWarnings("unchecked")
                     Iterator<Note> iter = f.getRichAnnotation().getNoteSet().iterator();
                     while (iter.hasNext()){
@@ -115,13 +110,28 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                         } else if (name.equals("gene")){
                             geneName = value;
                         }
-
                     }
+                    
+                    //check feature for subfeatures (currently only exons)
+                    @SuppressWarnings("unchecked")
+                    Iterator<RichFeature> subfeatureIter = f.features();
+                    while (subfeatureIter.hasNext()){
+                        
+                        RichFeature subfeature = subfeatureIter.next();
+                        String type = subfeature.getType();
+                        
+                        if (type.equalsIgnoreCase("exon")){
+                            int subStart = subfeature.getLocation().getMin();
+                            int subStop = subfeature.getLocation().getMax();
+                            exons.add(new ParsedSubfeature(subStart, subStop));
+                        }
+                    }
+                    
 
                     /* if the type of the feature is unknown to vamp (see below),
                      * an undefined type is used
                      */
-                    Integer type = FeatureType.UNDEFINED;
+                    FeatureType type = FeatureType.UNDEFINED;
 
                     // look for known types
                     if (parsedType.equalsIgnoreCase("CDS")){
@@ -143,11 +153,12 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                     } else if (parsedType.equalsIgnoreCase("mRNA")){
                         type = FeatureType.M_RNA;
                     } else {
-                        this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": "
-                                + "Found unknown feature " + parsedType);
+                        this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() 
+                                + ": Using unknown feature type for " + parsedType);
                     }
 
-                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName));
+                    //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
+                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
 
                 }
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
@@ -160,6 +171,25 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
         }
 
         return refGenome;
+    }
+    
+    /**
+     * Determines the strand of a feature.
+     * @param feature the feature whose strand is needed
+     * @param refGenJob the reference genome job this feature belongs to
+     * @return SequenceUtils.STRAND_REV (-1), SequenceUtils.STRAND_FWD (1) or 0, if the strand cannot be determined
+     */
+    private int determineStrand(RichFeature feature, ReferenceJob refGenJob) {
+        String strandString = RichLocation.Tools.enrich(feature.getLocation()).getStrand().toString();
+        int strand = 0;
+        if (strandString.equals("-")) {
+            strand = SequenceUtils.STRAND_REV;
+        } else if (strandString.equals("+")) {
+            strand = SequenceUtils.STRAND_FWD;
+        } else {
+            this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() + ": Unknown strand found: " + strandString);
+        }
+        return strand;
     }
 
     @Override
