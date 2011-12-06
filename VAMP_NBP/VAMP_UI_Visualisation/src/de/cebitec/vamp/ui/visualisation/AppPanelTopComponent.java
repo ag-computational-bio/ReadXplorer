@@ -149,8 +149,12 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // remove all viewers
         Component[] comps = visualPanel.getComponents();
         for (Component comp : comps){
-            if (comp instanceof BasePanel){
-                ((BasePanel) comp).getViewer().close();
+            if (comp instanceof BasePanel) {
+                try {
+                    ((BasePanel) comp).getViewer().close();
+                } catch (NullPointerException e) {
+                    //do nothing, we want to close something, which is already destroyed
+                }
             }
         }
         visualPanel.removeAll();

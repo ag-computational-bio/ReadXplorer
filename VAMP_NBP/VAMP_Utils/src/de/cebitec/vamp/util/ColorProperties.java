@@ -44,6 +44,8 @@ public class ColorProperties {
     public static final Color RRNA = new Color(50, 8, 207);
     public static final Color SOURCE = new Color(8, 109, 207);
     public static final Color TRNA = new Color(8, 207, 178);
+    public static final Color EXON = new Color(38, 145, 44);
+    public static final Color EXON_BORDER = new Color(45, 45, 45);
     public static final Color UNDEF_FEATURE = new Color(0, 255, 77);
     // histogram viewer specific colors
     public static final Color LOGO_MATCH = Color.GREEN;

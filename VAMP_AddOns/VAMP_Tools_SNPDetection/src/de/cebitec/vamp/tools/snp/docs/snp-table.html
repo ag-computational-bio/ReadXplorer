@@ -10,21 +10,40 @@ and open the template in the editor.
     </head>
     <body>
         <h2>About the SNP table model</h2>
-        <p>
+        <p style="font-size:0.9em">
             The SNP table model shows the following content:
         </p>
         <ol>
-            <li style="margin-bottom:13"><b><u>Pos</u></b>: The <b>absolute position</b> of the SNP in the reference genome. If it is an insertion it receives a "_(a-z (in ascending order))" as extension.</li>
-            <li style="margin-bottom:13"><b><u>Track</u></b>: The <b>name</b> of the track, this SNP is belonging to.</li>
-            <li style="margin-bottom:13"><b><u>Base</u></b>: The <b>consensus base</b> found in the mappings at the current position. Meaning the base with the highest coverage.</li>
-            <li style="margin-bottom:13"><b><u>A/C/G/T/N/_</u></b>: <b>Number of occurrences</b> of each of these bases or a gap at the current position.</li>
-            <li style="margin-bottom:13"><b><u>RefCov</u></b>: <b>Complete coverage</b> of the reference genome by this track at this position. For an insertion the coverage of the position directly before and after is taken into account.</li>
-            <li style="margin-bottom:13"><b><u>Freq</u></b>: The <b>frequency</b> of the consensus base among the complete coverage at the current position. For an insertion the coverage of the position directly before and after is taken into account.</li> 
-            <li style="margin-bottom:13"><b><u>Type</u></b>: <b>Effect type</b> of the SNP. <b>M</b> = Match, <b>S</b> = Substituion, <b>I</b> = Insertion, <b>D</b> = Deletion of the reference base.</li>
-            <li style="margin-bottom:13"><b><u>Amino SNP</u></b>: If the current position lies within a feature (e.g. gene) the amino acid is calculated for the triplet at the current position incuding the SNP base. The <b>amino acid</b> is represented in <b>one-character-code</b> together with its main <b>chemical property</b>.</li>
-            <li style="margin-bottom:13"><b><u>Amino Ref</u></b>: If the current position lies within a feature (e.g. gene) the amino acid is calculated for the reference triplet including the current position. The <b>amino acid</b> is represented in <b>one-character-code</b> together with its main <b>chemical property</b>.</li>
-            <li style="margin-bottom:13"><b><u>Effect on AA</u></b>: Constitutes the <b>effect</b> of the SNP on the amino acid sequence of its protein. <b>M</b> = Match, <b>I</b> = frame shift +1, <b>D</b> = Frame shift -1, <b>N</b> = Neutral substitution, <b>E</b> = Missense substituion.</li>
-            <li style="margin-bottom:13"><b><u>Feature (Gene)</u></b>: Either the <b>name</b> of the underlying gene, or, if the name is not available, its <b>locus tag</b>.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Pos</u></b>: The <b>absolute position</b> of the SNP in the 
+                reference genome. If it is an insertion it receives a "_(a-z (in ascending order))" as extension.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Track</u></b>: The <b>name</b> of the track, this SNP is 
+                belonging to.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Base</u></b>: The <b>consensus base</b> found in the 
+                mappings at the current position. Meaning the base with the highest coverage.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>A/C/G/T/N/_</u></b>: <b>Number of occurrences</b> of each 
+                of these bases or a gap at the current position.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>RefCov</u></b>: <b>Complete coverage</b> of the reference 
+                genome by this track at this position. For an insertion the coverage of the position directly before and 
+                after is taken into account.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Freq</u></b>: The <b>frequency</b> of the consensus base 
+                among the complete coverage at the current position. For an insertion the coverage of the position 
+                directly before and after is taken into account.</li> 
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Type</u></b>: <b>Effect type</b> of the SNP. <b>M</b> = 
+                Match, <b>S</b> = Substituion, <b>I</b> = Insertion, <b>D</b> = Deletion of the reference base.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Amino SNP</u></b>: If the current position lies within 
+                a feature (e.g. gene) and is not an insertion or deletion the amino acid is calculated for the triplet 
+                at the current position incuding the SNP base. The <b>amino acid</b> is represented 
+                in <b>one-character-code</b> together with its main <b>chemical property</b>.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Amino Ref</u></b>: If the current position lies within 
+                a feature (e.g. gene) and is not an insertion or deletion the amino acid is calculated for the reference 
+                triplet including the current position. The <b>amino acid</b> is represented in 
+                <b>one-character-code</b> together with its main <b>chemical property</b>.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Effect on AA</u></b>: Constitutes the <b>effect</b> of 
+                the SNP on the amino acid sequence of its protein. <b>M</b> = match, <b>I</b> = frame shift +1, 
+                <b>D</b> = Frame shift -1, <b>N</b> = neutral substitution, <b>E</b> = missense substituion.</li>
+            <li style="font-size:0.9em; margin-bottom:13"><b><u>Feature (Gene)</u></b>: Either the <b>name</b> of the 
+                underlying gene, or, if the name is not available, its <b>locus tag</b>. Always shown, if the SNP is 
+                located in a gene.</li>
         </ol>
         <!-- TODO describe your module, add more pages... -->
     </body>

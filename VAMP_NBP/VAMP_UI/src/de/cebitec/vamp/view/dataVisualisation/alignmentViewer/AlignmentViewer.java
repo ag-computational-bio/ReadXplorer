@@ -131,7 +131,7 @@ public class AlignmentViewer extends AbstractViewer {
         this.findMinAndMaxCount(mappings); //for currently shown mappings
         this.findMaxCoverage(coverage);
         this.setViewerHeight();
-        layout = new Layout(from, to, mappings);
+        layout = new Layout(from, to, mappings, this.getExcludedFeatureTypes());
         this.addBlocks(layout);
 
     }
@@ -182,7 +182,7 @@ public class AlignmentViewer extends AbstractViewer {
 
     /**
      * After creating a layout this method creates all visual components which
-     * represent the layout. Thus it creates all block components. 
+     * represent the layout. Thus, it creates all block components. 
      * Each block component depicts one mapping.
      * @param layout the layout containing all information about the mappings to paint
      */

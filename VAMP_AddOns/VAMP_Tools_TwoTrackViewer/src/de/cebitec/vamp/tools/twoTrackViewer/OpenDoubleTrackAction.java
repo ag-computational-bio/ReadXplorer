@@ -3,7 +3,7 @@ package de.cebitec.vamp.tools.twoTrackViewer;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -23,7 +23,7 @@ public final class OpenDoubleTrackAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        OpenTrackPanel otp = new OpenTrackPanel(context.getReference().getId());
+        OpenTrackPanelList otp = new OpenTrackPanelList(context.getReference().getId());
 
         DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Two Tracks");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);

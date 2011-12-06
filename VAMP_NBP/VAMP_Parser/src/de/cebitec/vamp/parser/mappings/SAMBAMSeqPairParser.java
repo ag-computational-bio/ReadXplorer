@@ -3,18 +3,18 @@ package de.cebitec.vamp.parser.mappings;
 import java.util.HashMap;
 
 /**
- * A BAMSeqPairParser extends the BAMParser, because it needs to alter
+ * A SAMBAMSeqPairParser extends the SAMBAMParser, because it needs to alter
  * the processReadname method in order to store a mapping between sequence id
  * and readname. This mapping is needed to connect the 2 mapping files belonging to
  * a sequence pair sequencing run.
  *
  * @author Rolf Hilker
  */
-public class BAMSeqPairParser extends SAMBAMParser implements SequencePairParserI {
+public class SAMBAMSeqPairParser extends SAMBAMParser implements SequencePairParserI {
 
     private HashMap<String, Integer> seqIDToReadNameMap;
 
-    public BAMSeqPairParser() {
+    public SAMBAMSeqPairParser() {
         this.seqIDToReadNameMap = new HashMap<String, Integer>();
     }
 

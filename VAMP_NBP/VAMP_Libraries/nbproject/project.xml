@@ -241,6 +241,23 @@
                 <package>org.h2.upgrade</package>
                 <package>org.h2.util</package>
                 <package>org.h2.value</package>
+                <package>org.japura.controller</package>
+                <package>org.japura.controller.modals</package>
+                <package>org.japura.debug</package>
+                <package>org.japura.exception</package>
+                <package>org.japura.gui</package>
+                <package>org.japura.gui.calendar</package>
+                <package>org.japura.gui.calendar.components</package>
+                <package>org.japura.gui.dnd</package>
+                <package>org.japura.gui.event</package>
+                <package>org.japura.gui.model</package>
+                <package>org.japura.gui.renderer</package>
+                <package>org.japura.i18n</package>
+                <package>org.japura.modal</package>
+                <package>org.japura.task</package>
+                <package>org.japura.task.listener</package>
+                <package>org.japura.util</package>
+                <package>org.japura.util.date</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
@@ -285,6 +302,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/bytecode.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/bytecode.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>

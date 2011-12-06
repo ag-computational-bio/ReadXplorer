@@ -54,7 +54,7 @@ public class H2SQLStatements {
             + " ("
             + FieldNames.DIFF_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.DIFF_MAPPING_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.DIFF_CHAR + " VARCHAR (1) NOT NULL, "
+            + FieldNames.DIFF_BASE + " VARCHAR (1) NOT NULL, "
             + FieldNames.DIFF_POSITION + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.DIFF_TYPE + " TINYINT UNSIGNED NOT NULL, "
             + FieldNames.DIFF_ORDER + " BIGINT UNSIGNED "
@@ -91,24 +91,39 @@ public class H2SQLStatements {
             "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_POSITION + ", " + FieldNames.COVERAGE_TRACK + ") ";
    
     
-//    public final static String SETUP_FEATURES =
-//            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
-//            + " ("
-//            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
-//            + FieldNames.FEATURE_REFGEN + " BIGINT UNSIGNED NOT NULL, "
-//            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
-//            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
-//            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
-//            + FieldNames.FEATURE_LOCUS + " VARCHAR (1000), "
-//            + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
-//            + FieldNames.FEATURE_ECNUM + " VARCHAR (20), " +
-//            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
-//            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
-//            ") ";
+    public final static String SETUP_FEATURES =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
+            + " ("
+            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.FEATURE_REFGEN_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_LOCUS_TAG + " VARCHAR (1000), "
+            + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
+            + FieldNames.FEATURE_EC_NUM + " VARCHAR (20), " +
+            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
+            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
+            ") ";
     
     
-    public final static String INDEX_FEATURES =
-            "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES + " (" + FieldNames.FEATURE_REFGEN + ") ";
+    public final static String INDEX_FEATURES = 
+            "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES + " (" + FieldNames.FEATURE_REFGEN_ID + ") ";
+            
+    
+    public static final String SETUP_SUBFEATURES =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
+            + " ("
+            + FieldNames.SUBFEATURES_PARENT_ID + " BIGINT NOT NULL, "
+            + FieldNames.SUBFEATURES_REFERENCE_ID + " BIGINT NOT NULL, "
+            + FieldNames.SUBFEATURES_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBFEATURES_START + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL "
+            + ") ";
+    
+       public final static String INDEX_FEATURE_DETAILS =
+            "CREATE INDEX IF NOT EXISTS INDEXFEATUREDETAILS ON " + FieldNames.TABLE_SUBFEATURES + " "
+               + "(" + FieldNames.SUBFEATURES_PARENT_ID + ", " + FieldNames.SUBFEATURES_REFERENCE_ID + ") ";
     
     
     public final static String SETUP_MAPPINGS =
@@ -120,9 +135,9 @@ public class H2SQLStatements {
             + FieldNames.MAPPING_START + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.MAPPING_STOP + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.MAPPING_DIRECTION + " TINYINT NOT NULL, "
-            + FieldNames.MAPPING_COUNT + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.MAPPING_NUM_OF_REPLICATES + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.MAPPING_NUM_OF_ERRORS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.MAPPING_BEST_MAPPING + " TINYINT UNSIGNED NOT NULL "
+            + FieldNames.MAPPING_IS_BEST_MAPPING + " TINYINT UNSIGNED NOT NULL "
             + ") ";
     
     
@@ -189,33 +204,6 @@ public class H2SQLStatements {
             "CREATE INDEX IF NOT EXISTS INDEXMAPPING_TO_SEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
             + "(" + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + ", " + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
 
-    
-    /* I have decided against an id as primary key. */
-    public static final String SETUP_SUBFEATURES = 
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
-            + " ("
-            + FieldNames.SUBFEATURES_ID + " BIGINT UNSIGNED PRIMARY KEY, "
-            + FieldNames.SUBFEATURES_REF_GEN_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURES_FEATURE_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURES_START + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL "
-            + ") ";
-    
-    public static final String INDEX_SUBFEATURES = 
-            "CREATE INDEX IF NOT EXISTS INDEXSUBFEATURE ON " + FieldNames.TABLE_SUBFEATURES
-            + " (" + FieldNames.SUBFEATURES_REF_GEN_ID + ", " + FieldNames.SUBFEATURES_FEATURE_ID 
-            + ", " + FieldNames.SUBFEATURES_START + ", " + FieldNames.SUBFEATURES_STOP + " ) ";
-    
-    
-    public final static String SETUP_FEATURES =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
-            + " ("
-            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
-            + FieldNames.FEATURE_REFGEN + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL "
-            + ") ";
 
     //////////////////  statements for data insertion  /////////////////////////  
 

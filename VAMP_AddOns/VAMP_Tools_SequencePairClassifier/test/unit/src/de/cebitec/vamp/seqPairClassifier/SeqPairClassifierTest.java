@@ -339,9 +339,9 @@ public class SeqPairClassifierTest {
         Assert.assertTrue(pair1.getMappingId1() == 21 && pair1.getMappingId2() == 22 && pair1.getType() == 0
                             && pair1.getReplicates() == 1);
         
-        Iterator keys = pairs.keySet().iterator();
+        Iterator<Pair<Long, Long>> keys = pairs.keySet().iterator();
         while (keys.hasNext()){
-            ParsedSeqPairMapping mp = pairs.get((Pair<Long, Long>) keys.next());
+            ParsedSeqPairMapping mp = pairs.get(keys.next());
             System.out.println(mp.toString());
         }
         for (Pair<Long,Long> pair : list){

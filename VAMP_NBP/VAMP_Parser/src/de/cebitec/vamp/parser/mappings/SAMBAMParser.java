@@ -29,14 +29,14 @@ public class SAMBAMParser implements MappingParserI, Observer {
 
     private static String name = "SAM/BAM Parser";
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam", "sam", "SAM", "Sam"};
-    private static String fileDescription = "BAM Output";
+    private static String fileDescription = "BAM or SAM Output";
     private HashMap<Integer, Integer> gapOrderIndex;
     private int errors = 0;
     private HashMap<String, Integer> seqToIDMap;
     private ArrayList<Observer> observers;
     private String errorMsg;
     private int noUniqueMappings;
-    private ArrayList readnames;
+    private ArrayList<String> readnames;
 
     public SAMBAMParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
@@ -88,9 +88,9 @@ public class SAMBAMParser implements MappingParserI, Observer {
                 readSeqwithoutGaps = first.getReadString();
             if (!first.getReadUnmappedFlag()) {
 
-                    int stop = 0;
+                int stop = 0;
                 boolean isReverseStrand = first.getReadNegativeStrandFlag();
-                byte direction = (byte) (isReverseStrand ? -1 : 1);
+                byte direction = (byte) (isReverseStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
 
                     readname = first.getReadName();
                     refName = first.getReferenceName();
@@ -258,7 +258,7 @@ public class SAMBAMParser implements MappingParserI, Observer {
                     // store a lower case char, if this is a gap in genome
                     Character base = readSeq.charAt(i);
                     base = Character.toUpperCase(base);
-                    if (direction == -1) {
+                    if (direction == SequenceUtils.STRAND_REV) {
                         base = SequenceUtils.getDnaComplement(base, readSeq);
                     }
 
@@ -270,7 +270,7 @@ public class SAMBAMParser implements MappingParserI, Observer {
                     // store the upper case char from input file, if this is a modification in the read
                     char c = readSeq.charAt(i);
                     c = Character.toUpperCase(c);
-                    if (direction == -1) {
+                    if (direction == SequenceUtils.STRAND_REV) {
                         c = SequenceUtils.getDnaComplement(c, readSeq);
                     }
                     ParsedDiff d = new ParsedDiff(absPos, c);

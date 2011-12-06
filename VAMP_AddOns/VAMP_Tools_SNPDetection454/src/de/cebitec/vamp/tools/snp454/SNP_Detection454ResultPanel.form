@@ -19,8 +19,8 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" alignment="1" pref="492" max="32767" attributes="0"/>
-                  <Component id="resultProgressBar" alignment="0" pref="492" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="1" pref="757" max="32767" attributes="0"/>
+                  <Component id="resultProgressBar" alignment="0" pref="757" max="32767" attributes="0"/>
                   <Component id="exportSNPsButton" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>

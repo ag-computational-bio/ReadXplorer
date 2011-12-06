@@ -13,48 +13,23 @@ public class FieldNames {
     private FieldNames() {
     }
 
-    /**
-     * NOTE: All commands belonging to the RUN domain have been commented out,
-     * because the run domain has been excluded from VAMP!!!!
-     * This includes the Run, Unique_Sequence and Readname tables! service provider?
-     */
-
     // names for various database tables
     public final static String TABLE_REF_GEN = "REFERENCE";
     public final static String TABLE_DIFF = "DIFF";
-//    public final static String TABLE_SEQUENCE = "UNIQUE_SEQUENCE";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
-    public static final String TABLE_FEATURE_DETAILS = "FEATURE_DETAILS";
+    public static final String TABLE_SUBFEATURES = "SUBFEATURES";
     public final static String TABLE_MAPPINGS = "MAPPING";
     public final static String TABLE_TRACKS = "TRACK";
     public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
     public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
     public final static String TABLE_POSITIONS = "POSITIONS";
-//    public final static String TABLE_RUN = "RUN";
-//    public final static String TABLE_READS = "READNAME";
-    public final static String TABLE_STATISTICS = "STATISTICS";    
-    public static final String TABLE_SUBFEATURES = "SUBFEATURES";
+    public final static String TABLE_STATISTICS = "STATISTICS";   
     
-    //SUBFEATUREs table fields, could be refactored if needed for other purposes (like introns -> subfeatures)
-    public static final String SUBFEATURES_ID = "ID";
-    public static final String SUBFEATURES_REF_GEN_ID = "REF_GEN_ID";
-    public static final String SUBFEATURES_FEATURE_ID = "FEATURE_ID";
-    public static final String SUBFEATURES_START = "START";
-    public static final String SUBFEATURES_STOP = "STOP";
+    
+    ////////////////////////  tables fields  //////////////////////////////// 
         
-    //feature detail table fields
-    public final static String FEATURE_DETAILS_ID = "ID";
-    public final static String FEATURE_DETAILS_LOCUS = "LOCUS_TAG";
-    public final static String FEATURE_DETAILS_PRODUCT = "PRODUCT";
-    public final static String FEATURE_DETAILS_ECNUM = "EC_NUM";
-    public final static String FEATURE_DETAILS_STRAND = "STRAND";
-    public static final String FEATURE_DETAILS_GENE = "GENE";
-
-
-    ////////////////////////  tables fields  ////////////////////////////////
-
     // position table fields
     public final static String POSITIONS_SNP_ID = "ID";
     public final static String POSITIONS_TRACK_ID = "TRACK_ID";
@@ -82,15 +57,12 @@ public class FieldNames {
     public final static String DIFF_ID = "ID";
     public final static String DIFF_MAPPING_ID = "MAPPING_ID";
     public final static String DIFF_POSITION = "POSITION";
-    public final static String DIFF_CHAR = "BASE";
+    public final static String DIFF_BASE = "BASE";
     public final static String DIFF_TYPE = "TYPE";
     public final static String DIFF_ORDER = "GAP_ORDER";
     public final static String DIFF_SNP_ID = "SNP_ID";
 
-//    // source table fields
-//    public final static String SEQUENCE_ID = "ID";
-//    public final static String SEQUENCE_RUN = "RUN_ID";
-
+    
     // coverage table fields
     public final static String COVERAGE_ID = "ID";
     public final static String COVERAGE_TRACK = "TRACK_ID";
@@ -126,25 +98,34 @@ public class FieldNames {
 
     //all feature table fields
     public final static String FEATURE_ID = "ID";
-    public final static String FEATURE_REFGEN = "REFERENCE_ID";
+    public final static String FEATURE_REFGEN_ID = "REFERENCE_ID";
     public final static String FEATURE_TYPE = "TYPE";
     public final static String FEATURE_START = "START";
     public final static String FEATURE_STOP = "STOP";
-    public final static String FEATURE_LOCUS = "LOCUS_TAG";
+    public final static String FEATURE_LOCUS_TAG = "LOCUS_TAG";
     public final static String FEATURE_PRODUCT = "PRODUCT";
-    public final static String FEATURE_ECNUM = "EC_NUM";
+    public final static String FEATURE_EC_NUM = "EC_NUM";
     public final static String FEATURE_STRAND = "STRAND";
     public static final String FEATURE_GENE = "GENE";
+    
+    
+    //subfeature table fields
+    public final static String SUBFEATURES_PARENT_ID = "PARENT_ID";
+    public final static String SUBFEATURES_REFERENCE_ID = "REFERENCE_ID";
+    public final static String SUBFEATURES_TYPE = "TYPE";
+    public final static String SUBFEATURES_START = "START";
+    public final static String SUBFEATURES_STOP = "STOP";
 
+    
     // mapping table fields
     public final static String MAPPING_ID = "ID";
     public final static String MAPPING_SEQUENCE_ID = "SEQUENCE_ID";
     public final static String MAPPING_START = "START";
     public final static String MAPPING_STOP = "STOP";
     public final static String MAPPING_NUM_OF_ERRORS = "NUM_OF_ERRORS";
-    public final static String MAPPING_BEST_MAPPING = "IS_BEST_MAPPING";
+    public final static String MAPPING_IS_BEST_MAPPING = "IS_BEST_MAPPING";
     public final static String MAPPING_DIRECTION = "DIRECTION";
-    public final static String MAPPING_COUNT = "NUM_OF_REPLICATES";
+    public final static String MAPPING_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
     public final static String MAPPING_TRACK = "TRACK_ID";
 
     // track table fields
@@ -153,9 +134,8 @@ public class FieldNames {
     public static final String TRACK_SEQUENCE_PAIR_ID = "SEQUENCE_PAIR_ID";
     public final static String TRACK_DESCRIPTION = "DESCRIPTION";
     public final static String TRACK_TIMESTAMP = "CREATIONTIME";
-    //public final static String TRACK_RUN = "RUN_ID";
     
-    //paired data table fields (mate pairs and paired end data
+    //paired data table fields (mate pairs and paired end data)
     public static final String SEQ_PAIR_ID = "ID";
     public static final String SEQ_PAIR_PAIR_ID = "PAIR_ID"; //one pair can be seen at diff. positions
     public static final String SEQ_PAIR_MAPPING1_ID = "MAPPING1_ID";
@@ -170,16 +150,6 @@ public class FieldNames {
     public static final String SEQ_PAIR_PIVOT_MAPPING_ID = "MAPPING_ID";
     public static final String SEQ_PAIR_PIVOT_SEQ_PAIR_ID = "SEQ_PAIR_ID";
 
-
-//    // run table fields
-//    public final static String RUN_ID = "ID";
-//    public final static String RUN_DESCRIPTION = "DESCRIPTION";
-//    public final static String RUN_TIMESTAMP = "CREATIONTIME";
-//
-//    // read table fields
-//    public final static String READ_ID = "ID";
-//    public final static String READ_NAME = "NAME";
-//    public final static String READ_SEQUENCE = "SEQUENCE_ID";
 
     // statistics table fields
     public final static String STATISTICS_ID = "ID";

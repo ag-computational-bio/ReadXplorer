@@ -3,9 +3,9 @@ package de.cebitec.vamp.databackend.connector;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.FieldNames;
 import de.cebitec.vamp.databackend.SQLStatements;
-import de.cebitec.vamp.databackend.dataObjects.PersistantExon;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubfeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,8 +71,8 @@ public class ReferenceConnector {
             ResultSet rs = fetch.executeQuery();
             while(rs.next()){
                 int id = rs.getInt(FieldNames.FEATURE_ID);
-                String ecnum = rs.getString(FieldNames.FEATURE_ECNUM);
-                String locus = rs.getString(FieldNames.FEATURE_LOCUS);
+                String ecnum = rs.getString(FieldNames.FEATURE_EC_NUM);
+                String locus = rs.getString(FieldNames.FEATURE_LOCUS_TAG);
                 String product = rs.getString(FieldNames.FEATURE_PRODUCT);
                 int start = rs.getInt(FieldNames.FEATURE_START);
                 int stop = rs.getInt(FieldNames.FEATURE_STOP);
@@ -88,7 +90,7 @@ public class ReferenceConnector {
         return features;
     }
     
-    public List<PersistantFeature> getFeaturesForGenome(int left, int right){
+    public List<PersistantFeature> getFeaturesForClosedInterval(int left, int right){
         List<PersistantFeature> features = new ArrayList<PersistantFeature>();
         try {
             
@@ -103,8 +105,8 @@ public class ReferenceConnector {
             ResultSet rs = fetch.executeQuery();
             while(rs.next()){
                 int id = rs.getInt(FieldNames.FEATURE_ID);
-                String ecnum = rs.getString(FieldNames.FEATURE_ECNUM);
-                String locus = rs.getString(FieldNames.FEATURE_LOCUS);
+                String ecnum = rs.getString(FieldNames.FEATURE_EC_NUM);
+                String locus = rs.getString(FieldNames.FEATURE_LOCUS_TAG);
                 String product = rs.getString(FieldNames.FEATURE_PRODUCT);
                 int start = rs.getInt(FieldNames.FEATURE_START);
                 int stop = rs.getInt(FieldNames.FEATURE_STOP);
@@ -122,21 +124,23 @@ public class ReferenceConnector {
         return features;
     }
         
-    public List<PersistantExon> getSubfeaturesForRegion(int from, int to){
-        List<PersistantExon> subfeatures = new ArrayList<PersistantExon>();
+    
+    public List<PersistantSubfeature> getSubfeaturesForRegion(int from, int to){
+        List<PersistantSubfeature> subfeatures = new ArrayList<PersistantSubfeature>();
         try {
-            PreparedStatement fetchExons = con.prepareStatement(SQLStatements.FETCH_SUBFEATURES_FOR_GENOMIC_INTERVAL);
-            fetchExons.setInt(1, refGenID);
-            fetchExons.setInt(1, from);
-            fetchExons.setInt(2, to);
+            PreparedStatement fetchSubfeatures = con.prepareStatement(SQLStatements.FETCH_SUBFEATURES_FOR_GENOMIC_INTERVAL);
+            fetchSubfeatures.setInt(1, refGenID);
+            fetchSubfeatures.setInt(2, from);
+            fetchSubfeatures.setInt(3, to);
 
-            ResultSet rs = fetchExons.executeQuery();
+            ResultSet rs = fetchSubfeatures.executeQuery();
             while(rs.next()){
-                int parentId = rs.getInt(FieldNames.SUBFEATURES_FEATURE_ID);
+                int parentId = rs.getInt(FieldNames.SUBFEATURES_PARENT_ID);
                 int start = rs.getInt(FieldNames.SUBFEATURES_START);
                 int stop = rs.getInt(FieldNames.SUBFEATURES_STOP);
+                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.SUBFEATURES_TYPE));
 
-                subfeatures.add(new PersistantExon(parentId, start, stop));
+                subfeatures.add(new PersistantSubfeature(parentId, start, stop, type));
             }
 
         } catch (SQLException ex) {
@@ -146,8 +150,8 @@ public class ReferenceConnector {
         return subfeatures;
     }
     
-    public List<PersistantExon> getSubfeaturesForGenome(int left, int right){
-        List<PersistantExon> subfeatures = new ArrayList<PersistantExon>();
+    public List<PersistantSubfeature> getSubfeaturesForClosedInterval(int left, int right){
+        List<PersistantSubfeature> subfeatures = new ArrayList<PersistantSubfeature>();
         try {
             
             PreparedStatement fetchExons = con.prepareStatement(SQLStatements.FETCH_SUBFEATURES_FOR_CLOSED_GENOMIC_INTERVAL);
@@ -160,11 +164,12 @@ public class ReferenceConnector {
 
             ResultSet rs = fetchExons.executeQuery();
             while(rs.next()){
-                int parentId = rs.getInt(FieldNames.SUBFEATURES_FEATURE_ID);
+                int parentId = rs.getInt(FieldNames.SUBFEATURES_PARENT_ID);
                 int start = rs.getInt(FieldNames.SUBFEATURES_START);
                 int stop = rs.getInt(FieldNames.SUBFEATURES_STOP);
+                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.SUBFEATURES_TYPE));
 
-                subfeatures.add(new PersistantExon(parentId, start, stop));
+                subfeatures.add(new PersistantSubfeature(parentId, start, stop, type));
             }
 
         } catch (SQLException ex) {
@@ -186,8 +191,7 @@ public class ReferenceConnector {
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
                 int refGenomeID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
-//                Long runID = rs.getLong(FieldNames.TRACK_RUN);
-                list.add(new PersistantTrack(id, description, date, refGenomeID));//, runID));
+                list.add(new PersistantTrack(id, description, date, refGenomeID));
             }
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);

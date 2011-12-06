@@ -12,14 +12,12 @@ public class PersistantTrack {
     private String description;
     private Timestamp date;
     private int refGenID;
- //   private Long runID; //excluded since RUN domain is excluded from VAMP
 
-    public PersistantTrack(int id, String description, Timestamp date, int refGenID){//, Long runID) {
+    public PersistantTrack(int id, String description, Timestamp date, int refGenID){
         this.id = id;
         this.description = description;
         this.date = date;
         this.refGenID = refGenID;
-//        this.runID = runID;
     }
 
     public int getId() {
@@ -42,9 +40,5 @@ public class PersistantTrack {
     public String toString(){
         return description;
     }
-
-//    public Long getRunID() {
-//        return runID;
-//    } //excluded since RUN domain is excluded from VAMP
 
 }

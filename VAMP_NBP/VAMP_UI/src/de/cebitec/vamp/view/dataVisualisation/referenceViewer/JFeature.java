@@ -24,24 +24,40 @@ import org.openide.util.Utilities;
  * Contains the content of a feature and takes care of the painting process.
  * Also contains its popup menu.
  *
- * @author ddoppmei
+ * @author ddoppmeier, rhilker
  */
-public class Feature extends JComponent {
+public class JFeature extends JComponent {
 
     private static final long serialVersionUID = 347348234;
     private PersistantFeature feature;
     private Dimension size;
-    public static final int height = 12;
+    public static final int NORMAL_HEIGHT = 12;
+    public static final int PARENT_FEATURE_HEIGHT = 8;
+    public static final byte BORDER_NONE = 0;
+    public static final byte BORDER_LEFT = -1;
+    public static final byte BORDER_RIGHT = 1;
+    public static final byte BORDER_BOTH = 2;
+    private int height;
     private Font font;
     private Color color;
+    private short border;
 
-    public Feature(final PersistantFeature feature, double length, final ReferenceViewer refViewer) {
+    /**
+     * A component for displaying a feature.
+     * @param feature the feature to display
+     * @param length length of the feature on the screen
+     * @param refViewer the reference viewer on which the feature is displayed
+     * @param border value among JFeature.BORDER_NONE, JFeature.BORDER_LEFT, JFeature.BORDER_RIGHT, JFeature.BORDER_BOTH
+     */
+    public JFeature(final PersistantFeature feature, double length, final ReferenceViewer refViewer, short border) {
         super();
         this.feature = feature;
-        size = new Dimension((int) length, height);
+        this.height = NORMAL_HEIGHT;
+        this.size = new Dimension((int) length, height);
         this.setSize(size);
-        font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
-        color = determineColor(feature);
+        this.font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+        this.color = this.determineColor(feature);
+        this.border = border;
 
         this.addListeners(refViewer);
         this.setToolTipText(createToolTipText());
@@ -57,7 +73,7 @@ public class Feature extends JComponent {
         sb.append("<table>");
 
         sb.append(createTableRow("Locus", feature.getLocus()));
-        sb.append(createTableRow("Type", FeatureType.getTypeString(feature.getType())));
+        sb.append(createTableRow("Type", feature.getType().getTypeString()));
         sb.append(createTableRow("Strand", (feature.getStrand() == 1 ? "forward" : "reverse")));
         sb.append(createTableRow("Start", String.valueOf(feature.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(feature.getStop())));
@@ -77,11 +93,11 @@ public class Feature extends JComponent {
         return "<tr><td align=\"right\"><b>" + label + ":</b></td><td align=\"left\">" + value + "</td></tr>";
     }
 
-    public void setSelected(boolean b) {
-        if (b) {
+    public void setSelected(boolean selected) {
+        if (selected) {
             color = ColorProperties.SELECTED_FEATURE;
         } else {
-            color = determineColor(feature);
+            color = this.determineColor(feature);
         }
         this.repaint();
     }
@@ -92,17 +108,56 @@ public class Feature extends JComponent {
 
         // draw the rectangle
         g.setColor(color);
-        g.fillRect(0, 0, this.getSize().width, height);
+        if (feature.getSubfeatures().isEmpty()){
+            g.fillRect(0, 0, this.getSize().width, this.height);
+            g.setColor(ColorProperties.EXON_BORDER);
+            g.drawRect(0, 0, this.getSize().width-1, this.height-1);
+            //paint border in feature color, if feature is larger than screen at that border
+            g.setColor(color);
+            this.overpaintBorder(g, 0, this.height-1);
+        } else { //features with subfeature have a smaller height
+            g.fillRect(0, (NORMAL_HEIGHT-PARENT_FEATURE_HEIGHT)/2, this.getSize().width, PARENT_FEATURE_HEIGHT);
+            g.setColor(ColorProperties.EXON_BORDER);
+            g.drawRect(0, (NORMAL_HEIGHT-PARENT_FEATURE_HEIGHT)/2, this.getSize().width-1, PARENT_FEATURE_HEIGHT-1);
+            g.setColor(color);
+            this.overpaintBorder(g, (NORMAL_HEIGHT-PARENT_FEATURE_HEIGHT)/2 + 1, PARENT_FEATURE_HEIGHT);
+        }
 
         // draw the locus of the feature inside the rectangle
         g.setColor(ColorProperties.FEATURE_LABEL);
         g.setFont(font);
         FontMetrics fm = g.getFontMetrics();
 
-        int fontY = this.getHeight() / 2 + fm.getMaxAscent() / 2;
-        String label = determineLabel(feature.getLocus(), fm);
-        g.drawString(label, 5, fontY);
+        int fontY = this.getHeight() / 2 - 2 + fm.getMaxAscent() / 2;
+        if (feature.hasLocus()){
+            String label = this.determineLabel(feature.getLocus(), fm);
+            g.drawString(label, 5, fontY);
+        }
 
+    }
+    
+    /**
+     * Overpaints the border of the feature again with a line, if it is larger 
+     * than the screen and continues at the border.
+     * @param g graphics object to paint on
+     * @param y1 first y value of the line to draw
+     * @param y2 second y value of the line to draw
+     */
+    private void overpaintBorder(Graphics2D g, int y1, int y2) {
+        switch (this.border) {
+            case JFeature.BORDER_BOTH:
+                g.drawLine(0, y1, 0, y2);
+                g.drawLine(this.getSize().width-1, y1, this.getSize().width-1, y2);
+                break;
+            case JFeature.BORDER_LEFT:
+                g.drawLine(0, y1, 0, y2);
+                break;
+            case JFeature.BORDER_RIGHT:
+                g.drawLine(this.getSize().width-1, y1, this.getSize().width-1, y2);
+                break;
+            default:
+                break;
+        }
     }
 
     private String determineLabel(String text, FontMetrics fm) {
@@ -118,34 +173,36 @@ public class Feature extends JComponent {
 
     /**
      * Set the color a feature is displayed with. Depends on the feature's type,
-     * @param f the feature
+     * @param feature the feature
      * @return the color for this feature
      */
-    private Color determineColor(PersistantFeature f) {
+    private Color determineColor(PersistantFeature feature) {
         Color c;
-
-        if (f.getType() == FeatureType.CDS) {
+        
+        if (feature.getType() == FeatureType.CDS) {
             c = ColorProperties.CDS;
-        } else if (f.getType() == FeatureType.M_RNA) {
+        } else if (feature.getType() == FeatureType.MRNA) {
             c = ColorProperties.MRNA;
-        } else if (f.getType() == FeatureType.MISC_RNA) {
+        } else if (feature.getType() == FeatureType.MISC_RNA) {
             c = ColorProperties.MISC_RNA;
-        } else if (f.getType() == FeatureType.REPEAT_UNIT) {
+        } else if (feature.getType() == FeatureType.REPEAT_UNIT) {
             c = ColorProperties.REPEAT_UNIT;
-        } else if (f.getType() == FeatureType.R_RNA) {
+        } else if (feature.getType() == FeatureType.RRNA) {
             c = ColorProperties.RRNA;
-        } else if (f.getType() == FeatureType.SOURCE) {
+        } else if (feature.getType() == FeatureType.SOURCE) {
             c = ColorProperties.SOURCE;
-        } else if (f.getType() == FeatureType.T_RNA) {
+        } else if (feature.getType() == FeatureType.TRNA) {
             c = ColorProperties.TRNA;
-        } else if (f.getType() == FeatureType.GENE) {
+        } else if (feature.getType() == FeatureType.GENE) {
             c = ColorProperties.GENE;
-        } else if (f.getType() == FeatureType.MI_RNA) {
+        } else if (feature.getType() == FeatureType.MIRNA) {
             c = ColorProperties.MI_RNA;
-        } else if (f.getType() == FeatureType.UNDEFINED) {
+        } else if (feature.getType() == FeatureType.EXON) {
+            c = ColorProperties.EXON;
+        } else if (feature.getType() == FeatureType.UNDEFINED) {
             c = ColorProperties.UNDEF_FEATURE;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for feature {0}", f.getType());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for feature {0}", feature.getType());
             c = ColorProperties.UNDEF_FEATURE;
         }
 
@@ -158,7 +215,7 @@ public class Feature extends JComponent {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1){
-                    refViewer.setSelectedFeature(Feature.this);
+                    refViewer.setSelectedFeature(JFeature.this);
                 }
                 showPopUp(e);
             }
@@ -215,8 +272,9 @@ public class Feature extends JComponent {
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                refViewer.forwardChildrensMousePosition(e.getX(), Feature.this);
+                refViewer.forwardChildrensMousePosition(e.getX(), JFeature.this);
             }
         });
     }
+    
 }

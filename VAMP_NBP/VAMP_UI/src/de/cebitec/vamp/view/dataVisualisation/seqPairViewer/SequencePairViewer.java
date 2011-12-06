@@ -1,9 +1,12 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -12,6 +15,7 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayerI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayoutI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -194,7 +198,16 @@ public class SequencePairViewer extends AbstractViewer {
             Iterator<BlockI> blockIt = b.getBlockIterator();
             while (blockIt.hasNext()) {
                 BlockPair block = (BlockPair) blockIt.next();
-                this.createJBlock(block, layerCounter);
+//                boolean excluded = false;
+//                if (block.getPersistantObject() instanceof PersistantSequencePair){
+//                    short seqPairType = ((PersistantSequencePair) block.getPersistantObject()).getSeqPairType();
+//                    excluded = this.inExclusionList(seqPairType);
+//                } else if (this.getExcludedFeatureTypes().contains(FeatureType.SINGLE_MAPPING)){
+//                    excluded = true;
+//                }                    
+//                if (!excluded) {
+                    this.createJBlock(block, layerCounter);
+//                }
             }
 
             layerCounter += countingStep;
@@ -293,4 +306,13 @@ public class SequencePairViewer extends AbstractViewer {
 //            }
 //        });
 //    }
+
+    private boolean inExclusionList(short seqPairType) {
+        if ((seqPairType == Properties.TYPE_PERFECT_PAIR && this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_PAIR))
+         || (seqPairType != Properties.TYPE_PERFECT_PAIR && this.getExcludedFeatureTypes().contains(FeatureType.DISTORTED_PAIR))){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

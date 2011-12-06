@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ParsedReference {
 
@@ -87,25 +87,30 @@ public class ParsedReference {
         return id;
     }
 
-    
-    public void addExons(List<ParsedFeature> exons) {
+    /**
+     * Adds subfeatures to their parent features. Should only be called after all
+     * regular features have been imported. If a parent feature cannot cannot be found 
+     * the subfeature becomes a regular feature. So they all should contain as much 
+     * information as a regular feature, if possible.
+     * @param subfeatures the subfeatures to add to their parent feature for this genome.
+     */
+    public void addSubfeatures(List<ParsedFeature> subfeatures) {
         int lastIndex = 0;
         boolean added = false;
-        for (ParsedFeature exon : exons){
+        for (ParsedFeature subfeature : subfeatures){
             //since the features are sorted in this.features we can do this in linear time
             for (int i = lastIndex; i<this.features.size(); ++i){
                 ParsedFeature feature = this.features.get(i);
-                if (feature.getStrand() == exon.getStrand() && feature.getStart() <= exon.getStart()
-                        && feature.getStop() >= exon.getStop()) {
-                    feature.addSubfeature(new ParsedSubfeature(exon.getStart(), exon.getStop()));
+                if (feature.getStrand() == subfeature.getStrand() && feature.getStart() <= subfeature.getStart()
+                        && feature.getStop() >= subfeature.getStop()) {
+                    feature.addSubfeature(new ParsedSubfeature(subfeature.getStart(), subfeature.getStop(), subfeature.getType()));
                     added = true;
                     lastIndex = i == 0 ? 0 : i-1;
                     break;
                 }
             }
             if (!added){ //if there is no parent feature for the subfeature it becomes an ordinary feature
-                this.features.add(exon);
-                //TODO next: subfeatures are not yet added to tables!
+                this.features.add(subfeature);
             }
         }
     }

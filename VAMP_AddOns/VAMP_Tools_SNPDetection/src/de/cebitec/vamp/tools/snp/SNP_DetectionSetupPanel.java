@@ -8,7 +8,6 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
-import de.cebitec.vamp.databackend.connector.ITrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import java.util.ArrayList;
@@ -26,13 +25,13 @@ import org.openide.util.TaskListener;
 
 /**
  *
- * @author jwinneba
+ * @author jwinneba, rhilker
  */
 public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private ITrackConnector con;
     private ProjectConnector proCon;
+    private List<Integer> trackIds;
     private SnpData snpData;
 
     public static final String PROP_SNPS_LOADED = "snpsLoaded";
@@ -41,6 +40,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
     public SNP_DetectionSetupPanel() {
         initComponents();
         snpData = new SnpData(new ArrayList<SnpI>(), new HashMap<Integer, String>());
+        this.proCon = ProjectConnector.getInstance();
     }
     
     private class SnpWorker extends SwingWorker<SnpData, Object> {
@@ -60,7 +60,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             CentralLookup.getDefault().add(this);
 
             ph.start();
-            List<SnpI> snps = proCon.findSNPs(percent, num);
+            List<SnpI> snps = proCon.findSNPs(percent, num, trackIds);
             snpData = new SnpData(snps, proCon.getOpenedTrackNames());
             return snpData;
         }
@@ -200,16 +200,20 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
     private javax.swing.JButton searchButton;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * @return the SnpData object containing all detected SNPs after a SNP detection
+     * was carried out.
+     */
     public SnpData getSnps() {
         return snpData;
     }
-
-//    public void setCon(ITrackConnector con) {
-//        this.con = con;
-//    }
-
-    public void setCon(ProjectConnector con) {
-        this.proCon = con;
+    
+    /**
+     * Set the track ids for which the snps should be detected.
+     * @param trackIds the list of track ids defining the tracks to detect snps for.
+     */
+    public void setTrackIds(List<Integer> trackIds){
+        this.trackIds = trackIds;
     }
 
     

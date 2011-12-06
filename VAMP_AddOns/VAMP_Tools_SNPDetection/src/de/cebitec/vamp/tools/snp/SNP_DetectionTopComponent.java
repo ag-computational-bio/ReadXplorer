@@ -1,7 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 
@@ -10,6 +9,7 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
@@ -59,10 +59,12 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * The <code>TrackViewer</code> instance is used to set up the setup and
      * result panels.
      *
-     * @param trackViewer instance used for this panels panels.
+     * @param referenceViewer the reference viewer for which the snp detection should be carried out.
+     * @param trackIds the list of track ids for which the snp detection should be carried out. They 
+     * all have to belong to the reference genome set in the reference viewer
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer){
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, List<Integer> trackIds){
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
         SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
@@ -70,13 +72,8 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         //add reference sequence for amino acid mutation detection
         resultPanel.setReferenceGenome(referenceViewer.getReference());
 
-        // assign the ProjectConnector
-        setupPanel.setCon(ProjectConnector.getInstance());
-        //setupPanel.setCon(trackViewer.getTrackCon());
-//        ReferenceViewer viewer = Lookup.getDefault().lookup(ReferenceViewer.class);
-//        if (viewer != null){
-//            resultPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
-//        }
+        // assign the track Ids
+        setupPanel.setTrackIds(trackIds);
         resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
 
         // listen on changes of the search
@@ -204,13 +201,8 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         return PREFERRED_ID;
     }
 
-//    public void openDetectionTab(TrackViewer trackViewer){
-//        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
-//        snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
-//    }
-
-    public void openDetectionTab(ReferenceViewer referenceViewer){
-        snpTabs.addTab("SNP Detection for opened Tabs", getSnpDetectionPanel(referenceViewer));
+    public void openDetectionTab(ReferenceViewer referenceViewer, List<Integer> trackIds){
+        snpTabs.addTab("SNP Detection for opened Tabs", this.getSnpDetectionPanel(referenceViewer, trackIds));
         snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
     }
     

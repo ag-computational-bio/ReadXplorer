@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
@@ -18,6 +19,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -44,13 +47,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     // gap at the sides of panel
     private int horizontalMargin;
     private int verticalMargin;
-    private int zoom =1;
-    private int tmpzoom = 1;
+    private int zoom = 1;
     private double basewidth;
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
     private int currentLogMousePos;
-     int lastPhysPos=0;
+    private int lastPhysPos = 0;
     private boolean printMouseOver;
     private BasePanel basePanel;
 
@@ -68,6 +70,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private LegendLabel legendLabel;
     private JPanel legend;
     private boolean hasLegend;
+    private List<FeatureType> excludedFeatureTypes;
 
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
@@ -75,6 +78,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference){
         super();
+        this.excludedFeatureTypes = new ArrayList<FeatureType>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
         this.boundsManager = boundsManager;
@@ -586,6 +590,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public boolean isLegendVisisble(){
         return legend.isVisible();
+    }
+    
+    public List<FeatureType> getExcludedFeatureTypes(){
+        return this.excludedFeatureTypes;
     }
 
     public boolean isMouseOverPaintingRequested() {

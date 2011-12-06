@@ -112,8 +112,6 @@ public class BioJavaParser implements ReferenceParserI {
                     refGenome.setName(refGenJob.getName());
                     refGenome.setTimestamp(refGenJob.getTimestamp());
                     refGenome.setSequence(seq.seqString());
-                    
-//                    List<ParsedFeature> lastGenes = new ArrayList<ParsedFeature>();
 
                     // iterate through all features
                     Iterator<Feature> featIt = seq.getFeatureSet().iterator();
@@ -181,44 +179,27 @@ public class BioJavaParser implements ReferenceParserI {
                         } else if (parsedType.equalsIgnoreCase("repeat_unit")) {
                             type = FeatureType.REPEAT_UNIT;
                         } else if (parsedType.equalsIgnoreCase("rRNA")) {
-                            type = FeatureType.R_RNA;
+                            type = FeatureType.RRNA;
                         } else if (parsedType.equalsIgnoreCase("source")) {
                             type = FeatureType.SOURCE;
                         } else if (parsedType.equalsIgnoreCase("tRNA")) {
-                            type = FeatureType.T_RNA;
+                            type = FeatureType.TRNA;
                         } else if (parsedType.equalsIgnoreCase("misc_RNA")) {
                             type = FeatureType.MISC_RNA;
                         } else if (parsedType.equalsIgnoreCase("miRNA")) {
-                            type = FeatureType.MI_RNA;
+                            type = FeatureType.MIRNA;
                         } else if (parsedType.equalsIgnoreCase("gene")) {
                             type = FeatureType.GENE;
                         } else if (parsedType.equalsIgnoreCase("mRNA")) {
-                            type = FeatureType.M_RNA;
+                            type = FeatureType.MRNA;
                         } else if (parsedType.equalsIgnoreCase("exon")) {
                             type = FeatureType.EXON;
                             System.out.println("exon found"); //if exon is within range of lastGene = belongs to it
                             
                             exons.add(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures));
                             continue;
-                            
-                        //since positions in genbank file are sorted this works.
-//                            boolean added = false;
-//                            for (ParsedFeature lastGene : lastGenes) {
-//                                if (lastGene.getStop() < start){ //remove genes out of range
-//                                    lastGenes.remove(lastGene);
-//                                } else if (lastGene.getStrand() == strand && lastGene.getStart() <= start 
-//                                        && lastGene.getStop() >= stop) {
-//                                    lastGene.addSubfeature(new ParsedSubfeature(start, stop));
-//                                    added = true;
-//                                    break;
-//                                }
-//                            }
-//                            if (!added){ //in this special case we directly add the feature now
-//                                refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures));
-//                                continue;
-//                            }
                         } else {
-                            this.sendErrorMsg(refGenJob.getFile().getAbsolutePath()
+                            this.sendErrorMsg(refGenJob.getFile().getName()
                                     + ": Using unknown feature type for " + parsedType);
                         }
                         
@@ -232,7 +213,7 @@ public class BioJavaParser implements ReferenceParserI {
                          */
                         //check feature for subfeatures
                         if (location.toString().contains("join")) {
-                            Iterator subFeatureIter = location.blockIterator();
+                            Iterator<Location> subFeatureIter = location.blockIterator();
                             int subStart = -1;
                             int subStop = -1;
                             while (subFeatureIter.hasNext()) {
@@ -242,7 +223,7 @@ public class BioJavaParser implements ReferenceParserI {
                                 String[] posArray = pos.split("\\..");
                                 subStart = Integer.parseInt(posArray[0]);
                                 subStop = Integer.parseInt(posArray[1]);
-                                subfeatures.add(new ParsedSubfeature(subStart, subStop));
+                                subfeatures.add(new ParsedSubfeature(subStart, subStop, type));
                             }
                         }
 
@@ -255,10 +236,9 @@ public class BioJavaParser implements ReferenceParserI {
 
                     }
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
-//            } else {
-//                this.sendErrorMsg("No sequence found in file "+refGenJob.getFile().getAbsolutePath());
                 } catch (Exception ex) {
                     this.sendErrorMsg(ex.getMessage());
+                    seqIter.nextSequence();
                 }
 
             }
@@ -266,7 +246,7 @@ public class BioJavaParser implements ReferenceParserI {
         } catch (Exception ex) {
             this.sendErrorMsg(ex.getMessage());
         }
-        refGenome.addExons(exons);
+        refGenome.addSubfeatures(exons);
         return refGenome;
     }
     

@@ -8,16 +8,18 @@ import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dialogMenus.OpenRefGenPanel;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import java.awt.Dialog;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.util.NbBundle;
 
 /**
  * Controls the view for one <code>ApplicationFrameI</code>
@@ -83,12 +85,12 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public void openTrack() {
-        OpenTrackPanel otp = new OpenTrackPanel(currentRefGen.getId());
+        OpenTrackPanelList otp = new OpenTrackPanelList(currentRefGen.getId());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Track");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
-        if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()){
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 // create basepanel
                 BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
@@ -97,6 +99,11 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
                 // show the panel and the track
                 getApp().showTrackPanel(trackPanel);
             }
+        } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
+            String msg = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfo",
+                    "No track selected. To open a track, at least one track has to be selected.");
+            String title = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfoTitle", "Info");
+            JOptionPane.showMessageDialog(genomeViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

@@ -47,7 +47,7 @@ public class MySQLStatements {
             "(" +
             FieldNames.DIFF_ID+" BIGINT PRIMARY KEY, "+
             FieldNames.DIFF_MAPPING_ID+" BIGINT UNSIGNED NOT NULL, "+
-            FieldNames.DIFF_CHAR+ " VARCHAR (1) NOT NULL, "+
+            FieldNames.DIFF_BASE+ " VARCHAR (1) NOT NULL, "+
             FieldNames.DIFF_POSITION+" BIGINT UNSIGNED NOT NULL, "+
             FieldNames.DIFF_TYPE+" TINYINT UNSIGNED NOT NULL, " +
             FieldNames.DIFF_ORDER+" BIGINT UNSIGNED , " +
@@ -78,20 +78,33 @@ public class MySQLStatements {
             ") ";
 
     
-    public final static String SETUP_FEATURES =
+       public final static String SETUP_FEATURES =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_FEATURES+" " +
             "(" +
             FieldNames.FEATURE_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.FEATURE_REFGEN+" BIGINT UNSIGNED NOT NULL, "+
+            FieldNames.FEATURE_REFGEN_ID+" BIGINT UNSIGNED NOT NULL, "+
             FieldNames.FEATURE_TYPE+" TINYINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_START+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_STOP+" BIGINT UNSIGNED NOT NULL, " +
-            FieldNames.FEATURE_LOCUS+" VARCHAR(1000) , " +
+            FieldNames.FEATURE_LOCUS_TAG+" VARCHAR(1000) , " +
             FieldNames.FEATURE_PRODUCT+" VARCHAR(1000), " +
-            FieldNames.FEATURE_ECNUM+" VARCHAR (20), " +
+            FieldNames.FEATURE_EC_NUM+" VARCHAR (20), " +
             FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
             FieldNames.FEATURE_GENE+" VARCHAR (20), " +
-            "INDEX ("+FieldNames.FEATURE_REFGEN+") " +
+            "INDEX ("+FieldNames.FEATURE_REFGEN_ID+") " +
+            ") ";
+       
+       public static final String SETUP_SUBFEATURES =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
+            + " ("
+                + FieldNames.SUBFEATURES_PARENT_ID + " BIGINT NOT NULL, "
+                + FieldNames.SUBFEATURES_REFERENCE_ID + " BIGINT NOT NULL, "
+                + FieldNames.SUBFEATURES_TYPE + " TINYINT UNSIGNED NOT NULL, "
+                + FieldNames.SUBFEATURES_START + " BIGINT UNSIGNED NOT NULL, "
+                + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL, "
+                + FieldNames.FEATURE_GENE + " VARCHAR (30) " +
+                "INDEX ("+  FieldNames.SUBFEATURES_PARENT_ID + ", " + 
+                        FieldNames.SUBFEATURES_REFERENCE_ID +") " +
             ") ";
 
     
@@ -104,9 +117,9 @@ public class MySQLStatements {
             FieldNames.MAPPING_START+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_STOP+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_DIRECTION+" TINYINT NOT NULL, " +
-            FieldNames.MAPPING_COUNT+" SMALLINT UNSIGNED NOT NULL, " +
+            FieldNames.MAPPING_NUM_OF_REPLICATES+" SMALLINT UNSIGNED NOT NULL, " +
             FieldNames.MAPPING_NUM_OF_ERRORS+" BIGINT UNSIGNED NOT NULL, " +
-            FieldNames.MAPPING_BEST_MAPPING+" TINYINT UNSIGNED NOT NULL, " +
+            FieldNames.MAPPING_IS_BEST_MAPPING+" TINYINT UNSIGNED NOT NULL, " +
             " INDEX ("+FieldNames.MAPPING_START+"), " +
             " INDEX ("+FieldNames.MAPPING_STOP+"), " +
             " INDEX ("+FieldNames.MAPPING_SEQUENCE_ID+") " +
@@ -285,15 +298,15 @@ public class MySQLStatements {
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT " +
                 "M."+FieldNames.MAPPING_ID+", "+
-                "M."+FieldNames.MAPPING_BEST_MAPPING+", "+
-                "M."+FieldNames.MAPPING_COUNT+", "+
+                "M."+FieldNames.MAPPING_IS_BEST_MAPPING+", "+
+                "M."+FieldNames.MAPPING_NUM_OF_REPLICATES+", "+
                 "M."+FieldNames.MAPPING_DIRECTION+", "+
                 "M."+FieldNames.MAPPING_NUM_OF_ERRORS+", "+
                 "M."+FieldNames.MAPPING_SEQUENCE_ID+", "+
                 "M."+FieldNames.MAPPING_START+", "+
                 "M."+FieldNames.MAPPING_STOP+", "+
                 "M."+FieldNames.MAPPING_TRACK+", "+
-                "D."+FieldNames.DIFF_CHAR+", "+
+                "D."+FieldNames.DIFF_BASE+", "+
                 "D."+FieldNames.DIFF_ORDER+", "+
                 "D."+FieldNames.DIFF_POSITION+", "+
                 "D."+FieldNames.DIFF_TYPE+" "+
@@ -301,8 +314,8 @@ public class MySQLStatements {
                 "(" +
                 "SELECT " +
                     FieldNames.MAPPING_ID+", "+
-                    FieldNames.MAPPING_BEST_MAPPING+", "+
-                    FieldNames.MAPPING_COUNT+", "+
+                    FieldNames.MAPPING_IS_BEST_MAPPING+", "+
+                    FieldNames.MAPPING_NUM_OF_REPLICATES+", "+
                     FieldNames.MAPPING_DIRECTION+", "+
                     FieldNames.MAPPING_NUM_OF_ERRORS+", "+
                     FieldNames.MAPPING_SEQUENCE_ID+", "+
@@ -324,7 +337,7 @@ public class MySQLStatements {
 
     public final static String FETCH_SNP_DATA_FOR_TRACK =
             "SELECT A."+FieldNames.DIFF_POSITION+", " +
-                    "A."+FieldNames.DIFF_CHAR+", " +
+                    "A."+FieldNames.DIFF_BASE+", " +
                     "A."+FieldNames.MAPPING_DIRECTION+", " +
                     "A."+FieldNames.DIFF_TYPE+", " +
                     "A.mult_count, " +
@@ -333,19 +346,19 @@ public class MySQLStatements {
             "FROM "+
 		"(SELECT " +
                     FieldNames.DIFF_POSITION+", "+
-                    FieldNames.DIFF_CHAR+", "+
+                    FieldNames.DIFF_BASE+", "+
                     FieldNames.DIFF_TYPE+", "+
                     FieldNames.MAPPING_DIRECTION+", " +
-                    "SUM("+FieldNames.MAPPING_COUNT+") as mult_count  "+
+                    "SUM("+FieldNames.MAPPING_NUM_OF_REPLICATES+") as mult_count  "+
 		"FROM "+
                     FieldNames.TABLE_MAPPINGS+" M " +
                     "left join "+FieldNames.TABLE_DIFF+" D " +
                     "on D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" " +
 		"WHERE " +
-                    "M."+FieldNames.MAPPING_TRACK+" = ? and M."+FieldNames.MAPPING_BEST_MAPPING+" = 1 "+
+                    "M."+FieldNames.MAPPING_TRACK+" = ? and M."+FieldNames.MAPPING_IS_BEST_MAPPING+" = 1 "+
 		"GROUP BY " +
                     "D."+FieldNames.DIFF_POSITION+", "+
-                    "D."+FieldNames.DIFF_CHAR+", " +
+                    "D."+FieldNames.DIFF_BASE+", " +
                     "M."+FieldNames.MAPPING_DIRECTION+" ,"+
                     "D."+FieldNames.DIFF_TYPE+"" +
                 ") as A , "+

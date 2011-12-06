@@ -10,7 +10,7 @@ and open the template in the editor.
     </head>
     <body>
         <h2>About VAMP's SNP detection</h2>
-        <p>
+        <p style="font-size:0.9em">
             The snp detection allows to detect snps among all opened/selected tracks for
             a single reference genome. It opens the dialog windows for creating a snp detection
             request and returns the result in a new tab, showing all details of the SNPs in a table.
@@ -19,6 +19,15 @@ and open the template in the editor.
             For explanations of the data in the table model see <a href="nbdocs://de.cebitec.vamp.tools.snp/de/cebitec/vamp/tools/snp/docs/snp-table.html">SNP table model</a>.
             <!-- TODO describe your module, add more pages... -->
         </p>
+        <p></p>
+        <h2>Features of the snp detection:</h2>
+        <ul style="font-size:0.9em">
+            <li style="margin-bottom:13">Exon, intron structure is taken into account: If a feature has subfeatures 
+                        a SNP is only translated, if it is located in an exon. The translation uses the length of 
+                        the subfeatures to determine the correct triplet around a SNP.</li>
+            <li style="margin-bottom:13">If a feature (e.g. gene) has no subfeatures, then all SNPs in 
+                        that feature are translated with respect to reading frame and strand.</li>
+        </ul>
     </body>
 </html>
 <!--

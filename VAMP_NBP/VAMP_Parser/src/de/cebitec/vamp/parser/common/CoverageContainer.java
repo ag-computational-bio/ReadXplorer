@@ -270,7 +270,7 @@ public class CoverageContainer {
                     if (value > 'a') {
                         position = position.substring(0, position.length() - 2);
                     }
-                    position = position + "_" + value; //TODO: for freq calc this has to be stored elsewhere, same pos differs now
+                    position = position + "_" + value;
                     value++;
                 }
 

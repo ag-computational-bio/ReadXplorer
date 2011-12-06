@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -8,6 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
@@ -24,9 +26,14 @@ import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -56,7 +63,7 @@ public class BasePanelFactory {
         ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGen);
 
         // show a color legend
-        genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend());
+        genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend(genomeViewer));
 
         // add panels to basepanel
         b.setViewer(genomeViewer);
@@ -77,7 +84,7 @@ public class BasePanelFactory {
         trackV.setName(track.getDescription());
 
         // create and set up legend
-        trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend());
+        trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend(trackV));
 
         // create info label
         CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -150,7 +157,7 @@ public class BasePanelFactory {
         AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGen, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), this.getAlignmentViewLegend());
+        viewer.setupLegend(new LegendLabel(viewer), this.getAlignmentViewLegend(viewer));
 
         // add panels to basepanel and add scrollbars
         b.setViewerInScrollpane(viewer);
@@ -168,7 +175,7 @@ public class BasePanelFactory {
         HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGen, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), getHistogramViewerLegend());
+        viewer.setupLegend(new LegendLabel(viewer), this.getHistogramViewerLegend());
 
         // add panels to basepanel
         b.setViewer(viewer);
@@ -191,7 +198,7 @@ public class BasePanelFactory {
         SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGen, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), this.getSeqPairViewerLegend());
+        viewer.setupLegend(new LegendLabel(viewer), this.getSeqPairViewerLegend(viewer));
 
         // add panels to basepanel and add scrollbars
         b.setViewerInScrollpane(viewer);
@@ -218,20 +225,52 @@ public class BasePanelFactory {
         return p;
     }
 
-    private JPanel getLegendEntry(Color c, String description) {
+    /**
+     * @param typeColor color of the feature type
+     * @param type the feature type whose legend entry is created
+     * @param viewer the viewer to which the legend entry belongs. If no function
+     * is assigend to the legend entry, viewer can be set to null. In this case a
+     * simple label is returned instead of the checkbox.
+     * @return A legend entry for a feature type.
+     */
+    private JPanel getLegendEntry(Color typeColor, FeatureType type, AbstractViewer viewer) {
         JPanel entry = new JPanel(new FlowLayout(FlowLayout.LEADING));
         entry.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
         ColorPanel color = new ColorPanel();
         color.setSize(new Dimension(10, 10));
-        color.setBackground(c);
+        color.setBackground(typeColor);
 
         entry.add(color);
-
-        entry.add(new JLabel(description));
+        if (viewer != null){
+            entry.add(this.getCheckBox(type, viewer));
+        } else {
+            entry.add(new JLabel(type.getTypeString()));
+        }
         entry.setAlignmentX(Component.LEFT_ALIGNMENT);
         return entry;
     }
+    
+    /**
+     * @param type the FeatureType for which the checkbox should be created
+     * @param viewer the viewer to which the checkbox belongs
+     * @return a check box for the given feature type, connected to the given viewer.
+     */
+    private JCheckBox getCheckBox(FeatureType type, AbstractViewer viewer){
+        JCheckBox checker = new JCheckBox(type.getTypeString());
+        //special cases are handled here
+        if (type != FeatureType.UNDEFINED) {
+            checker.setSelected(true);
+        } else {
+            checker.setSelected(false);
+        }
+        checker.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        //strangely next line is needed to ensure correct size of whole legend panel
+        checker.setBorder(BorderFactory.createLineBorder(ColorProperties.LEGEND_BACKGROUND));
+        checker.addActionListener(new FeatureTypeListener(type, viewer));
+        return checker;
+    }
+    
 
     private class ColorPanel extends JPanel {
 
@@ -273,31 +312,33 @@ public class BasePanelFactory {
         return entry;
     }
 
-    private JPanel getGenomeViewerLegend() {
+    private JPanel getGenomeViewerLegend(AbstractViewer viewer) {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(getLegendEntry(ColorProperties.CDS, "CDS"));
-        legend.add(getLegendEntry(ColorProperties.GENE, "gene"));
-        legend.add(getLegendEntry(ColorProperties.REPEAT_UNIT, "Repeat Unit"));
-        legend.add(getLegendEntry(ColorProperties.MRNA, "mRNA"));
-        legend.add(getLegendEntry(ColorProperties.MI_RNA, "microRNA"));
-        legend.add(getLegendEntry(ColorProperties.RRNA, "rRNA"));
-        legend.add(getLegendEntry(ColorProperties.TRNA, "tRNA"));
-        legend.add(getLegendEntry(ColorProperties.MISC_RNA, "misc. RNA"));
+        legend.add(this.getLegendEntry(ColorProperties.CDS, FeatureType.CDS, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.GENE, FeatureType.GENE, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.EXON, FeatureType.EXON, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.REPEAT_UNIT, FeatureType.REPEAT_UNIT, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.MRNA, FeatureType.MRNA, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
 
         return legend;
     }
 
-    private JPanel getTrackPanelLegend() {
+    private JPanel getTrackPanelLegend(AbstractViewer viewer) {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(getLegendEntry(ColorProperties.PERFECT_MATCH, "Perfect match cov."));
-        legend.add(getLegendEntry(ColorProperties.BEST_MATCH, "Best match cov."));
-        legend.add(getLegendEntry(ColorProperties.COMMON_MATCH, "Complete cov."));
+        legend.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH, FeatureType.PERFECT_COVERAGE, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.BEST_MATCH_COVERAGE, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, FeatureType.COMPLETE_COV, viewer));
 
         return legend;
     }
@@ -307,9 +348,9 @@ public class BasePanelFactory {
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(getLegendEntry(ColorProperties.COMPLETE_COV, "Complete coverage"));
-        legend.add(getLegendEntry(ColorProperties.TRACK1_COLOR, "Track 1 coverage"));
-        legend.add(getLegendEntry(ColorProperties.TRACK2_COLOR, "Track 2 coverage"));
+        legend.add(this.getLegendEntry(ColorProperties.COMPLETE_COV, FeatureType.COMPLETE_COVERAGE, null));
+        legend.add(this.getLegendEntry(ColorProperties.TRACK1_COLOR, FeatureType.TRACK1_COVERAGE, null));
+        legend.add(this.getLegendEntry(ColorProperties.TRACK2_COLOR, FeatureType.TRACK2_COVERAGE, null));
 
         return legend;
     }
@@ -319,41 +360,78 @@ public class BasePanelFactory {
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(getLegendEntry(ColorProperties.LOGO_A, "A"));
-        legend.add(getLegendEntry(ColorProperties.LOGO_C, "C"));
-        legend.add(getLegendEntry(ColorProperties.LOGO_G, "G"));
-        legend.add(getLegendEntry(ColorProperties.LOGO_T, "T"));
-        legend.add(getLegendEntry(ColorProperties.LOGO_N, "N"));
-        legend.add(getLegendEntry(ColorProperties.LOGO_MATCH, "Match"));
-        legend.add(getLegendEntry(ColorProperties.LOGO_READGAP, "Gap in read"));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_A, FeatureType.BASE_A, null));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_C, FeatureType.BASE_C, null));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_G, FeatureType.BASE_G, null));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_T, FeatureType.BASE_T, null));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_N, FeatureType.BASE_N, null));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_MATCH, FeatureType.MATCH, null));
+        legend.add(this.getLegendEntry(ColorProperties.LOGO_READGAP, FeatureType.GAP, null));
 
         return legend;
     }
 
-    private JPanel getAlignmentViewLegend() {
+    private JPanel getAlignmentViewLegend(AbstractViewer viewer) {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(getLegendEntry(ColorProperties.PERFECT_MATCH, "Perfect Match"));
-        legend.add(getLegendEntry(ColorProperties.BEST_MATCH, "Best Match"));
-        legend.add(getLegendEntry(ColorProperties.COMMON_MATCH, "Ordinary Match"));
-        legend.add(getGradientEntry("Low to high coverage"));
-        legend.add(getLegendEntry(ColorProperties.ALIGNMENT_A, "Diff."));
+        legend.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH, FeatureType.PERFECT_MATCH, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.BEST_MATCH, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, FeatureType.ORDINARY_MATCH, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.ALIGNMENT_A, FeatureType.DIFF, null));
+        legend.add(this.getGradientEntry("Low to high coverage"));
 
         return legend;
     }
 
-    private JPanel getSeqPairViewerLegend() {
+    private JPanel getSeqPairViewerLegend(AbstractViewer viewer) {
         JPanel legend = new JPanel();
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(getLegendEntry(ColorProperties.BLOCK_PERFECT, "Perfect seq. pair"));
-        legend.add(getLegendEntry(ColorProperties.BLOCK_DIST_LARGE, "Distorted seq. pair"));
-        legend.add(getLegendEntry(ColorProperties.BLOCK_UNPAIRED, "Single mapping"));
-        legend.add(getGradientEntry("Perfect to best to common mappings"));
+        legend.add(this.getLegendEntry(ColorProperties.BLOCK_PERFECT, FeatureType.PERFECT_PAIR, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.BLOCK_DIST_LARGE, FeatureType.DISTORTED_PAIR, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.BLOCK_UNPAIRED, FeatureType.SINGLE_MAPPING, viewer));
+        legend.add(this.getGradientEntry("Perfect to best to common mappings"));
 
         return legend;
+    }
+    
+    
+    /**
+     * A feature type listener adds or removes the feature type associated with
+     * it to to/from the excluded feature list of its associated viewer. Needs
+     * an AbstractButton as source, in order to determine if the button was selected
+     * or not.
+     */
+    private class FeatureTypeListener implements ActionListener {
+
+        FeatureType featureType; 
+        AbstractViewer viewer;
+        
+        /**
+         * A feature type listener adds or removes the feature type associated with
+         * it to to/from the excluded feature list of its associated viewer. Needs
+         * an AbstractButton as source, in order to determine if the button was selected
+         * or not.
+         * @param featureType the feature type handled by this listener
+         * @param viewer the viewer whose excluded feature list should be updated
+         */
+        public FeatureTypeListener(FeatureType featureType, AbstractViewer viewer) {
+            this.featureType = featureType;
+            this.viewer = viewer;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (((AbstractButton) e.getSource()).isSelected()){
+                this.viewer.getExcludedFeatureTypes().remove(this.featureType);
+            } else {
+                this.viewer.getExcludedFeatureTypes().add(this.featureType);
+            }
+            this.viewer.boundsChangedHook();
+            this.viewer.repaint();
+        }
     }
 }

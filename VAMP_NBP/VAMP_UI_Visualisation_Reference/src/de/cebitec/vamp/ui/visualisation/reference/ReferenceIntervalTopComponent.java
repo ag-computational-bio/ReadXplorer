@@ -15,7 +15,6 @@ import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupListener;
@@ -292,7 +291,7 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
         Set<FeatureType> keys = featureStats.keySet();
         for(Iterator<FeatureType> it = keys.iterator(); it.hasNext(); ){
             FeatureType type = it.next();
-            String typeS = FeatureType.getTypeString(type);
+            String typeS = type.getTypeString();
             model.addElement(typeS+": "+featureStats.get(type));
         }
         statisticsList.setModel(model);

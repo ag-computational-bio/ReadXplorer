@@ -104,8 +104,8 @@ public class SNP_Detection454ResultPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
-                    .addComponent(resultProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 757, Short.MAX_VALUE)
+                    .addComponent(resultProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 757, Short.MAX_VALUE)
                     .addComponent(exportSNPsButton, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );

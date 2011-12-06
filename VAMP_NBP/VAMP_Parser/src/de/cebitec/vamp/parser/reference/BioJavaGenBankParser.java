@@ -123,7 +123,7 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                         if (type.equalsIgnoreCase("exon")){
                             int subStart = subfeature.getLocation().getMin();
                             int subStop = subfeature.getLocation().getMax();
-                            exons.add(new ParsedSubfeature(subStart, subStop));
+                            exons.add(new ParsedSubfeature(subStart, subStop, FeatureType.EXON));
                         }
                     }
                     
@@ -139,19 +139,19 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                     } else if (parsedType.equalsIgnoreCase("repeat_unit")){
                         type = FeatureType.REPEAT_UNIT;
                     } else if (parsedType.equalsIgnoreCase("rRNA")){
-                        type = FeatureType.R_RNA;
+                        type = FeatureType.RRNA;
                     } else if (parsedType.equalsIgnoreCase("source")){
                         type = FeatureType.SOURCE;
                     } else if (parsedType.equalsIgnoreCase("tRNA")){
-                        type = FeatureType.T_RNA;
+                        type = FeatureType.TRNA;
                     } else if (parsedType.equalsIgnoreCase("misc_RNA")){
                         type = FeatureType.MISC_RNA;
                     } else if (parsedType.equalsIgnoreCase("miRNA")){
-                        type = FeatureType.MI_RNA;
+                        type = FeatureType.MIRNA;
                     } else if (parsedType.equalsIgnoreCase("gene")){
                         type = FeatureType.GENE;
                     } else if (parsedType.equalsIgnoreCase("mRNA")){
-                        type = FeatureType.M_RNA;
+                        type = FeatureType.MRNA;
                     } else {
                         this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() 
                                 + ": Using unknown feature type for " + parsedType);

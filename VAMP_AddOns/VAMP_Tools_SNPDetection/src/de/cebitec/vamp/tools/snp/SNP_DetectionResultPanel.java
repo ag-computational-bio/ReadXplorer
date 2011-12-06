@@ -12,6 +12,7 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubfeature;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
@@ -22,6 +23,7 @@ import de.cebitec.vamp.util.SequenceComparison;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
@@ -205,7 +207,15 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         //get all features from the reference to determine amino acid 
         String refSeq = this.reference.getSequence();
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
-        List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForRegion(0, refSeq.length());
+        List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForClosedInterval(0, refSeq.length());
+        Map<Integer, PersistantFeature> featureMap = new HashMap<Integer, PersistantFeature>();
+        for (PersistantFeature feature : featuresSorted){
+            featureMap.put(feature.getId(), feature); //ids are unique
+        }
+        List<PersistantSubfeature> subfeaturesSorted = refGenCon.getSubfeaturesForClosedInterval(0, refSeq.length());
+        PersistantFeature.addSubfeatures(featureMap, subfeaturesSorted);
+        featureMap.clear();
+        
         SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, refSeq);
         
         for (SnpI snpi : snps) {
@@ -277,13 +287,14 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                         ids += (feature.hasGeneName() ? feature.getGeneName() : feature.getLocus()) + "\n";
                     }
                     rowData[16] = ids;
-                    
+                    rowData[13] = "-";
+                    rowData[14] = "-";
                 } else {
+                    rowData[13] = "no gene";
+                    rowData[14] = "no gene";
                     rowData[15] = "";
                     rowData[16] = "";
                 }
-                rowData[13] = "";
-                rowData[14] = "";
             }
             
             model.addRow(rowData);
