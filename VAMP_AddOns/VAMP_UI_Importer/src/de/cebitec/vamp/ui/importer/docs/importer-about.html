@@ -10,16 +10,55 @@ and open the template in the editor.
     </head>
     <body>
         <h2>About VAMP Import</h2>
-        <h3>Reference genome import</h3>
-        <p>Three formats are available for import:</p>
+        <p></p>
+        <h2>Reference genome import</h2>
+        <p style="font-size:0.9em">Three formats are available for import:</p>
         <UL>
-            <li>Fasta format: Which does not contain any features.</li>
-            <li>Genbank format: Can include a vast number of different features.</li>
-            <li>EMBL format: Can include a vast number of different features.</li>
+            <li style="font-size:0.9em">Fasta format: Which does not contain any features</li>
+            <li style="font-size:0.9em">Genbank format: Can include a vast number of different features</li>
+            <li style="font-size:0.9em">EMBL format: Can include a vast number of different features</li>
         </UL>
-        <p>
+        <p style="font-size:0.9em">
             <strong>Notes Genbank format:</strong><br>
         </p>
+        <p></p>
+        <h2>Track import</h2>
+        <p style="font-size:0.9em">Also three formats are available for importing a track:</p>
+        <UL>
+            <li style="font-size:0.9em">Jok: Output of the short read mapper saruman</li>
+            <li style="font-size:0.9em">BAM format: Defined in 
+                <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://samtools.sourceforge.net/SAM1.pdf">
+                    <param name="text" value="<html><u>http://samtools.sourceforge.net/SAM1.pdf</u></html>">
+                    <param name="textColor" value="blue">
+                </object></li>
+            <li style="font-size:0.9em">SAM format: Also defined in 
+                 <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://samtools.sourceforge.net/SAM1.pdf">
+                    <param name="text" value="<html><u>http://samtools.sourceforge.net/SAM1.pdf</u></html>">
+                    <param name="textColor" value="blue">
+                </object></li>
+        </UL>
+        <p></p>
+        <h2>Sequence pair import</h2>
+        <p style="font-size:0.9em">
+            VAMP also allows to import Sequence pair data, such as mate pair or paired end data.
+            Requirements: Two mapping files with either all first reads or all second reads of 
+            the sequence pair.
+        </p>
+        <p></p>
+        <h2>Position table for track import</h2>
+        <p style="font-size:0.9em">
+            This feature was developed for useres with older databases. 
+            <br><u>!!! Caution: YOU DO NOT NEED THIS FEATURE WHEN IMPORTING COMPLETE NEW TRACKS !!!</u><br>
+            Instead of reimporting the whole data in a new database, it can directly be imported 
+            "on top" of the old database. Only make sure, that you import the same track data, 
+            as stored in the database.
+        </p>
+<!--        <p>
+            <strong>Additional notes:</strong><br>
+        </p>-->
+        
         
         <!-- TODO describe your module, add more pages... -->
 

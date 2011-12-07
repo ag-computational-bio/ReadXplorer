@@ -87,8 +87,8 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     public void openTrack() {
         OpenTrackPanelList otp = new OpenTrackPanelList(currentRefGen.getId());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Track");
-        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        openRefGenDialog.setVisible(true);
+        Dialog openTrackDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+        openTrackDialog.setVisible(true);
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             for (PersistantTrack track : otp.getSelectedTracks()) {

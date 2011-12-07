@@ -22,6 +22,7 @@ public class TrackJob implements Job {
     private int start;
     private int stop;
     private int stepSize;
+    
     /**
      * Creates a new track job along with its data.
      * @param trackID id of the track to create

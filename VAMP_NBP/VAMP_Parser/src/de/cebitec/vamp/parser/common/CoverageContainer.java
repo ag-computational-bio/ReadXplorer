@@ -42,17 +42,20 @@ public class CoverageContainer {
     private final int coverageArrayLength;
 
     /**
-     * Creates a new CoverageContainer and immediately computes the coverage.
-     * @param mappings The mappings whose coverage has to be computed
+     * Creates a new CoverageContainer.
      */
-    public CoverageContainer(ParsedMappingContainer mappings) {
+    public CoverageContainer() {
         coverage = new HashMap<Integer, Integer[]>();
         positionTable = new HashMap<String, Integer[]>();
         coverageArrayLength = NUM_OF_CASES * FIELDS_PER_CASE;
-        this.computeCoverage(mappings);
     }
     
 
+    /**
+     * Computes the coverage and the position table for the given mappings.
+     * @param mappings The mappings whose coverage has to be computed 
+     * @param onlyPositionTable true, if only the position table should be calculated.
+     */
     public void computeCoverage(ParsedMappingContainer mappings){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start computing the coverage");
         Iterator<Integer> sequenceIDIt = mappings.getMappedSequenceIDs().iterator();

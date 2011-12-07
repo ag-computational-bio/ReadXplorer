@@ -20,7 +20,7 @@ import org.openide.util.Utilities;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceFeature//EN", autostore = false)
-public final class ReferenceFeatureTopComponent extends TopComponent implements LookupListener{
+public final class ReferenceFeatureTopComponent extends TopComponent implements LookupListener {
 
     private static ReferenceFeatureTopComponent instance;
     private static final long serialVersionUID = 1L;

@@ -6,7 +6,6 @@ import de.cebitec.vamp.exporter.ExporterI;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
-import de.cebitec.vamp.util.SequenceComparison;
 import jxl.write.Label;
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -186,7 +186,7 @@ public class ReferenceConnector {
             fetch.setLong(1, refGenID);
 
             ResultSet rs = fetch.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 int id = rs.getInt(FieldNames.TRACK_ID);
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);

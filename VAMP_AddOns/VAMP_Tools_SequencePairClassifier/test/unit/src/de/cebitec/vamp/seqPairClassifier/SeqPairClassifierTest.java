@@ -110,8 +110,8 @@ public class SeqPairClassifierTest {
     
     private ParsedMappingContainer mappings = new ParsedMappingContainer();
     private ParsedMappingContainer mappings2 = new ParsedMappingContainer();
-    private CoverageContainer coverageContainer = new CoverageContainer(mappings);
-    private CoverageContainer coverageContainer2 = new CoverageContainer(mappings2);
+    private CoverageContainer coverageContainer = new CoverageContainer();
+    private CoverageContainer coverageContainer2 = new CoverageContainer();
     private ParsedTrack fwdTrack = new ParsedTrack("fwd track", mappings, coverageContainer);
     private ParsedTrack revTrack = new ParsedTrack("rev track", mappings2, coverageContainer2);
     
@@ -263,6 +263,9 @@ public class SeqPairClassifierTest {
         
         fwdTrack.setReadnameToSeqIdMap(map1);
         revTrack.setReadnameToSeqIdMap(map2);
+        
+        coverageContainer.computeCoverage(mappings);
+        coverageContainer2.computeCoverage(mappings2);
     }
 
     @BeforeClass

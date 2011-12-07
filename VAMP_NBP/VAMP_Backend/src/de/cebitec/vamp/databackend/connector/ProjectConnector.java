@@ -853,7 +853,7 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done locking {0} domain tables...", domainName);
     }
 
-    public int addTrack(ParsedTrack track, long refGenID, boolean seqPairs) throws StorageException {
+    public int addTrack(ParsedTrack track, long refGenID, boolean seqPairs, boolean onlyPosTable) throws StorageException {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
 
@@ -862,12 +862,14 @@ public class ProjectConnector {
             this.disableTrackDomainIndices();
         }
         isLastTrack = track.getParsedMappingContainer().isLastMappingContainer();
-        this.storeTrack(track, refGenID);
-        this.storeCoverage(track);
-        this.storeMappings(track);
-        this.storePositionTable(track);
-        this.storeDiffs(track);
-        this.storeTrackStatistics(track);
+        if (!onlyPosTable) {
+            this.storeTrack(track, refGenID);
+            this.storeCoverage(track);
+            this.storeMappings(track);
+            this.storeDiffs(track);
+            this.storeTrackStatistics(track);
+        }
+            this.storePositionTable(track);
 
         if (adapter.equalsIgnoreCase("mysql")) {
             this.enableTrackDomainIndices();

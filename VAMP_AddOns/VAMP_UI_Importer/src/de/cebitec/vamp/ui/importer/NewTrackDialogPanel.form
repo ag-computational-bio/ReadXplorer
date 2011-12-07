@@ -28,7 +28,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jComboBox1" alignment="1" pref="281" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="mappingFileField" pref="211" max="32767" attributes="0"/>
+                      <Component id="mappingFileField" pref="216" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                   </Group>

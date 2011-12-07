@@ -74,7 +74,7 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         
         this.setLayout(new BorderLayout());
-        PersistantTrack[] tracks = new PersistantTrack[1];
+        PersistantTrack[] tracks = new PersistantTrack[0];
         tracks = refGenConnector.getAssociatedTracks().toArray(tracks);
 
         JScrollPane scrollPane = new JScrollPane();
