@@ -19,7 +19,7 @@ public class FastaFileChooser extends VampFileChooser {
      * @param sequence
      */
     public FastaFileChooser(final String fileExtension, final String sequence){
-        super(VampFileChooser.SAVE, fileExtension, sequence);
+        super(VampFileChooser.SAVE_DIALOG, fileExtension, sequence);
     }
 
 

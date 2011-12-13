@@ -1,8 +1,8 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.Feature;
+import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -11,7 +11,6 @@ import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupListener;
@@ -21,7 +20,7 @@ import org.openide.util.Utilities;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceFeature//EN", autostore = false)
-public final class ReferenceFeatureTopComponent extends TopComponent implements LookupListener{
+public final class ReferenceFeatureTopComponent extends TopComponent implements LookupListener {
 
     private static ReferenceFeatureTopComponent instance;
     private static final long serialVersionUID = 1L;
@@ -236,14 +235,14 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
     @Override
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer refViewer : result.allInstances()) {
-            Feature feature = refViewer.getCurrentlySelectedFeature();
+            JFeature feature = refViewer.getCurrentlySelectedFeature();
             showFeatureDetails(feature != null ? feature.getPersistantFeature() : null);
 
             refViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_SELECTED, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    Feature feature = (Feature) evt.getNewValue();
+                    JFeature feature = (JFeature) evt.getNewValue();
                     showFeatureDetails(feature.getPersistantFeature());
                 }
             });
@@ -287,11 +286,11 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         productText.setText(f!= null ? f.getProduct() : "");
         productText.setToolTipText(f!= null ? f.getProduct() : "");
         locusField.setText(f!= null ? f.getLocus() : "");
-        typeText.setText(f!= null ? FeatureType.getTypeString(f.getType()) : "");
+        typeText.setText(f!= null ? f.getType().getTypeString() : "");
 
         String strand = "";
         if (f != null){
-            strand = f.getStrand() == 1 ? "forward" : "reverse";
+            strand = f.getStrand() == SequenceUtils.STRAND_FWD ? "forward" : "reverse";
         }
         strandText.setText(strand);
     }

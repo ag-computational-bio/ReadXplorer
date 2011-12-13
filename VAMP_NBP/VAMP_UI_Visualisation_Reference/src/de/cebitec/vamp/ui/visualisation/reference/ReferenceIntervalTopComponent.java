@@ -15,7 +15,6 @@ import org.openide.util.LookupEvent;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupListener;
@@ -211,12 +210,12 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer referenceViewer : result.allInstances()) {
             // update visible feature list
-            Map<Integer, Integer> featureStats = referenceViewer.getFeatureStats();
-            showFeatureStatisticsForIntervall(featureStats);
+            Map<FeatureType, Integer> featureStats = referenceViewer.getFeatureStats();
+            showFeatureStatisticsForInterval(featureStats);
 
             // update intervall
             BoundsInfo boundsInfo = referenceViewer.getBoundsInfo();
-            setIntervall(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
+            setInterval(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
 
             // register listeners so every change occurs
             referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_STATISTICS_CHANGED, new PropertyChangeListener() {
@@ -225,12 +224,12 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
                 public void propertyChange(PropertyChangeEvent evt) {
                     // update visible feature list
                     @SuppressWarnings("unchecked")
-                    Map<Integer, Integer> featureStats = (Map<Integer, Integer>) evt.getNewValue();
-                    showFeatureStatisticsForIntervall(featureStats);
+                    Map<FeatureType, Integer> featureStats = (Map<FeatureType, Integer>) evt.getNewValue();
+                    showFeatureStatisticsForInterval(featureStats);
 
                     // update intervall
                     BoundsInfo boundsInfo = ((ReferenceViewer) evt.getSource()).getBoundsInfo();
-                    setIntervall(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
+                    setInterval(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
                 }
             });
             referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_MOUSEPOSITION_CHANGED, new PropertyChangeListener() {
@@ -280,19 +279,19 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
         return PREFERRED_ID;
     }
 
-    private void setIntervall(int from, int to){
+    private void setInterval(int from, int to){
         intervalFromField.setText(String.valueOf(from));
         intervalToField.setText(String.valueOf(to));
     }
 
-    private void showFeatureStatisticsForIntervall(Map<Integer, Integer> featureStats) {
+    private void showFeatureStatisticsForInterval(Map<FeatureType, Integer> featureStats) {
         statisticsList.removeAll();
         DefaultListModel model = new DefaultListModel();
 
-        Set<Integer> keys = featureStats.keySet();
-        for(Iterator<Integer> it = keys.iterator(); it.hasNext(); ){
-            int type = it.next();
-            String typeS = FeatureType.getTypeString(type);
+        Set<FeatureType> keys = featureStats.keySet();
+        for(Iterator<FeatureType> it = keys.iterator(); it.hasNext(); ){
+            FeatureType type = it.next();
+            String typeS = type.getTypeString();
             model.addElement(typeS+": "+featureStats.get(type));
         }
         statisticsList.setModel(model);

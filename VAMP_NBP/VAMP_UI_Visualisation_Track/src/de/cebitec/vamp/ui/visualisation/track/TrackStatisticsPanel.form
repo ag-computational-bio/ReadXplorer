@@ -37,11 +37,11 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="numberReadsAbsLabel" pref="18" max="32767" attributes="0"/>
-                  <Component id="uniqueSequencesAbsLabel" pref="18" max="32767" attributes="0"/>
-                  <Component id="numUniqueMappingsAbsLabel" pref="18" max="32767" attributes="0"/>
-                  <Component id="numMappingsAbsLabel" pref="18" max="32767" attributes="0"/>
-                  <Component id="nameLabel" alignment="0" pref="18" max="32767" attributes="0"/>
+                  <Component id="numberReadsAbsLabel" pref="45" max="32767" attributes="0"/>
+                  <Component id="uniqueSequencesAbsLabel" pref="45" max="32767" attributes="0"/>
+                  <Component id="numUniqueMappingsAbsLabel" pref="45" max="32767" attributes="0"/>
+                  <Component id="numMappingsAbsLabel" pref="45" max="32767" attributes="0"/>
+                  <Component id="nameLabel" alignment="0" pref="45" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
           </Group>
@@ -56,15 +56,15 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="bestMatchMappingsAbsLabel" pref="43" max="32767" attributes="0"/>
-                          <Component id="perfectMappingsAbsLabel" pref="43" max="32767" attributes="0"/>
+                          <Component id="bestMatchMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
+                          <Component id="perfectMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                       <Component id="compPercentageLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="compPercentage" pref="38" max="32767" attributes="0"/>
+                      <Component id="compPercentage" pref="55" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
@@ -73,15 +73,15 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="perfectPercentage" alignment="0" pref="36" max="32767" attributes="0"/>
-                          <Component id="bmPercentage" alignment="0" pref="36" max="32767" attributes="0"/>
+                          <Component id="perfectPercentage" alignment="0" pref="55" max="32767" attributes="0"/>
+                          <Component id="bmPercentage" alignment="0" pref="55" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
-          <Component id="progressbar" alignment="0" pref="190" max="32767" attributes="0"/>
+          <Component id="progressbar" alignment="0" pref="188" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -282,11 +282,11 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="numUniqSeqPairsAbsLabel" alignment="0" pref="28" max="32767" attributes="0"/>
-                      <Component id="numPerfUniqSeqPairsAbsLabel" alignment="0" pref="28" max="32767" attributes="0"/>
-                      <Component id="singleMappings" pref="28" max="32767" attributes="0"/>
-                      <Component id="numSeqPairsAbsLabel" alignment="0" pref="28" max="32767" attributes="0"/>
-                      <Component id="numPerfSeqPairsAbsLabel" alignment="0" pref="28" max="32767" attributes="0"/>
+                      <Component id="numUniqSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
+                      <Component id="numPerfUniqSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
+                      <Component id="singleMappings" pref="41" max="32767" attributes="0"/>
+                      <Component id="numSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
+                      <Component id="numPerfSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>

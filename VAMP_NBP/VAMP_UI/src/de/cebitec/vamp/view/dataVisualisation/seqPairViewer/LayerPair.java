@@ -6,12 +6,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- *
  * @author Rolf Hilker
+ * 
+ * Contains a single layer of blocks belonging to  one sequence pair.
  */
 public class LayerPair implements LayerI {
     private ArrayList<BlockI> blocks;
 
+    /**
+     * Contains a single layer of blocks belonging to  one sequence pair.
+     */
     public LayerPair(){
         blocks = new ArrayList<BlockI>();
     }

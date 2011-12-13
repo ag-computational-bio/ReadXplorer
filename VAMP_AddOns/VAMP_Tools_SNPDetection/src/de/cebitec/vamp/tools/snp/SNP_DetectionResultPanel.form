@@ -16,14 +16,16 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace pref="236" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace pref="412" max="32767" attributes="0"/>
+              <Component id="alignmentButton1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="alignmentButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="1" pref="561" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="0" pref="789" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -34,6 +36,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="exportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="alignmentButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="alignmentButton1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -48,11 +51,11 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTable" name="jTable1">
+        <Component class="javax.swing.JTable" name="snpTable">
           <Properties>
             <Property name="autoCreateRowSorter" type="boolean" value="true"/>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="13" rowCount="0">
+              <Table columnCount="17" rowCount="0">
                 <Column editable="false" title="Pos" type="java.lang.String"/>
                 <Column editable="false" title="Track" type="java.lang.Integer"/>
                 <Column editable="false" title="Base" type="java.lang.String"/>
@@ -63,16 +66,20 @@
                 <Column editable="false" title="T" type="java.lang.Integer"/>
                 <Column editable="false" title="N" type="java.lang.Integer"/>
                 <Column editable="false" title="_" type="java.lang.Integer"/>
-                <Column editable="false" title="Cov" type="java.lang.Integer"/>
+                <Column editable="false" title="Ref Cov" type="java.lang.Integer"/>
                 <Column editable="false" title="Freq" type="java.lang.Integer"/>
                 <Column editable="false" title="Type" type="java.lang.String"/>
+                <Column editable="false" title="Amino SNP" type="java.lang.String"/>
+                <Column editable="false" title="Amino Ref" type="java.lang.String"/>
+                <Column editable="false" title="Effect on AA" type="java.lang.String"/>
+                <Column editable="false" title="Feature (Gene)" type="java.lang.String"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
               <TableColumnModel selectionModel="1">
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.jTable1.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -156,7 +163,35 @@
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.jTable1.columnModel.title12" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title12" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title13" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title14" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title15" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title16" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -192,6 +227,16 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="alignmentButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="alignmentButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.alignmentButton1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="alignmentButton1ActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

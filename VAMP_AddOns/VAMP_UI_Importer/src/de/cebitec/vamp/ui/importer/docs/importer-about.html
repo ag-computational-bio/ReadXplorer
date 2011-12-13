@@ -1,0 +1,78 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>About VAMP Import</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>About VAMP Import</h2>
+        <p></p>
+        <h2>Reference genome import</h2>
+        <p style="font-size:0.9em">Three formats are available for import:</p>
+        <UL>
+            <li style="font-size:0.9em">Fasta format: Which does not contain any features</li>
+            <li style="font-size:0.9em">Genbank format: Can include a vast number of different features</li>
+            <li style="font-size:0.9em">EMBL format: Can include a vast number of different features</li>
+        </UL>
+        <p style="font-size:0.9em">
+            <strong>Notes Genbank format:</strong><br>
+        </p>
+        <p></p>
+        <h2>Track import</h2>
+        <p style="font-size:0.9em">Also three formats are available for importing a track:</p>
+        <UL>
+            <li style="font-size:0.9em">Jok: Output of the short read mapper saruman</li>
+            <li style="font-size:0.9em">BAM format: Defined in 
+                <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://samtools.sourceforge.net/SAM1.pdf">
+                    <param name="text" value="<html><u>http://samtools.sourceforge.net/SAM1.pdf</u></html>">
+                    <param name="textColor" value="blue">
+                </object></li>
+            <li style="font-size:0.9em">SAM format: Also defined in 
+                 <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://samtools.sourceforge.net/SAM1.pdf">
+                    <param name="text" value="<html><u>http://samtools.sourceforge.net/SAM1.pdf</u></html>">
+                    <param name="textColor" value="blue">
+                </object></li>
+        </UL>
+        <p></p>
+        <h2>Sequence pair import</h2>
+        <p style="font-size:0.9em">
+            VAMP also allows to import Sequence pair data, such as mate pair or paired end data.
+            Requirements: Two mapping files with either all first reads or all second reads of 
+            the sequence pair.
+        </p>
+        <p></p>
+        <h2>Position table for track import</h2>
+        <p style="font-size:0.9em">
+            This feature was developed for useres with older databases. 
+            <br><u>!!! Caution: YOU DO NOT NEED THIS FEATURE WHEN IMPORTING COMPLETE NEW TRACKS !!!</u><br>
+            Instead of reimporting the whole data in a new database, it can directly be imported 
+            "on top" of the old database. Only make sure, that you import the same track data, 
+            as stored in the database.
+        </p>
+<!--        <p>
+            <strong>Additional notes:</strong><br>
+        </p>-->
+        
+        
+        <!-- TODO describe your module, add more pages... -->
+
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

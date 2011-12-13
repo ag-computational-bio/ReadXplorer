@@ -27,6 +27,7 @@
                 <package>com.mysql.jdbc.log</package>
                 <package>com.mysql.jdbc.profiler</package>
                 <package>com.mysql.jdbc.util</package>
+                <package>de.cebitec.common.sequencetools</package>
                 <package>javax.wsdl</package>
                 <package>javax.wsdl.extensions</package>
                 <package>javax.wsdl.extensions.http</package>
@@ -55,6 +56,10 @@
                 <package>jxl.read.biff</package>
                 <package>jxl.write</package>
                 <package>jxl.write.biff</package>
+                <package>net.sf.samtools</package>
+                <package>net.sf.samtools.apps</package>
+                <package>net.sf.samtools.example</package>
+                <package>net.sf.samtools.util</package>
                 <package>org.apache.axis</package>
                 <package>org.apache.axis.attachments</package>
                 <package>org.apache.axis.client</package>
@@ -124,23 +129,13 @@
                 <package>org.biojava.bio</package>
                 <package>org.biojava.bio.alignment</package>
                 <package>org.biojava.bio.annodb</package>
-                <package>org.biojava.bio.chromatogram</package>
-                <package>org.biojava.bio.chromatogram.graphic</package>
                 <package>org.biojava.bio.dist</package>
                 <package>org.biojava.bio.dp</package>
                 <package>org.biojava.bio.dp.onehead</package>
                 <package>org.biojava.bio.dp.twohead</package>
-                <package>org.biojava.bio.gui</package>
-                <package>org.biojava.bio.gui.glyph</package>
-                <package>org.biojava.bio.gui.sequence</package>
-                <package>org.biojava.bio.gui.sequence.tracklayout</package>
                 <package>org.biojava.bio.molbio</package>
                 <package>org.biojava.bio.program</package>
-                <package>org.biojava.bio.program.abi</package>
                 <package>org.biojava.bio.program.blast2html</package>
-                <package>org.biojava.bio.program.das</package>
-                <package>org.biojava.bio.program.das.dasalignment</package>
-                <package>org.biojava.bio.program.das.dasstructure</package>
                 <package>org.biojava.bio.program.formats</package>
                 <package>org.biojava.bio.program.gff</package>
                 <package>org.biojava.bio.program.gff3</package>
@@ -148,9 +143,6 @@
                 <package>org.biojava.bio.program.homologene</package>
                 <package>org.biojava.bio.program.indexdb</package>
                 <package>org.biojava.bio.program.phred</package>
-                <package>org.biojava.bio.program.sax</package>
-                <package>org.biojava.bio.program.sax.blastxml</package>
-                <package>org.biojava.bio.program.scf</package>
                 <package>org.biojava.bio.program.ssaha</package>
                 <package>org.biojava.bio.program.ssbind</package>
                 <package>org.biojava.bio.program.tagvalue</package>
@@ -163,7 +155,6 @@
                 <package>org.biojava.bio.seq</package>
                 <package>org.biojava.bio.seq.db</package>
                 <package>org.biojava.bio.seq.db.biofetch</package>
-                <package>org.biojava.bio.seq.db.biosql</package>
                 <package>org.biojava.bio.seq.db.emblcd</package>
                 <package>org.biojava.bio.seq.db.flat</package>
                 <package>org.biojava.bio.seq.distributed</package>
@@ -176,19 +167,6 @@
                 <package>org.biojava.bio.seq.io.game</package>
                 <package>org.biojava.bio.seq.io.game12</package>
                 <package>org.biojava.bio.seq.projection</package>
-                <package>org.biojava.bio.structure</package>
-                <package>org.biojava.bio.structure.align</package>
-                <package>org.biojava.bio.structure.align.helper</package>
-                <package>org.biojava.bio.structure.align.pairwise</package>
-                <package>org.biojava.bio.structure.gui</package>
-                <package>org.biojava.bio.structure.gui.events</package>
-                <package>org.biojava.bio.structure.gui.util</package>
-                <package>org.biojava.bio.structure.io</package>
-                <package>org.biojava.bio.structure.io.mmcif</package>
-                <package>org.biojava.bio.structure.io.mmcif.chem</package>
-                <package>org.biojava.bio.structure.io.mmcif.model</package>
-                <package>org.biojava.bio.structure.jama</package>
-                <package>org.biojava.bio.structure.server</package>
                 <package>org.biojava.bio.symbol</package>
                 <package>org.biojava.bio.taxa</package>
                 <package>org.biojava.directory</package>
@@ -214,12 +192,10 @@
                 <package>org.biojava.utils.xml</package>
                 <package>org.biojavax</package>
                 <package>org.biojavax.bio</package>
+                <package>org.biojavax.bio.alignment</package>
+                <package>org.biojavax.bio.alignment.blast</package>
                 <package>org.biojavax.bio.db</package>
-                <package>org.biojavax.bio.db.biosql</package>
                 <package>org.biojavax.bio.db.ncbi</package>
-                <package>org.biojavax.bio.phylo</package>
-                <package>org.biojavax.bio.phylo.io.nexus</package>
-                <package>org.biojavax.bio.phylo.io.phylip</package>
                 <package>org.biojavax.bio.seq</package>
                 <package>org.biojavax.bio.seq.io</package>
                 <package>org.biojavax.bio.taxa</package>
@@ -265,54 +241,79 @@
                 <package>org.h2.upgrade</package>
                 <package>org.h2.util</package>
                 <package>org.h2.value</package>
-                  <package>net.sf.samtools</package>
-                  <package>net.sf.samtools.apps</package>
-                  <package>net.sf.samtools.example</package>
-                  <package>net.sf.samtools.util</package>
+                <package>org.japura.controller</package>
+                <package>org.japura.controller.modals</package>
+                <package>org.japura.debug</package>
+                <package>org.japura.exception</package>
+                <package>org.japura.gui</package>
+                <package>org.japura.gui.calendar</package>
+                <package>org.japura.gui.calendar.components</package>
+                <package>org.japura.gui.dnd</package>
+                <package>org.japura.gui.event</package>
+                <package>org.japura.gui.model</package>
+                <package>org.japura.gui.renderer</package>
+                <package>org.japura.i18n</package>
+                <package>org.japura.modal</package>
+                <package>org.japura.task</package>
+                <package>org.japura.task.listener</package>
+                <package>org.japura.util</package>
+                <package>org.japura.util.date</package>
             </public-packages>
             <class-path-extension>
-                <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/sam-1.43.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/sam-1.43.jar</binary-origin>
+                <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/biojava-core-1.8.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jxl.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jxl.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-logging-1.0.4.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-logging-1.0.4.jar</binary-origin>
+                <runtime-relative-path>ext/sam-1.43.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/sam-1.43.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/h2-1.2.141.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/h2-1.2.141.jar</binary-origin>
+                <runtime-relative-path>ext/commons-logging-1.0.4.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-logging-1.0.4.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/biojava-1.8.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/biojava-1.8.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/axis.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/axis.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-discovery-0.2.jar</binary-origin>
+                <runtime-relative-path>ext/SequenceTools-1.0-SNAPSHOT.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/SequenceTools-1.0-SNAPSHOT.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/mysql-connector-java-5.1.7-bin.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/mysql-connector-java-5.1.7-bin.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/biojava.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/biojava.jar</binary-origin>
+                <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-discovery-0.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/bytecode.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/bytecode.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/h2-1.2.141.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/h2-1.2.141.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

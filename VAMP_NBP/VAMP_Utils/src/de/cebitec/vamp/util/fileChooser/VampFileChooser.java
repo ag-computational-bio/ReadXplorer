@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.util.fileChooser;
 
 import java.io.File;
@@ -23,10 +18,6 @@ import de.cebitec.vamp.util.Properties;
  */
 public abstract class VampFileChooser  extends JFileChooser {
 
-    /** Number representing the open file chooser event. */
-    public static final int OPEN = 0;
-    /** Number representing the save fasta event. */
-    public static final int SAVE = 1;
     protected Object data;
     protected String fileExtension;
     protected Preferences pref;
@@ -44,8 +35,8 @@ public abstract class VampFileChooser  extends JFileChooser {
 
     /**
      * Opens a file chooser for input or output file selection/creation.
-     * @param option the option: VampFileChooser.OPEN for file selection and
-     * VampFileChooser.SAVE for storing a file.
+     * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
+     * VampFileChooser.SAVE_DIALOG for storing a file.
      */
     private void openFileChooser(final int option) {
 
@@ -61,10 +52,10 @@ public abstract class VampFileChooser  extends JFileChooser {
             jfc.setCurrentDirectory(null);
         }
         int result;
-        if (option == VampFileChooser.OPEN) {
+        if (option == VampFileChooser.OPEN_DIALOG) {
             result = jfc.showOpenDialog(this.getParent());
         } else {
-            if (option == VampFileChooser.SAVE) {
+            if (option == VampFileChooser.SAVE_DIALOG) {
                 jfc.setFileFilter(new FileNameExtensionFilter(this.fileExtension, this.fileExtension));
             }
             result = jfc.showSaveDialog(null);
@@ -87,10 +78,10 @@ public abstract class VampFileChooser  extends JFileChooser {
             }
         }
 
-        if (option == VampFileChooser.OPEN) {
+        if (option == VampFileChooser.OPEN_DIALOG) {
             this.open(fileLocation);
         } else
-        if (option == VampFileChooser.SAVE) {
+        if (option == VampFileChooser.SAVE_DIALOG) {
             boolean done = this.checkFileExists(fileLocation, jfc);
             if (!done){
                 this.save(fileLocation);
@@ -114,7 +105,7 @@ public abstract class VampFileChooser  extends JFileChooser {
             if (overwriteFile == JOptionPane.YES_OPTION) {
                 this.save(fileLocation);
             } else {
-                this.openFileChooser(VampFileChooser.SAVE);
+                this.openFileChooser(VampFileChooser.SAVE_DIALOG);
             }
             return true;
         }

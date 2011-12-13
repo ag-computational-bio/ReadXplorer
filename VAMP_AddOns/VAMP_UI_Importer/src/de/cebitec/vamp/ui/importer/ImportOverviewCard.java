@@ -19,7 +19,8 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList, List<SeqPairJobContainer> seqPairJobList) {
+    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList, 
+            List<SeqPairJobContainer> seqPairJobList, List<TrackJob> positionTableJobList) {
         overviewTextArea.setText("");
 
         if(!refGenJobList.isEmpty()){
@@ -32,7 +33,6 @@ public class ImportOverviewCard extends javax.swing.JPanel {
             }
             overviewTextArea.append("\n");
         }
-
 
         if(!trackJobList.isEmpty()){
             overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.tracks") + ":\n");
@@ -51,6 +51,14 @@ public class ImportOverviewCard extends javax.swing.JPanel {
                 overviewTextArea.append("\t"+seqPairCont.getTrackJob1().getDescription()+"\n");
                 overviewTextArea.append(seqPairCont.getTrackJob2().getFile().getAbsolutePath()+"\n");
                 overviewTextArea.append("\t"+seqPairCont.getTrackJob2().getDescription()+"\n");
+            }
+        }
+        
+        if (!positionTableJobList.isEmpty()) {
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.posTable") + ":\n");
+            for (Iterator<TrackJob> it = positionTableJobList.iterator(); it.hasNext();) {
+                TrackJob trackJob = it.next();
+                overviewTextArea.append(trackJob.getDescription() + "\n");
             }
         }
     }

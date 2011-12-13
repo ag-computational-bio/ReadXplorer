@@ -152,6 +152,5 @@ public class SeqPairJobView extends javax.swing.JPanel implements ListSelectionL
     private javax.swing.JTable trackTable;
     // End of variables declaration//GEN-END:variables
 
-        //TODO: add values to table model!
 
 }

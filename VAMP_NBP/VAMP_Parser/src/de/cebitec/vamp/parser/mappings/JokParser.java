@@ -6,7 +6,6 @@ import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -15,8 +14,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-//import java.util.HashSet;
-//import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -211,6 +208,7 @@ public class JokParser implements MappingParserI, Observer {
             mappingContainer.setNumberOfUniqueSeq(noUniqueSeq); // = mappingContainer.mappings.size()
 //            s.clear();
             br.close();
+
             Logger.getLogger(this.getClass().getName()).log(Level.INFO,  NbBundle.getMessage(JokParser.class,
                     "Parser.Parsing.Finished",filepath));
             
@@ -256,7 +254,7 @@ public class JokParser implements MappingParserI, Observer {
                     Character base = readSeq.charAt(i);
                     base = Character.toUpperCase(base);
                     if (direction == -1) {
-                        base = SequenceUtils.getComplement(base, readSeq);
+                        base = SequenceUtils.getDnaComplement(base, readSeq);
                     }
 
                     ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, this.getOrderForGap(absPos));
@@ -268,7 +266,7 @@ public class JokParser implements MappingParserI, Observer {
                     char c = readSeq.charAt(i);
                     c = Character.toUpperCase(c);
                     if (direction == -1) {
-                        c = SequenceUtils.getComplement(c, readSeq);
+                        c = SequenceUtils.getDnaComplement(c, readSeq);
                     }
                     ParsedDiff d = new ParsedDiff(absPos, c);
                     diffs.add(d);
@@ -295,55 +293,6 @@ public class JokParser implements MappingParserI, Observer {
     @Override
     public String[] getFileExtensions() {
         return fileExtension;
-    }
-
-    @Override
-    public ParsedRun parseInputForReadData(TrackJob trackJob) throws ParsingException {
-        ParsedRun run = new ParsedRun(fileDescription);
-        try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
-            BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
-            int no = 0;
-            int lineno = 0;
-            String line = null;
-
-            while ((line = br.readLine()) != null) {
-                lineno++;
-                // tokenize input line
-                String[] tokens = line.split("\\s", 8);
-                // cast tokens
-                String readname = tokens[0];
-                String readSeq = tokens[4];
-                String editReadSeq = readSeq;
-                 //deletes all _ which represents gaps in the read seq
-                editReadSeq = readSeq.replaceAll("_", "");
-                if (editReadSeq.matches("[ATGCN]+")) {
-
-                    if (tokens[3].equals("<<")) {
-                        editReadSeq = SequenceUtils.getReverseComplement(editReadSeq);
-                    }
-                    editReadSeq = editReadSeq.toUpperCase();
-                    //if there are other modifications
-
-                    run.addReadData(editReadSeq, readname);
-                    if (lineno == 2000000) {
-                        no += lineno;
-                        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Parsed reads:{0}", no);
-                        lineno = 0;
-                    }
-                } else {
-                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "read doesnt match [ATGCN]+ {0} {1}", new Object[]{readname, editReadSeq});
-                }
-            }
-            br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
-
-        } catch (IOException ex) {
-            throw new ParsingException(ex);
-        }
-        run.setTimestamp(trackJob.getTimestamp());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed{0}", run.getSequences().size());
-        return run;
     }
 
     @Override

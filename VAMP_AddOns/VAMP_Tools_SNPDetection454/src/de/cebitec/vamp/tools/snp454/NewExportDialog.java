@@ -1,16 +1,11 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * NewExportDialog.java
  *
  * Created on 24.07.2011, 16:24:29
  */
 package de.cebitec.vamp.tools.snp454;
 
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import de.cebitec.vamp.exporter.ExportContoller;
 import java.util.List;
 import javax.swing.JOptionPane;

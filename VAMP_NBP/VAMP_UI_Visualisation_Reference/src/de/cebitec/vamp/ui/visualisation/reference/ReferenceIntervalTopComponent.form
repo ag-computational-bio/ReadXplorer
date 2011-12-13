@@ -38,9 +38,9 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="intervalToField" alignment="0" pref="122" max="32767" attributes="0"/>
-                          <Component id="intervalFromField" alignment="0" pref="122" max="32767" attributes="0"/>
-                          <Component id="currentPosField" alignment="0" pref="122" max="32767" attributes="0"/>
+                          <Component id="intervalToField" alignment="0" pref="143" max="32767" attributes="0"/>
+                          <Component id="intervalFromField" alignment="0" pref="143" max="32767" attributes="0"/>
+                          <Component id="currentPosField" alignment="0" pref="143" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">

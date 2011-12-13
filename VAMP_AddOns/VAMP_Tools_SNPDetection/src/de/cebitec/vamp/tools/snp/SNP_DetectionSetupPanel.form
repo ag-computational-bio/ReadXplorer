@@ -73,7 +73,7 @@
     <Component class="javax.swing.JSpinner" name="jSpinner1">
       <Properties>
         <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="60" type="code"/>
+          <Connection code="90" type="code"/>
         </Property>
       </Properties>
     </Component>

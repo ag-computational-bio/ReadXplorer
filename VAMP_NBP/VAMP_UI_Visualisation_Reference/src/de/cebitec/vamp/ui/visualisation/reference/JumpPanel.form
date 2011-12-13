@@ -37,8 +37,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jumpTextfield" pref="210" max="32767" attributes="1"/>
-                  <Component id="searchPatternField" alignment="0" pref="210" max="32767" attributes="1"/>
+                  <Component id="jumpTextfield" pref="57" max="32767" attributes="1"/>
+                  <Component id="searchPatternField" alignment="0" pref="57" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -90,8 +90,8 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="filterProperties" alignment="0" min="0" pref="327" max="32767" attributes="1"/>
-              <Component id="tableScrollPane" alignment="0" pref="327" max="32767" attributes="1"/>
+              <Component id="filterProperties" alignment="0" min="0" pref="174" max="32767" attributes="1"/>
+              <Component id="tableScrollPane" alignment="0" pref="174" max="32767" attributes="1"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -99,7 +99,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="filterProperties" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tableScrollPane" pref="326" max="32767" attributes="0"/>
+                  <Component id="tableScrollPane" pref="334" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

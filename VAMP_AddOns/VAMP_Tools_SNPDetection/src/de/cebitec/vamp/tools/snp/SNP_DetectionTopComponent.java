@@ -1,10 +1,10 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.api.objects.Snp;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-
 import java.awt.CardLayout;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
@@ -16,39 +16,45 @@ import javax.swing.JPanel;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
  * Top component which displays SNP detection tabs.
- *
- * @author jwinneba
+ * 
+ * @author jwinneba, rhilker
  */
-@ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.snp//SNP_Detection//EN", autostore = false)
+@ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.snp//SNP_Detection//EN",
+autostore = false)
+@TopComponent.Description(preferredID = "SNP_DetectionTopComponent",
+iconBase = "de/cebitec/vamp/tools/snp/snpDetection.png",
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+@TopComponent.Registration(mode = "output", openAtStartup = false)
+@ActionID(category = "Window", id = "de.cebitec.vamp.tools.snp.SNP_DetectionTopComponent")
+@ActionReference(path = "Menu/Window", position = 950)
+@TopComponent.OpenActionRegistration(displayName = "#CTL_SNP_DetectionAction",
+preferredID = "SNP_DetectionTopComponent")
 public final class SNP_DetectionTopComponent extends TopComponent {
 
     private static final long serialVersionUID = 1L;
     private static SNP_DetectionTopComponent instance;
     /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "de/cebitec/vamp/tools/snp/snpDetection.png";
     private static final String PREFERRED_ID = "SNP_DetectionTopComponent";
 
+    
     public SNP_DetectionTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(SNP_DetectionTopComponent.class, "CTL_SNP_DetectionTopComponent"));
         setToolTipText(NbBundle.getMessage(SNP_DetectionTopComponent.class, "HINT_SNP_DetectionTopComponent"));
-        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         // add listener to close TopComponent when no tabs are shown
         snpTabs.addContainerListener(new ContainerListener() {
 
             @Override
             public void componentAdded(ContainerEvent e) {
-
             }
 
             @Override
             public void componentRemoved(ContainerEvent e) {
-                if (snpTabs.getTabCount() == 0){
+                if (snpTabs.getTabCount() == 0) {
                     WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
                 }
             }
@@ -60,22 +66,21 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * The <code>TrackViewer</code> instance is used to set up the setup and
      * result panels.
      *
-     * @param trackViewer instance used for this panels panels.
+     * @param referenceViewer the reference viewer for which the snp detection should be carried out.
+     * @param trackIds the list of track ids for which the snp detection should be carried out. They 
+     * all have to belong to the reference genome set in the reference viewer
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer){
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, List<Integer> trackIds) {
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
         SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
         final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
+        //add reference sequence for amino acid mutation detection
+        resultPanel.setReferenceGenome(referenceViewer.getReference());
 
-        // assign the ProjectConnector
-        setupPanel.setCon(ProjectConnector.getInstance());
-        //setupPanel.setCon(trackViewer.getTrackCon());
-//        ReferenceViewer viewer = Lookup.getDefault().lookup(ReferenceViewer.class);
-//        if (viewer != null){
-//            resultPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
-//        }
+        // assign the track Ids
+        setupPanel.setTrackIds(trackIds);
         resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
 
         // listen on changes of the search
@@ -84,7 +89,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
             @Override
             @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
-                resultPanel.addSNPs((List<Snp>) evt.getNewValue());
+                resultPanel.addSNPs((SnpData) evt.getNewValue());
                 ((CardLayout) snpDetectionPanel.getLayout()).show(snpDetectionPanel, "results");
             }
         });
@@ -105,33 +110,23 @@ public final class SNP_DetectionTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        snpDetectionPanelTemplate = new javax.swing.JPanel();
-        setupPanelTemplate = new de.cebitec.vamp.tools.snp.SNP_DetectionSetupPanel();
-        resultPanelTemplate = new de.cebitec.vamp.tools.snp.SNP_DetectionResultPanel();
         snpTabs = new javax.swing.JTabbedPane();
-
-        snpDetectionPanelTemplate.setLayout(new java.awt.CardLayout());
-        snpDetectionPanelTemplate.add(setupPanelTemplate, "setup");
-        snpDetectionPanelTemplate.add(resultPanelTemplate, "results");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+            .addComponent(snpTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.tools.snp.SNP_DetectionResultPanel resultPanelTemplate;
-    private de.cebitec.vamp.tools.snp.SNP_DetectionSetupPanel setupPanelTemplate;
-    private javax.swing.JPanel snpDetectionPanelTemplate;
     private javax.swing.JTabbedPane snpTabs;
     // End of variables declaration//GEN-END:variables
+
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
@@ -170,7 +165,6 @@ public final class SNP_DetectionTopComponent extends TopComponent {
 
     @Override
     public void componentOpened() {
-
     }
 
     @Override
@@ -182,20 +176,12 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // store your settings
+        // TODO store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
-            instance = this;
-        }
-        instance.readPropertiesImpl(p);
-        return instance;
-    }
-
-    private void readPropertiesImpl(java.util.Properties p) {
+    void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // read your settings according to their version
+        // TODO read your settings according to their version
     }
 
     @Override
@@ -203,14 +189,14 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         return PREFERRED_ID;
     }
 
-//    public void openDetectionTab(TrackViewer trackViewer){
-//        snpTabs.addTab(trackViewer.getTrackCon().getAssociatedTrackName(), getSnpDetectionPanel(trackViewer));
-//        snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
-//    }
-
-    public void openDetectionTab(ReferenceViewer referenceViewer){
-        snpTabs.addTab("SNP Detection for opened Tabs", getSnpDetectionPanel(referenceViewer));
-        snpTabs.setTabComponentAt(snpTabs.getTabCount()-1, new TabWithCloseX(snpTabs));
+    /**
+     * This method needas to be called in order to open a new tab for snp detection.
+     * @param referenceViewer the reference viewer for which the snp detection should be carried out.
+     * @param trackIds the list of track ids (associated to the reference viewer) for which the snp 
+     *          detection should be carried out.
+     */
+    public void openDetectionTab(ReferenceViewer referenceViewer, List<Integer> trackIds) {
+        snpTabs.addTab("SNP Detection for opened Tabs", this.getSnpDetectionPanel(referenceViewer, trackIds));
+        snpTabs.setTabComponentAt(snpTabs.getTabCount() - 1, new TabWithCloseX(snpTabs));
     }
-    
 }

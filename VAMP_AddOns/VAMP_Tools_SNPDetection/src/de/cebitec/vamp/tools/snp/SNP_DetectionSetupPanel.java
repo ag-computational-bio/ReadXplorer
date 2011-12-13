@@ -7,10 +7,11 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.api.objects.Snp;
-import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.SwingWorker;
 import org.netbeans.api.progress.ProgressHandle;
@@ -24,24 +25,25 @@ import org.openide.util.TaskListener;
 
 /**
  *
- * @author jwinneba
+ * @author jwinneba, rhilker
  */
 public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private ITrackConnector con;
     private ProjectConnector proCon;
-    private List<Snp> snps;
+    private List<Integer> trackIds;
+    private SnpData snpData;
 
     public static final String PROP_SNPS_LOADED = "snpsLoaded";
 
     /** Creates new form SNP_DetectionSetupPanel */
     public SNP_DetectionSetupPanel() {
         initComponents();
-        snps = new ArrayList<Snp>();
+        snpData = new SnpData(new ArrayList<SnpI>(), new HashMap<Integer, String>());
+        this.proCon = ProjectConnector.getInstance();
     }
     
-    private class SnpWorker extends SwingWorker<List<Snp>, Object> {
+    private class SnpWorker extends SwingWorker<SnpData, Object> {
 
         private int percent;
         private int num;
@@ -54,12 +56,13 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
         }
 
         @Override
-        protected List<Snp> doInBackground() {
+        protected SnpData doInBackground() {
             CentralLookup.getDefault().add(this);
 
             ph.start();
-            snps = proCon.findSNPs(percent, num);
-            return snps;
+            List<SnpI> snps = proCon.findSNPs(percent, num, trackIds);
+            snpData = new SnpData(snps, proCon.getOpenedTrackNames());
+            return snpData;
         }
 
         @Override
@@ -95,7 +98,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             }
         });
 
-        jSpinner1.setValue(60);
+        jSpinner1.setValue(90);
 
         jLabel2.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionSetupPanel.class, "SNP_DetectionSetupPanel.jLabel2.text")); // NOI18N
 
@@ -161,7 +164,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
                 @Override
                 public void taskFinished(org.openide.util.Task task) {
-                    firePropertyChange(PROP_SNPS_LOADED, null, snps);
+                    firePropertyChange(PROP_SNPS_LOADED, null, snpData);
                     snpTask.removeTaskListener(this);
                     searchButton.setEnabled(true);
                 }
@@ -197,16 +200,20 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
     private javax.swing.JButton searchButton;
     // End of variables declaration//GEN-END:variables
 
-    public List<Snp> getSnps() {
-        return snps;
+    /**
+     * @return the SnpData object containing all detected SNPs after a SNP detection
+     * was carried out.
+     */
+    public SnpData getSnps() {
+        return snpData;
     }
-
-//    public void setCon(ITrackConnector con) {
-//        this.con = con;
-//    }
-
-    public void setCon(ProjectConnector con) {
-        this.proCon = con;
+    
+    /**
+     * Set the track ids for which the snps should be detected.
+     * @param trackIds the list of track ids defining the tracks to detect snps for.
+     */
+    public void setTrackIds(List<Integer> trackIds){
+        this.trackIds = trackIds;
     }
 
     

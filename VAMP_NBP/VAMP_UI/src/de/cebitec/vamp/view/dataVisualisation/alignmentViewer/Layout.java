@@ -1,16 +1,18 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
- * @author ddoppmei
+ * @author ddoppmeier, rhilker
  * 
  * A Layout holds all information to display for an alignment in different, non
- * overlapping layers.
+ * overlapping layers. It also know which data is on the exclusion list and should not be displayed.
  */
 public class Layout implements LayoutI {
 
@@ -21,14 +23,16 @@ public class Layout implements LayoutI {
     private ArrayList<LayerI> reverseLayers;
     private BlockContainer forwardBlockContainer;
     private BlockContainer reverseBlockContainer;
+    private List<FeatureType> exclusionList;
 
-    public Layout(int absStart, int absStop, Collection<PersistantMapping> mappings){
+    public Layout(int absStart, int absStop, Collection<PersistantMapping> mappings, List<FeatureType> exclusionList){
         this.absStart = absStart;
         this.absStop = absStop;
-        forwardLayers = new ArrayList<LayerI>();
-        reverseLayers = new ArrayList<LayerI>();
-        forwardBlockContainer = new BlockContainer();
-        reverseBlockContainer = new BlockContainer();
+        this.forwardLayers = new ArrayList<LayerI>();
+        this.reverseLayers = new ArrayList<LayerI>();
+        this.forwardBlockContainer = new BlockContainer();
+        this.reverseBlockContainer = new BlockContainer();
+        this.exclusionList = exclusionList;
         
         this.storeGaps(mappings);
         this.createBlocks(mappings);
@@ -37,15 +41,18 @@ public class Layout implements LayoutI {
     }
 
     /**
-     * Handles and stores the genome gaps.
+     * Handles and stores the genome gaps for all mappings, which are not in the
+     * type classes in the exclusion list.
      * @param mappings mappings covering current part of the genome
      */
     private void storeGaps(Collection<PersistantMapping> mappings){
         gapManager = new GenomeGapManager(absStart, absStop);
         Iterator<PersistantMapping> it = mappings.iterator();
         while(it.hasNext()){
-            PersistantMapping m = it.next();
-            gapManager.addGapsFromMapping(m.getGenomeGaps());
+            PersistantMapping mapping = it.next();
+            if (!this.inExclusionList(mapping)){
+                gapManager.addGapsFromMapping(mapping.getGenomeGaps());
+            }
         }
 
         // gaps do extend the width of this layout
@@ -67,31 +74,35 @@ public class Layout implements LayoutI {
     }
 
     /**
-     * Each mapping gets one block.
+     * Each mapping gets one block, if it is not in a type class in the exclusion list.
      * @param mappings mappings in current interval
      */
     private void createBlocks(Collection<PersistantMapping> mappings){
-        Iterator<PersistantMapping> it = mappings.iterator();
-        while(it.hasNext()){
-            PersistantMapping m = it.next();
-            // get start position
-            int start = m.getStart();
-            if(start < this.absStart){
-                start = this.absStart;
+        Iterator<PersistantMapping> mappingIt = mappings.iterator();
+        while(mappingIt.hasNext()) {
+            PersistantMapping mapping = mappingIt.next();
+            if (!this.inExclusionList(mapping)) {
+                
+                // get start position
+                int start = mapping.getStart();
+                if (start < this.absStart) {
+                    start = this.absStart;
+                }
+
+                // get stop position
+                int stop = mapping.getStop();
+                if (stop > this.absStop) {
+                    stop = this.absStop;
+                }
+
+                BlockI block = new Block(start, stop, mapping, gapManager);
+                if (mapping.isForwardStrand()) {
+                    forwardBlockContainer.addBlock(block);
+                } else {
+                    reverseBlockContainer.addBlock(block);
+                }
             }
 
-            // get stop position
-            int stop = m.getStop();
-            if(stop > this.absStop){
-                stop = this.absStop;
-            }
-
-            BlockI block = new Block(start, stop, m, gapManager);
-            if(m.isForwardStrand()){
-                forwardBlockContainer.addBlock(block);
-            } else {
-                reverseBlockContainer.addBlock(block);
-            }
         }
     }    
 
@@ -139,6 +150,22 @@ public class Layout implements LayoutI {
     @Override
     public GenomeGapManager getGenomeGapManager() {
         return gapManager;
+    }
+
+    /**
+     * Returns true if the type of the current mapping is in the exclusion list.
+     * This means it should not be displayed.
+     * @param m the mapping to test, if it should be displayed
+     * @return true, if the mapping should be excluded from being displayed, false otherwise
+     */
+    private boolean inExclusionList(PersistantMapping m) {
+        if ((m.getErrors() == 0 && this.exclusionList.contains(FeatureType.PERFECT_MATCH))
+                || (m.getErrors() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH)) 
+                || (m.getErrors() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.ORDINARY_MATCH))){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

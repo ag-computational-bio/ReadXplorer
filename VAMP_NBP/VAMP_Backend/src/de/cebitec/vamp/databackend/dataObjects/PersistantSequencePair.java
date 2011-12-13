@@ -90,7 +90,7 @@ public class PersistantSequencePair implements PersistantObject {
     }
 
     /**
-     * If both mappings of the pair are visible, set the second pair by using this method
+     * If both mappings of the pair are visible, set the second mapping by using this method
      * @param visiblemapping2  the second mapping of the pair
      */
     public void setVisiblemapping2(PersistantMapping visiblemapping2) {

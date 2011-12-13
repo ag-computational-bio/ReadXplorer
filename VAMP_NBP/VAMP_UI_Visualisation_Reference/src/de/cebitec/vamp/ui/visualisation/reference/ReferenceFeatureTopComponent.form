@@ -30,12 +30,12 @@
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane1" pref="233" max="32767" attributes="0"/>
-                          <Component id="typeText" alignment="1" pref="233" max="32767" attributes="0"/>
-                          <Component id="locusField" alignment="0" pref="233" max="32767" attributes="2"/>
-                          <Component id="startField" alignment="0" pref="233" max="32767" attributes="2"/>
-                          <Component id="stopField" alignment="0" pref="233" max="32767" attributes="2"/>
-                          <Component id="ecNumField" alignment="0" pref="233" max="32767" attributes="2"/>
+                          <Component id="jScrollPane1" pref="243" max="32767" attributes="0"/>
+                          <Component id="typeText" alignment="1" pref="243" max="32767" attributes="0"/>
+                          <Component id="locusField" alignment="0" pref="243" max="32767" attributes="2"/>
+                          <Component id="startField" alignment="0" pref="243" max="32767" attributes="2"/>
+                          <Component id="stopField" alignment="0" pref="243" max="32767" attributes="2"/>
+                          <Component id="ecNumField" alignment="0" pref="243" max="32767" attributes="2"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">

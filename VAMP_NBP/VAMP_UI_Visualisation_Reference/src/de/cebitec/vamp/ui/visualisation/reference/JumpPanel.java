@@ -12,6 +12,7 @@ import de.cebitec.vamp.view.dialogMenus.StandardMenuEvent;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -435,10 +436,11 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     }
 
     private void fillFeatureList() {
-        List<PersistantFeature> feat = refGenCon.getFeaturesForRegion(0, refGen.getSequence().length());
-
-        Collections.sort(feat, new FeatureNameSorter());
-        PersistantFeature[] featureData = feat.toArray(new PersistantFeature[0]);
+        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGen.getSequence().length());
+        
+        List<PersistantFeature> featList = new ArrayList<PersistantFeature>(features);
+        Collections.sort(featList, new FeatureNameSorter());
+        PersistantFeature[] featureData = featList.toArray(new PersistantFeature[0]);
 
         //Create new Model for Table
         featureTable.setModel(new FeatureTableModel(featureData));

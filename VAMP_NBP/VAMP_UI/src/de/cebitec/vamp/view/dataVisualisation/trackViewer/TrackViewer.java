@@ -1,9 +1,11 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.CoverageRequest;
 import de.cebitec.vamp.databackend.CoverageThreadListener;
-import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -37,7 +39,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
     private static final long serialVersionUID = 572406471;
 
-    private ITrackConnector trackCon;
+    private TrackConnector trackCon;
     private PersistantCoverage cov;
     private boolean covLoaded;
     private boolean twoTracks;
@@ -73,7 +75,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
      * @param refGen reference genome
      * @param trackCon database connection to one track, that is displayed
      */
-    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, ITrackConnector trackCon){
+    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackCon){
         super(boundsManager, basePanel, refGen);
         this.trackCon = trackCon;
         labelMargin = 3;
@@ -158,11 +160,9 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
             } else {
                 // fill and draw all coverage pathes
                 
-                Color complete = Color.BLUE;
-                
-                //Orange
-                Color track1 =  new Color(255,117,48);
-                Color track2 = Color.cyan;
+                Color complete = ColorProperties.COMPLETE_COV;
+                Color track1 = ColorProperties.TRACK1_COLOR;
+                Color track2 = ColorProperties.TRACK2_COLOR;
 
                 // n error mappings
                 g.setColor(track1);
@@ -329,11 +329,10 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     public synchronized void receiveCoverage(PersistantCoverage coverage){
         this.cov = coverage;
         trackInfo.setCoverage(cov);
-//        trackInfo.setTrackViewer(this);
-        if(cov.isTwoTracks()){
-        this.createCoveragePathsDiffOfTwoTracks();
-        }else{
-        this.createCoveragePaths();
+        if (cov.isTwoTracks()){
+            this.createCoveragePathsDiffOfTwoTracks();
+        } else {
+            this.createCoveragePaths();
         }
         covLoaded = true;
         this.repaint();
@@ -369,12 +368,27 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     }
 
     private void createCoveragePaths(){
-        bmFw = getCoveragePath(true, PersistantCoverage.BM);
-        bmRv = getCoveragePath(false, PersistantCoverage.BM);
-        zFw = getCoveragePath(true, PersistantCoverage.PERFECT);
-        zRv = getCoveragePath(false, PersistantCoverage.PERFECT);
-        nFw = getCoveragePath(true, PersistantCoverage.NERROR);
-        nRv = getCoveragePath(false, PersistantCoverage.NERROR);
+        if (!this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE)) {
+            bmFw = getCoveragePath(true, PersistantCoverage.BM);
+            bmRv = getCoveragePath(false, PersistantCoverage.BM);
+        } else {
+            bmFw.reset();
+            bmRv.reset();
+        }
+        if (!this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE)) {
+            zFw = getCoveragePath(true, PersistantCoverage.PERFECT);
+            zRv = getCoveragePath(false, PersistantCoverage.PERFECT);
+        } else {
+            zFw.reset();
+            zRv.reset();
+        }
+        if (!this.getExcludedFeatureTypes().contains(FeatureType.COMPLETE_COV)) {
+            nFw = getCoveragePath(true, PersistantCoverage.NERROR);
+            nRv = getCoveragePath(false, PersistantCoverage.NERROR);
+        } else {
+            nFw.reset();
+            nRv.reset();
+        }
     }
     private void createCoveragePathsDiffOfTwoTracks(){
         nFw = getCoveragePath(true, PersistantCoverage.TRACK1);
@@ -487,6 +501,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     @Override
     public void close(){
         super.close();
+        ProjectConnector.getInstance().removeTrackConnector(trackCon.getTrackID());
         trackCon = null;
     }
 
@@ -589,7 +604,7 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         repaint();
     }
 
-    public ITrackConnector getTrackCon() {
+    public TrackConnector getTrackCon() {
         return trackCon;
     }
 

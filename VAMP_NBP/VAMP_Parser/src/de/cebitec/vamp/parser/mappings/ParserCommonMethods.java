@@ -192,6 +192,12 @@ public final class ParserCommonMethods {
         return isForward;
     }
     
+    /**
+     * TODO: Can be used for homopolymer snp detection, to flag snps in homopolymers. needed?
+     * @param genome
+     * @param snp
+     * @return 
+     */
         public static boolean snpHasStretch(String genome, int snp) {
         String beforeSNP = genome.substring(0, 1);
 

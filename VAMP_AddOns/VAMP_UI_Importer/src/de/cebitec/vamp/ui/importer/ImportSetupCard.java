@@ -19,28 +19,26 @@ import org.openide.util.Lookup;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ImportSetupCard extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 127732323;
-
     private boolean canImport;
-
     public static final String PROP_HAS_JOBS = "hasJobs";
     public static final String PROP_JOB_SELECTED = "jobSelected";
-
     private int trackID = 0;
 
     /** Creates new form SetupImportCard */
     public ImportSetupCard() {
         initComponents();
-        refJobView.addPropertyChangeListener(getJobPropListener());
-        trackJobView.addPropertyChangeListener(getJobPropListener());
-        seqPairTrackJobsView.addPropertyChangeListener(getJobPropListener());
+        refJobView.addPropertyChangeListener(this.getJobPropListener());
+        trackJobView.addPropertyChangeListener(this.getJobPropListener());
+        seqPairTrackJobsView.addPropertyChangeListener(this.getJobPropListener());
+        positionTableJobView.addPropertyChangeListener(this.getJobPropListener());
     }
 
-    private PropertyChangeListener getJobPropListener(){
+    private PropertyChangeListener getJobPropListener() {
         return new PropertyChangeListener() {
 
             @Override
@@ -51,8 +49,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                     } else {
                         removeJob.setEnabled(false);
                     }
-                }
-                else if (evt.getPropertyName().equals(PROP_HAS_JOBS)) {
+                } else if (evt.getPropertyName().equals(PROP_HAS_JOBS)) {
                     setCanImport((Boolean) evt.getNewValue());
                 }
             }
@@ -63,21 +60,25 @@ public class ImportSetupCard extends javax.swing.JPanel {
         removeJob.setEnabled(b);
     }
 
-    public void setCanImport(boolean canOrcannot){
+    public void setCanImport(boolean canOrcannot) {
         canImport = canOrcannot;
         firePropertyChange(ImportWizardAction.PROP_CAN_IMPORT, null, canImport);
     }
 
-    public List<ReferenceJob> getRefJobList(){
+    public List<ReferenceJob> getRefJobList() {
         return refJobView.getJobs();
     }
 
-    public List<TrackJob> getTrackJobList(){
+    public List<TrackJob> getTrackJobList() {
         return trackJobView.getJobs();
     }
 
-    public List<SeqPairJobContainer> getSeqPairTrackJobList(){
+    public List<SeqPairJobContainer> getSeqPairTrackJobList() {
         return seqPairTrackJobsView.getJobs();
+    }
+    
+    public List<TrackJob> getPositionTableJobs(){
+        return this.positionTableJobView.getJobs();
     }
 
     @Override
@@ -98,6 +99,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         refJobView = new de.cebitec.vamp.ui.importer.RefJobView();
         trackJobView = new de.cebitec.vamp.ui.importer.TrackJobView();
         seqPairTrackJobsView = new de.cebitec.vamp.ui.importer.SeqPairJobView();
+        positionTableJobView = new de.cebitec.vamp.ui.importer.PositionTableJobView();
         addJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
@@ -113,6 +115,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         if (seqPairCalculator != null) {
             jTabbedPane1.addTab("Sequence Pair Tracks", seqPairTrackJobsView);
         }
+        jTabbedPane1.addTab("Position Table for Track", positionTableJobView);
 
         addJob.setText(org.openide.util.NbBundle.getMessage(ImportSetupCard.class, "ImportSetupCard.button.newJob")); // NOI18N
         addJob.addActionListener(new java.awt.event.ActionListener() {
@@ -133,9 +136,9 @@ public class ImportSetupCard extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(317, Short.MAX_VALUE)
+                .addContainerGap(333, Short.MAX_VALUE)
                 .addComponent(removeJob)
                 .addGap(7, 7, 7)
                 .addComponent(addJob)
@@ -155,26 +158,26 @@ public class ImportSetupCard extends javax.swing.JPanel {
 
     private void addJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobActionPerformed
         Component c = jTabbedPane1.getSelectedComponent();
-        if(c != null){
+        if (c != null) {
             String title;
             NewJobDialog dialogPane;
 
             // initialise NewJobDialog parameters
-            if (c instanceof RefJobView){
+            if (c instanceof RefJobView) {
                 title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.reference");
                 dialogPane = new NewReferenceDialogPanel();
-            }
-            else if (c instanceof SeqPairJobView){
+            } else if (c instanceof SeqPairJobView) {
                 title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.seqPairTrack");
                 dialogPane = new NewSeqPairTracksDialogPanel();
                 ((NewSeqPairTracksDialogPanel) dialogPane).setReferenceJobs(refJobView.getJobs());
-            }
-            else if (c instanceof TrackJobView){
+            } else if (c instanceof TrackJobView) {
                 title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.track");
                 dialogPane = new NewTrackDialogPanel();
-                ((NewTrackDialogPanel) dialogPane).setReferenceJobs(refJobView.getJobs());
-            }
-            else {
+                ((NewTrackDialogPanel) dialogPane).setReferenceJobs(this.refJobView.getJobs());
+            } else if (c instanceof PositionTableJobView) {
+                title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.posTable");
+                dialogPane = new NewPositionTableDialog();
+            } else {
                 title = null;
                 dialogPane = null;
             }
@@ -185,96 +188,111 @@ public class ImportSetupCard extends javax.swing.JPanel {
             dialog.setVisible(true);
 
             // keep the dialog open until the required info is provided or the dialog is canceled
-            while(newDialog.getValue() == DialogDescriptor.OK_OPTION && !dialogPane.isRequiredInfoSet()){
+            while (newDialog.getValue() == DialogDescriptor.OK_OPTION && !dialogPane.isRequiredInfoSet()) {
                 DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(ImportSetupCard.class, "MSG_ImportSetupCard.dialog.fillout"), NotifyDescriptor.INFORMATION_MESSAGE));
                 dialog.setVisible(true);
             }
 
             // do dialog specific stuff
-            if (newDialog.getValue() == DialogDescriptor.OK_OPTION && dialogPane.isRequiredInfoSet()){
-                if (dialogPane instanceof NewReferenceDialogPanel){
+            if (newDialog.getValue() == DialogDescriptor.OK_OPTION && dialogPane.isRequiredInfoSet()) {
+                if (dialogPane instanceof NewReferenceDialogPanel) {
                     NewReferenceDialogPanel nrdp = (NewReferenceDialogPanel) dialogPane;
-                    refJobView.add(new ReferenceJob(null, nrdp.getReferenceFile(), nrdp.getParser(), nrdp.getDescription(), nrdp.getReferenceName(), new Timestamp(System.currentTimeMillis())));
-                }
-                else if (dialogPane instanceof NewSeqPairTracksDialogPanel){
+                    refJobView.add(new ReferenceJob(null, nrdp.getReferenceFile(), nrdp.getParser(), nrdp.getDescription(), 
+                            nrdp.getReferenceName(), new Timestamp(System.currentTimeMillis())));
+                
+                } else if (dialogPane instanceof NewSeqPairTracksDialogPanel) {
                     NewSeqPairTracksDialogPanel seqPairPane = (NewSeqPairTracksDialogPanel) dialogPane;
                     ReferenceJob refJob = seqPairPane.getReferenceJob();
-                    TrackJob trackJob1 = new TrackJob(trackID++, seqPairPane.getMappingFile1(), seqPairPane.getDescription()+" Track 1", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
-                    TrackJob trackJob2 = new TrackJob(trackID++, seqPairPane.getMappingFile2(), seqPairPane.getDescription()+" Track 2", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob1 = new TrackJob(trackID++, seqPairPane.getMappingFile1(), seqPairPane.getDescription() + " Track 1", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob2 = new TrackJob(trackID++, seqPairPane.getMappingFile2(), seqPairPane.getDescription() + " Track 2", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
                     refJob.registerTrackWithoutRunJob(trackJob1);
-                    refJob.registerTrackWithoutRunJob(trackJob2);                    
-                    this.seqPairTrackJobsView.add(new SeqPairJobContainer(trackJob1, trackJob2, 
+                    refJob.registerTrackWithoutRunJob(trackJob2);
+                    this.seqPairTrackJobsView.add(new SeqPairJobContainer(trackJob1, trackJob2,
                             seqPairPane.getDistance(), seqPairPane.getDeviation(), seqPairPane.getOrientation()));
-                }
-                else if (dialogPane instanceof NewTrackDialogPanel){
+                
+                } else if (dialogPane instanceof NewTrackDialogPanel) {
                     NewTrackDialogPanel ntdp = (NewTrackDialogPanel) dialogPane;
                     ReferenceJob refJob = ntdp.getReferenceJob();
-                   
-                    TrackJob trackJob = new TrackJob(trackID++,ntdp.getMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
-                     trackJob.setIsStepwise((ntdp.getParser() instanceof SamBamStepParser? true:false));
-                     trackJob.setStepSize(ntdp.getstepSize());
+                    TrackJob trackJob = new TrackJob(trackID++, ntdp.getMappingFile(), ntdp.getDescription(), 
+                            refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
+                    trackJob.setIsStepwise((ntdp.getParser() instanceof SamBamStepParser ? true : false));
+                    trackJob.setStepSize(ntdp.getstepSize());
                      trackJob.setIsSorted(ntdp.isFileSorted());
                     refJob.registerTrackWithoutRunJob(trackJob);
                     trackJobView.add(trackJob);
+                
+                } else if (dialogPane instanceof NewPositionTableDialog) {
+                    NewPositionTableDialog posTableDialog = (NewPositionTableDialog) dialogPane;
+                    ReferenceJob refJob = posTableDialog.getReferenceJob();
+                    TrackJob parentTrackJob = posTableDialog.getParentTrack();
+                    TrackJob trackJob = new TrackJob(parentTrackJob.getID(), posTableDialog.getMappingFile(), "", refJob, 
+                            posTableDialog.getParser(), new Timestamp(System.currentTimeMillis()));
+                    trackJob.setIsStepwise((posTableDialog.getParser() instanceof SamBamStepParser));
+                    trackJob.setStepSize(posTableDialog.getStepSize());
+                    refJob.registerTrackWithoutRunJob(trackJob);
+                    this.positionTableJobView.add(trackJob);
                 }
 
             }
-        } else{
+        } else {
             // do nothing
         }
 }//GEN-LAST:event_addJobActionPerformed
 
     private void removeJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeJobActionPerformed
         Component c = jTabbedPane1.getSelectedComponent();
-        if(c == null){
-        } else if(c instanceof RefJobView) {
+        if (c == null) {
+        } else if (c instanceof RefJobView) {
             ReferenceJob job = refJobView.getSelectedItem();
-            if (job.hasRegisteredTrackswithoutrRunJob()){
+            if (job.hasRegisteredTrackswithoutrRunJob()) {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ImportSetupCard.class, "MSG_ImportSetupCard.dialog.problem.dependency"), NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);
-            }
-            else{
+            } else {
                 refJobView.remove(job);
             }
-        } else if(c instanceof SeqPairJobView){
+        } else if (c instanceof SeqPairJobView) {
             seqPairTrackJobsView.remove(seqPairTrackJobsView.getSelectedItem());
-        } else if(c instanceof TrackJobView){
+        } else if (c instanceof TrackJobView) {
             trackJobView.remove(trackJobView.getSelectedItem());
+        } else if (c instanceof PositionTableJobView) {
+            positionTableJobView.remove(positionTableJobView.getSelectedItem());
         }
     }//GEN-LAST:event_removeJobActionPerformed
 
     private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
         Component c = jTabbedPane1.getSelectedComponent();
         boolean isSelected = false;
-        if(c instanceof RefJobView){
-            if(refJobView.IsRowSelected()){
+        if (c instanceof RefJobView) {
+            if (refJobView.IsRowSelected()) {
                 isSelected = true;
             }
-        } else if (c instanceof SeqPairJobView){
-            if (seqPairTrackJobsView.isRowSelected()){
+        } else if (c instanceof SeqPairJobView) {
+            if (seqPairTrackJobsView.isRowSelected()) {
                 isSelected = true;
             }
-        } else if (c instanceof TrackJobView){
-            if (trackJobView.IsRowSelected()){
+        } else if (c instanceof TrackJobView) {
+            if (trackJobView.IsRowSelected()) {
+                isSelected = true;
+            }
+        } else if (c instanceof PositionTableJobView) {
+            if (positionTableJobView.IsRowSelected()){
                 isSelected = true;
             }
         }
 
-        if(isSelected){
+        if (isSelected) {
             setRemoveButtonEnabled(true);
-        } else{
+        } else {
             setRemoveButtonEnabled(false);
         }
 }//GEN-LAST:event_jTabbedPane1StateChanged
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addJob;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private de.cebitec.vamp.ui.importer.PositionTableJobView positionTableJobView;
     private de.cebitec.vamp.ui.importer.RefJobView refJobView;
     private javax.swing.JButton removeJob;
     private de.cebitec.vamp.ui.importer.SeqPairJobView seqPairTrackJobsView;
     private de.cebitec.vamp.ui.importer.TrackJobView trackJobView;
     // End of variables declaration//GEN-END:variables
-
 }

@@ -9,10 +9,9 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.mappings.BAMSeqPairParser;
+import de.cebitec.vamp.parser.mappings.SAMBAMSeqPairParser;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
 import de.cebitec.vamp.parser.mappings.JokSeqPairParser;
-import de.cebitec.vamp.parser.mappings.SAMSeqPairParser;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private File mappingFile1;
     private File mappingFile2;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokSeqPairParser(), new SAMSeqPairParser(), new BAMSeqPairParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokSeqPairParser(), new SAMBAMSeqPairParser()};
     private MappingParserI currentParser;
     private int distance; //distance of the sequences in a sequence pair in bp
     private short deviation; //deviation allowed from that distance in %

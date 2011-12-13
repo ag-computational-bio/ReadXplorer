@@ -29,9 +29,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
@@ -52,12 +50,13 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private static final int minVal = 10000;
     private static final int step = 1000;
     private static final int defaultVal = 300000;
+   
     /** Creates new form NewTrackDialogPanel */
     public NewTrackDialogPanel() {
-        refGenJobs = getRefGenJobs();
+        refGenJobs = this.getRefGenJobs();
         initComponents();
         // choose the default parser. first entry is shown in combobox by default
-        currentParser = parsers[0];
+        this.currentParser = this.parsers[0];
         this.setStepwiseField(false);
         setJSpinner();
 
@@ -333,5 +332,5 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private javax.swing.JLabel stepSizeLabel;
     private javax.swing.JSpinner stepSizeSpinner;
     // End of variables declaration//GEN-END:variables
-
+    
 }

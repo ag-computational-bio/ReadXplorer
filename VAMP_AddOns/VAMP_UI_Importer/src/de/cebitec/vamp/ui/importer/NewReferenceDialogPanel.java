@@ -8,9 +8,8 @@ package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
-import de.cebitec.vamp.parser.reference.BioJavaEmblParser;
 import de.cebitec.vamp.parser.reference.FastaReferenceParser;
-import de.cebitec.vamp.parser.reference.BioJavaGenBankParser;
+import de.cebitec.vamp.parser.reference.BioJavaParser;
 import java.awt.Component;
 import java.io.File;
 import java.util.logging.Level;
@@ -30,7 +29,8 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
     
     private static final long serialVersionUID = 8362375;
     private File refGenFile = null;
-    private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaEmblParser(), new BioJavaGenBankParser(), new FastaReferenceParser()};
+    private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaParser(BioJavaParser.EMBL), 
+            new BioJavaParser(BioJavaParser.GENBANK), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
     /** Creates new form NewReferenceDialogPanel */

@@ -1,21 +1,22 @@
 package de.cebitec.vamp.exporter;
 
-import de.cebitec.vamp.exporter.excel.ExcelExporter;
-import de.cebitec.vamp.api.objects.Snp;
-import de.cebitec.vamp.api.objects.Snp454;
+import de.cebitec.vamp.exporter.excel.SnpExcelExporter;
+import de.cebitec.vamp.databackend.dataObjects.Snp454;
+import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.openide.util.NbBundle;
 
 /**
  *
- * @author jstraube
+ * @author jstraube, rhilker
  */
 public class ExportContoller implements ActionListener {
 
@@ -23,7 +24,7 @@ public class ExportContoller implements ActionListener {
     private File tempFile;
     private String filename;
     private String contentType;
-    private List<Snp> snps = new ArrayList<Snp>();
+    private SnpData snpData;
     private List<Snp454> snps454;
     private ExporterI exporter = null;
 
@@ -64,15 +65,18 @@ public class ExportContoller implements ActionListener {
      * @param exportType The enum for the wanted exporter.
      * @param contentType The content type of the output file.
      */
-    public void notifyExportEvent(
-            EnumExportType exportType,
-            final String contentType) {
+    public void notifyExportEvent(EnumExportType exportType, final String contentType) {
+        //often used error messages
+        String msg = NbBundle.getMessage(ExportContoller.class, "ExportContoller.FailMsg",
+                "An error occured while reading the specified file");
+        String header = NbBundle.getMessage(ExportContoller.class, "ExportContoller.FailHeader", "Error");
+
         try {
             /* initialise correct exporter */
             switch (exportType) {
                 case EXCEL:
-                    exporter = new ExcelExporter();
-                    ((ExcelExporter)exporter).setSNPs(snps);
+                    exporter = new SnpExcelExporter();
+                    ((SnpExcelExporter)exporter).setSNPs(snpData);
                     break;
                 case SNP454:
                     exporter = new Snp454Exporter(this.snps454);
@@ -86,14 +90,19 @@ public class ExportContoller implements ActionListener {
             if (exporter.readyToExport()) {
                 try {
                      exportFile = exporter.writeFile(tempFile, filename);
-                     
+
                 } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE);
                     Logger.getLogger(this.getClass().getName()).log(Level.WARNING, " Export failed!", ex);
                 } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE);
                     Logger.getLogger(this.getClass().getName()).log(Level.WARNING, " Export failed!", ex);
                 }
             } else {
                 // Exporter is not ready!
+                String msg2 = NbBundle.getMessage(ExportContoller.class, "ExportContoller.NotReadyMsg",
+                    "The SNP data is empty, so nothing to store right now.");
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg2, header, JOptionPane.ERROR_MESSAGE);
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Exporter is not ready now");
             }
         }
@@ -114,8 +123,8 @@ public class ExportContoller implements ActionListener {
     public int getSize() {
         return (int) exportFile.length();
     }
-    public void setSnpData(List<Snp> snps){
-    this.snps = snps;
+    public void setSnpData(SnpData snpData){
+    this.snpData = snpData;
     }
 
     public void setFile(String path){

@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.track;
 
-import de.cebitec.vamp.databackend.connector.ITrackConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 public class TrackStatisticsPanel extends javax.swing.JPanel {
 
     private final static long serialVersionUID = 1239345;
-    private ITrackConnector trackCon;
+    private TrackConnector trackCon;
 
     /** Creates new form TrackNavigator */
     public TrackStatisticsPanel() {
@@ -20,7 +20,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 //        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use empty Constructor for this object! Standard constructor is only meant for GUI builder means");
     }
 
-    public TrackStatisticsPanel(ITrackConnector trackCon) {
+    public TrackStatisticsPanel(TrackConnector trackCon) {
         this.trackCon = trackCon;
         this.initComponents();
         this.hideSeqPairLabels();
@@ -32,7 +32,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
      * Use this method when switching to another track.
      * @param trackCon new track connector
      */
-    public void setTrackConnector(ITrackConnector trackCon) {
+    public void setTrackConnector(TrackConnector trackCon) {
         this.trackCon = trackCon;
         this.computeStats();
     }
@@ -349,7 +349,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
             @Override
             public void run() {
-                //RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId(),trackCon.getTrackID());
                 boolean recalculated = false;
                 boolean recalcSeqPair = false;
 

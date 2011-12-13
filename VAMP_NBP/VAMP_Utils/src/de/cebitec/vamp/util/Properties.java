@@ -9,6 +9,7 @@ public class Properties {
 
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";
+    public static final String STANDARD_CODE_INDEX = "1";
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
 
