@@ -328,9 +328,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         int stepsize = trackJob.getStepSize();
         int stop = stepsize;
         
-        if(!t.isSorted()){
-             ExternalSortBAM ex = new ExternalSortBAM(t.getFile().getPath());
-             t.setFile(ex.getSortedFile());
+        if(!trackJob.isSorted()){
+             ExternalSortBAM ex = new ExternalSortBAM(trackJob.getFile().getPath());
+             trackJob.setFile(ex.getSortedFile());
         }
         
         while (!isLastTrack) {
