@@ -5,7 +5,6 @@ import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -15,7 +14,6 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayerI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayoutI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -173,41 +171,17 @@ public class SequencePairViewer extends AbstractViewer {
         int layerCounter;
         int countingStep;
 
-//        // forward strand
-//        layerCounter = 1;
-//        countingStep = 1;
-//        Iterator<LayerI> it = layout.getForwardIterator();
-//        while (it.hasNext()) {
-//            LayerI b = it.next();
-//            Iterator<BlockI> blockIt = b.getBlockIterator();
-//            while (blockIt.hasNext()) {
-//                BlockI block = blockIt.next();
-//                this.createJBlock(block, layerCounter);
-//            }
-//
-//            layerCounter += countingStep;
-//        }
-//        this.viewerHeight = layerCounter * this.layerHeight;
-
-        // reverse strand
+        // only reverse layer
         layerCounter = -1;
         countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
         while (itRev.hasNext()) {
             LayerI b = itRev.next();
             Iterator<BlockI> blockIt = b.getBlockIterator();
+            
             while (blockIt.hasNext()) {
                 BlockPair block = (BlockPair) blockIt.next();
-//                boolean excluded = false;
-//                if (block.getPersistantObject() instanceof PersistantSequencePair){
-//                    short seqPairType = ((PersistantSequencePair) block.getPersistantObject()).getSeqPairType();
-//                    excluded = this.inExclusionList(seqPairType);
-//                } else if (this.getExcludedFeatureTypes().contains(FeatureType.SINGLE_MAPPING)){
-//                    excluded = true;
-//                }                    
-//                if (!excluded) {
-                    this.createJBlock(block, layerCounter);
-//                }
+                this.createJBlock(block, layerCounter);
             }
 
             layerCounter += countingStep;
@@ -230,16 +204,11 @@ public class SequencePairViewer extends AbstractViewer {
     private void createJBlock(BlockPair block, int layerCounter) {
         BlockComponentPair blockComp = new BlockComponentPair(block, this, blockHeight, minSaturationAndBrightness);
 
-        // negative layer counter means reverse strand
+        // the sequence pair viewer only uses the negative/lower layer 
         int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
         int yPosition = lower - layerCounter * layerHeight;
-//        if (layerCounter < 0) {
             // reverse/negative layer
             yPosition -= blockComp.getHeight() / 2;
-//        } else {
-//            // forward/positive layer
-//            yPosition -= jb.getHeight() / 2;
-//        }
 
         blockComp.setBounds(blockComp.getPhyStart(), yPosition, blockComp.getPhyWidth(), blockComp.getHeight());
         this.add(blockComp);

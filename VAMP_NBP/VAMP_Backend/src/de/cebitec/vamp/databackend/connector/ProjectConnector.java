@@ -191,25 +191,44 @@ public class ProjectConnector {
             con.setAutoCommit(false);
             //create tables if not exist yet
             con.prepareStatement(H2SQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_POSITIONS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_POSITIONS).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_DIFFS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_DIFF).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_COVERAGE).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_COVERAGE).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_FEATURES).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_FEATURES).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_SUBFEATURES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SUBFEATURE_PARENT_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SUBFEATURE_REF_ID).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_MAPPINGS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_START).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_STOP).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_SEQ_ID).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_TRACKS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_TRACK_REFID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_TRACK_SEQ_PAIR_ID).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIRS).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIRS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PAIR_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_MAPPING1_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_MAPPING2_ID).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
             con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_REPLICATES).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT_MID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT_SID).executeUpdate();
+            
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
 
             this.checkDBStructure();
@@ -1052,6 +1071,28 @@ public class ProjectConnector {
 
             PreparedStatement deleteDiffs = con.prepareStatement(SQLStatements.DELETE_DIFFS_FROM_TRACK);
             deleteDiffs.setLong(1, trackID);
+            int seqPairTrack = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_SEQ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
+            if (seqPairTrack > 0) {
+                PreparedStatement deleteSeqPairPivot = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_PIVOT);
+                deleteSeqPairPivot.setLong(1, trackID);
+                PreparedStatement deleteSeqPairReplicates = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_REPLICATE);
+                deleteSeqPairReplicates.setLong(1, trackID);
+                PreparedStatement deleteSeqPairs = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIRS);
+                deleteSeqPairs.setLong(1, trackID);
+                
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Pivot data...");
+                deleteSeqPairPivot.execute();
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Replicate data...");
+                deleteSeqPairReplicates.execute();
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Main data...");
+                deleteSeqPairs.execute();
+                
+                con.commit();
+                
+                deleteSeqPairPivot.close();
+                deleteSeqPairReplicates.close();
+                deleteSeqPairs.close();
+            }
             PreparedStatement deleteMappings = con.prepareStatement(SQLStatements.DELETE_MAPPINGS_FROM_TRACK);
             deleteMappings.setLong(1, trackID);
             PreparedStatement deleteCoverage = con.prepareStatement(SQLStatements.DELETE_COVERAGE_FROM_TRACK);
@@ -1061,10 +1102,15 @@ public class ProjectConnector {
             PreparedStatement deleteTrack = con.prepareStatement(SQLStatements.DELETE_TRACK);
             deleteTrack.setLong(1, trackID);
 
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Diffs...");
             deleteDiffs.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Mappings...");
             deleteMappings.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Coverage...");
             deleteCoverage.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Statistics...");
             deleteStatistics.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track...");
             deleteTrack.execute();
 
             con.commit();
@@ -1097,8 +1143,11 @@ public class ProjectConnector {
             PreparedStatement deleteGenome = con.prepareStatement(SQLStatements.DELETE_GENOME);
             deleteGenome.setLong(1, refGenID);
 
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Features...");
             deleteFeatures.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Subfeatures...");
             deleteSubeatures.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Genome...");
             deleteGenome.execute();
 
             con.commit();
@@ -1205,6 +1254,7 @@ public class ProjectConnector {
 
 
             //storing mapping to pair id data
+            long pivotId = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SEQUENCE_PAIR_PIVOT_ID, con);
             PreparedStatement insertSeqPairPivot = con.prepareStatement(SQLStatements.INSERT_SEQ_PAIR_PIVOT);
             batchCounter = 1;
             long correctSeqPairId;
@@ -1216,8 +1266,9 @@ public class ProjectConnector {
                 interimPairId = pair.getSecond();
                 correctSeqPairId = interimPairId + seqPairId;
 
-                insertSeqPairPivot.setLong(1, pair.getFirst()); //mapping id
-                insertSeqPairPivot.setLong(2, correctSeqPairId); //sequence pair id
+                insertSeqPairPivot.setLong(1, pivotId++);
+                insertSeqPairPivot.setLong(2, pair.getFirst()); //mapping id
+                insertSeqPairPivot.setLong(3, correctSeqPairId); //sequence pair id
 
                 insertSeqPairPivot.addBatch();
 

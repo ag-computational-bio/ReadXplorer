@@ -147,6 +147,7 @@ public class FieldNames {
     public static final String SEQ_PAIR_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
     
     //paired data to mapping connection table
+    public static final String SEQ_PAIR_PIVOT_ID = "ID";
     public static final String SEQ_PAIR_PIVOT_MAPPING_ID = "MAPPING_ID";
     public static final String SEQ_PAIR_PIVOT_SEQ_PAIR_ID = "SEQ_PAIR_ID";
 

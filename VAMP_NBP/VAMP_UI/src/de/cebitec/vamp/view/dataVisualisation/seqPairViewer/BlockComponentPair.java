@@ -78,6 +78,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         this.phyLeft = (int) bounds.getLeftPhysBound();
         this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos(absLogBlockStop).getRightPhysBound();
         this.length = phyRight - phyLeft;
+        this.length = this.length < 3 ? 3 : this.length;
         
         this.setPopupMenu();
         this.calcMappingBoundaries();
@@ -141,6 +142,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
                 mapping = seqPair.getVisibleMapping2();
                 this.addRectAndItsColor(blockColor, mapping, true);
             }
+            this.length = this.length < 6 ? 6 : this.length;
         }
 
         for (int i = 0; i < singleMappings.size(); ++i) {
@@ -164,11 +166,18 @@ public class BlockComponentPair extends JComponent implements ActionListener {
             absStopMapping = (int) parentViewer.getPhysBoundariesForLogPos(mapping.getStop()).getRightPhysBound();
         }
         int absLength = absStopMapping - absStartMapping;
+        absLength = absLength < 3 ? 3 : absLength;
         this.rectList.add(new Rectangle(absStartMapping - this.phyLeft, 0, absLength, this.height));
 
         if (addLine) {
             Rectangle rect = rectList.get(rectList.size() - 2);
-            this.lineList.add(new Line2D.Double(rect.x + rect.width, 2, absStartMapping - this.phyLeft - 1, 2));
+            int startMapping1 = rect.x;
+            int startCurMapping = (absStartMapping - this.phyLeft);
+            if (startMapping1 < startCurMapping){
+                this.lineList.add(new Line2D.Double(startMapping1 + rect.width, 2, absStartMapping - this.phyLeft - 1, 2));
+            } else { //endMapping2 < endMapping1
+                this.lineList.add(new Line2D.Double(rect.x - 1, 2, absStopMapping, 2));
+            }
         }
     }
 

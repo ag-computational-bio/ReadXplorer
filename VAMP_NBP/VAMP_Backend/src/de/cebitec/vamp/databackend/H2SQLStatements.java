@@ -35,8 +35,10 @@ public class H2SQLStatements {
             + FieldNames.POSITIONS_TYPE + " VARCHAR(1) NOT NULL"
             + ")";
     
+    
     public final static String INDEX_POSITIONS =
             "CREATE INDEX IF NOT EXISTS INDEXPOS ON " + FieldNames.TABLE_POSITIONS + "(" + FieldNames.POSITIONS_SNP_ID + ", " + FieldNames.POSITIONS_TRACK_ID + ") ";
+    
     
     public final static String SETUP_REFERENCE_GENOME =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REF_GEN
@@ -108,7 +110,8 @@ public class H2SQLStatements {
     
     
     public final static String INDEX_FEATURES = 
-            "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES + " (" + FieldNames.FEATURE_REFGEN_ID + ") ";
+            "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES 
+            + " (" + FieldNames.FEATURE_REFGEN_ID + ") ";
             
     
     public static final String SETUP_SUBFEATURES =
@@ -121,10 +124,16 @@ public class H2SQLStatements {
             + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL "
             + ") ";
     
-       public final static String INDEX_FEATURE_DETAILS =
-            "CREATE INDEX IF NOT EXISTS INDEXFEATUREDETAILS ON " + FieldNames.TABLE_SUBFEATURES + " "
-               + "(" + FieldNames.SUBFEATURES_PARENT_ID + ", " + FieldNames.SUBFEATURES_REFERENCE_ID + ") ";
     
+    public final static String INDEX_SUBFEATURE_PARENT_ID =
+            "CREATE INDEX IF NOT EXISTS INDEX_SUBFEATURE_PID ON " + FieldNames.TABLE_SUBFEATURES + " "
+            + "(" + FieldNames.SUBFEATURES_PARENT_ID + ") ";
+            
+        
+    public final static String INDEX_SUBFEATURE_REF_ID =
+            "CREATE INDEX IF NOT EXISTS INDEX_SUBFEATURE_RID ON " + FieldNames.TABLE_SUBFEATURES + " "
+            + "(" + FieldNames.SUBFEATURES_REFERENCE_ID + ") ";
+
     
     public final static String SETUP_MAPPINGS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_MAPPINGS
@@ -141,10 +150,20 @@ public class H2SQLStatements {
             + ") ";
     
     
-    public final static String INDEX_MAPPINGS =
+    public final static String INDEX_MAPPING_START =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
-            + "(" + FieldNames.MAPPING_START + ", " + FieldNames.MAPPING_STOP + "," + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
+            + "(" + FieldNames.MAPPING_START + " ) ";
     
+    
+    public final static String INDEX_MAPPING_STOP =
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            + "(" + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
+    
+    
+    public final static String INDEX_MAPPING_SEQ_ID =
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            + "(" + FieldNames.MAPPING_STOP + " ) ";
+
     
     public final static String SETUP_TRACKS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_TRACKS
@@ -158,9 +177,13 @@ public class H2SQLStatements {
             + ") ";
     
     
-    public final static String INDEX_TRACKS =
-            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACKS + " ("
-            + FieldNames.TRACK_REFERENCE_ID + ", " + FieldNames.TRACK_SEQUENCE_PAIR_ID + ") ";
+    public final static String INDEX_TRACK_REFID =
+            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACKS 
+            + " (" + FieldNames.TRACK_REFERENCE_ID + ") ";
+    
+    public final static String INDEX_TRACK_SEQ_PAIR_ID =
+            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACKS 
+            + " (" + FieldNames.TRACK_SEQUENCE_PAIR_ID + ") ";
     
     
     public static final String SETUP_SEQ_PAIRS =
@@ -168,16 +191,26 @@ public class H2SQLStatements {
             + " ("
             + FieldNames.SEQ_PAIR_ID + " BIGINT UNSIGNED PRIMARY KEY, "
             + FieldNames.SEQ_PAIR_PAIR_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SEQ_PAIR_MAPPING1_ID + " BIGINT UNSIGNED, "
-            + FieldNames.SEQ_PAIR_MAPPING2_ID + " BIGINT UNSIGNED, "
+            + FieldNames.SEQ_PAIR_MAPPING1_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SEQ_PAIR_MAPPING2_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.SEQ_PAIR_TYPE + " TINYINT NOT NULL "
             + ") ";
     
     
-    public final static String INDEX_SEQ_PAIRS =
+    public final static String INDEX_SEQ_PAIR_PAIR_ID =
             "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
-            + " (" + FieldNames.SEQ_PAIR_PAIR_ID + ", " + FieldNames.SEQ_PAIR_MAPPING1_ID + ", " + FieldNames.SEQ_PAIR_MAPPING2_ID + " ) ";
+            + " (" + FieldNames.SEQ_PAIR_PAIR_ID + " ) ";
     
+    
+    public final static String INDEX_SEQ_PAIR_MAPPING1_ID =
+            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
+            + " (" + FieldNames.SEQ_PAIR_MAPPING1_ID + " ) ";
+    
+    
+    public final static String INDEX_SEQ_PAIR_MAPPING2_ID =
+            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
+            + " (" + FieldNames.SEQ_PAIR_MAPPING2_ID + " ) ";
+  
     
     public static final String SETUP_SEQ_PAIR_REPLICATES =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
@@ -189,21 +222,27 @@ public class H2SQLStatements {
     
     public final static String INDEX_SEQ_PAIR_REPLICATES =
             "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIR_REPLICATES ON " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
-            + "("+FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+" ) ";
+            + "(" + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID + " ) ";
     
     
     public static final String SETUP_SEQ_PAIR_PIVOT =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
             + "("
+            + FieldNames.SEQ_PAIR_PIVOT_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " BIGINT UNSIGNED NOT NULL "
             + ") ";
     
     
-    public final static String INDEX_SEQ_PAIR_PIVOT =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPING_TO_SEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
-            + "(" + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + ", " + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
+    public final static String INDEX_SEQ_PAIR_PIVOT_MID =
+            "CREATE INDEX IF NOT EXISTS INDEX_SEQ_PAIR_PIVOT_MID ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
+            + "(" + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " ) ";
 
+    
+    public final static String INDEX_SEQ_PAIR_PIVOT_SID =
+            "CREATE INDEX IF NOT EXISTS INDEX_SEQ_PAIR_PIVOT_SID ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
+            + "(" + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
+    
 
     //////////////////  statements for data insertion  /////////////////////////  
 
