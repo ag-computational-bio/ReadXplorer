@@ -16,6 +16,8 @@ import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -32,7 +34,6 @@ public class AlignmentViewer extends AbstractViewer {
     private int blockHeight;
     private int layerHeight;
     private ZoomLevelExcusePanel zoomExcuse;
-//    private int minCountInInterval;
     private int maxCountInInterval;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
@@ -45,7 +46,7 @@ public class AlignmentViewer extends AbstractViewer {
         super(boundsInfoManager, basePanel, refGen);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
-        this.setInDrawingMode(false);
+        this.setInDrawingMode(true);
         this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
@@ -54,6 +55,7 @@ public class AlignmentViewer extends AbstractViewer {
         maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
         this.setActive(false);
+       setupComponents();
     }
 
     @Override
@@ -67,8 +69,9 @@ public class AlignmentViewer extends AbstractViewer {
 
     @Override
     public void boundsChangedHook() {
-
+       
         if (isInMaxZoomLevel() && isActive()) {
+           //  updatePhysicalBounds();
             setInDrawingMode(true);
         } else {
             setInDrawingMode(false);
@@ -93,9 +96,14 @@ public class AlignmentViewer extends AbstractViewer {
                     this.add(this.getSequenceBar());
                 }
 
-                // setup the layout of mappings
-                this.createAndShowNewLayout(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+                // setup the layout of mapping
+                
+              //error occured check this      updatePhysicalBounds();
+
+                this.createAndShowNewLayout(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
+                
                 this.getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
+                
             }
 
         } else {
@@ -103,6 +111,9 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
 
+    /*
+     * places the excuse panel if zoom level is too high
+     */
     private void placeExcusePanel(JPanel p) {
         // has to be checked for null because, this method may be called upon
         // initialization of this object (depending on behaviour of AbstractViewer)
@@ -124,7 +135,11 @@ public class AlignmentViewer extends AbstractViewer {
             this.updateUI();
         }
     }
-
+    
+/*
+     *calls the sql requests direct, we have to check if from and to are out of bounds 
+     * in fact that there are errors
+     */
     private void createAndShowNewLayout(int from, int to) {
         Collection<PersistantMapping> mappings = trackConnector.getMappings(from, to);
         HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
@@ -133,7 +148,6 @@ public class AlignmentViewer extends AbstractViewer {
         this.setViewerHeight();
         layout = new Layout(from, to, mappings);
         this.addBlocks(layout);
-
     }
 
     /**
@@ -317,4 +331,5 @@ public class AlignmentViewer extends AbstractViewer {
         this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));
         this.revalidate();
     }
+
 }

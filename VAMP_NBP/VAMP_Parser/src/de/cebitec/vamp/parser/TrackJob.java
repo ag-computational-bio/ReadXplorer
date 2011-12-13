@@ -22,6 +22,7 @@ public class TrackJob implements Job {
     private int start;
     private int stop;
     private int stepSize;
+    private boolean isSorted=true;
     /**
      * Creates a new track job along with its data.
      * @param trackID id of the track to create
@@ -61,6 +62,10 @@ public class TrackJob implements Job {
     @Override
     public File getFile() {
         return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 
     public void setRefGen(ReferenceJob refGen) {
@@ -123,6 +128,16 @@ public class TrackJob implements Job {
         this.firstJob = isFirstJob;
     }
 
+    public boolean isSorted() {
+        return isSorted;
+    }
+
+    public void setIsSorted(boolean isSorted) {
+        this.isSorted = isSorted;
+    }
+
+    
+    
     public int getStepSize() {
         return stepSize;
     }

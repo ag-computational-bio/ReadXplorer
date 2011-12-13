@@ -579,26 +579,6 @@ public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
             "MAX("+FieldNames.STATISTICS_ID +") AS LATEST_ID " +
         "FROM " +
             FieldNames.TABLE_STATISTICS;
-             
-
-//    public final static String FETCH_READNAMES_FOR_SEQUENCE_ID =
-//            "SELECT "+
-//                FieldNames.READ_NAME+" " +
-//            "FROM "+
-//                FieldNames.TABLE_READS+" " +
-//            "WHERE "+
-//                FieldNames.READ_SEQUENCE+" = ?";
-
-
-//    public final static String FETCH_NUM_OF_READS_FOR_RUN_CALCULATE =
-//            "SELECT " +
-//                "COUNT(R."+FieldNames.READ_ID+") as NUM " +
-//            "FROM "+
-//                FieldNames.TABLE_READS+" as R , "+
-//                FieldNames.TABLE_SEQUENCE+" as S " +
-//            "WHERE "+
-//                "S."+FieldNames.SEQUENCE_RUN+" = ? and " +
-//                "R."+FieldNames.READ_SEQUENCE+" = S."+FieldNames.SEQUENCE_ID;
     
 
     public final static String FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL =
@@ -1042,7 +1022,7 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
      * 20 reads auf 10pos = 10 unique mappings + je 20 replicates
      * nimm 1 der unique mapping mit gleicher seq id & zähle replicates = 20 hieße 20 reads, kann die 20 noch anderweitig zustande kommen?
      */
-    public final static String FETCH_NUM_READS_FOR_TRACK_CALCULATE = //TODO: implement
+    public final static String FETCH_NUM_READS_FOR_TRACK_CALCULATE = 
             "SELECT " + 
                 " sum(M."+FieldNames.MAPPING_COUNT+") AS NUM " + 
             " FROM(SELECT "+ 
@@ -1207,21 +1187,6 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
            " WHERE " +
                 FieldNames.MAPPING_TRACK + " = ? " +
            " LIMIT 1 ";
-   
-
-
-
-
-
-//    public final static String FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK =
-//            "SELECT " +
-//            FieldNames.STATICS_NUMBER_OF_MAPPED_SEQ +" as Num "+
-//            " FROM "+
-//                FieldNames.TABLE_STATICS+" as S " +
-//            "WHERE "+
-//                "S."+FieldNames.STATICS_TRACK+" = ?";
-
-    
     
 
     

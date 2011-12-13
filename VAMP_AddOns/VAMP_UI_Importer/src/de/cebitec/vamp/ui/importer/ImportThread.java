@@ -6,9 +6,9 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
+import de.cebitec.vamp.externalSort.ExternalSortBAM;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedReference;
-import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.TrackParser;
@@ -76,23 +76,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         return refGenome;
     }
 
-    /**
-     * 
-     * @param trackJob
-     * @return
-     * @throws ParsingException
-     * @deprecated Since the RUN domain has been excluded this method is not needed anymore!
-     */
-    @Deprecated
-    private ParsedRun parseRunfromTrack(TrackJob trackJob) throws ParsingException {
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing run data from mapping source \"{0}\"", trackJob.getFile().getAbsolutePath());
-        TrackParserI parser = new TrackParser();
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing parser: \"{0}\"", parser.toString());
-        ParsedRun run = parser.parseMappingforReadData(trackJob);
-
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished parising run data from mapping source \"{0}\"", trackJob.getFile().getAbsolutePath());
-        return run;
-    }
 
     
     private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException {
@@ -126,27 +109,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
     }
 
-   /* private void storeRun(ParsedRun run, RunJob runJob) throws StorageException{
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing run data from source \""+runJob.getFile().getAbsolutePath()+"\"");
-
-        long runID = ProjectConnector.getInstance().addRun(run);
-
-        runJob.setPersistant(runID);
-
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing run data from source \""+runJob.getFile().getAbsolutePath()+"\"");
-
-    }*/
-
-//    public void storeRunFromTrackData(ParsedRun run , TrackJob trackJob)throws StorageException{
-//        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing run data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
-//
-//        long runID = ProjectConnector.getInstance().addRun(run);
-//
-//         trackJob.setPersistant(runID);
-//
-//        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing run data from source \"{0}runID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), runID});
-//    }
-
     
     private void storeTrack(ParsedTrack track, TrackJob trackJob, boolean seqPairs) throws StorageException{
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -174,17 +136,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         }
     }
 
-//    private boolean isValidTrackwithoutRun(TrackJob trackJob) {
-//        if (!validTracksRun.containsKey(trackJob)) {
-//            // track is not dependent on previous run oder refGen, so it is not registered
-//            return true;
-//        } else if (validTracksRun.containsKey(trackJob) && validTracksRun.get(trackJob) == true) {
-//            // if it is registered, it must be a valid one
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
+
 
     private void processRefGenomeJobs(){
         if(!references.isEmpty()){
@@ -232,47 +184,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             io.getOut().println("");
         }
     }
-
-
-//    private void processTrackRUNJobs(){
-//        if(!tracksRun.isEmpty()){
-//            io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.readtrack") + ":");
-//            for(Iterator<TrackJob> it = tracksRun.iterator(); it.hasNext(); ){
-//                TrackJob t = it.next();
-//                ph.progress(workunits++);
-//
-//                // only import this track if no problems occured with dependencies
-//                if(isValidTrackwithoutRun(t)){
-//                    try {
-//
-//                        //parsing
-//                        ParsedRun run = parseRunfromTrack(t);
-//                        io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.parsed"));
-//                    //returns the reads that couldnt be read by the parser
-//                    if(!run.getErrorList().isEmpty() || run.getSequences().isEmpty()){
-//                    io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.error.readload") + ": " + run.getErrorList().toString());
-//                    }
-//                    //storing
-//                    try {
-//                        storeRunFromTrackData(run, t);
-//                        io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.stored"));
-//                    } catch (StorageException ex) {
-//                        // if something went wrong, mark all dependent track jobs
-//                        io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
-//                        Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//
-//            } catch (ParsingException ex) {
-//                        // something went wrong
-//                        io.getOut().println("\""+t.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
-//                        Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                } else {
-//                    io.getOut().println("\""+t.getFile().getName()+" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.error.depend") + "!");
-//                }
-//            }
-//        }
-//    }
 
     /**
      * Processes track jobs (parsing and storing).
@@ -400,6 +311,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         int start = 1;
         int stepsize =  t.getStepSize();
         int stop =stepsize;
+        
+        if(!t.isSorted()){
+             ExternalSortBAM ex = new ExternalSortBAM(t.getFile().getPath());
+             t.setFile(ex.getSortedFile());
+        }
+        
         while (!isLastTrack) {
             //parsing
             t.setStart(start);

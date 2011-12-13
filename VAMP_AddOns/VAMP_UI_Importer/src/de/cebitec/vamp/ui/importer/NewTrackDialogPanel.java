@@ -25,6 +25,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JList;
@@ -58,11 +59,10 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         // choose the default parser. first entry is shown in combobox by default
         currentParser = parsers[0];
         this.setStepwiseField(false);
-        stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal,maxVal , step));
-        JFormattedTextField txt = ((JSpinner.NumberEditor) stepSizeSpinner.getEditor()).getTextField();
-        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+        setJSpinner();
 
     }
+    
 
     @Override
     public boolean isRequiredInfoSet(){
@@ -89,6 +89,12 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     public MappingParserI getParser(){
         return currentParser;
     }
+
+    public boolean isFileSorted() {
+        return fileSorted.isSelected();
+    }
+    
+    
     
     public Integer getstepSize(){
           stepSize= (Integer)stepSizeSpinner.getValue();
@@ -96,9 +102,17 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         return stepSize;
     }
     
+        private void setJSpinner(){
+         stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal,maxVal , step));
+        JFormattedTextField txt = ((JSpinner.NumberEditor) stepSizeSpinner.getEditor()).getTextField();
+        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+
+    }
+    
     private void setStepwiseField(boolean setFields){
         stepSizeLabel.setVisible(setFields);
         stepSizeSpinner.setVisible(setFields);
+        fileSorted.setVisible(setFields);
     }
 
     public void setReferenceJobs(List<ReferenceJob> jobs){
@@ -157,6 +171,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         jComboBox1 = new javax.swing.JComboBox(parsers);
         stepSizeLabel = new javax.swing.JLabel();
         stepSizeSpinner = new javax.swing.JSpinner();
+        fileSorted = new javax.swing.JCheckBox();
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.jLabel1.text")); // NOI18N
 
@@ -194,6 +209,9 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
 
         stepSizeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.stepSizeLabel.text")); // NOI18N
 
+        fileSorted.setSelected(true);
+        fileSorted.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.fileSorted.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -214,7 +232,10 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                         .addComponent(chooseButton))
                     .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
                     .addComponent(refGenBox, 0, 281, Short.MAX_VALUE)
-                    .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fileSorted)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -236,12 +257,13 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                 .addGap(2, 2, 2)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(stepSizeLabel)
-                    .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fileSorted))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refGenLabel)
                     .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -286,7 +308,14 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             mappingFile = null;
             mappingFileField.setText("");
             descriptionField.setText("");
-            setStepwiseField(newparser instanceof SamBamStepParser? true:false);
+            setStepwiseField(false);
+            if(newparser instanceof SamBamStepParser){
+            setStepwiseField(true);
+            JOptionPane.showMessageDialog(this,
+                  "Please make sure that your file is sorted by read sequence. \n If not, deselect the checkbox!",
+                    "Stepwise parser",
+            JOptionPane.WARNING_MESSAGE);
+            }
         }
 }//GEN-LAST:event_jComboBox1ActionPerformed
 
@@ -294,6 +323,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private javax.swing.JButton chooseButton;
     private javax.swing.JTextField descriptionField;
     private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JCheckBox fileSorted;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField mappingFileField;

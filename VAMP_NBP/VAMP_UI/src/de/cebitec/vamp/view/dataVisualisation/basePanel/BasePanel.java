@@ -88,7 +88,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
     public void setViewer(AbstractViewer viewer, JSlider verticalZoom){
         this.viewer = viewer;
         verticalZoom.setOrientation(JSlider.VERTICAL);
-        boundsManager.addBoundsListener(viewer);
+        this.boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
         centerPanel.add(verticalZoom, BorderLayout.WEST);
@@ -98,7 +98,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
 
     public void setViewer(AbstractViewer viewer){
         this.viewer = viewer;
-        boundsManager.addBoundsListener(viewer);
+        this.boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
         
@@ -120,9 +120,12 @@ public class BasePanel extends JPanel implements MousePositionListener {
     public void setViewerInScrollpane(AbstractViewer viewer){
         this.viewer = viewer;
         this.boundsManager.addBoundsListener(viewer);
+      
         this.currentMousePosListeners.add(viewer);
         this.centerScrollpane = new JScrollPane(this.viewer);
+        this.centerScrollpane.setPreferredSize(new Dimension(490, 400));
         this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
         this.centerScrollpane.setVisible(true);
         this.viewer.setVisible(true);

@@ -34,7 +34,11 @@
                   </Group>
                   <Component id="descriptionField" alignment="0" pref="281" max="32767" attributes="0"/>
                   <Component id="refGenBox" alignment="0" pref="281" max="32767" attributes="0"/>
-                  <Component id="stepSizeSpinner" alignment="0" min="-2" pref="95" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="stepSizeSpinner" min="-2" pref="95" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="fileSorted" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -63,13 +67,14 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="stepSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="stepSizeSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="fileSorted" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="refGenLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="refGenBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="25" max="32767" attributes="0"/>
+              <EmptySpace pref="23" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -157,6 +162,14 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="stepSizeSpinner">
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="fileSorted">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/importer/Bundle.properties" key="NewTrackDialogPanel.fileSorted.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

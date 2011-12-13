@@ -209,9 +209,11 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 else if (dialogPane instanceof NewTrackDialogPanel){
                     NewTrackDialogPanel ntdp = (NewTrackDialogPanel) dialogPane;
                     ReferenceJob refJob = ntdp.getReferenceJob();
-                    TrackJob trackJob = new TrackJob(trackID++, ntdp.getMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
+                   
+                    TrackJob trackJob = new TrackJob(trackID++,ntdp.getMappingFile(), ntdp.getDescription(), refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
                      trackJob.setIsStepwise((ntdp.getParser() instanceof SamBamStepParser? true:false));
                      trackJob.setStepSize(ntdp.getstepSize());
+                     trackJob.setIsSorted(ntdp.isFileSorted());
                     refJob.registerTrackWithoutRunJob(trackJob);
                     trackJobView.add(trackJob);
                 }

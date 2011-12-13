@@ -9,16 +9,11 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-//import de.cebitec.vamp.api.objects.Read;
-import de.cebitec.vamp.api.objects.Snp;
 import de.cebitec.vamp.api.objects.Snp454;
 import de.cebitec.vamp.databackend.GenericSQLQueries;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,7 +42,6 @@ public class TrackConnector implements ITrackConnector {
 
     private String associatedTrackName;
     private long trackID;  
-    //private long runID;
     private int genomeSize;
     private CoverageThread thread;
     private Connection con;
@@ -102,29 +96,11 @@ public class TrackConnector implements ITrackConnector {
         thread.start();
     }
 
-//    private int fetchRunID() {
-//        int id = 0;
-//        try {
-//            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_RUNID_FOR_TRACK);
-//            fetch.setLong(1, trackID);
-//
-//            ResultSet rs = fetch.executeQuery();
-//            if (rs.next()) {
-//                id = rs.getInt(FieldNames.TRACK_RUN);
-//            }
-//
-//        } catch (SQLException ex) {
-//            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//        return id;
-//    }
 
     @Override
     public Collection<PersistantMapping> getMappings(int from, int to) {
         HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
-
-        if (from < to) {
+        if (from < to && from >0 && to>0) {
             try {
                 
                 //determine readlength
@@ -277,8 +253,8 @@ public class TrackConnector implements ITrackConnector {
 
     @Override
     public int getNumOfReadsCalculate() {
-        //return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, con, trackID);
-        return 0; //TODO: implement calc number of reads
+            return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE,SQLStatements.GET_NUM, con, trackID);
+  
     }
 
     @Override
@@ -408,7 +384,7 @@ public class TrackConnector implements ITrackConnector {
         HashMap<Integer, Integer> positionMap = new HashMap<Integer, Integer>();
         int coverage;
         int position;
-        if (from < to) {
+        if (from < to && from >0 && to >0) {
             try {
 
                 fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);

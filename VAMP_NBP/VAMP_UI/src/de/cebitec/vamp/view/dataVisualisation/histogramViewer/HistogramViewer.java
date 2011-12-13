@@ -41,7 +41,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
 
     private static final long serialVersionUID = 234765253;
     private InputOutput io;
-    private List<String> bases;
     private static int height = 500;
     private TrackConnector trackConnector;
     private PersistantReference refGen;
@@ -60,7 +59,9 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
     private int maxCoverage;
     private List<Integer> scaleValues;
     private double pxPerCoverageUnit;
-
+    private enum Bases {
+        m,a, c, t, g, n,_,
+    }
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
@@ -69,7 +70,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         this.setInDrawingMode(false);
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
-
         scaleValues = new ArrayList<Integer>();
         zoomExcuse = new ZoomLevelExcusePanel();
 
@@ -77,16 +77,6 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         gapManager = new GenomeGapManager(lowerBound, upperBound);
         gaps = new ArrayList<PersistantReferenceGap>();
         cov = new PersistantCoverage(lowerBound, lowerBound);
-
-        bases = new ArrayList<String>();
-        bases.add("match");
-        bases.add("a");
-        bases.add("c");
-        bases.add("g");
-        bases.add("t");
-        bases.add("n");
-        bases.add("readgap");
-
         this.showSequenceBar(true, true);
     }
 
@@ -395,92 +385,89 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
      * @param isForwardStrand true, if bars for fwd strand should be painted
      * @param isColored true, if the histogram should be colored
      */
+    @SuppressWarnings("fallthrough")
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean isColored) {
-        double value;
+        double value = 0;
         int featureHeight;
         Color c = null;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-        String base = refGen.getSequence().substring(absPos - 1, absPos);
-        if (absPos != relPos) {
-        }
+        char base= refGen.getSequence().charAt(absPos-1);
 
-        for (String type : bases) {
-            if (type.equals("match") && isColored) {
-                value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
-                if (isForwardStrand) {
-                    if (base.equals("a")) {
+        for (Bases type : Bases.values()) {
+                switch (type) {
+                    case m:
+                        value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
+                        if (!isColored) {
+                            c = ColorProperties.LOGO_MATCH;
+                        } else {
+                            switch (base) {
+                                case 'a':
+                                    c = isForwardStrand ? ColorProperties.LOGO_A : ColorProperties.LOGO_T;
+                                    break;
+                                case 't':
+                                    c = isForwardStrand ? ColorProperties.LOGO_T : ColorProperties.LOGO_A;
+                                    break;
+                                case 'c':
+                                    c = isForwardStrand ? ColorProperties.LOGO_C : ColorProperties.LOGO_G;
+                                    break;
+                                case 'g':
+                                    c = isForwardStrand ? ColorProperties.LOGO_G : ColorProperties.LOGO_C;
+                                    break;
+                                case 'n':
+                                    c = ColorProperties.LOGO_N;
+                                    break;
+                                case '-':
+                                    c = ColorProperties.LOGO_READGAP;
+                                    break;
+                                default:
+                                    c = ColorProperties.LOGO_BASE_UNDEF;
+                                    break;
+                            }
+                        }
+                        break;
+                    case a:
+                        value = logoData.getNumOfAAt(relPos, isForwardStrand);
                         c = ColorProperties.LOGO_A;
-                    } else if (base.equals("t")) {
-                        c = ColorProperties.LOGO_T;
-                    } else if (base.equals("c")) {
+                        break;
+                    case c:
+                        value = logoData.getNumOfCAt(relPos, isForwardStrand);
                         c = ColorProperties.LOGO_C;
-                    } else if (base.equals("g")) {
+                        break;
+                    case g:
+                        value = logoData.getNumOfGAt(relPos, isForwardStrand);
                         c = ColorProperties.LOGO_G;
-                    } else if (base.equals("n")) {
-                        c = ColorProperties.LOGO_N;
-                    } else if (base.equals("readgap")) {
-                        c = ColorProperties.LOGO_READGAP;
-                    }
-                } else {
-                    if (base.equals("t")) {
-                        c = ColorProperties.LOGO_A;
-                    } else if (base.equals("a")) {
+                        break;
+                    case t:
+                        value = logoData.getNumOfTAt(relPos, isForwardStrand);
                         c = ColorProperties.LOGO_T;
-                    } else if (base.equals("g")) {
-                        c = ColorProperties.LOGO_C;
-                    } else if (base.equals("c")) {
-                        c = ColorProperties.LOGO_G;
-                    } else if (base.equals("n")) {
-                        c = ColorProperties.LOGO_N;
-                    } else if (base.equals("readgap")) {
+                        break;
+                    case _:
+                        value = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
                         c = ColorProperties.LOGO_READGAP;
-                    }
+                        break;
+                    case n:
+                        value = logoData.getNumOfNAt(relPos, isForwardStrand);
+                        c = ColorProperties.LOGO_N;
+                        break;
+                    default:
+                        c = ColorProperties.LOGO_BASE_UNDEF;
+                        value = logoData.getNumOfNAt(relPos, isForwardStrand);
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base {0}!", type);
+                        break;
                 }
-                
-             }else if (type.equals("match")&& !isColored){
-                c = ColorProperties.LOGO_MATCH;
-                 value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
-            } else if (type.equals("a")) {
-                value = logoData.getNumOfAAt(relPos, isForwardStrand);
-                c = ColorProperties.LOGO_A;
-            } else if (type.equals("c")) {
-                value = logoData.getNumOfCAt(relPos, isForwardStrand);
-                c = ColorProperties.LOGO_C;
-            } else if (type.equals("g")) {
-                value = logoData.getNumOfGAt(relPos, isForwardStrand);
-                c = ColorProperties.LOGO_G;
-            } else if (type.equals("t")) {
-                value = logoData.getNumOfTAt(relPos, isForwardStrand);
-                c = ColorProperties.LOGO_T;
-            } else if (type.equals("readgap")) {
-                value = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
-                c = ColorProperties.LOGO_READGAP;
-            } else if (type.equals("n")) {
-                value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                c = ColorProperties.LOGO_N;
-            } else {
-                value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base {0}!", type);
-                c = ColorProperties.LOGO_BASE_UNDEF;
-            }
-            featureHeight = (int) (value * heightPerCoverageUnit);
 
-            if (isForwardStrand) {
-                y -= featureHeight;
-            }
+            featureHeight = (int) (value * heightPerCoverageUnit);
 
             PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
             BarComponent block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), c);
             if (isForwardStrand) {
+                    y -= featureHeight;
                 block.setBounds(x, y, (int) bounds.getPhysWidth(), featureHeight);
             } else {
                 block.setBounds(x, y + 1, (int) bounds.getPhysWidth(), featureHeight);
+                   y += featureHeight;
             }
             this.add(block);
-
-            if (!isForwardStrand) {
-                y += featureHeight;
-            }
         }
     }
 

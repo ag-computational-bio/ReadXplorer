@@ -6,6 +6,7 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
@@ -34,7 +35,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
     private BasePanel seqPairBasePanel;
     private CardLayout cards;
 
-    private static String HISTOGRAMCARD = "logo";
+    private static String HISTOGRAMCARD = "histo";
     private static String ALIGNMENTCARD = "alignment";
     private static String SEQPAIRCARD = "sequencePair";
     
@@ -226,17 +227,19 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         } else {
             this.sequencePairButton.setEnabled(false);
         }
-        this.alignmentBasePanel = factory.getAlignmentViewBasePanel(this.trackConnector);
-        this.changeViewerStatus(ALIGNMENTCARD, false);
+
         this.histogramBasePanel = factory.getHistogrammViewerBasePanel(this.trackConnector);
         this.changeViewerStatus(HISTOGRAMCARD, true);
         this.selectedViewer = HISTOGRAMCARD;
-        
+        this.alignmentBasePanel = factory.getAlignmentViewBasePanel(this.trackConnector);
+        this.alignmentBasePanel.setPreferredSize(new Dimension(490,400));
+        this.changeViewerStatus(ALIGNMENTCARD, false);
         this.cards = (CardLayout) this.cardPanel.getLayout();
         
         this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
         this.cardPanel.add(this.histogramBasePanel, HISTOGRAMCARD);
         this.cards.show(this.cardPanel, HISTOGRAMCARD);
+        this.histogramButton.setEnabled(false);
         
     }
 
@@ -312,9 +315,11 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
     public void changeViewerStatus(String selectedViewer, boolean activated) {
         if (selectedViewer.equals(HISTOGRAMCARD)) {
             this.histogramBasePanel.getViewer().setActive(activated);
+             this.histogramButton.setEnabled(!activated);
         }
         if (selectedViewer.equals(ALIGNMENTCARD)) {
             this.alignmentBasePanel.getViewer().setActive(activated);
+             this.alignmentButton.setEnabled(!activated);
         }
         if (this.seqPairBasePanel != null && selectedViewer.equals(SEQPAIRCARD)) {
             this.seqPairBasePanel.getViewer().setActive(activated);

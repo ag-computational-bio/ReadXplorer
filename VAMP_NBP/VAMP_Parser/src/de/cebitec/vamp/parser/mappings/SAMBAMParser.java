@@ -49,12 +49,9 @@ public class SAMBAMParser implements MappingParserI, Observer {
     @Override
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
-        int flag = 0;
         int lineno = 0;
-
         String filepath = trackJob.getFile().getAbsolutePath();
         String readname = null;
-        String refName = null;
         String refSeq = null;
         String readSeq = null;
         String readSeqwithoutGaps = null;
@@ -68,23 +65,16 @@ public class SAMBAMParser implements MappingParserI, Observer {
         mappingContainer.registerObserver(this);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SAMBAMParser.class,
                 "Parser.Parsing.Start", filepath));
-        SAMFileReader sam = new SAMFileReader(trackJob.getFile());
+        SAMFileReader sam = new SAMFileReader(trackJob.getFile());        
         SAMRecordIterator itor;
         try {
             itor = sam.iterator();
         } catch (RuntimeException e) {
             throw new ParsingException(e.getMessage() + ". !! Track will be empty, thus not be stored !!");
         }
-        int i = 1;
         try {
             while (itor.hasNext()) {
-                i++;
-                if(i%1000000==0){
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "num of mappings"+i);
-                }
                 SAMRecord first = itor.next();
-                flag = first.getFlags();
-
                 int start = first.getAlignmentStart();
                 readSeqwithoutGaps = first.getReadString();
             if (!first.getReadUnmappedFlag()) {
@@ -94,8 +84,7 @@ public class SAMBAMParser implements MappingParserI, Observer {
                 byte direction = (byte) (isReverseStrand ? -1 : 1);
 
                     readname = first.getReadName();
-                    refName = first.getReferenceName();
-
+           
                     cigar = first.getCigarString();
                     readSeqwithoutGaps = first.getReadString().toLowerCase();
 
@@ -207,7 +196,7 @@ public class SAMBAMParser implements MappingParserI, Observer {
             this.sendErrorMsg(e.getMessage());
         }
 
-
+        //TODO:Check if   necessary 
         mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);//TODO: check if counting is correct here
         mappingContainer.setNumberOfUniqueSeq(noUniqueReads);
        // mappingContainer.setNumberOfReads(this.readnames.size());
