@@ -3,6 +3,7 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.LogicalBoundsListener;
@@ -37,13 +38,11 @@ import javax.swing.SwingUtilities;
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {
 
     private static final long serialVersionUID = 1L;
-
     // logical coordinates for genome interval
     private BoundsInfo bounds;
     private boolean isPanning = false;
     // correlation factor to compute physical position from logical position
     private double correlationFactor;
-    
     // gap at the sides of panel
     private int horizontalMargin;
     private int verticalMargin;
@@ -55,29 +54,23 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private int lastPhysPos = 0;
     private boolean printMouseOver;
     private BasePanel basePanel;
-
     private SequenceBar seqBar;
     private boolean centerSeqBar;
     private PaintingAreaInfo paintingAreaInfo;
-
     private PersistantReference reference;
-
     private boolean isInMaxZoomLevel;
     private boolean inDrawingMode;
-
     private boolean isActive;
-
     private LegendLabel legendLabel;
     private JPanel legend;
     private boolean hasLegend;
     private List<FeatureType> excludedFeatureTypes;
     private boolean pAInfoIsAviable = false;
- 
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
 
-    public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference){
+    public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
         this.excludedFeatureTypes = new ArrayList<FeatureType>();
         this.setLayout(null);
@@ -98,9 +91,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         horizontalMargin = 40;
         verticalMargin = 10;
 
-       
+
         paintingAreaInfo = new PaintingAreaInfo();
- //       this.adjustPaintingAreaInfo();
+        //       this.adjustPaintingAreaInfo();
 
         printMouseOver = false;
         // setup all components
@@ -112,17 +105,17 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     }
 
-    private void setSizes(){
+    private void setSizes() {
         setMinimumSize(new Dimension(Integer.MIN_VALUE, getMaximalHeight()));
         setMaximumSize(new Dimension(Integer.MAX_VALUE, getMaximalHeight()));
         setPreferredSize(new Dimension(getPreferredSize().width, getMaximalHeight()));
     }
 
     public void close() {
-        boundsManager.removeBoundListener(this);      
+        boundsManager.removeBoundListener(this);
     }
 
-    public void setupLegend(LegendLabel label, JPanel legend){
+    public void setupLegend(LegendLabel label, JPanel legend) {
         this.hasLegend = true;
 
         int labelX = 2;
@@ -139,65 +132,67 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.legend.setVisible(false);
     }
 
-    public void showSequenceBar(boolean showSeqBar, boolean centerSeqBar){
-        if(showSeqBar){
+    public void showSequenceBar(boolean showSeqBar, boolean centerSeqBar) {
+        if (showSeqBar) {
             this.seqBar = new SequenceBar(this, reference);
             this.centerSeqBar = centerSeqBar;
         } else {
             seqBar = null;
         }
-       // this.updatePhysicalBounds();
+        // this.updatePhysicalBounds();
     }
-/*
+    /*
      * check this error occures!
      */
-    private void adjustPaintingAreaInfo(){
-        if(this.getHeight()>0&&this.getWidth()>0){
-        pAInfoIsAviable =true;
-        paintingAreaInfo.setForwardHigh(verticalMargin);
-        paintingAreaInfo.setReverseHigh(this.getHeight()-1 -verticalMargin);
-        paintingAreaInfo.setPhyLeft(horizontalMargin);
-        paintingAreaInfo.setPhyRight(this.getWidth()-1 - horizontalMargin);        
 
-        // if existent, leave space for sequence bar
-        if (this.seqBar != null){
-            if (centerSeqBar){
-                int y1 = this.getSize().height / 2 - seqBar.getSize().height / 2;
-                int y2 = this.getSize().height / 2 + seqBar.getSize().height / 2;
-                seqBar.setBounds(0, y1, this.getSize().width, seqBar.getSize().height);
-                paintingAreaInfo.setForwardLow(y1 - 1);
-                paintingAreaInfo.setReverseLow(y2 + 1);
+    private void adjustPaintingAreaInfo() {
+        if (this.getHeight() > 0 && this.getWidth() > 0) {
+            pAInfoIsAviable = true;
+            paintingAreaInfo.setForwardHigh(verticalMargin);
+            paintingAreaInfo.setReverseHigh(this.getHeight() - 1 - verticalMargin);
+            paintingAreaInfo.setPhyLeft(horizontalMargin);
+            paintingAreaInfo.setPhyRight(this.getWidth() - 1 - horizontalMargin);
+
+            // if existent, leave space for sequence bar
+            if (this.seqBar != null) {
+                if (centerSeqBar) {
+                    int y1 = this.getSize().height / 2 - seqBar.getSize().height / 2;
+                    int y2 = this.getSize().height / 2 + seqBar.getSize().height / 2;
+                    seqBar.setBounds(0, y1, this.getSize().width, seqBar.getSize().height);
+                    paintingAreaInfo.setForwardLow(y1 - 1);
+                    paintingAreaInfo.setReverseLow(y2 + 1);
+                } else {
+                    seqBar.setBounds(0, 20, this.getSize().width, seqBar.getSize().height);
+                    paintingAreaInfo.setForwardLow(20 - 1);
+                    paintingAreaInfo.setReverseLow(seqBar.getSize().height + 21);
+                }
+
             } else {
-                seqBar.setBounds(0, 20, this.getSize().width, seqBar.getSize().height);
-                paintingAreaInfo.setForwardLow(20 - 1);
-                paintingAreaInfo.setReverseLow(seqBar.getSize().height + 21);
+                paintingAreaInfo.setForwardLow(this.getSize().height / 2 - 1);
+                paintingAreaInfo.setReverseLow(this.getSize().height / 2 + 1);
             }
-
         } else {
-            paintingAreaInfo.setForwardLow(this.getSize().height / 2 -1);
-            paintingAreaInfo.setReverseLow(this.getSize().height / 2 +1);
-        }
-        }else{
-            pAInfoIsAviable=false;
+            pAInfoIsAviable = false;
         }
     }
 
-    public boolean hasSequenceBar(){
-        if(seqBar != null){
+    public boolean hasSequenceBar() {
+        if (seqBar != null) {
             return true;
         } else {
             return false;
         }
     }
 
-    public SequenceBar getSequenceBar(){
+    public SequenceBar getSequenceBar() {
         return seqBar;
     }
 
     protected abstract int getMaximalHeight();
 
-    private void initComponents(){
+    private void initComponents() {
         this.addComponentListener(new ComponentAdapter() {
+
             @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 updatePhysicalBounds();
@@ -210,15 +205,15 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
 
-             if((zoom <=500&&zoom>0 &&e.getUnitsToScroll() >0 )||(zoom <=500&& zoom >0&&e.getUnitsToScroll()<0)){
-                  zoom+= e.getUnitsToScroll();
-                  if(zoom >500){
-                      zoom =500;
-                  }
-                  if(zoom<1){
-                      zoom =1;
-                }
-                  boundsManager.zoomLevelUpdated(zoom);
+                if ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) {
+                    zoom += e.getUnitsToScroll();
+                    if (zoom > 500) {
+                        zoom = 500;
+                    }
+                    if (zoom < 1) {
+                        zoom = 1;
+                    }
+                    boundsManager.zoomLevelUpdated(zoom);
                 }
             }
         });
@@ -227,46 +222,49 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                     setPanMode(e.getX());
+                setPanMode(e.getX());
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
-            
+
                 Point p = e.getPoint();
                 // only report mouse position when moved over viewing area and panel is requested to draw
                 int tmpPos = transformToLogicalCoord(p.x);
-                if(tmpPos >= getBoundsInfo().getLogLeft() && tmpPos <= getBoundsInfo().getLogRight() && isInDrawingMode()){
+                if (tmpPos >= getBoundsInfo().getLogLeft() && tmpPos <= getBoundsInfo().getLogRight() && isInDrawingMode()) {
                     basePanel.reportMouseOverPaintingStatus(true);
                     basePanel.reportCurrentMousePos(tmpPos);
                 } else {
                     basePanel.reportMouseOverPaintingStatus(false);
                     AbstractViewer.this.repaintMousePosition(AbstractViewer.this.getCurrentMousePos(), AbstractViewer.this.getCurrentMousePos());
                 }
-       
+
             }
         });
         this.addMouseListener(new MouseListener() {
 
             @Override
-            public void mouseClicked(MouseEvent e) {}
+            public void mouseClicked(MouseEvent e) {
+            }
 
             @Override
             public void mousePressed(MouseEvent e) {
-             
-            if( SwingUtilities.isLeftMouseButton(e)){
-                isPanning = true;
-                AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            }
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            isPanning=false;
-             AbstractViewer.this.setCursor(Cursor.getDefaultCursor());
+
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    isPanning = true;
+                    AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
             }
 
             @Override
-            public void mouseEntered(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {
+                isPanning = false;
+                AbstractViewer.this.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
 
             @Override
             public void mouseExited(MouseEvent e) {
@@ -274,26 +272,23 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             }
         });
     }
-    
-    
-    private void setPanMode(int position){
-        if(isPanning){
-           int logi= transformToLogicalCoordForPannig(position);
-      //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
+
+    private void setPanMode(int position) {
+        if (isPanning) {
+            int logi = transformToLogicalCoordForPannig(position);
+            //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
             boundsManager.navigatorBarUpdated(logi);
         }
     }
-
-
 
     public abstract void changeToolTipText(int logPos);
 
     /**
      * Compute the space that is currently assigned for one base of the genome
      */
-    private void calcBaseWidth(){
-        if(pAInfoIsAviable){
-        basewidth = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
+    private void calcBaseWidth() {
+        if (pAInfoIsAviable) {
+            basewidth = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
     }
 
@@ -302,8 +297,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @param logPos
      * @return
      */
-    public PhysicalBaseBounds getPhysBoundariesForLogPos(int logPos){
-        double left =  transformToPhysicalCoord(logPos);
+    public PhysicalBaseBounds getPhysBoundariesForLogPos(int logPos) {
+        double left = transformToPhysicalCoord(logPos);
         double right = left + basewidth - 1;
         return new PhysicalBaseBounds(left, right);
     }
@@ -315,8 +310,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @param logPos a position in the genome
      * @return horizontal position for requested base position
      */
-    protected double transformToPhysicalCoord(int logPos){
-        double tmp = (logPos - bounds.getLogLeft())*correlationFactor + horizontalMargin;
+    protected double transformToPhysicalCoord(int logPos) {
+        double tmp = (logPos - bounds.getLogLeft()) * correlationFactor + horizontalMargin;
         return tmp;
     }
 
@@ -325,43 +320,43 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @param physPos horizontal position of a pixel
      * @return logical position corresponding to the pixel
      */
-    protected int transformToLogicalCoord(int physPos){
-     //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "boundsLeft "+ bounds.getLogLeft()+"right"+ bounds.getLogRight());
+    protected int transformToLogicalCoord(int physPos) {
+        //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "boundsLeft "+ bounds.getLogLeft()+"right"+ bounds.getLogRight());
         return (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
-    
+
     }
 
-        /**
+    /**
      * Compute the logical position for any given physical position
      * @param physPos horizontal position of a pixel
      * @return logical position corresponding to the pixel
      */
-    protected int transformToLogicalCoordForPannig(int physPos){
-       
-        int pos ;
+    protected int transformToLogicalCoordForPannig(int physPos) {
+
+        int pos;
         int currentLog = bounds.getCurrentLogPos();
         int leftbound = bounds.getLogLeft();
-        int rightBound =  bounds.getLogRight();
-        pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
-         int lb = leftbound-((rightBound-leftbound)/2);
+        int rightBound = bounds.getLogRight();
+        pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
+        int lb = leftbound - ((rightBound - leftbound) / 2);
         //we want to go to smaller positions
-        if(lastPhysPos>physPos){
+        if (lastPhysPos > physPos) {
             lastPhysPos = physPos;
             //mouse on the right side of currentLog
-                pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + lb);
-           } else {
-              lastPhysPos = physPos;
-               //mouse on the right side of currentLog
-             if (currentLog<pos){
-                   pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + leftbound);
-             // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "rightside plus "+pos);
-            }else{
-                pos =  (int) (((double) physPos - horizontalMargin) / correlationFactor + rightBound);
-               //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "leftside plus "+pos);
+            pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + lb);
+        } else {
+            lastPhysPos = physPos;
+            //mouse on the right side of currentLog
+            if (currentLog < pos) {
+                pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + leftbound);
+                // Logger.getLogger(this.getClass().getName()).log(Level.INFO, "rightside plus "+pos);
+            } else {
+                pos = (int) (((double) physPos - horizontalMargin) / correlationFactor + rightBound);
+                //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "leftside plus "+pos);
             }
 
-                }
-        if(pos <=0){
+        }
+        if (pos <= 0) {
             pos = 1;
         }
         return pos;
@@ -373,9 +368,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * correlationfactor, which is updated by this method, depending on the
      * current width of this panel
      */
-    private void recalcCorrelatioFactor(){
-        if(pAInfoIsAviable){
-        correlationFactor =  (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
+    private void recalcCorrelatioFactor() {
+        if (pAInfoIsAviable) {
+            correlationFactor = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
     }
 
@@ -383,7 +378,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * Update the physical coordinates of this panel, available width for painting.
      * Method is called automatically, when this panel resizes
      */
-    public void updatePhysicalBounds(){
+    public void updatePhysicalBounds() {
         this.setSizes();
         this.adjustPaintingAreaInfo();
         this.boundsManager.getUpdatedBoundsInfo((LogicalBoundsListener) this);
@@ -396,35 +391,35 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * and the current position
      */
     @Override
-    public void updateLogicalBounds(BoundsInfo bounds){
+    public void updateLogicalBounds(BoundsInfo bounds) {
         this.bounds = bounds;
-        calcBaseWidth();
-        recalcCorrelatioFactor();
+        this.calcBaseWidth();
+        this.recalcCorrelatioFactor();
 
-        if(basewidth > 7){
+        if (this.basewidth > 7) {
             this.setIsInMaxZoomLevel(true);
         } else {
             this.setIsInMaxZoomLevel(false);
         }
-        if(seqBar != null){
-            seqBar.boundsChanged();
+        if (this.seqBar != null) {
+            this.seqBar.boundsChanged();
         }
-        if(isActive()){
-            boundsChangedHook();
-            repaint();
+        if (this.isActive()) {
+            this.boundsChangedHook();
+            this.repaint();
         }
     }
 
     @Override
-    public void setCurrentMousePosition(int newPos){
+    public void setCurrentMousePosition(int newPos) {
         oldLogMousePos = currentLogMousePos;
         currentLogMousePos = newPos;
-        if(oldLogMousePos != currentLogMousePos){
+        if (oldLogMousePos != currentLogMousePos) {
             this.repaintMousePosition(oldLogMousePos, currentLogMousePos);
             this.firePropertyChange(PROP_MOUSEPOSITION_CHANGED, oldLogMousePos, currentLogMousePos);
         }
 
-        if(newPos >= this.getBoundsInfo().getLogLeft() && newPos <= this.getBoundsInfo().getLogRight()){
+        if (newPos >= this.getBoundsInfo().getLogLeft() && newPos <= this.getBoundsInfo().getLogRight()) {
             this.changeToolTipText(newPos);
         } else {
             this.setToolTipText(null);
@@ -436,25 +431,25 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @param oldPos the old mouse position
      * @param newPos the new mouse position
      */
-    private void repaintMousePosition(int oldPos, int newPos){
-        if(isInDrawingMode()){
+    private void repaintMousePosition(int oldPos, int newPos) {
+        if (isInDrawingMode()) {
             PhysicalBaseBounds mouseAreaOld = getPhysBoundariesForLogPos(oldPos);
             PhysicalBaseBounds mouseAreaNew = getPhysBoundariesForLogPos(newPos);
 
             int min;
             int max;
-            if(oldPos >= newPos){
+            if (oldPos >= newPos) {
                 min = (int) mouseAreaNew.getLeftPhysBound();
-                max = (int) mouseAreaOld.getLeftPhysBound()+getWidthOfMouseOverlay(oldPos);
+                max = (int) mouseAreaOld.getLeftPhysBound() + getWidthOfMouseOverlay(oldPos);
             } else {
                 min = (int) mouseAreaOld.getLeftPhysBound();
-                max = (int) mouseAreaNew.getLeftPhysBound()+getWidthOfMouseOverlay(newPos);
+                max = (int) mouseAreaNew.getLeftPhysBound() + getWidthOfMouseOverlay(newPos);
             }
             min--;
             max++;
-            int width = max - min +1;
+            int width = max - min + 1;
 
-            repaint(min, 0, width, this.getHeight()-1);
+            repaint(min, 0, width, this.getHeight() - 1);
         }
     }
 
@@ -463,50 +458,50 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * of the viewer.
      * @param g the grapics object to paint in
      */
-    private void drawMouseCursor(Graphics g){
+    private void drawMouseCursor(Graphics g) {
         int currentLogPos = getCurrentMousePos();
-        if(getBoundsInfo().getLogLeft() <= currentLogPos && currentLogPos <= getBoundsInfo().getLogRight()){
+        if (getBoundsInfo().getLogLeft() <= currentLogPos && currentLogPos <= getBoundsInfo().getLogRight()) {
             PhysicalBaseBounds mouseArea = this.getPhysBoundariesForLogPos(currentLogPos);
             int width = getWidthOfMouseOverlay(currentLogPos);
             PaintingAreaInfo info = this.getPaintingAreaInfo();
-            g.drawRect((int)mouseArea.getLeftPhysBound(), info.getForwardHigh(), width-1, info.getCompleteHeight()-1);
+            g.drawRect((int) mouseArea.getLeftPhysBound(), info.getForwardHigh(), width - 1, info.getCompleteHeight() - 1);
         }
     }
 
-    private void paintCurrentCenterPosition(Graphics g){
+    private void paintCurrentCenterPosition(Graphics g) {
         PhysicalBaseBounds coords = getPhysBoundariesForLogPos(getBoundsInfo().getCurrentLogPos());
         PaintingAreaInfo info = this.getPaintingAreaInfo();
         g.setColor(ColorProperties.CURRENT_POSITION);
-        int width = (int) (coords.getPhysWidth()>= 1 ? coords.getPhysWidth() : 1);
-        g.fillRect((int)coords.getLeftPhysBound(), info.getForwardHigh(), width, info.getCompleteHeight());
+        int width = (int) (coords.getPhysWidth() >= 1 ? coords.getPhysWidth() : 1);
+        g.fillRect((int) coords.getLeftPhysBound(), info.getForwardHigh(), width, info.getCompleteHeight());
     }
 
-    protected int getWidthOfMouseOverlay(int position){
+    protected int getWidthOfMouseOverlay(int position) {
         PhysicalBaseBounds mouseArea = getPhysBoundariesForLogPos(position);
         return (int) (mouseArea.getPhysWidth() >= 3 ? mouseArea.getPhysWidth() : 3);
     }
 
     @Override
-    protected void paintComponent(Graphics graphics){
+    protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
-        if(isInDrawingMode()){
+        if (isInDrawingMode()) {
             graphics.setColor(ColorProperties.MOUSEOVER);
-            if(printMouseOver){
+            if (printMouseOver) {
                 drawMouseCursor(graphics);
             }
             paintCurrentCenterPosition(graphics);
         }
     }
-    
+
     @Override
-    public void setMouseOverPaintingRequested(boolean requested){
+    public void setMouseOverPaintingRequested(boolean requested) {
         // repaint whole viewer if mouse curser was painted before, but none is not wanted
-        if(printMouseOver && !requested){
+        if (printMouseOver && !requested) {
             repaint();
         }
         printMouseOver = requested;
-        if(!printMouseOver){
+        if (!printMouseOver) {
             currentLogMousePos = 0;
         }
         firePropertyChange(PROP_MOUSEOVER_REQUESTED, null, requested);
@@ -524,35 +519,34 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * Returns the current bounds of the visible area of this component.
      * @return the current bounds values
      */
-    public BoundsInfo getBoundsInfo(){
+    public BoundsInfo getBoundsInfo() {
         return this.bounds;
-        
+
     }
 
     /**
      * @return the current dimension of this panel
      */
     @Override
-    public Dimension getPaintingAreaDimension(){
-        return pAInfoIsAviable ? new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight()): null;
-        
-    }
+    public Dimension getPaintingAreaDimension() {
+        return pAInfoIsAviable ? new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight()) : null;
 
+    }
 
     @Override
     public boolean isPaintingAreaAviable() {
-      return  pAInfoIsAviable;
+        return pAInfoIsAviable;
     }
 
-    public PaintingAreaInfo getPaintingAreaInfo(){
+    public PaintingAreaInfo getPaintingAreaInfo() {
         return paintingAreaInfo;
     }
 
-    private int getCurrentMousePos(){
+    private int getCurrentMousePos() {
         return currentLogMousePos;
     }
 
-    public void forwardChildrensMousePosition(int relPhyPos, JComponent child){
+    public void forwardChildrensMousePosition(int relPhyPos, JComponent child) {
         int phyPos = child.getX() + relPhyPos;
         int logPos = transformToLogicalCoord(phyPos);
 
@@ -578,43 +572,56 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     public PersistantReference getReference() {
-        return reference;
+        return this.reference;
     }
 
-    public boolean isActive(){
-        return isActive;
+    public boolean isActive() {
+        return this.isActive;
     }
 
-    public void setActive(boolean isActive){
+    public void setActive(boolean isActive) {
         this.isActive = isActive;
-        if(isActive){
-            setSizes();
-            updatePhysicalBounds();
+        if (isActive) {
+            this.setSizes();
+            this.updatePhysicalBounds();
         }
     }
 
-    public void updateLegendVisibility(boolean isShowingLegend){
-        legend.setVisible(isShowingLegend);
+    public void updateLegendVisibility(boolean isShowingLegend) {
+        this.legend.setVisible(isShowingLegend);
     }
 
-    public LegendLabel getLegendLabel(){
-        return legendLabel;
+    public LegendLabel getLegendLabel() {
+        return this.legendLabel;
     }
 
-    public boolean hasLegend(){
-        return hasLegend;
+    public boolean hasLegend() {
+        return this.hasLegend;
     }
 
-    public JPanel getLegendPanel(){
-        return legend;
+    public JPanel getLegendPanel() {
+        return this.legend;
     }
 
-    public boolean isLegendVisisble(){
+    public boolean isLegendVisisble() {
         return legend.isVisible();
     }
-    
-    public List<FeatureType> getExcludedFeatureTypes(){
+
+    public List<FeatureType> getExcludedFeatureTypes() {
         return this.excludedFeatureTypes;
+    }
+
+    /**
+     * @param seqPairType sequence pair type to check
+     * @return true, if the given sequence typ is on the exclusion list
+     */
+    public boolean inExclusionList(short seqPairType) {
+        if ((seqPairType == Properties.TYPE_PERFECT_PAIR && this.excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR))
+                || (seqPairType != Properties.TYPE_PERFECT_PAIR && this.excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean isMouseOverPaintingRequested() {
@@ -626,7 +633,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.adjustPaintingAreaInfo();
     }
 
-    public int getHorizontalMargin(){
+    public int getHorizontalMargin() {
         return this.horizontalMargin;
     }
 
@@ -635,21 +642,19 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.adjustPaintingAreaInfo();
     }
 
-    public BoundsInfoManager getBoundsInformationManager(){
+    public BoundsInfoManager getBoundsInformationManager() {
         return this.boundsManager;
     }
 
     /**
      * @return the current width of a single base of the sequence
      */
-    public double getBaseWidth(){
+    public double getBaseWidth() {
         this.calcBaseWidth();
         return this.basewidth;
     }
-    
-    
-    public Dimension getBasePanelSize(){
+
+    public Dimension getBasePanelSize() {
         return this.basePanel.getSize();
     }
-
-  }
+}

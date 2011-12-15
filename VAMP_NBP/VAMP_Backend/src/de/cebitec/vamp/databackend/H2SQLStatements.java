@@ -157,12 +157,12 @@ public class H2SQLStatements {
     
     public final static String INDEX_MAPPING_STOP =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
-            + "(" + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
+            + "(" + FieldNames.MAPPING_STOP + " ) ";
     
     
     public final static String INDEX_MAPPING_SEQ_ID =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
-            + "(" + FieldNames.MAPPING_STOP + " ) ";
+            + "(" + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
 
     
     public final static String SETUP_TRACKS =

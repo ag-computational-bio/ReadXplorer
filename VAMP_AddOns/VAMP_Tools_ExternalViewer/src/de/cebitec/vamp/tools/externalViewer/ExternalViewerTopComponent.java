@@ -156,10 +156,10 @@ public final class ExternalViewerTopComponent extends TopComponent {
 }//GEN-LAST:event_alignmentButtonActionPerformed
 
     private void colorHistogramBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorHistogramBoxActionPerformed
-        HistogramViewer vi = (HistogramViewer) histogramBasePanel.getViewer();
-        vi.isColored(colorHistogramBox.isSelected());
-        vi.boundsChangedHook();
-        vi.repaint();
+        HistogramViewer histViewer = (HistogramViewer) histogramBasePanel.getViewer();
+        histViewer.isColored(colorHistogramBox.isSelected());
+        histViewer.boundsChangedHook();
+        histViewer.repaint();
 }//GEN-LAST:event_colorHistogramBoxActionPerformed
 
 private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequencePairButtonActionPerformed
@@ -239,7 +239,7 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
         this.cardPanel.add(this.histogramBasePanel, HISTOGRAMCARD);
         this.cards.show(this.cardPanel, HISTOGRAMCARD);
-        this.histogramButton.setEnabled(false);
+//        this.histogramButton.setEnabled(false);
         
     }
 
@@ -315,13 +315,14 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
     public void changeViewerStatus(String selectedViewer, boolean activated) {
         if (selectedViewer.equals(HISTOGRAMCARD)) {
             this.histogramBasePanel.getViewer().setActive(activated);
-             this.histogramButton.setEnabled(!activated);
+//            this.histogramButton.setEnabled(!activated);
         }
         if (selectedViewer.equals(ALIGNMENTCARD)) {
             this.alignmentBasePanel.getViewer().setActive(activated);
-             this.alignmentButton.setEnabled(!activated);
+//            this.alignmentButton.setEnabled(!activated);
         }
         if (this.seqPairBasePanel != null && selectedViewer.equals(SEQPAIRCARD)) {
+//            this.sequencePairButton.setEnabled(!activated);
             this.seqPairBasePanel.getViewer().setActive(activated);
         }
     }

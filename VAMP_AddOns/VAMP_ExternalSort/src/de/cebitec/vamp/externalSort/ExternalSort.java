@@ -1,27 +1,32 @@
 package de.cebitec.vamp.externalSort;
 
 /**
-\
+ *
  * @author jstraube
- *  This class sorts any text file by given index and returns a sorted file.
+ * This class sorts any text file by given index and returns a sorted file.
  * It uses a merge sort which creates temporary files for merging to save memory. The created files 
  * will be removed after sorting.
  * 
  */
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class ExternalSort {
 
-private String sortedFile;
-private String chunkName;
+    private String sortedFile;
+    private String chunkName;
 
-    
-    public ExternalSort(String path){
-          long start = System.nanoTime();
-        externalSort(path);
-        long time = System.nanoTime() -start;
-        System.out.println("The relation was sorted in "+ time);
+    public ExternalSort(String path) {
+        long start = System.nanoTime();
+        this.externalSort(path);
+        long time = System.nanoTime() - start;
+        System.out.println("The relation was sorted in " + time);
     }
 
     private void externalSort(String path) {
@@ -30,46 +35,47 @@ private String chunkName;
             File baseFile = new File(path);
             FileReader intialRelationInput = new FileReader(baseFile);
             BufferedReader initRelationReader = new BufferedReader(intialRelationInput);
-            
+
             String[] row;
             int indexToCompare = 9;
             ArrayList<String[]> tenKRows = new ArrayList<String[]>();
 
             int numFiles = 0;
-              String line="";
-              String header="";
+            String line = "";
+            String header = "";
             while (line != null) {
 // get 10k rows
                 for (int i = 0; i < 10000; i++) {
-                    
-                     line = initRelationReader.readLine();
 
-                    if(line!=null){
-                    if(!line.startsWith("@")){
-                       
-                    if (line == null) {
-                        row = null;
-                        break;
-                    }
-                    row = line.split("\\t");
-                    tenKRows.add(row);
-                    }else{
-                        header = header.concat(line+"\n");
-                    }
-                     }else{
-                        
+                    line = initRelationReader.readLine();
+
+                    if (line != null) {
+                        if (!line.startsWith("@")) {
+
+                            if (line == null) {
+                                row = null;
+                                break;
+                            }
+                            row = line.split("\\t");
+                            tenKRows.add(row);
+                        } else {
+                            header = header.concat(line + "\n");
+                        }
+                    } else {
+
                         break;
                     }
 
                 }
 // sort the rows
-                tenKRows = mergeSort(tenKRows, indexToCompare);
+                tenKRows = ExternalSort.mergeSort(tenKRows, indexToCompare);
 
 // write to disk
-                chunkName =  baseFile.getParent()+ "/chunk";     
-                BufferedWriter bw = new BufferedWriter(new FileWriter(chunkName+numFiles));
+                
+                this.chunkName = System.getProperty("user.home") + "/chunk";
+                BufferedWriter bw = new BufferedWriter(new FileWriter(this.chunkName + numFiles));
                 bw.write(header);
-               
+
                 for (int i = 0; i < tenKRows.size(); i++) {
                     bw.append(flattenArray(tenKRows.get(i), "\t") + "\n");
                 }
@@ -77,7 +83,7 @@ private String chunkName;
                 numFiles++;
                 tenKRows.clear();
             }
-            header="";
+            header = "";
             mergeFiles(baseFile, numFiles, indexToCompare);
 
 
@@ -92,32 +98,33 @@ private String chunkName;
 
     }
 
-    private  void mergeFiles(File baseFile, int numFiles, int compareIndex) {
+    private void mergeFiles(File baseFile, int numFiles, int compareIndex) {
         try {
+            ArrayList<File> files = new ArrayList<File>();
             ArrayList<FileReader> mergefr = new ArrayList<FileReader>();
             ArrayList<BufferedReader> mergefbr = new ArrayList<BufferedReader>();
             ArrayList<String[]> filerows = new ArrayList<String[]>();
-            String name =baseFile.getParent() + "/sort_" + baseFile.getName();
+            String name = baseFile.getParent() + "/sort_" + baseFile.getName();
             FileWriter fw = new FileWriter(name);
             BufferedWriter bw = new BufferedWriter(fw);
             boolean someFileStillHasRows = false;
-          
+
             for (int i = 0; i < numFiles; i++) {
-                File f = new File(chunkName + i );
-                f.deleteOnExit();
+                File f = new File(chunkName + i);
+                files.add(f);
                 mergefr.add(new FileReader(f));
                 mergefbr.add(new BufferedReader(mergefr.get(i)));
                 // get the first row
                 String line = mergefbr.get(i).readLine();
                 if (line != null) {
-                 if (line.startsWith("@")) {
-                     if(i==0){
-                   bw.write(line+ "\n");
-                     }
-                
-                  line = mergefbr.get(i).readLine();
-                }
-                
+                    if (line.startsWith("@")) {
+                        if (i == 0) {
+                            bw.write(line + "\n");
+                        }
+
+                        line = mergefbr.get(i).readLine();
+                    }
+
                     filerows.add(line.split("\\t"));
                     someFileStillHasRows = true;
                 } else {
@@ -125,7 +132,7 @@ private String chunkName;
                 }
 
             }
-          
+
 //have to write something like put the last string and the incomming string check the lexikographical order if 
             String[] row;
             while (someFileStillHasRows) {
@@ -146,7 +153,7 @@ private String chunkName;
                     row = filerows.get(i);
                     if (min != null) {
 
-                        if (row != null && row[compareIndex].compareTo(min) <0) {
+                        if (row != null && row[compareIndex].compareTo(min) < 0) {
                             minIndex = i;
                             min = filerows.get(i)[compareIndex];
                         }
@@ -214,16 +221,20 @@ private String chunkName;
                 mergefbr.get(i).close();
             }
             for (int i = 0; i < mergefr.size(); i++) {
-                mergefr.get(i).close();
-               
+                mergefr.get(i).close();      
+                try {
+                    Files.delete(files.get(i).toPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
         }
-    
+
     }
 
 // sort an arrayList of arrays based on the ith column
@@ -252,7 +263,7 @@ private String chunkName;
     private static ArrayList<String[]> merge(ArrayList<String[]> left, ArrayList<String[]> right, int index) {
         ArrayList<String[]> result = new ArrayList<String[]>();
         while (left.size() > 0 && right.size() > 0) {
-            if (left.get(0)[index].compareTo(right.get(0)[index])<=0) {
+            if (left.get(0)[index].compareTo(right.get(0)[index]) <= 0) {
                 result.add(left.get(0));
                 left.remove(0);
             } else {
@@ -270,11 +281,9 @@ private String chunkName;
                 result.add(right.get(i));
             }
         }
-        
+
         return result;
     }
-
-
 
 // just a utility function to turn arrays into strings with spaces between each element
     private static String flattenArray(String[] arr, String delimiter) {
@@ -291,9 +300,6 @@ private String chunkName;
     }
 
     public String getSortedFile() {
-        return sortedFile;
+        return this.sortedFile;
     }
-    
-    
-    
 }

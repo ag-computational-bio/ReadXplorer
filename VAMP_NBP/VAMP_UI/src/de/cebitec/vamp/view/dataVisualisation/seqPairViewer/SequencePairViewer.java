@@ -18,8 +18,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -44,6 +46,10 @@ public class SequencePairViewer extends AbstractViewer {
     private float minSaturationAndBrightness;
 //    private float maxSaturationAndBrightness;
 //    private float percentSandBPerCovUnit;
+    private int oldLogLeft;
+    private int oldLogRight;
+    private Collection<PersistantSeqPairGroup> seqPairs;
+    private byte lastInclTypeFlag;
 
     /**
      * Creates a new viewer for displaying sequence pair information between two
@@ -66,7 +72,9 @@ public class SequencePairViewer extends AbstractViewer {
         minSaturationAndBrightness = 0.9f;
 //        maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
+        this.setupComponents();
         this.setActive(false);
+        this.seqPairs = new ArrayList<PersistantSeqPairGroup>();
     }
 
     @Override
@@ -81,42 +89,64 @@ public class SequencePairViewer extends AbstractViewer {
     @Override
     public void boundsChangedHook() {
 
-        if (isActive()) {
-            setInDrawingMode(true);
+        if (this.isActive()) {
+            this.setInDrawingMode(true);
             this.setupComponents();
         } else {
-            setInDrawingMode(false);
+            this.setInDrawingMode(false);
         }
 
     }
 
     private void setupComponents() {
-        this.removeAll();
+            this.removeAll();
 
-        if (isInDrawingMode()) {
-            if (this.hasLegend()) {
-                this.add(this.getLegendLabel());
-                this.add(this.getLegendPanel());
-            }
-            // if a sequence viewer was set for this panel, add/show it
-            if (this.hasSequenceBar()) {
-                this.add(this.getSequenceBar());
-            }
+            if (this.isInDrawingMode()) {
+                if (this.hasLegend()) {
+                    this.add(this.getLegendLabel());
+                    this.add(this.getLegendPanel());
+                }
+                // if a sequence viewer was set for this panel, add/show it
+                if (this.hasSequenceBar()) {
+                    this.add(this.getSequenceBar());
+                }
 
-            // setup the layout of mappings
-            this.createAndShowNewLayout(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+                // setup the layout of mappings
+                this.createAndShowNewLayout(this.getBoundsInfo().getLogLeft(), this.getBoundsInfo().getLogRight());
         }
     }
 
 
     /**
-     * Creates the complete layout of this viewer for a given interval
+     * Creates the complete layout of this viewer for a given interval.
      * @param from left (smaller) border of interval
      * @param to right (larger) border of interval
      */
     private void createAndShowNewLayout(int from, int to) {
-        Collection<PersistantSeqPairGroup> seqPairs = trackConnector.getSeqPairMappings(from, to, trackID2);
         
+        //check for feature types in the exclusion list and adapt database query for performance
+        List<FeatureType> excludedFeatureTypes = this.getExcludedFeatureTypes();
+        byte includedTypeFlag = Properties.BOTH;
+        if (excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING) &&
+            excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR) && 
+            excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR)){
+            includedTypeFlag = Properties.NONE;
+        } else if (excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING)){
+            includedTypeFlag = Properties.SEQ_PAIRS;
+        } else if (excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR) && 
+                   excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR)) {
+            includedTypeFlag = Properties.SINGLE_MAPPINGS;
+        }
+
+        int logLeft = this.getBoundsInfo().getLogLeft();
+        int logRight = this.getBoundsInfo().getLogRight();
+        if (logLeft != this.oldLogLeft || logRight != this.oldLogRight || this.lastInclTypeFlag != includedTypeFlag) {
+            
+            this.seqPairs = trackConnector.getSeqPairMappings(from, to, trackID2, includedTypeFlag);
+            this.oldLogLeft = logLeft;
+            this.oldLogRight = logRight;
+            this.lastInclTypeFlag = includedTypeFlag;
+        }
 //        HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
 //        HashMap<Integer, Integer> coverage2 = trackConnector2.getCoverageInfosOfTrack(from, to);
 //        this.findMinAndMaxCount(seqPairs); //for currently shown mappings
@@ -168,23 +198,30 @@ public class SequencePairViewer extends AbstractViewer {
 //    }
 
     private void addBlocks(LayoutI layout) {
-        int layerCounter;
-        int countingStep;
 
         // only reverse layer
-        layerCounter = -1;
-        countingStep = -1;
+        int layerCounter = -1;
+        int countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
+        boolean isOneBlockAdded = false;
+        boolean isBlockAdded = false;
         while (itRev.hasNext()) {
             LayerI b = itRev.next();
             Iterator<BlockI> blockIt = b.getBlockIterator();
             
             while (blockIt.hasNext()) {
                 BlockPair block = (BlockPair) blockIt.next();
-                this.createJBlock(block, layerCounter);
+                isBlockAdded = this.createJBlock(block, layerCounter);
+                if (isBlockAdded){
+                    isOneBlockAdded = true;
+                }
+            }
+            
+            if (isOneBlockAdded) {
+                layerCounter += countingStep;
+                isOneBlockAdded = false;
             }
 
-            layerCounter += countingStep;
         }
         this.viewerHeight = Math.abs(layerCounter) * this.layerHeight + 20;
     }
@@ -201,17 +238,31 @@ public class SequencePairViewer extends AbstractViewer {
         g.setColor(Color.black);
     }
 
-    private void createJBlock(BlockPair block, int layerCounter) {
+    /**
+     * Creates a new visible component (BlockComponentPair) representing a sequence pair no matter
+     * if it only consists of a single mapping, one mapping of the pair, or both pair mappings
+     * and other single mappings.
+     * @param block the pair data to show is stored in this object
+     * @param layerCounter determines the y-position of the component
+     * @return true, if the pair has visible components and should be added to the panel, false otherwise
+     */
+    private boolean createJBlock(BlockPair block, int layerCounter) {
         BlockComponentPair blockComp = new BlockComponentPair(block, this, blockHeight, minSaturationAndBrightness);
 
-        // the sequence pair viewer only uses the negative/lower layer 
-        int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
-        int yPosition = lower - layerCounter * layerHeight;
+        if (blockComp.isPaintable()) {
+            // the sequence pair viewer only uses the negative/lower layer 
+            int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
+            int yPosition = lower - layerCounter * layerHeight;
             // reverse/negative layer
             yPosition -= blockComp.getHeight() / 2;
 
-        blockComp.setBounds(blockComp.getPhyStart(), yPosition, blockComp.getPhyWidth(), blockComp.getHeight());
-        this.add(blockComp);
+            blockComp.setBounds(blockComp.getPhyStart(), yPosition, blockComp.getPhyWidth(), blockComp.getHeight());
+            this.add(blockComp);
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     private void drawBaseLines(Graphics2D graphics) {
@@ -275,13 +326,4 @@ public class SequencePairViewer extends AbstractViewer {
 //            }
 //        });
 //    }
-
-    private boolean inExclusionList(short seqPairType) {
-        if ((seqPairType == Properties.TYPE_PERFECT_PAIR && this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_PAIR))
-         || (seqPairType != Properties.TYPE_PERFECT_PAIR && this.getExcludedFeatureTypes().contains(FeatureType.DISTORTED_PAIR))){
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

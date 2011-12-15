@@ -26,24 +26,23 @@ public class LayoutPairs implements LayoutI {
     private ArrayList<LayerI> reverseLayers;
     private BlockContainer reverseBlockContainer;
 
-    public LayoutPairs(int absStart, int absStop, Collection<PersistantSeqPairGroup> seqPairs){
+    public LayoutPairs(int absStart, int absStop, Collection<PersistantSeqPairGroup> seqPairs) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.reverseLayers = new ArrayList<LayerI>();
         this.reverseBlockContainer = new BlockContainer();
-        
+
         this.createBlocks(seqPairs);
         this.layoutBlocks(this.reverseLayers, this.reverseBlockContainer);
     }
 
-
     /**
-     * Each mapping gets one block.
+     * Each seq pair group gets one block.
      * @param seqPair mappings in current interval
      */
-    private void createBlocks(Collection<PersistantSeqPairGroup> seqPair){
+    private void createBlocks(Collection<PersistantSeqPairGroup> seqPair) {
         Iterator<PersistantSeqPairGroup> groupIt = seqPair.iterator();
-        while(groupIt.hasNext()){
+        while (groupIt.hasNext()) {
             PersistantSeqPairGroup group = groupIt.next();
             List<PersistantSequencePair> seqPairs = group.getSequencePairs();
             List<PersistantMapping> singleMappings = group.getSingleMappings();
@@ -51,45 +50,45 @@ public class LayoutPairs implements LayoutI {
             Iterator<PersistantMapping> singleIt = singleMappings.iterator();
             long start = Long.MAX_VALUE;
             long stop = Long.MIN_VALUE;
-            
+
             //handle pairs
-            while(pairIt.hasNext()){
+            while (pairIt.hasNext()) {
                 PersistantSequencePair pair = pairIt.next();
-                
+
                 // get start position
-                if (pair.getStart() > this.absStart && pair.getStart() < start){
+                if (pair.getStart() > this.absStart && pair.getStart() < start) {
                     start = pair.getStart();
                 }
 
                 // get stop position
-                if (pair.getStop() < this.absStop && pair.getStop() > stop){
+                if (pair.getStop() < this.absStop && pair.getStop() > stop) {
                     stop = pair.getStop();
                 }
             }
-            
+
             //handle single mappings
-            while (singleIt.hasNext()){
+            while (singleIt.hasNext()) {
                 PersistantMapping mapping = singleIt.next();
-                
+
                 //update start position, if necessary
-                if (mapping.getStart() > this.absStart && mapping.getStart() < start){
+                if (mapping.getStart() > this.absStart && mapping.getStart() < start) {
                     start = mapping.getStart();
                 }
-                
+
                 //update start position, if necessary
-                if (mapping.getStop() < this.absStop && mapping.getStop() > stop){
+                if (mapping.getStop() < this.absStop && mapping.getStop() > stop) {
                     stop = mapping.getStop();
                 }
             }
-            
+
             start = start == Long.MAX_VALUE ? this.absStart : start;
             stop = stop == Long.MIN_VALUE ? this.absStop : stop;
 
             BlockI block = new BlockPair((int) start, (int) stop, seqPairs, singleMappings, group.getSeqPairId());
             this.reverseBlockContainer.addBlock(block);
-            
+
         }
-    }    
+    }
 
     /**
      * Fills each single layer until all blocks were added from the block container
@@ -97,9 +96,9 @@ public class LayoutPairs implements LayoutI {
      * @param layers list of layers to add the blocks to
      * @param blocks block container to add to layers
      */
-    private void layoutBlocks(ArrayList<LayerI> layers, BlockContainer blocks){
+    private void layoutBlocks(ArrayList<LayerI> layers, BlockContainer blocks) {
         LayerI l;
-        while(!blocks.isEmpty()){
+        while (!blocks.isEmpty()) {
             l = new LayerPair();
             this.fillLayer(l, blocks);
             layers.add(l);
@@ -112,13 +111,13 @@ public class LayoutPairs implements LayoutI {
      * @param l single layer to fill with blocks
      * @param blocks block container
      */
-    private void fillLayer(LayerI l, BlockContainer blocks ){
+    private void fillLayer(LayerI l, BlockContainer blocks) {
         BlockI block = blocks.getNextByPositionAndRemove(0);
         int counter = 0;
-        while(block != null){
+        while (block != null) {
             counter++;
             l.addBlock(block);
-            block = blocks.getNextByPositionAndRemove(block.getAbsStop()+1);
+            block = blocks.getNextByPositionAndRemove(block.getAbsStop() + 1);
         }
     }
 
@@ -127,13 +126,13 @@ public class LayoutPairs implements LayoutI {
      * sequence bar, it only returns null!
      */
     @Override
-    public Iterator<LayerI> getForwardIterator(){
+    public Iterator<LayerI> getForwardIterator() {
 //        return forwardLayers.iterator();
         return null;
     }
 
     @Override
-    public Iterator<LayerI> getReverseIterator(){
+    public Iterator<LayerI> getReverseIterator() {
         return reverseLayers.iterator();
     }
 
@@ -144,5 +143,4 @@ public class LayoutPairs implements LayoutI {
     public GenomeGapManager getGenomeGapManager() {
         return null;
     }
-
 }

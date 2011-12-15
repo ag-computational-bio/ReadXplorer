@@ -16,8 +16,6 @@ import java.awt.Graphics2D;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -41,6 +39,10 @@ public class AlignmentViewer extends AbstractViewer {
     private float minSaturationAndBrightness;
     private float maxSaturationAndBrightness;
     private float percentSandBPerCovUnit;
+    private int oldLogLeft;
+    private int oldLogRight;
+    Collection<PersistantMapping> mappings;
+    HashMap<Integer, Integer> completeCoverage;
 
     public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
@@ -55,7 +57,7 @@ public class AlignmentViewer extends AbstractViewer {
         maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
         this.setActive(false);
-       setupComponents();
+        setupComponents();
     }
 
     @Override
@@ -141,13 +143,21 @@ public class AlignmentViewer extends AbstractViewer {
      * in fact that there are errors
      */
     private void createAndShowNewLayout(int from, int to) {
-        Collection<PersistantMapping> mappings = trackConnector.getMappings(from, to);
-        HashMap<Integer, Integer> coverage = trackConnector.getCoverageInfosOfTrack(from, to);
-        this.findMinAndMaxCount(mappings); //for currently shown mappings
-        this.findMaxCoverage(coverage);
+        
+        int logLeft = this.getBoundsInfo().getLogLeft();
+        int logRight = this.getBoundsInfo().getLogRight();
+        if (logLeft != this.oldLogLeft || logRight != this.oldLogRight) {
+            
+            this.mappings = trackConnector.getMappings(from, to);
+            this.completeCoverage = trackConnector.getCoverageInfosOfTrack(from, to);
+            this.oldLogLeft = logLeft;
+            this.oldLogRight = logRight;
+        }
+        this.findMinAndMaxCount(this.mappings); //for currently shown mappings
+        this.findMaxCoverage(this.completeCoverage);
         this.setViewerHeight();
-        layout = new Layout(from, to, mappings, this.getExcludedFeatureTypes());
-        this.addBlocks(layout);
+        this.layout = new Layout(from, to, this.mappings, this.getExcludedFeatureTypes());
+        this.addBlocks(this.layout);
     }
 
     /**

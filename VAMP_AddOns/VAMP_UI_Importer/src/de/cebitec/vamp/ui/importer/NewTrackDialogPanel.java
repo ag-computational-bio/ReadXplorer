@@ -3,7 +3,6 @@
  *
  * Created on 13.01.2011, 15:18:28
  */
-
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -44,14 +43,14 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMBAMParser(),new SamBamStepParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMBAMParser(), new SamBamStepParser()};
     private MappingParserI currentParser;
-    private int stepSize =0 ;
+    private int stepSize = 0;
     private static final int maxVal = 1000000000;
     private static final int minVal = 10000;
     private static final int step = 1000;
     private static final int defaultVal = 300000;
-   
+
     /** Creates new form NewTrackDialogPanel */
     public NewTrackDialogPanel() {
         refGenJobs = this.getRefGenJobs();
@@ -62,60 +61,56 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         setJSpinner();
 
     }
-    
 
     @Override
-    public boolean isRequiredInfoSet(){
-        if (mappingFile == null || refGenBox.getSelectedItem() == null || descriptionField.getText().isEmpty()){
+    public boolean isRequiredInfoSet() {
+        if (mappingFile == null || refGenBox.getSelectedItem() == null || descriptionField.getText().isEmpty()) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
     }
 
-    public File getMappingFile(){
+    public File getMappingFile() {
         return mappingFile;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return descriptionField.getText();
     }
 
-    public ReferenceJob getReferenceJob(){
+    public ReferenceJob getReferenceJob() {
         return (ReferenceJob) refGenBox.getSelectedItem();
     }
 
-    public MappingParserI getParser(){
+    public MappingParserI getParser() {
         return currentParser;
     }
 
     public boolean isFileSorted() {
         return fileSorted.isSelected();
     }
-    
-    
-    
-    public Integer getstepSize(){
-          stepSize= (Integer)stepSizeSpinner.getValue();
+
+    public Integer getstepSize() {
+        stepSize = (Integer) stepSizeSpinner.getValue();
 
         return stepSize;
     }
-    
-        private void setJSpinner(){
-         stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal,maxVal , step));
+
+    private void setJSpinner() {
+        stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal, maxVal, step));
         JFormattedTextField txt = ((JSpinner.NumberEditor) stepSizeSpinner.getEditor()).getTextField();
         ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
 
     }
-    
-    private void setStepwiseField(boolean setFields){
+
+    private void setStepwiseField(boolean setFields) {
         stepSizeLabel.setVisible(setFields);
         stepSizeSpinner.setVisible(setFields);
         fileSorted.setVisible(setFields);
     }
 
-    public void setReferenceJobs(List<ReferenceJob> jobs){
+    public void setReferenceJobs(List<ReferenceJob> jobs) {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
 
         List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
@@ -168,7 +163,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         mappingFileField = new javax.swing.JTextField();
         chooseButton = new javax.swing.JButton();
         descriptionField = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox(parsers);
+        outputTypeCombo = new javax.swing.JComboBox(parsers);
         stepSizeLabel = new javax.swing.JLabel();
         stepSizeSpinner = new javax.swing.JSpinner();
         fileSorted = new javax.swing.JCheckBox();
@@ -191,7 +186,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             }
         });
 
-        jComboBox1.setRenderer(new DefaultListCellRenderer(){
+        outputTypeCombo.setRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
                 if(value instanceof ParserI){
@@ -201,9 +196,9 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                 }
             }
         });
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        outputTypeCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                outputTypeComboActionPerformed(evt);
             }
         });
 
@@ -217,21 +212,24 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(refGenLabel))
                     .addComponent(stepSizeLabel)
-                    .addComponent(jLabel1)
-                    .addComponent(refGenLabel)
+                    .addComponent(descriptionLabel)
                     .addComponent(mappingFileLabel)
-                    .addComponent(descriptionLabel))
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.TRAILING, 0, 281, Short.MAX_VALUE)
+                    .addComponent(outputTypeCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, 311, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(mappingFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+                        .addComponent(mappingFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chooseButton))
-                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-                    .addComponent(refGenBox, 0, 281, Short.MAX_VALUE)
+                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+                    .addComponent(refGenBox, 0, 311, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -243,27 +241,27 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(outputTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(mappingFileLabel)
                     .addComponent(mappingFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chooseButton))
+                    .addComponent(chooseButton)
+                    .addComponent(mappingFileLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(descriptionLabel)
-                    .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(descriptionLabel))
                 .addGap(2, 2, 2)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(stepSizeLabel)
                     .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fileSorted))
+                    .addComponent(fileSorted)
+                    .addComponent(stepSizeLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(refGenLabel)
-                    .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(23, Short.MAX_VALUE))
+                    .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(refGenLabel))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -273,7 +271,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
 
         String path = prefs2.get("RefGenome.Filepath", null);
-        if(path!=null){
+        if (path != null) {
             fc.setCurrentDirectory(new File(path));
         }
         int result = fc.showOpenDialog(this);
@@ -301,37 +299,36 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         }
 }//GEN-LAST:event_chooseButtonActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        MappingParserI newparser = (MappingParserI) jComboBox1.getSelectedItem();
-        if (currentParser != newparser) {
-            currentParser = newparser;
-            mappingFile = null;
-            mappingFileField.setText("");
-            descriptionField.setText("");
-            setStepwiseField(false);
-            if(newparser instanceof SamBamStepParser){
-            setStepwiseField(true);
-            JOptionPane.showMessageDialog(this,
-                  "Please make sure that your file is sorted by read sequence. \n If not, deselect the checkbox!",
-                    "Stepwise parser",
-            JOptionPane.WARNING_MESSAGE);
+    private void outputTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outputTypeComboActionPerformed
+        MappingParserI newparser = (MappingParserI) this.outputTypeCombo.getSelectedItem();
+        if (this.currentParser != newparser) {
+            this.currentParser = newparser;
+            this.mappingFile = null;
+            this.mappingFileField.setText("");
+            this.descriptionField.setText("");
+            this.setStepwiseField(false);
+            if (newparser instanceof SamBamStepParser) {
+                this.setStepwiseField(true);
+                this.fileSorted.requestFocus();
+                JOptionPane.showMessageDialog(this,
+                        "Please make sure that your file is sorted by read sequence. \n If not, deselect the checkbox!",
+                        "Stepwise parser",
+                        JOptionPane.WARNING_MESSAGE);
             }
         }
-}//GEN-LAST:event_jComboBox1ActionPerformed
-
+}//GEN-LAST:event_outputTypeComboActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseButton;
     private javax.swing.JTextField descriptionField;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JCheckBox fileSorted;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField mappingFileField;
     private javax.swing.JLabel mappingFileLabel;
+    private javax.swing.JComboBox outputTypeCombo;
     private javax.swing.JComboBox refGenBox;
     private javax.swing.JLabel refGenLabel;
     private javax.swing.JLabel stepSizeLabel;
     private javax.swing.JSpinner stepSizeSpinner;
     // End of variables declaration//GEN-END:variables
-    
 }

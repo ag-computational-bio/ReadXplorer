@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
@@ -134,26 +135,32 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         for (int i = 0; i < seqPairs.size(); ++i) {
             seqPair = seqPairs.get(i);
             mapping = seqPair.getVisibleMapping();
-            blockColor = this.determineBlockColor(seqPair);
-            this.pairColors.add(blockColor);
-            this.addRectAndItsColor(blockColor, mapping, false);
+            if (!this.parentViewer.inExclusionList(seqPair.getSeqPairType())) {
+                
+                blockColor = this.determineBlockColor(seqPair);
+                this.pairColors.add(blockColor);
+                this.addRectAndItsColor(blockColor, mapping, false);
 
-            if (seqPair.hasVisibleMapping2()) {
-                mapping = seqPair.getVisibleMapping2();
-                this.addRectAndItsColor(blockColor, mapping, true);
+                if (seqPair.hasVisibleMapping2()) {
+                    mapping = seqPair.getVisibleMapping2();
+                    this.addRectAndItsColor(blockColor, mapping, true);
+                }
+                this.length = this.length < 6 ? 6 : this.length;
             }
-            this.length = this.length < 6 ? 6 : this.length;
         }
 
-        for (int i = 0; i < singleMappings.size(); ++i) {
-            mapping = singleMappings.get(i);
-            this.addRectAndItsColor(ColorProperties.BLOCK_UNPAIRED, mapping, false);
+        if (!parentViewer.getExcludedFeatureTypes().contains(FeatureType.SINGLE_MAPPING)) {
+            for (int i = 0; i < singleMappings.size(); ++i) {
+                mapping = singleMappings.get(i);
+                this.addRectAndItsColor(ColorProperties.BLOCK_UNPAIRED, mapping, false);
+            }
         }
     }
 
     /**
      * Determines the bounds of the rectangle representing the mapping and adjusts its color
-     * depending on the mapping type.
+     * depending on the mapping type. Also paints the line for a sequence pair, if 
+     * both mappings are visible.
      * @param pairColor basic color of the current sequence pair
      * @param mapping mapping to create a colored rectangle for
      * @param addLine true if this is the second mapping of a pair and a connecting line is desired, false otherwise
@@ -174,9 +181,10 @@ public class BlockComponentPair extends JComponent implements ActionListener {
             int startMapping1 = rect.x;
             int startCurMapping = (absStartMapping - this.phyLeft);
             if (startMapping1 < startCurMapping){
-                this.lineList.add(new Line2D.Double(startMapping1 + rect.width, 2, absStartMapping - this.phyLeft - 1, 2));
+                this.lineList.add(new Line2D.Double(startMapping1 + rect.width, 2, startCurMapping - 1, 2));
             } else { //endMapping2 < endMapping1
-                this.lineList.add(new Line2D.Double(rect.x - 1, 2, absStopMapping, 2));
+//                this.lineList.add(new Line2D.Double(rect.x - 1, 2, absStopMapping, 2));
+                this.lineList.add(new Line2D.Double(startCurMapping + absLength, 2, startMapping1 - 1, 2));
             }
         }
     }
@@ -316,6 +324,14 @@ public class BlockComponentPair extends JComponent implements ActionListener {
             type = PersistantSequencePair.determineType(((PersistantSequencePair) block.getPersistantObject()).getSeqPairType());
         }
         return type;
+    }
+    
+    /**
+     * @return true, if this component contains rectangles to paint and thus is paintable;
+     * false otherwise.
+     */
+    public boolean isPaintable(){
+        return !this.rectList.isEmpty();
     }
 
 }

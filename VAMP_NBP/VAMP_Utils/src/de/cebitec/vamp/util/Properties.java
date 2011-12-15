@@ -30,4 +30,9 @@ public class Properties {
     public static final String PROP_ALIGNMENT_VIEWER = "AlignmentViewerActive";
     public static final String PROP_SEQ_PAIR_VIEWER = "SeqPairViewerActive";
     
+    public static final byte NONE = -1;
+    public static final byte BOTH = 0;
+    public static final byte SEQ_PAIRS = 1;
+    public static final byte SINGLE_MAPPINGS = 2;
+    
 }
