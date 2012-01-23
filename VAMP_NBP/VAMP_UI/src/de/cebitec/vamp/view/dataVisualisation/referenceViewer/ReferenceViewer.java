@@ -268,7 +268,7 @@ public class ReferenceViewer extends AbstractViewer {
         } else if(direction == -1){
             // reverse strand
             // "start" at end of genome and use stop of feature, because  start <= stop ALWAYS!
-            frame = ((refGen.getSequence().length() - f.getStop() +1) % 3 +1 )* -1;
+            frame = ((refGen.getSequence().length() - f.getStop()) % 3 + 1 )* -1;
         }
         return frame;
     }

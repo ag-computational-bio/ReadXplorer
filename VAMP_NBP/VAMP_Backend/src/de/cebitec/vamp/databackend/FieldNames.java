@@ -68,8 +68,8 @@ public class FieldNames {
     public final static String COVERAGE_TRACK = "TRACK_ID";
     public final static String COVERAGE_POSITION = "POSITION";
     public final static String COVERAGE_BM_FW_MULT =    "BEST_MATCH_FORWARD_REDUNDANT";
-    public final static String COVERAGE_BM_FW_NUM =     "BEST_MATCH_FORWARD_NON_REDUNDANT";
-    public final static String COVERAGE_BM_RV_MULT =    "BEST_MATCH_REVERSE_REDUNDANT";
+    public final static String COVERAGE_BM_FW_NUM =     "BEST_MATCH_FORWARD_NON_REDUNDANT"; //NON_REDUNDANT is what you want!
+    public final static String COVERAGE_BM_RV_MULT =    "BEST_MATCH_REVERSE_REDUNDANT"; //check if this is needed anyway
     public final static String COVERAGE_BM_RV_NUM =     "BEST_MATCH_REVERSE_NON_REDUNDANT";
     public final static String COVERAGE_ZERO_FW_MULT =  "PERFECT_MATCH_FORWARD_REDUNDANT";
     public final static String COVERAGE_ZERO_FW_NUM =   "PERFECT_MATCH_FORWARD_NON_REDUNDANT";

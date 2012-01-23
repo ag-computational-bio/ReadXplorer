@@ -59,23 +59,24 @@ public class StartCodonFilter implements RegionFilterI {
      * Searches and identifies start codons and saves their position
      * in this class' region list.
      */
-    private void findStartCodons(){
+    private void findStartCodons() {
         regions.clear();
 
-        if(this.atLeastOneCodonSelected()){
+        if (this.atLeastOneCodonSelected()) {
             // extends interval to search to the left and right,
             // to find start/stop codons that overlap current interval boundaries
             int offset = 3;
             int start = absStart - offset;
             int stop = absStop + 2;
+            int genomeLength = refGen.getSequence().length();
 
             if (stop > 0) {
                 if (start < 0) {
                     offset -= Math.abs(start);
                     start = 0;
                 }
-                if (stop > refGen.getSequence().length()) {
-                    stop = refGen.getSequence().length();
+                if (stop > genomeLength) {
+                    stop = genomeLength;
                 }
 
                 sequence = refGen.getSequence().substring(start, stop);
@@ -84,8 +85,8 @@ public class StartCodonFilter implements RegionFilterI {
                 int index = 0;
                 for (int i = 0; i < this.selectedCodons.size(); ++i) {
                     if (this.selectedCodons.get(i)) {
-                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
-                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
+                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected, genomeLength);
+                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected, genomeLength);
                     } else {
                         index += 2;
                     }
@@ -104,9 +105,10 @@ public class StartCodonFilter implements RegionFilterI {
      * @param isForwardStrand if pattern is fwd or rev
      * @param offset offset needed for storing the correct region positions
      * @param restricted determining if the visualization should be restricted to a certain frame
+     * @param genomeLength length of the genome, needed for checking frame on the reverse strand
      */
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, 
-            int offset, boolean restricted){
+            int offset, boolean restricted, int genomeLength){
         // match forward
         final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
         if (!restricted || restricted && codonFwdStrand == isForwardStrand){
@@ -114,13 +116,16 @@ public class StartCodonFilter implements RegionFilterI {
             while (m.find()) {
                 int from = m.start();
                 int to = m.end() - 1;
+                final int start = absStart - offset + from + 1;
+                final int stop = absStart - offset + to + 1;
                 if (restricted) {
-                    final int start = absStart - offset + from + 1;
-                    if (((start % 3) + 1 == this.frameCurrFeature || -(start % 3) == (-this.frameCurrFeature) - 3)) {
-                        regions.add(new Region(start, absStart - offset + to + 1, isForwardStrand));
+                    if ((start % 3) + 1 == this.frameCurrFeature || 
+                            ((genomeLength - stop) % 3) + 1 == -this.frameCurrFeature) {
+                            //-(start % 3) == (-this.frameCurrFeature) - 3)) {
+                        regions.add(new Region(start, stop, isForwardStrand));
                     }
                 } else {
-                    regions.add(new Region(absStart - offset + from + 1, absStart - offset + to + 1, isForwardStrand));
+                    regions.add(new Region(start, stop, isForwardStrand));
                 }
             }
         }
