@@ -258,17 +258,16 @@ public class ReferenceViewer extends AbstractViewer {
      * @param f feature whose frame has to be determined
      * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the feature
      */
-    public int determineFrame(PersistantFeature f){
+    public int determineFrame(PersistantFeature f) {
         int frame = 0;
         int direction = f.getStrand();
 
-        if(direction == 1){
+        if (direction == 1) {
             // forward strand
-            frame = f.getStart() % 3 +1;
-        } else if(direction == -1){
-            // reverse strand
-            // "start" at end of genome and use stop of feature, because  start <= stop ALWAYS!
-            frame = ((refGen.getSequence().length() - f.getStop()) % 3 + 1 )* -1;
+            frame = (f.getStart() - 1) % 3 + 1;
+        } else if (direction == -1) {
+            // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
+            frame = (f.getStop() - 1) % 3 - 3;
         }
         return frame;
     }

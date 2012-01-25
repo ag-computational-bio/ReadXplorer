@@ -85,8 +85,8 @@ public class StartCodonFilter implements RegionFilterI {
                 int index = 0;
                 for (int i = 0; i < this.selectedCodons.size(); ++i) {
                     if (this.selectedCodons.get(i)) {
-                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected, genomeLength);
-                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected, genomeLength);
+                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected);
+                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected);
                     } else {
                         index += 2;
                     }
@@ -107,8 +107,7 @@ public class StartCodonFilter implements RegionFilterI {
      * @param restricted determining if the visualization should be restricted to a certain frame
      * @param genomeLength length of the genome, needed for checking frame on the reverse strand
      */
-    private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, 
-            int offset, boolean restricted, int genomeLength){
+    private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, int offset, boolean restricted){
         // match forward
         final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
         if (!restricted || restricted && codonFwdStrand == isForwardStrand){
@@ -116,12 +115,20 @@ public class StartCodonFilter implements RegionFilterI {
             while (m.find()) {
                 int from = m.start();
                 int to = m.end() - 1;
-                final int start = absStart - offset + from + 1;
-                final int stop = absStart - offset + to + 1;
+                final int start = absStart - offset + from + 1; // +1 because in matcher each pos is 
+                final int stop = absStart - offset + to + 1; //shifted by -1 (index starts with 0)
                 if (restricted) {
-                    if ((start % 3) + 1 == this.frameCurrFeature || 
-                            ((genomeLength - stop) % 3) + 1 == -this.frameCurrFeature) {
-                            //-(start % 3) == (-this.frameCurrFeature) - 3)) {
+                    /*
+                     * Works because e.g. for positions 1-3 & 6-4: 
+                     * +1 = (pos 1 - 1) % 3 = 0 -> 0 + 1 = frame +1
+                     * +2 = (pos 2 - 1) % 3 = 1 -> 1 + 1 = frame +2
+                     * +3 = (pos 3 - 1) % 3 = 2 -> 2 + 1 = frame +3
+                     * -1 = (pos 6 - 1) % 3 = 2 -> 2 - 3 = frame -1
+                     * -2 = (pos 5 - 1) % 3 = 1 -> 1 - 3 = frame -2
+                     * -3 = (pos 4 - 1) % 3 = 0 -> 0 - 3 = frame -3
+                     */
+                    if ((start - 1) % 3 + 1 == this.frameCurrFeature ||
+                         (stop - 1) % 3 - 3 == this.frameCurrFeature) {
                         regions.add(new Region(start, stop, isForwardStrand));
                     }
                 } else {
