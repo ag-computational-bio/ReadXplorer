@@ -6,7 +6,7 @@ package de.cebitec.vamp.ui.importer;
  *
  * @author jwinneba
  */
-public interface NewJobDialog {
+public interface NewJobDialogI {
 
     public boolean isRequiredInfoSet();
 

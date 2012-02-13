@@ -8,30 +8,32 @@ import java.util.HashMap;
  */
 public class PersistantCoverage {
 
+    //Normally only mult is needed, but not num!
+    
     private int leftBound;
     private int rightBound;
     private boolean finished;
     private boolean twoTracks = false;
-    private HashMap<Integer, Integer> bmFwMult;
-    private HashMap<Integer, Integer> bmFwNum;
-    private HashMap<Integer, Integer> bmRvMult;
-    private HashMap<Integer, Integer> bmRvNum;
-    private HashMap<Integer, Integer> nFwMult;
-    private HashMap<Integer, Integer> nFwNum;
-    private HashMap<Integer, Integer> nRvMult;
-    private HashMap<Integer, Integer> nRvNum;
-    private HashMap<Integer, Integer> zFwMult;
-    private HashMap<Integer, Integer> zFwNum;
-    private HashMap<Integer, Integer> zRvMult;
-    private HashMap<Integer, Integer> zRvNum;
+    private HashMap<Integer, Integer> bestMatchFwdMult;
+    private HashMap<Integer, Integer> bestMatchFwdNum;
+    private HashMap<Integer, Integer> bestMatchRevMult;
+    private HashMap<Integer, Integer> bestMatchRevNum;
+    private HashMap<Integer, Integer> commonFwdMult;
+    private HashMap<Integer, Integer> commonFwdNum;
+    private HashMap<Integer, Integer> commonRevMult;
+    private HashMap<Integer, Integer> commonRevNum;
+    private HashMap<Integer, Integer> perfectFwdMult;
+    private HashMap<Integer, Integer> perfectFwdNum;
+    private HashMap<Integer, Integer> perfectRevMult;
+    private HashMap<Integer, Integer> perfectRevNum;
+    
     //coverage Infos of track1
-
-    private HashMap<Integer, Integer> nFwMultTrack1;
-    private HashMap<Integer, Integer> nRvMultTrack1;
+    private HashMap<Integer, Integer> commonFwdMultTrack1;
+    private HashMap<Integer, Integer> commonRevMultTrack1;
     //coverage Infos of track2
-
-    private HashMap<Integer, Integer> nFwMultTrack2;
-    private HashMap<Integer, Integer> nRvMultTrack2;
+    private HashMap<Integer, Integer> commonFwdMultTrack2;
+    private HashMap<Integer, Integer> commonRevMultTrack2;
+    
     public static int PERFECT = 1;
     public static int BM = 2;
     public static int NERROR = 3;
@@ -44,20 +46,20 @@ public class PersistantCoverage {
         this.rightBound = rightBound;
         this.finished = false;
         this.twoTracks = false;
-        bmFwMult = new HashMap<Integer, Integer>();
-        bmFwNum = new HashMap<Integer, Integer>();
-        bmRvMult = new HashMap<Integer, Integer>();
-        bmRvNum = new HashMap<Integer, Integer>();
+        bestMatchFwdMult = new HashMap<Integer, Integer>();
+        bestMatchFwdNum = new HashMap<Integer, Integer>();
+        bestMatchRevMult = new HashMap<Integer, Integer>();
+        bestMatchRevNum = new HashMap<Integer, Integer>();
 
-        nFwMult = new HashMap<Integer, Integer>();
-        nFwNum = new HashMap<Integer, Integer>();
-        nRvMult = new HashMap<Integer, Integer>();
-        nRvNum = new HashMap<Integer, Integer>();
+        commonFwdMult = new HashMap<Integer, Integer>();
+        commonFwdNum = new HashMap<Integer, Integer>();
+        commonRevMult = new HashMap<Integer, Integer>();
+        commonRevNum = new HashMap<Integer, Integer>();
 
-        zFwMult = new HashMap<Integer, Integer>();
-        zFwNum = new HashMap<Integer, Integer>();
-        zRvMult = new HashMap<Integer, Integer>();
-        zRvNum = new HashMap<Integer, Integer>();
+        perfectFwdMult = new HashMap<Integer, Integer>();
+        perfectFwdNum = new HashMap<Integer, Integer>();
+        perfectRevMult = new HashMap<Integer, Integer>();
+        perfectRevNum = new HashMap<Integer, Integer>();
     }
 
     public PersistantCoverage(int leftBound, int rightBound, boolean twoTracks) {
@@ -66,14 +68,14 @@ public class PersistantCoverage {
         this.rightBound = rightBound;
         this.finished = false;
 
-        nFwMult = new HashMap<Integer, Integer>();
-        nRvMult = new HashMap<Integer, Integer>();
+        commonFwdMult = new HashMap<Integer, Integer>();
+        commonRevMult = new HashMap<Integer, Integer>();
 
-        nFwMultTrack1 = new HashMap<Integer, Integer>();
-        nFwMultTrack2 = new HashMap<Integer, Integer>();
+        commonFwdMultTrack1 = new HashMap<Integer, Integer>();
+        commonFwdMultTrack2 = new HashMap<Integer, Integer>();
 
-        nRvMultTrack1 = new HashMap<Integer, Integer>();
-        nRvMultTrack2 = new HashMap<Integer, Integer>();
+        commonRevMultTrack1 = new HashMap<Integer, Integer>();
+        commonRevMultTrack2 = new HashMap<Integer, Integer>();
 
     }
 
@@ -103,193 +105,193 @@ public class PersistantCoverage {
         }
     }
 
-    public void setBmFwMult(int logPos, int value) {
-        bmFwMult.put(logPos, value);
+    public void setBestMatchFwdMult(int logPos, int value) {
+        bestMatchFwdMult.put(logPos, value);
     }
 
-    public void setBmFwNum(int logPos, int value) {
-        bmFwNum.put(logPos, value);
+    public void setBestMatchFwdNum(int logPos, int value) {
+        bestMatchFwdNum.put(logPos, value);
     }
 
-    public void setBmRvMult(int logPos, int value) {
-        bmRvMult.put(logPos, value);
+    public void setBestMatchRevMult(int logPos, int value) {
+        bestMatchRevMult.put(logPos, value);
     }
 
-    public void setBmRvNum(int logPos, int value) {
-        bmRvNum.put(logPos, value);
+    public void setBestMatchRevNum(int logPos, int value) {
+        bestMatchRevNum.put(logPos, value);
     }
 
-    public void setnFwMult(int logPos, int value) {
-        nFwMult.put(logPos, value);
+    public void setCommonFwdMult(int logPos, int value) {
+        commonFwdMult.put(logPos, value);
     }
 
-    public void setnFwNum(int logPos, int value) {
-        nFwNum.put(logPos, value);
+    public void setCommonFwdNum(int logPos, int value) {
+        commonFwdNum.put(logPos, value);
     }
 
-    public void setnRvMult(int logPos, int value) {
-        nRvMult.put(logPos, value);
+    public void setCommonRevMult(int logPos, int value) {
+        commonRevMult.put(logPos, value);
     }
 
-    public void setnRvNum(int logPos, int value) {
-        nRvNum.put(logPos, value);
+    public void setCommonRevNum(int logPos, int value) {
+        commonRevNum.put(logPos, value);
     }
 
-    public void setzFwMult(int logPos, int value) {
-        zFwMult.put(logPos, value);
+    public void setPerfectFwdMult(int logPos, int value) {
+        perfectFwdMult.put(logPos, value);
     }
 
-    public void setzFwNum(int logPos, int value) {
-        zFwNum.put(logPos, value);
+    public void setPerfectFwdNum(int logPos, int value) {
+        perfectFwdNum.put(logPos, value);
     }
 
-    public void setzRvMult(int logPos, int value) {
-        zRvMult.put(logPos, value);
+    public void setPerfectRevMult(int logPos, int value) {
+        perfectRevMult.put(logPos, value);
     }
 
-    public void setzRvNum(int logPos, int value) {
-        zRvNum.put(logPos, value);
+    public void setPerfectRevNum(int logPos, int value) {
+        perfectRevNum.put(logPos, value);
     }
     
 
 
-     public void setNFwMultTrack1(int logPos, int value) {
-        nFwMultTrack1.put(logPos, value);
+     public void setCommonFwdMultTrack1(int logPos, int value) {
+        commonFwdMultTrack1.put(logPos, value);
     }
-    public void setNFwMultTrack2(int logPos, int value) {
-        nFwMultTrack2.put(logPos, value);
+    public void setCommonFwdMultTrack2(int logPos, int value) {
+        commonFwdMultTrack2.put(logPos, value);
     }
-    public void setNRvMultTrack1(int logPos, int value) {
-        nRvMultTrack1.put(logPos, value);
+    public void setCommonRevMultTrack1(int logPos, int value) {
+        commonRevMultTrack1.put(logPos, value);
     }
-    public void setNRvMultTrack2(int logPos, int value) {
-        nRvMultTrack2.put(logPos, value);
+    public void setCommonRevMultTrack2(int logPos, int value) {
+        commonRevMultTrack2.put(logPos, value);
     }
 
 
-    public int getBmFwMult(int logPos) {
-        if (bmFwMult.containsKey(logPos)) {
-            return bmFwMult.get(logPos);
+    public int getBestMatchFwdMult(int logPos) {
+        if (bestMatchFwdMult.containsKey(logPos)) {
+            return bestMatchFwdMult.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getBmFwNum(int logPos) {
-        if (bmFwNum.containsKey(logPos)) {
-            return bmFwNum.get(logPos);
+    public int getBestMatchFwdNum(int logPos) {
+        if (bestMatchFwdNum.containsKey(logPos)) {
+            return bestMatchFwdNum.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getBmRvMult(int logPos) {
-        if (bmRvMult.containsKey(logPos)) {
-            return bmRvMult.get(logPos);
+    public int getBestMatchRevMult(int logPos) {
+        if (bestMatchRevMult.containsKey(logPos)) {
+            return bestMatchRevMult.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getBmRvNum(int logPos) {
-        if (bmRvNum.containsKey(logPos)) {
-            return bmRvNum.get(logPos);
+    public int getBestMatchRevNum(int logPos) {
+        if (bestMatchRevNum.containsKey(logPos)) {
+            return bestMatchRevNum.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getnFwMult(int logPos) {
-        if (nFwMult.containsKey(logPos)) {
-            return nFwMult.get(logPos);
+    public int getCommonFwdMult(int logPos) {
+        if (commonFwdMult.containsKey(logPos)) {
+            return commonFwdMult.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getnFwNum(int logPos) {
-        if (nFwNum.containsKey(logPos)) {
-            return nFwNum.get(logPos);
+    public int getCommonFwdNum(int logPos) {
+        if (commonFwdNum.containsKey(logPos)) {
+            return commonFwdNum.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getnRvMult(int logPos) {
-        if (nRvMult.containsKey(logPos)) {
-            return nRvMult.get(logPos);
+    public int getCommonRevMult(int logPos) {
+        if (commonRevMult.containsKey(logPos)) {
+            return commonRevMult.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getnRvNum(int logPos) {
-        if (nRvNum.containsKey(logPos)) {
-            return nRvNum.get(logPos);
+    public int getCommonRevNum(int logPos) {
+        if (commonRevNum.containsKey(logPos)) {
+            return commonRevNum.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getzFwMult(int logPos) {
-        if (zFwMult.containsKey(logPos)) {
-            return zFwMult.get(logPos);
+    public int getPerfectFwdMult(int logPos) {
+        if (perfectFwdMult.containsKey(logPos)) {
+            return perfectFwdMult.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getzFwNum(int logPos) {
-        if (zFwNum.containsKey(logPos)) {
-            return zFwNum.get(logPos);
+    public int getPerfectFwdNum(int logPos) {
+        if (perfectFwdNum.containsKey(logPos)) {
+            return perfectFwdNum.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getzRvMult(int logPos) {
-        if (zRvMult.containsKey(logPos)) {
-            return zRvMult.get(logPos);
+    public int getPerfectRevMult(int logPos) {
+        if (perfectRevMult.containsKey(logPos)) {
+            return perfectRevMult.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getzRvNum(int logPos) {
-        if (zRvNum.containsKey(logPos)) {
-            return zRvNum.get(logPos);
+    public int getPerfectRevNum(int logPos) {
+        if (perfectRevNum.containsKey(logPos)) {
+            return perfectRevNum.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getNFwMultTrack1(int logPos) {
-        if (nFwMultTrack1.containsKey(logPos)) {
-            return nFwMultTrack1.get(logPos);
+    public int getCommonFwdMultTrack1(int logPos) {
+        if (commonFwdMultTrack1.containsKey(logPos)) {
+            return commonFwdMultTrack1.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getNRvMultTrack1(int logPos) {
-        if (nRvMultTrack1.containsKey(logPos)) {
-            return nRvMultTrack1.get(logPos);
+    public int getCommonRevMultTrack1(int logPos) {
+        if (commonRevMultTrack1.containsKey(logPos)) {
+            return commonRevMultTrack1.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getNFwMultTrack2(int logPos) {
-        if (nFwMultTrack2.containsKey(logPos)) {
-            return nFwMultTrack2.get(logPos);
+    public int getCommonFwdMultTrack2(int logPos) {
+        if (commonFwdMultTrack2.containsKey(logPos)) {
+            return commonFwdMultTrack2.get(logPos);
         } else {
             return 0;
         }
     }
 
-    public int getNRvMultTrack2(int logPos) {
-        if (nRvMultTrack2.containsKey(logPos)) {
-            return nRvMultTrack2.get(logPos);
+    public int getCommonRevMultTrack2(int logPos) {
+        if (commonRevMultTrack2.containsKey(logPos)) {
+            return commonRevMultTrack2.get(logPos);
         } else {
             return 0;
         }
@@ -297,8 +299,8 @@ public class PersistantCoverage {
 
 
 
-    private boolean isInBounds(int logPos) {
-        if (logPos < leftBound || logPos > rightBound) {
+    public boolean isInBounds(int posToCheck) {
+        if (posToCheck < leftBound || posToCheck > rightBound) {
             return false;
         } else {
             return true;

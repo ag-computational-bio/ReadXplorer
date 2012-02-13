@@ -29,11 +29,10 @@ public class ReferenceViewer extends AbstractViewer {
     private final static long serialVersionUID = 7964236;
     private static int height = 250;
     private static int FRAMEHEIGHT = 20;
-    private PersistantReference refGen;
     private Map<FeatureType, Integer> featureStats;
     private JFeature currentlySelectedFeature;
     private int labelMargin;
-    private ReferenceConnector refGenC;
+    private ReferenceConnector refGenConnector;
     private ArrayList<JFeature> features;
     private ArrayList<JFeature> subfeatures;
 
@@ -42,14 +41,20 @@ public class ReferenceViewer extends AbstractViewer {
     public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
     private int trackCount = 0;
     
-    public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen){
-        super(boundsInfoManager, basePanel, refGen);
+    /**
+     * Creates a new reference viewer. 
+     * @param boundsInfoManager the global bounds info manager 
+     * @param basePanel the base panel
+     * @param refGenome the persistant reference, which is always accessible through the getReference 
+     *      method in any abstract viewer.
+     */
+    public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome){
+        super(boundsInfoManager, basePanel, refGenome);
         this.features = new ArrayList<JFeature>();
         this.subfeatures = new ArrayList<JFeature>();
-        this.refGenC = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
+        this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         this.featureStats = new EnumMap<FeatureType, Integer>(FeatureType.class);
         this.getExcludedFeatureTypes().add(FeatureType.UNDEFINED);
-        this.refGen = refGen;
         this.showSequenceBar(true, true);
         this.labelMargin = 3;
         this.setViewerSize();
@@ -85,8 +90,7 @@ public class ReferenceViewer extends AbstractViewer {
     @Override
     public void close(){
         super.close();
-        refGenC = null;
-        refGen = null;
+        refGenConnector = null;
         featureStats.clear();
         this.features.clear();
         this.subfeatures.clear();
@@ -120,10 +124,10 @@ public class ReferenceViewer extends AbstractViewer {
             this.add(this.getSequenceBar());
         }
 
-        List<PersistantFeature> featureList = refGenC.getFeaturesForRegion(
+        List<PersistantFeature> featureList = refGenConnector.getFeaturesForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
         Map<Integer, PersistantFeature> featureMap = PersistantFeature.getFeatureMap(featureList);
-        List<PersistantSubfeature> subfeatureList = refGenC.getSubfeaturesForRegion(
+        List<PersistantSubfeature> subfeatureList = refGenConnector.getSubfeaturesForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
         
         //at first add subfeatures to their parent features

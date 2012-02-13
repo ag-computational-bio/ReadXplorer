@@ -271,7 +271,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc);
         int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
-        trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
 
         trackV.setName(track.getDescription());
 
@@ -329,7 +329,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon);
 
         int featureWidth = (feature.getStop() - feature.getStart()) / 2;
-        trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
 
         //eigener ComponentListener für TrackV
         trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
@@ -439,7 +439,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                 for (BasePanel p : featureToTrackpanelList.get(feat)) {
                                     trackPanelToTrack.remove(p);
                                     //Stop CoverageThread
-                                    ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getThread().stop();
+                                    ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getCoverageThread().stop();
                                 }
                                 featureToTrackpanelList.remove(feat);
                                 featureToLayoutWidget.remove(feat);

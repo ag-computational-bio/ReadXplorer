@@ -330,7 +330,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText());
             this.boundsManager.navigatorBarUpdated(this.jumpPosition);
         } else {
-            JOptionPane.showMessageDialog(this, "Please enter a valid position!", "Invalid Position", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"+this.refGen.getSequence().length()+")", "Invalid Position", JOptionPane.ERROR_MESSAGE);
         }
 }//GEN-LAST:event_jumpButtonActionPerformed
 
@@ -408,7 +408,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
      */
     private boolean isValidSearchInput(String s) {
-        return s.matches("[acgt]+");
+        return s.matches("[acgtn]+");
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

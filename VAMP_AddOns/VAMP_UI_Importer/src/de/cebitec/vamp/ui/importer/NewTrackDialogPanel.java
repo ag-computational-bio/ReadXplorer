@@ -24,7 +24,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JList;
@@ -38,7 +37,7 @@ import javax.swing.text.NumberFormatter;
  *
  * @author jwinneba
  */
-public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDialog {
+public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
     private File mappingFile;

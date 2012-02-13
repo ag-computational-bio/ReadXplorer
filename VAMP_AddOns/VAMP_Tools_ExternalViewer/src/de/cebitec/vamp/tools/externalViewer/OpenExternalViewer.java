@@ -31,8 +31,7 @@ public final class OpenExternalViewer implements ActionListener {
             } else {
                 return;
             }
-        }
-        else{
+        } else {
             // context cannot be emtpy, so no check here
             currentTrackViewer = context.get(0);
         }

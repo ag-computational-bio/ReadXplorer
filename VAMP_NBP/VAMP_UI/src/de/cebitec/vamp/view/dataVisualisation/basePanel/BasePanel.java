@@ -38,29 +38,29 @@ public class BasePanel extends JPanel implements MousePositionListener {
     public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
         super();
         this.setLayout(new BorderLayout());
-        centerPanel = new JPanel(new BorderLayout());
+        this.centerPanel = new JPanel(new BorderLayout());
         this.add(centerPanel, BorderLayout.CENTER);
         this.boundsManager = boundsManager;
         this.viewController = viewController;
-        currentMousePosListeners = new ArrayList<MousePositionListener>();
+        this.currentMousePosListeners = new ArrayList<MousePositionListener>();
     }
 
     public void close(){
         this.shutdownViewer();
         this.shutdownInfoPanelAndAdjustmentPanel();
         this.remove(centerPanel);
-        centerPanel = null;
-        viewController = null;
+        this.centerPanel = null;
+        this.viewController = null;
         this.updateUI();
     }
 
     private void shutdownViewer(){
-        if(viewer != null){
-            boundsManager.removeBoundListener(viewer);
-            currentMousePosListeners.remove(viewer);
-            centerPanel.remove(viewer);
-            viewer.close();
-            viewer = null;
+        if(this.viewer != null){
+            this.boundsManager.removeBoundListener(viewer);
+            this.currentMousePosListeners.remove(viewer);
+            this.centerPanel.remove(viewer);
+            this.viewer.close();
+            this.viewer = null;
         }
     }
 
@@ -129,6 +129,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
         this.centerScrollpane.setVisible(true);
         this.viewer.setVisible(true);
+        this.viewer.setScrollBar(this.centerScrollpane.getVerticalScrollBar());
         
         this.addPlaceholder();
         this.updateSize();
@@ -150,6 +151,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
         this.centerPanel.add(verticalZoom, BorderLayout.WEST);
+        this.viewer.setScrollBar(this.centerScrollpane.getVerticalScrollBar());
         
         this.addPlaceholder();
         this.updateSize();

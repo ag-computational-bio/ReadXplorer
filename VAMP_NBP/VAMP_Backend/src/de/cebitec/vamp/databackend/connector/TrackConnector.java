@@ -1,6 +1,6 @@
 package de.cebitec.vamp.databackend.connector;
 
-import de.cebitec.vamp.databackend.CoverageRequest;
+import de.cebitec.vamp.databackend.GenomeRequest;
 import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.FieldNames;
 
@@ -32,12 +32,12 @@ public class TrackConnector {
     private String associatedTrackName;
     private int trackID;
     private int genomeSize;
-    private CoverageThread thread;
+    private CoverageThread coverageThread;
     private Connection con;
     /*Coverage at Position*/
     private static int COV = 0;
     /*Number of Diffs at Position (more than one per read possible)*/
-    private static int DIFF_COV = 1;
+    private static int DIFF_COV = 1; //TODO: delete after check
     private static int SNP_COV = 2;
     private static int A_COV = 3;
     private static int C_COV = 4;
@@ -81,8 +81,8 @@ public class TrackConnector {
             trackIds.add(track.getId());
         }
 
-        thread = new CoverageThread(trackIds);
-        thread.start();
+        coverageThread = new CoverageThread(trackIds);
+        coverageThread.start();
     }
 
     public Collection<PersistantMapping> getMappings(int from, int to) {
@@ -166,8 +166,15 @@ public class TrackConnector {
         return mappings.values();
     }
 
-    public void addCoverageRequest(CoverageRequest request) {
-        thread.addCoverageRequest(request);
+    /**
+     * Handles a coverage request. This means the request containig the sender
+     * of the request (the object that wants to receive the coverage) is handed
+     * over to the CoverageThread, who will carry out the request as soon
+     * as possible. Afterwards the coverage result is handed over to the receiver.
+     * @param request the coverage request including the receiving object
+     */
+    public void addCoverageRequest(GenomeRequest request) {
+        coverageThread.addRequest(request);
     }
 
     public Collection<PersistantDiff> getDiffsForInterval(int from, int to) {
@@ -561,8 +568,8 @@ public class TrackConnector {
 
     }
 
-    public CoverageThread getThread() {
-        return this.thread;
+    public CoverageThread getCoverageThread() {
+        return this.coverageThread;
     }
 
     public int getNumOfSeqPairsCalculate() {

@@ -2,12 +2,13 @@ package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.databackend.CoverageRequest;
-import de.cebitec.vamp.databackend.CoverageThreadListener;
+import de.cebitec.vamp.databackend.GenomeRequest;
+import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
@@ -35,7 +36,7 @@ import org.openide.util.NbPreferences;
  * Display the coverage for a sequenced track related to a reference genome
  * @author ddoppmeier
  */
-public class TrackViewer extends AbstractViewer implements CoverageThreadListener {
+public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 572406471;
 
@@ -212,21 +213,21 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
        
         if(isForwardStrand && !twoTracks){
             if(covType == PersistantCoverage.PERFECT){
-                value = cov.getzFwMult(absPos);
+                value = cov.getPerfectFwdMult(absPos);
             } else if(covType == PersistantCoverage.BM){
-                value = cov.getBmFwMult(absPos);
+                value = cov.getBestMatchFwdMult(absPos);
             } else if(covType == PersistantCoverage.NERROR){
-                value = cov.getnFwMult(absPos);
+                value = cov.getCommonFwdMult(absPos);
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
             }
         } else if(!isForwardStrand && !twoTracks) {
             if(covType == PersistantCoverage.PERFECT){
-                value = cov.getzRvMult(absPos);
+                value = cov.getPerfectRevMult(absPos);
             } else if(covType == PersistantCoverage.BM){
-                value = cov.getBmRvMult(absPos);
+                value = cov.getBestMatchRevMult(absPos);
             } else if(covType == PersistantCoverage.NERROR){
-                value = cov.getnRvMult(absPos);
+                value = cov.getCommonRevMult(absPos);
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
             }
@@ -234,21 +235,21 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
         else if (isForwardStrand && twoTracks) {
             if(covType == PersistantCoverage.DIFF){
-                value = cov.getnFwMult(absPos);
+                value = cov.getCommonFwdMult(absPos);
             } else if(covType == PersistantCoverage.TRACK2){
-                value = cov.getNFwMultTrack2(absPos);
+                value = cov.getCommonFwdMultTrack2(absPos);
             } else if(covType == PersistantCoverage.TRACK1){
-                value = cov.getNFwMultTrack1(absPos);
+                value = cov.getCommonFwdMultTrack1(absPos);
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
             }
         } else {
             if(covType == PersistantCoverage.DIFF){
-                value = cov.getnRvMult(absPos);
+                value = cov.getCommonRevMult(absPos);
             } else if(covType == PersistantCoverage.TRACK2){
-                value = cov.getNRvMultTrack2(absPos);
+                value = cov.getCommonRevMultTrack2(absPos);
             } else if(covType == PersistantCoverage.TRACK1){
-                value = cov.getNRvMultTrack1(absPos);
+                value = cov.getCommonRevMultTrack1(absPos);
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
             }
@@ -322,21 +323,26 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
     private void requestCoverage() {
         covLoaded = false;
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        trackCon.addCoverageRequest(new CoverageRequest(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight(), this));
+        trackCon.addCoverageRequest(new GenomeRequest(getBoundsInfo().getLogLeft(), 
+                getBoundsInfo().getLogRight(), this, Properties.COMPLETE_COVERAGE));
     }
 
     @Override
-    public synchronized void receiveCoverage(PersistantCoverage coverage){
-        this.cov = coverage;
-        trackInfo.setCoverage(cov);
-        if (cov.isTwoTracks()){
-            this.createCoveragePathsDiffOfTwoTracks();
-        } else {
-            this.createCoveragePaths();
+    public synchronized void receiveData(Object coverageData){
+        if (coverageData instanceof PersistantCoverage) {
+            PersistantCoverage coverage = (PersistantCoverage) coverageData;
+            this.cov = coverage;
+            trackInfo.setCoverage(cov);
+            if (cov.isTwoTracks()) {
+                this.createCoveragePathsDiffOfTwoTracks();
+            } else {
+                this.createCoveragePaths();
+            }
+            covLoaded = true;
+            this.repaint();
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        covLoaded = true;
-        this.repaint();
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        
     }
 
     @Override
@@ -411,14 +417,14 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
         }
         if(covLoaded && twoTracks){
 
-            int nFwVal = cov.getnFwMult(logPos);
-            int nRvVal = cov.getnRvMult(logPos);
+            int nFwVal = cov.getCommonFwdMult(logPos);
+            int nRvVal = cov.getCommonRevMult(logPos);
             //track 1 info
-            int nFwValTrack1 = cov.getNFwMultTrack1(logPos);
-            int nRvValTrack1 = cov.getNRvMultTrack1(logPos);
+            int nFwValTrack1 = cov.getCommonFwdMultTrack1(logPos);
+            int nRvValTrack1 = cov.getCommonRevMultTrack1(logPos);
             //track 2 info
-            int nFwValTrack2 = cov.getNFwMultTrack2(logPos);
-            int nRvValTrack2 = cov.getNRvMultTrack2(logPos);
+            int nFwValTrack2 = cov.getCommonFwdMultTrack2(logPos);
+            int nRvValTrack2 = cov.getCommonRevMultTrack2(logPos);
 
             StringBuilder sb = new StringBuilder();
             sb.append("<html>");
@@ -449,12 +455,12 @@ public class TrackViewer extends AbstractViewer implements CoverageThreadListene
 
         } else if(covLoaded && !twoTracks){
 
-            int zFwVal = cov.getzFwMult(logPos);
-            int zRvVal = cov.getzRvMult(logPos);
-            int bFw = cov.getBmFwMult(logPos);
-            int bRv = cov.getBmRvMult(logPos);
-            int nFwVal = cov.getnFwMult(logPos);
-            int nRvVal = cov.getnRvMult(logPos);
+            int zFwVal = cov.getPerfectFwdMult(logPos);
+            int zRvVal = cov.getPerfectRevMult(logPos);
+            int bFw = cov.getBestMatchFwdMult(logPos);
+            int bRv = cov.getBestMatchRevMult(logPos);
+            int nFwVal = cov.getCommonFwdMult(logPos);
+            int nRvVal = cov.getCommonRevMult(logPos);
 
             StringBuilder sb = new StringBuilder();
             sb.append("<html>");

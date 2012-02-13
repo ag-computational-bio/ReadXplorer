@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -20,7 +19,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class AlignmentViewer extends AbstractViewer {
 
@@ -28,10 +27,8 @@ public class AlignmentViewer extends AbstractViewer {
     private static int height = 500;
     private TrackConnector trackConnector;
     private LayoutI layout;
-    private PersistantReference refGen;
     private int blockHeight;
     private int layerHeight;
-    private ZoomLevelExcusePanel zoomExcuse;
     private int maxCountInInterval;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
@@ -44,15 +41,13 @@ public class AlignmentViewer extends AbstractViewer {
     Collection<PersistantMapping> mappings;
     HashMap<Integer, Integer> completeCoverage;
 
-    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
-        super(boundsInfoManager, basePanel, refGen);
-        this.refGen = refGen;
+    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome, TrackConnector trackConnector) {
+        super(boundsInfoManager, basePanel, refGenome);
         this.trackConnector = trackConnector;
         this.setInDrawingMode(true);
         this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
-        zoomExcuse = new ZoomLevelExcusePanel();
         minSaturationAndBrightness = 0.3f;
         maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
@@ -72,7 +67,7 @@ public class AlignmentViewer extends AbstractViewer {
     @Override
     public void boundsChangedHook() {
        
-        if (isInMaxZoomLevel() && isActive()) {
+        if (this.isInMaxZoomLevel() && isActive()) {
            //  updatePhysicalBounds();
             setInDrawingMode(true);
         } else {
@@ -85,31 +80,30 @@ public class AlignmentViewer extends AbstractViewer {
     private void setupComponents() {
         this.removeAll();
 
-        if (isInMaxZoomLevel()) {
-            // at least sufficient horizontal zoom level to show bases
 
-            if (isInDrawingMode()) {
-                if (this.hasLegend()) {
-                    this.add(this.getLegendLabel());
-                    this.add(this.getLegendPanel());
-                }
-                // if a sequence viewer was set for this panel, add/show it
-                if (this.hasSequenceBar()) {
-                    this.add(this.getSequenceBar());
-                }
+        if (!this.isInMaxZoomLevel()) {
+            this.getBoundsInformationManager().zoomLevelUpdated(1);
+        }
+        // at least sufficient horizontal zoom level to show bases
 
-                // setup the layout of mapping
-                
-              //error occured check this      updatePhysicalBounds();
-
-                this.createAndShowNewLayout(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
-                
-                this.getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
-                
+        if (isInDrawingMode()) {
+            if (this.hasLegend()) {
+                this.add(this.getLegendLabel());
+                this.add(this.getLegendPanel());
+            }
+            // if a sequence viewer was set for this panel, add/show it
+            if (this.hasSequenceBar()) {
+                this.add(this.getSequenceBar());
             }
 
-        } else {
-            this.placeExcusePanel(zoomExcuse);
+            // setup the layout of mapping
+
+            //error occured check this      updatePhysicalBounds();
+
+            this.createAndShowNewLayout(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
+
+            this.getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
+
         }
     }
 
@@ -171,8 +165,8 @@ public class AlignmentViewer extends AbstractViewer {
         this.fwdMappingsInInterval = 0;
 
         for (PersistantMapping m : mappings) {
-            int coverage = m.getCoverage();
-//            if(coverage < minCountInInterval){
+            int coverage = m.getNbReplicates();
+//            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
 //            }
             if (coverage > maxCountInInterval) {
@@ -320,10 +314,6 @@ public class AlignmentViewer extends AbstractViewer {
             width *= (layout.getGenomeGapManager().getNumOfGapsAt(position) + 1);
         }
         return width;
-    }
-
-    public PersistantReference getRefGen() {
-        return refGen;
     }
 
     /**

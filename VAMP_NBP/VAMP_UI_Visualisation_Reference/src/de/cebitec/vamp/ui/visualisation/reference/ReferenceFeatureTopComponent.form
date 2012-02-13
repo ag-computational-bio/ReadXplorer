@@ -18,31 +18,37 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="locusLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="typeLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="geneLabel" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="geneField" alignment="0" pref="237" max="32767" attributes="2"/>
+                          <Component id="typeText" alignment="1" pref="237" max="32767" attributes="0"/>
+                          <Component id="locusField" alignment="0" pref="237" max="32767" attributes="2"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="stopLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel4" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="startLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="locusLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="productLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="typeLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel3" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane1" pref="243" max="32767" attributes="0"/>
-                          <Component id="typeText" alignment="1" pref="243" max="32767" attributes="0"/>
-                          <Component id="locusField" alignment="0" pref="243" max="32767" attributes="2"/>
-                          <Component id="startField" alignment="0" pref="243" max="32767" attributes="2"/>
-                          <Component id="stopField" alignment="0" pref="243" max="32767" attributes="2"/>
-                          <Component id="ecNumField" alignment="0" pref="243" max="32767" attributes="2"/>
+                          <Component id="strandText" alignment="0" pref="237" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="237" max="32767" attributes="0"/>
+                          <Component id="startField" alignment="0" pref="237" max="32767" attributes="2"/>
+                          <Component id="stopField" alignment="0" pref="237" max="32767" attributes="2"/>
+                          <Component id="ecNumField" alignment="0" pref="237" max="32767" attributes="2"/>
                       </Group>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
-                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="strandText" pref="233" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -61,6 +67,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="locusField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="locusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="geneField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="geneLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -87,7 +98,7 @@
                   <Component id="strandText" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="37" max="32767" attributes="0"/>
+              <EmptySpace pref="154" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -226,5 +237,23 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JTextField" name="geneField">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComponent.geneField.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="geneLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComponent.geneLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComponent.geneLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

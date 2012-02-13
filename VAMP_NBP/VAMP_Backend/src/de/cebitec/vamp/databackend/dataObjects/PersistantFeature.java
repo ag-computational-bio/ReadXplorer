@@ -114,7 +114,8 @@ public class PersistantFeature implements PersistantFeatureI {
 
     @Override
     public String toString(){
-        return locus;
+        return this.locus != null && !this.locus.isEmpty() ? 
+                this.locus : "Feature with start: " + this.start + ", stop: " + this.stop;
     }
 
     /**
@@ -159,5 +160,26 @@ public class PersistantFeature implements PersistantFeatureI {
                 featuresSorted.get(id).addSubfeature(subfeature);
             }
         }
+    }
+    
+    /**
+     * Retrieves the best possible name for the feature. First it checks the gene
+     * name, then the locus information and if both are not given it returns
+     * "Feature with start: x, stop: y"
+     * @param feature the feature whose name is wanted
+     * @return the best possible name for the feature or null, if the feature was null.
+     */
+    public static String getFeatureName(PersistantFeature feature) {
+        String featureName = null;
+        if (feature != null) {
+            if (feature.getGeneName() != null && !feature.getGeneName().isEmpty()) {
+                featureName = feature.getGeneName();
+            } else if (feature.getLocus() != null && !feature.getLocus().isEmpty()) {
+                featureName = feature.getLocus();
+            } else {
+                featureName = "Feature with start: " + feature.getStart() + ", stop: " + feature.getStop();
+            }
+        }
+        return featureName;
     }
 }

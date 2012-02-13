@@ -41,7 +41,7 @@ import javax.swing.text.NumberFormatter;
  * 
  * The dialog panel for importing only position tables for an existing track.
  */
-public class NewPositionTableDialog extends JPanel implements NewJobDialog {
+public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
     private File mappingFile;

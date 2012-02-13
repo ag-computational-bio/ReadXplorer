@@ -293,7 +293,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     private javax.swing.JTextField zeroRevField;
     // End of variables declaration//GEN-END:variables
 
-    public void setZeroFwd(int count){
+    public void setPerfectFwd(int count){
         if(count >= 0){
             zeroFwdField.setText(String.valueOf(count));
         } else {
@@ -301,7 +301,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         }
     }
 
-    public void setZeroRev(int count){
+    public void setPerfectRev(int count){
         if(count >= 0){
             zeroRevField.setText(String.valueOf(count));
         } else {
@@ -325,7 +325,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         }
     }
 
-    public void setNFwd(int count){
+    public void setCommonFwd(int count){
         if(count >= 0){
             nFwdField.setText(String.valueOf(count));
         } else {
@@ -333,7 +333,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         }
     }
 
-    public void setNRev(int count){
+    public void setCommonRev(int count){
         if(count >= 0){
             nRevField.setText(String.valueOf(count));
         } else {
@@ -346,33 +346,33 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         if(/*mouseOverWanted &&*/ cov != null){
 
             if (!doubleTrackHackBoolean) {
-                setZeroFwd(cov.getzFwMult(logPos));
-                setZeroRev(cov.getzRvMult(logPos));
-                setBmFwd(cov.getBmFwMult(logPos));
-                setBmRev(cov.getBmRvMult(logPos));
-                setNFwd(cov.getnFwMult(logPos));
-                setNRev(cov.getnRvMult(logPos));
-                currentPositionLabel.setText(String.valueOf(logPos));
+                this.setPerfectFwd(cov.getPerfectFwdMult(logPos));
+                this.setPerfectRev(cov.getPerfectRevMult(logPos));
+                this.setBmFwd(cov.getBestMatchFwdMult(logPos));
+                this.setBmRev(cov.getBestMatchRevMult(logPos));
+                this.setCommonFwd(cov.getCommonFwdMult(logPos));
+                this.setCommonRev(cov.getCommonRevMult(logPos));
+                this.currentPositionLabel.setText(String.valueOf(logPos));
             }
             // TODO there has to be a much nicer way, maybe alter PersistantTrack or something else
             else {
-                setZeroFwd(cov.getnFwMult(logPos));
-                setZeroRev(cov.getnRvMult(logPos));
-                setBmFwd(cov.getNFwMultTrack1(logPos));
-                setBmRev(cov.getNRvMultTrack1(logPos));
-                setNFwd(cov.getNFwMultTrack2(logPos));
-                setNRev(cov.getNRvMultTrack2(logPos));
-                currentPositionLabel.setText(String.valueOf(logPos));
+                this.setPerfectFwd(cov.getCommonFwdMult(logPos));
+                this.setPerfectRev(cov.getCommonRevMult(logPos));
+                this.setBmFwd(cov.getCommonFwdMultTrack1(logPos));
+                this.setBmRev(cov.getCommonRevMultTrack1(logPos));
+                this.setCommonFwd(cov.getCommonFwdMultTrack2(logPos));
+                this.setCommonRev(cov.getCommonRevMultTrack2(logPos));
+                this.currentPositionLabel.setText(String.valueOf(logPos));
             }
 
         } else {
-            setZeroFwd(-1);
-            setZeroRev(-1);
-            setBmFwd(-1);
-            setBmRev(-1);
-            setNFwd(-1);
-            setNRev(-1);
-            currentPositionLabel.setText("");
+            this.setPerfectFwd(-1);
+            this.setPerfectRev(-1);
+            this.setBmFwd(-1);
+            this.setBmRev(-1);
+            this.setCommonFwd(-1);
+            this.setCommonRev(-1);
+            this.currentPositionLabel.setText("");
         }
     }
 

@@ -37,7 +37,7 @@ public class PersistantMapping implements PersistantObject {
         this.isBestMatch = isBestMapping;
     }
 
-    public int getCoverage() {
+    public int getNbReplicates() {
         return count;
     }
     

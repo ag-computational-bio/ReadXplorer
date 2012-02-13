@@ -19,10 +19,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="refGenLabel" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="refGenLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                   <Component id="stepSizeLabel" min="-2" max="-2" attributes="0"/>
                   <Component id="descriptionLabel" min="-2" max="-2" attributes="0"/>
                   <Component id="mappingFileLabel" min="-2" max="-2" attributes="0"/>
