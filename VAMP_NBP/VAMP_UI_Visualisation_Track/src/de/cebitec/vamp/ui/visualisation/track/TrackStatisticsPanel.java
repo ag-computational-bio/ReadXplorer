@@ -13,7 +13,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
     private final static long serialVersionUID = 1239345;
     private TrackConnector trackCon;
-
+    private int trackID=-1;
     /** Creates new form TrackNavigator */
     public TrackStatisticsPanel() {
         initComponents();
@@ -24,7 +24,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         this.trackCon = trackCon;
         this.initComponents();
         this.hideSeqPairLabels();
-        this.computeStats();
+      //  this.computeStats();
     }
 
     /**
@@ -34,12 +34,13 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
      */
     public void setTrackConnector(TrackConnector trackCon) {
         this.trackCon = trackCon;
+        if(trackCon.getTrackID()!= trackID){
+        trackID=trackCon.getTrackID();
+        nameLabel.setText(trackCon.getAssociatedTrackName());
         this.computeStats();
+        }
     }
 
-    public void setTrackName(String name) {
-        nameLabel.setText(name);
-    }
 
     /** This method is called from within the constructor to
      * initialize the form.

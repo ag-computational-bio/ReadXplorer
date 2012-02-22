@@ -1,8 +1,6 @@
 package de.cebitec.vamp.externalSort;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +21,7 @@ import org.openide.windows.InputOutput;
  * 
  * 
  * This class sorts Sam or Bam files by read sequence and returns a sorted Bam file.
- * It uses a merge sort which creates temporary files for merging to save memory. The created files 
+ * It uses a merge sort which creates temporary files for merging to save memory. Created files 
  * will be removed after sorting.
  */
 public class ExternalSortBAM {
@@ -47,14 +45,13 @@ public class ExternalSortBAM {
         ArrayList<Integer> list = getTime(time);
         io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.sort.finished", list.get(0), list.get(1), list.get(2)));
         ph.finish();
-        //  io.closeInputOutput();
+      //  io.getOut().close();
+    //     io.closeInputOutput();
     }
 
-    private void externalSort(String path) {
-        try {
-            //file input
-            File baseFile = new File(path);
-            SAMFileReader samReader = new SAMFileReader(baseFile);
+    
+    private void countLines(File base){
+                   SAMFileReader samReader = new SAMFileReader(base);
             samheader = samReader.getFileHeader();
             SAMRecordIterator itLine = samReader.iterator();
             int lines = 0;
@@ -66,10 +63,16 @@ public class ExternalSortBAM {
             ph.start(workunits);
             itLine.close();
             samReader.close();
-            SAMFileReader samReader2 = new SAMFileReader(baseFile);
-            SAMRecordIterator it = samReader2.iterator();
-
-
+    }
+    
+    private void externalSort(String path) {
+        try {
+            //file input
+            File baseFile = new File(path);
+            countLines(baseFile);
+            
+            SAMFileReader samReader = new SAMFileReader(baseFile);
+            SAMRecordIterator it = samReader.iterator();
 
             ArrayList<SAMRecord> chunkSizeRows = new ArrayList<SAMRecord>();
 
@@ -77,9 +80,7 @@ public class ExternalSortBAM {
             SAMRecord record = null;
             workunits = 0;
             while (it.hasNext()) {
-
 // get chunkSize rows
-
                 for (int i = 0; i < chunkSize; i++) {
                     record = it.hasNext() ? it.next() : null;
                     if (record != null) {
@@ -89,11 +90,13 @@ public class ExternalSortBAM {
                     }
                 }
 // sort the rows
-                chunkSizeRows = ExternalSortBAM.mergeSort(chunkSizeRows);
+               
+                chunkSizeRows =mergeSort(chunkSizeRows);
 
 // write to disk
                 chunkName = System.getProperty("user.home") + "/chunk";
-                BAMFileWriter bfw = new BAMFileWriter(new File(chunkName + numFiles));
+                File f = new File(chunkName + numFiles);
+                BAMFileWriter bfw = new BAMFileWriter(f);
 
                 bfw.setHeader(samheader);
                 for (int i = 0; i < chunkSizeRows.size(); i++) {
@@ -107,13 +110,14 @@ public class ExternalSortBAM {
                 ph.progress(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.progress.chunks.creating"), workunits);
             }
             it.close();
+            samReader.close();
             io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.sort.chunks.created", numFiles));
             io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.sort.chunks.merge"));
 
             mergeFiles(baseFile, numFiles);
 
 
-            samReader.close();
+          
 
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
@@ -125,8 +129,7 @@ public class ExternalSortBAM {
     private void mergeFiles(File baseFile, int numFiles) {
         try {
 
-            ArrayList<File> files = new ArrayList<File>();
-            ArrayList<SAMFileReader> fileReaders = new ArrayList<SAMFileReader>();
+            ArrayList<File> files= new ArrayList<File>();
             ArrayList<SAMRecordIterator> mergeIt = new ArrayList<SAMRecordIterator>();
             ArrayList<SAMRecord> filerows = new ArrayList<SAMRecord>();
             String[] s = baseFile.getName().split("\\.");
@@ -140,7 +143,6 @@ public class ExternalSortBAM {
                 File f = new File(chunkName + i);
                 files.add(f);
                 SAMFileReader fileReader = new SAMFileReader(f);
-                fileReaders.add(fileReader);
                 mergeIt.add(fileReader.iterator());
                 // get the first row
                 SAMRecord line = mergeIt.get(i).next();
@@ -236,26 +238,13 @@ public class ExternalSortBAM {
 // close all the files
             bfw.close();
             sortedFile = sorted;
+            
             for (int i = 0; i < mergeIt.size(); i++) {
                 mergeIt.get(i).close();
-                fileReaders.get(i).close();
-                try {
-                    Files.delete(files.get(i).toPath());
-                } catch (IOException e) {
-                    io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.FileDeletionError", files.get(i).getAbsolutePath()));
-                }
+                files.get(i).delete();
             }
-//            for (File file : files){
-//                file.renameTo(new File("lala"));
-//                try {
-//                    Files.delete(file.toPath());
-//                }
-//                
-////                if (!success){
-////                    System.out.println("not deleted");
-////                }
-//            }
-
+            mergeIt.clear();
+            filerows.clear();
 
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
@@ -312,7 +301,6 @@ public class ExternalSortBAM {
                 result.add(right.get(i));
             }
         }
-
         return result;
     }
 

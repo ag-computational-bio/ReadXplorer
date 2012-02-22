@@ -159,7 +159,8 @@ public class ProjectConnector {
             this.setupMySQLDatabase();
         } else {
             this.adapter = adapter;
-            this.url = "jdbc:" + adapter + ":" + database + ";FILE_LOCK=SERIALIZED;MULTI_THREADED=1";
+            this.url = "jdbc:" + adapter + ":" + database + ";AUTO_SERVER=TRUE;MULTI_THREADED=1"; 
+            //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
 
             this.connectH2DataBase(url);
             this.setupDatabaseH2();

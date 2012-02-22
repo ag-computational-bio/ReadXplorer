@@ -35,7 +35,8 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     private PersistantReference currentRefGen;
     private BasePanel genomeViewer;
     private Map<PersistantTrack, BasePanel> trackToPanel;
-
+    private List<BasePanel> currentTracks= new ArrayList<BasePanel>();
+    
     private ApplicationFrameI app;
 
     public ViewController(ApplicationFrameI app){
@@ -91,13 +92,16 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         openTrackDialog.setVisible(true);
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
+           
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 // create basepanel
                 BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
+                currentTracks.add(trackPanel);
                 trackToPanel.put(track, trackPanel);
-
+                
                 // show the panel and the track
                 getApp().showTrackPanel(trackPanel);
+                
             }
         } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
             String msg = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfo",
@@ -105,6 +109,10 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
             String title = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfoTitle", "Info");
             JOptionPane.showMessageDialog(genomeViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
+    }
+    
+    public List<BasePanel> getOpenTracks(){
+        return currentTracks ;
     }
 
     /**
@@ -115,7 +123,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
      */
     public void closeTrackPanel(JPanel track) {
         BasePanel trackPanel = (BasePanel) track;
-
+        currentTracks.clear();
         getApp().closeTrackPanel(trackPanel);
         trackPanel.close();
         mousePosListener.remove(trackPanel);
@@ -125,6 +133,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
     public void openTrack2(BasePanel tp) {
         getApp().showTrackPanel(tp);
+        currentTracks.add(tp);
     }
 
     @Deprecated
