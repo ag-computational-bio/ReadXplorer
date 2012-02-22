@@ -1,15 +1,16 @@
 package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.util.Pair;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,13 +22,11 @@ import java.util.logging.Logger;
  * The thread carries out the database querries to receive the mappings for a certain interval.
  */
 public class MappingThreadAnalyses extends Thread implements RequestThreadI {
-    
-//    private static int FIXED_INTERVAL_LENGTH = 1000;
 
     private int trackId;
     private Connection con;
     private ConcurrentLinkedQueue<GenomeRequest> requestQueue;
-    private Pair<PersistantFeature, Collection<PersistantMapping>> currentMappings;
+    private List<PersistantMapping> currentMappings;
     private int nbRequests;
     private double requestCounter;
 
@@ -46,8 +45,18 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
         requestQueue.add(request);
     }
 
-    private Collection<PersistantMapping> loadMappings(GenomeRequest request) {
-        HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
+    /**
+     * Loads all mappings (without diffs) from the DB with start positions within 
+     * the given interval of the reference genome.
+     * @param request the genome request containing the requested genome interval
+     * @return the list of mappings belonging to the given interval
+     */
+    private List<PersistantMapping> loadMappings(GenomeRequest request) {
+        
+        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
+        
+        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
         int from = request.getFrom();
         int to = request.getTo();
 
@@ -55,9 +64,9 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_WITHOUT_DIFFS);
             fetch.setLong(1, from);
             fetch.setLong(2, to);
-            fetch.setLong(3, from);
-            fetch.setLong(4, to);
-            fetch.setLong(5, trackId);
+//            fetch.setLong(3, from);
+//            fetch.setLong(4, to);
+            fetch.setLong(3, trackId);
 
             ResultSet rs = fetch.executeQuery();
             //  int counter = 0;
@@ -73,11 +82,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
 
                 PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
                         direction, count, errors, seqId, isBestMapping);
-
-                // add new mapping if not exists
-                if (!mappings.containsKey(mapping.getId())) {
-                    mappings.put(mapping.getId(), mapping);
-                }
+                mappings.add(mapping);
 
             }
             rs.close();
@@ -86,9 +91,14 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
-        return mappings.values();
+        
+        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
+        
+        return mappings;
     }
 
+    
     @Override
     public void run() {
         
@@ -97,7 +107,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
             GenomeRequest request = requestQueue.poll();
             if (request != null) {
                 this.requestCounter++;
-                this.currentMappings = new Pair<PersistantFeature, Collection<PersistantMapping>>(request.getFeature(), this.loadMappings(request));
+                this.currentMappings = this.loadMappings(request);
                 request.getSender().receiveData(currentMappings);
             } else {
                 try {

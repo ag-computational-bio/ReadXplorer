@@ -1,7 +1,5 @@
 package de.cebitec.vamp.databackend;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-
 /**
  * @author ddoppmeier, rhilker
  * 
@@ -16,7 +14,6 @@ public class GenomeRequest {
     private int to;
     private ThreadListener sender;
     private byte desiredCoverage;
-    private PersistantFeature feature;
 
     /**
      * A genome request can be any request for any genome data. It is defined by at
@@ -34,7 +31,6 @@ public class GenomeRequest {
         this.to = to;
         this.sender = sender;
         this.desiredCoverage = desiredCoverage;
-        this.feature = null;
     }
         
     /**
@@ -45,13 +41,12 @@ public class GenomeRequest {
      * @param from start position of the interval for receiving the mappings
      * @param to stop position of the interval for receiving the mappings
      * @param sender the sending object, that wants to receive the result of the request
-     * @param feature the feature belonging to the request
      */
-    public GenomeRequest(int from, int to, ThreadListener sender, PersistantFeature feature){
+    // @param feature the feature belonging to the request
+    public GenomeRequest(int from, int to, ThreadListener sender){
         this.from = from;
         this.to = to;
         this.sender = sender;
-        this.feature = feature;
         this.desiredCoverage = 0;
     }
 
@@ -73,12 +68,6 @@ public class GenomeRequest {
      */
     public byte getDesiredCoverage(){
         return this.desiredCoverage;
-    }
-
-    public PersistantFeature getFeature() {
-        return this.feature;
-    }
-    
-    
+    } 
 
 }

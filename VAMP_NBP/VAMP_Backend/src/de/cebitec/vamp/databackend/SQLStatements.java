@@ -277,6 +277,18 @@ public class SQLStatements {
 
     
     /**
+     * Insert a new coverage distribution for a track with all 35 distribution fields.
+     */
+    public static String INSERT_COVERAGE_DISTRIBUTION = 
+            "INSERT INTO "+FieldNames.TABLE_COVERAGE_DISTRIBUTION+" " +
+            "(" +
+                FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID+", " +
+                FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID+", " +
+                FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " " +
+            ") " +
+            "VALUES (?,?,?)";
+    
+    /**
      * Delete the track data.
      */
     public final static String DELETE_DIFFS_FROM_TRACK =
@@ -687,10 +699,16 @@ public class SQLStatements {
         + "FROM "
             + FieldNames.TABLE_MAPPINGS + " "
         + "WHERE "
-            + "( " 
-            + FieldNames.MAPPING_START + " BETWEEN ? AND ? or "
-            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ?) and "
-            + FieldNames.MAPPING_TRACK + " = ? ";
+            + FieldNames.MAPPING_START + " BETWEEN ? AND ? and "
+//            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? and "
+            + FieldNames.MAPPING_TRACK + " = ? "
+        + "ORDER BY " + FieldNames.MAPPING_START;
+    
+    /*
+     * <1min variante mit start between ? and ?
+     * 3min: variante mit start < ? & start < ?
+     * 7min: variante mit start < ? & stop > ?
+     */
 
 
     public final static String FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL =
@@ -1485,6 +1503,7 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
    public static final String GET_LATEST_TRACK_SEQUENCE_PAIR_ID = 
             "SELECT MAX("+FieldNames.TRACK_SEQUENCE_PAIR_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_TRACKS;
    
+   
    public static final String GET_CURRENT_READLENGTH = 
            "SELECT " + 
                 FieldNames.MAPPING_STOP + ", " +
@@ -1494,6 +1513,16 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
            " WHERE " +
                 FieldNames.MAPPING_TRACK + " = ? " +
            " LIMIT 1 ";
+   
+   
+    public static final String FETCH_COVERAGE_INCREASE_DISTRIBUTION = 
+            "SELECT " +
+                FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + ", " +
+                FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " " +
+            " FROM " + 
+                FieldNames.TABLE_COVERAGE_DISTRIBUTION + 
+            " WHERE " +
+                FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? ";
     
 //        public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("

@@ -1,4 +1,4 @@
-package de.cebitec.vamp.tools.externalViewer;
+package de.cebitec.vamp.tools.detailedViewer;
 
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -20,14 +20,14 @@ import org.openide.util.Utilities;
  * 
  * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.externalViewer//ExternalViewer//EN", autostore = false)
-public final class ExternalViewerTopComponent extends TopComponent {
+@ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.detailedViewer//DetailedViewer//EN", autostore = false)
+public final class DetailedViewerTopComponent extends TopComponent {
 
-    private static ExternalViewerTopComponent instance;
+    private static DetailedViewerTopComponent instance;
     private static final long serialVersionUID = 1L;
     /** path to the icon used by the component and its open action */
-    static final String ICON_PATH = "de/cebitec/vamp/tools/externalViewer/externalViewer.png";
-    private static final String PREFERRED_ID = "ExternalViewerTopComponent";
+    static final String ICON_PATH = "de/cebitec/vamp/tools/detailedViewer/detailedViewer.png";
+    private static final String PREFERRED_ID = "DetailedViewerTopComponent";
 
     private TrackConnector trackConnector;
     private BasePanel alignmentBasePanel;
@@ -41,10 +41,10 @@ public final class ExternalViewerTopComponent extends TopComponent {
     
     private String selectedViewer;
 
-    public ExternalViewerTopComponent() {
+    public DetailedViewerTopComponent() {
         initComponents();
-        setName(NbBundle.getMessage(ExternalViewerTopComponent.class, "CTL_ExternalViewerTopComponent"));
-        setToolTipText(NbBundle.getMessage(ExternalViewerTopComponent.class, "HINT_ExternalViewerTopComponent"));
+        setName(NbBundle.getMessage(DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent"));
+        setToolTipText(NbBundle.getMessage(DetailedViewerTopComponent.class, "HINT_DetailedViewerTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
     }
 
@@ -66,14 +66,14 @@ public final class ExternalViewerTopComponent extends TopComponent {
 
         setLayout(new java.awt.BorderLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(histogramButton, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.histogramButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(histogramButton, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.histogramButton.text")); // NOI18N
         histogramButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 histogramButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(alignmentButton, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.alignmentButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(alignmentButton, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.alignmentButton.text")); // NOI18N
         alignmentButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 alignmentButtonActionPerformed(evt);
@@ -81,7 +81,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
         });
 
         colorHistogramBox.setFont(new java.awt.Font("Dialog", 1, 10));
-        org.openide.awt.Mnemonics.setLocalizedText(colorHistogramBox, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.colorHistogramBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(colorHistogramBox, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.colorHistogramBox.text")); // NOI18N
         colorHistogramBox.setMinimumSize(new java.awt.Dimension(50, 22));
         colorHistogramBox.setPreferredSize(new java.awt.Dimension(100, 22));
         colorHistogramBox.addActionListener(new java.awt.event.ActionListener() {
@@ -90,7 +90,7 @@ public final class ExternalViewerTopComponent extends TopComponent {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(sequencePairButton, org.openide.util.NbBundle.getMessage(ExternalViewerTopComponent.class, "ExternalViewerTopComponent.sequencePairButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(sequencePairButton, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.sequencePairButton.text")); // NOI18N
         sequencePairButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sequencePairButtonActionPerformed(evt);
@@ -184,27 +184,27 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ExternalViewerTopComponent getDefault() {
+    public static synchronized DetailedViewerTopComponent getDefault() {
         if (instance == null) {
-            instance = new ExternalViewerTopComponent();
+            instance = new DetailedViewerTopComponent();
         }
         return instance;
     }
 
     /**
-     * Obtain the ExternalViewerTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the DetailedViewerTopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized ExternalViewerTopComponent findInstance() {
+    public static synchronized DetailedViewerTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(ExternalViewerTopComponent.class.getName()).warning(
+            Logger.getLogger(DetailedViewerTopComponent.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof ExternalViewerTopComponent) {
-            return (ExternalViewerTopComponent) win;
+        if (win instanceof DetailedViewerTopComponent) {
+            return (DetailedViewerTopComponent) win;
         }
-        Logger.getLogger(ExternalViewerTopComponent.class.getName()).warning(
+        Logger.getLogger(DetailedViewerTopComponent.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();

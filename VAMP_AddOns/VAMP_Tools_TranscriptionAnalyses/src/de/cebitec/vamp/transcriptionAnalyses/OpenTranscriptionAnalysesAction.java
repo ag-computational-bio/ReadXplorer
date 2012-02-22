@@ -28,7 +28,7 @@ import org.openide.windows.WindowManager;
 
 @ActionID(category = "Tools",
 id = "de.cebitec.vamp.transcriptionAnalyses.OpenTranscriptionAnalysesAction")
-@ActionRegistration(iconBase = "de/cebitec/vamp/transcriptionAnalyses/externalViewer.png",
+@ActionRegistration(iconBase = "de/cebitec/vamp/transcriptionAnalyses/transcriptionAnalyses.png",
 displayName = "#CTL_OpenTranscriptionAnalysesAction")
 @ActionReferences({
     @ActionReference(path = "Menu/Tools", position = 142, separatorAfter = 150),

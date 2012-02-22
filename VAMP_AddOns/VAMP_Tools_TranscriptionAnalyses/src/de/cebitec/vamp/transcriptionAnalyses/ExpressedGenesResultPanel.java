@@ -13,6 +13,8 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  * @author -Rolf Hilker-
@@ -20,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 public class ExpressedGenesResultPanel extends javax.swing.JPanel {
 
     private BoundsInfoManager bim;
-    private List<PersistantFeature> expressedGenes;
+    private List<ExpressedGene> expressedGenes;
     
     /** Creates new form ExpressedGenesResultPanel */
     public ExpressedGenesResultPanel() {
@@ -53,14 +55,14 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Feature (Gene)", "Total Read Count"
+                "Feature (Gene)", "Strand", "Total Read Count"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -73,7 +75,8 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         });
         expressedGenesPane.setViewportView(expressedGenesTable);
         expressedGenesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title0")); // NOI18N
-        expressedGenesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title1")); // NOI18N
+        expressedGenesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title2_1")); // NOI18N
+        expressedGenesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title1")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -105,18 +108,23 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         this.bim = boundsInformationManager;
     }
 
-    public void addExpressedGenes(List<PersistantFeature> expressedGenes) {
-        final int nbColumns = 2;
+    public void addExpressedGenes(List<ExpressedGene> expressedGenes) {
+        final int nbColumns = 3;
         this.expressedGenes = expressedGenes;
         DefaultTableModel model = (DefaultTableModel) this.expressedGenesTable.getModel();        
 
-        for (PersistantFeature feature : this.expressedGenes) {
+        for (ExpressedGene expressedGene : this.expressedGenes) {
             
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = feature;
-//            rowData[1] = ;
+            rowData[0] = expressedGene.getExpressedFeature();
+            rowData[1] = expressedGene.getExpressedFeature().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
+            rowData[2] = expressedGene.getReadCount();
 
             model.addRow(rowData);
         }
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        this.expressedGenesTable.setRowSorter(sorter);
+        sorter.setModel(model);
     }
 }

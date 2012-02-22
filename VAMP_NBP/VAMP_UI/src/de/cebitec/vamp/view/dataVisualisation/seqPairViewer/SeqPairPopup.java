@@ -3,6 +3,7 @@ package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
+import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -241,8 +242,9 @@ public class SeqPairPopup extends JPopupMenu {
     }
     
     private String getMappingInfos(PersistantMapping mapping){
-        String strand = mapping.isForwardStrand() ? NbBundle.getMessage(BlockComponentPair.class, "Fwd") : 
-                                                    NbBundle.getMessage(BlockComponentPair.class, "Rev");
+        String strand = mapping.getStrand() == SequenceUtils.STRAND_FWD ? 
+                    NbBundle.getMessage(BlockComponentPair.class, "Fwd") : 
+                    NbBundle.getMessage(BlockComponentPair.class, "Rev");
         return NbBundle.getMessage(BlockComponentPair.class, "Type").concat(" ").
                     concat(this.getMappingTypeString(mapping)).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Start")).concat(" ").

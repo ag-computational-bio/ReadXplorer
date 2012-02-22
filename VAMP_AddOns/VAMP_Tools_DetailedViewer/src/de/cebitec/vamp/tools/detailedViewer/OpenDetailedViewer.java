@@ -1,4 +1,4 @@
-package de.cebitec.vamp.tools.externalViewer;
+package de.cebitec.vamp.tools.detailedViewer;
 
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
@@ -10,11 +10,11 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
-public final class OpenExternalViewer implements ActionListener {
+public final class OpenDetailedViewer implements ActionListener {
 
     private final List<TrackViewer> context;
 
-    public OpenExternalViewer(List<TrackViewer> context) {
+    public OpenDetailedViewer(List<TrackViewer> context) {
         this.context = context;
     }
 
@@ -23,7 +23,7 @@ public final class OpenExternalViewer implements ActionListener {
         TrackViewer currentTrackViewer = null;
         if (context.size() > 1){
             JList trackList = new JList(context.toArray());
-            DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenExternalViewer.class, "TTL_OpenExternalViewer"));
+            DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenDetailedViewer.class, "TTL_OpenExternalViewer"));
             dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
             DialogDisplayer.getDefault().notify(dd);
             if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()){
@@ -36,8 +36,8 @@ public final class OpenExternalViewer implements ActionListener {
             currentTrackViewer = context.get(0);
         }
 
-        ExternalViewerTopComponent externalViewer = new ExternalViewerTopComponent();
-        externalViewer.setTrackConnector((TrackConnector) currentTrackViewer.getTrackCon());
-        externalViewer.open();
+        DetailedViewerTopComponent detailedViewer = new DetailedViewerTopComponent();
+        detailedViewer.setTrackConnector((TrackConnector) currentTrackViewer.getTrackCon());
+        detailedViewer.open();
     }
 }

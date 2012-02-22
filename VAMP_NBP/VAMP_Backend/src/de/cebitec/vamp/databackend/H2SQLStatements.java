@@ -7,7 +7,7 @@ package de.cebitec.vamp.databackend;
  * @author jstraube, rhilker
  */
 public class H2SQLStatements {
-
+    
     /**
      * Private constructor so this utility class can not be instantiated.
      */
@@ -151,17 +151,17 @@ public class H2SQLStatements {
     
     
     public final static String INDEX_MAPPING_START =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTART ON " + FieldNames.TABLE_MAPPINGS + " "
             + "(" + FieldNames.MAPPING_START + " ) ";
     
     
     public final static String INDEX_MAPPING_STOP =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTOP ON " + FieldNames.TABLE_MAPPINGS + " "
             + "(" + FieldNames.MAPPING_STOP + " ) ";
     
     
     public final static String INDEX_MAPPING_SEQ_ID =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSEQID ON " + FieldNames.TABLE_MAPPINGS + " "
             + "(" + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
 
     
@@ -226,8 +226,8 @@ public class H2SQLStatements {
     
     
     public static final String SETUP_SEQ_PAIR_PIVOT =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
-            + "("
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_PIVOT
+            + " ("
             + FieldNames.SEQ_PAIR_PIVOT_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " BIGINT UNSIGNED NOT NULL "
@@ -235,15 +235,25 @@ public class H2SQLStatements {
     
     
     public final static String INDEX_SEQ_PAIR_PIVOT_MID =
-            "CREATE INDEX IF NOT EXISTS INDEX_SEQ_PAIR_PIVOT_MID ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
-            + "(" + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " ) ";
+            "CREATE INDEX IF NOT EXISTS INDEX_SEQ_PAIR_PIVOT_MID ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT
+            + " (" + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " ) ";
 
     
     public final static String INDEX_SEQ_PAIR_PIVOT_SID =
-            "CREATE INDEX IF NOT EXISTS INDEX_SEQ_PAIR_PIVOT_SID ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT + " "
-            + "(" + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
+            "CREATE INDEX IF NOT EXISTS INDEX_SEQ_PAIR_PIVOT_SID ON " + FieldNames.TABLE_SEQ_PAIR_PIVOT
+            + " (" + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
     
-
-    //////////////////  statements for data insertion  /////////////////////////  
+    
+    public static final String SETUP_COVERAGE_DISTRIBUTION = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COVERAGE_DISTRIBUTION + " ( "
+            + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " BIGINT UNSIGNED NOT NULL ) ";
+    
+    
+    public static final String INDEX_COVERAGE_DIST = 
+            "CREATE INDEX IF NOT EXISTS INDEX_COVERAGE_DIST ON " + FieldNames.TABLE_COVERAGE_DISTRIBUTION
+            + " (" + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " ) ";
+  
 
 }

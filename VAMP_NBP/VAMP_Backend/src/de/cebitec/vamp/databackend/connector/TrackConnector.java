@@ -10,6 +10,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.GenericSQLQueries;
+import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.util.Properties;
 import java.sql.Connection;
@@ -305,10 +306,13 @@ public class TrackConnector {
     public int getNumOfPerfectUniqueMappingsCalculate() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
+    
+    public int getCoveredPerfectPos() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
+    }
 
     public double getPercentRefGenPerfectCovered() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
-        return absValue / genomeSize * 100;
+        return this.getCoveredPerfectPos() / genomeSize * 100;
     }
 
     public double getPercentRefGenPerfectCoveredCalculate() {
@@ -317,9 +321,12 @@ public class TrackConnector {
 
     }
 
+    public int getCoveredBestMatchPos() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
+    }
+    
     public double getPercentRefGenBmCovered() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
-        return absValue / genomeSize * 100;
+        return this.getCoveredBestMatchPos() / genomeSize * 100;
     }
 
     public double getPercentRefGenBmCoveredCalculate() {
@@ -327,9 +334,12 @@ public class TrackConnector {
         return absValue / genomeSize * 100;
     }
 
+    public int getCoveredCommonMatchPos() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
+    }
+        
     public double getPercentRefGenNErrorCovered() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
-        return absValue / genomeSize * 100;
+        return this.getCoveredCommonMatchPos() / genomeSize * 100;
     }
 
     public double getPercentRefGenNErrorCoveredCalculate() {
@@ -883,5 +893,57 @@ public class TrackConnector {
 
         return seqPairData;
 
+    }
+
+    /**
+     * Fetches the {@link DiscreteCountingDistribution} for this track.
+     * @return the {@link DiscreteCountingDistribution} for this track.
+     */
+    public DiscreteCountingDistribution getCoverageIncreaseDistribution() {
+        DiscreteCountingDistribution covIncreaseDistribution = new DiscreteCountingDistribution();
+        
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_INCREASE_DISTRIBUTION);
+            fetch.setInt(1, this.trackID);
+
+            ResultSet rs = fetch.executeQuery();
+            while (rs.next()) {
+                int coverageIntervalId = rs.getInt(FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID);
+                int count = rs.getInt(FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT);
+                covIncreaseDistribution.setCountForIndex(coverageIntervalId, count);
+            }
+            rs.close();
+            fetch.close();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return covIncreaseDistribution;
+    }
+    
+    /**
+     * Fetches the {@link DiscreteCountingDistribution} for this track.
+     * @return the {@link DiscreteCountingDistribution} for this track.
+     */
+    public void insertCoverageIncreaseDistribution(DiscreteCountingDistribution distribution) {
+        
+        int[] covDistribution = distribution.getDiscreteCountingDistribution();
+        try {
+            PreparedStatement insert = con.prepareStatement(SQLStatements.INSERT_COVERAGE_DISTRIBUTION);
+            
+            for (int i = 0; i < covDistribution.length; ++i) {
+                insert.setInt(1, this.trackID);
+                insert.setInt(2, i);
+                insert.setInt(3, covDistribution[i]);
+                insert.addBatch();
+            }
+            
+            insert.executeBatch();
+            insert.close();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

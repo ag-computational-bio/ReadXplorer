@@ -13,6 +13,8 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -149,6 +151,10 @@ public class GeneStartsResultPanel extends javax.swing.JPanel {
             rowData[8] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
 
             model.addRow(rowData);
+            
+            TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+            this.geneStartTable.setRowSorter(sorter);
+            sorter.setModel(model);
         }
     }
     

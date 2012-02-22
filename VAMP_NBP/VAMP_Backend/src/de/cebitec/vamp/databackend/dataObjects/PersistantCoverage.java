@@ -7,8 +7,8 @@ import java.util.HashMap;
  * @author ddoppmeier
  */
 public class PersistantCoverage {
-
-    //Normally only mult is needed, but not num!
+    
+    //2 for fwd (mult = all & num = without duplicates), and 2 rev
     
     private int leftBound;
     private int rightBound;
@@ -105,70 +105,161 @@ public class PersistantCoverage {
         }
     }
 
-    public void setBestMatchFwdMult(int logPos, int value) {
-        bestMatchFwdMult.put(logPos, value);
+    /**
+     * Set the best match forward coverage with duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setBestMatchFwdMult(int logPos, int coverage) {
+        bestMatchFwdMult.put(logPos, coverage);
     }
 
-    public void setBestMatchFwdNum(int logPos, int value) {
-        bestMatchFwdNum.put(logPos, value);
+    /**
+     * Set the best match forward coverage WITHOUT duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setBestMatchFwdNum(int logPos, int coverage) {
+        bestMatchFwdNum.put(logPos, coverage);
     }
 
-    public void setBestMatchRevMult(int logPos, int value) {
-        bestMatchRevMult.put(logPos, value);
+    /**
+     * Set the best match reverse coverage with duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setBestMatchRevMult(int logPos, int coverage) {
+        bestMatchRevMult.put(logPos, coverage);
     }
 
-    public void setBestMatchRevNum(int logPos, int value) {
-        bestMatchRevNum.put(logPos, value);
+    /**
+     * Set the best match reverse coverage WITHOUT duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setBestMatchRevNum(int logPos, int coverage) {
+        bestMatchRevNum.put(logPos, coverage);
     }
 
-    public void setCommonFwdMult(int logPos, int value) {
-        commonFwdMult.put(logPos, value);
+    /**
+     * Set the common match forward coverage with duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonFwdMult(int logPos, int coverage) {
+        commonFwdMult.put(logPos, coverage);
     }
 
-    public void setCommonFwdNum(int logPos, int value) {
-        commonFwdNum.put(logPos, value);
+    /**
+     * Set the common match forward coverage WITHOUT duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonFwdNum(int logPos, int coverage) {
+        commonFwdNum.put(logPos, coverage);
     }
 
-    public void setCommonRevMult(int logPos, int value) {
-        commonRevMult.put(logPos, value);
+    /**
+     * Set the common match reverse coverage with duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonRevMult(int logPos, int coverage) {
+        commonRevMult.put(logPos, coverage);
     }
 
-    public void setCommonRevNum(int logPos, int value) {
-        commonRevNum.put(logPos, value);
+    /**
+     * Set the common match reverse coverage WITHOUT duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonRevNum(int logPos, int coverage) {
+        commonRevNum.put(logPos, coverage);
     }
 
-    public void setPerfectFwdMult(int logPos, int value) {
-        perfectFwdMult.put(logPos, value);
+    /**
+     * Set the perfect match forward coverage with duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setPerfectFwdMult(int logPos, int coverage) {
+        perfectFwdMult.put(logPos, coverage);
     }
 
-    public void setPerfectFwdNum(int logPos, int value) {
-        perfectFwdNum.put(logPos, value);
+    /**
+     * Set the perfect match forward coverage WITHOUT duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setPerfectFwdNum(int logPos, int coverage) {
+        perfectFwdNum.put(logPos, coverage);
     }
 
-    public void setPerfectRevMult(int logPos, int value) {
-        perfectRevMult.put(logPos, value);
+    /**
+     * Set the perfect match reverse coverage with duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setPerfectRevMult(int logPos, int coverage) {
+        perfectRevMult.put(logPos, coverage);
     }
 
-    public void setPerfectRevNum(int logPos, int value) {
-        perfectRevNum.put(logPos, value);
+    /**
+     * Set the perfect match reverse coverage WITHOUT duplicates.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setPerfectRevNum(int logPos, int coverage) {
+        perfectRevNum.put(logPos, coverage);
     }
     
 
 
-     public void setCommonFwdMultTrack1(int logPos, int value) {
-        commonFwdMultTrack1.put(logPos, value);
+    /**
+     * Set the common match forward coverage with duplicates for track 1 in a
+     * two track analysis case.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonFwdMultTrack1(int logPos, int coverage) {
+        commonFwdMultTrack1.put(logPos, coverage);
     }
-    public void setCommonFwdMultTrack2(int logPos, int value) {
-        commonFwdMultTrack2.put(logPos, value);
+    
+    /**
+     * Set the common match forward coverage with duplicates for track 2 in a
+     * two track analysis case.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonFwdMultTrack2(int logPos, int coverage) {
+        commonFwdMultTrack2.put(logPos, coverage);
     }
-    public void setCommonRevMultTrack1(int logPos, int value) {
-        commonRevMultTrack1.put(logPos, value);
+    
+    /**
+     * Set the common match reverse coverage with duplicates for track 1 in a
+     * two track analysis case.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonRevMultTrack1(int logPos, int coverage) {
+        commonRevMultTrack1.put(logPos, coverage);
     }
-    public void setCommonRevMultTrack2(int logPos, int value) {
-        commonRevMultTrack2.put(logPos, value);
+    
+    /**
+     * Set the common match reverse coverage with duplicates for track 2 in a
+     * two track analysis case.
+     * @param logPos position
+     * @param coverage coverage value 
+     */
+    public void setCommonRevMultTrack2(int logPos, int coverage) {
+        commonRevMultTrack2.put(logPos, coverage);
     }
 
 
+    /**
+     * Get the best match forward coverage with duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getBestMatchFwdMult(int logPos) {
         if (bestMatchFwdMult.containsKey(logPos)) {
             return bestMatchFwdMult.get(logPos);
@@ -177,6 +268,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the best match forward coverage WITHOUT duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getBestMatchFwdNum(int logPos) {
         if (bestMatchFwdNum.containsKey(logPos)) {
             return bestMatchFwdNum.get(logPos);
@@ -185,6 +280,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the best match reverse coverage with duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getBestMatchRevMult(int logPos) {
         if (bestMatchRevMult.containsKey(logPos)) {
             return bestMatchRevMult.get(logPos);
@@ -193,6 +292,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the best match reverse coverage WITHOUT duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getBestMatchRevNum(int logPos) {
         if (bestMatchRevNum.containsKey(logPos)) {
             return bestMatchRevNum.get(logPos);
@@ -201,6 +304,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match forward coverage with duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonFwdMult(int logPos) {
         if (commonFwdMult.containsKey(logPos)) {
             return commonFwdMult.get(logPos);
@@ -209,6 +316,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match forward coverage WITHOUT duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonFwdNum(int logPos) {
         if (commonFwdNum.containsKey(logPos)) {
             return commonFwdNum.get(logPos);
@@ -217,6 +328,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match reverse coverage with duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonRevMult(int logPos) {
         if (commonRevMult.containsKey(logPos)) {
             return commonRevMult.get(logPos);
@@ -225,6 +340,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match reverse coverage WITHOUT duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonRevNum(int logPos) {
         if (commonRevNum.containsKey(logPos)) {
             return commonRevNum.get(logPos);
@@ -233,6 +352,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the perfect match forward coverage with duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getPerfectFwdMult(int logPos) {
         if (perfectFwdMult.containsKey(logPos)) {
             return perfectFwdMult.get(logPos);
@@ -241,6 +364,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the perfect match forward coverage WITHOUT duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getPerfectFwdNum(int logPos) {
         if (perfectFwdNum.containsKey(logPos)) {
             return perfectFwdNum.get(logPos);
@@ -249,6 +376,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the perfect match reverse coverage with duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getPerfectRevMult(int logPos) {
         if (perfectRevMult.containsKey(logPos)) {
             return perfectRevMult.get(logPos);
@@ -257,6 +388,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the perfect match reverse coverage WITHOUT duplicates.
+     * @param logPos position whose coverage is needed
+     */
     public int getPerfectRevNum(int logPos) {
         if (perfectRevNum.containsKey(logPos)) {
             return perfectRevNum.get(logPos);
@@ -265,6 +400,11 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match forward coverage with duplicates for track 1 in a
+     * two track analysis case.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonFwdMultTrack1(int logPos) {
         if (commonFwdMultTrack1.containsKey(logPos)) {
             return commonFwdMultTrack1.get(logPos);
@@ -273,6 +413,11 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match reverse coverage with duplicates for track 1 in a
+     * two track analysis case.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonRevMultTrack1(int logPos) {
         if (commonRevMultTrack1.containsKey(logPos)) {
             return commonRevMultTrack1.get(logPos);
@@ -281,6 +426,11 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match forward coverage with duplicates for track 2 in a
+     * two track analysis case.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonFwdMultTrack2(int logPos) {
         if (commonFwdMultTrack2.containsKey(logPos)) {
             return commonFwdMultTrack2.get(logPos);
@@ -289,6 +439,11 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * Get the common match reverse coverage with duplicates for track 2 in a
+     * two track analysis case.
+     * @param logPos position whose coverage is needed
+     */
     public int getCommonRevMultTrack2(int logPos) {
         if (commonRevMultTrack2.containsKey(logPos)) {
             return commonRevMultTrack2.get(logPos);
@@ -298,7 +453,12 @@ public class PersistantCoverage {
     }
 
 
-
+    /**
+     * @param posToCheck the position which should be checked if it is in the 
+     * bounds
+     * @return true, if the posToCheck is within the bounds of this PersistantCoverage
+     * and false otherwise
+     */
     public boolean isInBounds(int posToCheck) {
         if (posToCheck < leftBound || posToCheck > rightBound) {
             return false;
@@ -307,6 +467,10 @@ public class PersistantCoverage {
         }
     }
 
+    /**
+     * @return true, if this PersistantCoverage was created for handling of two 
+     * tracks and false, if it is only for one track.
+     */
     public boolean isTwoTracks() {
         return twoTracks;
     }

@@ -229,6 +229,9 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT_SID).executeUpdate();
             
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
+            
+            con.prepareStatement(H2SQLStatements.SETUP_COVERAGE_DISTRIBUTION).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_COVERAGE_DIST).executeUpdate();
 
             this.checkDBStructure();
 
@@ -260,6 +263,7 @@ public class ProjectConnector {
             con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
             con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).execute();
+            con.prepareStatement(MySQLStatements.SETUP_COVERAGE_DISTRIBUTION).executeUpdate();
 
             this.checkDBStructure();
 
@@ -550,6 +554,9 @@ public class ProjectConnector {
 
                 // insert coverage for track
                 int batchCounter = 1;
+                int coveredPerfectPos = 0;
+                int coveredBestMatchPos = 0;
+                int coveredCommonMatchPos = 0;
                 CoverageContainer cov = track.getCoverageContainer();
                 Iterator<Integer> covsIt = cov.getCoveredPositions().iterator();
                 while (covsIt.hasNext()) {
@@ -576,9 +583,32 @@ public class ProjectConnector {
                             batchCounter = 0;
                             insertCoverage.executeBatch();
                         }
+                        if (cov.getNErrorMappingsForwardCoverage(pos) > 0) {
+                            ++coveredCommonMatchPos;
+                            if (cov.getBestMappingForwardCoverage(pos) > 0) {
+                                ++coveredBestMatchPos;
+                                if (cov.getZeroErrorMappingsForwardCoverage(pos) > 0) {
+                                    ++coveredPerfectPos;
+                                }
+                            }
+                        }
+                        if (cov.getNErrorMappingsReverseCoverage(pos) > 0) {
+                            ++coveredCommonMatchPos;
+                            if (cov.getBestMappingReverseCoverage(pos) > 0) {
+                                ++coveredBestMatchPos;
+                                if (cov.getZeroErrorMappingsReverseCoverage(pos) > 0) {
+                                    ++coveredPerfectPos;
+                                }
+                            }
+                        }
                 }
                 insertCoverage.executeBatch();
                 insertCoverage.close();
+                
+                //here we get the calculations for free, so we store it in this step
+                cov.setCoveredPerfectPositions(coveredPerfectPos);
+                cov.setCoveredBestMatchPositions(coveredBestMatchPos);
+                cov.setCoveredCommonMatchPositions(coveredCommonMatchPos);
                 
             } catch (SQLException ex) {
                 ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
@@ -642,9 +672,28 @@ public class ProjectConnector {
             long id = -1;
             id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
 
-                coveragePerf = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
-                coverageBM = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-                coverageComplete = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_NUM, con, trackID);
+                CoverageContainer cov = track.getCoverageContainer();
+                if (cov.getCoveredPerfectPositions() > 0) {
+                    coveragePerf = cov.getCoveredPerfectPositions();
+                } else {
+                    coveragePerf = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, 
+                            SQLStatements.GET_NUM, con, trackID);
+                }
+                
+                if (cov.getCoveredBestMatchPositions() > 0) {
+                    coverageBM = cov.getCoveredBestMatchPositions();
+                } else {
+                    coverageBM = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE, 
+                            SQLStatements.GET_NUM, con, trackID);
+                }
+                
+                if (cov.getCoveredCommonMatchPositions() > 0) {
+                    coverageComplete = cov.getCoveredCommonMatchPositions();
+                } else {
+                    coverageComplete = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, 
+                            SQLStatements.GET_NUM, con, trackID);
+                }
+                
                 noUniqueMappings = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SINGLETON_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
                 noUniqueSeq = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
                 numReads = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
@@ -885,7 +934,7 @@ public class ProjectConnector {
             this.storeCoverage(track);
             this.storeMappings(track);
             this.storeDiffs(track);
-            this.storeTrackStatistics(track);
+            this.storeTrackStatistics(track); //needs to be called after storeCoverage
         }
             this.storePositionTable(track);
 

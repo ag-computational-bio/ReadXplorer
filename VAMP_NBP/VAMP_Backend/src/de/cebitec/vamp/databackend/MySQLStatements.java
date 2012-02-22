@@ -370,4 +370,10 @@ public class MySQLStatements {
     //public final static String FETCH_SNPS_FROM_SNP_TABLE =
     //        "SELECT "
     
+        public static final String SETUP_COVERAGE_DISTRIBUTION = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COVERAGE_DISTRIBUTION + " ( "
+            + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " BIGINT UNSIGNED NOT NULL,"
+            + " INDEX (" + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + ")) ";
 }

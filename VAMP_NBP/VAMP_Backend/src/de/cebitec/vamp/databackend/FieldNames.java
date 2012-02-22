@@ -25,7 +25,8 @@ public class FieldNames {
     public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
     public final static String TABLE_POSITIONS = "POSITIONS";
-    public final static String TABLE_STATISTICS = "STATISTICS";   
+    public final static String TABLE_STATISTICS = "STATISTICS";  
+    public final static String TABLE_COVERAGE_DISTRIBUTION = "COVERAGE_DISTRIBUTION";
     
     
     ////////////////////////  tables fields  //////////////////////////////// 
@@ -175,5 +176,9 @@ public class FieldNames {
     // unique sequences = num mapped seq = count all distinct seq ids
     // num mappings = count ALL mapping ids
     // num reads = extra calculation: count all reads during import process, also possible later
+    
+    public static final String COVERAGE_DISTRIBUTION_TRACK_ID = "TRACK_ID";
+    public static final String COVERAGE_DISTRIBUTION_COV_INTERVAL_ID = "COV_INTERVAL_ID";
+    public static final String COVERAGE_DISTRIBUTION_INC_COUNT = "INC_COUNT";
     
 }
