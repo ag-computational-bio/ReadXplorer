@@ -1,6 +1,6 @@
 package de.cebitec.vamp.databackend;
 
-
+import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 
 /**
@@ -278,6 +278,18 @@ public class SQLStatements {
 
     
     /**
+     * Insert a new coverage distribution for a track with all 35 distribution fields.
+     */
+    public static String INSERT_COVERAGE_DISTRIBUTION = 
+            "INSERT INTO "+FieldNames.TABLE_COVERAGE_DISTRIBUTION+" " +
+            "(" +
+                FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID+", " +
+                FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID+", " +
+                FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " " +
+            ") " +
+            "VALUES (?,?,?)";
+    
+    /**
      * Delete the track data.
      */
     public final static String DELETE_DIFFS_FROM_TRACK =
@@ -501,7 +513,7 @@ public class SQLStatements {
             "(SELECT "+
                 FieldNames.COVERAGE_POSITION+", "+
                 FieldNames.COVERAGE_BM_FW_MULT+", " +
-                FieldNames.COVERAGE_BM_FW_NUM+", " +
+                FieldNames.COVERAGE_BM_FW_NUM+", " + //TODO: was ist mit num? wird nie benutzt!!!
                 FieldNames.COVERAGE_BM_RV_MULT+", " +
                 FieldNames.COVERAGE_BM_RV_NUM+", " +
                 FieldNames.COVERAGE_N_FW_MULT+", " +
@@ -517,6 +529,99 @@ public class SQLStatements {
             "WHERE "+
                 FieldNames.COVERAGE_POSITION+ " between ? and ? and "+
                 FieldNames.COVERAGE_TRACK+" = ? )";
+    
+    
+    public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
+            "SELECT "+
+                FieldNames.COVERAGE_POSITION+", "+
+                FieldNames.COVERAGE_N_FW_MULT+", " +
+                FieldNames.COVERAGE_N_RV_MULT +
+            " FROM " +
+                FieldNames.TABLE_COVERAGE +
+            " WHERE "+
+                FieldNames.COVERAGE_POSITION+ " BETWEEN ? AND ? and "+
+                FieldNames.COVERAGE_TRACK+" = ? ";
+
+    
+    public final static String FETCH_COVERAGE_FOR_TRACK =
+            "SELECT "+
+                FieldNames.COVERAGE_POSITION + ", " +
+                FieldNames.COVERAGE_N_FW_MULT + " + " +
+                FieldNames.COVERAGE_N_RV_MULT + " as " + FieldNames.COVERAGE_N_MULT +
+            " FROM " +
+                FieldNames.TABLE_COVERAGE +
+            " WHERE "+
+                FieldNames.COVERAGE_TRACK + " = ?  and " + FieldNames.COVERAGE_POSITION + " between ? and ?";
+
+    
+    public static final String FETCH_COVERAGE_BEST_FOR_INTERVAL = 
+            "SELECT " + 
+                FieldNames.COVERAGE_POSITION + ", " +
+                FieldNames.COVERAGE_ZERO_FW_MULT+", " +
+                FieldNames.COVERAGE_ZERO_RV_MULT+", " +
+                FieldNames.COVERAGE_BM_FW_MULT+", " +
+                FieldNames.COVERAGE_BM_RV_MULT+
+            " FROM " +
+                FieldNames.TABLE_COVERAGE +
+            " WHERE " +
+                FieldNames.COVERAGE_TRACK + " = ? AND " +
+                FieldNames.COVERAGE_POSITION + " BETWEEN ? AND ?";
+
+    public final static String FETCH_TRACKS_FOR_GENOME =
+            "SELECT "+
+                FieldNames.TRACK_ID+", "+
+                FieldNames.TRACK_DESCRIPTION+", "+
+                FieldNames.TRACK_TIMESTAMP+", " +
+                FieldNames.TRACK_REFERENCE_ID +
+            " FROM "+
+                FieldNames.TABLE_TRACKS +
+            " WHERE "+
+                FieldNames.TRACK_REFERENCE_ID+" = ? ";
+
+    
+    public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
+            "SELECT A."+FieldNames.DIFF_POSITION+", " +
+                    "A."+FieldNames.DIFF_BASE+", " +
+                    "A."+FieldNames.MAPPING_DIRECTION+", " +
+                    "A."+FieldNames.DIFF_TYPE+", " +
+                    "A."+FieldNames.DIFF_ORDER+", " +
+                    "A.mult_count, " +
+                    "C."+FieldNames.COVERAGE_BM_FW_MULT+", " +
+                    "C."+FieldNames.COVERAGE_BM_RV_MULT+" " +
+            "FROM "+
+		"(SELECT " +
+                    FieldNames.DIFF_POSITION+", "+
+                    FieldNames.DIFF_BASE+", "+
+                    FieldNames.DIFF_TYPE+", "+
+                    FieldNames.DIFF_ORDER+", " +
+                    FieldNames.MAPPING_DIRECTION+", " +
+                    "SUM("+FieldNames.MAPPING_NUM_OF_REPLICATES+") as mult_count  "+
+		"FROM "+
+                    FieldNames.TABLE_MAPPINGS+" AS M " +
+                    "left join "+FieldNames.TABLE_DIFF+" AS D " +
+                    "on D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" " +
+		"WHERE " +
+                    "M."+FieldNames.MAPPING_TRACK+" = ? and M."+FieldNames.MAPPING_IS_BEST_MAPPING+" = 1 and M."+
+                    FieldNames.MAPPING_START+" BETWEEN ? AND ? and D."+FieldNames.DIFF_POSITION+" BETWEEN ? AND ? " +
+		"GROUP BY " +
+                    "D."+FieldNames.DIFF_POSITION+", "+
+                    "D."+FieldNames.DIFF_ORDER+", "+
+                    "D."+FieldNames.DIFF_BASE+", " +
+                    "M."+FieldNames.MAPPING_DIRECTION+" ,"+
+                    "D."+FieldNames.DIFF_TYPE+"" +
+                ") as A , "+
+		FieldNames.TABLE_COVERAGE+" AS C "+
+            "WHERE " +
+                "C."+FieldNames.COVERAGE_TRACK+" = ? AND " +
+                "C."+FieldNames.COVERAGE_POSITION+" = A."+FieldNames.DIFF_POSITION;
+    
+    
+    
+    public final static String GET_LATEST_STATISTICS_ID =
+        "SELECT " +
+            "MAX("+FieldNames.STATISTICS_ID +") AS LATEST_ID " +
+        "FROM " +
+            FieldNames.TABLE_STATISTICS;
     
     
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
@@ -580,89 +685,32 @@ public class SQLStatements {
             "on " +
                 "M."+FieldNames.MAPPING_ID+" = D."+FieldNames.DIFF_MAPPING_ID;
     
-
-    public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
-            "SELECT "+
-                FieldNames.COVERAGE_POSITION+", "+
-                FieldNames.COVERAGE_N_FW_MULT+", " +
-                FieldNames.COVERAGE_N_RV_MULT+" " +
-            "FROM " +
-                FieldNames.TABLE_COVERAGE+" " +
-            "WHERE "+
-                FieldNames.COVERAGE_POSITION+ " BETWEEN ? AND ? and "+
-                FieldNames.COVERAGE_TRACK+" = ? ";
-
     
-    public final static String FETCH_COVERAGE_FOR_TRACK =
-            "SELECT "+
-                FieldNames.COVERAGE_POSITION+", "+
-
-                FieldNames.COVERAGE_N_FW_MULT+" + " +FieldNames.COVERAGE_N_RV_MULT+
-               " as " + FieldNames.COVERAGE_N_MULT+
-
-            " FROM " +
-                FieldNames.TABLE_COVERAGE+" " +
-            "WHERE "+
-                FieldNames.COVERAGE_TRACK+" = ?  and " + FieldNames.COVERAGE_POSITION + " between ? and ?";
-
-
-    public final static String FETCH_TRACKS_FOR_GENOME =
-            "SELECT "+
-                FieldNames.TRACK_ID+", "+
-                FieldNames.TRACK_DESCRIPTION+", "+
-                FieldNames.TRACK_TIMESTAMP+", " +
-                FieldNames.TRACK_REFERENCE_ID+" "+//", "+
-                //FieldNames.TRACK_RUN+" " +
-            "FROM "+
-                FieldNames.TABLE_TRACKS+" " +
-            "WHERE "+
-                FieldNames.TRACK_REFERENCE_ID+" = ? ";
-
+    public final static String FETCH_MAPPINGS_WITHOUT_DIFFS =
+        "SELECT "
+            + FieldNames.MAPPING_ID + ", "
+            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+            + FieldNames.MAPPING_NUM_OF_REPLICATES + ", "
+            + FieldNames.MAPPING_DIRECTION + ", "
+            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+            + FieldNames.MAPPING_SEQUENCE_ID + ", "
+            + FieldNames.MAPPING_START + ", "
+            + FieldNames.MAPPING_STOP + ", "
+            + FieldNames.MAPPING_TRACK + " "
+        + "FROM "
+            + FieldNames.TABLE_MAPPINGS + " "
+        + "WHERE "
+            + FieldNames.MAPPING_START + " BETWEEN ? AND ? and "
+//            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? and "
+            + FieldNames.MAPPING_TRACK + " = ? "
+        + "ORDER BY " + FieldNames.MAPPING_START;
     
-    public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
-            "SELECT A."+FieldNames.DIFF_POSITION+", " +
-                    "A."+FieldNames.DIFF_BASE+", " +
-                    "A."+FieldNames.MAPPING_DIRECTION+", " +
-                    "A."+FieldNames.DIFF_TYPE+", " +
-                    "A."+FieldNames.DIFF_ORDER+", " +
-                    "A.mult_count, " +
-                    "C."+FieldNames.COVERAGE_BM_FW_MULT+", " +
-                    "C."+FieldNames.COVERAGE_BM_RV_MULT+" " +
-            "FROM "+
-		"(SELECT " +
-                    FieldNames.DIFF_POSITION+", "+
-                    FieldNames.DIFF_BASE+", "+
-                    FieldNames.DIFF_TYPE+", "+
-                    FieldNames.DIFF_ORDER+", " +
-                    FieldNames.MAPPING_DIRECTION+", " +
-                    "SUM("+FieldNames.MAPPING_NUM_OF_REPLICATES+") as mult_count  "+
-		"FROM "+
-                    FieldNames.TABLE_MAPPINGS+" AS M " +
-                    "left join "+FieldNames.TABLE_DIFF+" AS D " +
-                    "on D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" " +
-		"WHERE " +
-                    "M."+FieldNames.MAPPING_TRACK+" = ? and M."+FieldNames.MAPPING_IS_BEST_MAPPING+" = 1 and M."+
-                    FieldNames.MAPPING_START+" BETWEEN ? AND ? and D."+FieldNames.DIFF_POSITION+" BETWEEN ? AND ? " +
-		"GROUP BY " +
-                    "D."+FieldNames.DIFF_POSITION+", "+
-                    "D."+FieldNames.DIFF_ORDER+", "+
-                    "D."+FieldNames.DIFF_BASE+", " +
-                    "M."+FieldNames.MAPPING_DIRECTION+" ,"+
-                    "D."+FieldNames.DIFF_TYPE+"" +
-                ") as A , "+
-		FieldNames.TABLE_COVERAGE+" AS C "+
-            "WHERE " +
-                "C."+FieldNames.COVERAGE_TRACK+" = ? AND " +
-                "C."+FieldNames.COVERAGE_POSITION+" = A."+FieldNames.DIFF_POSITION;
-    
-    
-    
-    public final static String GET_LATEST_STATISTICS_ID =
-        "SELECT " +
-            "MAX("+FieldNames.STATISTICS_ID +") AS LATEST_ID " +
-        "FROM " +
-            FieldNames.TABLE_STATISTICS;
-    
+    /*
+     * <1min variante mit start between ? and ?
+     * 3min: variante mit start < ? & start < ?
+     * 7min: variante mit start < ? & stop > ?
+     */
+
 
     public final static String FETCH_GENOME_GAPS_IN_TRACK_FOR_INTERVAL =
             "SELECT "+
@@ -1456,6 +1504,7 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
    public static final String GET_LATEST_TRACK_SEQUENCE_PAIR_ID = 
             "SELECT MAX("+FieldNames.TRACK_SEQUENCE_PAIR_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_TRACKS;
    
+   
    public static final String GET_CURRENT_READLENGTH = 
            "SELECT " + 
                 FieldNames.MAPPING_STOP + ", " +
@@ -1465,6 +1514,16 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
            " WHERE " +
                 FieldNames.MAPPING_TRACK + " = ? " +
            " LIMIT 1 ";
+   
+   
+    public static final String FETCH_COVERAGE_INCREASE_DISTRIBUTION = 
+            "SELECT " +
+                FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + ", " +
+                FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " " +
+            " FROM " + 
+                FieldNames.TABLE_COVERAGE_DISTRIBUTION + 
+            " WHERE " +
+                FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? ";
     
 //        public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("

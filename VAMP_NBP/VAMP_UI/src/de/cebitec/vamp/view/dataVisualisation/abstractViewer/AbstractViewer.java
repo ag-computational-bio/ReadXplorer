@@ -24,16 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 /**
  * AbstractViewer ist a superclass for displaying genome related information.
  * It provides methods to compute the physical position (meaning pixel) for any
  * logical position (base position in genome) and otherwise. Depending on it's
  * own size and settings in the ViewerController AbstractViewer knows, which
- * intervall from the genome should be diplayed currently and provides getter
- * methods for these values
- * @author ddoppmeier
+ * interval from the genome should currently be diplayed and provides getter
+ * methods for these values. Tooltips in this viewer are initially shown for 
+ * 20 seconds.
+ * @author ddoppmeier, rhilker
  */
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {
 
@@ -69,6 +72,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
+    private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
@@ -271,6 +275,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 basePanel.reportMouseOverPaintingStatus(false);
             }
         });
+        
+        //ensure the tooltips are shown for 20 seconds to be able to read the data
+        ToolTipManager.sharedInstance().setDismissDelay(20000);
+
     }
 
     private void setPanMode(int position) {
@@ -386,8 +394,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     /**
      * Assign new logical bounds to this panel, meaning the range from the genome
-     * that should be displayed
-     * @param bounds Information about the intervall that should be displayed
+     * that should be displayed. In case the abstract viewer was handed over a scrollbar
+     * the value of the scrollbar is adjusted to the middle.
+     * @param bounds Information about the interval that should be displayed
      * and the current position
      */
     @Override
@@ -407,6 +416,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         if (this.isActive()) {
             this.boundsChangedHook();
             this.repaint();
+        }
+        
+        if (this.scrollBar != null) {
+            this.scrollBar.setValue(this.scrollBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
         }
     }
 
@@ -656,5 +669,22 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public Dimension getBasePanelSize() {
         return this.basePanel.getSize();
+    }
+
+    /**
+     * A scrollbar should be handed over, in case the scrollbar should adapt its
+     * value to the middle position, whenever the genome position was updated.
+     * @param scrollBar the scrollbar which should adapt
+     */
+    public void setScrollBar(JScrollBar scrollBar) {
+        this.scrollBar = scrollBar;
+    }
+    
+    /**
+     * In case a scrollbar was handed over to the viewer, it is returned, otherwise
+     * null. The scrollbar will allow you to change the scrollbar value.
+     */
+    public JScrollBar getScrollBar() {
+        return this.scrollBar;
     }
 }

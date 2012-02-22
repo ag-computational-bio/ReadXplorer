@@ -106,7 +106,7 @@ public class BioJavaParser implements ReferenceParserI {
                 RichSequence seq = null;
                 try {
                     seq = seqIter.nextRichSequence();
-                    this.sendErrorMsg("rich seq set");
+//                    this.sendErrorMsg("rich seq set");
 
                     refGenome.setDescription(refGenJob.getDescription());
                     refGenome.setName(refGenJob.getName());

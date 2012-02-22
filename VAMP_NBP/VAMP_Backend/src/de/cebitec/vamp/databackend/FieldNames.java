@@ -25,7 +25,8 @@ public class FieldNames {
     public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
     public final static String TABLE_POSITIONS = "POSITIONS";
-    public final static String TABLE_STATISTICS = "STATISTICS";   
+    public final static String TABLE_STATISTICS = "STATISTICS";  
+    public final static String TABLE_COVERAGE_DISTRIBUTION = "COVERAGE_DISTRIBUTION";
     
     
     ////////////////////////  tables fields  //////////////////////////////// 
@@ -68,8 +69,8 @@ public class FieldNames {
     public final static String COVERAGE_TRACK = "TRACK_ID";
     public final static String COVERAGE_POSITION = "POSITION";
     public final static String COVERAGE_BM_FW_MULT =    "BEST_MATCH_FORWARD_REDUNDANT";
-    public final static String COVERAGE_BM_FW_NUM =     "BEST_MATCH_FORWARD_NON_REDUNDANT";
-    public final static String COVERAGE_BM_RV_MULT =    "BEST_MATCH_REVERSE_REDUNDANT";
+    public final static String COVERAGE_BM_FW_NUM =     "BEST_MATCH_FORWARD_NON_REDUNDANT"; //NON_REDUNDANT is what you want!
+    public final static String COVERAGE_BM_RV_MULT =    "BEST_MATCH_REVERSE_REDUNDANT"; //check if this is needed anyway
     public final static String COVERAGE_BM_RV_NUM =     "BEST_MATCH_REVERSE_NON_REDUNDANT";
     public final static String COVERAGE_ZERO_FW_MULT =  "PERFECT_MATCH_FORWARD_REDUNDANT";
     public final static String COVERAGE_ZERO_FW_NUM =   "PERFECT_MATCH_FORWARD_NON_REDUNDANT";
@@ -175,5 +176,9 @@ public class FieldNames {
     // unique sequences = num mapped seq = count all distinct seq ids
     // num mappings = count ALL mapping ids
     // num reads = extra calculation: count all reads during import process, also possible later
+    
+    public static final String COVERAGE_DISTRIBUTION_TRACK_ID = "TRACK_ID";
+    public static final String COVERAGE_DISTRIBUTION_COV_INTERVAL_ID = "COV_INTERVAL_ID";
+    public static final String COVERAGE_DISTRIBUTION_INC_COUNT = "INC_COUNT";
     
 }

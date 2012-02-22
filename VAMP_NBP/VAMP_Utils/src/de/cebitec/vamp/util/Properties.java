@@ -35,4 +35,8 @@ public class Properties {
     public static final byte SEQ_PAIRS = 1;
     public static final byte SINGLE_MAPPINGS = 2;
     
+    public static final byte PERFECT_COVERAGE = 1;
+    public static final byte BEST_MATCH_COVERAGE = 2;
+    public static final byte COMPLETE_COVERAGE = 3;
+    
 }

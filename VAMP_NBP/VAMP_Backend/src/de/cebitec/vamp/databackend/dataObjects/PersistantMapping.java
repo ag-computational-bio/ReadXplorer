@@ -7,7 +7,7 @@ import java.util.TreeSet;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class PersistantMapping implements PersistantObject {
 
@@ -15,7 +15,7 @@ public class PersistantMapping implements PersistantObject {
     private int start;
     private int trackId;
     private int stop;
-    private boolean forwardStrand;
+    private byte strand;
     private Map<Integer, PersistantDiff> diffs;
     private int count;
     private TreeMap<Integer, TreeSet<PersistantReferenceGap>> gaps;
@@ -29,7 +29,7 @@ public class PersistantMapping implements PersistantObject {
         this.stop = stop;
         this.count = count;
         this.trackId = trackId;
-        forwardStrand = (direction == 1 ?  true :  false);
+        strand = direction;
         diffs = new HashMap<Integer, PersistantDiff>();
         gaps = new TreeMap<Integer, TreeSet<PersistantReferenceGap>>();
         this.errors = errors;
@@ -37,7 +37,7 @@ public class PersistantMapping implements PersistantObject {
         this.isBestMatch = isBestMapping;
     }
 
-    public int getCoverage() {
+    public int getNbReplicates() {
         return count;
     }
     
@@ -55,8 +55,8 @@ public class PersistantMapping implements PersistantObject {
         return id;
     }
 
-    public boolean isForwardStrand() {
-        return forwardStrand;
+    public byte getStrand() {
+        return strand;
     }
 
     public int getTrackId() {

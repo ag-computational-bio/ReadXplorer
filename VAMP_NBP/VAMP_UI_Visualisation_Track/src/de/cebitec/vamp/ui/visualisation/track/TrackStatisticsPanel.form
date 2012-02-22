@@ -27,32 +27,16 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="labelNameLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="numMappingsLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="uniqueSequencesLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="allReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                  <Component id="numberReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="numberReadsAbsLabel" pref="45" max="32767" attributes="0"/>
-                  <Component id="uniqueSequencesAbsLabel" pref="45" max="32767" attributes="0"/>
-                  <Component id="numUniqueMappingsAbsLabel" pref="45" max="32767" attributes="0"/>
-                  <Component id="numMappingsAbsLabel" pref="45" max="32767" attributes="0"/>
-                  <Component id="nameLabel" alignment="0" pref="45" max="32767" attributes="0"/>
-              </Group>
-              <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="-2" pref="49" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="perfectMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
                           <Component id="bestMatchMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
+                          <Component id="numberReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="uniqueSequencesLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="allReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -82,6 +66,31 @@
           </Group>
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
           <Component id="progressbar" alignment="0" pref="188" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="68" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="labelNameLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="numMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="numMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
+                          <Component id="nameLabel" alignment="1" pref="55" max="32767" attributes="0"/>
+                          <Component id="numUniqueMappingsAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="uniqueSequencesAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
+                          <Component id="numberReadsAbsLabel" alignment="1" pref="55" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -89,28 +98,28 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="labelNameLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="nameLabel" alignment="0" min="-2" pref="15" max="-2" attributes="0"/>
+                  <Component id="labelNameLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="nameLabel" min="-2" pref="15" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="numMappingsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="numMappingsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="numMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="numMappingsLabel" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="allReadsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="numUniqueMappingsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="allReadsLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="numUniqueMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="uniqueSequencesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="uniqueSequencesAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="uniqueSequencesLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="uniqueSequencesAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="numberReadsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
-                  <Component id="numberReadsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="numberReadsLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="numberReadsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">

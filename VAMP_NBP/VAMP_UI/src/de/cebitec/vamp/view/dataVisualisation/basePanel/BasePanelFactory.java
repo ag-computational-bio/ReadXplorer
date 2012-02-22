@@ -45,7 +45,7 @@ import javax.swing.JPanel;
 public class BasePanelFactory {
 
     private BoundsInfoManager boundsManager;
-    private PersistantReference refGen;
+    private PersistantReference refGenome;
     private ViewController viewController;
 
     public BasePanelFactory(BoundsInfoManager boundsManager, ViewController viewController) {
@@ -53,14 +53,14 @@ public class BasePanelFactory {
         this.viewController = viewController;
     }
 
-    public BasePanel getGenomeViewerBasePanel(PersistantReference refGen) {
+    public BasePanel getGenomeViewerBasePanel(PersistantReference refGenome) {
 
-        this.refGen = refGen;
+        this.refGenome = refGenome;
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
         // create viewer
-        ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGen);
+        ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGenome);
 
         // show a color legend
         genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend(genomeViewer));
@@ -154,7 +154,7 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create an alignmentviewer
-        AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGen, connector);
+        AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
         viewer.setupLegend(new LegendLabel(viewer), this.getAlignmentViewLegend(viewer));
@@ -172,7 +172,7 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create a trackviewer
-        HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGen, connector);
+        HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
         viewer.setupLegend(new LegendLabel(viewer), this.getHistogramViewerLegend());
@@ -195,7 +195,7 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create a sequence pair viewer
-        SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGen, connector);
+        SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
         viewer.setupLegend(new LegendLabel(viewer), this.getSeqPairViewerLegend(viewer));
@@ -211,7 +211,7 @@ public class BasePanelFactory {
     private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider) {
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
-        AdjustmentPanel control = new AdjustmentPanel(1, refGen.getSequence().length(),
+        AdjustmentPanel control = new AdjustmentPanel(1, refGenome.getSequence().length(),
                 bounds.getCurrentLogPos(), bounds.getZoomValue(), hasScrollbar, hasSlider);
         control.addAdjustmentListener(boundsManager);
         boundsManager.addSynchronousNavigator(control);

@@ -42,14 +42,14 @@ public class JokParser implements MappingParserI, Observer {
     }
 
     @Override
-    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
+    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.registerObserver(this);
         this.seqToIDMap = new HashMap<String, Integer>();
         String filepath = trackJob.getFile().getAbsolutePath();
         try {
 
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(JokParser.class,
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(JokParser.class,
                 "Parser.Parsing.Start", filepath));
 
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));

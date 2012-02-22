@@ -1,13 +1,14 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.databackend.CoverageRequest;
-import de.cebitec.vamp.databackend.CoverageThreadListener;
+import de.cebitec.vamp.databackend.GenomeRequest;
+import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
@@ -37,7 +38,7 @@ import org.openide.windows.InputOutput;
  *
  * @author ddoppmeier
  */
-public class HistogramViewer extends AbstractViewer implements CoverageThreadListener {
+public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
     private InputOutput io;
@@ -103,22 +104,22 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
                 }
             }
 
-            int complete = cov.getnFwMult(logPos);
+            int complete = cov.getCommonFwdMult(logPos);
             if (complete != 0) {
                 appendStatsTable(sb, complete, relPos, true, "Forward strand", false);
             }
 
-            complete = cov.getnRvMult(logPos);
+            complete = cov.getCommonRevMult(logPos);
             if (complete != 0) {
                 appendStatsTable(sb, complete, relPos, false, "Reverse strand", false);
             }
 
             if (gapManager != null && gapManager.hasGapAt(logPos)) {
                 int tmp = logPos + gapManager.getNumOfGapsSmaller(logPos);
-                complete = cov.getnFwMult(logPos);
+                complete = cov.getCommonFwdMult(logPos);
                 appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
 
-                complete = cov.getnFwMult(logPos);
+                complete = cov.getCommonFwdMult(logPos);
                 appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
             }
 
@@ -188,16 +189,19 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
     }
 
     @Override
-    public synchronized void receiveCoverage(final PersistantCoverage coverage) {
-        SwingUtilities.invokeLater(new Runnable() {
+    public synchronized void receiveData(Object coverageData) {
+        if (coverageData instanceof PersistantCoverage) {
+            final PersistantCoverage coverage = (PersistantCoverage) coverageData;
+            SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                cov = coverage;
-                setupData();
-                repaint();
-            }
-        });
+                @Override
+                public void run() {
+                    cov = coverage;
+                    setupData();
+                    repaint();
+                }
+            });
+        }
     }
 
     /**
@@ -231,7 +235,7 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
             this.setupData();
         } else {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            trackConnector.addCoverageRequest(new CoverageRequest(lowerBound, upperBound, this));
+            trackConnector.addCoverageRequest(new GenomeRequest(lowerBound, upperBound, this, Properties.COMPLETE_COVERAGE));
         }
     }
 
@@ -243,25 +247,21 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         this.dataLoaded = false;
         this.removeAll();
 
-        if (isInMaxZoomLevel()) {
-            this.setInDrawingMode(true);
-
-            if (this.hasLegend()) {
-                this.add(this.getLegendLabel());
-                this.add(this.getLegendPanel());
-            }
-            if (this.hasSequenceBar()) {
-                this.add(this.getSequenceBar());
-            }
-
-            this.requestData();
-
-        } else {
-            this.setInDrawingMode(false);
-            gapManager = null;
-
-            this.placeExcusePanel(zoomExcuse);
+        if (!this.isInMaxZoomLevel()) {
+            this.getBoundsInformationManager().zoomLevelUpdated(1);
         }
+        
+        this.setInDrawingMode(true);
+
+        if (this.hasLegend()) {
+            this.add(this.getLegendLabel());
+            this.add(this.getLegendPanel());
+        }
+        if (this.hasSequenceBar()) {
+            this.add(this.getSequenceBar());
+        }
+
+        this.requestData();
     }
 
     private List<Integer> getCoverageScaleLineValues() {
@@ -519,8 +519,8 @@ public class HistogramViewer extends AbstractViewer implements CoverageThreadLis
         for (int i = lowerBound; i <= upperBound; i++) {
             int relPos = i + gapManager.getNumOfGapsAt(i);
             relPos += gapManager.getNumOfGapsSmaller(i);
-            logoData.setCoverageAt(relPos, cov.getnFwMult(i), true);
-            logoData.setCoverageAt(relPos, cov.getnRvMult(i), false);
+            logoData.setCoverageAt(relPos, cov.getCommonFwdMult(i), true);
+            logoData.setCoverageAt(relPos, cov.getCommonRevMult(i), false);
 
         }
 

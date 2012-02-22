@@ -25,7 +25,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author jwinneba
  */
-public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJobDialog {
+public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJobDialogI {
     
     private static final long serialVersionUID = 8362375;
     private File refGenFile = null;

@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 public final class SequenceUtils {
 
     /** Indicates that something is located on the forward strand (1). */
-    public static final int STRAND_FWD = 1;
+    public static final byte STRAND_FWD = 1;
     /** Indicates that something is located on the reverse strand (-1). */
-    public static final int STRAND_REV = -1;
+    public static final byte STRAND_REV = -1;
     
     /** String for tagging positions or anything else as not having a gene with "No gene".*/
     public static final String NO_GENE = "No gene";

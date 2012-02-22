@@ -160,7 +160,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         Component c = jTabbedPane1.getSelectedComponent();
         if (c != null) {
             String title;
-            NewJobDialog dialogPane;
+            NewJobDialogI dialogPane;
 
             // initialise NewJobDialog parameters
             if (c instanceof RefJobView) {
@@ -183,7 +183,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
             }
 
             // create dialog
-            DialogDescriptor newDialog = new DialogDescriptor(dialogPane, title, true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.CANCEL_OPTION, null);
+            DialogDescriptor newDialog = new DialogDescriptor(dialogPane, title, true, DialogDescriptor.OK_CANCEL_OPTION, DialogDescriptor.OK_OPTION, null);
             Dialog dialog = DialogDisplayer.getDefault().createDialog(newDialog);
             dialog.setVisible(true);
 

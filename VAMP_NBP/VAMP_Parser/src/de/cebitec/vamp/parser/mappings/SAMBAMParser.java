@@ -47,7 +47,7 @@ public class SAMBAMParser implements MappingParserI, Observer {
 
     @Override
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
-    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
+    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError {
         int lineno = 0;
         String filepath = trackJob.getFile().getAbsolutePath();
         String readname = null;

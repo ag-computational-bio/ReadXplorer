@@ -63,6 +63,8 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         startLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         productText = new javax.swing.JTextArea();
+        geneField = new javax.swing.JTextField();
+        geneLabel = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeLabel.text")); // NOI18N
         typeLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeLabel.toolTipText")); // NOI18N
@@ -107,6 +109,12 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         productText.setRows(5);
         jScrollPane1.setViewportView(productText);
 
+        geneField.setEditable(false);
+        geneField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.geneField.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(geneLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.geneLabel.text")); // NOI18N
+        geneLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.geneLabel.toolTipText")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -114,27 +122,31 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(locusLabel)
+                            .addComponent(typeLabel)
+                            .addComponent(geneLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(geneField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                            .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                            .addComponent(locusField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(stopLabel)
                             .addComponent(jLabel4)
                             .addComponent(startLabel)
-                            .addComponent(locusLabel)
                             .addComponent(productLabel)
-                            .addComponent(typeLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
-                            .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
-                            .addComponent(locusField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
-                            .addComponent(startField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
-                            .addComponent(stopField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
-                            .addComponent(ecNumField, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(strandText, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)))
+                            .addComponent(strandText, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                            .addComponent(startField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                            .addComponent(stopField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                            .addComponent(ecNumField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -148,6 +160,10 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(locusField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(locusLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(geneField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(geneLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -168,12 +184,14 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(strandText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField ecNumField;
+    private javax.swing.JTextField geneField;
+    private javax.swing.JLabel geneLabel;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
@@ -280,19 +298,20 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
     }
 
     public void showFeatureDetails(PersistantFeature f) {
-        ecNumField.setText(f!= null ? f.getEcNumber() : "");
-        startField.setText(f!= null ? String.valueOf(f.getStart()) : "");
-        stopField.setText(f!= null ? String.valueOf(f.getStop()) : "");
-        productText.setText(f!= null ? f.getProduct() : "");
-        productText.setToolTipText(f!= null ? f.getProduct() : "");
-        locusField.setText(f!= null ? f.getLocus() : "");
-        typeText.setText(f!= null ? f.getType().getTypeString() : "");
+        this.ecNumField.setText(f != null ? f.getEcNumber() : "");
+        this.startField.setText(f != null ? String.valueOf(f.getStart()) : "");
+        this.stopField.setText(f != null ? String.valueOf(f.getStop()) : "");
+        this.productText.setText(f != null ? f.getProduct() : "");
+        this.productText.setToolTipText(f != null ? f.getProduct() : "");
+        this.locusField.setText(f != null ? f.getLocus() : "");
+        this.geneField.setText(f != null ? f.getGeneName() : "");
+        this.typeText.setText(f != null ? f.getType().getTypeString() : "");
 
         String strand = "";
         if (f != null){
             strand = f.getStrand() == SequenceUtils.STRAND_FWD ? "forward" : "reverse";
         }
-        strandText.setText(strand);
+        this.strandText.setText(strand);
     }
 
 }

@@ -1,0 +1,44 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>About Transcription Analyses Tool</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>About Transcription Analyses Tool</h2>
+        <p style="font-size:0.9em">
+            The transcription analyses module enables you to carry out different automated
+            analyses for transcriptome data sets. <br><br>
+            1. The <b>Gene Start Analysis</b> (enabled by checking the "Gene Starts" box) has one default parameter. 
+            The <u>minimal increase of the coverage</u> (absolute read counts) from one position to the neighboring one
+            has to be set (default = 50).<br>
+            <u>Additionally</u>, two more parameters can be set: A <u>maximal initial read count</u> (e.g. 10, default: disabled with 0) can be set and
+            along with this parameter the <u>minimal increase of the coverage</u> for predicted gene starts with less than x (in our example 10) 
+            reads at the position directly in front of the gene start has to be set. It can be the same as the mandatory first parameter, 
+            but you can also choose a different value, depending on your analysis. If one of these two additional paramters is > 0 
+            the other one also has to be set correctly.<br><br>
+            2. The <b>Expressed Genes Analysis</b> allows to flag annotated genes of the reference sequence as expressed genes.
+            Only one parameter needs to be set: The <u>minimum number of reads</u> mapped within the bounds
+            of a gene (default = 1000).<br><br>
+            For all these analyses the results are returned in a matrix. Furthermore, they are visualized in the corresponding track
+            viewer by different colors. This helps to compare the different analysis results at a glance.
+            <!-- TODO describe your module, add more pages... -->
+        </p>
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

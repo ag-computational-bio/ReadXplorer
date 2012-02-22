@@ -33,7 +33,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker
  */
-public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements NewJobDialog {
+public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 776435254;
     private File mappingFile1;

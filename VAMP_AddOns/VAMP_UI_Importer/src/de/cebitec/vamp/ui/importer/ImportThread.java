@@ -65,7 +65,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         this.validTracksRun = new HashMap<TrackJob, Boolean>();
     }
 
-    private ParsedReference parseRefJob(ReferenceJob refGenJob) throws ParsingException {
+    private ParsedReference parseRefJob(ReferenceJob refGenJob) throws ParsingException, OutOfMemoryError {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
 
         ReferenceParserI parser = refGenJob.getParser();

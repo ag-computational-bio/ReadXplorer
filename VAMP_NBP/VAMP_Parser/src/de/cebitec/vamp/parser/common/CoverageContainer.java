@@ -40,6 +40,10 @@ public class CoverageContainer {
     private static final int DIFFS = 11;
 
     private final int coverageArrayLength;
+    
+    private int coveredPerfectPositions;
+    private int coveredBestMatchPositions;
+    private int coveredCommonMatchPositions;
 
     /**
      * Creates a new CoverageContainer.
@@ -48,6 +52,9 @@ public class CoverageContainer {
         coverage = new HashMap<Integer, Integer[]>();
         positionTable = new HashMap<String, Integer[]>();
         coverageArrayLength = NUM_OF_CASES * FIELDS_PER_CASE;
+        this.coveredPerfectPositions = 0;
+        this.coveredBestMatchPositions = 0;
+        this.coveredCommonMatchPositions = 0;
     }
     
 
@@ -117,12 +124,19 @@ public class CoverageContainer {
         return coverage.keySet();
     }
 
-    //real coverage
+    /**
+     * @param position 
+     * @return real coverage
+     */
     public int getBestMappingForwardCoverage(int position) {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, true, true);
     }
-    //number of unique mappings
-
+    
+    /**
+     * 
+     * @param position
+     * @return number of unique mappings
+     */
     public int getNumberOfBestMappingsForward(int position) {
         return this.getCoverageOfType(position, BEST_MAPPING_CASE, true, false);
     }
@@ -291,7 +305,7 @@ public class CoverageContainer {
                 // increase occurence of gap bases at position
                 bases = positionTable.get(position);
 
-                switch (base) { //724960
+                switch (base) {
                     case 'A':
                         bases[DIFFS] += mapping.getCount();
                         bases[GAP_A] += mapping.getCount();
@@ -328,5 +342,58 @@ public class CoverageContainer {
     public boolean positionCovered(int position) {
         return coverage.containsKey(position);
     }
+
+    /**
+     * Set the number of positions covered by perfect match mappings.
+     * @param coveredPerfectPositions number of positions covered by perfect match mappings
+     */
+    public void setCoveredPerfectPositions(int coveredPerfectPositions) {
+        this.coveredPerfectPositions = coveredPerfectPositions;
+    }
+
+    /**
+     * This parameter is currently set when calling the "ProjectConnector.storeCoverage()"
+     * method. Before that happened it will be null.
+     * @return the number of positions covered by perfect match mappings.
+     */
+    public int getCoveredPerfectPositions() {
+        return this.coveredPerfectPositions;
+    }
+
+    /**
+     * Set the number of positions covered by best match mappings.
+     * @param coveredBestMatchPositions 
+     */
+    public void setCoveredBestMatchPositions(int coveredBestMatchPositions) {
+        this.coveredBestMatchPositions = coveredBestMatchPositions;
+    }
+    
+    /**
+     * This parameter is currently set when calling the "ProjectConnector.storeCoverage()"
+     * method. Before that happened it will be null.
+     * @return the number of positions covered by best match mappings.
+     */
+    public int getCoveredBestMatchPositions() {
+        return this.coveredBestMatchPositions;
+    }
+    
+    /**
+     * Set the number of positions covered by common match mappings.
+     * @param coveredCommonMatchPositions number of positions covered by common match mappings
+     */
+    public void setCoveredCommonMatchPositions(int coveredCommonMatchPositions) {
+        this.coveredCommonMatchPositions = coveredCommonMatchPositions;
+    }
+        
+    /**
+     * This parameter is currently set when calling the "ProjectConnector.storeCoverage()"
+     * method. Before that happened it will be null.
+     * @return the number of positions covered by common match mappings.
+     */
+    public int getCoveredCommonMatchPositions() {
+        return this.coveredCommonMatchPositions;
+    }
+    
+    
 
 }

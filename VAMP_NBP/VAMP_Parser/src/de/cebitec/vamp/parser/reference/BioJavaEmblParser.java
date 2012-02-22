@@ -70,7 +70,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
                 try {
                     try {
                         seq = seqIter.nextRichSequence();
-                        this.sendErrorMsg("rich seq set");
+//                        this.sendErrorMsg("rich seq set");
                     } catch (Exception e) {
                         this.sendErrorMsg(e.getMessage());
                         break;

@@ -20,7 +20,7 @@ public class TrackParser implements TrackParserI {
 //    public ParsedTrack parseMappings(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID,
 //            String sequenceString, Observer observer) throws ParsingException {
     public ParsedTrack parseMappings(TrackJob trackJob, String sequenceString, Observer observer, 
-                    CoverageContainer covContainer) throws ParsingException {
+                    CoverageContainer covContainer) throws ParsingException, OutOfMemoryError {
         // parse mapping files and store them in appropriate source objects
         MappingParserI mappingp = trackJob.getParser();
         mappingp.registerObserver(observer);

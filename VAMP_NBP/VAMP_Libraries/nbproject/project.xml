@@ -223,6 +223,7 @@
                 <package>org.h2.index</package>
                 <package>org.h2.jdbc</package>
                 <package>org.h2.jdbcx</package>
+                <package>org.h2.jmx</package>
                 <package>org.h2.message</package>
                 <package>org.h2.result</package>
                 <package>org.h2.schema</package>

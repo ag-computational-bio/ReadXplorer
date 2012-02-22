@@ -2,6 +2,7 @@ package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,7 +97,7 @@ public class Layout implements LayoutI {
                 }
 
                 BlockI block = new Block(start, stop, mapping, gapManager);
-                if (mapping.isForwardStrand()) {
+                if (mapping.getStrand() == SequenceUtils.STRAND_FWD) {
                     forwardBlockContainer.addBlock(block);
                 } else {
                     reverseBlockContainer.addBlock(block);

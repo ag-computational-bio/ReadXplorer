@@ -133,7 +133,7 @@ public class BlockComponent extends JComponent implements ActionListener {
 
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
-        sb.append(createTableRow("Replicates", String.valueOf(mapping.getCoverage())));
+        sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
 //        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
         sb.append(createTableRow("Mismatches", String.valueOf(mapping.getErrors())));
         this.appendDiffs(mapping, sb);
@@ -303,7 +303,7 @@ public class BlockComponent extends JComponent implements ActionListener {
         }
 
         float[] values = Color.RGBtoHSB(tmp.getRed(), tmp.getGreen(), tmp.getBlue(), null);
-        float sAndB = minSaturationAndBrightness + m.getCoverage() * percentSandBPerCovUnit;
+        float sAndB = minSaturationAndBrightness + m.getNbReplicates() * percentSandBPerCovUnit;
         tmp = Color.getHSBColor(values[0], sAndB, sAndB);
 
         return tmp;

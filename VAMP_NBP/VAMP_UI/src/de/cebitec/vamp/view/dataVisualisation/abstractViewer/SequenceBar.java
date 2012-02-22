@@ -189,7 +189,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
     /**
      * Draw base of the sequence.
      * @param g Graphics2D object to paint on
-     * @param pos position of the base in the reference genome
+     * @param pos position of the base in the reference genome starting with 1 (not 0!).
+     *      To get the correct base 1 is substracted from pos within this method.
      */
     private void drawChar(Graphics2D g, int pos) {
         // pos depents on slider value and cannot be smaller 1

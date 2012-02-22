@@ -5,11 +5,14 @@ import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.api.cookies.CloseRefGenCookie;
 import de.cebitec.vamp.api.cookies.CloseTrackCookie;
 import de.cebitec.vamp.api.cookies.OpenTrackCookie;
+import de.cebitec.vamp.view.dataVisualisation.TranscriptionAnalysesFrameI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.lang.ref.Reference;
@@ -36,7 +39,7 @@ import org.openide.util.lookup.InstanceContent;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.view//AppPanel//EN", autostore = false)
-public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI {
+public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI, TranscriptionAnalysesFrameI {
 
     private static AppPanelTopComponent instance;
     /** path to the icon used by the component and its open action */
@@ -50,6 +53,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
     public AppPanelTopComponent() {
         initComponents();
+        this.jSplitPane1.setDividerLocation(2000);
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
         setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
@@ -74,25 +78,35 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        viewerPane = new javax.swing.JScrollPane();
         visualPanel = new javax.swing.JPanel();
+        transcriptionAnalysesPane = new javax.swing.JScrollPane();
+
+        jSplitPane1.setDividerLocation(600);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         visualPanel.setLayout(new javax.swing.BoxLayout(visualPanel, javax.swing.BoxLayout.PAGE_AXIS));
-        jScrollPane1.setViewportView(visualPanel);
+        viewerPane.setViewportView(visualPanel);
+
+        jSplitPane1.setTopComponent(viewerPane);
+        jSplitPane1.setRightComponent(transcriptionAnalysesPane);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JScrollPane transcriptionAnalysesPane;
+    private javax.swing.JScrollPane viewerPane;
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -307,6 +321,49 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         }
     }
     
+    @Override
+    public void showTranscriptionAnalysesTopPanel(final JPanel transAnalysesPanel) {
+        // add the transcription analyses panel
+        this.transcriptionAnalysesPane.setViewportView(transAnalysesPanel);
+        this.jSplitPane1.setDividerLocation(530);
+        this.transcriptionAnalysesPane.updateUI();
+
+    }
+    
+    @Override
+    public void closeTranscriptionAnalysesTopPanel(final JPanel transAnalysesPanel) {
+        this.transcriptionAnalysesPane.remove(transAnalysesPanel);
+        this.jSplitPane1.setDividerLocation(this.getHeight());
+        this.transcriptionAnalysesPane.updateUI();
+    }
+    
+    @Override
+    public boolean hasTranscriptionAnalysesTopPanel() {
+        return this.getJPanel(this.transcriptionAnalysesPane.getComponents()) != null;
+    }
+
+    @Override
+    public JPanel getTranscriptionAnalysesTopPanel() {
+        return (JPanel) this.getJPanel(this.transcriptionAnalysesPane.getComponents());
+    }
+    
+    /**
+     * Checks all components recursively for a JPanel and returns the first one found.
+     * If there is no JPanel among the components, null is returned.
+     * @param comps component array to check for a JPanel
+     * @return The first identified JPanel or null, if there is no JPanel
+     */
+    private Component getJPanel(Component[] comps) {
+        for (Component comp : comps) {
+            if (comp instanceof JPanel) {
+                return (JPanel) comp;
+            } else if (comp instanceof Container) {
+                return this.getJPanel(((Container) comp).getComponents());
+            }
+        }
+        return null;
+    }
+    
     /*
      * Overriding these two methods ensures that only displayed components are updated
      * and thus increases performance of the viewers.
@@ -385,6 +442,14 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         public boolean isEnabled() {
             JPanel comp = tc.get();
             return comp != null;
+        }
+    }
+    
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        if (this.transcriptionAnalysesPane.getComponentCount() <= 0) {
+            this.jSplitPane1.setDividerLocation(this.getPreferredSize().height);
         }
     }
 }
