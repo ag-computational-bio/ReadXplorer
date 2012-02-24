@@ -109,6 +109,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
 
             ResultSet rs = fetch.executeQuery();
             //  int counter = 0;
+            int tmpHeighestCov = 0;
             while (rs.next()) {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
                 //   counter++;
@@ -118,14 +119,24 @@ public class CoverageThread extends Thread implements RequestThreadI {
                 cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
                 cov.setPerfectRevNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
                 //best match cov
+
                 cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
                 cov.setBestMatchFwdNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
                 cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
                 cov.setBestMatchRevNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
                 //complete cov
-                cov.setCommonFwdMult(pos, rs.getInt(FieldNames.COVERAGE_N_FW_MULT));
+
+                int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+                if(pos>=request.getFrom() & pos<= request.getTo()){
+                if (tmpHeighestCov < covNFWMult || tmpHeighestCov < covNRevMult) {
+                    tmpHeighestCov = covNFWMult < covNRevMult ? covNRevMult : covNFWMult;
+                    cov.setHeighstCoverage(tmpHeighestCov);
+                }
+                }
+                cov.setCommonFwdMult(pos, covNFWMult);
                 cov.setCommonFwdNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
-                cov.setCommonRevMult(pos, rs.getInt(FieldNames.COVERAGE_N_RV_MULT));
+                cov.setCommonRevMult(pos, covNRevMult);
                 cov.setCommonRevNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
 
             }

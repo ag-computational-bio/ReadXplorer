@@ -15,10 +15,13 @@ public class CoverageZoomSlider extends JSlider{
     public CoverageZoomSlider(final TrackViewer trackViewer){
         super(1,100,1); //TODO: adjust to max coverage value in current view!
         trackViewer.verticalZoomLevelUpdated(this.getValue());
+    
         this.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
+                    JSlider slide =(JSlider) e.getSource(); 
+                    slide.setToolTipText(slide.getValue()+"");
                 trackViewer.verticalZoomLevelUpdated(CoverageZoomSlider.this.getValue());
             }
         });

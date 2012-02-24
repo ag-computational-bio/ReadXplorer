@@ -31,6 +31,7 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import org.openide.util.NbPreferences;
 
 /**
@@ -232,7 +233,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 } else if (covType == PersistantCoverage.BM) {
                 value = cov.getBestMatchFwdMult(absPos);
                 } else if (covType == PersistantCoverage.NERROR) {
-                value = cov.getCommonFwdMult(absPos);
+                    int ncovFw = cov.getCommonFwdMult(absPos);
+                    int currentHeighestCov = cov.getHeighstCoverage();
+                    cov.setHeighstCoverage(ncovFw<currentHeighestCov?currentHeighestCov:ncovFw);
+                    value = ncovFw;
+
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
                 }
@@ -242,7 +247,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 } else if (covType == PersistantCoverage.BM) {
                 value = cov.getBestMatchRevMult(absPos);
                 } else if (covType == PersistantCoverage.NERROR) {
-                value = cov.getCommonRevMult(absPos);
+          
+                    int ncovRev = cov.getCommonRevMult(absPos);
+                    int currentHeighestCov = cov.getHeighstCoverage();
+                    cov.setHeighstCoverage(ncovRev<currentHeighestCov?currentHeighestCov:ncovRev);
+                value = ncovRev;
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
                 }
@@ -256,8 +265,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 if (covType == PersistantCoverage.DIFF) {
                 value = cov.getCommonFwdMult(absPos);
                     if (hasNormalizationFactor) {
-                        int value2 = cov.getCommonFwdMultTrack1(absPos);
-                        int value1 = cov.getCommonFwdMultTrack2(absPos);
+                        int value2 = cov.getCommonFwdMultTrack2(absPos);
+                        int value1 = cov.getCommonFwdMultTrack1(absPos);
                         value = getNormValue(id2, value2) - getNormValue(id1, value1);
                         value = value < 0 ? value * -1 : value;
                     }
@@ -381,10 +390,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             PersistantCoverage coverage = (PersistantCoverage) coverageData;
             this.cov = coverage;
             trackInfo.setCoverage(cov);
+            cov.setHeighstCoverage(0);
+                   
             if (cov.isTwoTracks()) {
                 this.createCoveragePathsDiffOfTwoTracks();
             } else {
                 this.createCoveragePaths();
+                 computeAutomaticScale();
             }
             covLoaded = true;
             this.repaint();
@@ -405,11 +417,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             if (cov.isTwoTracks()) {
                 this.createCoveragePathsDiffOfTwoTracks();
             } else {
+                cov.setHeighstCoverage(0);
                 this.createCoveragePaths();
             }
             covLoaded = true;
         }
-
+        computeAutomaticScale();
         computeScaleStep();
 
         if (this.hasLegend()) {
@@ -668,7 +681,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void verticalZoomLevelUpdated(int value) {
         scaleFactor = Math.round(Math.pow(value, 2) / 10);
         scaleFactor = (scaleFactor < 1 ? 1 : scaleFactor);
-
+ 
         this.computeScaleStep();
         createCoveragePaths();
         this.repaint();
@@ -683,6 +696,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         num = num==0?1:num;
         return (Math.log(num) / Math.log(2));
     }
+
 
     private void computeScaleStep() {
         int visibleCoverage = (int) (this.getPaintingAreaInfo().getAvailableForwardHeight() * scaleFactor);
@@ -714,6 +728,24 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             scaleLineStep = 20000;
         }
+    }
+    
+        /*
+     * TODO: Find best scaling value
+     * This Methode transforms heighest coverage to slider value
+     * slider value from 1-1000
+     */
+    private void computeAutomaticScale() {
+              if (cov != null & slider != null) {
+       double heighestCoverage = (double) cov.getHeighstCoverage();
+        scaleFactor = Math.floor( heighestCoverage/140.0)+2;
+    //    scaleFactor = Math.log(heighestCoverage)/Math.log(2);
+        scaleFactor = scaleFactor<1 ? 1.0: scaleFactor;
+        scaleFactor = scaleFactor>140000.0?1000.0:scaleFactor;
+        
+        slider.setValue((int)scaleFactor);
+              }
+
     }
 
     private void createLines(int step, Graphics2D g) {
@@ -772,7 +804,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void scaleValueChanged() {
     hasNormalizationFactor =normSetting.getIdToValue().keySet().size() ==2 ?(normSetting.getHasNormFac(id1)| normSetting.getHasNormFac(id2)):normSetting.getHasNormFac(id1);
         boundsChangedHook();
-   //     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "scaleValueChanged " + isSelected + " " + factor.size());
         repaint();
     }
 
@@ -805,6 +836,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void setNormSetting(NormalizationSettings normSetting) {
         this.normSetting = normSetting;
     }
+    
+    private JSlider slider = null;
+    public void setVerticalZoomValue(JSlider vzoom){
+        slider = vzoom;
+                }
     
     
 }

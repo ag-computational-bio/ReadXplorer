@@ -26,7 +26,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -86,8 +85,6 @@ public class TrackNormalizationPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     public void setTrackName(String trackName) {
-
-        Logger.getLogger(TrackNormalizationPanel.class.getName()).warning(trackName);
 
         this.getLayout().addLayoutComponent(trackName, new JLabel(trackName));
 
