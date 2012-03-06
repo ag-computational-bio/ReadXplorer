@@ -269,7 +269,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         // create track viewer
         MultiTrackConnector tc = new MultiTrackConnector(track);
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc);
+        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
         int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
         trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
 
@@ -326,7 +326,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         // get double track connector
         MultiTrackConnector trackCon = new MultiTrackConnector(tracks);
-        MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon);
+        MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
 
         int featureWidth = (feature.getStop() - feature.getStart()) / 2;
         trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);

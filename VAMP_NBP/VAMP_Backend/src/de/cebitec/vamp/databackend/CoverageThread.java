@@ -20,9 +20,10 @@ public class CoverageThread extends Thread implements RequestThreadI {
 
     private long trackID;
     private long trackID2;
+    private List<Integer> trackIds;
     private Connection con;
     private ConcurrentLinkedQueue<GenomeRequest> requestQueue;
-    private PersistantCoverage currentCov;
+    private PersistantCoverage[] currentCov;
     private int coveredWidth;
     private GenomeRequest latestRequest;
     private double requestCounter;
@@ -39,22 +40,33 @@ public class CoverageThread extends Thread implements RequestThreadI {
 
         // do id specific stuff
         switch (trackIds.size()){
-            case 1: singleCoverageThread(trackIds.get(0)); break;
-            case 2: doubleCoverageThread(trackIds.get(0), trackIds.get(1)); break;
-            default: throw new UnsupportedOperationException("More than two tracks not supported yet.");
+            case 1: this.singleCoverageThread(trackIds.get(0)); break;
+            case 2: this.doubleCoverageThread(trackIds.get(0), trackIds.get(1)); break;
+            case 0: throw new UnsupportedOperationException("At least one track needs to handed over to the CoverageThread.");
+            default: this.multipleCoverageThread(trackIds);
         }
     }
 
     private void singleCoverageThread(long trackID){
         this.trackID = trackID;
         trackID2 = 0;
-        currentCov = new PersistantCoverage(0, 0);
+        currentCov = new PersistantCoverage[1];
+        currentCov[0] = new PersistantCoverage(0, 0);
     }
 
     private void doubleCoverageThread(long trackID,long trackID2){
         this.trackID = trackID;
         this.trackID2 = trackID2;
-        currentCov = new PersistantCoverage(0, 0,true);
+        currentCov = new PersistantCoverage[1];
+        currentCov[0] = new PersistantCoverage(0, 0, true);
+    }
+     
+    private void multipleCoverageThread(List<Integer> trackIds){
+        this.trackIds = trackIds;
+        this.trackID = 0;
+        this.trackID2 = 0;
+        currentCov = new PersistantCoverage[this.trackIds.size()];
+        currentCov[0] = new PersistantCoverage(0, 0);
     }
     
      public void setCoveredWidth(int coveredWidth) {
@@ -229,6 +241,16 @@ public class CoverageThread extends Thread implements RequestThreadI {
         }
         return cov;
     }
+    
+    /**
+     * Loads the coverage for multiple tracks
+     * @param request
+     * @return 
+     */
+    private PersistantCoverage[] loadCoverageMutliple(GenomeRequest request) {
+        //TODO: implement
+        return null;
+    }
 
     @Override
     public void run() {
@@ -237,24 +259,30 @@ public class CoverageThread extends Thread implements RequestThreadI {
 
             GenomeRequest request = requestQueue.poll();
             if (request != null) {
-                if (!currentCov.coversBounds(request.getFrom(), request.getTo())) {
+                if (!currentCov[0].coversBounds(request.getFrom(), request.getTo())) {
                     requestCounter++;
                     if (matchesLatestRequestBounds(request)) {
                         if (trackID2 != 0) {
-                            currentCov = this.loadCoverage2(request); //at the moment we only need the complete coverage here
-                        } else {
+                            currentCov[0] = this.loadCoverage2(request); //at the moment we only need the complete coverage here
+                        } else if (this.trackID != 0) {
                             if (request.getDesiredCoverage() == Properties.COMPLETE_COVERAGE) {
-                                currentCov = this.loadCoverage(request);
+                                currentCov[0] = this.loadCoverage(request);
                             } else if (request.getDesiredCoverage() == Properties.BEST_MATCH_COVERAGE) {
-                                currentCov = this.loadCoverageBest(request);
+                                currentCov[0] = this.loadCoverageBest(request);
                             } //else request.getDesiredCoverage() == Properties.PERFECT_COVERAGE does not exist yet, as it is not needed yet
+                        } else if (this.trackIds != null && !this.trackIds.isEmpty()) {
+                            currentCov = this.loadCoverageMutliple(request);
                         }
                     } else {
                         skippedCounter++;
                     }
                 }
                 if (matchesLatestRequestBounds(request)) {
-                    request.getSender().receiveData(currentCov);
+                    if (this.currentCov.length == 1) {
+                        request.getSender().receiveData(currentCov[0]);
+                    } else {
+                        request.getSender().receiveData(currentCov);
+                    }
                 }
             } else {
                 try {

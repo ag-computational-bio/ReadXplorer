@@ -67,6 +67,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     public static final String PROP_TRACK_CLICKED = "track clicked";
     public static final String PROP_TRACK_ENTERED = "track entered";
+    private boolean combineTracks;
 
 
     /**
@@ -76,9 +77,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param refGen reference genome
      * @param trackCon database connection to one track, that is displayed
      */
-    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackCon){
+    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
+            TrackConnector trackCon, boolean combineTracks){
         super(boundsManager, basePanel, refGen);
         this.trackCon = trackCon;
+        this.combineTracks = combineTracks;
         labelMargin = 3;
         scaleFactor = 1;
         covLoaded = false;
@@ -323,8 +326,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private void requestCoverage() {
         covLoaded = false;
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        trackCon.addCoverageRequest(new GenomeRequest(getBoundsInfo().getLogLeft(), 
-                getBoundsInfo().getLogRight(), this, Properties.COMPLETE_COVERAGE));
+        if (this.combineTracks) {
+            trackCon.addCoverageRequest(new GenomeRequest(getBoundsInfo().getLogLeft(),
+                    getBoundsInfo().getLogRight(), this, Properties.COMPLETE_COVERAGE));
+        } else { //ordinary coverage request or double track in non-combined mode request
+            trackCon.addCoverageRequest(new GenomeRequest(getBoundsInfo().getLogLeft(),
+                    getBoundsInfo().getLogRight(), this, Properties.COMPLETE_COVERAGE));
+        }
     }
 
     @Override
@@ -627,5 +635,15 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         this.setPreferredSize(new Dimension(1, 300));
         this.revalidate();
     }
+
+    /**
+     * @return true, if this is a double track viewer, which combines the selected
+     * tracks into a single coverage wave.
+     */
+    public boolean isCombineTracks() {
+        return this.combineTracks;
+    }
+    
+    
     
 }

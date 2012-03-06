@@ -13,8 +13,11 @@ public class MultipleTrackViewer extends TrackViewer {
 
     private static final long serialVersionUID = 2L;
 
-    public MultipleTrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackCon) {
-        super(boundsManager, basePanel, refGen, trackCon);
+    public MultipleTrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, 
+            PersistantReference refGen, TrackConnector trackCon, boolean combineTracks) {
+        super(boundsManager, basePanel, refGen, trackCon, combineTracks);
     }
+    
+    
 
 }

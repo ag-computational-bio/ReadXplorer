@@ -80,7 +80,7 @@ public class BasePanelFactory {
 
         // create track viewer
         TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track);
-        TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc);
+        TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc, false);
         trackV.setName(track.getDescription());
 
         // create and set up legend
@@ -108,18 +108,19 @@ public class BasePanelFactory {
      *
      * @param tracks to visualize on this <code>BasePanel</code>.
      * @param refGen reference the tracks belong to.
+     * @param boolean combineTracks true, if the coverage of two or more tracks should be combined
      * @return
      */
-    public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks, PersistantReference refGen) {
-        if (tracks.size() > 2) {
-            throw new UnsupportedOperationException("More than two tracks not supported yet.");
-        } else if (tracks.size() == 2) {
+    public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks, PersistantReference refGen, boolean combineTracks) {
+        if (tracks.size() > 2 && !combineTracks) {
+            throw new UnsupportedOperationException("More than two tracks not supported in non-combined mode.");
+        } else if (tracks.size() == 2 && !combineTracks || combineTracks) {
             BasePanel b = new BasePanel(boundsManager, viewController);
             viewController.addMousePositionListener(b);
 
             // get double track connector
             TrackConnector trackCon = ProjectConnector.getInstance().getTrackConnector(tracks);
-            MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon);
+            MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon, combineTracks);
 
             // create and set up legend
             trackV.setupLegend(new LegendLabel(trackV), this.getDoubleTrackPanelLegend());
@@ -143,7 +144,7 @@ public class BasePanelFactory {
             viewController.openTrack2(b);
             return b;
         } else if (tracks.size() == 1) {
-            return getTrackBasePanel(tracks.get(0), refGen);
+            return this.getTrackBasePanel(tracks.get(0), refGen);
         } else {
             throw new UnknownError();
         }

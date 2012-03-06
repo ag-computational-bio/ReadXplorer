@@ -4,9 +4,12 @@ import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -24,8 +27,15 @@ public final class OpenDoubleTrackAction implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ev) {
         OpenTrackPanelList otp = new OpenTrackPanelList(context.getReference().getId());
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        JCheckBox optionBox = new JCheckBox("Combine multiple tracks");
+        optionBox.setToolTipText("When checked, more than two tracks can be chosen and the coverage of all tracks is combined"
+                + " and looks like the ordinary track viewer for one track.");
+        contentPanel.add(otp, BorderLayout.CENTER);
+        contentPanel.add(optionBox, BorderLayout.SOUTH);
+        
 
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Two Tracks");
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(contentPanel, "Open Multiple Tracks");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
@@ -43,7 +53,7 @@ public final class OpenDoubleTrackAction implements ActionListener {
         if (okSelected) {
             ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
             BasePanelFactory factory = viewCon.getBasePanelFac();
-            factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), context.getReference());
+            factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), context.getReference(), optionBox.isSelected());
         }
     }
 }
