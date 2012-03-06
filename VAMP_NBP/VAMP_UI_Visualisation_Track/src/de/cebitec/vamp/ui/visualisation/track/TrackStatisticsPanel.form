@@ -36,7 +36,7 @@
                           <Component id="bestMatchMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
                           <Component id="numberReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="uniqueSequencesLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="allReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Component id="singletonMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -74,22 +74,13 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="numMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
-                          <Component id="nameLabel" alignment="1" pref="55" max="32767" attributes="0"/>
-                          <Component id="numUniqueMappingsAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="uniqueSequencesAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
-                          <Component id="numberReadsAbsLabel" alignment="1" pref="55" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="numMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
+                  <Component id="nameLabel" alignment="1" pref="55" max="32767" attributes="0"/>
+                  <Component id="singletonMappingsAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
+                  <Component id="uniqueSequencesAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
+                  <Component id="numberReadsAbsLabel" alignment="1" pref="55" max="32767" attributes="0"/>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -108,8 +99,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="allReadsLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="numUniqueMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
+                  <Component id="singletonMappingsLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="singletonMappingsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -158,7 +149,7 @@
   <SubComponents>
     <Component class="javax.swing.JProgressBar" name="progressbar">
     </Component>
-    <Component class="javax.swing.JLabel" name="allReadsLabel">
+    <Component class="javax.swing.JLabel" name="singletonMappingsLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Singleton Mappings:"/>
       </Properties>
@@ -168,7 +159,7 @@
         <Property name="text" type="java.lang.String" value="Unique Seq:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="numUniqueMappingsAbsLabel">
+    <Component class="javax.swing.JLabel" name="singletonMappingsAbsLabel">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="horizontalTextPosition" type="int" value="2"/>

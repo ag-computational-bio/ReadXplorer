@@ -11,6 +11,7 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
@@ -33,6 +34,12 @@ import org.openide.util.NbBundle;
  * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases above 100 
  * with an initial read count of 0-10 are detected as gene starts, but for all positions
  * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
+ * 
+ * 1. Nach Coverage: a) Coverage Increase larger than threshold of 99,9% increases in data set
+		     b) Coverage Increase in percent larger than 98% of the increase percentages
+ 2. Nach Mappingstarts: a) Nach Chernoff-Formel
+			b) Nach Wahrscheinlichkeitsformel (Binomialverteilung)
+
  */
 public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneStart>>, JobI {
 
@@ -47,8 +54,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     private List<PersistantFeature> genomeFeatures;
     private List<GeneStart> detectedStarts; //stores position and true for fwd, false for rev strand
     private DiscreteCountingDistribution covIncreaseDistribution;
-    private DiscreteCountingDistribution covIncreasePercentDistr;
-    private boolean calcCoverageIncreaseDistribution;
+    private DiscreteCountingDistribution covIncPercentDistribution;
+    private boolean calcCoverageDistributions;
     private boolean geneStartAutomatic;
     
     //varibles for gene start detection
@@ -114,16 +121,9 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         CoverageThreadAnalyses coverageThread = new CoverageThreadAnalyses(trackIds);
         coverageThread.start();
         
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getSequence().length();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);   
-        this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution();
-        this.covIncreasePercentDistr = new DiscreteCountingDistribution();
-        this.calcCoverageIncreaseDistribution = this.covIncreaseDistribution.isEmpty();
-        if (this.geneStartAutomatic && !this.calcCoverageIncreaseDistribution) {
-            this.estimateCutoff();
-        }
+        this.initDatastructures(trackCon);
 
+        //decide upon stepSize of a single request and analyse coverage of whole genome
         int stepSize = 200000;
         int from = 1;
         int to = genomeSize > stepSize ? stepSize : genomeSize;
@@ -145,6 +145,27 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         coverageThread.addRequest(coverageRequest);
     }
 
+    /**
+     * Initializes the initial data structures needed for a gene start analysis.
+     * @param trackCon the track connector
+     */
+    private void initDatastructures(TrackConnector trackCon) {
+        
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
+        this.genomeSize = refConnector.getRefGen().getSequence().length();
+        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);   
+        
+        this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
+        this.covIncPercentDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
+        this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
+        if (this.geneStartAutomatic && !this.calcCoverageDistributions) {
+            this.estimateCutoff();
+            this.estimateCutoffPercent();
+        }
+        
+        this.increaseReadPercent = this.calcCoverageDistributions ? 10 : this.increaseReadPercent;
+    }
+
     
     @Override
     public List<GeneStart> getResults() {
@@ -160,23 +181,12 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
             PersistantCoverage coverage = (PersistantCoverage) data;
             this.detectGeneStarts(coverage);
 
-            //TODO: prozentualer increase
-            //annotation finden/ändern
-
+            //TODO: annotation finden/ändern
         }
 
         //when the last request is finished signalize the parent to collect the data
         if (nbCarriedOutRequests >= nbRequests) {
-            if (this.calcCoverageIncreaseDistribution) { //if it was calculated, also store it
-                this.trackViewer.getTrackCon().insertCoverageIncreaseDistribution(covIncreaseDistribution);
-                if (this.geneStartAutomatic) {
-                    this.estimateCutoff();
-                    this.correctGeneStartList();
-                }
-            }
-            //TODO: correctly incorporate this
-            this.estimateCutoffPercent();
-            
+            this.storeDistributions();
             this.parent.showData(true);
             this.nbCarriedOutRequests = 0;
             this.progressHandle.finish();
@@ -204,7 +214,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         coverage.setBestMatchFwdMult(fixedLeftBound, covLastFwdPos);
         coverage.setBestMatchRevMult(fixedLeftBound, covLastRevPos);
 
-        if (this.calcCoverageIncreaseDistribution) { //this way code is duplicated, but if clause only evaluated once
+        if (this.calcCoverageDistributions) { //this way code is duplicated, but if clause only evaluated once
             for (int i = fixedLeftBound; i < rightBound; ++i) {
                 
                 fwdCov1 = coverage.getPerfectFwdMult(i) + coverage.getBestMatchFwdMult(i);
@@ -214,11 +224,14 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                 diffFwd = fwdCov2 - fwdCov1;
                 diffRev = revCov1 - revCov2;
                 
-                percentDiffFwd = (int) (((double) fwdCov2 / (double) fwdCov1) * 100.0) - 100;
-                percentDiffRev = (int) (((double) revCov1 / (double) revCov2) * 100.0) - 100;
+                percentDiffFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
+                percentDiffRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
                 
                 this.covIncreaseDistribution.increaseDistribution(diffFwd);
                 this.covIncreaseDistribution.increaseDistribution(diffRev);
+                this.covIncPercentDistribution.increaseDistribution(percentDiffFwd);
+                this.covIncPercentDistribution.increaseDistribution(percentDiffRev);
+                
                 this.detectStart(i, fwdCov1, fwdCov2, revCov1, revCov2, diffFwd, diffRev, percentDiffFwd, percentDiffRev);
             }
         } else {
@@ -230,10 +243,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                 diffFwd = fwdCov2 - fwdCov1;
                 diffRev = revCov1 - revCov2;
                 
-                percentDiffFwd = (int) (((double) fwdCov2 / (double) fwdCov1) * 100.0) - 100;
-                percentDiffRev = (int) (((double) revCov1 / (double) revCov2) * 100.0) - 100;
-                this.covIncreasePercentDistr.increaseDistribution(percentDiffFwd);
-                this.covIncreasePercentDistr.increaseDistribution(percentDiffRev);
+                percentDiffFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
+                percentDiffRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
                 
                 this.detectStart(i, fwdCov1, fwdCov2, revCov1, revCov2, diffFwd, diffRev, percentDiffFwd, percentDiffRev);
             }
@@ -260,15 +271,20 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         
 
         if (this.increaseReadCount2 > 0) { //if low coverage read count is calculated separately
-//TODO: percentage einbeziehen!!!
-            if (diffFwd > this.increaseReadCount && fwdCov1 > this.maxInitialReadCount
-                    || fwdCov1 <= this.maxInitialReadCount && diffFwd > this.increaseReadCount2) {
+            if (diffFwd > this.increaseReadCount 
+                    && percentDiffFwd > this.increaseReadPercent 
+                    && fwdCov1 > this.maxInitialReadCount
+                    || fwdCov1 <= this.maxInitialReadCount 
+                    && diffFwd > this.increaseReadCount2) {
 
                 DetectedFeatures detFeatures = this.findNextFeature(pos + 1, SequenceUtils.STRAND_FWD);
                 this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detFeatures));
             }
-            if (diffRev > this.increaseReadCount && revCov2 > this.maxInitialReadCount
-                    || revCov2 <= this.maxInitialReadCount && diffRev > this.increaseReadCount2) {
+            if (diffRev > this.increaseReadCount 
+                    && percentDiffRev > this.increaseReadPercent 
+                    && revCov2 > this.maxInitialReadCount
+                    || revCov2 <= this.maxInitialReadCount 
+                    && diffRev > this.increaseReadCount2) {
 
                 DetectedFeatures detFeatures = this.findNextFeature(pos, SequenceUtils.STRAND_REV);
                 this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detFeatures));
@@ -298,7 +314,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
      * given gene start and strand.
      */
     private DetectedFeatures findNextFeature(int geneStartPos, byte strand) {
-        final int maxDeviation = 500;
+        final int maxDeviation = 1000;
         int minStartPos = geneStartPos - maxDeviation < 0 ? 0 : geneStartPos - maxDeviation;
         int maxStartPos = geneStartPos + maxDeviation > this.genomeSize ? genomeSize : geneStartPos + maxDeviation;
         PersistantFeature feature;
@@ -394,18 +410,19 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
      * read counts from one position to the next.
      * 2 Parameters take care of this task: 
      * At first calculate the index of the coverage increase distribution, which exceeds 
-     * the threshold of more than 1 gene per 1KB genome size for the first time for this track.
-     * Second, if the number of possible gene starts is still larger than 0,05%
-     * + a 10% correction term, use the 0,05% of largest coverage increases
+     * the threshold of more than 2 genes per 1KB genome size for the first time for this track.
+     * Second, if the number of possible gene starts is still larger than 0,1%
+     * + a 10% correction term, use the 0,1% of largest coverage increases
      * as threshold. 
      * These thresholds return an index from the coverage increase distribution
      * and the increaseReadCount variable is set according to the smallest 
-     * coverage increase value for the calculated index.
+     * total coverage increase value for the calculated index.
      */
     private void estimateCutoff() {
         long totalCount = this.covIncreaseDistribution.getTotalCount();
-        int fstReferenceValue = this.genomeSize / 1000; // 1 Gene per 1KB Genome size
-        long scndReferenceValue = totalCount / 2000; //threshold of 0,05% of largest coverage increases
+        int fstReferenceValue = this.genomeSize / 500; // 2 Gene per 1KB Genome size
+        long scndReferenceValue = totalCount / 1000; //threshold of 0,1% of largest coverage increases
+        System.out.println("fstref: " + fstReferenceValue + ", scndref: " + scndReferenceValue);
         int[] covIncDistribution = this.covIncreaseDistribution.getDiscreteCountingDistribution();
         
         int nbGeneStarts = 0;
@@ -432,10 +449,17 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         this.increaseReadCount = covIncreaseDistribution.getMinCountForIndex(selectedIndex);
     }
     
+    /**
+     * Used to computationally estimate the optimal percentage cutoff = minimum increase of 
+     * read counts at one position in percent.
+     * This threshold returns an index from the coverage percentage increase distribution
+     * and the increaseReadPercent variable is set according to the smallest 
+     * coverage percentage increase value for the calculated index.
+     */
     private void estimateCutoffPercent() {
-        long totalCount = this.covIncreasePercentDistr.getTotalCount();
-        long referenceValue = totalCount / 1000; //threshold of 1% of largest coverage increases in percent
-        int[] covIncDistribution = this.covIncreasePercentDistr.getDiscreteCountingDistribution();
+        long totalCount = this.covIncPercentDistribution.getTotalCount();
+        long referenceValue = totalCount / 500; //threshold of 2% of largest coverage increases in percent
+        int[] covIncDistribution = this.covIncPercentDistribution.getDiscreteCountingDistribution();
         
         for (int i : covIncDistribution) {
             System.out.println(i);
@@ -451,8 +475,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                 break;
             }
         }
-        
-        this.increaseReadPercent = covIncreasePercentDistr.getMinCountForIndex(selectedIndex);
+        this.increaseReadPercent = covIncPercentDistribution.getMinCountForIndex(selectedIndex);
+        System.out.println("cutoff percent" + this.increaseReadPercent);
     }
 
     /**
@@ -460,9 +484,31 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
      * the increaseReadCount was changed after calculating the list of detectedGenes.
      */
     private void correctGeneStartList() {
-        for (GeneStart geneStart : this.detectedStarts) {
-            if (geneStart.getStartCoverage() - geneStart.getInitialCoverage() < this.increaseReadCount) {
+        int percentDiff;
+        GeneStart geneStart;
+        for (int i = 0; i < this.detectedStarts.size(); ++i) {
+            geneStart = this.detectedStarts.get(i);
+            percentDiff = (int) (((double) geneStart.getStartCoverage() / (double) geneStart.getInitialCoverage()) * 100.0) - 100;
+            if (geneStart.getStartCoverage() - geneStart.getInitialCoverage() < this.increaseReadCount
+                    && percentDiff < this.increaseReadPercent) {
                 this.detectedStarts.remove(geneStart);
+            }
+        }
+    }
+
+    /**
+     * If a new distribution was calculated, this method stores it in the DB and
+     * corrects the result list with the new estimated parameters, if the geneStartAutomatic
+     * was chosen.
+     */
+    private void storeDistributions() {
+        if (this.calcCoverageDistributions) { //if it was calculated, also store it
+            this.trackViewer.getTrackCon().insertCoverageDistribution(covIncreaseDistribution);
+            this.trackViewer.getTrackCon().insertCoverageDistribution(covIncPercentDistribution);
+            if (this.geneStartAutomatic) {
+                this.estimateCutoff();
+                this.estimateCutoffPercent();
+                this.correctGeneStartList();
             }
         }
     }

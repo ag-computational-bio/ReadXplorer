@@ -6,6 +6,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.List;
@@ -49,6 +50,7 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
 
         expressedGenesPane = new javax.swing.JScrollPane();
         expressedGenesTable = new javax.swing.JTable();
+        exportButton = new javax.swing.JButton();
 
         expressedGenesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -78,18 +80,38 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         expressedGenesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title2_1")); // NOI18N
         expressedGenesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title1")); // NOI18N
 
+        exportButton.setText(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.exportButton.text")); // NOI18N
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(297, Short.MAX_VALUE)
+                .addComponent(exportButton))
             .addComponent(expressedGenesPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(expressedGenesPane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(expressedGenesPane, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(exportButton))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+        ExpressedGenesColumns expressedGenesData = new ExpressedGenesColumns(this.expressedGenes);
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", expressedGenesData, "Expressed Genes Table"); 
+    }//GEN-LAST:event_exportButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane expressedGenesPane;
     private javax.swing.JTable expressedGenesTable;
     // End of variables declaration//GEN-END:variables

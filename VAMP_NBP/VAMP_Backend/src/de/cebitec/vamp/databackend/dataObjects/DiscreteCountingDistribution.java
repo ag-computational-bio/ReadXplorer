@@ -86,6 +86,7 @@ public class DiscreteCountingDistribution {
     private static final int idx34 = 34;
     
     private int[] DiscreteCountingDistribution;
+    private byte type;
     private long totalCount;
 
     /**
@@ -326,6 +327,25 @@ public class DiscreteCountingDistribution {
     public long getTotalCount() {
         return this.totalCount;
     }
+
+    /**
+     * @return the type of this distribution: Either Properties.COVERAGE_INCREASE_DISTRIBUTION
+     * or Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
+     */
+    public byte getType() {
+        return this.type;
+    }
+
+    /**
+     * Set the type of this distribution.
+     * @param type of this distribution: Either Properties.COVERAGE_INCREASE_DISTRIBUTION
+     * or Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
+     */
+    public void setType(byte type) {
+        this.type = type;
+    }
+    
+    
     
     /**
      * Contains the data structure for temporary storing a distribution of 

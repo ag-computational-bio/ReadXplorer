@@ -28,6 +28,8 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
     private boolean doneGeneStarts;
     private boolean detectExpressedGenes;
     private boolean doneExpressedGenes;
+    private int nbAnalyses;
+    private int nbFinishedAnalyses;
     
     public static final String PROP_ANALYSES_FINISHED = "analysesFinished";   
     
@@ -337,6 +339,9 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
             this.detectExpressedGenes = this.expressedGenesBox.isSelected();
             this.doneGeneStarts = false;
             this.doneExpressedGenes = false;
+            this.nbAnalyses = this.detectGeneStarts ? 1 : 0;
+            this.nbAnalyses = this.detectExpressedGenes ? ++this.nbAnalyses : this.nbAnalyses;
+            this.nbFinishedAnalyses = 0;
             
             this.startAnalyses();
 
@@ -426,6 +431,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
             this.analysisGeneStarts = new AnalysisGeneStart(this, this.trackViewer, increaseReadCount,
                     increaseReadPercent, maxInitialReadCount, increaseReadCount2, this.geneStartAutomatic);
             this.analysisGeneStarts.startAnalysis();
+            
             return;
         }
         if (this.detectExpressedGenes && !this.doneExpressedGenes) {
@@ -446,6 +452,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 GeneStartsResultPanel geneStartResultPanel = new GeneStartsResultPanel();
                 geneStartResultPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
                 geneStartResultPanel.addGeneStarts(this.analysisGeneStarts.getResults());
+                System.out.println("Size: " + this.analysisGeneStarts.getResults().size());
                 //TODO: get track name
                 this.resultTabs.addTab("Detected gene starts for track", geneStartResultPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
@@ -454,7 +461,6 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 //start remaining analyses, if there are any
                 this.doneGeneStarts = true;
                 TranscriptionAnalysesPanel.this.startAnalyses();
-                return;
             }
             if (this.detectExpressedGenes && !this.doneExpressedGenes) {
             
@@ -480,9 +486,12 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 //annotation finden/ändern
 
             }
+            ++this.nbFinishedAnalyses;
             
         }
-        this.detectionButton.setEnabled(true);
+        if (this.nbFinishedAnalyses >= this.nbAnalyses) {
+            this.detectionButton.setEnabled(true);
+        }
 
     }
     

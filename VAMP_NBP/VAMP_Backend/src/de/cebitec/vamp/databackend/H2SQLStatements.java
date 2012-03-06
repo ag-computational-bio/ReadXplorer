@@ -152,18 +152,23 @@ public class H2SQLStatements {
     
     public final static String INDEX_MAPPING_START =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTART ON " + FieldNames.TABLE_MAPPINGS + " "
-            + "(" + FieldNames.MAPPING_START + " ) ";
+            + "(" + FieldNames.MAPPING_START + " , " + FieldNames.MAPPING_TRACK + " ) ";
     
     
-    public final static String INDEX_MAPPING_STOP =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTOP ON " + FieldNames.TABLE_MAPPINGS + " "
-            + "(" + FieldNames.MAPPING_STOP + " ) ";
+//    public final static String INDEX_MAPPING_STOP =
+//            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTOP ON " + FieldNames.TABLE_MAPPINGS + " "
+//            + "(" + FieldNames.MAPPING_STOP + " ) ";
     
     
     public final static String INDEX_MAPPING_SEQ_ID =
             "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSEQID ON " + FieldNames.TABLE_MAPPINGS + " "
             + "(" + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
-
+    
+    
+    public final static String INDEX_MAPPINGS =
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            + "(" + FieldNames.MAPPING_START + ", " + FieldNames.MAPPING_STOP + "," + FieldNames.MAPPING_TRACK + " ) ";
+    
     
     public final static String SETUP_TRACKS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_TRACKS
@@ -198,17 +203,17 @@ public class H2SQLStatements {
     
     
     public final static String INDEX_SEQ_PAIR_PAIR_ID =
-            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
+            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIR_ID ON " + FieldNames.TABLE_SEQ_PAIRS
             + " (" + FieldNames.SEQ_PAIR_PAIR_ID + " ) ";
     
     
     public final static String INDEX_SEQ_PAIR_MAPPING1_ID =
-            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
+            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIR_M1 ON " + FieldNames.TABLE_SEQ_PAIRS
             + " (" + FieldNames.SEQ_PAIR_MAPPING1_ID + " ) ";
     
     
     public final static String INDEX_SEQ_PAIR_MAPPING2_ID =
-            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIRS ON " + FieldNames.TABLE_SEQ_PAIRS
+            "CREATE INDEX IF NOT EXISTS INDEXSEQ_PAIR_M2 ON " + FieldNames.TABLE_SEQ_PAIRS
             + " (" + FieldNames.SEQ_PAIR_MAPPING2_ID + " ) ";
   
     
@@ -247,6 +252,7 @@ public class H2SQLStatements {
     public static final String SETUP_COVERAGE_DISTRIBUTION = 
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COVERAGE_DISTRIBUTION + " ( "
             + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " TINYINT UNSIGNED NOT NULL, "
             + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " BIGINT UNSIGNED NOT NULL ) ";
     

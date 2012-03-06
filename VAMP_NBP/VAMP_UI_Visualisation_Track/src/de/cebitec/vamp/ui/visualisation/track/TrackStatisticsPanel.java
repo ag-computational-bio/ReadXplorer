@@ -51,9 +51,9 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         progressbar = new javax.swing.JProgressBar();
-        allReadsLabel = new javax.swing.JLabel();
+        singletonMappingsLabel = new javax.swing.JLabel();
         uniqueSequencesLabel = new javax.swing.JLabel();
-        numUniqueMappingsAbsLabel = new javax.swing.JLabel();
+        singletonMappingsAbsLabel = new javax.swing.JLabel();
         perfectMappingsLabel = new javax.swing.JLabel();
         bestMatchMappingsLabel = new javax.swing.JLabel();
         numMappingsLabel = new javax.swing.JLabel();
@@ -86,12 +86,12 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         setBorder(javax.swing.BorderFactory.createTitledBorder("Global Track Statistics"));
         setPreferredSize(new java.awt.Dimension(200, 400));
 
-        allReadsLabel.setText("Singleton Mappings:");
+        singletonMappingsLabel.setText("Singleton Mappings:");
 
         uniqueSequencesLabel.setText("Unique Seq:");
 
-        numUniqueMappingsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        numUniqueMappingsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        singletonMappingsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singletonMappingsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         perfectMappingsLabel.setText("Perfect:");
 
@@ -224,7 +224,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                             .addComponent(bestMatchMappingsLabel)
                             .addComponent(numberReadsLabel)
                             .addComponent(uniqueSequencesLabel)
-                            .addComponent(allReadsLabel))
+                            .addComponent(singletonMappingsLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
@@ -252,17 +252,12 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     .addComponent(numMappingsLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                            .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                            .addComponent(numUniqueMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                            .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
-                        .addContainerGap())))
+                    .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                    .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                    .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                    .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                    .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -277,8 +272,8 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     .addComponent(numMappingsLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(allReadsLabel)
-                    .addComponent(numUniqueMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(singletonMappingsLabel)
+                    .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(uniqueSequencesLabel)
@@ -315,7 +310,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel allReadsLabel;
     private javax.swing.JLabel bestMatchMappingsAbsLabel;
     private javax.swing.JLabel bestMatchMappingsLabel;
     private javax.swing.JLabel bmPercentage;
@@ -335,7 +329,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel numSeqPairsLabel;
     private javax.swing.JLabel numUniqSeqPairsAbsLabel;
     private javax.swing.JLabel numUniqSeqPairsLabel;
-    private javax.swing.JLabel numUniqueMappingsAbsLabel;
     private javax.swing.JLabel numberReadsAbsLabel;
     private javax.swing.JLabel numberReadsLabel;
     private javax.swing.JLabel perfPercentageLabel;
@@ -345,6 +338,8 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JProgressBar progressbar;
     private javax.swing.JLabel singleMappings;
     private javax.swing.JLabel singleMappingsLabel;
+    private javax.swing.JLabel singletonMappingsAbsLabel;
+    private javax.swing.JLabel singletonMappingsLabel;
     private javax.swing.JLabel uniqueSequencesAbsLabel;
     private javax.swing.JLabel uniqueSequencesLabel;
     // End of variables declaration//GEN-END:variables
@@ -450,7 +445,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     numUniqueMappings = trackCon.getNumOfUniqueMappingsCalculate();
                     recalculated = true;
                 }
-                numUniqueMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
+                singletonMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
 
                 int numUniqueSequences = trackCon.getNumOfUniqueSequences();
                 if (numUniqueSequences == -1) {

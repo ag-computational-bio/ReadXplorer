@@ -6,7 +6,6 @@ package de.cebitec.vamp.databackend;
  * @author ddoppmeier, rhilker
  */
 public class FieldNames {
-
     /**
      * Private constructor so this utility class can not be instantiated.
      */
@@ -178,6 +177,7 @@ public class FieldNames {
     // num reads = extra calculation: count all reads during import process, also possible later
     
     public static final String COVERAGE_DISTRIBUTION_TRACK_ID = "TRACK_ID";
+    public static final String COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE = "DISTRIBUTION_TYPE";
     public static final String COVERAGE_DISTRIBUTION_COV_INTERVAL_ID = "COV_INTERVAL_ID";
     public static final String COVERAGE_DISTRIBUTION_INC_COUNT = "INC_COUNT";
     

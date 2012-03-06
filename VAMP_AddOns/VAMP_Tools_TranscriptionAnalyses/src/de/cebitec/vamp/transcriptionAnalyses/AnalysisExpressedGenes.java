@@ -10,9 +10,11 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -31,7 +33,9 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     private int minNumberReads;
     private int genomeSize;
     private List<PersistantFeature> genomeFeatures;
+    private HashMap<Integer, ExpressedGene> featureReadCount; //feature id to count of mappings for feature
     private List<ExpressedGene> expressedGenes;
+    private List<PersistantMapping> mappingsAll;
     
     MappingThreadAnalyses mappingThread;
     private int nbRequests;
@@ -58,6 +62,8 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
         
         this.nbCarriedOutRequests = 0;
         this.expressedGenes = new ArrayList<ExpressedGene>();
+        this.mappingsAll = new ArrayList<PersistantMapping>();
+        this.featureReadCount = new HashMap<Integer, ExpressedGene>();
         this.lastMappingIdx = 0;
         this.lastMappingIdx = 0;
     }
@@ -78,51 +84,80 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
         this.genomeSize = refConnector.getRefGen().getSequence().length();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
+        int numMappingsTotal = 0;
+        int numUnneededMappings = 0;
+        List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
+        for (PersistantTrack track : tracksAll) {
+            TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
+            numMappingsTotal += connector.getNumOfUniqueMappings();
+            if (track.getId() < trackCon.getTrackID()) {
+                numUnneededMappings += connector.getNumOfUniqueMappings();
+            }
+        }
+        int numInterestingMappings = numMappingsTotal - (numUnneededMappings + trackCon.getNumOfUniqueMappings());
+        
+        for (PersistantFeature feature : this.genomeFeatures) {
+            this.featureReadCount.put(feature.getId(), new ExpressedGene(feature));
+        }
+        
         
 //        int coveredPerfectPos = trackCon.getCoveredPerfectPos();
         //use for RPKM
         int coveredBestMatchPos = trackCon.getCoveredBestMatchPos();
+        int totalExonModelLength = 0; //calculate the total length of the transcriptome
+        for (PersistantFeature feature : this.genomeFeatures) {
+            totalExonModelLength += feature.getStop() - feature.getStart();
+        }
+        totalExonModelLength /= 1000;
 
         for (int trackId : trackIds) {
             
-            int stepSize = 200000;
-            int from = 1;
-            int to = genomeSize > stepSize ? stepSize : genomeSize;
-            int additionalRequest = genomeSize % stepSize == 0 ? 0 : 1;
-            this.nbRequests = genomeSize / stepSize + additionalRequest;
-            this.progressHandle.switchToDeterminate(this.nbRequests);
+            int stepSize = 50000;
+            int from = numUnneededMappings;
+            int to = numUnneededMappings + (numInterestingMappings > stepSize ? stepSize : numInterestingMappings);
+            int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
+            this.nbRequests = numInterestingMappings / stepSize + additionalRequest; 
+            this.progressHandle.switchToDeterminate(this.nbRequests + 1); //+ 1 for subsequent calculations
+            this.progressHandle.progress("Request " + (nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
             
             this.mappingThread = new MappingThreadAnalyses(trackId, this.nbRequests);
-            mappingThread.start();
+            this.mappingThread.start();
             
-            while (to < genomeSize) {
+            while (to < numInterestingMappings) {
                 GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
-                mappingThread.addRequest(mappingRequest);
+                this.mappingThread.addRequest(mappingRequest);
                 
                 from = to + 1;
                 to += stepSize;
             }
 
             //calc last interval until genomeSize
-            to = genomeSize;
+            to = numInterestingMappings;
             GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
-            mappingThread.addRequest(mappingRequest);
+            this.mappingThread.addRequest(mappingRequest);
         }
     }
     
     
     @Override
     public void receiveData(Object data) {
-        this.progressHandle.progress("Request " + (++nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+        this.progressHandle.progress("Request " + (++nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
 
-        List<PersistantMapping> mappings = (List<PersistantMapping>) data;
-        this.detectExpressedGenes(mappings);
+        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
+        
+        if (data.getClass() == mappings.getClass()) {
+            mappings = (List<PersistantMapping>) data;
+            this.detectExpressedGenes(mappings);
+//            this.mappingsAll.addAll(mappings);
 
-        //when the last request is finished signalize the parent to collect the data
-        if (nbCarriedOutRequests >= nbRequests) {
-            this.parent.showData(true);
-            this.nbCarriedOutRequests = 0;
-            this.progressHandle.finish();
+            //when the last request is finished signalize the parent to collect the data
+            if (nbCarriedOutRequests >= nbRequests - 1) {
+//                this.sortMappings(this.mappingsAll);
+                this.findExpressedGenes();
+                this.parent.showData(true);
+                this.nbCarriedOutRequests = 0;
+                this.progressHandle.finish();
+            }
         }
     }
 
@@ -132,7 +167,69 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
         return this.expressedGenes;
     }
     
-    /**
+//    /**
+//     * Carries out the detection of predicted expressed genes.
+//     * @param mappings the coverage for predicting the gene starts
+//     */
+//    public void detectExpressedGenes(List<PersistantMapping> mappings) {
+//            PersistantFeature feature;
+//            boolean fstFittingMapping = true;
+//            boolean nextFeature = false;
+//            int readCount = 0;
+//            
+//            for (int i = this.lastFeatureIdx; i < this.genomeFeatures.size(); ++i) {
+//                feature = this.genomeFeatures.get(i);
+//                int featStart = feature.getStart();
+//                int featStop = feature.getStop();
+//                nextFeature = false; //false, if the analysis of the current feature is not finished
+//                fstFittingMapping = true;
+//                readCount = 0;
+//
+//                for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
+//                    PersistantMapping mapping = mappings.get(j);
+//
+//                    //mappings identified within a feature
+//                    if (mapping.getStop() > featStart && feature.getStrand() == mapping.getStrand()
+//                            && mapping.getStart() < featStop) {
+//
+//                        if (fstFittingMapping == true) {
+//                            this.lastMappingIdx = j;
+//                            fstFittingMapping = false;
+//                        }
+//                        this.currentCount += mapping.getNbReplicates();
+//
+//
+//                        //still mappings left, but need next feature
+//                    } else if (mapping.getStart() > featStop) {
+//                        readCount = this.currentCount;
+//                        nextFeature = true;
+//                        break;
+//                    }
+//                }
+//
+//                //store last feature index & readcount for next call of receiveData
+//                //this.currentCount is still set and will be reused during next call
+//                if (!nextFeature) {
+//                    this.lastFeatureIdx = i;
+//                    break;
+//                }
+//
+//                //store expressed genes
+//                if (readCount > this.minNumberReads) {
+//                    ExpressedGene gene = new ExpressedGene(feature);
+//                    gene.setReadCount(this.currentCount);
+//                    this.expressedGenes.add(gene);
+//                }
+//                
+//                this.currentCount = 0;
+//            }
+//            
+//            this.lastMappingIdx = 0;
+//            //TODO: solution for more than one feature overlapping mapping request boundaries
+//            
+//    }
+    
+        /**
      * Carries out the detection of predicted expressed genes.
      * @param mappings the coverage for predicting the gene starts
      */
@@ -142,7 +239,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
             boolean nextFeature = false;
             int readCount = 0;
             
-            for (int i = this.lastFeatureIdx; i < this.genomeFeatures.size(); ++i) {
+            for (int i = 0; i < this.genomeFeatures.size(); ++i) {
                 feature = this.genomeFeatures.get(i);
                 int featStart = feature.getStart();
                 int featStop = feature.getStop();
@@ -180,11 +277,12 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
                 }
 
                 //store expressed genes
-                if (readCount > this.minNumberReads) {
-                    ExpressedGene gene = new ExpressedGene(feature);
-                    gene.setReadCount(this.currentCount);
-                    this.expressedGenes.add(gene);
-                }
+                //TODO initialize this 
+//                if (readCount > this.minNumberReads) {
+//                    ExpressedGene gene = new ExpressedGene(feature);
+                    this.featureReadCount.get(feature.getId()).setReadCount(this.featureReadCount.get(feature.getId()).getReadCount() + this.currentCount);
+//                    this.expressedGenes.add(gene);
+//                }
                 
                 this.currentCount = 0;
             }
@@ -205,7 +303,39 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     public int getNbTotalRequests() {
         return this.nbRequests;
     }
-    
+
+    /**
+     * Sorts the mappings by start position.
+     * @param mappingsAll mapping list to sort by start position
+     */
+    private void sortMappings(List<PersistantMapping> mappingsAll) {
+        HashMap<Integer, ArrayList<PersistantMapping>> mappingsToPos = new HashMap<Integer, ArrayList<PersistantMapping>>();
+        int start;
+        
+        for (PersistantMapping mapping : mappingsAll) {
+            start = mapping.getStart();
+            if (!mappingsToPos.containsKey(start)) {
+                mappingsToPos.put(start, new ArrayList<PersistantMapping>());
+            }
+            mappingsToPos.get(start).add(mapping);
+        }
+        
+        this.mappingsAll.clear();
+        for (int i = 0; i < this.genomeSize; ++i) {
+            List<PersistantMapping> mappingsAtPos = mappingsToPos.get(i);
+            if (mappingsAtPos != null) {
+                this.mappingsAll.addAll(mappingsAtPos);
+            }
+        }
+    }
+
+    private void findExpressedGenes() {
+        for (Integer id : this.featureReadCount.keySet()) {
+            if (this.featureReadCount.get(id).getReadCount() > this.minNumberReads) {
+                this.expressedGenes.add(this.featureReadCount.get(id));
+            }
+        }
+    }
     
     
 }

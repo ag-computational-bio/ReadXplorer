@@ -283,10 +283,11 @@ public class SQLStatements {
             "INSERT INTO "+FieldNames.TABLE_COVERAGE_DISTRIBUTION+" " +
             "(" +
                 FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID+", " +
+                FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE+", " +
                 FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID+", " +
                 FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " " +
             ") " +
-            "VALUES (?,?,?)";
+            "VALUES (?,?,?,?)";
     
     /**
      * Delete the track data.
@@ -702,6 +703,25 @@ public class SQLStatements {
             + FieldNames.MAPPING_START + " BETWEEN ? AND ? and "
 //            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? and "
             + FieldNames.MAPPING_TRACK + " = ? "
+        + "ORDER BY " + FieldNames.MAPPING_START;
+    
+    public final static String FETCH_MAPPINGS_WITHOUT_DIFFS2 =
+        "SELECT "
+            + FieldNames.MAPPING_ID + ", "
+            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+            + FieldNames.MAPPING_NUM_OF_REPLICATES + ", "
+            + FieldNames.MAPPING_DIRECTION + ", "
+            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+            + FieldNames.MAPPING_SEQUENCE_ID + ", "
+            + FieldNames.MAPPING_START + ", "
+            + FieldNames.MAPPING_STOP + ", "
+            + FieldNames.MAPPING_TRACK + " "
+        + "FROM "
+            + FieldNames.TABLE_MAPPINGS + " "
+        + "WHERE "
+            + FieldNames.MAPPING_ID + " BETWEEN ? AND ? "
+//            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? and "
+//            + FieldNames.MAPPING_TRACK + " = ? "
         + "ORDER BY " + FieldNames.MAPPING_START;
     
     /*
@@ -1515,14 +1535,15 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
            " LIMIT 1 ";
    
    
-    public static final String FETCH_COVERAGE_INCREASE_DISTRIBUTION = 
+    public static final String FETCH_COVERAGE_DISTRIBUTION = 
             "SELECT " +
                 FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + ", " +
                 FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " " +
             " FROM " + 
                 FieldNames.TABLE_COVERAGE_DISTRIBUTION + 
             " WHERE " +
-                FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? ";
+                FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? AND " +
+                FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " = ? ";
     
 //        public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("

@@ -71,18 +71,83 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
             ResultSet rs = fetch.executeQuery();
             //  int counter = 0;
             while (rs.next()) {
-                int id = rs.getInt(FieldNames.MAPPING_ID);
-                int start = rs.getInt(FieldNames.MAPPING_START);
-                int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
-                boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+                int currentTrackId = rs.getInt(FieldNames.MAPPING_TRACK);
+                if (currentTrackId == this.trackId) {
 
-                PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
-                        direction, count, errors, seqId, isBestMapping);
-                mappings.add(mapping);
+                    int id = rs.getInt(FieldNames.MAPPING_ID);
+                    int start = rs.getInt(FieldNames.MAPPING_START);
+                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                    int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
+                    int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
+                    boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+
+
+                    PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
+                            direction, count, errors, seqId, isBestMapping);
+                    mappings.add(mapping);
+                }
+
+
+            }
+            rs.close();
+            fetch.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
+        
+        return mappings;
+    }
+    
+    /**
+     * Loads all mappings (without diffs) from the DB with ids within 
+     * the given interval of the reference genome.
+     * @param request the genome request containing the requested mapping id interval
+     * @return the list of mappings belonging to the given mapping id interval
+     */
+    private List<PersistantMapping> loadMappingsById(GenomeRequest request) {
+        
+        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
+        
+        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
+        int from = request.getFrom();
+        int to = request.getTo();
+
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_WITHOUT_DIFFS2);
+            fetch.setLong(1, from);
+            fetch.setLong(2, to);
+//            fetch.setLong(3, from);
+//            fetch.setLong(4, to);
+//            fetch.setLong(3, trackId);
+
+            ResultSet rs = fetch.executeQuery();
+            //  int counter = 0;
+            while (rs.next()) {
+                int currentTrackId = rs.getInt(FieldNames.MAPPING_TRACK);
+                if (currentTrackId == this.trackId) {
+
+                    int id = rs.getInt(FieldNames.MAPPING_ID);
+                    int start = rs.getInt(FieldNames.MAPPING_START);
+                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                    int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
+                    int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
+                    boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+
+
+                    PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
+                            direction, count, errors, seqId, isBestMapping);
+                    mappings.add(mapping);
+                }
+
 
             }
             rs.close();
@@ -107,7 +172,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
             GenomeRequest request = requestQueue.poll();
             if (request != null) {
                 this.requestCounter++;
-                this.currentMappings = this.loadMappings(request);
+                this.currentMappings = this.loadMappingsById(request);
                 request.getSender().receiveData(currentMappings);
             } else {
                 try {

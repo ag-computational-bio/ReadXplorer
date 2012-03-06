@@ -16,7 +16,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantSubfeature;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
-import de.cebitec.vamp.exporter.excel.SnpExcelFileChooser;
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.SequenceComparison;
@@ -176,8 +176,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        evt.setSource(snpData);
-        SnpExcelFileChooser fileChooser = new SnpExcelFileChooser("xls", evt);
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", snpData, "SNP Table");
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed

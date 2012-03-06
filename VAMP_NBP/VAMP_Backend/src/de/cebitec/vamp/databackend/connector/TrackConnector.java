@@ -896,21 +896,25 @@ public class TrackConnector {
     }
 
     /**
-     * Fetches the {@link DiscreteCountingDistribution} for this track.
-     * @return the {@link DiscreteCountingDistribution} for this track.
+     * Fetches a {@link DiscreteCountingDistribution} for this track.
+     * @param the type of distribution either Properties.COVERAGE_INCREASE_DISTRIBUTION
+     * or Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
+     * @return a {@link DiscreteCountingDistribution} for this track.
      */
-    public DiscreteCountingDistribution getCoverageIncreaseDistribution() {
-        DiscreteCountingDistribution covIncreaseDistribution = new DiscreteCountingDistribution();
+    public DiscreteCountingDistribution getCoverageIncreaseDistribution(byte type) {
+        DiscreteCountingDistribution coverageDistribution = new DiscreteCountingDistribution();
+        coverageDistribution.setType(type);
         
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_INCREASE_DISTRIBUTION);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_DISTRIBUTION);
             fetch.setInt(1, this.trackID);
+            fetch.setByte(2, type);
 
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 int coverageIntervalId = rs.getInt(FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID);
                 int count = rs.getInt(FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT);
-                covIncreaseDistribution.setCountForIndex(coverageIntervalId, count);
+                coverageDistribution.setCountForIndex(coverageIntervalId, count);
             }
             rs.close();
             fetch.close();
@@ -919,14 +923,15 @@ public class TrackConnector {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
         
-        return covIncreaseDistribution;
+        return coverageDistribution;
     }
     
     /**
-     * Fetches the {@link DiscreteCountingDistribution} for this track.
-     * @return the {@link DiscreteCountingDistribution} for this track.
+     * Sets the coverage increase distribution {@link DiscreteCountingDistribution} for this track.
+     * @param distribution the coverage increase distribution 
+     *          {@link DiscreteCountingDistribution} for this track.
      */
-    public void insertCoverageIncreaseDistribution(DiscreteCountingDistribution distribution) {
+    public void insertCoverageDistribution(DiscreteCountingDistribution distribution) {
         
         int[] covDistribution = distribution.getDiscreteCountingDistribution();
         try {
@@ -934,8 +939,9 @@ public class TrackConnector {
             
             for (int i = 0; i < covDistribution.length; ++i) {
                 insert.setInt(1, this.trackID);
-                insert.setInt(2, i);
-                insert.setInt(3, covDistribution[i]);
+                insert.setByte(2, distribution.getType());
+                insert.setInt(3, i);
+                insert.setInt(4, covDistribution[i]);
                 insert.addBatch();
             }
             
