@@ -26,6 +26,7 @@ public class PersistantCoverage {
     private HashMap<Integer, Integer> perfectFwdNum;
     private HashMap<Integer, Integer> perfectRevMult;
     private HashMap<Integer, Integer> perfectRevNum;
+    private int heighstCoverage;
     
     //coverage Infos of track1
     private HashMap<Integer, Integer> commonFwdMultTrack1;
@@ -477,6 +478,17 @@ public class PersistantCoverage {
 
     public void setTwoTracks(boolean twoTracks) {
         this.twoTracks = twoTracks;
+    }
+
+    /*
+     * Setter and Getter for the heighest coverage for automatic scaling
+     */
+    public int getHeighstCoverage() {
+        return heighstCoverage;
+    }
+
+    public void setHeighstCoverage(int heighstCoverage) {
+        this.heighstCoverage = heighstCoverage;
     }
     
 

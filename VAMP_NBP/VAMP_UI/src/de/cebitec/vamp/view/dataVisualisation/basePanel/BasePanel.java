@@ -4,6 +4,7 @@ import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -90,6 +91,10 @@ public class BasePanel extends JPanel implements MousePositionListener {
         verticalZoom.setOrientation(JSlider.VERTICAL);
         this.boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
+        if(viewer instanceof TrackViewer){
+        TrackViewer tv = (TrackViewer)viewer ;
+        tv.setVerticalZoomValue(verticalZoom);
+        }
         centerPanel.add(viewer, BorderLayout.CENTER);
         centerPanel.add(verticalZoom, BorderLayout.WEST);
 

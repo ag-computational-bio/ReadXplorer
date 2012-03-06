@@ -30,32 +30,18 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
-    private String associatedTrackName;
+
+    private ArrayList<String> associatedTrackNames;
     private int trackID;
     private int genomeSize;
     private CoverageThread coverageThread;
     private Connection con;
-    /*Coverage at Position*/
-    private static int COV = 0;
-    /*Number of Diffs at Position (more than one per read possible)*/
-    private static int DIFF_COV = 1; //TODO: delete after check
-    private static int SNP_COV = 2;
-    private static int A_COV = 3;
-    private static int C_COV = 4;
-    private static int G_COV = 5;
-    private static int T_COV = 6;
-    private static int N_COV = 7;
-    private static int _COV = 8;
-    private static int A_GAP = 9;
-    private static int C_GAP = 10;
-    private static int G_GAP = 11;
-    private static int T_GAP = 12;
-    private static int N_GAP = 13;
-    /*Number of SNPs at Position (only one per read possible)*/
+    private ArrayList<Integer> trackIds ;
     private static int FIXED_INTERVAL_LENGTH = 1000;
 
     protected TrackConnector(PersistantTrack track) {
-        associatedTrackName = track.getDescription();
+       associatedTrackNames = new ArrayList<String>();
+        associatedTrackNames.add( track.getDescription());
         trackID = track.getId();
         con = ProjectConnector.getInstance().getConnection();
         genomeSize = this.getRefGenLength();
@@ -77,8 +63,10 @@ public class TrackConnector {
     }
 
     private void startCoverageThread(List<PersistantTrack> tracks) {
-        List<Integer> trackIds = new ArrayList<Integer>(tracks.size());
+        trackIds = new ArrayList<Integer>(tracks.size());
+        associatedTrackNames = new ArrayList<String>();
         for (PersistantTrack track : tracks) {
+            associatedTrackNames.add(track.getDescription());
             trackIds.add(track.getId());
         }
 
@@ -472,47 +460,19 @@ public class TrackConnector {
     }
 
     public String getAssociatedTrackName() {
-        return associatedTrackName;
+        return associatedTrackNames.get(0);
     }
 
-//    /**
-//     * Filtert die SNPs fuer die 454 Daten. Die Coverage links und rechts des SNPs duerfen nicht auffaellig
-//     * abweichen, mindestens 3 Reads an der Position muessen sich unterscheiden und wenn eine bestimmte
-//     * Prozentzahl sich unterscheidet.
-//     * @param map
-//     * @param overallPercentage
-//     * @param absThreshold
-//     * @return 
-//     */
-//    private List<Snp454> filterSnps454(Map<Integer, Integer[]> map, int percentageThreshold, int absThreshold) {
-//        ArrayList<Snp454 > snps = new ArrayList<Snp454>();
-//        Iterator<Integer> positions = map.keySet().iterator();
-//        String refSequence = this.getRefGenSequence();
-//        while (positions.hasNext()) {
-//            int position = positions.next();
-//            Integer[] data = map.get(position);
-//            double complete = data[COV];
-//            double snpCov = data[SNP_COV];
-//            int positionVariation = (int) ((snpCov / complete) * 100);
-//            
-//            boolean continuousCoverage = isCoverageContinuous(position, complete);            
-//            //Filterschritt: mindestens 3 reads muessen abweichen (zusaetzlich, falls nur wenige 
-//            // reads an der Stelle mappen) && continuousCoverage && (diffCov > 3)
-//            if ((positionVariation >= percentageThreshold) && (complete > 3) && continuousCoverage) {
-//                //pruefen, ob fuer jede basenabweichung der threshold erreicht ist, wenn ja = SNP 
-//                for (int i = A_COV; i < data.length; i++) {
-//                    double count = data[i];
-//                    int percentage = (int) (count / ((double) data[DIFF_COV]) * 100);
-//                    if (count >= absThreshold) {
-//                        snps.add(this.createSNP454(count, i, position, percentage, positionVariation, refSequence));
-//                    }
-//                }
-//            }
-//        }
-//        return snps;
-//    }    
-    /**
-     * pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
+    public ArrayList<String> getAssociatedTrackNames() {
+        return associatedTrackNames;
+    }
+
+    public ArrayList<Integer> getTrackIds() {
+        return trackIds;
+    }
+
+
+/* pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
      * stetige Readabdeckung
      * TODO: try to incorporate continuous coverage as optional in snp detection
      */

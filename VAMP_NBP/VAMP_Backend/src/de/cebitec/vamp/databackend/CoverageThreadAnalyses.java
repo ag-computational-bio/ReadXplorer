@@ -72,6 +72,7 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
             fetch.setLong(3, trackID);
 
             ResultSet rs = fetch.executeQuery();
+            int tmpHeighestCov = 0;
             //  int counter = 0;
             while (rs.next()) {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
@@ -82,9 +83,17 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
                 cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
                 cov.setBestMatchRevNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
                 //complete cov
-                cov.setCommonFwdMult(pos, rs.getInt(FieldNames.COVERAGE_N_FW_MULT));
+                int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+                
+                if(tmpHeighestCov < covNFWMult || tmpHeighestCov < covNRevMult){
+                    tmpHeighestCov = covNFWMult < covNRevMult?covNRevMult : covNFWMult;
+                     cov.setHeighstCoverage(tmpHeighestCov);
+                }
+               
+                cov.setCommonFwdMult(pos,covNFWMult );
                 cov.setCommonFwdNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
-                cov.setCommonRevMult(pos, rs.getInt(FieldNames.COVERAGE_N_RV_MULT));
+                cov.setCommonRevMult(pos, covNRevMult);
                 cov.setCommonRevNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
                 //perfect cov
                 cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));

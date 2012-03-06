@@ -189,6 +189,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
             WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").close();
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
+             WindowManager.getDefault().findTopComponent("TrackNormalizationTopComponent").close();
         }
     }
 
@@ -271,6 +272,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // search for opened tracks, if there are none open the track statistics window
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
+             WindowManager.getDefault().findTopComponent("TrackNormalizationTopComponent").open();
         }
 
         // put the panel's TrackViewer in lookup so it can be accessed
@@ -315,6 +317,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // if this was the last trackPanel close the track statistics window
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
+            WindowManager.getDefault().findTopComponent("TrackNormalizationTopComponent").close();
         }
     }
     

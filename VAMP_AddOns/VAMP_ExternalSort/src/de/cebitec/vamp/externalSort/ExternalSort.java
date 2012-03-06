@@ -13,8 +13,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class ExternalSort {
@@ -222,11 +220,11 @@ public class ExternalSort {
             }
             for (int i = 0; i < mergefr.size(); i++) {
                 mergefr.get(i).close();      
-                try {
+         /*       try {
                     Files.delete(files.get(i).toPath());
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
 
 

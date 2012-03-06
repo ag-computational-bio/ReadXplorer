@@ -159,7 +159,7 @@ public class PaintingAreaInfo {
         }
     }
 
-    public boolean fitsIntoAvailableForwardSpace(int yValue){
+    public boolean fitsIntoAvailableForwardSpace(double yValue){
         if(yValue <= availableForwardHeight){
             return true;
         } else {
@@ -167,7 +167,7 @@ public class PaintingAreaInfo {
         }
     }
 
-    public boolean fitsIntoAvailableReverseSpace(int yValue){
+    public boolean fitsIntoAvailableReverseSpace(double yValue){
         if(yValue <= availableReverseHeight){
             return true;
         } else {

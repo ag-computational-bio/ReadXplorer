@@ -106,19 +106,16 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
     public void resultChanged(LookupEvent ev) {
         if (result.allInstances().isEmpty() && !Utilities.actionsGlobalContext().lookupAll(ReferenceViewer.class).isEmpty()){
             setVisible(false);
-        }
-        else{
+        }  else{
             if (!isVisible()){ setVisible(true); }
             for (TrackViewer trackViewer : result.allInstances()) {
                 trackStatisticsPanel.setTrackConnector(trackViewer.getTrackCon());
-                trackStatisticsPanel.setTrackName(trackViewer.getTrackCon().getAssociatedTrackName());
 
                 trackViewer.addMouseListener(new MouseListener() {
 
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        trackStatisticsPanel.setTrackName(((TrackViewer) e.getSource()).getTrackCon().getAssociatedTrackName());
-                            trackStatisticsPanel.setTrackConnector(((TrackViewer) e.getSource()).getTrackCon());
+                       trackStatisticsPanel.setTrackConnector( ((TrackViewer) e.getSource()).getTrackCon());
                     }
 
                     @Override
