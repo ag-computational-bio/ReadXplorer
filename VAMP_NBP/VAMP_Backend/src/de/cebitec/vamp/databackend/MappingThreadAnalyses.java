@@ -174,6 +174,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
                 this.requestCounter++;
                 this.currentMappings = this.loadMappingsById(request);
                 request.getSender().receiveData(currentMappings);
+                
             } else {
                 try {
                     Thread.sleep(10);
