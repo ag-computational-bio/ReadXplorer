@@ -47,6 +47,9 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
     private HashMap<Integer, PutativOperon> featureReadCount; //feature id to count of mappings for feature
     private List<OperonAdjacency> neighbarOperon;
     private int lastGene = 0;
+    private int average_Read_Length = 0;
+    TrackConnector trackCon;
+    private int average_SeqPair_length = 0;
 
     public AnalysisOperon(DataVisualisationI parent, TrackViewer trackViewer, int minNumberReads, boolean operonDetectionAutomatic) {
         this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisOperon.class, "MSG_AnalysesWorker.progress.name"));
@@ -64,9 +67,12 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
     public void startAnalysis() {
 
         this.progressHandle.start();
-        TrackConnector trackCon = trackViewer.getTrackCon();
+        this.trackCon = trackViewer.getTrackCon();
         List<Integer> trackIds = new ArrayList<Integer>();
         trackIds.add(trackCon.getTrackID());
+        average_Read_Length = trackCon.getAverageReadLength();
+        average_SeqPair_length = trackCon.getAverageSeqPairLenght();
+        //System.out.println(average_SeqPair_length);
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
         this.genomeSize = refConnector.getRefGen().getSequence().length();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
@@ -74,6 +80,7 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
         int numUnneededMappings = 0;
         WholNumberMappingGenom = trackCon.getNumOfUniqueBmMappings();
         TranscritomLength = trackCon.getCoveredBestMatchPos();
+
         List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
         for (PersistantTrack track : tracksAll) {
             TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
@@ -185,10 +192,10 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
                         read_cover_Gen1++;
                     } else if (mapping.getStart() > featStop_Gen1 && mapping.getStop() >= featStart_Gen2 && mapping.getStop() <= featStop_Gen2) {
                         read_cover_Gen2++;
-                    } else if (mapping.getStart()>=featStart_Gen1 && mapping.getStart()<=featStop_Gen1 && mapping.getStop()>=featStart_Gen2&& mapping.getStop()<=featStop_Gen2) {
+                    } else if (mapping.getStart() >= featStart_Gen1 && mapping.getStart() <= featStop_Gen1 && mapping.getStop() >= featStart_Gen2 && mapping.getStop() <= featStop_Gen2) {
                         read_cover_Gen1_and_Gen2++;
-                    } else if (mapping.getStart()>featStop_Gen1 &&mapping.getStop()<featStart_Gen2) {
-                    read_cover_none++;
+                    } else if (mapping.getStart() > featStop_Gen1 && mapping.getStop() < featStart_Gen2) {
+                        read_cover_none++;
                     }
 //                    if (mapping.getStart() <= featStop_Gen1 && mapping.getStart()>=featStart_Gen1) {
 //                        if (mapping.getStop() >= featStart_Gen2 && mapping.getStop() <=featStop_Gen2) {
@@ -234,12 +241,25 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
             int numberSignifikant = 0;
             PersistantFeature feature_Gen1 = featureReadCount.get(keyss[z]).getGenFeature1();
             PersistantFeature feature_Gen2 = featureReadCount.get(keyss[z]).getGenFeature2();
-            if (!operonDetectionAutomatic) {
-                numberSignifikant = (WholNumberMappingGenom * 35) / TranscritomLength;
-            } else {
-                numberSignifikant = minNumberReads;
 
+            if (trackCon.getNumOfSeqPairs() > 0) {
+                //System.out.println("mkdmkd "+ trackCon.getNumOfSeqPairs());
+                if (!operonDetectionAutomatic) {
+                    numberSignifikant = (WholNumberMappingGenom * average_SeqPair_length) / TranscritomLength;
+                } else {
+                    numberSignifikant = minNumberReads;
+
+                }
+            } else {
+                if (!operonDetectionAutomatic) {
+                    numberSignifikant = (WholNumberMappingGenom * average_Read_Length) / TranscritomLength;
+                } else {
+                    numberSignifikant = minNumberReads;
+
+                }
             }
+
+
 
 
             if (allReadCover > numberSignifikant) {
@@ -254,7 +274,7 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
 
                     neighbarOperon.add(operon_gene);
 //                    System.out.println(feature_Gen1.getId() + "==" + feature_Gen2.getId());
-//                    System.out.println("mkdmkd");
+                    lastGene = feature_Gen2.getId();
                 } else if (lastGene != feature_Gen1.getId() && lastGene != 0) {
 
                     Operon op = new Operon();
@@ -265,16 +285,16 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
                     operonList.add(op);
                     neighbarOperon.clear();
                     neighbarOperon.add(operon_gene);
-//                    System.out.println(feature_Gen1.getId() + "==" + feature_Gen2.getId());
+
+                    lastGene = feature_Gen2.getId();
 
                 } else if (lastGene == 0) {
                     neighbarOperon.add(operon_gene);
-//                    System.out.println(feature_Gen1.getId() + "==" + feature_Gen2.getId());
-
+                    lastGene = feature_Gen2.getId();
                 }
 
             }
-            lastGene = feature_Gen2.getId();
+
         }
 
 //        for(int a=0;a<operonList.size();a++){

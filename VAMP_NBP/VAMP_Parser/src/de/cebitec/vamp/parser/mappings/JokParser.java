@@ -58,9 +58,12 @@ public class JokParser implements MappingParserI, Observer {
             String line = null;
             int noUniqueSeq = 0;
             this.noUniqueMappings = 0;
+            int averageOfReadLength=0;
+            int addreadsLength=0;
+            int countofread=br.readLine().length();
             while ((line = br.readLine()) != null) {
                 lineno++;
-
+                
                 // tokenize input line
                 String[] tokens = line.split("\\t+", 8);
                 if (tokens.length == 7) { // if the length is not correct the read is not parsed
@@ -73,6 +76,7 @@ public class JokParser implements MappingParserI, Observer {
                         stop = Integer.parseInt(tokens[2]);
                         start++;
                         stop++; // some people (no names here...) start counting at 0, I count genome position starting with 1
+                        addreadsLength+=(stop-start);
                     } catch (NumberFormatException e) { //
                         if (!tokens[1].equals("*")) {
                             this.sendErrorMsg("Value for current start position in "
@@ -203,7 +207,9 @@ public class JokParser implements MappingParserI, Observer {
 //                s.add(i);
 //            }
 //            // it.remove();
-
+            averageOfReadLength=addreadsLength/mappingContainer.getMappingInformations().get(6);
+            mappingContainer.setAverageReadLength(averageOfReadLength);
+            
             mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
             mappingContainer.setNumberOfUniqueSeq(noUniqueSeq); // = mappingContainer.mappings.size()
 //            s.clear();

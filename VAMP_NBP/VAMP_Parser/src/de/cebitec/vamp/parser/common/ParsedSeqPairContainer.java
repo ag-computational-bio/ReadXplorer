@@ -21,7 +21,7 @@ public class ParsedSeqPairContainer {
     private long numOfUniqueSPs = 0; //container size at the end of classification
     private long numOfSingleMappings = 0; //container size at the end of classification
     private String description;
-    
+    private int average_Seq_Pair_length=0;
     private HashMap<Pair<Long, Long>, ParsedSeqPairMapping> parsedSeqPairs;
     private List<Pair<Long, Long>> mappingToPairIDList;
 
@@ -152,6 +152,20 @@ public class ParsedSeqPairContainer {
 
     public void setTrackId2(int trackId2) {
         this.trackId2 = trackId2;
+    }
+
+    /**
+     * @return the average_Seq_Pair_length
+     */
+    public int getAverage_Seq_Pair_length() {
+        return average_Seq_Pair_length;
+    }
+
+    /**
+     * @param average_Seq_Pair_length the average_Seq_Pair_length to set
+     */
+    public void setAverage_Seq_Pair_length(int average_Seq_Pair_length) {
+        this.average_Seq_Pair_length = average_Seq_Pair_length;
     }
     
     

@@ -26,6 +26,7 @@ public class FieldNames {
     public final static String TABLE_POSITIONS = "POSITIONS";
     public final static String TABLE_STATISTICS = "STATISTICS";  
     public final static String TABLE_COVERAGE_DISTRIBUTION = "COVERAGE_DISTRIBUTION";
+   
     
     
     ////////////////////////  tables fields  //////////////////////////////// 
@@ -170,6 +171,8 @@ public class FieldNames {
     public final static String STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS = "NUM_UNIQUE_SEQPAIRS";
     public final static String STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS = "NUM_UNIQUE_PERFECT_SEQPAIRS";
     public static final String STATISTICS_NUM_SINGLE_MAPPINGS = "NUM_SINGLE_MAPPINGS";
+    public static final String STATISTICS_AVERAGE_READ_LENGTH = "AVERAGE_READ_LENGTH";
+    public static final String STATISTICS_AVERAGE_SEQ_PAIR_LENGTH= "AVERAGE_SEQPAIR_LENGTH";
     
     // unique mappings = count all distinct mapping ids
     // unique sequences = num mapped seq = count all distinct seq ids

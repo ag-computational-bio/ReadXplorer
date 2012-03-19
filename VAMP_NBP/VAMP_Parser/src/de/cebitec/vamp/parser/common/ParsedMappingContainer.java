@@ -24,6 +24,7 @@ public class ParsedMappingContainer implements Observable, Observer {
     private ArrayList<Observer> observers;
     private boolean lastMappingContainer=false;
     private boolean firstMappingContainer=false;
+    private int averageReadLength;
     /**
      * Creates an empty mapping container.
      */
@@ -82,6 +83,7 @@ public class ParsedMappingContainer implements Observable, Observer {
         mappingInfos.put(4, numUniqueMappings);
         mappingInfos.put(5, numUniqueSeq);
         mappingInfos.put(6, numReads);
+        mappingInfos.put(7,averageReadLength);
 
         return mappingInfos;
     }
@@ -141,6 +143,20 @@ public class ParsedMappingContainer implements Observable, Observer {
 
     public void setFirstMappingContainer(boolean firstMappingContainer) {
         this.firstMappingContainer = firstMappingContainer;
+    }
+
+    /**
+     * @return the averageReadLength
+     */
+    public int getAverageReadLength() {
+        return averageReadLength;
+    }
+
+    /**
+     * @param averageReadLength the averageReadLength to set
+     */
+    public void setAverageReadLength(int averageReadLength) {
+        this.averageReadLength = averageReadLength;
     }
     
     

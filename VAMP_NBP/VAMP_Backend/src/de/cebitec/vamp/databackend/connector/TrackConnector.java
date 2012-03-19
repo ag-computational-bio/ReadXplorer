@@ -30,18 +30,17 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
-
     private ArrayList<String> associatedTrackNames;
     private int trackID;
     private int genomeSize;
     private CoverageThread coverageThread;
     private Connection con;
-    private ArrayList<Integer> trackIds ;
+    private ArrayList<Integer> trackIds;
     private static int FIXED_INTERVAL_LENGTH = 1000;
 
     protected TrackConnector(PersistantTrack track) {
-       associatedTrackNames = new ArrayList<String>();
-        associatedTrackNames.add( track.getDescription());
+        associatedTrackNames = new ArrayList<String>();
+        associatedTrackNames.add(track.getDescription());
         trackID = track.getId();
         con = ProjectConnector.getInstance().getConnection();
         genomeSize = this.getRefGenLength();
@@ -76,7 +75,7 @@ public class TrackConnector {
 
     public Collection<PersistantMapping> getMappings(int from, int to) {
         HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
-        if (from < to && from >0 && to>0) {
+        if (from < to && from > 0 && to > 0) {
             try {
 
                 //determine readlength
@@ -158,8 +157,9 @@ public class TrackConnector {
     /**
      * Handles a coverage request. This means the request containig the sender
      * of the request (the object that wants to receive the coverage) is handed
-     * over to the CoverageThread, who will carry out the request as soon
-     * as possible. Afterwards the coverage result is handed over to the receiver.
+     * over to the CoverageThread, who will carry out the request as soon as
+     * possible. Afterwards the coverage result is handed over to the receiver.
+     *
      * @param request the coverage request including the receiving object
      */
     public void addCoverageRequest(GenomeRequest request) {
@@ -294,7 +294,15 @@ public class TrackConnector {
     public int getNumOfPerfectUniqueMappingsCalculate() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
     }
-    
+
+    public int getAverageReadLength() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_READ_LENGTH, SQLStatements.GET_NUM, con, trackID);
+    }
+
+    public int getAverageSeqPairLenght() {
+        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_SEQ_PAIR_LENGTH, SQLStatements.GET_NUM, con, trackID);
+    }
+
     public int getCoveredPerfectPos() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_PERFECT_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
     }
@@ -312,7 +320,7 @@ public class TrackConnector {
     public int getCoveredBestMatchPos() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
     }
-    
+
     public double getPercentRefGenBmCovered() {
         return this.getCoveredBestMatchPos() / genomeSize * 100;
     }
@@ -325,7 +333,7 @@ public class TrackConnector {
     public int getCoveredCommonMatchPos() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_COMPLETE_COVERAGE_OF_GENOME, SQLStatements.GET_NUM, con, trackID);
     }
-        
+
     public double getPercentRefGenNErrorCovered() {
         return this.getCoveredCommonMatchPos() / genomeSize * 100;
     }
@@ -340,7 +348,7 @@ public class TrackConnector {
         HashMap<Integer, Integer> positionMap = new HashMap<Integer, Integer>();
         int coverage;
         int position;
-        if (from < to && from >0 && to >0) {
+        if (from < to && from > 0 && to > 0) {
             try {
 
                 fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
@@ -472,9 +480,10 @@ public class TrackConnector {
     }
 
 
-/* pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
-     * stetige Readabdeckung
-     * TODO: try to incorporate continuous coverage as optional in snp detection
+    /*
+     * pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
+     * stetige Readabdeckung TODO: try to incorporate continuous coverage as
+     * optional in snp detection
      */
     private boolean isCoverageContinuous(int position, double coverage) {
         boolean isContinous = true;
@@ -564,12 +573,15 @@ public class TrackConnector {
 
     /**
      * Fetches all sequence pair mappings for the given interval and typeFlag.
+     *
      * @param from start position of the currently viewed interval
      * @param to stop position of the currently viewed interval
-     * @param trackID2 the track id of the second track to which the currently viewed
-     *                  sequence paris belong
-     * @param typeFlag flagging which data to retrieve using Properties.SEQ_PAIRS, Properties.SINGLE_MAPPINGS, Properties.BOTH
-     * @return the collection of sequence pair mappings for the given interval and typeFlag
+     * @param trackID2 the track id of the second track to which the currently
+     * viewed sequence paris belong
+     * @param typeFlag flagging which data to retrieve using
+     * Properties.SEQ_PAIRS, Properties.SINGLE_MAPPINGS, Properties.BOTH
+     * @return the collection of sequence pair mappings for the given interval
+     * and typeFlag
      */
     public Collection<PersistantSeqPairGroup> getSeqPairMappings(int from, int to, int trackID2, byte typeFlag) {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<Long, PersistantSeqPairGroup>();
@@ -593,7 +605,7 @@ public class TrackConnector {
 //                fetchReadlength.close();
 
                 //sequence pair processing
-                
+
                 if (typeFlag != Properties.SINGLE_MAPPINGS && typeFlag != Properties.NONE) {
 
                     //we need both statements, because an "OR" query for mapping1_id OR mapping2_id is incredibly slow...
@@ -731,8 +743,9 @@ public class TrackConnector {
     }
 
     /**
-     * @return The sequence pair id belonging to the track connectors track id or <code>0</code> if this
-     * track is not a sequence pair track.
+     * @return The sequence pair id belonging to the track connectors track id
+     * or
+     * <code>0</code> if this track is not a sequence pair track.
      */
     public Integer getSeqPairToTrackID() {
         int value = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_SEQ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
@@ -741,7 +754,8 @@ public class TrackConnector {
 
     /**
      * @param seqPairId the sequence pair id to get the second track id for
-     * @return the second track id of a sequence pair beyond this track connectors track id
+     * @return the second track id of a sequence pair beyond this track
+     * connectors track id
      */
     public int getTrackIdToSeqPairId(int seqPairId) {
         int num = 0;
@@ -763,8 +777,10 @@ public class TrackConnector {
 
     /**
      * Returns all mappings belonging to a sequence pair
+     *
      * @param seqPairId sequence id to search for
-     * @return all data belonging to this sequence pair id (all mappings and pair replicates)
+     * @return all data belonging to this sequence pair id (all mappings and
+     * pair replicates)
      */
     public PersistantSeqPairGroup getMappingsForSeqPairId(long seqPairId) {
 
@@ -857,14 +873,16 @@ public class TrackConnector {
 
     /**
      * Fetches a {@link DiscreteCountingDistribution} for this track.
-     * @param the type of distribution either Properties.COVERAGE_INCREASE_DISTRIBUTION
-     * or Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
+     *
+     * @param the type of distribution either
+     * Properties.COVERAGE_INCREASE_DISTRIBUTION or
+     * Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
      * @return a {@link DiscreteCountingDistribution} for this track.
      */
     public DiscreteCountingDistribution getCoverageIncreaseDistribution(byte type) {
         DiscreteCountingDistribution coverageDistribution = new DiscreteCountingDistribution();
         coverageDistribution.setType(type);
-        
+
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_DISTRIBUTION);
             fetch.setInt(1, this.trackID);
@@ -878,25 +896,27 @@ public class TrackConnector {
             }
             rs.close();
             fetch.close();
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return coverageDistribution;
     }
-    
+
     /**
-     * Sets the coverage increase distribution {@link DiscreteCountingDistribution} for this track.
-     * @param distribution the coverage increase distribution 
+     * Sets the coverage increase distribution {@link DiscreteCountingDistribution}
+     * for this track.
+     *
+     * @param distribution the coverage increase distribution
      *          {@link DiscreteCountingDistribution} for this track.
      */
     public void insertCoverageDistribution(DiscreteCountingDistribution distribution) {
-        
+
         int[] covDistribution = distribution.getDiscreteCountingDistribution();
         try {
             PreparedStatement insert = con.prepareStatement(SQLStatements.INSERT_COVERAGE_DISTRIBUTION);
-            
+
             for (int i = 0; i < covDistribution.length; ++i) {
                 insert.setInt(1, this.trackID);
                 insert.setByte(2, distribution.getType());
@@ -904,10 +924,10 @@ public class TrackConnector {
                 insert.setInt(4, covDistribution[i]);
                 insert.addBatch();
             }
-            
+
             insert.executeBatch();
             insert.close();
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
