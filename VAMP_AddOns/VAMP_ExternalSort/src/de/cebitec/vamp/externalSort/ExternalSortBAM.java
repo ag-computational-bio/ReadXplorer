@@ -1,6 +1,7 @@
 package de.cebitec.vamp.externalSort;
 
 import java.io.File;
+//import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -236,13 +237,17 @@ public class ExternalSortBAM {
 
 
 // close all the files
-            bfw.close();
-            sortedFile = sorted;
-            
-            for (int i = 0; i < mergeIt.size(); i++) {
-                mergeIt.get(i).close();
-                files.get(i).delete();
-            }
+//            bfw.close();
+//            sortedFile = sorted;
+//            for (int i = 0; i < mergeIt.size(); i++) {
+//                mergeIt.get(i).close();
+//                fileReaders.get(i).close();
+//                try {
+//                    Files.delete(files.get(i).toPath());
+//                } catch (IOException e) {
+//                    io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.FileDeletionError", files.get(i).getAbsolutePath()));
+//                }
+//            }
             mergeIt.clear();
             filerows.clear();
 

@@ -66,6 +66,7 @@ public class ProjectConnector {
     private final static int DIFF_BATCH_SIZE = BATCH_SIZE;
     private final static String VARCHAR_20 = "VARCHAR(20)";
     private final static String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
+    private final static String INT_UNSIGNED = "INT UNSIGNED";
     
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
@@ -319,7 +320,11 @@ public class ProjectConnector {
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
                     FieldNames.TABLE_FEATURES, FieldNames.ANNOTATION_GENE, "VARCHAR (20)"));
-               
+        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_READ_LENGTH, INT_UNSIGNED));
+        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
+                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH, INT_UNSIGNED));
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
     }
@@ -665,12 +670,13 @@ public class ProjectConnector {
         int coverageBM = 0;
         int coverageComplete = 0;
         long trackID = track.getID();
-
+        int averageRead=0;
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
             mappings += mappingInfos.get(1);
             perfectMappings += mappingInfos.get(2);
             bmMappings += mappingInfos.get(3);
+            averageRead=mappingInfos.get(7);
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the statistics list");
         }
@@ -718,6 +724,7 @@ public class ProjectConnector {
                 insertStatistics.setInt(9, coverageComplete);
                 insertStatistics.setInt(10, noUniqueSeq);
                 insertStatistics.setInt(11, numReads);
+                insertStatistics.setInt(12,averageRead);
                 insertStatistics.execute();
                 insertStatistics.close();
                 mappings = 0;
@@ -754,6 +761,7 @@ public class ProjectConnector {
                 addStatistics.setLong(4, numUniquePerfSeqPairs);
                 addStatistics.setLong(5, numSingleMappings);
                 addStatistics.setLong(6, id);
+                addStatistics.setLong(7, seqPairContainer.getAverage_Seq_Pair_length());
                 addStatistics.execute();
 
                 addStatistics.close();
