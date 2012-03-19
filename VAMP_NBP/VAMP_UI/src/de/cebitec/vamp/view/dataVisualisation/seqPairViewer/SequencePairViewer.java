@@ -124,17 +124,17 @@ public class SequencePairViewer extends AbstractViewer {
      */
     private void createAndShowNewLayout(int from, int to) {
         
-        //check for feature types in the exclusion list and adapt database query for performance
-        List<FeatureType> excludedFeatureTypes = this.getExcludedFeatureTypes();
+        //check for annotation types in the exclusion list and adapt database query for performance
+        List<FeatureType> excludedAnnotationTypes = this.getExcludedFeatureTypes();
         byte includedTypeFlag = Properties.BOTH;
-        if (excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING) &&
-            excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR) && 
-            excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR)){
+        if (excludedAnnotationTypes.contains(FeatureType.SINGLE_MAPPING) &&
+            excludedAnnotationTypes.contains(FeatureType.PERFECT_PAIR) && 
+            excludedAnnotationTypes.contains(FeatureType.DISTORTED_PAIR)){
             includedTypeFlag = Properties.NONE;
-        } else if (excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING)){
+        } else if (excludedAnnotationTypes.contains(FeatureType.SINGLE_MAPPING)){
             includedTypeFlag = Properties.SEQ_PAIRS;
-        } else if (excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR) && 
-                   excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR)) {
+        } else if (excludedAnnotationTypes.contains(FeatureType.PERFECT_PAIR) && 
+                   excludedAnnotationTypes.contains(FeatureType.DISTORTED_PAIR)) {
             includedTypeFlag = Properties.SINGLE_MAPPINGS;
         }
 

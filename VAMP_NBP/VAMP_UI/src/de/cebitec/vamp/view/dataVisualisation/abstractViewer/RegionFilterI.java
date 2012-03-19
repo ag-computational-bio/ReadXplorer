@@ -9,7 +9,7 @@ import java.util.List;
 public interface RegionFilterI {
 
     /**
-     * Identifies regions. Remember to set setFrameCurrFeature in StartCodonFilter
+     * Identifies regions. Remember to set setFrameCurrAnnotation in StartCodonFilter
      * first, if only regions of a specified frame should be identified.
      * @return a list of the identified regions
      */

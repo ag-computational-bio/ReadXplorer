@@ -10,7 +10,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -51,7 +51,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     private int increaseReadPercent;
     private int maxInitialReadCount;
     private int increaseReadCount2;
-    private List<PersistantFeature> genomeFeatures;
+    private List<PersistantAnnotation> genomeAnnotations;
     private List<GeneStart> detectedStarts; //stores position and true for fwd, false for rev strand
     private DiscreteCountingDistribution covIncreaseDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
@@ -63,8 +63,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     private int nbCarriedOutRequests;
     private int covLastFwdPos;
     private int covLastRevPos;
-    private int lastFeatureIdxGenStartsFwd;
-    private int lastFeatureIdxGenStartsRev;
+    private int lastAnnotationIdxGenStartsFwd;
+    private int lastAnnotationIdxGenStartsRev;
 
     /**
      * Carries out the logic behind the gene start analysis.
@@ -101,8 +101,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         this.detectedStarts = new ArrayList<GeneStart>();
         this.covLastFwdPos = 0;
         this.covLastRevPos = 0;
-        this.lastFeatureIdxGenStartsFwd = 0;
-        this.lastFeatureIdxGenStartsRev = 0;
+        this.lastAnnotationIdxGenStartsFwd = 0;
+        this.lastAnnotationIdxGenStartsRev = 0;
     }
 
     /**
@@ -115,7 +115,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     public void startAnalysis() {
 
         this.progressHandle.start();
-        TrackConnector trackCon = trackViewer.getTrackCon();
+        TrackConnector trackCon = this.trackViewer.getTrackCon();
         List<Integer> trackIds = new ArrayList<Integer>();
         trackIds.add(trackCon.getTrackID());
         CoverageThreadAnalyses coverageThread = new CoverageThreadAnalyses(trackIds);
@@ -126,12 +126,12 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         //decide upon stepSize of a single request and analyse coverage of whole genome
         int stepSize = 200000;
         int from = 1;
-        int to = genomeSize > stepSize ? stepSize : genomeSize;
-        int additionalRequest = genomeSize % stepSize == 0 ? 0 : 1;
-        this.nbRequests = genomeSize / stepSize + additionalRequest;
+        int to = this.genomeSize > stepSize ? stepSize : this.genomeSize;
+        int additionalRequest = this.genomeSize % stepSize == 0 ? 0 : 1;
+        this.nbRequests = this.genomeSize / stepSize + additionalRequest;
         this.progressHandle.switchToDeterminate(this.nbRequests);
 
-        while (to < genomeSize) {
+        while (to < this.genomeSize) {
             GenomeRequest coverageRequest = new GenomeRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
             coverageThread.addRequest(coverageRequest);
 
@@ -140,7 +140,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         }
 
         //calc last interval until genomeSize
-        to = genomeSize;
+        to = this.genomeSize;
         GenomeRequest coverageRequest = new GenomeRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
         coverageThread.addRequest(coverageRequest);
     }
@@ -151,9 +151,10 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
      */
     private void initDatastructures(TrackConnector trackCon) {
         
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
+        int refId = this.trackViewer.getReference().getId();
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
         this.genomeSize = refConnector.getRefGen().getSequence().length();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);   
+        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, this.genomeSize);   
         
         this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
         this.covIncPercentDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
@@ -175,7 +176,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     
     @Override
     public void receiveData(Object data) {
-        this.progressHandle.progress("Request " + (++nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+        this.progressHandle.progress("Request " + (++this.nbCarriedOutRequests + 1) + 
+                " of " + this.nbRequests, this.nbCarriedOutRequests);
 
         if (data instanceof PersistantCoverage) {
             PersistantCoverage coverage = (PersistantCoverage) data;
@@ -277,8 +279,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                     || fwdCov1 <= this.maxInitialReadCount 
                     && diffFwd > this.increaseReadCount2) {
 
-                DetectedFeatures detFeatures = this.findNextFeature(pos + 1, SequenceUtils.STRAND_FWD);
-                this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detFeatures));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, SequenceUtils.STRAND_FWD);
+                this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
             }
             if (diffRev > this.increaseReadCount 
                     && percentDiffRev > this.increaseReadPercent 
@@ -286,113 +288,113 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                     || revCov2 <= this.maxInitialReadCount 
                     && diffRev > this.increaseReadCount2) {
 
-                DetectedFeatures detFeatures = this.findNextFeature(pos, SequenceUtils.STRAND_REV);
-                this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detFeatures));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, SequenceUtils.STRAND_REV);
+                this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
             }
 
         } else {
             if (diffFwd > this.increaseReadCount && percentDiffFwd > this.increaseReadPercent) {
-                DetectedFeatures detFeatures = this.findNextFeature(pos + 1, SequenceUtils.STRAND_FWD);
-                this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detFeatures));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, SequenceUtils.STRAND_FWD);
+                this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
             }
             if (diffRev > this.increaseReadCount && percentDiffRev > this.increaseReadPercent) {
-                DetectedFeatures detFeatures = this.findNextFeature(pos, SequenceUtils.STRAND_REV);
-                this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detFeatures));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, SequenceUtils.STRAND_REV);
+                this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
             }
         }
     }
 
     /**
-     * Detects and returns the genomic features, which can be associated to the
-     * given gene start and strand. This can be eiter a feature starting at the
+     * Detects and returns the genomic annotations, which can be associated to the
+     * given gene start and strand. This can be eiter a annotation starting at the
      * predicted gene start, which would be a correct start, or it will contain
-     * the maximal two closest features found in a vicinity of 500bp up- or 
+     * the maximal two closest annotations found in a vicinity of 500bp up- or 
      * downstream of the gene start.
      * @param geneStartPos the predicted gene start position
      * @param strand the strand, on which the gene start is located
-     * @return the genomic features, which can be associated to the
+     * @return the genomic annotations, which can be associated to the
      * given gene start and strand.
      */
-    private DetectedFeatures findNextFeature(int geneStartPos, byte strand) {
+    private DetectedAnnotations findNextAnnotation(int geneStartPos, byte strand) {
         final int maxDeviation = 1000;
         int minStartPos = geneStartPos - maxDeviation < 0 ? 0 : geneStartPos - maxDeviation;
         int maxStartPos = geneStartPos + maxDeviation > this.genomeSize ? genomeSize : geneStartPos + maxDeviation;
-        PersistantFeature feature;
-        DetectedFeatures detectedFeatures = new DetectedFeatures();
+        PersistantAnnotation annotation;
+        DetectedAnnotations detectedAnnotations = new DetectedAnnotations();
         int start;
-        boolean fstFittingFeature = true;
+        boolean fstFittingAnnotation = true;
         if (strand == SequenceUtils.STRAND_FWD) {
-            for (int i = this.lastFeatureIdxGenStartsFwd; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
-                start = feature.getStart();
+            for (int i = this.lastAnnotationIdxGenStartsFwd; i < this.genomeAnnotations.size(); ++i) {
+                annotation = this.genomeAnnotations.get(i);
+                start = annotation.getStart();
 
-                if (start >= minStartPos && feature.getStrand() == strand && start <= maxStartPos) {
+                if (start >= minStartPos && annotation.getStrand() == strand && start <= maxStartPos) {
 
-                    if (fstFittingFeature) {
-                        this.lastFeatureIdxGenStartsFwd = i; //this is the first feature in the interval
-                        fstFittingFeature = false;
+                    if (fstFittingAnnotation) {
+                        this.lastAnnotationIdxGenStartsFwd = i; //this is the first annotation in the interval
+                        fstFittingAnnotation = false;
                     }
 
-                    if (start < geneStartPos && feature.getStop() > geneStartPos) {
-                        //store feature as next smaller feature, but search for closer
-                        //smaller feature & correctly annotated gene start
-                        detectedFeatures.setupstreamFeature(feature);
+                    if (start < geneStartPos && annotation.getStop() > geneStartPos) {
+                        //store annotation as next smaller annotation, but search for closer
+                        //smaller annotation & correctly annotated gene start
+                        detectedAnnotations.setUpstreamAnnotation(annotation);
                     } else if (start == geneStartPos) {
                         //store correctly annotated gene start
-                        detectedFeatures.setCorrectStartFeature(feature);
-                        detectedFeatures.setupstreamFeature(null);
+                        detectedAnnotations.setCorrectStartAnnotation(annotation);
+                        detectedAnnotations.setUpstreamAnnotation(null);
                         break;
                     } else if (start > geneStartPos) {
-                        //store next bigger feature, translation start is earlier
-                        detectedFeatures.setDownstreamFeature(feature);
+                        //store next bigger annotation, translation start is earlier
+                        detectedAnnotations.setDownstreamAnnotation(annotation);
                         break;
                     }
 
                 } else if (start >= maxStartPos) {
-                    if (fstFittingFeature) {
-                        this.lastFeatureIdxGenStartsFwd = i; //this is the first feature in the interval
+                    if (fstFittingAnnotation) {
+                        this.lastAnnotationIdxGenStartsFwd = i; //this is the first annotation in the interval
                     }
                     break;
                 }
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
-                start = feature.getStop();
+            for (int i = this.lastAnnotationIdxGenStartsRev; i < this.genomeAnnotations.size(); ++i) {
+                annotation = this.genomeAnnotations.get(i);
+                start = annotation.getStop();
 
-                if (start >= minStartPos && feature.getStrand() == strand && start <= maxStartPos) {
+                if (start >= minStartPos && annotation.getStrand() == strand && start <= maxStartPos) {
 
-                    if (fstFittingFeature) {
-                        this.lastFeatureIdxGenStartsRev = i; //this is the first feature in the interval
-                        fstFittingFeature = false;
+                    if (fstFittingAnnotation) {
+                        this.lastAnnotationIdxGenStartsRev = i; //this is the first annotation in the interval
+                        fstFittingAnnotation = false;
                     }
 
                     if (start < geneStartPos) {
-                        //store feature as next bigger feature, but search for closer
-                        //bigger feature & correctly annotated gene start
-                        detectedFeatures.setDownstreamFeature(feature);
+                        //store annotation as next bigger annotation, but search for closer
+                        //bigger annotation & correctly annotated gene start
+                        detectedAnnotations.setDownstreamAnnotation(annotation);
                     } else if (start == geneStartPos) {
                         //store correctly annotated gene start
-                        detectedFeatures.setCorrectStartFeature(feature);
-                        detectedFeatures.setDownstreamFeature(null);
+                        detectedAnnotations.setCorrectStartAnnotation(annotation);
+                        detectedAnnotations.setDownstreamAnnotation(null);
                         break;
-                    } else if (start > geneStartPos && feature.getStart() < geneStartPos) {
-                        //store next smaller feature, translation start is further in gene
-                        detectedFeatures.setupstreamFeature(feature);
+                    } else if (start > geneStartPos && annotation.getStart() < geneStartPos) {
+                        //store next smaller annotation, translation start is further in gene
+                        detectedAnnotations.setUpstreamAnnotation(annotation);
                         break;
 
                     }
 
                 } else if (start >= maxStartPos) {
-                    if (fstFittingFeature) {
-                        this.lastFeatureIdxGenStartsRev = i;
+                    if (fstFittingAnnotation) {
+                        this.lastAnnotationIdxGenStartsRev = i;
                     }
                     break;
                 }
             }
         }
-        return detectedFeatures;
+        return detectedAnnotations;
     }
 
     @Override
@@ -420,9 +422,8 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
      */
     private void estimateCutoff() {
         long totalCount = this.covIncreaseDistribution.getTotalCount();
-        int fstReferenceValue = this.genomeSize / 500; // 2 Gene per 1KB Genome size
+        int fstReferenceValue = this.genomeSize / 500; // 2 Genes per 1KB Genome size
         long scndReferenceValue = totalCount / 1000; //threshold of 0,1% of largest coverage increases
-        System.out.println("fstref: " + fstReferenceValue + ", scndref: " + scndReferenceValue);
         int[] covIncDistribution = this.covIncreaseDistribution.getDiscreteCountingDistribution();
         
         int nbGeneStarts = 0;
@@ -461,9 +462,9 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         long referenceValue = totalCount / 500; //threshold of 2% of largest coverage increases in percent
         int[] covIncDistribution = this.covIncPercentDistribution.getDiscreteCountingDistribution();
         
-        for (int i : covIncDistribution) {
-            System.out.println(i);
-        }
+//        for (int i : covIncDistribution) {
+//            System.out.println(i);
+//        }
         
         int nbCoverageIncreases = 0;
         int selectedIndex = 0;
@@ -476,7 +477,6 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
             }
         }
         this.increaseReadPercent = covIncPercentDistribution.getMinCountForIndex(selectedIndex);
-        System.out.println("cutoff percent" + this.increaseReadPercent);
     }
 
     /**

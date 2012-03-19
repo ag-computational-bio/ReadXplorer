@@ -2,7 +2,7 @@ package de.cebitec.vamp.parser.reference;
 
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  * The FastaReferenceParser can parse the reference genome from a fasta file.
- * Attention: there will be no features in this file just the sequence
+ * Attention: there will be no annotations in this file just the sequence
  *
  * @author jstraube, rhilker
  */
@@ -31,7 +31,7 @@ public class FastaReferenceParser implements ReferenceParserI {
      * and the sequence from the reference genome
      */
     @Override
-    public ParsedReference parseReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
+    public ParsedReference parseReference(ReferenceJob referenceJob, AnnotationFilter filter) throws ParsingException {
         ParsedReference refGenome = new ParsedReference();
         StringBuilder sBuilder = new StringBuilder();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile());

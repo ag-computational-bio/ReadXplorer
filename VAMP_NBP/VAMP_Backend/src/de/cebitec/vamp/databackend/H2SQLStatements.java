@@ -93,46 +93,46 @@ public class H2SQLStatements {
             "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_POSITION + ", " + FieldNames.COVERAGE_TRACK + ") ";
    
     
-    public final static String SETUP_FEATURES =
+    public final static String SETUP_ANNOTATIONS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
             + " ("
-            + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
-            + FieldNames.FEATURE_REFGEN_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.FEATURE_LOCUS_TAG + " VARCHAR (1000), "
-            + FieldNames.FEATURE_PRODUCT + " VARCHAR (2000), "
-            + FieldNames.FEATURE_EC_NUM + " VARCHAR (20), " +
-            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
-            FieldNames.FEATURE_GENE+" VARCHAR (20) " +
+            + FieldNames.ANNOTATION_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.ANNOTATION_REFGEN_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.ANNOTATION_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.ANNOTATION_START + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.ANNOTATION_STOP + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.ANNOTATION_LOCUS_TAG + " VARCHAR (1000), "
+            + FieldNames.ANNOTATION_PRODUCT + " VARCHAR (2000), "
+            + FieldNames.ANNOTATION_EC_NUM + " VARCHAR (20), " +
+            FieldNames.ANNOTATION_STRAND+" TINYINT NOT NULL, " +
+            FieldNames.ANNOTATION_GENE+" VARCHAR (20) " +
             ") ";
     
     
-    public final static String INDEX_FEATURES = 
+    public final static String INDEX_ANNOTATIONS = 
             "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES 
-            + " (" + FieldNames.FEATURE_REFGEN_ID + ") ";
+            + " (" + FieldNames.ANNOTATION_REFGEN_ID + ") ";
             
     
-    public static final String SETUP_SUBFEATURES =
+    public static final String SETUP_SUBANNOTATIONS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
             + " ("
-            + FieldNames.SUBFEATURES_PARENT_ID + " BIGINT NOT NULL, "
-            + FieldNames.SUBFEATURES_REFERENCE_ID + " BIGINT NOT NULL, "
-            + FieldNames.SUBFEATURES_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURES_START + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL "
+            + FieldNames.SUBANNOTATION_PARENT_ID + " BIGINT NOT NULL, "
+            + FieldNames.SUBANNOTATION_REFERENCE_ID + " BIGINT NOT NULL, "
+            + FieldNames.SUBANNOTATION_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBANNOTATION_START + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.SUBANNOTATION_STOP + " BIGINT UNSIGNED NOT NULL "
             + ") ";
     
     
-    public final static String INDEX_SUBFEATURE_PARENT_ID =
+    public final static String INDEX_SUBANNOTATION_PARENT_ID =
             "CREATE INDEX IF NOT EXISTS INDEX_SUBFEATURE_PID ON " + FieldNames.TABLE_SUBFEATURES + " "
-            + "(" + FieldNames.SUBFEATURES_PARENT_ID + ") ";
+            + "(" + FieldNames.SUBANNOTATION_PARENT_ID + ") ";
             
         
-    public final static String INDEX_SUBFEATURE_REF_ID =
+    public final static String INDEX_SUBANNOTATION_REF_ID =
             "CREATE INDEX IF NOT EXISTS INDEX_SUBFEATURE_RID ON " + FieldNames.TABLE_SUBFEATURES + " "
-            + "(" + FieldNames.SUBFEATURES_REFERENCE_ID + ") ";
+            + "(" + FieldNames.SUBANNOTATION_REFERENCE_ID + ") ";
 
     
     public final static String SETUP_MAPPINGS =

@@ -1,31 +1,31 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 
 /**
  * @author -Rolf Hilker-
  * 
- * Data structure for storing a feature (gene), which is detected as expressed
+ * Data structure for storing a annotation (gene), which is detected as expressed
  * and its corresponding data.
  */
 public class ExpressedGene {
 
-    private PersistantFeature expressedFeature;
+    private PersistantAnnotation expressedAnnotation;
     private int readCount;
     
     /**
      * Creates a new ExpressedGene.
-     * @param expressedFeature the feature (gene) which is detected as expressed.
+     * @param expressedAnnotation the annotation (gene) which is detected as expressed.
      */
-    public ExpressedGene(PersistantFeature expressedFeature) {
-        this.expressedFeature = expressedFeature;
+    public ExpressedGene(PersistantAnnotation expressedAnnotation) {
+        this.expressedAnnotation = expressedAnnotation;
     }
 
     /**
-     * @return the feature (gene) which is detected as expressed.
+     * @return the annotation (gene) which is detected as expressed.
      */
-    public PersistantFeature getExpressedFeature() {
-        return this.expressedFeature;
+    public PersistantAnnotation getExpressedAnnotation() {
+        return this.expressedAnnotation;
     }
 
     /**

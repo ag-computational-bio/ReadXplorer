@@ -24,24 +24,24 @@ import org.openide.util.Utilities;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceInterval//EN", autostore = false)
-public final class ReferenceIntervalTopComponent extends TopComponent implements LookupListener, MousePositionListener {
+public final class ReferenceIntervalTopComp extends TopComponent implements LookupListener, MousePositionListener {
 
     private static final long serialVersionUID = 1L;
-    private static ReferenceIntervalTopComponent instance;
+    private static ReferenceIntervalTopComp instance;
     private Result<ReferenceViewer> result;
     private boolean showCurrentPosition = true;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "ReferenceIntervalTopComponent";
+    private static final String PREFERRED_ID = "ReferenceIntervalTopComp";
 
-    public ReferenceIntervalTopComponent() {
-        initComponents();
-        setName(NbBundle.getMessage(ReferenceIntervalTopComponent.class, "CTL_ReferenceIntervalTopComponent"));
-        setToolTipText(NbBundle.getMessage(ReferenceIntervalTopComponent.class, "HINT_ReferenceIntervalTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-        putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
+    public ReferenceIntervalTopComp() {
+        this.initComponents();
+        this.setName(NbBundle.getMessage(ReferenceIntervalTopComp.class, "CTL_ReferenceIntervalTopComp"));
+        this.setToolTipText(NbBundle.getMessage(ReferenceIntervalTopComp.class, "HINT_ReferenceIntervalTopComp"));
+//      this.setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        this.putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
+        this.putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
+        this.putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
 
     }
 
@@ -64,33 +64,33 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
         jLabel6 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel1.text")); // NOI18N
-        jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel1.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel1.text")); // NOI18N
+        jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel1.toolTipText")); // NOI18N
 
         intervalFromField.setEditable(false);
-        intervalFromField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.intervalFromField.toolTipText")); // NOI18N
+        intervalFromField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.intervalFromField.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel2.text")); // NOI18N
-        jLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel2.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel2.text")); // NOI18N
+        jLabel2.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel2.toolTipText")); // NOI18N
 
         intervalToField.setEditable(false);
-        intervalToField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.intervalToField.toolTipText")); // NOI18N
+        intervalToField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.intervalToField.toolTipText")); // NOI18N
 
         statisticsList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { " " };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        statisticsList.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.statisticsList.toolTipText")); // NOI18N
+        statisticsList.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.statisticsList.toolTipText")); // NOI18N
         jScrollPane1.setViewportView(statisticsList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel5.text")); // NOI18N
-        jLabel5.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel5.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel5.text")); // NOI18N
+        jLabel5.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel5.toolTipText")); // NOI18N
 
         currentPosField.setEditable(false);
-        currentPosField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.currentPosField.toolTipText")); // NOI18N
+        currentPosField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.currentPosField.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComponent.class, "ReferenceIntervalTopComponent.jLabel6.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel6.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -165,27 +165,27 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ReferenceIntervalTopComponent getDefault() {
+    public static synchronized ReferenceIntervalTopComp getDefault() {
         if (instance == null) {
-            instance = new ReferenceIntervalTopComponent();
+            instance = new ReferenceIntervalTopComp();
         }
         return instance;
     }
 
     /**
-     * Obtain the ReferenceIntervalTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the ReferenceIntervalTopComp instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized ReferenceIntervalTopComponent findInstance() {
+    public static synchronized ReferenceIntervalTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(ReferenceIntervalTopComponent.class.getName()).warning(
+            Logger.getLogger(ReferenceIntervalTopComp.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof ReferenceIntervalTopComponent) {
-            return (ReferenceIntervalTopComponent) win;
+        if (win instanceof ReferenceIntervalTopComp) {
+            return (ReferenceIntervalTopComp) win;
         }
-        Logger.getLogger(ReferenceIntervalTopComponent.class.getName()).warning(
+        Logger.getLogger(ReferenceIntervalTopComp.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();
@@ -206,23 +206,23 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
     @Override
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer referenceViewer : result.allInstances()) {
-            // update visible feature list
-            Map<FeatureType, Integer> featureStats = referenceViewer.getFeatureStats();
-            showFeatureStatisticsForInterval(featureStats);
+            // update visible annotation list
+            Map<FeatureType, Integer> annotationStats = referenceViewer.getAnnotationStats();
+            this.showAnnotationStatsForInterval(annotationStats);
 
             // update intervall
             BoundsInfo boundsInfo = referenceViewer.getBoundsInfo();
             setInterval(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
 
             // register listeners so every change occurs
-            referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_STATISTICS_CHANGED, new PropertyChangeListener() {
+            referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_ANNOTATION_STATS_CHANGED, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    // update visible feature list
+                    // update visible annotation list
                     @SuppressWarnings("unchecked")
-                    Map<FeatureType, Integer> featureStats = (Map<FeatureType, Integer>) evt.getNewValue();
-                    showFeatureStatisticsForInterval(featureStats);
+                    Map<FeatureType, Integer> annotationStats = (Map<FeatureType, Integer>) evt.getNewValue();
+                    ReferenceIntervalTopComp.this.showAnnotationStatsForInterval(annotationStats);
 
                     // update intervall
                     BoundsInfo boundsInfo = ((ReferenceViewer) evt.getSource()).getBoundsInfo();
@@ -281,15 +281,15 @@ public final class ReferenceIntervalTopComponent extends TopComponent implements
         intervalToField.setText(String.valueOf(to));
     }
 
-    private void showFeatureStatisticsForInterval(Map<FeatureType, Integer> featureStats) {
+    private void showAnnotationStatsForInterval(Map<FeatureType, Integer> annotationStats) {
         statisticsList.removeAll();
         DefaultListModel model = new DefaultListModel();
 
-        Set<FeatureType> keys = featureStats.keySet();
+        Set<FeatureType> keys = annotationStats.keySet();
         for(Iterator<FeatureType> it = keys.iterator(); it.hasNext(); ){
             FeatureType type = it.next();
             String typeS = type.getTypeString();
-            model.addElement(typeS+": "+featureStats.get(type));
+            model.addElement(typeS+": "+annotationStats.get(type));
         }
         statisticsList.setModel(model);
     }

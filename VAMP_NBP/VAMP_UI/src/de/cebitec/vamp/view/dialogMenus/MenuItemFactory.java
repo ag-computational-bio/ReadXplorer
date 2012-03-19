@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dialogMenus;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.parser.output.OutputParser;
 import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
 import java.awt.Toolkit;
@@ -55,12 +55,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for storing a sequence in fasta format.
      * The sequence to store has to be known, when the method is called.
      * @param sequence the sequence to store as fasta
-     * @param feature the feature whose sequence is to be converted to fasta
+     * @param annotation the annotation whose sequence is to be converted to fasta
      *                it contains the header information, but not the sequence
      * @return jmenuitem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final PersistantFeature feature){
-        return this.initStoreFastaItem(sequence, feature, -1, -1);
+    public JMenuItem getStoreFastaItem(final String sequence, final PersistantAnnotation annotation){
+        return this.initStoreFastaItem(sequence, annotation, -1, -1);
 
     }
 
@@ -77,15 +77,15 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     }
 
     /**
-     * Initializes a store fasta item either from a feature or with given start
+     * Initializes a store fasta item either from an annotation or with given start
      * and stop indices.
      * @param sequence the sequence to store in fasta format
-     * @param feature the feature containing the header information, <code>null</code> if not from a feature
-     * @param seqStart the startpoint of the sequence (-1 if feature is used!)
-     * @param seqEnd the endpoint of the sequence (-1 if feature is used!)
+     * @param annotation the annotation containing the header information, <code>null</code> if not from an annotation
+     * @param seqStart the startpoint of the sequence (-1 if annotation is used!)
+     * @param seqEnd the endpoint of the sequence (-1 if annotation is used!)
      * @return a menu item capable of storing a sequence in fasta format
      */
-    private JMenuItem initStoreFastaItem(final String sequence, final PersistantFeature feature,
+    private JMenuItem initStoreFastaItem(final String sequence, final PersistantAnnotation annotation,
             final int seqStart, final int seqEnd) {
 
         JMenuItem storeFastaItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta"));
@@ -94,8 +94,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String output;
-                if (feature != null) {
-                    output = this.generateFastaFromFeature();
+                if (annotation != null) {
+                    output = this.generateFastaFromAnnotation();
                 } else {
                     String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ").concat(String.valueOf(seqEnd));
                     output = OutputParser.generateFasta(sequence, header);
@@ -106,10 +106,10 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             /**
              * Generates a string ready for output in a fasta file.
              */
-            private String generateFastaFromFeature() {
-                String ecNumber = feature.getEcNumber() != null ? feature.getEcNumber() : "no EC number";
-                String locus = feature.getLocus() != null ? feature.getLocus() : "no locus";
-                String product = feature.getProduct() != null ? feature.getProduct() : "no product";
+            private String generateFastaFromAnnotation() {
+                String ecNumber = annotation.getEcNumber() != null ? annotation.getEcNumber() : "no EC number";
+                String locus = annotation.getLocus() != null ? annotation.getLocus() : "no locus";
+                String product = annotation.getProduct() != null ? annotation.getProduct() : "no product";
 
                 return OutputParser.generateFasta(sequence, ecNumber, locus, product);
             }

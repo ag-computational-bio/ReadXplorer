@@ -1,38 +1,32 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 /**
- *
  * @author dkramer
  */
 public interface IThumbnailView {
     /**
-     * This method is used after selecting a feature for which all tracks for a given reference should be viewed in Thumbnails.
-     * @param feature
+     * This method is used after selecting an annotation for which all tracks for a given reference should be viewed in Thumbnails.
+     * @param annotation
      * @param refViewer the currently viewed ReferenceViewer
      */
-    public void addFeatureToList(PersistantFeature feature,ReferenceViewer refViewer);
+    public void addAnnotationToList(PersistantAnnotation annotation, ReferenceViewer refViewer);
 
     public void showThumbnailView(ReferenceViewer refViewer);
 
-    public void showThumbnailView(ReferenceViewer refViewer,ViewController con);
+    public void showThumbnailView(ReferenceViewer refViewer, ViewController con);
 
-    public void removeAllFeatures(ReferenceViewer refViewer);
+    public void removeAllAnnotations(ReferenceViewer refViewer);
 
-    public void removeCertainFeatures(PersistantFeature f);
+    public void removeCertainAnnotation(PersistantAnnotation annotation);
 
-    public void showPopUp(PersistantFeature f, ReferenceViewer refViewer,MouseEvent e, JPopupMenu popUp);
+    public void showPopUp(PersistantAnnotation annotation, ReferenceViewer refViewer, MouseEvent e, JPopupMenu popUp);
 
-    public void showTablePopUp(JTable table,ReferenceViewer refViewer,MouseEvent e);
+    public void showTablePopUp(JTable table, ReferenceViewer refViewer, MouseEvent e);
 
 }

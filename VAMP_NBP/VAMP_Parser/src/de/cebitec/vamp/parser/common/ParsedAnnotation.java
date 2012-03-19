@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author ddoppmeier, rhilker
  */
-public class ParsedFeature {
+public class ParsedAnnotation {
     
     private FeatureType type;
     private Integer start;
@@ -17,10 +17,10 @@ public class ParsedFeature {
     private String product;
     private String ecNumber;
     private String geneName;
-    private List<ParsedSubfeature> subfeatures;
+    private List<ParsedSubAnnotation> subAnnotations;
 
     /**
-     * Contains all available information about a persistant feature
+     * Contains all available information about a persistant annotation
      * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA, FeatureType.SOURCE,
                    FeatureType.T_RNA, FeatureType.MISC_RNA, FeatureType.MI_RNA, FeatureType.GENE,
                    FeatureType.M_RNA (mandatory)
@@ -31,10 +31,10 @@ public class ParsedFeature {
      * @param product description of the protein product
      * @param ecNumber ec number
      * @param geneName name of the gene, if it exists (e.g. "dnaA")
-     * @param subfeatures the list of subfeatures belonging to this feature
+     * @param subAnnotations the list of sub annotations belonging to this annotation
      */
-    public ParsedFeature(FeatureType type, int start, int stop, int strand, String locusTag, String product, 
-                String ecNumber, String geneName, List<ParsedSubfeature> subfeatures){
+    public ParsedAnnotation(FeatureType type, int start, int stop, int strand, String locusTag, String product, 
+                String ecNumber, String geneName, List<ParsedSubAnnotation> subAnnotations){
         this.type = type; // if type is null, 0 is assumed, which is equal to FeatureType.UNDEFINED
         this.start = start;
         this.stop = stop;
@@ -43,7 +43,7 @@ public class ParsedFeature {
         this.product = product;
         this.ecNumber = ecNumber;
         this.geneName = geneName;
-        this.subfeatures = subfeatures;
+        this.subAnnotations = subAnnotations;
     }
 
     public boolean hasEcNumber(){
@@ -79,14 +79,14 @@ public class ParsedFeature {
     }
 
     /**
-     * @return start of the feature. Always the smaller value among start and stop.
+     * @return start of the annotation. Always the smaller value among start and stop.
      */
     public int getStart() {
         return start;
     }
 
     /**
-     * @return stop of the feature. Always the larger value among start and stop.
+     * @return stop of the annotation. Always the larger value among start and stop.
      */
     public int getStop() {
         return stop;
@@ -105,18 +105,18 @@ public class ParsedFeature {
     }
 
     /**
-     * @return the list of exons of this feature or an empty list if there are no exons
+     * @return the list of exons of this annotation or an empty list if there are no exons
      */
-    public List<ParsedSubfeature> getSubfeatures() {
-        return subfeatures;
+    public List<ParsedSubAnnotation> getSubAnnotations() {
+        return subAnnotations;
     }
 
     /**
-     * Adds a subfeature to the list of subfeatures (e.g. an exon to a gene).
-     * @param parsedSubfeature the subfeature to add.
+     * Adds a sub annotation to the list of sub annotations (e.g. an exon to a gene).
+     * @param parsedSubAnnotation the sub annotation to add.
      */
-    public void addSubfeature(ParsedSubfeature parsedSubfeature) {
-        this.subfeatures.add(parsedSubfeature);
+    public void addSubAnnotation(ParsedSubAnnotation parsedSubAnnotation) {
+        this.subAnnotations.add(parsedSubAnnotation);
     }
 
 }

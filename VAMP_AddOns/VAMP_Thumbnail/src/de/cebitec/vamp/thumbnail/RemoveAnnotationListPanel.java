@@ -11,30 +11,27 @@
 
 package de.cebitec.vamp.thumbnail;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import java.util.ArrayList;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import java.util.List;
-import java.util.Set;
-import javax.swing.JList;
 
 /**
  *
  * @author Denis
  */
-public class RemoveFeatureListPanel extends javax.swing.JPanel {
-    private List<PersistantFeature> selectedFeatures;
+public class RemoveAnnotationListPanel extends javax.swing.JPanel {
+    private List<PersistantAnnotation> selectedAnnotations;
     
     /** Creates new form RemoveTrackListPanel */
-    public RemoveFeatureListPanel() {
+    public RemoveAnnotationListPanel() {
         initComponents();
     }
 
-    private PersistantFeature[] fillList(){
-        return selectedFeatures.toArray(new PersistantFeature[0]);
+    private PersistantAnnotation[] fillList(){
+        return selectedAnnotations.toArray(new PersistantAnnotation[0]);
     }
 
-    RemoveFeatureListPanel(List<PersistantFeature> features) {
-        selectedFeatures = features;
+    RemoveAnnotationListPanel(List<PersistantAnnotation> annotations) {
+        selectedAnnotations = annotations;
         initComponents();        
     }
 
@@ -57,7 +54,7 @@ public class RemoveFeatureListPanel extends javax.swing.JPanel {
 
         jScrollPane1.setViewportView(jList1);
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(RemoveFeatureListPanel.class, "RemoveFeatureListPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(RemoveAnnotationListPanel.class, "RemoveAnnotationListPanel.jLabel1.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

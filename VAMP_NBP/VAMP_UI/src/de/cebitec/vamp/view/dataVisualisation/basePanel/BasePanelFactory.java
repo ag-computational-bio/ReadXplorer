@@ -10,15 +10,12 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
-import de.cebitec.vamp.view.dataVisualisation.abstractViewer.LegendLabel;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.MenuLabel;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.vamp.view.dataVisualisation.trackViewer.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -63,7 +60,8 @@ public class BasePanelFactory {
         ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGenome);
 
         // show a color legend
-        genomeViewer.setupLegend(new LegendLabel(genomeViewer), this.getGenomeViewerLegend(genomeViewer));
+        JPanel genomePanelLegend = this.getGenomeViewerLegend(genomeViewer);
+        genomeViewer.setupLegend(new MenuLabel(genomePanelLegend, MenuLabel.TITLE_LEGEND), genomePanelLegend);
 
         // add panels to basepanel
         b.setViewer(genomeViewer);
@@ -84,7 +82,12 @@ public class BasePanelFactory {
         trackV.setName(track.getDescription());
 
         // create and set up legend
-        trackV.setupLegend(new LegendLabel(trackV), this.getTrackPanelLegend(trackV));
+        JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
+        trackV.setupLegend(new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND), trackPanelLegend);
+        
+        // create and set up options (currently normalization)
+        JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
+        trackV.setupOptions(new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS), trackPanelOptions);
 
         // create info label
         CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -119,14 +122,25 @@ public class BasePanelFactory {
             viewController.addMousePositionListener(b);
 
             // get double track connector
-            TrackConnector trackCon = ProjectConnector.getInstance().getTrackConnector(tracks);
+            TrackConnector trackCon = ProjectConnector.getInstance().getTrackConnector(tracks, combineTracks);
             MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon, combineTracks);
 
             // create and set up legend
-            trackV.setupLegend(new LegendLabel(trackV), this.getDoubleTrackPanelLegend());
+            if (combineTracks) {
+                JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
+                trackV.setupLegend(new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND), trackPanelLegend);
+            } else {
+                JPanel trackPanelLegend = this.getDoubleTrackPanelLegend();
+                trackV.setupLegend(new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND), trackPanelLegend);
+            }
+            
+            // create and set up options (currently normalization)
+            JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
+            trackV.setupOptions(new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS), trackPanelOptions);
 
             // create info panel
             CoverageInfoLabel cil = new CoverageInfoLabel();
+            cil.setCombineTracks(combineTracks);
             cil.renameFields();
             trackV.setTrackInfoPanel(cil);
 
@@ -158,7 +172,8 @@ public class BasePanelFactory {
         AlignmentViewer viewer = new AlignmentViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), this.getAlignmentViewLegend(viewer));
+        JPanel alignmentPanelLegend = this.getAlignmentViewLegend(viewer);
+        viewer.setupLegend(new MenuLabel(alignmentPanelLegend, MenuLabel.TITLE_LEGEND), alignmentPanelLegend);
 
         // add panels to basepanel and add scrollbars
         b.setViewerInScrollpane(viewer);
@@ -176,7 +191,8 @@ public class BasePanelFactory {
         HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), this.getHistogramViewerLegend());
+        JPanel historgramPanelLegend = this.getHistogramViewerLegend();
+        viewer.setupLegend(new MenuLabel(historgramPanelLegend, MenuLabel.TITLE_LEGEND), historgramPanelLegend);
 
         // add panels to basepanel
         b.setViewer(viewer);
@@ -199,7 +215,8 @@ public class BasePanelFactory {
         SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
-        viewer.setupLegend(new LegendLabel(viewer), this.getSeqPairViewerLegend(viewer));
+        JPanel seqPairPanelLegend = this.getSeqPairViewerLegend(viewer);
+        viewer.setupLegend(new MenuLabel(seqPairPanelLegend, MenuLabel.TITLE_LEGEND), seqPairPanelLegend);
 
         // add panels to basepanel and add scrollbars
         b.setViewerInScrollpane(viewer);
@@ -327,7 +344,7 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
         legend.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
         legend.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.UNDEF_ANNOTATION, FeatureType.UNDEFINED, viewer));
 
         return legend;
     }
@@ -354,6 +371,18 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.TRACK2_COLOR, FeatureType.TRACK2_COVERAGE, null));
 
         return legend;
+    }
+    
+    /**
+     * @param viewer the track viewer for which the options panel should be created.
+     * @return A new options panel for a track viewer.
+     */
+    private JPanel getTrackPanelOptions(TrackViewer viewer) {
+        TrackNormalizationPanel options = new TrackNormalizationPanel(viewer);
+        options.setLayout(new BoxLayout(options, BoxLayout.PAGE_AXIS));
+        options.setBackground(ColorProperties.LEGEND_BACKGROUND);
+
+        return options;
     }
 
     private JPanel getHistogramViewerLegend() {

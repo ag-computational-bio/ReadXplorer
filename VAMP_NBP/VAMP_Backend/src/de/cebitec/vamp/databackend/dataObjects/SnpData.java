@@ -129,7 +129,7 @@ public class SnpData implements ExcelExportDataI {
         dataColumnDescriptions.add("Amino Snp");
         dataColumnDescriptions.add("Amino Ref");
         dataColumnDescriptions.add("Effect on AA");
-        dataColumnDescriptions.add("Features (Genes)");
+        dataColumnDescriptions.add("Annotations");
         
         return dataColumnDescriptions;
     }

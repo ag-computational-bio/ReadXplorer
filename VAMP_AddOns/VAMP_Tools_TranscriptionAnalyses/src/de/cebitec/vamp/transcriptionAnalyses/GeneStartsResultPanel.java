@@ -5,7 +5,7 @@
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -58,7 +58,7 @@ public class GeneStartsResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Position", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Next Downstream Feature"
+                "Position", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Annotation", "Next Upstream Annotation", "Next Downstream Annotation"
             }
         ) {
             Class[] types = new Class [] {
@@ -144,13 +144,13 @@ public class GeneStartsResultPanel extends javax.swing.JPanel {
                 rowData[5] = Integer.MAX_VALUE;
             }
             
-            DetectedFeatures detFeatures = geneStart.getDetFeatures();
-            PersistantFeature feature = detFeatures.getCorrectStartFeature();
-            rowData[6] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
-            feature = detFeatures.getUpstreamFeature();
-            rowData[7] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
-            feature = detFeatures.getDownstreamFeature();
-            rowData[8] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
+            DetectedAnnotations detAnnotations = geneStart.getDetAnnotations();
+            PersistantAnnotation annotation = detAnnotations.getCorrectStartAnnotation();
+            rowData[6] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
+            annotation = detAnnotations.getUpstreamAnnotation();
+            rowData[7] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
+            annotation = detAnnotations.getDownstreamAnnotation();
+            rowData[8] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
 
             model.addRow(rowData);
             

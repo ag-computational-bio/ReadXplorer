@@ -41,12 +41,14 @@ public final class OpenDoubleTrackAction implements ActionListener {
 
         // check if two tracks were selected
         boolean okSelected = false;
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().size() == 2) {
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && (otp.getSelectedTracks().size() == 2 || 
+                optionBox.isSelected() && otp.getSelectedTracks().size() > 1)) {
             okSelected = true;
         } else 
         if (!  (dialogDescriptor.getValue().equals(DialogDescriptor.CANCEL_OPTION) || 
-                dialogDescriptor.getValue().equals(DialogDescriptor.CLOSED_OPTION))){
-            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks.", NotifyDescriptor.INFORMATION_MESSAGE));
+                dialogDescriptor.getValue().equals(DialogDescriptor.CLOSED_OPTION))) {
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks in standard mode or at least two track in combined mode!", 
+                    NotifyDescriptor.INFORMATION_MESSAGE));
             openRefGenDialog.setVisible(true);
             okSelected = true;
         }

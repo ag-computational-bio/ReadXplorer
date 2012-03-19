@@ -15,6 +15,6 @@ public class MultiTrackConnector extends TrackConnector {
     }
 
     MultiTrackConnector(List<PersistantTrack> tracks) {
-        super(9999, tracks);
+        super(9999, tracks, false);
     }
 }

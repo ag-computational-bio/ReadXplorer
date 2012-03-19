@@ -72,7 +72,7 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
             fetch.setLong(3, trackID);
 
             ResultSet rs = fetch.executeQuery();
-            int tmpHeighestCov = 0;
+            int tmpHighestCov = 0;
             //  int counter = 0;
             while (rs.next()) {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
@@ -86,9 +86,9 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
                 int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
                 int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
                 
-                if(tmpHeighestCov < covNFWMult || tmpHeighestCov < covNRevMult){
-                    tmpHeighestCov = covNFWMult < covNRevMult?covNRevMult : covNFWMult;
-                     cov.setHeighstCoverage(tmpHeighestCov);
+                if (tmpHighestCov < covNFWMult || tmpHighestCov < covNRevMult) {
+                    tmpHighestCov = covNFWMult < covNRevMult?covNRevMult : covNFWMult;
+                    cov.setHighestCoverage(tmpHighestCov);
                 }
                
                 cov.setCommonFwdMult(pos,covNFWMult );

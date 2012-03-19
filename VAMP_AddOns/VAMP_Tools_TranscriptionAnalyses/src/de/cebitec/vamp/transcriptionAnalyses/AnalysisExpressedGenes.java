@@ -8,7 +8,7 @@ import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
@@ -32,8 +32,8 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     private TrackViewer trackViewer;
     private int minNumberReads;
     private int genomeSize;
-    private List<PersistantFeature> genomeFeatures;
-    private HashMap<Integer, ExpressedGene> featureReadCount; //feature id to count of mappings for feature
+    private List<PersistantAnnotation> genomeAnnotations;
+    private HashMap<Integer, ExpressedGene> annotationReadCount; //annotation id to count of mappings for annotation
     private List<ExpressedGene> expressedGenes;
     private List<PersistantMapping> mappingsAll;
     
@@ -41,7 +41,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     private int nbRequests;
     private int nbCarriedOutRequests;
     
-    private int lastFeatureIdx;
+    private int lastAnnotationIdx;
     private int lastMappingIdx;
     private int currentCount;
 
@@ -63,7 +63,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
         this.nbCarriedOutRequests = 0;
         this.expressedGenes = new ArrayList<ExpressedGene>();
         this.mappingsAll = new ArrayList<PersistantMapping>();
-        this.featureReadCount = new HashMap<Integer, ExpressedGene>();
+        this.annotationReadCount = new HashMap<Integer, ExpressedGene>();
         this.lastMappingIdx = 0;
         this.lastMappingIdx = 0;
     }
@@ -83,7 +83,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
         trackIds.add(trackCon.getTrackID());
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
         this.genomeSize = refConnector.getRefGen().getSequence().length();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
+        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         int numMappingsTotal = 0;
         int numUnneededMappings = 0;
         List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
@@ -94,10 +94,10 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
                 numUnneededMappings += connector.getNumOfUniqueMappings();
             }
         }
-        int numInterestingMappings = numMappingsTotal - (numUnneededMappings + trackCon.getNumOfUniqueMappings());
+        int numInterestingMappings = numUnneededMappings + trackCon.getNumOfUniqueMappings();
         
-        for (PersistantFeature feature : this.genomeFeatures) {
-            this.featureReadCount.put(feature.getId(), new ExpressedGene(feature));
+        for (PersistantAnnotation annotation : this.genomeAnnotations) {
+            this.annotationReadCount.put(annotation.getId(), new ExpressedGene(annotation));
         }
         
         
@@ -105,8 +105,8 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
         //use for RPKM
         int coveredBestMatchPos = trackCon.getCoveredBestMatchPos();
         int totalExonModelLength = 0; //calculate the total length of the transcriptome
-        for (PersistantFeature feature : this.genomeFeatures) {
-            totalExonModelLength += feature.getStop() - feature.getStart();
+        for (PersistantAnnotation annotation : this.genomeAnnotations) {
+            totalExonModelLength += annotation.getStop() - annotation.getStart();
         }
         totalExonModelLength /= 1000;
 
@@ -114,9 +114,9 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
             
             int stepSize = 50000;
             int from = numUnneededMappings;
-            int to = numUnneededMappings + (numInterestingMappings > stepSize ? stepSize : numInterestingMappings);
+            int to = numInterestingMappings - numUnneededMappings > stepSize ? numUnneededMappings + stepSize : numInterestingMappings;
             int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
-            this.nbRequests = numInterestingMappings / stepSize + additionalRequest; 
+            this.nbRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest; 
             this.progressHandle.switchToDeterminate(this.nbRequests + 1); //+ 1 for subsequent calculations
             this.progressHandle.progress("Request " + (nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
             
@@ -172,24 +172,24 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
 //     * @param mappings the coverage for predicting the gene starts
 //     */
 //    public void detectExpressedGenes(List<PersistantMapping> mappings) {
-//            PersistantFeature feature;
+//            PersistantAnnotation annotation;
 //            boolean fstFittingMapping = true;
 //            boolean nextFeature = false;
 //            int readCount = 0;
 //            
 //            for (int i = this.lastFeatureIdx; i < this.genomeFeatures.size(); ++i) {
-//                feature = this.genomeFeatures.get(i);
-//                int featStart = feature.getStart();
-//                int featStop = feature.getStop();
-//                nextFeature = false; //false, if the analysis of the current feature is not finished
+//                annotation = this.genomeFeatures.get(i);
+//                int featStart = annotation.getStart();
+//                int featStop = annotation.getStop();
+//                nextFeature = false; //false, if the analysis of the current annotation is not finished
 //                fstFittingMapping = true;
 //                readCount = 0;
 //
 //                for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
 //                    PersistantMapping mapping = mappings.get(j);
 //
-//                    //mappings identified within a feature
-//                    if (mapping.getStop() > featStart && feature.getStrand() == mapping.getStrand()
+//                    //mappings identified within a annotation
+//                    if (mapping.getStop() > featStart && annotation.getStrand() == mapping.getStrand()
 //                            && mapping.getStart() < featStop) {
 //
 //                        if (fstFittingMapping == true) {
@@ -199,7 +199,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
 //                        this.currentCount += mapping.getNbReplicates();
 //
 //
-//                        //still mappings left, but need next feature
+//                        //still mappings left, but need next annotation
 //                    } else if (mapping.getStart() > featStop) {
 //                        readCount = this.currentCount;
 //                        nextFeature = true;
@@ -207,7 +207,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
 //                    }
 //                }
 //
-//                //store last feature index & readcount for next call of receiveData
+//                //store last annotation index & readcount for next call of receiveData
 //                //this.currentCount is still set and will be reused during next call
 //                if (!nextFeature) {
 //                    this.lastFeatureIdx = i;
@@ -216,7 +216,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
 //
 //                //store expressed genes
 //                if (readCount > this.minNumberReads) {
-//                    ExpressedGene gene = new ExpressedGene(feature);
+//                    ExpressedGene gene = new ExpressedGene(annotation);
 //                    gene.setReadCount(this.currentCount);
 //                    this.expressedGenes.add(gene);
 //                }
@@ -225,7 +225,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
 //            }
 //            
 //            this.lastMappingIdx = 0;
-//            //TODO: solution for more than one feature overlapping mapping request boundaries
+//            //TODO: solution for more than one annotation overlapping mapping request boundaries
 //            
 //    }
     
@@ -234,24 +234,24 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
      * @param mappings the coverage for predicting the gene starts
      */
     public void detectExpressedGenes(List<PersistantMapping> mappings) {
-            PersistantFeature feature;
+            PersistantAnnotation annotation;
             boolean fstFittingMapping = true;
-            boolean nextFeature = false;
+            boolean nextAnnotation = false;
             int readCount = 0;
             
-            for (int i = 0; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
-                int featStart = feature.getStart();
-                int featStop = feature.getStop();
-                nextFeature = false; //false, if the analysis of the current feature is not finished
+            for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
+                annotation = this.genomeAnnotations.get(i);
+                int featStart = annotation.getStart();
+                int featStop = annotation.getStop();
+                nextAnnotation = false; //false, if the analysis of the current annotation is not finished
                 fstFittingMapping = true;
                 readCount = 0;
 
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
                     PersistantMapping mapping = mappings.get(j);
 
-                    //mappings identified within a feature
-                    if (mapping.getStop() > featStart && feature.getStrand() == mapping.getStrand()
+                    //mappings identified within a annotation
+                    if (mapping.getStop() > featStart && annotation.getStrand() == mapping.getStrand()
                             && mapping.getStart() < featStop) {
 
                         if (fstFittingMapping == true) {
@@ -261,26 +261,26 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
                         this.currentCount += mapping.getNbReplicates();
 
 
-                        //still mappings left, but need next feature
+                        //still mappings left, but need next annotation
                     } else if (mapping.getStart() > featStop) {
                         readCount = this.currentCount;
-                        nextFeature = true;
+                        nextAnnotation = true;
                         break;
                     }
                 }
 
-                //store last feature index & readcount for next call of receiveData
+                //store last annotation index & readcount for next call of receiveData
                 //this.currentCount is still set and will be reused during next call
-                if (!nextFeature) {
-                    this.lastFeatureIdx = i;
+                if (!nextAnnotation) {
+                    this.lastAnnotationIdx = i;
                     break;
                 }
 
                 //store expressed genes
                 //TODO initialize this 
 //                if (readCount > this.minNumberReads) {
-//                    ExpressedGene gene = new ExpressedGene(feature);
-                    this.featureReadCount.get(feature.getId()).setReadCount(this.featureReadCount.get(feature.getId()).getReadCount() + this.currentCount);
+//                    ExpressedGene gene = new ExpressedGene(annotation);
+                    this.annotationReadCount.get(annotation.getId()).setReadCount(this.annotationReadCount.get(annotation.getId()).getReadCount() + this.currentCount);
 //                    this.expressedGenes.add(gene);
 //                }
                 
@@ -288,7 +288,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
             }
             
             this.lastMappingIdx = 0;
-            //TODO: solution for more than one feature overlapping mapping request boundaries
+            //TODO: solution for more than one annotation overlapping mapping request boundaries
             
     }
 
@@ -330,9 +330,9 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     }
 
     private void findExpressedGenes() {
-        for (Integer id : this.featureReadCount.keySet()) {
-            if (this.featureReadCount.get(id).getReadCount() > this.minNumberReads) {
-                this.expressedGenes.add(this.featureReadCount.get(id));
+        for (Integer id : this.annotationReadCount.keySet()) {
+            if (this.annotationReadCount.get(id).getReadCount() > this.minNumberReads) {
+                this.expressedGenes.add(this.annotationReadCount.get(id));
             }
         }
     }

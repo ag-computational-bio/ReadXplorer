@@ -5,7 +5,7 @@
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -57,7 +57,7 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Feature (Gene)", "Strand", "Total Read Count"
+                "Annotation", "Strand", "Total Read Count"
             }
         ) {
             Class[] types = new Class [] {
@@ -120,8 +120,8 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.expressedGenesTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = this.expressedGenesTable.convertRowIndexToModel(selectedView);
-        PersistantFeature feature = (PersistantFeature) this.expressedGenesTable.getModel().getValueAt(selectedModel, 0);
-        int pos = feature.getStrand() == SequenceUtils.STRAND_FWD ? feature.getStart() : feature.getStop();
+        PersistantAnnotation annotation = (PersistantAnnotation) this.expressedGenesTable.getModel().getValueAt(selectedModel, 0);
+        int pos = annotation.getStrand() == SequenceUtils.STRAND_FWD ? annotation.getStart() : annotation.getStop();
 
         bim.navigatorBarUpdated(pos);
     }
@@ -138,8 +138,8 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         for (ExpressedGene expressedGene : this.expressedGenes) {
             
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = expressedGene.getExpressedFeature();
-            rowData[1] = expressedGene.getExpressedFeature().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
+            rowData[0] = expressedGene.getExpressedAnnotation();
+            rowData[1] = expressedGene.getExpressedAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
             rowData[2] = expressedGene.getReadCount();
 
             model.addRow(rowData);

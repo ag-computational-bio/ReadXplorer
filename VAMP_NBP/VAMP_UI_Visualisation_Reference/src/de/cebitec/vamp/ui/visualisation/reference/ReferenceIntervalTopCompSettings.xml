@@ -3,6 +3,6 @@
 <settings version="1.0">
     <module name="de.cebitec.vamp.ui.visualisation.reference" spec="1.0"/>
     <instanceof class="org.openide.windows.TopComponent"/>
-    <instanceof class="de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComponent"/>
-    <instance class="de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComponent" method="getDefault"/>
+    <instanceof class="de.cebitec.vamp.ui.visualisation.reference.ReferenceIntervalTopComp"/>
+    <instance class="de.cebitec.vamp.ui.visualisation.reference.ReferenceIntervalTopComp" method="getDefault"/>
 </settings>

@@ -125,7 +125,7 @@ public class Snp implements SnpI {
 
     /**
      * @param codon Adds the codon to this snp object. Depending on the amount of
-     * features, this genomic position is involved in, each SNP can contain more
+     * annotations, this genomic position is involved in, each SNP can contain more
      * than one codon. The codon contains an amino acid, its property and the
      * gene id the amino acid belongs to.
      */
@@ -135,7 +135,7 @@ public class Snp implements SnpI {
     
     /**
      * @return the list of codon belonging to this snp object. Depending on the amount of
-     * features, this genomic position is involved in, each SNP can contain more
+     * annotations, this genomic position is involved in, each SNP can contain more
      * than one codon. Each codon contains an amino acid, its property and the
      * gene id the amino acid belongs to.
      */
@@ -146,7 +146,7 @@ public class Snp implements SnpI {
     /**
      * @return effect type of the snp on the amino acid sequence. Might be empty
      *         if the snp position is not covered by a gene or the snp type is
-     *         SequenceComparison.SUBSTITUTION (in this case each feature needs one
+     *         SequenceComparison.SUBSTITUTION (in this case each annotation needs one
      *         effect tag, since the effect can vary between SequenceComparison.SUBSTITUTION
      *         and SequenceComparison.MATCH)
      */

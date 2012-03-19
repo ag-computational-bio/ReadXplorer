@@ -260,7 +260,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
                                             largestPotSmallerDist = currDist;
                                             potPotSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR));
                                         }
-                                    } else {//////////////// distance too small or large //////////////////////////
+                                    } else {//////////////// distance too large //////////////////////////
                                         //TODO: something to do??
                                     }
                                 } else { //////////////////////////// inversion of one read ////////////////////////////////

@@ -11,14 +11,14 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedAnnotation;
 import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsedSeqPairMapping;
-import de.cebitec.vamp.parser.common.ParsedSubfeature;
+import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.SequenceComparison;
@@ -58,7 +58,7 @@ public class ProjectConnector {
     private HashMap<Integer, TrackConnector> trackConnectors;
     private HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
-    private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
+    private final static int ANNOTATION_BATCH_SIZE = BATCH_SIZE;
     private final static int COVERAGE_BATCH_SIZE = BATCH_SIZE * 3;
     private final static int MAPPING_BATCH_SIZE = BATCH_SIZE;
     private static final int SEQPAIR_BATCH_SIZE = BATCH_SIZE;
@@ -119,7 +119,7 @@ public class ProjectConnector {
             }
 
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return tracks;
@@ -201,12 +201,12 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.SETUP_COVERAGE).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_COVERAGE).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_FEATURES).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_FEATURES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_ANNOTATIONS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_ANNOTATIONS).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_SUBFEATURES).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SUBFEATURE_PARENT_ID).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SUBFEATURE_REF_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_SUBANNOTATIONS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SUBANNOTATION_PARENT_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SUBANNOTATION_REF_ID).executeUpdate();
             
             con.prepareStatement(H2SQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
@@ -257,8 +257,8 @@ public class ProjectConnector {
             con.prepareStatement(MySQLStatements.SETUP_POSITIONS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_DIFFS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_COVERAGE).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_FEATURES).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_SUBFEATURES).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_ANNOTATIONS).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_SUBANNOTATIONS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS).execute();
@@ -318,7 +318,7 @@ public class ProjectConnector {
                     FieldNames.TABLE_TRACKS, FieldNames.TRACK_SEQUENCE_PAIR_ID, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE, "VARCHAR (20)"));
+                    FieldNames.TABLE_FEATURES, FieldNames.ANNOTATION_GENE, "VARCHAR (20)"));
                
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
@@ -348,7 +348,12 @@ public class ProjectConnector {
         }
     }
 
-    
+    /**
+     * If the current transaction tried to make changes in the DB, these changes are
+     * rolled back.
+     * @param className name of the class in which the error occured
+     * @param ex the exception, which was thrown
+     */
     public void rollbackOnError(String className, Exception ex) {
 
         Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, "Error occured. Trying to recover", ex);
@@ -385,6 +390,7 @@ public class ProjectConnector {
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully deleted all data");
         } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
             Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, "Deletion of data failed", ex);
         }
     }
@@ -403,7 +409,7 @@ public class ProjectConnector {
             con.commit();
             con.setAutoCommit(true);
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "done unlocking tables");
     }
@@ -412,14 +418,14 @@ public class ProjectConnector {
     private void disableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start disabling reference data domain indexing...");
         this.disableDomainIndices(MySQLStatements.DISABLE_REFERENCE_INDICES, null);
-        this.disableDomainIndices(MySQLStatements.DISABLE_FEATURE_INDICES, null);
+        this.disableDomainIndices(MySQLStatements.DISABLE_ANNOTATION_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done disabling reference data domain indexing");
     }
 
     private void enableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling reference data domain indexing...");
         this.enableDomainIndices(MySQLStatements.ENABLE_REFERENCE_INDICES, null);
-        this.enableDomainIndices(MySQLStatements.ENABLE_FEATURE_INDICES, null);
+        this.enableDomainIndices(MySQLStatements.ENABLE_ANNOTATION_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done enabling reference data domain indexing");
     }
 
@@ -443,74 +449,74 @@ public class ProjectConnector {
             insertGenome.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting reference sequence data");
     }
 
-    private void storeFeatures(ParsedReference reference) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting features...");
+    private void storeAnnotations(ParsedReference reference) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting annotations...");
         try {
-            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_FEATURE_ID, con);
-            PreparedStatement insertFeature = con.prepareStatement(SQLStatements.INSERT_FEATURE);
-            PreparedStatement insertSubfeature = con.prepareStatement(SQLStatements.INSERT_SUBFEATURE);
+            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_ANNOTATION_ID, con);
+            PreparedStatement insertAnnotation = con.prepareStatement(SQLStatements.INSERT_ANNOTATION);
+            PreparedStatement insertSubAnnotation = con.prepareStatement(SQLStatements.INSERT_SUBANNOTATION);
 
             int batchCounter = 1;
             int batchCountSubfeat = 1;
             int referenceId = reference.getID();
-            Iterator<ParsedFeature> featIt = reference.getFeatures().iterator();
+            Iterator<ParsedAnnotation> featIt = reference.getAnnotations().iterator();
             while (featIt.hasNext()) {
                 
                 batchCounter++;
-                ParsedFeature feature = featIt.next();
-                insertFeature.setLong(1, id);
-                insertFeature.setLong(2, referenceId);
-                insertFeature.setInt(3, feature.getType().getTypeInt());
-                insertFeature.setInt(4, feature.getStart());
-                insertFeature.setInt(5, feature.getStop());
-                insertFeature.setString(6, feature.getLocusTag());
-                insertFeature.setString(7, feature.getProduct());
-                insertFeature.setString(8, feature.getEcNumber());
-                insertFeature.setInt(9, feature.getStrand());
-                insertFeature.setString(10, feature.getGeneName());
-                insertFeature.addBatch();
+                ParsedAnnotation annotation = featIt.next();
+                insertAnnotation.setLong(1, id);
+                insertAnnotation.setLong(2, referenceId);
+                insertAnnotation.setInt(3, annotation.getType().getTypeInt());
+                insertAnnotation.setInt(4, annotation.getStart());
+                insertAnnotation.setInt(5, annotation.getStop());
+                insertAnnotation.setString(6, annotation.getLocusTag());
+                insertAnnotation.setString(7, annotation.getProduct());
+                insertAnnotation.setString(8, annotation.getEcNumber());
+                insertAnnotation.setInt(9, annotation.getStrand());
+                insertAnnotation.setString(10, annotation.getGeneName());
+                insertAnnotation.addBatch();
 
-                for (ParsedSubfeature subfeature : feature.getSubfeatures()) {
+                for (ParsedSubAnnotation subAnnotation : annotation.getSubAnnotations()) {
                     batchCountSubfeat++;
-                    insertSubfeature.setLong(1, id);
-                    insertSubfeature.setLong(2, referenceId);
-                    insertSubfeature.setInt(3, subfeature.getType().getTypeInt());
-                    insertSubfeature.setInt(4, subfeature.getStart());
-                    insertSubfeature.setInt(5, subfeature.getStop());
-                    insertSubfeature.addBatch();
+                    insertSubAnnotation.setLong(1, id);
+                    insertSubAnnotation.setLong(2, referenceId);
+                    insertSubAnnotation.setInt(3, subAnnotation.getType().getTypeInt());
+                    insertSubAnnotation.setInt(4, subAnnotation.getStart());
+                    insertSubAnnotation.setInt(5, subAnnotation.getStop());
+                    insertSubAnnotation.addBatch();
                     
-                    if (batchCountSubfeat == FEATURE_BATCH_SIZE) {
+                    if (batchCountSubfeat == ANNOTATION_BATCH_SIZE) {
                         batchCountSubfeat = 1;
-                        insertSubfeature.executeBatch();
+                        insertSubAnnotation.executeBatch();
                     }
                 }
                 
-                if (batchCounter == FEATURE_BATCH_SIZE) {
+                if (batchCounter == ANNOTATION_BATCH_SIZE) {
                     batchCounter = 1;
-                    insertFeature.executeBatch();
+                    insertAnnotation.executeBatch();
                 }
                 ++id;
                 //  it.remove();
             }
 
-            insertFeature.executeBatch();
-            insertSubfeature.executeBatch();
-            insertFeature.close();
-            insertSubfeature.close();
+            insertAnnotation.executeBatch();
+            insertSubAnnotation.executeBatch();
+            insertAnnotation.close();
+            insertSubAnnotation.close();
 
 
         } catch (SQLException ex) {
-            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting features");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting annotations");
     }
 
     private void lockReferenceDomainTables() {
@@ -529,7 +535,7 @@ public class ProjectConnector {
             }
 
             this.storeGenome(reference);
-            this.storeFeatures(reference);
+            this.storeAnnotations(reference);
 
             if (adapter.equalsIgnoreCase("mysql")) {
                 this.enableReferenceIndices();
@@ -538,7 +544,7 @@ public class ProjectConnector {
 
             con.setAutoCommit(true);
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName());
@@ -613,7 +619,7 @@ public class ProjectConnector {
                 cov.setCoveredCommonMatchPositions(coveredCommonMatchPos);
                 
             } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+                this.rollbackOnError(this.getClass().getName(), ex);
             }
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
         }
@@ -642,7 +648,7 @@ public class ProjectConnector {
                 track.setID(currentTrackID);
             }
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
@@ -721,7 +727,7 @@ public class ProjectConnector {
             }
 
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track statistics data");
     }
@@ -753,7 +759,7 @@ public class ProjectConnector {
                 addStatistics.close();
 
             } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+                this.rollbackOnError(this.getClass().getName(), ex);
             }
         }
         
@@ -805,7 +811,7 @@ public class ProjectConnector {
             insertMapping.executeBatch();
 
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing mapping data");
     }
@@ -885,7 +891,7 @@ public class ProjectConnector {
             insertGap.close();
 
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting diff data");
@@ -917,7 +923,7 @@ public class ProjectConnector {
             lock.execute();
             lock.close();
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done locking {0} domain tables...", domainName);
     }
@@ -985,7 +991,7 @@ public class ProjectConnector {
             disableDomainIndices.execute();
             disableDomainIndices.close();
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         if (domainName != null) {
@@ -1007,7 +1013,7 @@ public class ProjectConnector {
             enableDomainIndices.execute();
             enableDomainIndices.close();
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         if (domainName != null) {
@@ -1043,14 +1049,14 @@ public class ProjectConnector {
         return trackConnectors.get(trackID);
     }
 
-    public TrackConnector getTrackConnector(List<PersistantTrack> tracks) {
+    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) {
         // makes sure the track id is not already used
         int id = 9999;
         for (PersistantTrack track : tracks) {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-        trackConnectors.put(id, new TrackConnector(id, tracks));
+        trackConnectors.put(id, new TrackConnector(id, tracks, combineTracks));
         return trackConnectors.get(id);
     }
     
@@ -1086,7 +1092,7 @@ public class ProjectConnector {
     }
 
     
-    public List<PersistantReference> getGenomes() {
+    public List<PersistantReference> getGenomes() throws OutOfMemoryError {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
         ArrayList<PersistantReference> refGens = new ArrayList<PersistantReference>();
@@ -1108,7 +1114,7 @@ public class ProjectConnector {
             }
 
         } catch (SQLException e) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), e);
+            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, e);
         }
 
         return refGens;
@@ -1186,23 +1192,23 @@ public class ProjectConnector {
         try {
             con.setAutoCommit(false);
 
-            PreparedStatement deleteFeatures = con.prepareStatement(SQLStatements.DELETE_FEATURES_FROM_GENOME);
-            deleteFeatures.setLong(1, refGenID);
-            PreparedStatement deleteSubeatures = con.prepareStatement(SQLStatements.DELETE_SUBFEATURES_FROM_GENOME);
+            PreparedStatement deleteAnnotations = con.prepareStatement(SQLStatements.DELETE_ANNOTATIONS_FROM_GENOME);
+            deleteAnnotations.setLong(1, refGenID);
+            PreparedStatement deleteSubeatures = con.prepareStatement(SQLStatements.DELETE_SUBANNOTATIONS_FROM_GENOME);
             deleteSubeatures.setLong(1, refGenID);
             PreparedStatement deleteGenome = con.prepareStatement(SQLStatements.DELETE_GENOME);
             deleteGenome.setLong(1, refGenID);
 
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Features...");
-            deleteFeatures.execute();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Subfeatures...");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting annotations...");
+            deleteAnnotations.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Sub annotations...");
             deleteSubeatures.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Genome...");
             deleteGenome.execute();
 
             con.commit();
 
-            deleteFeatures.close();
+            deleteAnnotations.close();
             deleteSubeatures.close();
             deleteGenome.close();
 
@@ -1335,7 +1341,7 @@ public class ProjectConnector {
             insertReplicate.close();
 
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair data");
     }
@@ -1372,12 +1378,11 @@ public class ProjectConnector {
             setSeqPairIds.close();
 
         } catch (SQLException ex) {
-            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, ex);
+            this.rollbackOnError(this.getClass().getName(), ex);
         }
     }
         
     //TODO: delete seqpairs
-    //TODO: seqpair queries
                 
     /**
      * Since Coverage container only stores the data, here we have to calculate which base is the
@@ -1570,7 +1575,7 @@ public class ProjectConnector {
                 insertPosition.close();
 
             } catch (SQLException ex) {
-                ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
+                this.rollbackOnError(this.getClass().getName(), ex);
             }
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting snp data");

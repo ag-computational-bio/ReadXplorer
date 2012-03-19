@@ -64,9 +64,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private boolean isInMaxZoomLevel;
     private boolean inDrawingMode;
     private boolean isActive;
-    private LegendLabel legendLabel;
-    private JPanel legend;
+    private MenuLabel legendLabel;
+    private JPanel legend;    
     private boolean hasLegend;
+    private MenuLabel optionsLabel;
+    private JPanel options;
+    private boolean hasOptions;
     private List<FeatureType> excludedFeatureTypes;
     private boolean pAInfoIsAviable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
@@ -119,7 +122,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         boundsManager.removeBoundListener(this);
     }
 
-    public void setupLegend(LegendLabel label, JPanel legend) {
+    public void setupLegend(MenuLabel label, JPanel legend) {
         this.hasLegend = true;
 
         int labelX = 2;
@@ -134,6 +137,28 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
         this.legend.setBounds(labelX, legendY, legend.getPreferredSize().width, legend.getPreferredSize().height);
         this.legend.setVisible(false);
+    }
+    
+    /**
+     * Setup an option panel in the right top corner of the viewer.
+     * @param label 
+     * @param options 
+     */
+    public void setupOptions(MenuLabel label, JPanel options) {
+        this.hasOptions = true;
+
+        int labelX = 70; // this.getWidth() - 72;
+        int labelY = 0;
+
+        this.optionsLabel = label;
+        this.optionsLabel.setSize(new Dimension(70, 20));
+        this.optionsLabel.setBounds(labelX, labelY, this.optionsLabel.getSize().width, this.optionsLabel.getSize().height);
+
+        this.options = options;
+        int legendY = labelY + optionsLabel.getSize().height + 2;
+
+        this.options.setBounds(labelX, legendY, options.getPreferredSize().width, options.getPreferredSize().height);
+        this.options.setVisible(false);
     }
 
     public void showSequenceBar(boolean showSeqBar, boolean centerSeqBar) {
@@ -600,11 +625,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
-    public void updateLegendVisibility(boolean isShowingLegend) {
-        this.legend.setVisible(isShowingLegend);
-    }
-
-    public LegendLabel getLegendLabel() {
+    public MenuLabel getLegendLabel() {
         return this.legendLabel;
     }
 
@@ -617,7 +638,23 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     public boolean isLegendVisisble() {
-        return legend.isVisible();
+        return this.legend.isVisible();
+    }
+    
+    public MenuLabel getOptionsLabel() {
+        return this.optionsLabel;
+    }
+    
+    public boolean hasOptions() {
+        return this.hasOptions;
+    }
+    
+    public JPanel getOptionsPanel() {
+        return this.options;
+    }
+    
+    public boolean isOptionsVisible() {
+        return this.options.isVisible();
     }
 
     public List<FeatureType> getExcludedFeatureTypes() {

@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -72,7 +72,7 @@
                 <Column editable="false" title="Amino SNP" type="java.lang.String"/>
                 <Column editable="false" title="Amino Ref" type="java.lang.String"/>
                 <Column editable="false" title="Effect on AA" type="java.lang.String"/>
-                <Column editable="false" title="Feature (Gene)" type="java.lang.String"/>
+                <Column editable="false" title="Annotation" type="java.lang.String"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">

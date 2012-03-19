@@ -2,10 +2,8 @@
 package de.cebitec.vamp.databackend;
 
 /**
- *
  * @author jstraube, rhilker
- */
-/*
+ * 
  * This class contains the statements which are only used by the MySQL Database
  */
 public class MySQLStatements {
@@ -78,33 +76,33 @@ public class MySQLStatements {
             ") ";
 
     
-       public final static String SETUP_FEATURES =
+       public final static String SETUP_ANNOTATIONS =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_FEATURES+" " +
             "(" +
-            FieldNames.FEATURE_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.FEATURE_REFGEN_ID+" BIGINT UNSIGNED NOT NULL, "+
-            FieldNames.FEATURE_TYPE+" TINYINT UNSIGNED NOT NULL, " +
-            FieldNames.FEATURE_START+" BIGINT UNSIGNED NOT NULL, " +
-            FieldNames.FEATURE_STOP+" BIGINT UNSIGNED NOT NULL, " +
-            FieldNames.FEATURE_LOCUS_TAG+" VARCHAR(1000) , " +
-            FieldNames.FEATURE_PRODUCT+" VARCHAR(1000), " +
-            FieldNames.FEATURE_EC_NUM+" VARCHAR (20), " +
-            FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
-            FieldNames.FEATURE_GENE+" VARCHAR (20), " +
-            "INDEX ("+FieldNames.FEATURE_REFGEN_ID+") " +
+            FieldNames.ANNOTATION_ID+" BIGINT PRIMARY KEY, " +
+            FieldNames.ANNOTATION_REFGEN_ID+" BIGINT UNSIGNED NOT NULL, "+
+            FieldNames.ANNOTATION_TYPE+" TINYINT UNSIGNED NOT NULL, " +
+            FieldNames.ANNOTATION_START+" BIGINT UNSIGNED NOT NULL, " +
+            FieldNames.ANNOTATION_STOP+" BIGINT UNSIGNED NOT NULL, " +
+            FieldNames.ANNOTATION_LOCUS_TAG+" VARCHAR(1000) , " +
+            FieldNames.ANNOTATION_PRODUCT+" VARCHAR(1000), " +
+            FieldNames.ANNOTATION_EC_NUM+" VARCHAR (20), " +
+            FieldNames.ANNOTATION_STRAND+" TINYINT NOT NULL, " +
+            FieldNames.ANNOTATION_GENE+" VARCHAR (20), " +
+            "INDEX ("+FieldNames.ANNOTATION_REFGEN_ID+") " +
             ") ";
        
-       public static final String SETUP_SUBFEATURES =
+       public static final String SETUP_SUBANNOTATIONS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
             + " ("
-                + FieldNames.SUBFEATURES_PARENT_ID + " BIGINT NOT NULL, "
-                + FieldNames.SUBFEATURES_REFERENCE_ID + " BIGINT NOT NULL, "
-                + FieldNames.SUBFEATURES_TYPE + " TINYINT UNSIGNED NOT NULL, "
-                + FieldNames.SUBFEATURES_START + " BIGINT UNSIGNED NOT NULL, "
-                + FieldNames.SUBFEATURES_STOP + " BIGINT UNSIGNED NOT NULL, "
-                + FieldNames.FEATURE_GENE + " VARCHAR (30) " +
-                "INDEX ("+  FieldNames.SUBFEATURES_PARENT_ID + ", " + 
-                        FieldNames.SUBFEATURES_REFERENCE_ID +") " +
+                + FieldNames.SUBANNOTATION_PARENT_ID + " BIGINT NOT NULL, "
+                + FieldNames.SUBANNOTATION_REFERENCE_ID + " BIGINT NOT NULL, "
+                + FieldNames.SUBANNOTATION_TYPE + " TINYINT UNSIGNED NOT NULL, "
+                + FieldNames.SUBANNOTATION_START + " BIGINT UNSIGNED NOT NULL, "
+                + FieldNames.SUBANNOTATION_STOP + " BIGINT UNSIGNED NOT NULL, "
+                + FieldNames.ANNOTATION_GENE + " VARCHAR (30) " +
+                "INDEX ("+  FieldNames.SUBANNOTATION_PARENT_ID + ", " + 
+                        FieldNames.SUBANNOTATION_REFERENCE_ID +") " +
             ") ";
 
     
@@ -255,11 +253,11 @@ public class MySQLStatements {
             "ALTER TABLE "+FieldNames.TABLE_REF_GEN+" DISABLE KEYS";
 
     
-    public final static String ENABLE_FEATURE_INDICES =
+    public final static String ENABLE_ANNOTATION_INDICES =
             "ALTER TABLE "+FieldNames.TABLE_FEATURES+" ENABLE KEYS";
 
     
-    public final static String DISABLE_FEATURE_INDICES =
+    public final static String DISABLE_ANNOTATION_INDICES =
             "ALTER TABLE "+FieldNames.TABLE_FEATURES+" DISABLE KEYS";
 
     

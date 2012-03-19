@@ -1,6 +1,6 @@
 package de.cebitec.vamp.parser.reference.Filter;
 
-import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedAnnotation;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -8,15 +8,15 @@ import java.util.Iterator;
  *
  * @author ddoppmeier
  */
-public class FeatureFilter {
+public class AnnotationFilter {
 
-    // valid feature if one of the whitelist rules is applied
+    // valid annotation if one of the whitelist rules is applied
     private ArrayList<FilterRuleI> whitelist;
-    // valid features have to apply all blacklist rules
-    // e.g. o FilterRuleCDS added to the blacklist means, that a CDS Type feature is not accepted
+    // valid annotations have to apply all blacklist rules
+    // e.g. o FilterRuleCDS added to the blacklist means, that a CDS Type annotation is not accepted
     private ArrayList<FilterRuleI> blacklist;
 
-    public FeatureFilter(){
+    public AnnotationFilter(){
         whitelist = new ArrayList<FilterRuleI>();
         blacklist = new ArrayList<FilterRuleI>();
     }
@@ -29,7 +29,7 @@ public class FeatureFilter {
         whitelist.add(rule);
     }
 
-    public boolean isValidFeature(ParsedFeature feature){
+    public boolean isValidAnnotation(ParsedAnnotation annotation){
 
         boolean whitelistAccepted = false;
         boolean blacklistAccepted = true;
@@ -39,13 +39,13 @@ public class FeatureFilter {
             Iterator<FilterRuleI> it = whitelist.iterator();
             while(it.hasNext()){
                 FilterRuleI rule = it.next();
-                if(rule.appliesRule(feature)){
+                if(rule.appliesRule(annotation)){
                     whitelistAccepted = true;
                     break;
                 }
             }
         } else {
-            // no rules in whitelist to apply: feature is accepted
+            // no rules in whitelist to apply: annotation is accepted
             whitelistAccepted = true;
         }
 
@@ -54,13 +54,13 @@ public class FeatureFilter {
             Iterator<FilterRuleI> it = blacklist.iterator();
             while(it.hasNext()){
                 FilterRuleI rule = it.next();
-                if(rule.appliesRule(feature)){
+                if(rule.appliesRule(annotation)){
                     blacklistAccepted = false;
                     break;
                 }
             }
         } else {
-            // no rules in blacklist to apply: feature is accepted
+            // no rules in blacklist to apply: annotation is accepted
             blacklistAccepted = true;
         }
 

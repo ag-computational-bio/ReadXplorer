@@ -16,20 +16,20 @@ import org.openide.util.Utilities;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false)
-public final class ReferenceNavigatorTopComponent extends TopComponent implements LookupListener{
+public final class ReferenceNavigatorTopComp extends TopComponent implements LookupListener{
 
     private static final long serialVersionUID = 1L;
 
-    private static ReferenceNavigatorTopComponent instance;
+    private static ReferenceNavigatorTopComp instance;
     private Result<ReferenceViewer> result;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "ReferenceNavigatorTopComponent";
+    private static final String PREFERRED_ID = "ReferenceNavigatorTopComp";
 
-    public ReferenceNavigatorTopComponent() {
+    public ReferenceNavigatorTopComp() {
         initComponents();
-        setName(NbBundle.getMessage(ReferenceNavigatorTopComponent.class, "CTL_ReferenceNavigatorTopComponent"));
-        setToolTipText(NbBundle.getMessage(ReferenceNavigatorTopComponent.class, "HINT_ReferenceNavigatorTopComponent"));
+        setName(NbBundle.getMessage(ReferenceNavigatorTopComp.class, "CTL_ReferenceNavigatorTopComp"));
+        setToolTipText(NbBundle.getMessage(ReferenceNavigatorTopComp.class, "HINT_ReferenceNavigatorTopComp"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
@@ -69,27 +69,27 @@ public final class ReferenceNavigatorTopComponent extends TopComponent implement
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ReferenceNavigatorTopComponent getDefault() {
+    public static synchronized ReferenceNavigatorTopComp getDefault() {
         if (instance == null) {
-            instance = new ReferenceNavigatorTopComponent();
+            instance = new ReferenceNavigatorTopComp();
         }
         return instance;
     }
 
     /**
-     * Obtain the ReferenceNavigatorTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the ReferenceNavigatorTopComp instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized ReferenceNavigatorTopComponent findInstance() {
+    public static synchronized ReferenceNavigatorTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(ReferenceNavigatorTopComponent.class.getName()).warning(
+            Logger.getLogger(ReferenceNavigatorTopComp.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof ReferenceNavigatorTopComponent) {
-            return (ReferenceNavigatorTopComponent) win;
+        if (win instanceof ReferenceNavigatorTopComp) {
+            return (ReferenceNavigatorTopComp) win;
         }
-        Logger.getLogger(ReferenceNavigatorTopComponent.class.getName()).warning(
+        Logger.getLogger(ReferenceNavigatorTopComp.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();

@@ -4,10 +4,10 @@ import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeatureI;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubfeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -29,16 +29,16 @@ public class ReferenceViewer extends AbstractViewer {
     private final static long serialVersionUID = 7964236;
     private static int height = 250;
     private static int FRAMEHEIGHT = 20;
-    private Map<FeatureType, Integer> featureStats;
-    private JFeature currentlySelectedFeature;
+    private Map<FeatureType, Integer> annotationStats;
+    private JAnnotation currentlySelectedAnnotation;
     private int labelMargin;
     private ReferenceConnector refGenConnector;
-    private ArrayList<JFeature> features;
-    private ArrayList<JFeature> subfeatures;
+    private ArrayList<JAnnotation> annotations;
+    private ArrayList<JAnnotation> subAnnotations;
 
-    public final static String PROP_FEATURE_STATISTICS_CHANGED = "feats changed";
-    public final static String PROP_FEATURE_SELECTED = "feat selected";
-    public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
+    public final static String PROP_ANNOTATION_STATS_CHANGED = "feats changed";
+    public final static String PROP_ANNOTATION_SELECTED = "feat selected";
+    public static final String PROP_EXCLUDED_ANNOTATION_EVT = "excl feat evt";
     private int trackCount = 0;
     
     /**
@@ -50,10 +50,10 @@ public class ReferenceViewer extends AbstractViewer {
      */
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome){
         super(boundsInfoManager, basePanel, refGenome);
-        this.features = new ArrayList<JFeature>();
-        this.subfeatures = new ArrayList<JFeature>();
+        this.annotations = new ArrayList<JAnnotation>();
+        this.subAnnotations = new ArrayList<JAnnotation>();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
-        this.featureStats = new EnumMap<FeatureType, Integer>(FeatureType.class);
+        this.annotationStats = new EnumMap<FeatureType, Integer>(FeatureType.class);
         this.getExcludedFeatureTypes().add(FeatureType.UNDEFINED);
         this.showSequenceBar(true, true);
         this.labelMargin = 3;
@@ -61,27 +61,27 @@ public class ReferenceViewer extends AbstractViewer {
     }
            
 
-    public void setSelectedFeature(JFeature feature){
+    public void setSelectedAnnotation(JAnnotation annotation){
         
-        firePropertyChange(PROP_FEATURE_SELECTED, currentlySelectedFeature, feature);
+        firePropertyChange(PROP_ANNOTATION_SELECTED, currentlySelectedAnnotation, annotation);
 
-        // if the currently selected feature is clicked again, de-select it
-        if (currentlySelectedFeature == feature){
-            currentlySelectedFeature.setSelected(false);
-            currentlySelectedFeature = null;
+        // if the currently selected annotation is clicked again, de-select it
+        if (currentlySelectedAnnotation == annotation){
+            currentlySelectedAnnotation.setSelected(false);
+            currentlySelectedAnnotation = null;
         } else {
 
-            // if there was a feature selected before, de-select it
-            if (currentlySelectedFeature != null){
-                currentlySelectedFeature.setSelected(false);
+            // if there was a annotation selected before, de-select it
+            if (currentlySelectedAnnotation != null){
+                currentlySelectedAnnotation.setSelected(false);
             }
 
-            currentlySelectedFeature = feature;
-            currentlySelectedFeature.setSelected(true);
+            currentlySelectedAnnotation = annotation;
+            currentlySelectedAnnotation.setSelected(true);
         }
 
         //only recalculate if reading frame was switched
-        if (currentlySelectedFeature == null || this.getSequenceBar().getFrameCurrFeature() != this.determineFrame(currentlySelectedFeature.getPersistantFeature())){
+        if (currentlySelectedAnnotation == null || this.getSequenceBar().getFrameCurrAnnotation() != this.determineFrame(currentlySelectedAnnotation.getPersistantAnnotation())){
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -91,9 +91,9 @@ public class ReferenceViewer extends AbstractViewer {
     public void close(){
         super.close();
         refGenConnector = null;
-        featureStats.clear();
-        this.features.clear();
-        this.subfeatures.clear();
+        annotationStats.clear();
+        this.annotations.clear();
+        this.subAnnotations.clear();
         this.getExcludedFeatureTypes().clear();
     }
 
@@ -105,16 +105,16 @@ public class ReferenceViewer extends AbstractViewer {
     @Override
     public void boundsChangedHook() {
         // TODO compute this outside of EDT if too timeconsuming
-        this.createFeatures();
+        this.createAnnotations();
 
 //        firePropertyChange(PROP_INTERVAL_CHANGED, null, getBoundsInfo());
     }
 
-    private void createFeatures(){
+    private void createAnnotations(){
         this.removeAll();
-        this.features.clear();
-        this.subfeatures.clear();
-        this.featureStats.clear();
+        this.annotations.clear();
+        this.subAnnotations.clear();
+        this.annotationStats.clear();
         
         if (this.hasLegend()){
             this.add(this.getLegendLabel());
@@ -124,123 +124,123 @@ public class ReferenceViewer extends AbstractViewer {
             this.add(this.getSequenceBar());
         }
 
-        List<PersistantFeature> featureList = refGenConnector.getFeaturesForRegion(
+        List<PersistantAnnotation> annotationList = refGenConnector.getAnnotationsForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
-        Map<Integer, PersistantFeature> featureMap = PersistantFeature.getFeatureMap(featureList);
-        List<PersistantSubfeature> subfeatureList = refGenConnector.getSubfeaturesForRegion(
+        Map<Integer, PersistantAnnotation> annotationMap = PersistantAnnotation.getAnnotationMap(annotationList);
+        List<PersistantSubAnnotation> subAnnotationList = refGenConnector.getSubAnnotationsForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
         
-        //at first add subfeatures to their parent features
-        PersistantFeature.addSubfeatures(featureMap, subfeatureList);
-        featureMap.clear();
+        //at first add sub annotations to their parent annotations
+        PersistantAnnotation.addSubAnnotations(annotationMap, subAnnotationList);
+        annotationMap.clear();
         
-        for (PersistantFeature feature : featureList){
-            this.addFeatureComponent(feature);
-            this.registerFeatureInStats(feature);
+        for (PersistantAnnotation annotation : annotationList){
+            this.addAnnotationComponent(annotation);
+            this.registerAnnotationInStats(annotation);
         }
         
-        for (JFeature jsubfeature : this.subfeatures) {
-            this.add(jsubfeature);
+        for (JAnnotation jSubAnnotation : this.subAnnotations) {
+            this.add(jSubAnnotation);
         }
-        for (JFeature jfeature : this.features) {
-            this.add(jfeature);
+        for (JAnnotation jAnnotation : this.annotations) {
+            this.add(jAnnotation);
         }
 
-        firePropertyChange(PROP_FEATURE_STATISTICS_CHANGED, null, featureStats);
+        firePropertyChange(PROP_ANNOTATION_STATS_CHANGED, null, annotationStats);
     }
 
     
-    private void registerFeatureInStats(PersistantFeatureI feature){
-        FeatureType type = feature.getType();
-        if(!this.featureStats.containsKey(type)){
-            this.featureStats.put(type, 0);
+    private void registerAnnotationInStats(PersistantAnnotationI annotation){
+        FeatureType type = annotation.getType();
+        if(!this.annotationStats.containsKey(type)){
+            this.annotationStats.put(type, 0);
         }
-        this.featureStats.put(type, this.featureStats.get(type)+1);
+        this.annotationStats.put(type, this.annotationStats.get(type)+1);
     }
 
     /**
-     * Creates a feature component for a given feature and adds it to the reference viewer.
-     * @param feature the feature to add to the viewer.
+     * Creates a annotation component for a given annotation and adds it to the reference viewer.
+     * @param annotation the annotation to add to the viewer.
      */
-    private void addFeatureComponent(PersistantFeature feature){
-        int frame = this.determineFrame(feature);
+    private void addAnnotationComponent(PersistantAnnotation annotation){
+        int frame = this.determineFrame(annotation);
         int yCoord = this.determineYFromFrame(frame);
         PaintingAreaInfo bounds = getPaintingAreaInfo();
         
-        //handle subfeatures of the feature (e.g. exons)
+        //handle sub annotations of the annotation (e.g. exons)
         boolean subfeatAdded = false;
-        for (PersistantSubfeature subfeature : feature.getSubfeatures()) {
-            this.registerFeatureInStats(subfeature);
+        for (PersistantSubAnnotation subAnnotation : annotation.getSubAnnotations()) {
+            this.registerAnnotationInStats(subAnnotation);
 
-            if (!this.getExcludedFeatureTypes().contains(subfeature.getType())) {
-                byte border = JFeature.BORDER_NONE;
-                // get left boundary of the feature
-                double phyStart = this.getPhysBoundariesForLogPos(subfeature.getStart()).getLeftPhysBound();
+            if (!this.getExcludedFeatureTypes().contains(subAnnotation.getType())) {
+                byte border = JAnnotation.BORDER_NONE;
+                // get left boundary of the annotation
+                double phyStart = this.getPhysBoundariesForLogPos(subAnnotation.getStart()).getLeftPhysBound();
                 if (phyStart < bounds.getPhyLeft()) {
                     phyStart = bounds.getPhyLeft();
-                    border = JFeature.BORDER_LEFT;
+                    border = JAnnotation.BORDER_LEFT;
                 }
 
-                // get right boundary of the feature
-                double phyStop = this.getPhysBoundariesForLogPos(subfeature.getStop()).getRightPhysBound();
+                // get right boundary of the annotation
+                double phyStop = this.getPhysBoundariesForLogPos(subAnnotation.getStop()).getRightPhysBound();
                 if (phyStop > bounds.getPhyRight()) {
                     phyStop = bounds.getPhyRight();
-                    border = border == JFeature.BORDER_LEFT ? JFeature.BORDER_BOTH : JFeature.BORDER_RIGHT;
+                    border = border == JAnnotation.BORDER_LEFT ? JAnnotation.BORDER_BOTH : JAnnotation.BORDER_RIGHT;
                 }
 
                 // set a minimum length to be displayed, otherwise a high zoomlevel could
-                // lead to dissapearing features
+                // lead to dissapearing annotations
                 double length = phyStop - phyStart;
                 if (length < 3) {
                     length = 3;
                 }
 
-                PersistantFeature subfeatureFeature = new PersistantFeature(feature.getId(), feature.getEcNumber(),
-                        feature.getLocus(), feature.getProduct(), subfeature.getStart(), subfeature.getStop(),
-                        feature.getStrand(), subfeature.getType(), feature.getGeneName());
-                JFeature jSubfeature = new JFeature(subfeatureFeature, length, this, border);
-                int yFrom = yCoord - (jSubfeature.getHeight() / 2);
-                jSubfeature.setBounds((int) phyStart, yFrom, jSubfeature.getSize().width, jSubfeature.getHeight());
+                PersistantAnnotation subAnnotationAnnotation = new PersistantAnnotation(annotation.getId(), annotation.getEcNumber(),
+                        annotation.getLocus(), annotation.getProduct(), subAnnotation.getStart(), subAnnotation.getStop(),
+                        annotation.getStrand(), subAnnotation.getType(), annotation.getGeneName());
+                JAnnotation jSubAnnotation = new JAnnotation(subAnnotationAnnotation, length, this, border);
+                int yFrom = yCoord - (jSubAnnotation.getHeight() / 2);
+                jSubAnnotation.setBounds((int) phyStart, yFrom, jSubAnnotation.getSize().width, jSubAnnotation.getHeight());
 
-                this.subfeatures.add(jSubfeature);
+                this.subAnnotations.add(jSubAnnotation);
                 subfeatAdded = true;
             }
         }
 
-        if (!this.getExcludedFeatureTypes().contains(feature.getType()) || subfeatAdded) {
-            byte border = JFeature.BORDER_NONE;
-            // get left boundary of the feature
-            double phyStart = this.getPhysBoundariesForLogPos(feature.getStart()).getLeftPhysBound();
+        if (!this.getExcludedFeatureTypes().contains(annotation.getType()) || subfeatAdded) {
+            byte border = JAnnotation.BORDER_NONE;
+            // get left boundary of the annotation
+            double phyStart = this.getPhysBoundariesForLogPos(annotation.getStart()).getLeftPhysBound();
             if (phyStart < bounds.getPhyLeft()) {
                 phyStart = bounds.getPhyLeft();
-                border = JFeature.BORDER_LEFT;
+                border = JAnnotation.BORDER_LEFT;
             }
 
-            // get right boundary of the feature
-            double phyStop = this.getPhysBoundariesForLogPos(feature.getStop()).getRightPhysBound();
+            // get right boundary of the annotation
+            double phyStop = this.getPhysBoundariesForLogPos(annotation.getStop()).getRightPhysBound();
             if (phyStop > bounds.getPhyRight()) {
                 phyStop = bounds.getPhyRight();
-                border = border == JFeature.BORDER_LEFT ? JFeature.BORDER_BOTH : JFeature.BORDER_RIGHT;
+                border = border == JAnnotation.BORDER_LEFT ? JAnnotation.BORDER_BOTH : JAnnotation.BORDER_RIGHT;
             }
 
             // set a minimum length to be displayed, otherwise a high zoomlevel could
-            // lead to dissapearing features
+            // lead to dissapearing annotations
             double length = phyStop - phyStart;
             if (length < 3) {
                 length = 3;
             }
 
-            JFeature jFeature = new JFeature(feature, length, this, border);
-            int yFrom = yCoord - (jFeature.getHeight() / 2);
-            jFeature.setBounds((int) phyStart, yFrom, jFeature.getSize().width, jFeature.getHeight());
+            JAnnotation jAnnotation = new JAnnotation(annotation, length, this, border);
+            int yFrom = yCoord - (jAnnotation.getHeight() / 2);
+            jAnnotation.setBounds((int) phyStart, yFrom, jAnnotation.getSize().width, jAnnotation.getHeight());
 
-            if (currentlySelectedFeature != null) {
-                if (feature.getId() == currentlySelectedFeature.getPersistantFeature().getId()) {
-                    setSelectedFeature(jFeature);
+            if (currentlySelectedAnnotation != null) {
+                if (annotation.getId() == currentlySelectedAnnotation.getPersistantAnnotation().getId()) {
+                    setSelectedAnnotation(jAnnotation);
                 }
             }
 
-            this.features.add(jFeature);
+            this.annotations.add(jAnnotation);
         }
     }
 
@@ -259,19 +259,19 @@ public class ReferenceViewer extends AbstractViewer {
     }
 
     /**
-     * @param f feature whose frame has to be determined
-     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the feature
+     * @param annotation annotation whose frame has to be determined
+     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the annotation
      */
-    public int determineFrame(PersistantFeature f) {
+    public int determineFrame(PersistantAnnotation annotation) {
         int frame = 0;
-        int direction = f.getStrand();
+        int direction = annotation.getStrand();
 
         if (direction == 1) {
             // forward strand
-            frame = (f.getStart() - 1) % 3 + 1;
+            frame = (annotation.getStart() - 1) % 3 + 1;
         } else if (direction == -1) {
             // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
-            frame = (f.getStop() - 1) % 3 - 3;
+            frame = (annotation.getStop() - 1) % 3 - 3;
         }
         return frame;
     }
@@ -335,12 +335,12 @@ public class ReferenceViewer extends AbstractViewer {
         }
     }
 
-    public Map<FeatureType, Integer> getFeatureStats() {
-        return this.featureStats;
+    public Map<FeatureType, Integer> getAnnotationStats() {
+        return this.annotationStats;
     }
 
-    public JFeature getCurrentlySelectedFeature() {
-        return this.currentlySelectedFeature;
+    public JAnnotation getCurrentlySelectedAnnotation() {
+        return this.currentlySelectedAnnotation;
     }
     
     /**

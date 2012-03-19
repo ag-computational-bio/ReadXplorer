@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -51,9 +51,9 @@
                 <Column editable="false" title="Start Coverage" type="java.lang.Integer"/>
                 <Column editable="false" title="Coverage Increase" type="java.lang.Integer"/>
                 <Column editable="false" title="Coverage Increase %" type="java.lang.Integer"/>
-                <Column editable="false" title="Correct Feature" type="java.lang.String"/>
-                <Column editable="false" title="Next Upstream Feature" type="java.lang.String"/>
-                <Column editable="false" title="Next Downstream Feature" type="java.lang.String"/>
+                <Column editable="false" title="Correct Annotation" type="java.lang.String"/>
+                <Column editable="false" title="Next Upstream Annotation" type="java.lang.String"/>
+                <Column editable="false" title="Next Downstream Annotation" type="java.lang.String"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">

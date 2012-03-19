@@ -1,12 +1,12 @@
 package de.cebitec.vamp.parser.reference;
 
-import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedAnnotation;
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.parser.common.ParsedSubfeature;
+import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.BufferedReader;
@@ -84,12 +84,12 @@ public class BioJavaParser implements ReferenceParserI {
     }
 
     @Override
-    public ParsedReference parseReference(ReferenceJob refGenJob, FeatureFilter filter) throws ParsingException {
+    public ParsedReference parseReference(ReferenceJob refGenJob, AnnotationFilter filter) throws ParsingException {
 
         ParsedReference refGenome = new ParsedReference();
-        refGenome.setFeatureFilter(filter);
+        refGenome.setAnnotationFilter(filter);
         //at first store all eonxs in one data structure and add them to the ref genome at the end
-        List<ParsedFeature> exons = new ArrayList<ParsedFeature>();
+        List<ParsedAnnotation> exons = new ArrayList<ParsedAnnotation>();
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
         try {
@@ -113,12 +113,12 @@ public class BioJavaParser implements ReferenceParserI {
                     refGenome.setTimestamp(refGenJob.getTimestamp());
                     refGenome.setSequence(seq.seqString());
 
-                    // iterate through all features
+                    // iterate through all annotations
                     Iterator<Feature> featIt = seq.getFeatureSet().iterator();
                     while (featIt.hasNext()) {
-                        RichFeature feature = (RichFeature) featIt.next();
+                        RichFeature annotation = (RichFeature) featIt.next();
 
-                        // attributes of feature that should be stored
+                        // attributes of annotation that should be stored
                         String parsedType = null;
                         String locusTag = "unknown locus tag";
                         String product = null;
@@ -127,26 +127,26 @@ public class BioJavaParser implements ReferenceParserI {
                         int strand = 0;
                         String ecNumber = null;
                         String geneName = null;
-                        List<ParsedSubfeature> subfeatures = new ArrayList<ParsedSubfeature>();
-                        Location location = feature.getLocation();
+                        List<ParsedSubAnnotation> subAnnotations = new ArrayList<ParsedSubAnnotation>();
+                        Location location = annotation.getLocation();
 
-                        parsedType = feature.getType();
+                        parsedType = annotation.getType();
                         start = location.getMin();
                         stop = location.getMax();
                         if (start >= stop) {
                             this.sendErrorMsg("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath() 
-                                    + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
+                                    + ". Found start: " + start + ", stop: " + stop + ". Annotation ignored.");
                             continue;
                         }
                         try {
-                            strand = this.determineStrand(feature, refGenJob);
+                            strand = this.determineStrand(annotation, refGenJob);
                         } catch (IllegalStateException e) {
                             this.sendErrorMsg(e.getMessage());
                             continue;
                         }
 
-                        //Determine feature tags
-                        Iterator<Note> noteIter = feature.getRichAnnotation().getNoteSet().iterator();
+                        //Determine annotation tags
+                        Iterator<Note> noteIter = annotation.getRichAnnotation().getNoteSet().iterator();
                         while (noteIter.hasNext()) {
                             Note note = noteIter.next();
                             String name = note.getTerm().getName();
@@ -168,7 +168,7 @@ public class BioJavaParser implements ReferenceParserI {
                         }
 
                         /* 
-                         * If the type of the feature is unknown to vamp (see below),
+                         * If the type of the annotation is unknown to vamp (see below),
                          * an undefined type is used.
                          */
                         FeatureType type = FeatureType.UNDEFINED;
@@ -196,11 +196,11 @@ public class BioJavaParser implements ReferenceParserI {
                             type = FeatureType.EXON;
                             System.out.println("exon found"); //if exon is within range of lastGene = belongs to it
                             
-                            exons.add(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures));
+                            exons.add(new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, subAnnotations));
                             continue;
                         } else {
                             this.sendErrorMsg(refGenJob.getFile().getName()
-                                    + ": Using unknown feature type for " + parsedType);
+                                    + ": Using unknown annotation type for " + parsedType);
                         }
                         
 
@@ -211,27 +211,27 @@ public class BioJavaParser implements ReferenceParserI {
                          * of one gene and the last position of the last cds/exon and we can't
                          * see exon intron structure
                          */
-                        //check feature for subfeatures
+                        //check annotation for subannotations
                         if (location.toString().contains("join")) {
-                            Iterator<Location> subFeatureIter = location.blockIterator();
+                            Iterator<Location> subAnnotationIter = location.blockIterator();
                             int subStart = -1;
                             int subStop = -1;
-                            while (subFeatureIter.hasNext()) {
+                            while (subAnnotationIter.hasNext()) {
 
-                                String pos = subFeatureIter.next().toString();
+                                String pos = subAnnotationIter.next().toString();
                                 //array always contains at least 2 entries
                                 String[] posArray = pos.split("\\..");
                                 subStart = Integer.parseInt(posArray[0]);
                                 subStop = Integer.parseInt(posArray[1]);
-                                subfeatures.add(new ParsedSubfeature(subStart, subStop, type));
+                                subAnnotations.add(new ParsedSubAnnotation(subStart, subStop, type));
                             }
                         }
 
-                        //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
-                        ParsedFeature currentFeature = new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subfeatures);
-                        refGenome.addFeature(currentFeature);
-//                        if (currentFeature.getType() == FeatureType.GENE){
-//                            lastGenes.add(currentFeature);
+                        //TODO: filter unknown annotations, if a known annotation exists with same locus! best to do not here
+                        ParsedAnnotation currentAnnotation = new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, subAnnotations);
+                        refGenome.addAnnotation(currentAnnotation);
+//                        if (currentAnnotation.getType() == FeatureType.GENE){
+//                            lastGenes.add(currentAnnotation);
 //                        }
 
                     }
@@ -246,18 +246,18 @@ public class BioJavaParser implements ReferenceParserI {
         } catch (Exception ex) {
             this.sendErrorMsg(ex.getMessage());
         }
-        refGenome.addSubfeatures(exons);
+        refGenome.addSubAnnotations(exons);
         return refGenome;
     }
     
     /**
-     * Determines the strand of a feature.
-     * @param feature the feature whose strand is needed
-     * @param refGenJob the reference genome job this feature belongs to
+     * Determines the strand of a annotation.
+     * @param annotation the annotation whose strand is needed
+     * @param refGenJob the reference genome job this annotation belongs to
      * @return SequenceUtils.STRAND_REV (-1), SequenceUtils.STRAND_FWD (1) or 0, if the strand cannot be determined
      */
-    private int determineStrand(RichFeature feature, ReferenceJob refGenJob) throws IllegalStateException {
-        String strandString = RichLocation.Tools.enrich(feature.getLocation()).getStrand().toString();
+    private int determineStrand(RichFeature annotation, ReferenceJob refGenJob) throws IllegalStateException {
+        String strandString = RichLocation.Tools.enrich(annotation.getLocation()).getStrand().toString();
         int strand = 0;
         if (strandString.equals("-")) {
             strand = SequenceUtils.STRAND_REV;
@@ -265,7 +265,7 @@ public class BioJavaParser implements ReferenceParserI {
             strand = SequenceUtils.STRAND_FWD;
         } else {
             throw new IllegalStateException(refGenJob.getFile().getAbsolutePath() 
-                    + ": Unknown strand found: " + strandString + ". Feature ignored.");
+                    + ": Unknown strand found: " + strandString + ". Annotation ignored.");
         }
         return strand;
     }

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -185,11 +186,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             }
         }
         if (lastViewer) {
-            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").close();
-            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").close();
-            WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").close();
+            WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComp").close();
+            WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComp").close();
+            WindowManager.getDefault().findTopComponent("ReferenceAnnotationTopComp").close();
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
-             WindowManager.getDefault().findTopComponent("TrackNormalizationTopComponent").close();
         }
     }
 
@@ -229,9 +229,9 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         visualPanel.add(refGenPanel);
         visualPanel.updateUI();
 
-        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComponent").open();
-        WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComponent").open();
-        WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent").open();
+        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComp").open();
+        WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComp").open();
+        WindowManager.getDefault().findTopComponent("ReferenceAnnotationTopComp").open();
 
         // put the panels ReferenceViewer in lookup so it can be accessed
         BasePanel bp = (BasePanel) refGenPanel;
@@ -272,7 +272,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // search for opened tracks, if there are none open the track statistics window
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
-             WindowManager.getDefault().findTopComponent("TrackNormalizationTopComponent").open();
         }
 
         // put the panel's TrackViewer in lookup so it can be accessed
@@ -317,7 +316,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         // if this was the last trackPanel close the track statistics window
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
-            WindowManager.getDefault().findTopComponent("TrackNormalizationTopComponent").close();
         }
     }
     
@@ -447,9 +445,16 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     
     @Override
     public void paint(Graphics g) {
-        super.paint(g);
-        if (this.transcriptionAnalysesPane.getComponentCount() <= 0) {
-            this.jSplitPane1.setDividerLocation(this.getPreferredSize().height);
+        try {
+            super.paint(g);
+            if (this.transcriptionAnalysesPane.getComponentCount() <= 0) {
+                this.jSplitPane1.setDividerLocation(this.getPreferredSize().height);
+            }
+        } catch (OutOfMemoryError e) {
+            String msg = NbBundle.getMessage(AppPanelTopComponent.class, "OOM_Message",
+                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+            String title = NbBundle.getMessage(AppPanelTopComponent.class, "OOM_Header", "Restart Software");
+            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

@@ -10,9 +10,9 @@ import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubfeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
@@ -49,7 +49,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     public SNP_DetectionResultPanel() {
         initComponents();
         
-        //ensures number of lines will adapt to number of translations (features) for each snp
+        //ensures number of lines will adapt to number of translations (annotations) for each snp
         LineWrapCellRenderer cellRenderer = new LineWrapCellRenderer();
         this.snpTable.getColumnModel().getColumn(13).setCellRenderer(cellRenderer);
         this.snpTable.getColumnModel().getColumn(14).setCellRenderer(cellRenderer);
@@ -87,7 +87,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Pos", "Track", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "Amino SNP", "Amino Ref", "Effect on AA", "Feature (Gene)"
+                "Pos", "Track", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "Amino SNP", "Amino Ref", "Effect on AA", "Annotation"
             }
         ) {
             Class[] types = new Class [] {
@@ -203,19 +203,19 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         Map<Integer, String> trackNames = this.snpData.getTrackNames();
         DefaultTableModel model = (DefaultTableModel) snpTable.getModel();        
 
-        //get all features from the reference to determine amino acid 
+        //get all annotations from the reference to determine amino acid 
         String refSeq = this.reference.getSequence();
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
-        List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForClosedInterval(0, refSeq.length());
-        Map<Integer, PersistantFeature> featureMap = new HashMap<Integer, PersistantFeature>();
-        for (PersistantFeature feature : featuresSorted){
-            featureMap.put(feature.getId(), feature); //ids are unique
+        List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, refSeq.length());
+        Map<Integer, PersistantAnnotation> annotationMap = new HashMap<Integer, PersistantAnnotation>();
+        for (PersistantAnnotation annotation : annotationsSorted){
+            annotationMap.put(annotation.getId(), annotation); //ids are unique
         }
-        List<PersistantSubfeature> subfeaturesSorted = refGenCon.getSubfeaturesForClosedInterval(0, refSeq.length());
-        PersistantFeature.addSubfeatures(featureMap, subfeaturesSorted);
-        featureMap.clear();
+        List<PersistantSubAnnotation> subAnnotationsSorted = refGenCon.getSubAnnotationsForClosedInterval(0, refSeq.length());
+        PersistantAnnotation.addSubAnnotations(annotationMap, subAnnotationsSorted);
+        annotationMap.clear();
         
-        SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, refSeq);
+        SnpTranslator snpTranslator = new SnpTranslator(annotationsSorted, refSeq);
         
         for (SnpI snpi : snps) {
             
@@ -245,7 +245,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 String ids = "";
                 char aminoAcid;
                 
-                snpTranslator.checkForFeature(snp);
+                snpTranslator.checkForAnnotation(snp);
                 List<CodonSnp> codons = snp.getCodons();
                 
                 for (CodonSnp codon : codons) {
@@ -269,9 +269,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 rowData[16] = ids;
 
             } else {
-                List<PersistantFeature> featuresFound = snpTranslator.checkCoveredByFeature(snp.getPosition());
+                List<PersistantAnnotation> annotationsFound = snpTranslator.checkCoveredByAnnotation(snp.getPosition());
                 String ids = "";
-                if (!featuresFound.isEmpty()) {
+                if (!annotationsFound.isEmpty()) {
                     if (snp.getType().equals(SequenceComparison.INSERTION)) {
                         rowData[15] = String.valueOf(SequenceComparison.INSERTION.getType());
                         
@@ -282,8 +282,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                         rowData[15] = String.valueOf(SequenceComparison.MATCH.getType());
                     }
                     
-                    for (PersistantFeature feature : featuresFound){
-                        ids += (feature.hasGeneName() ? feature.getGeneName() : feature.getLocus()) + "\n";
+                    for (PersistantAnnotation annotation : annotationsFound){
+                        ids += (annotation.hasGeneName() ? annotation.getGeneName() : annotation.getLocus()) + "\n";
                     }
                     rowData[16] = ids;
                     rowData[13] = "-";

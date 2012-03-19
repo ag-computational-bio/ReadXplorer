@@ -13,7 +13,7 @@ public class GeneStart {
     private byte strand;
     private int initialCoverage;
     private int startCoverage;
-    private DetectedFeatures detFeatures;
+    private DetectedAnnotations detAnnotations;
     
     /**
      * Data structure for storing a gene start.
@@ -21,14 +21,14 @@ public class GeneStart {
      * @param strand The strand on which the gene start was detected.
      * @param initialCoverage The coverage directly before the detected gene start
      * @param startCoverage The coverage at the detected gene start position (getPos()).
-     * @param detFeatures object containing the features associated to this predicted gene start
+     * @param detAnnotations object containing the annotations associated to this predicted gene start
      */
-    public GeneStart(int pos, byte strand, int initialCoverage, int startCoverage, DetectedFeatures detFeatures) {
+    public GeneStart(int pos, byte strand, int initialCoverage, int startCoverage, DetectedAnnotations detAnnotations) {
         this.pos = pos;
         this.strand = strand;
         this.initialCoverage = initialCoverage;
         this.startCoverage = startCoverage;
-        this.detFeatures = detFeatures;
+        this.detAnnotations = detAnnotations;
     }
 
     /**
@@ -60,10 +60,10 @@ public class GeneStart {
     }
 
     /**
-     * @return The object containing the features associated to this predicted gene start.
+     * @return The object containing the annotations associated to this predicted gene start.
      */
-    public DetectedFeatures getDetFeatures() {
-        return this.detFeatures;
+    public DetectedAnnotations getDetAnnotations() {
+        return this.detAnnotations;
     }
     
     

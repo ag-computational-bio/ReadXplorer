@@ -1,6 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
@@ -46,10 +46,10 @@ class ExpressedGenesColumns implements ExcelExportDataI {
         for (ExpressedGene expressedGene : this.expressedGenes) {      
             List<Object> expressedGeneRow = new ArrayList<Object>();
             
-            expressedGeneRow.add(PersistantFeature.getFeatureName(expressedGene.getExpressedFeature()));
-            expressedGeneRow.add(expressedGene.getExpressedFeature().getStart());
-            expressedGeneRow.add(expressedGene.getExpressedFeature().getStop());
-            expressedGeneRow.add(expressedGene.getExpressedFeature().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev");
+            expressedGeneRow.add(PersistantAnnotation.getAnnotationName(expressedGene.getExpressedAnnotation()));
+            expressedGeneRow.add(expressedGene.getExpressedAnnotation().getStart());
+            expressedGeneRow.add(expressedGene.getExpressedAnnotation().getStop());
+            expressedGeneRow.add(expressedGene.getExpressedAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev");
             expressedGeneRow.add(expressedGene.getReadCount());
             
             expressedGenesExport.add(expressedGeneRow);

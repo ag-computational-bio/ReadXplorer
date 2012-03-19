@@ -32,6 +32,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -112,10 +113,17 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     public void setReferenceJobs(List<ReferenceJob> jobs) {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
 
-        List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-        for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-            PersistantReference r = it.next();
-            list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
+        try {
+            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
+            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
+                PersistantReference r = it.next();
+                list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
+            }
+        } catch (OutOfMemoryError e) {
+            String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
+                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+            String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
+            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
 
         list.addAll(jobs);
@@ -130,11 +138,18 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
 
     private ReferenceJob[] getRefGenJobs() {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
-
-        List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-        for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-            PersistantReference r = it.next();
-            list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
+        
+        try {
+            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
+            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
+                PersistantReference r = it.next();
+                list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
+            }
+        } catch (OutOfMemoryError e) {
+            String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
+                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+            String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
+            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
 
         ReferenceJob[] gens = new ReferenceJob[list.size()];

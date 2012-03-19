@@ -5,10 +5,10 @@ import de.cebitec.vamp.api.objects.FeatureType;
 /**
  * @author rhilker
  * 
- * A PersistantSubfeature is a subfeature of a PersistantFeature. 
+ * A PersistantSubAnnotation is a sub annotation of a PersistantAnnotation. 
  * Thus, it contains only a start and stop position.
  */
-public class PersistantSubfeature implements PersistantFeatureI {
+public class PersistantSubAnnotation implements PersistantAnnotationI {
 
     private int parentId;
     private int start;
@@ -16,12 +16,12 @@ public class PersistantSubfeature implements PersistantFeatureI {
     private FeatureType type;
 
     /**
-     * Creates a new subfeature.
-     * @param parentId the id of the parent feature
-     * @param start absolute start of the subfeature in regard to the reference genome
-     * @param stop absolute stop of the subfeature in regard to the reference genome
+     * Creates a new sub annotation.
+     * @param parentId the id of the parent annotation
+     * @param start absolute start of the sub annotation in regard to the reference genome
+     * @param stop absolute stop of the sub annotation in regard to the reference genome
      */
-    public PersistantSubfeature(int parentId, int start, int stop, FeatureType type) {
+    public PersistantSubAnnotation(int parentId, int start, int stop, FeatureType type) {
         this.parentId = parentId;
         this.start = start;
         this.stop = stop;
@@ -30,7 +30,7 @@ public class PersistantSubfeature implements PersistantFeatureI {
     }
 
     /**
-     * @return the id of the parent feature
+     * @return the id of the parent annotation
      */
     public int getParentId() {
         return this.parentId;

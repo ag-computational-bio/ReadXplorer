@@ -1,20 +1,17 @@
-/*
- * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
- */
 package de.cebitec.vamp.thumbnail;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.thumbnail.Actions.ASyncSliderCookie;
 import de.cebitec.vamp.thumbnail.Actions.OpenThumbCookie;
 import de.cebitec.vamp.thumbnail.Actions.RemoveCookie;
 import de.cebitec.vamp.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComponent;
+import de.cebitec.vamp.ui.visualisation.reference.ReferenceAnnotationTopComp;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
@@ -65,7 +62,9 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * ServiceProvider for IThumbnailView
+ * ServiceProvider for IThumbnailView.
+ * This Module can display all Tracks for a given List of Annotations in a Thumbnail-like View.
+ *
  * @author denis
  */
 @ServiceProvider(service = IThumbnailView.class)
@@ -75,15 +74,15 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     //Currently active ThumbnailTopComponent and ReferenceViewer
     private ThumbNailViewTopComponent activeTopComp;
     private ReferenceViewer activeViewer;
-    //Gives access to all Features which are displayed for a referenceViewer
-    private HashMap<ReferenceViewer, List<PersistantFeature>> selectedFeatures;
-    //Gives access to all BasePanels for feature
-    private HashMap<PersistantFeature, List<BasePanel>> featureToTrackpanelList;
+    //Gives access to all Annotations which are displayed for a referenceViewer
+    private HashMap<ReferenceViewer, List<PersistantAnnotation>> selectedAnnotations;
+    //Gives access to all BasePanels for Annotation
+    private HashMap<PersistantAnnotation, List<BasePanel>> annotationToTrackpanelList;
     //Gives access to PersistantTrack from BasePanel
     private HashMap<BasePanel, PersistantTrack> trackPanelToTrack;
-    //Gives access to LayoutWidget for currentFeature
-    private HashMap<PersistantFeature, Widget> featureToLayoutWidget;
-    private PersistantFeature currentFeature;
+    //Gives access to LayoutWidget for currentAnnotation
+    private HashMap<PersistantAnnotation, Widget> annotationToLayoutWidget;
+    private PersistantAnnotation currentAnnotation;
     private ViewController controller;
     private InstanceContent content;
     //Controller of ThumbnailController
@@ -93,10 +92,10 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     public ThumbnailController() {
         this.refThumbTopComponents = new HashMap<ReferenceViewer, ThumbNailViewTopComponent>();
-        this.selectedFeatures = new HashMap<ReferenceViewer, List<PersistantFeature>>();
-        this.featureToTrackpanelList = new HashMap<PersistantFeature, List<BasePanel>>();
+        this.selectedAnnotations = new HashMap<ReferenceViewer, List<PersistantAnnotation>>();
+        this.annotationToTrackpanelList = new HashMap<PersistantAnnotation, List<BasePanel>>();
         this.trackPanelToTrack = new HashMap<BasePanel, PersistantTrack>();
-        this.featureToLayoutWidget = new HashMap<PersistantFeature, Widget>();
+        this.annotationToLayoutWidget = new HashMap<PersistantAnnotation, Widget>();
 
         content = new InstanceContent();
         controllerLookup = new ThumbControllerLookup(content);
@@ -125,8 +124,8 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //After Lookup-stuff is done requestActive for ThumbnailTopComponent
         activeTopComp.requestActive();
         //Build scene
-        if (selectedFeatures.containsKey(activeViewer) && selectedFeatures.get(activeViewer).size() > 40) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
+        if (selectedAnnotations.containsKey(activeViewer) && selectedAnnotations.get(activeViewer).size() > 40) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyAnnotations"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
         } else {
             drawScene();
@@ -158,8 +157,8 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller = con;
         activeTopComp.requestActive();
         //Build scene
-        if (selectedFeatures.containsKey(activeViewer) && selectedFeatures.get(activeViewer).size() > 40) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
+        if (selectedAnnotations.containsKey(activeViewer) && selectedAnnotations.get(activeViewer).size() > 40) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyAnnotations"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
         } else {
             drawScene();
@@ -208,10 +207,10 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     private void sliderSynchronisation(boolean synch) {
         //synchronize all Sliders for all RefrenceViewer's ThumbnailViewTopComponents
         for (ReferenceViewer oneViewer : refThumbTopComponents.keySet()) {
-            if (selectedFeatures.containsKey(oneViewer)) {
-                for (PersistantFeature feature : selectedFeatures.get(oneViewer)) {
+            if (selectedAnnotations.containsKey(oneViewer)) {
+                for (PersistantAnnotation annotation : selectedAnnotations.get(oneViewer)) {
                     ZoomChangeListener zoomChangeListener = new ZoomChangeListener();
-                    for (BasePanel bp : featureToTrackpanelList.get(feature)) {
+                    for (BasePanel bp : annotationToTrackpanelList.get(annotation)) {
                         try {
                             JPanel panel = (JPanel) bp.getComponent(0);
                             if (panel != null) {
@@ -237,20 +236,20 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
 
     /*
-     * Draws all Thumbnail-Widgets for all features
+     * Draws all Thumbnail-Widgets for all annotations
      */
     private void drawScene() {
         //Get all associated Tracks for Reference
         ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
-        if (activeViewer != null && selectedFeatures.containsKey(activeViewer)) {
-            for (PersistantFeature feature : selectedFeatures.get(activeViewer)) {
-                addFeatureToView(feature, refCon);
+        if (activeViewer != null && selectedAnnotations.containsKey(activeViewer)) {
+            for (PersistantAnnotation annotation : selectedAnnotations.get(activeViewer)) {
+                this.addAnnotationToView(annotation, refCon);
             }
             if (!(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp)) {
                 activeTopComp.requestAttention(true);
             }
         } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_NoFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_NoAnnotations"), NotifyDescriptor.INFORMATION_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             activeTopComp.close();
             refThumbTopComponents.remove(activeViewer);
@@ -270,8 +269,8 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         MultiTrackConnector tc = new MultiTrackConnector(track);
 
         final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
-        int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
+        int annotationWidth = (currentAnnotation.getStop() - currentAnnotation.getStart()) / 2;
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(annotationWidth);
 
         trackV.setName(track.getDescription());
 
@@ -279,7 +278,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         trackV.setTrackInfoPanel(cil);
 
         //eigener ComponentListener für TrackV
-        trackV.addComponentListener(new TrackViewerCompListener(currentFeature, trackV));
+        trackV.addComponentListener(new TrackViewerCompListener(currentAnnotation, trackV));
 
 
         // create zoom slider
@@ -287,7 +286,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         //Set initial Slider-value based on Coverage if autoSlider is true
         if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(currentFeature.getStart(), currentFeature.getStop());
+            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(currentAnnotation.getStart(), currentAnnotation.getStop());
             int max = 0;
             int cnt = 0;
             int avg = 0;
@@ -319,7 +318,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * @param tracks Tracks to compare.
      * @return
      */
-    private BasePanel createMultipleTrackPanel(List<PersistantTrack> tracks, PersistantFeature feature) {
+    private BasePanel createMultipleTrackPanel(List<PersistantTrack> tracks, PersistantAnnotation annotation) {
         BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
         BasePanel b = new BasePanel(boundsManager, controller);
         controller.addMousePositionListener(b);
@@ -328,11 +327,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         MultiTrackConnector trackCon = new MultiTrackConnector(tracks);
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
 
-        int featureWidth = (feature.getStop() - feature.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
+        int annotationWidth = (annotation.getStop() - annotation.getStart()) / 2;
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(annotationWidth);
 
         //eigener ComponentListener für TrackV
-        trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
+        trackV.addComponentListener(new TrackViewerCompListener(annotation, trackV));
 
 
         // create info panel
@@ -340,9 +339,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         cil.renameFields();
         trackV.setTrackInfoPanel(cil);
 
-        // create zoom slider and set its value based on other slider's values for this feature
+        // create zoom slider and set its value based on other slider's values for this Annotation
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
-        BasePanel p = featureToTrackpanelList.get(feature).get(0);
+        BasePanel p = annotationToTrackpanelList.get(annotation).get(0);
         try {
             int sValue = ((CoverageZoomSlider) ((JPanel) p.getComponent(0)).getComponent(1)).getValue();
             slider.setValue(sValue);
@@ -361,7 +360,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         tp.setBackground(ColorProperties.TITLE_BACKGROUND);
         b.setTitlePanel(tp);
         //estimate current size of other BPs based on first BP
-        BasePanel refBP = featureToTrackpanelList.get(feature).get(0);
+        BasePanel refBP = annotationToTrackpanelList.get(annotation).get(0);
         b.setMinimumSize(new Dimension(200, 150));
         b.setPreferredSize(new Dimension(refBP.getBounds().width, refBP.getBounds().height));
         return b;
@@ -383,33 +382,33 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     @Override
-    public void removeAllFeatures(ReferenceViewer refViewer) {
-        //could be used as a function to delete all features
+    public void removeAllAnnotations(ReferenceViewer refViewer) {
+        //could be used as a function to delete all Annotations
     }
 
     @Override
-    public void removeCertainFeatures(PersistantFeature f) {
-        selectedFeatures.get(activeViewer).remove(f);
-        //If all Features for activeViewer have been removed it is also removed as key from the list
-        if (selectedFeatures.get(activeViewer).isEmpty()) {
-            selectedFeatures.remove(activeViewer);
+    public void removeCertainAnnotation(PersistantAnnotation f) {
+        selectedAnnotations.get(activeViewer).remove(f);
+        //If all Annotations for activeViewer have been removed it is also removed as key from the list
+        if (selectedAnnotations.get(activeViewer).isEmpty()) {
+            selectedAnnotations.remove(activeViewer);
         }
     }
 
     @Override
-    public void addFeatureToList(PersistantFeature feature, final ReferenceViewer refViewer) {
-        if (!selectedFeatures.containsKey(refViewer)) {
-            ArrayList<PersistantFeature> list = new ArrayList<PersistantFeature>();
-            list.add(feature);
-            selectedFeatures.put(refViewer, list);
+    public void addAnnotationToList(PersistantAnnotation annotation, final ReferenceViewer refViewer) {
+        if (!selectedAnnotations.containsKey(refViewer)) {
+            ArrayList<PersistantAnnotation> list = new ArrayList<PersistantAnnotation>();
+            list.add(annotation);
+            selectedAnnotations.put(refViewer, list);
         } else {
-            selectedFeatures.get(refViewer).add(feature);
+            selectedAnnotations.get(refViewer).add(annotation);
         }
         activeTopComp = refThumbTopComponents.get(refViewer);
-        //adds feature directly to Scene if ThumbnailTopComponent for this RefViewer is open
+        //adds Annotation directly to Scene if ThumbnailTopComponent for this RefViewer is open
         if (WindowManager.getDefault().getRegistry().getOpened().contains(activeTopComp)) {
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
-            addFeatureToView(feature, refCon);
+            addAnnotationToView(annotation, refCon);
             if (getLookup().lookup(ASyncSliderCookie.class) != null) {
                 sliderSynchronisation(true);
             }
@@ -424,26 +423,26 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
                 @Override
                 public void removeTracks() {
-                    RemoveFeatureListPanel rfp = new RemoveFeatureListPanel(selectedFeatures.get(activeViewer));
-                    DialogDescriptor dialogDescriptor = new DialogDescriptor(rfp, "Remove Features");
+                    RemoveAnnotationListPanel rfp = new RemoveAnnotationListPanel(selectedAnnotations.get(activeViewer));
+                    DialogDescriptor dialogDescriptor = new DialogDescriptor(rfp, "Remove Annotations");
                     Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
                     openRefGenDialog.setVisible(true);
-                    //Removes all Selected Features from Scene and ArrayLists
+                    //Removes all Selected Annotations from Scene and ArrayLists
                     if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
                         for (Object f : rfp.getSelectedValues()) {
-                            PersistantFeature feat = (PersistantFeature) f;
-                            removeCertainFeatures(feat);
-                            if (featureToLayoutWidget.containsKey(feat) && featureToTrackpanelList.containsKey(feat)) {
-                                activeTopComp.getScene().removeChild(featureToLayoutWidget.get(feat));
+                            PersistantAnnotation feat = (PersistantAnnotation) f;
+                            removeCertainAnnotation(feat);
+                            if (annotationToLayoutWidget.containsKey(feat) && annotationToTrackpanelList.containsKey(feat)) {
+                                activeTopComp.getScene().removeChild(annotationToLayoutWidget.get(feat));
 
-                                for (BasePanel p : featureToTrackpanelList.get(feat)) {
+                                for (BasePanel p : annotationToTrackpanelList.get(feat)) {
                                     trackPanelToTrack.remove(p);
                                     //Stop CoverageThread
                                     ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getCoverageThread().stop();
                                 }
-                                featureToTrackpanelList.remove(feat);
-                                featureToLayoutWidget.remove(feat);
-                                //If no Features are to display remove Cookies and close TopComp.
+                                annotationToTrackpanelList.remove(feat);
+                                annotationToLayoutWidget.remove(feat);
+                                //If no Annotations are to display remove Cookies and close TopComp.
                                 if (activeTopComp.getScene().getChildren().isEmpty()) {
                                     getLookup().removeAll(RemoveCookie.class);
                                     refThumbTopComponents.get(activeViewer).remove(activeTopComp);
@@ -462,12 +461,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     /**
      * Creates Widgets for CompareTrackBasePanel to display in TopComponent's Scene
      * @param tracks
-     * @param feature
+     * @param annotation
      */
-    private void compareTwoTracks(List<PersistantTrack> tracks, PersistantFeature feature) {
-        BasePanel bp = createMultipleTrackPanel(tracks, feature);
+    private void compareTwoTracks(List<PersistantTrack> tracks, PersistantAnnotation annotation) {
+        BasePanel bp = createMultipleTrackPanel(tracks, annotation);
         bp.addMouseListener(this);
-        featureToTrackpanelList.get(feature).add(bp);
+        annotationToTrackpanelList.get(annotation).add(bp);
         //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
         if (getLookup().lookup(ASyncSliderCookie.class) != null) {
             sliderSynchronisation(true);
@@ -486,19 +485,19 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             }
         }, ActionFactory.createDefaultResizeProvider()));
 
-        //Add MultipleTrackPanel to Layout for currentFeature
-        featureToLayoutWidget.get(currentFeature).addChild(compWidg);
+        //Add MultipleTrackPanel to Layout for currentAnnotation
+        annotationToLayoutWidget.get(currentAnnotation).addChild(compWidg);
         activeTopComp.getScene().validate();
     }
 
     /**
-     * MouseAdapter, for updating feature information
+     * MouseAdapter, for updating Annotation information
      */
     @Override
     public void mousePressed(MouseEvent e) {
         BasePanel p = (BasePanel) e.getSource();
         if (p != null) {
-            updateCurrentFeature(p);
+            this.updateCurrentAnnotation(p);
         }
     }
 
@@ -513,16 +512,16 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     /**
-     * Updates the ReferenceFeatureComponent to the currently selected feature and sets currentFeature value.
+     * Updates the ReferenceAnnotationComponent to the currently selected Annotation and sets currentAnnotation value.
      * @param bp BasePanel where user has clicked
      */
-    private void updateCurrentFeature(BasePanel bp) {
-        ReferenceFeatureTopComponent comp = (ReferenceFeatureTopComponent) WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent");
+    private void updateCurrentAnnotation(BasePanel bp) {
+        ReferenceAnnotationTopComp comp = (ReferenceAnnotationTopComp) WindowManager.getDefault().findTopComponent("ReferenceAnnotationTopComp");
         if (comp != null) {
-            for (PersistantFeature feature : featureToTrackpanelList.keySet()) {
-                if (featureToTrackpanelList.get(feature).contains(bp)) {
-                    currentFeature = feature;
-                    comp.showFeatureDetails(feature);
+            for (PersistantAnnotation annotation : annotationToTrackpanelList.keySet()) {
+                if (annotationToTrackpanelList.get(annotation).contains(bp)) {
+                    currentAnnotation = annotation;
+                    comp.showAnnotationDetails(annotation);
                     break;
                 }
             }
@@ -530,13 +529,13 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     @Override
-    public void showPopUp(final PersistantFeature f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp) {
+    public void showPopUp(final PersistantAnnotation f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp) {
         JMenuItem addListItem = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Add"));
         addListItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                addFeatureToList(f, viewer);
+                addAnnotationToList(f, viewer);
             }
         });
         popUp.add(addListItem);
@@ -569,8 +568,8 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 if (selectedRows.length > 0) {
                     for (int i : selectedRows) {
                         int correctedRow = table.convertRowIndexToModel(i);
-                        PersistantFeature feature = (PersistantFeature) table.getModel().getValueAt(correctedRow, 0);
-                        addFeatureToList(feature, refViewer);
+                        PersistantAnnotation annotation = (PersistantAnnotation) table.getModel().getValueAt(correctedRow, 0);
+                        addAnnotationToList(annotation, refViewer);
                     }
                 }
             }
@@ -641,18 +640,18 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     /**
-     * Creates a new LayoutWidget for given feature and adds it to the scene.
-     * @param feature
+     * Creates a new LayoutWidget for given annotation and adds it to the scene.
+     * @param annotation
      * @param refCon
      */
-    private void addFeatureToView(PersistantFeature feature, ReferenceConnector refCon) {
-        this.currentFeature = feature;
-        //Create LayoutWidget to layout all Tracks for a feature in GridLayout
+    private void addAnnotationToView(PersistantAnnotation annotation, ReferenceConnector refCon) {
+        this.currentAnnotation = annotation;
+        //Create LayoutWidget to layout all Tracks for a annotation in GridLayout
         Widget layoutWidg = new Widget(activeTopComp.getScene());
         layoutWidg.setLayout(new ThumbGridLayout((refCon.getAssociatedTracks().size())));
-        featureToLayoutWidget.put(feature, layoutWidg);
+        annotationToLayoutWidget.put(annotation, layoutWidg);
 
-        //Save all BasePanels for feature in List to put into HashMap
+        //Save all BasePanels for annotation in List to put into HashMap
         List<BasePanel> bps = new ArrayList<BasePanel>();
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
         for (PersistantTrack track : refCon.getAssociatedTracks()) {
@@ -677,9 +676,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             }, ActionFactory.createDefaultResizeProvider()));
 
             layoutWidg.addChild(compWidg);
-            layoutWidg.setBorder(BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
+            layoutWidg.setBorder(BorderFactory.createTitledBorder("Tracks for annotation:" + currentAnnotation.toString()));
         }
-        this.featureToTrackpanelList.put(currentFeature, bps);
+        this.annotationToTrackpanelList.put(currentAnnotation, bps);
         activeTopComp.getScene().addChild(layoutWidg);
         activeTopComp.getScene().validate();
     }
@@ -702,7 +701,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 ArrayList<PersistantTrack> trackList = new ArrayList<PersistantTrack>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
-                compareTwoTracks(trackList, currentFeature);
+                compareTwoTracks(trackList, currentAnnotation);
             } catch (ClassCastException ex) {
                 Logger.getLogger(ThumbnailController.class.getName()).log(
                         Level.WARNING, ex.getMessage());
@@ -714,7 +713,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             //Get Source of Event i.e. BasePanel
             BasePanel bp = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
             if (bp != null) {
-                updateCurrentFeature(bp);
+                updateCurrentAnnotation(bp);
                 JCheckBox src = (JCheckBox) e.getSource();
                 if (src.isSelected()) {
                     countTracks++;
@@ -723,7 +722,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                             firstTrackPanelToCompare = bp;
                             break;
                         case 2: {
-                            if (featureToTrackpanelList.get(currentFeature).contains(firstTrackPanelToCompare)) {
+                            if (annotationToTrackpanelList.get(currentAnnotation).contains(firstTrackPanelToCompare)) {
                                 startCompare(e);
 
                             } else {

@@ -53,10 +53,10 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
     }
 
     private void updateLogicalListeners(){
-        for(LogicalBoundsListener a : boundListeners){
-          if(a.isPaintingAreaAviable()){
-            a.updateLogicalBounds(computeBounds(a.getPaintingAreaDimension()));
-        }
+        for (LogicalBoundsListener a : boundListeners) {
+            if (a.isPaintingAreaAviable()) {
+                a.updateLogicalBounds(computeBounds(a.getPaintingAreaDimension()));
+            }
         }
     }
 

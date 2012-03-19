@@ -9,6 +9,8 @@ package de.cebitec.vamp.view.dialogMenus;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import java.util.List;
+import javax.swing.JOptionPane;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -29,12 +31,20 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
      * Get a list of available genomes from the database.
      * @return Array of genomes WITHOUT actual sequence
      */
-    private PersistantReference[] fillList(){
-        List<PersistantReference> gens = ProjectConnector.getInstance().getGenomes();
+    private PersistantReference[] fillList() {
+        PersistantReference[] genArray = new PersistantReference[0];
+        try {
+            List<PersistantReference> gens = ProjectConnector.getInstance().getGenomes();
 
-        PersistantReference[] genArray = new PersistantReference[gens.size()];
-        for( int i = 0; i< gens.size() ; i++ ){
-            genArray[i] = gens.get(i);
+            genArray = new PersistantReference[gens.size()];
+            for (int i = 0; i < gens.size(); i++) {
+                genArray[i] = gens.get(i);
+            }
+        } catch (OutOfMemoryError e) {
+            String msg = NbBundle.getMessage(OpenRefGenPanel.class, "OOM_Message",
+                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+            String title = NbBundle.getMessage(OpenRefGenPanel.class, "OOM_Header", "Restart Software");
+            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
 
         return genArray;

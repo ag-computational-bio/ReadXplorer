@@ -1,6 +1,5 @@
 package de.cebitec.vamp.databackend;
 
-import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 
 /**
@@ -84,31 +83,31 @@ public class SQLStatements {
             "VALUES (?,?,?,?,?)";
 
     
-    public final static String INSERT_FEATURE =
+    public final static String INSERT_ANNOTATION =
             "INSERT INTO " + FieldNames.TABLE_FEATURES + " " +
             "(" +
-            FieldNames.FEATURE_ID+", " +
-            FieldNames.FEATURE_REFGEN_ID+", "+
-            FieldNames.FEATURE_TYPE+", " +
-            FieldNames.FEATURE_START+", " +
-            FieldNames.FEATURE_STOP+", " +
-            FieldNames.FEATURE_LOCUS_TAG+", " +
-            FieldNames.FEATURE_PRODUCT+", " +
-            FieldNames.FEATURE_EC_NUM+", " +
-            FieldNames.FEATURE_STRAND+", "+
-            FieldNames.FEATURE_GENE+" "+
+            FieldNames.ANNOTATION_ID+", " +
+            FieldNames.ANNOTATION_REFGEN_ID+", "+
+            FieldNames.ANNOTATION_TYPE+", " +
+            FieldNames.ANNOTATION_START+", " +
+            FieldNames.ANNOTATION_STOP+", " +
+            FieldNames.ANNOTATION_LOCUS_TAG+", " +
+            FieldNames.ANNOTATION_PRODUCT+", " +
+            FieldNames.ANNOTATION_EC_NUM+", " +
+            FieldNames.ANNOTATION_STRAND+", "+
+            FieldNames.ANNOTATION_GENE+" "+
             ") " +
             "VALUES (?,?,?,?,?,?,?,?,?,?) ";
     
     
-    public final static String INSERT_SUBFEATURE =
+    public final static String INSERT_SUBANNOTATION =
             "INSERT INTO " + FieldNames.TABLE_SUBFEATURES +" " +
             "(" +
-            FieldNames.SUBFEATURES_PARENT_ID+", " +
-            FieldNames.SUBFEATURES_REFERENCE_ID+", " +
-            FieldNames.SUBFEATURES_TYPE+", " +
-            FieldNames.SUBFEATURES_START+", " +
-            FieldNames.SUBFEATURES_STOP+" "+
+            FieldNames.SUBANNOTATION_PARENT_ID+", " +
+            FieldNames.SUBANNOTATION_REFERENCE_ID+", " +
+            FieldNames.SUBANNOTATION_TYPE+", " +
+            FieldNames.SUBANNOTATION_START+", " +
+            FieldNames.SUBANNOTATION_STOP+" "+
             ") " +
             "VALUES (?,?,?,?,?)";
 
@@ -382,18 +381,18 @@ public class SQLStatements {
             ")";
     
 
-    public final static String DELETE_FEATURES_FROM_GENOME =
+    public final static String DELETE_ANNOTATIONS_FROM_GENOME =
             "DELETE FROM " +
                 FieldNames.TABLE_FEATURES +
             " WHERE "+
-                FieldNames.FEATURE_REFGEN_ID+" = ?";
+                FieldNames.ANNOTATION_REFGEN_ID+" = ?";
     
     
-    public final static String DELETE_SUBFEATURES_FROM_GENOME = //TODO: test delete feature details
+    public final static String DELETE_SUBANNOTATIONS_FROM_GENOME = //TODO: test delete annotation details
             "DELETE FROM "+
                 FieldNames.TABLE_SUBFEATURES +
             " WHERE " +
-                FieldNames.SUBFEATURES_REFERENCE_ID + " = ?";
+                FieldNames.SUBANNOTATION_REFERENCE_ID + " = ?";
     
     
     public final static String DELETE_GENOME =
@@ -440,78 +439,78 @@ public class SQLStatements {
                 FieldNames.REF_GEN_ID+" = ?";
 
     
-    public final static String FETCH_FEATURES_FOR_INTERVAL_FROM_GENOME =
+    public final static String FETCH_ANNOTATIONS_FOR_GENOME_INTERVAL =
             "SELECT " +
-                FieldNames.FEATURE_ID+", "+
-                FieldNames.FEATURE_TYPE+", " +
-                FieldNames.FEATURE_START+", "+
-                FieldNames.FEATURE_STOP+", "+
-                FieldNames.FEATURE_EC_NUM+", "+
-                FieldNames.FEATURE_LOCUS_TAG+", "+
-                FieldNames.FEATURE_PRODUCT+", "+
-                FieldNames.FEATURE_STRAND+", "+
-                FieldNames.FEATURE_GENE +
+                FieldNames.ANNOTATION_ID+", "+
+                FieldNames.ANNOTATION_TYPE+", " +
+                FieldNames.ANNOTATION_START+", "+
+                FieldNames.ANNOTATION_STOP+", "+
+                FieldNames.ANNOTATION_EC_NUM+", "+
+                FieldNames.ANNOTATION_LOCUS_TAG+", "+
+                FieldNames.ANNOTATION_PRODUCT+", "+
+                FieldNames.ANNOTATION_STRAND+", "+
+                FieldNames.ANNOTATION_GENE +
             " FROM "+
                 FieldNames.TABLE_FEATURES +
             " WHERE "+
-                FieldNames.FEATURE_REFGEN_ID+" = ? and " +
-                FieldNames.FEATURE_STOP+" >= ? and " +
-                FieldNames.FEATURE_START+" <= ? " + 
-            " ORDER BY " + FieldNames.FEATURE_START;
+                FieldNames.ANNOTATION_REFGEN_ID+" = ? and " +
+                FieldNames.ANNOTATION_STOP+" >= ? and " +
+                FieldNames.ANNOTATION_START+" <= ? " + 
+            " ORDER BY " + FieldNames.ANNOTATION_START;
     
     
-    public final static String FETCH_FEATURES_FOR_CLOSED_INTERVAL_FROM_GENOME =
+    public final static String FETCH_ANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
             "SELECT " +
-                FieldNames.FEATURE_ID+", "+
-                FieldNames.FEATURE_TYPE+", " +
-                FieldNames.FEATURE_START+", "+
-                FieldNames.FEATURE_STOP+", "+
-                FieldNames.FEATURE_EC_NUM+", "+
-                FieldNames.FEATURE_LOCUS_TAG+", "+
-                FieldNames.FEATURE_PRODUCT+", "+
-                FieldNames.FEATURE_STRAND+", "+
-                FieldNames.FEATURE_GENE +
+                FieldNames.ANNOTATION_ID+", "+
+                FieldNames.ANNOTATION_TYPE+", " +
+                FieldNames.ANNOTATION_START+", "+
+                FieldNames.ANNOTATION_STOP+", "+
+                FieldNames.ANNOTATION_EC_NUM+", "+
+                FieldNames.ANNOTATION_LOCUS_TAG+", "+
+                FieldNames.ANNOTATION_PRODUCT+", "+
+                FieldNames.ANNOTATION_STRAND+", "+
+                FieldNames.ANNOTATION_GENE +
             " FROM "+
                 FieldNames.TABLE_FEATURES +
             " WHERE "+
-                FieldNames.FEATURE_REFGEN_ID + " = ? and " +
-                FieldNames.FEATURE_START + " between ? and ? and " +
-                FieldNames.FEATURE_STOP + " between ? and ? " +
-                " ORDER BY " + FieldNames.FEATURE_START;
+                FieldNames.ANNOTATION_REFGEN_ID + " = ? and " +
+                FieldNames.ANNOTATION_START + " between ? and ? and " +
+                FieldNames.ANNOTATION_STOP + " between ? and ? " +
+                " ORDER BY " + FieldNames.ANNOTATION_START;
         
         
-    public static final String FETCH_SUBFEATURES_FOR_GENOMIC_INTERVAL =
+    public static final String FETCH_SUBANNOTATIONS_FOR_GENOME_INTERVAL =
             "SELECT " +
-                FieldNames.SUBFEATURES_PARENT_ID+", "+
-                FieldNames.SUBFEATURES_START+", "+
-                FieldNames.SUBFEATURES_STOP+", " +
-                FieldNames.SUBFEATURES_TYPE+" " +
+                FieldNames.SUBANNOTATION_PARENT_ID+", "+
+                FieldNames.SUBANNOTATION_START+", "+
+                FieldNames.SUBANNOTATION_STOP+", " +
+                FieldNames.SUBANNOTATION_TYPE+" " +
             "FROM "+
                 FieldNames.TABLE_SUBFEATURES+" " +
             "WHERE "
-                + FieldNames.SUBFEATURES_REFERENCE_ID + " = ? and "
-                + FieldNames.SUBFEATURES_STOP+" >= ? and "
-                + FieldNames.SUBFEATURES_START+" <= ? " +
-            "ORDER BY " + FieldNames.SUBFEATURES_START;
+                + FieldNames.SUBANNOTATION_REFERENCE_ID + " = ? and "
+                + FieldNames.SUBANNOTATION_STOP+" >= ? and "
+                + FieldNames.SUBANNOTATION_START+" <= ? " +
+            "ORDER BY " + FieldNames.SUBANNOTATION_START;
     
         
-    public static final String FETCH_SUBFEATURES_FOR_CLOSED_GENOMIC_INTERVAL =
+    public static final String FETCH_SUBANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
             "SELECT " +
-                FieldNames.SUBFEATURES_PARENT_ID+", "+
-                FieldNames.SUBFEATURES_START+", "+
-                FieldNames.SUBFEATURES_STOP+", " +
-                FieldNames.SUBFEATURES_TYPE+" " +
+                FieldNames.SUBANNOTATION_PARENT_ID+", "+
+                FieldNames.SUBANNOTATION_START+", "+
+                FieldNames.SUBANNOTATION_STOP+", " +
+                FieldNames.SUBANNOTATION_TYPE+" " +
             "FROM "+
                 FieldNames.TABLE_SUBFEATURES+" " +
             "WHERE "
-                + FieldNames.SUBFEATURES_REFERENCE_ID + " = ? and "
-                + FieldNames.SUBFEATURES_START + " between ? and ? and "
-                + FieldNames.SUBFEATURES_STOP + " between ? and ? " +
-                " ORDER BY " + FieldNames.SUBFEATURES_START;
+                + FieldNames.SUBANNOTATION_REFERENCE_ID + " = ? and "
+                + FieldNames.SUBANNOTATION_START + " between ? and ? and "
+                + FieldNames.SUBANNOTATION_STOP + " between ? and ? " +
+                " ORDER BY " + FieldNames.SUBANNOTATION_START;
         
 
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
-            "(SELECT "+
+            "SELECT "+
                 FieldNames.COVERAGE_POSITION+", "+
                 FieldNames.COVERAGE_BM_FW_MULT+", " +
                 FieldNames.COVERAGE_BM_FW_NUM+", " + //TODO: was ist mit num? wird nie benutzt!!!
@@ -529,7 +528,33 @@ public class SQLStatements {
                 FieldNames.TABLE_COVERAGE+" " +
             "WHERE "+
                 FieldNames.COVERAGE_POSITION+ " between ? and ? and "+
-                FieldNames.COVERAGE_TRACK+" = ? )";
+                FieldNames.COVERAGE_TRACK+" = ? ";
+    
+    
+        public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART1 =
+            "SELECT "+
+                FieldNames.COVERAGE_POSITION+", "+
+                FieldNames.COVERAGE_BM_FW_MULT+", " +
+                FieldNames.COVERAGE_BM_FW_NUM+", " + 
+                FieldNames.COVERAGE_BM_RV_MULT+", " +
+                FieldNames.COVERAGE_BM_RV_NUM+", " +
+                FieldNames.COVERAGE_N_FW_MULT+", " +
+                FieldNames.COVERAGE_N_FW_NUM+", " +
+                FieldNames.COVERAGE_N_RV_MULT+", " +
+                FieldNames.COVERAGE_N_RV_NUM+", " +
+                FieldNames.COVERAGE_ZERO_FW_MULT+", " +
+                FieldNames.COVERAGE_ZERO_FW_NUM+", " +
+                FieldNames.COVERAGE_ZERO_RV_MULT+", " +
+                FieldNames.COVERAGE_ZERO_RV_NUM+", " +
+                FieldNames.COVERAGE_TRACK + 
+            " FROM " +
+                FieldNames.TABLE_COVERAGE+
+            " WHERE "+
+                FieldNames.COVERAGE_POSITION+ " between ? and ? and ";
+        
+        
+            public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART2 =
+                FieldNames.COVERAGE_TRACK+" = ? ";
     
     
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
@@ -1497,8 +1522,8 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
     public final static String GET_LATEST_REFERENCE_ID =
             "SELECT MAX("+FieldNames.REF_GEN_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_REF_GEN;
 
-    public final static String GET_LATEST_FEATURE_ID =
-            "SELECT MAX("+FieldNames.FEATURE_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_FEATURES;
+    public final static String GET_LATEST_ANNOTATION_ID =
+            "SELECT MAX("+FieldNames.ANNOTATION_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_FEATURES;
 
     public final static String GET_LATEST_TRACK_ID =
             "SELECT MAX("+FieldNames.TRACK_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_TRACKS;
@@ -1548,40 +1573,40 @@ public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
     
 //        public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("
-//                    + FieldNames.FEATURE_ID + ", "
-//                    + FieldNames.FEATURE_EC_NUM + ", " 
-//                    + FieldNames.FEATURE_LOCUS_TAG + ", " 
-//                    + FieldNames.FEATURE_PRODUCT + ", " 
-//                    + FieldNames.FEATURE_STRAND + ", " 
-//                    + FieldNames.FEATURE_GENE + ") "
+//                    + FieldNames.ANNOTATION_ID + ", "
+//                    + FieldNames.ANNOTATION_EC_NUM + ", " 
+//                    + FieldNames.ANNOTATION_LOCUS_TAG + ", " 
+//                    + FieldNames.ANNOTATION_PRODUCT + ", " 
+//                    + FieldNames.ANNOTATION_STRAND + ", " 
+//                    + FieldNames.ANNOTATION_GENE + ") "
 //                + " SELECT "
-//                    + FieldNames.FEATURE_ID + ", "
-//                    + FieldNames.FEATURE_EC_NUM + ", " 
-//                    + FieldNames.FEATURE_LOCUS_TAG + ", " 
-//                    + FieldNames.FEATURE_PRODUCT + ", " 
-//                    + FieldNames.FEATURE_STRAND + ", " 
-//                    + FieldNames.FEATURE_GENE
+//                    + FieldNames.ANNOTATION_ID + ", "
+//                    + FieldNames.ANNOTATION_EC_NUM + ", " 
+//                    + FieldNames.ANNOTATION_LOCUS_TAG + ", " 
+//                    + FieldNames.ANNOTATION_PRODUCT + ", " 
+//                    + FieldNames.ANNOTATION_STRAND + ", " 
+//                    + FieldNames.ANNOTATION_GENE
 //                + " FROM " 
 //                    + FieldNames.TABLE_FEATURES +
 //                " WHERE EXISTS ("
 //                    + "SELECT * "
 //                    + "FROM INFORMATION_SCHEMA.COLUMNS "
 //                    + "WHERE TABLE_NAME = '" + FieldNames.TABLE_FEATURES + "' "
-//                    + " AND COLUMN_NAME = '" + FieldNames.FEATURE_PRODUCT + "' ) ";
+//                    + " AND COLUMN_NAME = '" + FieldNames.ANNOTATION_PRODUCT + "' ) ";
 //        
 //        
 //        public static final String CHECK_FEATURE_TABLE = 
 //                "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" 
 //                    + FieldNames.TABLE_FEATURES + "' AND COLUMN_NAME = '"
-//                    + FieldNames.FEATURE_PRODUCT + "' ";
+//                    + FieldNames.ANNOTATION_PRODUCT + "' ";
 //   
 //        
 //        public static final String ALTER_FEATURE_TABLE = 
-//                "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_EC_NUM + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_GENE + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_LOCUS_TAG + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_PRODUCT + "; "
-//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.FEATURE_STRAND + "; ";
+//                "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_EC_NUM + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_GENE + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_LOCUS_TAG + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_PRODUCT + "; "
+//                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_STRAND + "; ";
             
         
 }

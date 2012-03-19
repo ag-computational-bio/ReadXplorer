@@ -1,8 +1,8 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.util.SequenceUtils;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JAnnotation;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -19,24 +19,24 @@ import org.openide.util.Utilities;
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceFeature//EN", autostore = false)
-public final class ReferenceFeatureTopComponent extends TopComponent implements LookupListener {
+@ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceAnnotation//EN", autostore = false)
+public final class ReferenceAnnotationTopComp extends TopComponent implements LookupListener {
 
-    private static ReferenceFeatureTopComponent instance;
+    private static ReferenceAnnotationTopComp instance;
     private static final long serialVersionUID = 1L;
     private Result<ReferenceViewer> result;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "ReferenceFeatureTopComponent";
+    private static final String PREFERRED_ID = "ReferenceAnnotationTopComp";
 
-    public ReferenceFeatureTopComponent() {
-        initComponents();
-        setName(NbBundle.getMessage(ReferenceFeatureTopComponent.class, "CTL_ReferenceFeatureTopComponent"));
-        setToolTipText(NbBundle.getMessage(ReferenceFeatureTopComponent.class, "HINT_ReferenceFeatureTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-        putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
+    public ReferenceAnnotationTopComp() {
+        this.initComponents();
+        this.setName(NbBundle.getMessage(ReferenceAnnotationTopComp.class, "CTL_ReferenceAnnotationTopComp"));
+        this.setToolTipText(NbBundle.getMessage(ReferenceAnnotationTopComp.class, "HINT_ReferenceAnnotationTopComp"));
+//        this.setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        this.putClientProperty(TopComponent.PROP_CLOSING_DISABLED, Boolean.TRUE);
+        this.putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
+        this.putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
 
     }
 
@@ -66,54 +66,54 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         geneField = new javax.swing.JTextField();
         geneLabel = new javax.swing.JLabel();
 
-        org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeLabel.text")); // NOI18N
-        typeLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.typeLabel.text")); // NOI18N
+        typeLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.typeLabel.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.jLabel3.text")); // NOI18N
-        jLabel3.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.jLabel3.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel3.text")); // NOI18N
+        jLabel3.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel3.toolTipText")); // NOI18N
 
         typeText.setEditable(false);
-        typeText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.typeText.toolTipText")); // NOI18N
+        typeText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.typeText.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(productLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.productLabel.text")); // NOI18N
-        productLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.productLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(productLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.productLabel.text")); // NOI18N
+        productLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.productLabel.toolTipText")); // NOI18N
 
         strandText.setEditable(false);
-        strandText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.strandText.toolTipText")); // NOI18N
+        strandText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.strandText.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.jLabel4.text")); // NOI18N
-        jLabel4.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.jLabel4.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel4.text")); // NOI18N
+        jLabel4.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel4.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(stopLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.stopLabel.text")); // NOI18N
-        stopLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.stopLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(stopLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.stopLabel.text")); // NOI18N
+        stopLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.stopLabel.toolTipText")); // NOI18N
 
         ecNumField.setEditable(false);
-        ecNumField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.ecNumField.toolTipText")); // NOI18N
+        ecNumField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.ecNumField.toolTipText")); // NOI18N
 
         stopField.setEditable(false);
-        stopField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.stopField.toolTipText")); // NOI18N
+        stopField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.stopField.toolTipText")); // NOI18N
 
         locusField.setEditable(false);
-        locusField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.locusField.toolTipText")); // NOI18N
+        locusField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.locusField.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(locusLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.locusLabel.text")); // NOI18N
-        locusLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.locusLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(locusLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.locusLabel.text")); // NOI18N
+        locusLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.locusLabel.toolTipText")); // NOI18N
 
         startField.setEditable(false);
-        startField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.startField.toolTipText")); // NOI18N
+        startField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startField.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(startLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.startLabel.text")); // NOI18N
-        startLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.startLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(startLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startLabel.text")); // NOI18N
+        startLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startLabel.toolTipText")); // NOI18N
 
         productText.setColumns(20);
         productText.setRows(5);
         jScrollPane1.setViewportView(productText);
 
         geneField.setEditable(false);
-        geneField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.geneField.toolTipText")); // NOI18N
+        geneField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.geneField.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(geneLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.geneLabel.text")); // NOI18N
-        geneLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComponent.class, "ReferenceFeatureTopComponent.geneLabel.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(geneLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.geneLabel.text")); // NOI18N
+        geneLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.geneLabel.toolTipText")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -212,27 +212,27 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized ReferenceFeatureTopComponent getDefault() {
+    public static synchronized ReferenceAnnotationTopComp getDefault() {
         if (instance == null) {
-            instance = new ReferenceFeatureTopComponent();
+            instance = new ReferenceAnnotationTopComp();
         }
         return instance;
     }
 
     /**
-     * Obtain the ReferenceFeatureTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the ReferenceAnnotationTopComp instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized ReferenceFeatureTopComponent findInstance() {
+    public static synchronized ReferenceAnnotationTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(ReferenceFeatureTopComponent.class.getName()).warning(
+            Logger.getLogger(ReferenceAnnotationTopComp.class.getName()).warning(
                     "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
             return getDefault();
         }
-        if (win instanceof ReferenceFeatureTopComponent) {
-            return (ReferenceFeatureTopComponent) win;
+        if (win instanceof ReferenceAnnotationTopComp) {
+            return (ReferenceAnnotationTopComp) win;
         }
-        Logger.getLogger(ReferenceFeatureTopComponent.class.getName()).warning(
+        Logger.getLogger(ReferenceAnnotationTopComp.class.getName()).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
                 + "' ID. That is a potential source of errors and unexpected behavior.");
         return getDefault();
@@ -253,15 +253,15 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
     @Override
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer refViewer : result.allInstances()) {
-            JFeature feature = refViewer.getCurrentlySelectedFeature();
-            showFeatureDetails(feature != null ? feature.getPersistantFeature() : null);
+            JAnnotation annotation = refViewer.getCurrentlySelectedAnnotation();
+            this.showAnnotationDetails(annotation != null ? annotation.getPersistantAnnotation() : null);
 
-            refViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_SELECTED, new PropertyChangeListener() {
+            refViewer.addPropertyChangeListener(ReferenceViewer.PROP_ANNOTATION_SELECTED, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    JFeature feature = (JFeature) evt.getNewValue();
-                    showFeatureDetails(feature.getPersistantFeature());
+                    JAnnotation annotation = (JAnnotation) evt.getNewValue();
+                    showAnnotationDetails(annotation.getPersistantAnnotation());
                 }
             });
         }
@@ -297,7 +297,7 @@ public final class ReferenceFeatureTopComponent extends TopComponent implements 
         return PREFERRED_ID;
     }
 
-    public void showFeatureDetails(PersistantFeature f) {
+    public void showAnnotationDetails(PersistantAnnotation f) {
         this.ecNumField.setText(f != null ? f.getEcNumber() : "");
         this.startField.setText(f != null ? String.valueOf(f.getStart()) : "");
         this.stopField.setText(f != null ? String.valueOf(f.getStop()) : "");

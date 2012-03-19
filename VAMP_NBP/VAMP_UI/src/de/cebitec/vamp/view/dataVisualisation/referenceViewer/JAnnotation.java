@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
@@ -21,18 +21,18 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 
 /**
- * Contains the content of a feature and takes care of the painting process.
+ * Contains the content of an annotation and takes care of the painting process.
  * Also contains its popup menu.
  *
  * @author ddoppmeier, rhilker
  */
-public class JFeature extends JComponent {
+public class JAnnotation extends JComponent {
 
     private static final long serialVersionUID = 347348234;
-    private PersistantFeature feature;
+    private PersistantAnnotation annotation;
     private Dimension size;
     public static final int NORMAL_HEIGHT = 12;
-    public static final int PARENT_FEATURE_HEIGHT = 8;
+    public static final int PARENT_ANNOTATION_HEIGHT = 8;
     public static final byte BORDER_NONE = 0;
     public static final byte BORDER_LEFT = -1;
     public static final byte BORDER_RIGHT = 1;
@@ -43,28 +43,28 @@ public class JFeature extends JComponent {
     private short border;
 
     /**
-     * A component for displaying a feature.
-     * @param feature the feature to display
-     * @param length length of the feature on the screen
-     * @param refViewer the reference viewer on which the feature is displayed
-     * @param border value among JFeature.BORDER_NONE, JFeature.BORDER_LEFT, JFeature.BORDER_RIGHT, JFeature.BORDER_BOTH
+     * A component for displaying an annotation.
+     * @param annotation the annotation to display
+     * @param length length of the annotation on the screen
+     * @param refViewer the reference viewer on which the annotation is displayed
+     * @param border value among JAnnotation.BORDER_NONE, JAnnotation.BORDER_LEFT, JAnnotation.BORDER_RIGHT, JAnnotation.BORDER_BOTH
      */
-    public JFeature(final PersistantFeature feature, double length, final ReferenceViewer refViewer, short border) {
+    public JAnnotation(final PersistantAnnotation annotation, double length, final ReferenceViewer refViewer, short border) {
         super();
-        this.feature = feature;
+        this.annotation = annotation;
         this.height = NORMAL_HEIGHT;
         this.size = new Dimension((int) length, height);
         this.setSize(size);
         this.font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
-        this.color = this.determineColor(feature);
+        this.color = this.determineColor(annotation);
         this.border = border;
 
         this.addListeners(refViewer);
         this.setToolTipText(createToolTipText());
     }
 
-    public PersistantFeature getPersistantFeature() {
-        return feature;
+    public PersistantAnnotation getPersistantAnnotation() {
+        return annotation;
     }
 
     private String createToolTipText() {
@@ -72,16 +72,16 @@ public class JFeature extends JComponent {
         sb.append("<html>");
         sb.append("<table>");
 
-        sb.append(createTableRow("Locus", feature.getLocus()));
-        sb.append(createTableRow("Type", feature.getType().getTypeString()));
-        sb.append(createTableRow("Strand", (feature.getStrand() == 1 ? "forward" : "reverse")));
-        sb.append(createTableRow("Start", String.valueOf(feature.getStart())));
-        sb.append(createTableRow("Stop", String.valueOf(feature.getStop())));
-        if (feature.getProduct() != null && !feature.getProduct().isEmpty()) {
-            sb.append(createTableRow("Product", feature.getProduct()));
+        sb.append(createTableRow("Locus", annotation.getLocus()));
+        sb.append(createTableRow("Type", annotation.getType().getTypeString()));
+        sb.append(createTableRow("Strand", (annotation.getStrand() == 1 ? "forward" : "reverse")));
+        sb.append(createTableRow("Start", String.valueOf(annotation.getStart())));
+        sb.append(createTableRow("Stop", String.valueOf(annotation.getStop())));
+        if (annotation.getProduct() != null && !annotation.getProduct().isEmpty()) {
+            sb.append(createTableRow("Product", annotation.getProduct()));
         }
-        if (feature.getEcNumber() != null && !feature.getEcNumber().isEmpty()) {
-            sb.append(createTableRow("EC no.", feature.getEcNumber()));
+        if (annotation.getEcNumber() != null && !annotation.getEcNumber().isEmpty()) {
+            sb.append(createTableRow("EC no.", annotation.getEcNumber()));
         }
 
         sb.append("</table>");
@@ -95,9 +95,9 @@ public class JFeature extends JComponent {
 
     public void setSelected(boolean selected) {
         if (selected) {
-            color = ColorProperties.SELECTED_FEATURE;
+            color = ColorProperties.SELECTED_ANNOTATION;
         } else {
-            color = this.determineColor(feature);
+            color = this.determineColor(annotation);
         }
         this.repaint();
     }
@@ -108,36 +108,36 @@ public class JFeature extends JComponent {
 
         // draw the rectangle
         g.setColor(color);
-        if (feature.getSubfeatures().isEmpty()){
+        if (annotation.getSubAnnotations().isEmpty()){
             g.fillRect(0, 0, this.getSize().width, this.height);
             g.setColor(ColorProperties.EXON_BORDER);
             g.drawRect(0, 0, this.getSize().width-1, this.height-1);
-            //paint border in feature color, if feature is larger than screen at that border
+            //paint border in annotation color, if annotation is larger than screen at that border
             g.setColor(color);
             this.overpaintBorder(g, 0, this.height-1);
-        } else { //features with subfeature have a smaller height
-            g.fillRect(0, (NORMAL_HEIGHT-PARENT_FEATURE_HEIGHT)/2, this.getSize().width, PARENT_FEATURE_HEIGHT);
+        } else { //annotations with sub annotations have a smaller height
+            g.fillRect(0, (NORMAL_HEIGHT-PARENT_ANNOTATION_HEIGHT)/2, this.getSize().width, PARENT_ANNOTATION_HEIGHT);
             g.setColor(ColorProperties.EXON_BORDER);
-            g.drawRect(0, (NORMAL_HEIGHT-PARENT_FEATURE_HEIGHT)/2, this.getSize().width-1, PARENT_FEATURE_HEIGHT-1);
+            g.drawRect(0, (NORMAL_HEIGHT-PARENT_ANNOTATION_HEIGHT)/2, this.getSize().width-1, PARENT_ANNOTATION_HEIGHT-1);
             g.setColor(color);
-            this.overpaintBorder(g, (NORMAL_HEIGHT-PARENT_FEATURE_HEIGHT)/2 + 1, PARENT_FEATURE_HEIGHT);
+            this.overpaintBorder(g, (NORMAL_HEIGHT-PARENT_ANNOTATION_HEIGHT)/2 + 1, PARENT_ANNOTATION_HEIGHT);
         }
 
-        // draw the locus of the feature inside the rectangle
-        g.setColor(ColorProperties.FEATURE_LABEL);
+        // draw the locus of the annotation inside the rectangle
+        g.setColor(ColorProperties.ANNOTATION_LABEL);
         g.setFont(font);
         FontMetrics fm = g.getFontMetrics();
 
         int fontY = this.getHeight() / 2 - 2 + fm.getMaxAscent() / 2;
-        if (feature.hasLocus()){
-            String label = this.determineLabel(feature.getLocus(), fm);
+        if (annotation.hasLocus()){
+            String label = this.determineLabel(annotation.getLocus(), fm);
             g.drawString(label, 5, fontY);
         }
 
     }
     
     /**
-     * Overpaints the border of the feature again with a line, if it is larger 
+     * Overpaints the border of the annotation again with a line, if it is larger 
      * than the screen and continues at the border.
      * @param g graphics object to paint on
      * @param y1 first y value of the line to draw
@@ -145,14 +145,14 @@ public class JFeature extends JComponent {
      */
     private void overpaintBorder(Graphics2D g, int y1, int y2) {
         switch (this.border) {
-            case JFeature.BORDER_BOTH:
+            case JAnnotation.BORDER_BOTH:
                 g.drawLine(0, y1, 0, y2);
                 g.drawLine(this.getSize().width-1, y1, this.getSize().width-1, y2);
                 break;
-            case JFeature.BORDER_LEFT:
+            case JAnnotation.BORDER_LEFT:
                 g.drawLine(0, y1, 0, y2);
                 break;
-            case JFeature.BORDER_RIGHT:
+            case JAnnotation.BORDER_RIGHT:
                 g.drawLine(this.getSize().width-1, y1, this.getSize().width-1, y2);
                 break;
             default:
@@ -172,38 +172,38 @@ public class JFeature extends JComponent {
     }
 
     /**
-     * Set the color a feature is displayed with. Depends on the feature's type,
-     * @param feature the feature
-     * @return the color for this feature
+     * Set the color an annotation is displayed with. Depends on the annotation type,
+     * @param annotation the annotation
+     * @return the color for this annotation
      */
-    private Color determineColor(PersistantFeature feature) {
+    private Color determineColor(PersistantAnnotation annotation) {
         Color c;
         
-        if (feature.getType() == FeatureType.CDS) {
+        if (annotation.getType() == FeatureType.CDS) {
             c = ColorProperties.CDS;
-        } else if (feature.getType() == FeatureType.MRNA) {
+        } else if (annotation.getType() == FeatureType.MRNA) {
             c = ColorProperties.MRNA;
-        } else if (feature.getType() == FeatureType.MISC_RNA) {
+        } else if (annotation.getType() == FeatureType.MISC_RNA) {
             c = ColorProperties.MISC_RNA;
-        } else if (feature.getType() == FeatureType.REPEAT_UNIT) {
+        } else if (annotation.getType() == FeatureType.REPEAT_UNIT) {
             c = ColorProperties.REPEAT_UNIT;
-        } else if (feature.getType() == FeatureType.RRNA) {
+        } else if (annotation.getType() == FeatureType.RRNA) {
             c = ColorProperties.RRNA;
-        } else if (feature.getType() == FeatureType.SOURCE) {
+        } else if (annotation.getType() == FeatureType.SOURCE) {
             c = ColorProperties.SOURCE;
-        } else if (feature.getType() == FeatureType.TRNA) {
+        } else if (annotation.getType() == FeatureType.TRNA) {
             c = ColorProperties.TRNA;
-        } else if (feature.getType() == FeatureType.GENE) {
+        } else if (annotation.getType() == FeatureType.GENE) {
             c = ColorProperties.GENE;
-        } else if (feature.getType() == FeatureType.MIRNA) {
+        } else if (annotation.getType() == FeatureType.MIRNA) {
             c = ColorProperties.MI_RNA;
-        } else if (feature.getType() == FeatureType.EXON) {
+        } else if (annotation.getType() == FeatureType.EXON) {
             c = ColorProperties.EXON;
-        } else if (feature.getType() == FeatureType.UNDEFINED) {
-            c = ColorProperties.UNDEF_FEATURE;
+        } else if (annotation.getType() == FeatureType.UNDEFINED) {
+            c = ColorProperties.UNDEF_ANNOTATION;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for feature {0}", feature.getType());
-            c = ColorProperties.UNDEF_FEATURE;
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for annotation {0}", annotation.getType());
+            c = ColorProperties.UNDEF_ANNOTATION;
         }
 
         return c;
@@ -215,7 +215,7 @@ public class JFeature extends JComponent {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1){
-                    refViewer.setSelectedFeature(JFeature.this);
+                    refViewer.setSelectedAnnotation(JAnnotation.this);
                 }
                 showPopUp(e);
             }
@@ -247,17 +247,17 @@ public class JFeature extends JComponent {
                     //add thumbnail view options
                     final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                     if (thumb != null) {
-                        thumb.showPopUp(feature, refViewer, e, popUp);
+                        thumb.showPopUp(annotation, refViewer, e, popUp);
                     }
 
                     MenuItemFactory menuItemFactory = new MenuItemFactory();
 
                     //add copy option
-                    String selFeatureSequence = viewer.getReference().getSequence().substring(feature.getStart() - 1, feature.getStop());
-                    popUp.add(menuItemFactory.getCopyItem(selFeatureSequence));
+                    String selAnnotationSequence = viewer.getReference().getSequence().substring(annotation.getStart() - 1, annotation.getStop());
+                    popUp.add(menuItemFactory.getCopyItem(selAnnotationSequence));
 
                     //add store as fasta file option
-                    popUp.add(menuItemFactory.getStoreFastaItem(selFeatureSequence, feature));
+                    popUp.add(menuItemFactory.getStoreFastaItem(selAnnotationSequence, annotation));
 
                     popUp.show(e.getComponent(), e.getX(), e.getY());
                 }
@@ -272,7 +272,7 @@ public class JFeature extends JComponent {
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                refViewer.forwardChildrensMousePosition(e.getX(), JFeature.this);
+                refViewer.forwardChildrensMousePosition(e.getX(), JAnnotation.this);
             }
         });
     }

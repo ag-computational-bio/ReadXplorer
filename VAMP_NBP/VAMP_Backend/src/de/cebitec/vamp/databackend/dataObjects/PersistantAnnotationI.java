@@ -6,20 +6,20 @@ import de.cebitec.vamp.api.objects.FeatureType;
  *
  * @author rhilker
  */
-public interface PersistantFeatureI {
+public interface PersistantAnnotationI {
         
     /**
-     * @return start of the feature. Always the smaller value among start and stop.
+     * @return start of the annotation. Always the smaller value among start and stop.
      */
     public int getStart();
     
     /**
-     * @return stop of the feature. Always the larger value among start and stop.
+     * @return stop of the annotation. Always the larger value among start and stop.
      */
     public int getStop();
     
     /**
-     * @return type of the feature among FeatureTypes.
+     * @return type of the annotation among FeatureTypes.
      */
     public FeatureType getType();
     

@@ -2,8 +2,8 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubfeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.util.SequenceComparison;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -42,78 +42,78 @@ public class SnpTranslatorTest {
     }
 
     /**
-     * Test of checkCoveredByFeature method, of class SnpTranslator.
+     * Test of checkCoveredByAnnotation method, of class SnpTranslator.
      */
     @Test
-    public void testCheckCoveredByFeature() {
-//        System.out.println("checkCoveredByFeature");
+    public void testCheckCoveredByAnnotation() {
+//        System.out.println("checkCoveredByAnnotation");
 //        String position = "";
 //        SnpTranslator instance = null;
 //        List expResult = null;
-//        List result = instance.checkCoveredByFeature(position);
+//        List result = instance.checkCoveredByAnnotation(position);
 //        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
     }
 
     /**
-     * Test of checkForFeature method, of class SnpTranslator.
+     * Test of checkForAnnotation method, of class SnpTranslator.
      */
     @Test
-    public void testCheckForFeature() {
-//        System.out.println("checkForFeature");
+    public void testCheckForAnnotation() {
+//        System.out.println("checkForAnnotation");
 //        Snp snp = null;
 //        SnpTranslator instance = null;
-//        instance.checkForFeature(snp);
+//        instance.checkForAnnotation(snp);
         // TODO review the generated test code and remove the default call to fail.
     }
     
     @Test
     public void testCalcSnpList() {
         System.out.println("CalcSnpListTest");
-        PersistantFeature feat1 = new PersistantFeature(1, "ec1", "locus1", "product1", 1, 205, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name1");
-        PersistantFeature feat2 = new PersistantFeature(2, "ec2", "locus2", "product2", 2, 320, SequenceUtils.STRAND_REV, FeatureType.CDS, "name2");
-        PersistantFeature feat3 = new PersistantFeature(3, "ec3", "locus3", "product3", 430, 650, SequenceUtils.STRAND_REV, FeatureType.CDS, "name3");
-        PersistantFeature feat4 = new PersistantFeature(4, "ec4", "locus4", "product4", 570, 810, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name4");
-        PersistantFeature feat5 = new PersistantFeature(5, "ec5", "miRnaL5", "miRnaP5", 1000, 1100, SequenceUtils.STRAND_FWD, FeatureType.MIRNA, "miRnaN5");
-        PersistantFeature feat6 = new PersistantFeature(6, "ec6", "locus6", "product6", 11000, 11130, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name6");
-        PersistantFeature feat7 = new PersistantFeature(7, "ec7", "locus7", "product7", 10800, 11129, SequenceUtils.STRAND_REV, FeatureType.CDS, "name7");
-        PersistantSubfeature subfeat1 = new PersistantSubfeature(1, 1, 7, FeatureType.EXON); //ttt aaa g
-        PersistantSubfeature subfeat2 = new PersistantSubfeature(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
-        PersistantSubfeature subfeat3 = new PersistantSubfeature(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt
-        PersistantSubfeature subfeat4 = new PersistantSubfeature(2, 200, 260, FeatureType.EXON); //t ctt ggc cac agc tcc gac aaa gga agg act cgc ttc gga ccc cta ctt gct cta cca ata
-        PersistantSubfeature subfeat5 = new PersistantSubfeature(3, 499, 530, FeatureType.EXON); //cc gtc gtc acg cac cta gaa gag gcg cta ctc
-        PersistantSubfeature subfeat6 = new PersistantSubfeature(3, 550, 560, FeatureType.EXON); //tgt gga cct ag
-        PersistantSubfeature subfeat7 = new PersistantSubfeature(3, 580, 620, FeatureType.EXON); //g gct tcc gct gct taa cgc aca cat acg tgg gtt ggc aaa g
-        PersistantSubfeature subfeat7b = new PersistantSubfeature(3, 625, 630, FeatureType.EXON); //ag cta a
-        PersistantSubfeature subfeat8 = new PersistantSubfeature(3, 640, 650, FeatureType.EXON); //tc ttt atg gag
-        PersistantSubfeature subfeat9 = new PersistantSubfeature(4, 570, 590, FeatureType.EXON); //cag gtc gaa gcc gaa ggc gac
-        PersistantSubfeature subfeat10 = new PersistantSubfeature(4, 600, 621, FeatureType.EXON); //gtg tat gca ccc aac cgt ttc g
-        PersistantSubfeature subfeat11 = new PersistantSubfeature(4, 751, 810, FeatureType.EXON); //tc gtc cca tcg cag acc cac gtg gct ccc ccg cct ccg gtt gct ccg ccg ccg gcg cca g
-        PersistantSubfeature subfeat12 = new PersistantSubfeature(5, 1000, 1020, FeatureType.EXON); //tga agc aca cca gct atc tca
-        PersistantSubfeature subfeat13 = new PersistantSubfeature(5, 1070, 1100, FeatureType.EXON); //ggc ccg cgc cgc cgc ctg gca ggt ggc gga c
-        PersistantSubfeature subfeat14 = new PersistantSubfeature(6, 11000, 11050, FeatureType.EXON); //cta cca ggt cca ggt cga gct gct tct cga tga gga tgc gca gca cgc cca
-        PersistantSubfeature subfeat15 = new PersistantSubfeature(6, 11100, 11130, FeatureType.EXON); //gcc gat gcc gaa gat acc gac cag ggt atc g
-        PersistantSubfeature subfeat16 = new PersistantSubfeature(7, 10800, 11000, FeatureType.EXON); //gacctgccggacatgcgcgaccagcttcaggtcgccgctcgaaccgaactcgcgcgcgtggctgaccatgtgccggtgcaggtgcggaagcaggagcatcgcgcgcgcgtccgccagcttgtgcttcaggtcgtggacgagccggtccggccgccggaactggaacagcggcataacgagctgccgccgcaactggcg ccg
-        PersistantSubfeature subfeat17 = new PersistantSubfeature(7, 11100, 11129, FeatureType.EXON); //cgg cta cgg ctt cta tgg ctg gtc cca tag
-        feat1.addSubfeature(subfeat1);
-        feat1.addSubfeature(subfeat2);
-        feat2.addSubfeature(subfeat3);
-        feat2.addSubfeature(subfeat4);
-        feat3.addSubfeature(subfeat5);
-        feat3.addSubfeature(subfeat6);
-        feat3.addSubfeature(subfeat7);
-        feat3.addSubfeature(subfeat7b);
-        feat3.addSubfeature(subfeat8);
-        feat4.addSubfeature(subfeat9);
-        feat4.addSubfeature(subfeat10);
-        feat4.addSubfeature(subfeat11);
-        feat5.addSubfeature(subfeat12);
-        feat5.addSubfeature(subfeat13);
-        feat6.addSubfeature(subfeat14);
-        feat6.addSubfeature(subfeat15);
-        feat7.addSubfeature(subfeat16);
-        feat7.addSubfeature(subfeat17);
-        List<PersistantFeature> featuresFound = new ArrayList<PersistantFeature>();
+        PersistantAnnotation feat1 = new PersistantAnnotation(1, "ec1", "locus1", "product1", 1, 205, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name1");
+        PersistantAnnotation feat2 = new PersistantAnnotation(2, "ec2", "locus2", "product2", 2, 320, SequenceUtils.STRAND_REV, FeatureType.CDS, "name2");
+        PersistantAnnotation feat3 = new PersistantAnnotation(3, "ec3", "locus3", "product3", 430, 650, SequenceUtils.STRAND_REV, FeatureType.CDS, "name3");
+        PersistantAnnotation feat4 = new PersistantAnnotation(4, "ec4", "locus4", "product4", 570, 810, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name4");
+        PersistantAnnotation feat5 = new PersistantAnnotation(5, "ec5", "miRnaL5", "miRnaP5", 1000, 1100, SequenceUtils.STRAND_FWD, FeatureType.MIRNA, "miRnaN5");
+        PersistantAnnotation feat6 = new PersistantAnnotation(6, "ec6", "locus6", "product6", 11000, 11130, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name6");
+        PersistantAnnotation feat7 = new PersistantAnnotation(7, "ec7", "locus7", "product7", 10800, 11129, SequenceUtils.STRAND_REV, FeatureType.CDS, "name7");
+        PersistantSubAnnotation subfeat1 = new PersistantSubAnnotation(1, 1, 7, FeatureType.EXON); //ttt aaa g
+        PersistantSubAnnotation subfeat2 = new PersistantSubAnnotation(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
+        PersistantSubAnnotation subfeat3 = new PersistantSubAnnotation(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt
+        PersistantSubAnnotation subfeat4 = new PersistantSubAnnotation(2, 200, 260, FeatureType.EXON); //t ctt ggc cac agc tcc gac aaa gga agg act cgc ttc gga ccc cta ctt gct cta cca ata
+        PersistantSubAnnotation subfeat5 = new PersistantSubAnnotation(3, 499, 530, FeatureType.EXON); //cc gtc gtc acg cac cta gaa gag gcg cta ctc
+        PersistantSubAnnotation subfeat6 = new PersistantSubAnnotation(3, 550, 560, FeatureType.EXON); //tgt gga cct ag
+        PersistantSubAnnotation subfeat7 = new PersistantSubAnnotation(3, 580, 620, FeatureType.EXON); //g gct tcc gct gct taa cgc aca cat acg tgg gtt ggc aaa g
+        PersistantSubAnnotation subfeat7b = new PersistantSubAnnotation(3, 625, 630, FeatureType.EXON); //ag cta a
+        PersistantSubAnnotation subfeat8 = new PersistantSubAnnotation(3, 640, 650, FeatureType.EXON); //tc ttt atg gag
+        PersistantSubAnnotation subfeat9 = new PersistantSubAnnotation(4, 570, 590, FeatureType.EXON); //cag gtc gaa gcc gaa ggc gac
+        PersistantSubAnnotation subfeat10 = new PersistantSubAnnotation(4, 600, 621, FeatureType.EXON); //gtg tat gca ccc aac cgt ttc g
+        PersistantSubAnnotation subfeat11 = new PersistantSubAnnotation(4, 751, 810, FeatureType.EXON); //tc gtc cca tcg cag acc cac gtg gct ccc ccg cct ccg gtt gct ccg ccg ccg gcg cca g
+        PersistantSubAnnotation subfeat12 = new PersistantSubAnnotation(5, 1000, 1020, FeatureType.EXON); //tga agc aca cca gct atc tca
+        PersistantSubAnnotation subfeat13 = new PersistantSubAnnotation(5, 1070, 1100, FeatureType.EXON); //ggc ccg cgc cgc cgc ctg gca ggt ggc gga c
+        PersistantSubAnnotation subfeat14 = new PersistantSubAnnotation(6, 11000, 11050, FeatureType.EXON); //cta cca ggt cca ggt cga gct gct tct cga tga gga tgc gca gca cgc cca
+        PersistantSubAnnotation subfeat15 = new PersistantSubAnnotation(6, 11100, 11130, FeatureType.EXON); //gcc gat gcc gaa gat acc gac cag ggt atc g
+        PersistantSubAnnotation subfeat16 = new PersistantSubAnnotation(7, 10800, 11000, FeatureType.EXON); //gacctgccggacatgcgcgaccagcttcaggtcgccgctcgaaccgaactcgcgcgcgtggctgaccatgtgccggtgcaggtgcggaagcaggagcatcgcgcgcgcgtccgccagcttgtgcttcaggtcgtggacgagccggtccggccgccggaactggaacagcggcataacgagctgccgccgcaactggcg ccg
+        PersistantSubAnnotation subfeat17 = new PersistantSubAnnotation(7, 11100, 11129, FeatureType.EXON); //cgg cta cgg ctt cta tgg ctg gtc cca tag
+        feat1.addSubAnnotation(subfeat1);
+        feat1.addSubAnnotation(subfeat2);
+        feat2.addSubAnnotation(subfeat3);
+        feat2.addSubAnnotation(subfeat4);
+        feat3.addSubAnnotation(subfeat5);
+        feat3.addSubAnnotation(subfeat6);
+        feat3.addSubAnnotation(subfeat7);
+        feat3.addSubAnnotation(subfeat7b);
+        feat3.addSubAnnotation(subfeat8);
+        feat4.addSubAnnotation(subfeat9);
+        feat4.addSubAnnotation(subfeat10);
+        feat4.addSubAnnotation(subfeat11);
+        feat5.addSubAnnotation(subfeat12);
+        feat5.addSubAnnotation(subfeat13);
+        feat6.addSubAnnotation(subfeat14);
+        feat6.addSubAnnotation(subfeat15);
+        feat7.addSubAnnotation(subfeat16);
+        feat7.addSubAnnotation(subfeat17);
+        List<PersistantAnnotation> featuresFound = new ArrayList<PersistantAnnotation>();
         featuresFound.add(feat1);
         featuresFound.add(feat2);
         featuresFound.add(feat3);
@@ -170,7 +170,7 @@ public class SnpTranslatorTest {
                 
         SnpTranslator snpTranslator = new SnpTranslator(featuresFound, refSeq);
         for (Snp snp : snps){
-            snpTranslator.checkForFeature(snp);
+            snpTranslator.checkForAnnotation(snp);
         }
         
         for (Snp snp : snps){

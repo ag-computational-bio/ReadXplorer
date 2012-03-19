@@ -12,7 +12,7 @@ import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.TrackParser;
-import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
 import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import de.cebitec.vamp.util.Observer;
@@ -70,7 +70,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         ReferenceParserI parser = refGenJob.getParser();
         parser.registerObserver(this);
-        FeatureFilter filter = new FeatureFilter();
+        AnnotationFilter filter = new AnnotationFilter();
         filter.addBlacklistRule(new FilterRuleSource());
         ParsedReference refGenome = parser.parseReference(refGenJob, filter);
 
@@ -78,7 +78,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         return refGenome;
     }
 
-    private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException {
+    
+    private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0}trackjobID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
 
         String sequenceString = null;
@@ -90,7 +91,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         }
 
         TrackParser parser = new TrackParser();
-//        ParsedTrack track = parser.parseMappings(trackJob, readnameToSeqIDmap, sequenceString, this);
         ParsedTrack track = parser.parseMappings(trackJob, sequenceString, this, covContainer);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished parsing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -315,6 +315,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         } catch (ParsingException ex) {
             // something went wrong
             io.getOut().println(ex.getMessage());
+            io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
+        } catch (OutOfMemoryError e) {
+            io.getOut().println(e.getMessage());
             io.getOut().println("\"" + trackJob.getFile().getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.failed") + "!");
         }
         return null;

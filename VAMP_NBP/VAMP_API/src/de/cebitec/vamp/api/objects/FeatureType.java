@@ -4,7 +4,7 @@ package de.cebitec.vamp.api.objects;
  *@author ddoppmeier, rhilker
  * 
  * Enumeration for all different features types used in vamp. This does not only
- * include genetic feature, but also features displayed in viewers.
+ * include genetic annotations, but also features displayed in viewers.
  * Each type is created with an integer and a string representation and
  * it can return values for both. 
  * It also allows to return the feature type represented by a given integer
@@ -130,7 +130,7 @@ public enum FeatureType {
     private static final String COMPLETE_COV_STRING = "Complete cov.";
     
     //feature types for the double track viewer
-    private static final String COMPLETE_COVERAGE_STRING = "Complete coverage";
+    private static final String COMPLETE_COVERAGE_STRING = "Difference between both";
     private static final String TRACK1_COVERAGE_STRING = "Track 1 coverage";
     private static final String TRACK2_COVERAGE_STRING = "Track 2 coverage";
     

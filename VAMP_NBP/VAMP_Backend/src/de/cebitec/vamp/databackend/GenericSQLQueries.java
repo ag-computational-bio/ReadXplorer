@@ -1,6 +1,5 @@
 package de.cebitec.vamp.databackend;
 
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,7 +38,7 @@ public class GenericSQLQueries {
                 num = rs.getInt(identifier);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(SQLStatements.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return num;
@@ -62,7 +61,7 @@ public class GenericSQLQueries {
             }
             latestID.close();
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(ProjectConnector.getInstance().getClass().getName(), ex);
+            Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ++id;
     }

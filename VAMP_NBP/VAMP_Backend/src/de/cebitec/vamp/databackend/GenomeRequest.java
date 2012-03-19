@@ -41,8 +41,7 @@ public class GenomeRequest {
      * @param from start position of the interval for receiving the mappings
      * @param to stop position of the interval for receiving the mappings
      * @param sender the sending object, that wants to receive the result of the request
-     */
-    // @param feature the feature belonging to the request
+     */    
     public GenomeRequest(int from, int to, ThreadListener sender){
         this.from = from;
         this.to = to;

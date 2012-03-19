@@ -8,23 +8,22 @@ import javax.swing.event.ChangeListener;
  *
  * @author ddoppmeier
  */
-public class CoverageZoomSlider extends JSlider{
+public class CoverageZoomSlider extends JSlider {
 
     private static final long serialVersionUID = 249753543;
 
-    public CoverageZoomSlider(final TrackViewer trackViewer){
-        super(1,100,1); //TODO: adjust to max coverage value in current view!
+    public CoverageZoomSlider(final TrackViewer trackViewer) {
+        super(1, 200, 1);
         trackViewer.verticalZoomLevelUpdated(this.getValue());
-    
+
         this.addChangeListener(new ChangeListener() {
 
             @Override
             public void stateChanged(ChangeEvent e) {
-                    JSlider slide =(JSlider) e.getSource(); 
-                    slide.setToolTipText(slide.getValue()+"");
+                JSlider slide = (JSlider) e.getSource();
+                slide.setToolTipText(slide.getValue() + "");
                 trackViewer.verticalZoomLevelUpdated(CoverageZoomSlider.this.getValue());
             }
         });
     }
-
 }

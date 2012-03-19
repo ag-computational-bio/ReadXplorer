@@ -17,10 +17,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 
 public class DataAdminWizardSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
@@ -91,29 +93,38 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
         List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
         List<TrackJob> trackJobs = new ArrayList<TrackJob>();
         HashMap<Integer, ReferenceJob> indexedGens = new HashMap<Integer, ReferenceJob>();
+        
+        try {
 
-        List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-        for(Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext(); ){
-            PersistantReference dbGen = it.next();
-            // File and parser parameter meaningles in this context
-            ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
-            indexedGens.put(r.getID(), r);
-            refJobs.add(r);
-        }
+            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
+            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
+                PersistantReference dbGen = it.next();
+                // File and parser parameter meaningles in this context
+                ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
+                indexedGens.put(r.getID(), r);
+                refJobs.add(r);
+            }
 
-        List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
-        for(Iterator<PersistantTrack> it = dbTracks.iterator(); it.hasNext(); ){
-            PersistantTrack dbTrack = it.next();
+            List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
+            for (Iterator<PersistantTrack> it = dbTracks.iterator(); it.hasNext();) {
+                PersistantTrack dbTrack = it.next();
 
-            // File and parser, refgenjob, runjob parameters meaningles in this context
-            TrackJob t = new TrackJob(dbTrack.getId(), null, dbTrack.getDescription(),
-                    indexedGens.get(dbTrack.getRefGenID()),
-                    null, dbTrack.getTimestamp());
+                // File and parser, refgenjob, runjob parameters meaningles in this context
+                TrackJob t = new TrackJob(dbTrack.getId(), null, dbTrack.getDescription(),
+                        indexedGens.get(dbTrack.getRefGenID()),
+                        null, dbTrack.getTimestamp());
 
-            // register dependent tracks at genome and run
-            ReferenceJob gen = indexedGens.get(dbTrack.getRefGenID());
-            gen.registerTrackWithoutRunJob(t);
-            trackJobs.add(t);
+                // register dependent tracks at genome and run
+                ReferenceJob gen = indexedGens.get(dbTrack.getRefGenID());
+                gen.registerTrackWithoutRunJob(t);
+                trackJobs.add(t);
+            }
+        
+        } catch (OutOfMemoryError e) {
+            String msg = NbBundle.getMessage(DataAdminWizardSelectionPanel.class, "OOM_Message",
+                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+            String title = NbBundle.getMessage(DataAdminWizardSelectionPanel.class, "OOM_Header", "Restart Software");
+            JOptionPane.showMessageDialog(this.component, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
 
         // fill result map

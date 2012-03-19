@@ -14,6 +14,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     private PersistantCoverage cov;
     private boolean mouseOverWanted;
     private boolean doubleTrackHackBoolean;
+    private boolean combineTracks;
 
     /** Creates new form CoverageInfoPanel */
     public CoverageInfoLabel() {
@@ -345,7 +346,7 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
     public void setCurrentMousePosition(int logPos) {
         if(/*mouseOverWanted &&*/ cov != null){
 
-            if (!doubleTrackHackBoolean) {
+            if (!doubleTrackHackBoolean || combineTracks) {
                 this.setPerfectFwd(cov.getPerfectFwdMult(logPos));
                 this.setPerfectRev(cov.getPerfectRevMult(logPos));
                 this.setBmFwd(cov.getBestMatchFwdMult(logPos));
@@ -411,6 +412,10 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         
         this.setPreferredSize(new Dimension(1, this.getPreferredSize().height));
         this.revalidate();
+    }
+
+    public void setCombineTracks(boolean combineTracks) {
+        this.combineTracks = combineTracks;
     }
 
 }

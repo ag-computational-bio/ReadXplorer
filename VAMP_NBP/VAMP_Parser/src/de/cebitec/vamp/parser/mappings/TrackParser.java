@@ -22,6 +22,7 @@ public class TrackParser implements TrackParserI {
     public ParsedTrack parseMappings(TrackJob trackJob, String sequenceString, Observer observer, 
                     CoverageContainer covContainer) throws ParsingException, OutOfMemoryError {
         // parse mapping files and store them in appropriate source objects
+        ParsedTrack track = null;
         MappingParserI mappingp = trackJob.getParser();
         mappingp.registerObserver(observer);
         ParsedMappingContainer mappings = mappingp.parseInput(trackJob, sequenceString);
@@ -35,7 +36,7 @@ public class TrackParser implements TrackParserI {
         }
         this.coverageContainer.computeCoverage(mappings);
         
-        ParsedTrack track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
+        track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
         track.setIsStepwise(trackJob.isStepwise());
         track.setTimestamp(trackJob.getTimestamp());
 

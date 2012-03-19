@@ -57,7 +57,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private PatternFilter patternFilter;
     private Preferences pref;
     private HighlightAreaListener highlightListener;
-    private int frameCurrFeature;
+    private int frameCurrAnnotation;
 
     /**
      * Creates a new sequence bar instance.
@@ -358,7 +358,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.codonFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
         this.determineFrame();
 
-        this.codonFilter.setCurrFeatureData(frameCurrFeature);
+        this.codonFilter.setCurrAnnotationData(frameCurrAnnotation);
         this.codonHitsToHighlight = this.codonFilter.findRegions();
         for (Region r : this.codonHitsToHighlight) {
 
@@ -393,7 +393,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.patternFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
         //this.determineFrame();
 
-        //this.patternFilter.setCurrFeatureData(frameCurrFeature);
+        //this.patternFilter.setCurrAnnotationData(frameCurrAnnotation);
         this.patternHitsToHighlight = this.patternFilter.findRegions();
         BoundsInfo bounds = this.parentViewer.getBoundsInfo();
         
@@ -431,15 +431,15 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Determines the frame of the currently selected feature. if there is none it
+     * Determines the frame of the currently selected annotation. if there is none it
      * is set to 10.
      */
     private void determineFrame() {
-        this.frameCurrFeature = StartCodonFilter.INIT;//if it is 10 later, no selected feature exists yet!
+        this.frameCurrAnnotation = StartCodonFilter.INIT;//if it is 10 later, no selected annotation exists yet!
         if (this.parentViewer instanceof ReferenceViewer) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
-            if (refViewer.getCurrentlySelectedFeature() != null) {
-                frameCurrFeature = refViewer.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
+            if (refViewer.getCurrentlySelectedAnnotation() != null) {
+                frameCurrAnnotation = refViewer.determineFrame(refViewer.getCurrentlySelectedAnnotation().getPersistantAnnotation());
             }
         }
     }
@@ -601,10 +601,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * @return The frame of the current feature
+     * @return The frame of the current annotation
      */
-    public int getFrameCurrFeature() {
-        return this.frameCurrFeature;
+    public int getFrameCurrAnnotation() {
+        return this.frameCurrAnnotation;
     }
 
     /**

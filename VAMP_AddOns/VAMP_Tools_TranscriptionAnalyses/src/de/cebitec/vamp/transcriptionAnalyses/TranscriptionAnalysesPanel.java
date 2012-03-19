@@ -345,10 +345,6 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
             
             this.startAnalyses();
 
-//            this.transcAnalyzer = new TranscriptionAnalyzer(TranscriptionAnalysesPanel.this, this.trackViewer, 
-//                    this.detectGeneStarts, this.detectExpressedGenes, increaseReadCount, maxInitialReadCount, 
-//                    increaseReadCount2, minNumberReads);
-//            this.transcAnalyzer.startAnalyses();
             if (this.detectGeneStarts || this.detectExpressedGenes) {
                 this.detectionButton.setEnabled(false);
             }

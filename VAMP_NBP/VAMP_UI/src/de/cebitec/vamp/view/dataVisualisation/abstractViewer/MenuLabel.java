@@ -7,22 +7,28 @@ import java.awt.event.MouseListener;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
-public class LegendLabel extends JLabel {
+public class MenuLabel extends JLabel {
 
     private static final long serialVersionUID = 2974452;
-    private AbstractViewer parent;
+    
+    public static final String TITLE_LEGEND = "Legend";
+    public static final String TITLE_OPTIONS = "Options";
+    
+    private final JPanel associatedPanel;
     private boolean isShowingLabel;
     private Icon expandIcon;
     private Icon collapseIcon;
+    
 
-    public LegendLabel(AbstractViewer parent){
-        super("Legend");
-        this.parent = parent;
+    public MenuLabel(JPanel associatedPanel, String title){
+        super(title);
+        this.associatedPanel = associatedPanel;
         isShowingLabel = false;
         expandIcon = new ImageIcon(this.getClass().getClassLoader().getResource("de/cebitec/vamp/resources/expandIcon.png"));
         collapseIcon = new ImageIcon(this.getClass().getClassLoader().getResource("de/cebitec/vamp/resources/collapseIcon.png"));
@@ -32,14 +38,14 @@ public class LegendLabel extends JLabel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(isShowingLabel){
+                if (isShowingLabel) {
                     isShowingLabel = false;
-                    LegendLabel.this.setIcon(expandIcon);
+                    MenuLabel.this.setIcon(expandIcon);
                 } else {
                     isShowingLabel = true;
-                    LegendLabel.this.setIcon(collapseIcon);
+                    MenuLabel.this.setIcon(collapseIcon);
                 }
-                LegendLabel.this.parent.updateLegendVisibility(isShowingLabel);
+                MenuLabel.this.associatedPanel.setVisible(isShowingLabel);
             }
             @Override
             public void mousePressed(MouseEvent e) {

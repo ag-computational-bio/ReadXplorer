@@ -28,6 +28,6 @@ public interface TrackParserI {
          * @throws ParsingException exectption if something went wrong during parsing process
          */
        public abstract ParsedTrack parseMappings(TrackJob trackJob, String sequenceString,
-               Observer observer,CoverageContainer covContainer) throws ParsingException;
+               Observer observer,CoverageContainer covContainer) throws ParsingException, OutOfMemoryError;
 
 }

@@ -75,27 +75,26 @@ public class SAMBAMParser implements MappingParserI, Observer {
             while (itor.hasNext()) {
                 SAMRecord first = itor.next();
                 int start = first.getAlignmentStart();
-                readSeqwithoutGaps = first.getReadString();
-            if (!first.getReadUnmappedFlag()) {
+                if (!first.getReadUnmappedFlag()) {
 
-                int stop = 0;
-                boolean isReverseStrand = first.getReadNegativeStrandFlag();
-                byte direction = (byte) (isReverseStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
+                    int stop = 0;
+                    boolean isReverseStrand = first.getReadNegativeStrandFlag();
+                    byte direction = (byte) (isReverseStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
 
                     readname = first.getReadName();
-           
+
                     cigar = first.getCigarString();
                     readSeqwithoutGaps = first.getReadString().toLowerCase();
 
                     errors = 0;
 
-                int length = sequenceString.length();
-                    if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S")|| cigar.contains("N")) {
-                    stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
-                    refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
-                    String[] refandRead = ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
-                    refSeq = refandRead[0];
-                    readSeq = refandRead[1];
+                    int length = sequenceString.length();
+                    if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
+                        stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
+                        refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
+                        String[] refandRead = ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
+                        refSeq = refandRead[0];
+                        readSeq = refandRead[1];
                     } else {
                         stop = start + readSeqwithoutGaps.length() - 1;
                         refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
@@ -103,57 +102,57 @@ public class SAMBAMParser implements MappingParserI, Observer {
                         readSeq = readSeqwithoutGaps;
                     }
                     //check parameters
-                if (length < start || length < stop) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorReadPosition",
-                            filepath, lineno, start, stop, length));
-                    continue;
-                }
+                    if (length < start || length < stop) {
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorReadPosition",
+                                filepath, lineno, start, stop, length));
+                        continue;
+                    }
                     if (readname == null || readname.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorReadname",
-                            filepath, lineno, readname));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorReadname",
+                                filepath, lineno, readname));
                         continue;
                     }
 
                     if (start >= stop) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorStartStop",
-                            filepath, lineno, start, stop));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorStartStop",
+                                filepath, lineno, start, stop));
                         continue;
                     }
                     if (direction == 0) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorDirection", filepath, lineno));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorDirection", filepath, lineno));
                         continue;
                     }
                     if (readSeq == null || readSeq.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorReadEmpty",
-                            filepath, lineno, readSeq));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorReadEmpty",
+                                filepath, lineno, readSeq));
                         continue;
                     }
                     if (refSeq == null || refSeq.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorRef",
-                            filepath, lineno, refSeq));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorRef",
+                                filepath, lineno, refSeq));
                         continue;
                     }
                     if (readSeq.length() != refSeq.length()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorReadLength",
-                            filepath, lineno, readSeq, refSeq));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorReadLength",
+                                filepath, lineno, readSeq, refSeq));
                         continue;
                     }
                     if (errors < 0 || errors > readSeq.length()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorRead",
-                            errors, filepath, lineno));
-                    continue;
-                }
-                if (!cigar.matches("[MHISDPXN=\\d]+")) {
-                    this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.checkMapping.ErrorCigar", cigar, filepath, lineno));
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorRead",
+                                errors, filepath, lineno));
+                        continue;
+                    }
+                    if (!cigar.matches("[MHISDPXN=\\d]+")) {
+                        this.sendErrorMsg(NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.checkMapping.ErrorCigar", cigar, filepath, lineno));
                         continue;
                     }
 //                if (!readnameToSequenceID.containsKey(readname)) {
@@ -164,7 +163,7 @@ public class SAMBAMParser implements MappingParserI, Observer {
                     //TODO: calc reads for stats bam parser
                     // Reads with an error already skip this part because of "continue" statements
                     //!!Thats wrong you can have one read mapped on different positions
-                DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
 
@@ -172,26 +171,26 @@ public class SAMBAMParser implements MappingParserI, Observer {
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                     int seqID;
 
-                //  readSeq=isReverseStrand?SequenceUtils.getReverseComplement(readSeq):readSeq;
-                      readSeqwithoutGaps = isReverseStrand ?  SequenceUtils.getReverseComplement(readSeqwithoutGaps) : readSeqwithoutGaps;
-                if (this.seqToIDMap.containsKey(readSeqwithoutGaps)) {
-                    seqID = this.seqToIDMap.get(readSeqwithoutGaps);
+                    //  readSeq=isReverseStrand?SequenceUtils.getReverseComplement(readSeq):readSeq;
+                    readSeqwithoutGaps = isReverseStrand ? SequenceUtils.getReverseComplement(readSeqwithoutGaps) : readSeqwithoutGaps;
+                    if (this.seqToIDMap.containsKey(readSeqwithoutGaps)) {
+                        seqID = this.seqToIDMap.get(readSeqwithoutGaps);
                     } else {
                         seqID = ++noUniqueReads; //int seqID = readnameToSequenceID.get(readname);
-                    this.seqToIDMap.put(readSeqwithoutGaps, seqID);
+                        this.seqToIDMap.put(readSeqwithoutGaps, seqID);
                     } //readnameToSequenceID.get(readname);
                     mappingContainer.addParsedMapping(mapping, seqID);
-             
-        //            this.processReadname(seqID, readname);
+
+                    //            this.processReadname(seqID, readname);
                     if (!itor.hasNext()) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SAMBAMParser.class,
-                            "Parser.Iterator.noMoreData",filepath));
+                        Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SAMBAMParser.class,
+                                "Parser.Iterator.noMoreData", filepath));
                     }
                 } else {
                     ++counterUnmapped;
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             this.sendErrorMsg(e.getMessage());
         }
 

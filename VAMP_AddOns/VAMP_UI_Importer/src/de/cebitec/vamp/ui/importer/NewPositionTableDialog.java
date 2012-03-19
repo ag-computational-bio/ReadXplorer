@@ -25,16 +25,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
+import org.openide.util.NbBundle;
 
 /**
  * @author rhilker
@@ -57,8 +51,8 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
     
     /** Creates new form NewPositionTableDialog */
     public NewPositionTableDialog() {
-        refGenJobs = this.getRefGenJobs();
-        initComponents();
+        this.getRefGenJobs();
+        this.initComponents();
         // choose the default parser. first entry is shown in combobox by default
         this.setTrackJobs((ReferenceJob) this.refGenCombo.getSelectedItem());
         currentParser = parsers[0];
@@ -89,67 +83,55 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
 
     
     public ReferenceJob getReferenceJob() {
-        return (ReferenceJob) refGenCombo.getSelectedItem();
+        return (ReferenceJob) this.refGenCombo.getSelectedItem();
     }
 
     
     public MappingParserI getParser() {
-        return currentParser;
+        return this.currentParser;
     }
 
     
     public Integer getStepSize() {
-        stepSize = (Integer) stepSizeSpinner.getValue();
-        return stepSize;
+        this.stepSize = (Integer) this.stepSizeSpinner.getValue();
+        return this.stepSize;
     }
 
     
     private void setStepwiseField(boolean setFields) {
-        stepSizeLabel.setVisible(setFields);
-        stepSizeSpinner.setVisible(setFields);
+        this.stepSizeLabel.setVisible(setFields);
+        this.stepSizeSpinner.setVisible(setFields);
     }
-
     
-    public void setReferenceJobs(List<ReferenceJob> jobs) {
-        List<ReferenceJob> list = new ArrayList<ReferenceJob>();
-
-        List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-        for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-            PersistantReference r = it.next();
-            list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
-        }
-
-        list.addAll(jobs);
-
-        ReferenceJob[] refs = new ReferenceJob[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            refs[i] = list.get(i);
-        }
-
-        refGenCombo.setModel(new DefaultComboBoxModel(refs));
-        this.setTrackJobs((ReferenceJob) this.refGenCombo.getSelectedItem());
-    }
-
     
     private ReferenceJob[] getRefGenJobs() {
-        List<ReferenceJob> list = new ArrayList<ReferenceJob>();
+        if (this.refGenJobs == null) {
+            List<ReferenceJob> list = new ArrayList<ReferenceJob>();
 
-        List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
-        for (Iterator<PersistantReference> refIt = refs.iterator(); refIt.hasNext();) {
-            PersistantReference ref = refIt.next();
-            list.add(new ReferenceJob(ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp()));
+            try {
+                List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
+                for (Iterator<PersistantReference> refIt = refs.iterator(); refIt.hasNext();) {
+                    PersistantReference ref = refIt.next();
+                    list.add(new ReferenceJob(ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp()));
+                }
+            } catch (OutOfMemoryError e) {
+                String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
+                        "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+                String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
+                JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            this.refGenJobs = new ReferenceJob[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                this.refGenJobs[i] = list.get(i);
+            }
         }
 
-        ReferenceJob[] refJobs = new ReferenceJob[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            refJobs[i] = list.get(i);
-        }
-
-        return refJobs;
+        return this.refGenJobs;
     }
     
     
-    public void setTrackJobs(ReferenceJob refJob) {
+    private void setTrackJobs(ReferenceJob refJob) {
         
         if (refJob != null) {
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(refJob.getID());
@@ -161,7 +143,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
                 tracks[i] = new TrackJob(track.getId(), null, track.getDescription(), refJob, null, track.getTimestamp());
             }
 
-            parentTrackCombo.setModel(new DefaultComboBoxModel(tracks));
+            this.parentTrackCombo.setModel(new DefaultComboBoxModel(tracks));
             this.parentTrackCombo.setEnabled(true);
         } else {
             this.parentTrackCombo.setEnabled(false);

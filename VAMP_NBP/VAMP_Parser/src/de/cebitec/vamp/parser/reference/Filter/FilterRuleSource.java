@@ -1,7 +1,7 @@
 package de.cebitec.vamp.parser.reference.Filter;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedAnnotation;
 
 /**
  * @author ddoppmeier
@@ -11,8 +11,8 @@ import de.cebitec.vamp.parser.common.ParsedFeature;
 public class FilterRuleSource implements FilterRuleI {
 
     @Override
-    public boolean appliesRule(ParsedFeature feature) {
-        if(feature.getType() == FeatureType.SOURCE){
+    public boolean appliesRule(ParsedAnnotation annotation) {
+        if(annotation.getType() == FeatureType.SOURCE){
             return true;
         } else {
             return false;

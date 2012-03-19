@@ -23,7 +23,7 @@ public class PatternFilter implements RegionFilterI {
     private int absStop;
     private PersistantReference refGen;
     private String sequence;
-    //private int frameCurrFeature;
+    //private int frameCurrAnnotation;
     private Pattern pattern;
     private Pattern patternRev;
 
@@ -33,7 +33,7 @@ public class PatternFilter implements RegionFilterI {
         this.absStop = absStop;
         this.refGen = refGen;
 
-        //this.frameCurrFeature = StartCodonFilter.INIT; //because this is not a frame value
+        //this.frameCurrAnnotation = StartCodonFilter.INIT; //because this is not a frame value
     }
 
     /**
@@ -58,9 +58,9 @@ public class PatternFilter implements RegionFilterI {
             }
 
             this.sequence = this.refGen.getSequence().substring(start, stop);
-//            boolean isFeatureSelected = this.frameCurrFeature != INIT;
-            this.matchPattern(this.sequence, this.pattern, true, offset);//, isFeatureSelected);
-            this.matchPattern(this.sequence, this.patternRev, false, offset);//, isFeatureSelected);
+//            boolean isAnnotationSelected = this.frameCurrAnnotation != INIT;
+            this.matchPattern(this.sequence, this.pattern, true, offset);//, isAnnotationSelected);
+            this.matchPattern(this.sequence, this.patternRev, false, offset);//, isAnnotationSelected);
         }
         return this.matchedPatterns;
 
@@ -122,7 +122,7 @@ public class PatternFilter implements RegionFilterI {
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand,
             int offset) { //, boolean restricted){
         // match forward
-//        final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
+//        final boolean codonFwdStrand = this.frameCurrAnnotation > 0 ? true : false;
 //        if (!restricted || restricted && codonFwdStrand == isForwardStrand){
         Matcher m = p.matcher(sequence);
         while (m.find()) {
@@ -130,7 +130,7 @@ public class PatternFilter implements RegionFilterI {
             int to = m.end() - 1;
 //                if (restricted) {
 //                    final int start = absStart - offset + from + 1;
-//                    if (((start % 3) + 1 == this.frameCurrFeature || -(start % 3) == (-this.frameCurrFeature) - 3)) {
+//                    if (((start % 3) + 1 == this.frameCurrAnnotation || -(start % 3) == (-this.frameCurrAnnotation) - 3)) {
 //                        regions.add(new Region(start, absStart - offset + to + 1, isForwardStrand));
 //                    }
 //                } else {
@@ -177,16 +177,16 @@ public class PatternFilter implements RegionFilterI {
     }
     
     
-//    public int getFrameCurrFeature() {
-//        return this.frameCurrFeature;
+//    public int getFrameCurrAnnotation() {
+//        return this.frameCurrAnnotation;
 //    }
 //    /**
-//     * Sets the data needed for the current feature. Currently only the frame is
+//     * Sets the data needed for the current annotation. Currently only the frame is
 //     * necessary. This always has to be set first in case the action should only
 //     * show start codons of the correct frame.
-//     * @param frameCurrFeature the frame of the currently selected feature
+//     * @param frameCurrAnnotation the frame of the currently selected annotation
 //     */
-//    public void setCurrFeatureData(int frameCurrFeature) {
-//        this.frameCurrFeature = frameCurrFeature;
+//    public void setCurrAnnotationData(int frameCurrAnnotation) {
+//        this.frameCurrAnnotation = frameCurrAnnotation;
 //    }
 }

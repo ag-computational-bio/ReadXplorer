@@ -54,7 +54,7 @@ public class CodonSnp {
     }
 
     /**
-     * @return The identifier of the gene or feature, this codon belongs to.
+     * @return The identifier of the gene or annotation, this codon belongs to.
      */
     public String getGeneId() {
         return geneId;

@@ -34,10 +34,10 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
      */
     public void setTrackConnector(TrackConnector trackCon) {
         this.trackCon = trackCon;
-        if(trackCon.getTrackID()!= trackID){
-        trackID=trackCon.getTrackID();
-        nameLabel.setText(trackCon.getAssociatedTrackName());
-        this.computeStats();
+        if (trackCon != null && trackCon.getTrackID() != trackID) {
+            trackID = trackCon.getTrackID();
+            nameLabel.setText(trackCon.getAssociatedTrackName());
+            this.computeStats();
         }
     }
 
