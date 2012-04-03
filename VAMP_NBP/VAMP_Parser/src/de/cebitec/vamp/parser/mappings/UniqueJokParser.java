@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * number of equal sequences found during the filtering step.
  * @author ddoppmeier
  */
-public class UniqueJokParser implements MappingParserI, Observer {
+public class UniqueJokParser implements MappingParserI {
 
     private static String name = "Unique Reads Jok Output Parser";
     private static String[] fileExtension = new String[]{"out"};
@@ -45,7 +45,6 @@ public class UniqueJokParser implements MappingParserI, Observer {
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
-        mappingContainer.registerObserver(this);
         this.seqToIDMap = new HashMap<String, Integer>();
 
         try {
@@ -181,8 +180,6 @@ public class UniqueJokParser implements MappingParserI, Observer {
                 }
             }
 
-            mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
-            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
             br.close();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
@@ -297,13 +294,6 @@ public class UniqueJokParser implements MappingParserI, Observer {
     public void notifyObservers() {
         for (Observer observer : this.observers){
             observer.update(this.errorMsg);
-        }
-    }
-
-    @Override
-    public void update(Object args) {
-        if (args instanceof Boolean && (Boolean) args == true) {
-            ++this.noUniqueMappings;
         }
     }
 

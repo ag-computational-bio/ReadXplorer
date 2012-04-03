@@ -1,9 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
@@ -25,15 +23,15 @@ public class OperonColumns implements ExcelExportDataI {
     public List<String> dataColumnDescriptions() {
         List<String> dataColumnDescriptions = new ArrayList();
 
-        dataColumnDescriptions.add("Gen1");
-        dataColumnDescriptions.add("Gen2");
+        dataColumnDescriptions.add("Gene 1");
+        dataColumnDescriptions.add("Gene 2");
         dataColumnDescriptions.add("Strand");
-        dataColumnDescriptions.add("Position of Gen1");
-        dataColumnDescriptions.add("Position of Gen2");
-        dataColumnDescriptions.add("read cover Gen1");
-        dataColumnDescriptions.add("read cover Gen2");
-        dataColumnDescriptions.add("read cover none");
-        dataColumnDescriptions.add("read cover Gen1 and Gen2");
+        dataColumnDescriptions.add("Start Gene 1");
+        dataColumnDescriptions.add("Start Gene 2");
+        dataColumnDescriptions.add("Gene 1 Reads");
+        dataColumnDescriptions.add("Gene 2 Reads");
+        dataColumnDescriptions.add("Internal Reads");
+        dataColumnDescriptions.add("Spanning Reads");
 
         return dataColumnDescriptions;
     }
@@ -43,8 +41,8 @@ public class OperonColumns implements ExcelExportDataI {
         List<List<Object>> operonExport = new ArrayList<List<Object>>();
 
         for (Operon operon : operonDetection) {
-            String genName1 = "";
-            String genName2 = "";
+            String geneName1 = "";
+            String geneName2 = "";
             String strand = "";
             String pos1 = "";
             String pos2 = "";
@@ -53,20 +51,20 @@ public class OperonColumns implements ExcelExportDataI {
             String coverNone = "";
             String coverGen1And2 = "";
             for (OperonAdjacency ad : operon.getOperon()) {
-                genName1 += ad.getOperonFeature().getLocus() + "\n";
-                genName2 += ad.getOperonFeature2().getLocus() + "\n";
-                strand += (ad.getOperonFeature().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
-                pos1 += ad.getOperonFeature().getStart() + "\n";
-                pos2 += ad.getOperonFeature2().getStart() + "\n";
-                coverGen1 += ad.getRead_cover_Gen1() + "\n";
-                coverGen2 += ad.getRead_cover_Gen2() + "\n";
-                coverNone += ad.getRead_cover_none() + "\n";
-                coverGen1And2 += ad.getRead_cover_Gen1_and_Gen2() + "\n";
+                geneName1 += ad.getOperonAnnotation().getLocus() + "\n";
+                geneName2 += ad.getOperonAnnotation2().getLocus() + "\n";
+                strand += (ad.getOperonAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
+                pos1 += ad.getOperonAnnotation().getStart() + "\n";
+                pos2 += ad.getOperonAnnotation2().getStart() + "\n";
+                coverGen1 += ad.getReadsGene1() + "\n";
+                coverGen2 += ad.getReadsGene2() + "\n";
+                coverNone += ad.getInternalReads() + "\n";
+                coverGen1And2 += ad.getSpanningReads() + "\n";
 
             }
             List<Object> operonsRow = new ArrayList<Object>();
-            operonsRow.add(genName1);
-            operonsRow.add(genName2);
+            operonsRow.add(geneName1);
+            operonsRow.add(geneName2);
             operonsRow.add(strand);
             operonsRow.add(pos1);
             operonsRow.add(pos2);

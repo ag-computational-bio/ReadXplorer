@@ -13,8 +13,6 @@ import de.cebitec.vamp.util.SequenceUtils;
 import java.util.HashMap;
 import org.openide.util.NbBundle;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
@@ -23,7 +21,7 @@ import net.sf.samtools.SAMRecordIterator;
  *
  * @author jstraube
  */
-public class SamBamStepParser implements MappingParserI, Observer {
+public class SamBamStepParser implements MappingParserI {
 
     private static String name = "SAM/BAM Stepwise Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
@@ -33,7 +31,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
     private HashMap<String, Integer> seqToIDMap;
     private int noUniqueMappings;
     private ArrayList<Observer> observers;
-    private String errorMsg;
+    private String msg;
     private int noUniqueSeq = 0;
     //private BufferedReader brall=null;
     private SAMRecordIterator itorAll = null;
@@ -62,6 +60,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
         this.noUniqueMappings = 0;
         int start;
         int stop;
+        int sumReadLength = 0;
 
         //     String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
@@ -70,10 +69,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
         //TODO check why if there is too much output we get a java heap space exception 
         // mappingContainer.registerObserver(this);
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SamBamStepParser.class,
-                "Parser.Parsing.Start", filename));
-
-
+        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filename));
 
         if (itorAll == null) {
             SAMFileReader sam = new SAMFileReader(trackJob.getFile());
@@ -127,49 +123,49 @@ public class SamBamStepParser implements MappingParserI, Observer {
 
                 //check parameters
                 if (length < start || length < stop) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorReadPosition",
                             filename, lineno, start, stop, length));
                     continue;
                 }
                 if (readname == null || readname.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorReadname", filename, lineno, readname));
                     continue;
                 }
 
                 if (start >= stop) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
                     continue;
                 }
                 if (direction == 0) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorDirection", filename, lineno));
                     continue;
                 }
                 if (readSeq == null || readSeq.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
                     continue;
                 }
                 if (refSeq == null || refSeq.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorRef", filename, lineno, refSeq));
                     continue;
                 }
                 if (readSeq.length() != refSeq.length()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorReadLength", filename, lineno, readSeq, refSeq));
                     continue;
                 }
                 if (errors < 0 || errors > readSeq.length()) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorRead", errors, filename, lineno));
                     continue;
                 }
                 if (!cigar.matches("[MHISDPXN=\\d]+")) {
-                    this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
                     continue;
                 }
@@ -193,10 +189,13 @@ public class SamBamStepParser implements MappingParserI, Observer {
                 } //int seqID = readnameToSequenceID.get(readname);
 
                 mappingContainer.addParsedMapping(mapping, seqID);
-                mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
+                sumReadLength += (stop - start);
 
 
                 if (lineno == end) {
+                    
+                    mappingContainer.setSumReadLength(mappingContainer.getSumReadLength() + sumReadLength);
+                    
                     shift++;
                     record = itorAll.hasNext() ? itorAll.next() : null;
                     if (record != null) {
@@ -214,7 +213,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
                 }
 
             } else {
-                this.sendErrorMsg(NbBundle.getMessage(SamBamStepParser.class,
+                this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                         "Parser.Parsing.CorruptData", lineno, first.getReadName()));
             }
 
@@ -222,10 +221,9 @@ public class SamBamStepParser implements MappingParserI, Observer {
 
         this.seqToIDMap = null; //release resources
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SamBamStepParser.class,
-                "Parser.Parsing.Finished", filename));
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(SamBamStepParser.class,
-                "Parser.Parsing.Successfully"));
+        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Finished", filename));
+        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Successfully"));
+
         return mappingContainer;
 
     }
@@ -316,24 +314,17 @@ public class SamBamStepParser implements MappingParserI, Observer {
     @Override
     public void notifyObservers() {
         for (Observer observer : this.observers) {
-            observer.update(this.errorMsg);
+            observer.update(this.msg);
         }
     }
 
     /**
-     * Method setting and sending the error msg to all observers.
-     * @param errorMsg the error msg to send
+     * Method setting and sending the msg to all observers.
+     * @param msg the msg to send (can be an error or any other message).
      */
-    private void sendErrorMsg(final String errorMsg) {
-        this.errorMsg = errorMsg;
-        //  this.notifyObservers();
-    }
-
-    @Override
-    public void update(Object args) {
-        if (args instanceof Boolean && (Boolean) args == true) {
-            ++this.noUniqueMappings;
-        }
+    private void sendMsg(final String msg) {
+        this.msg = msg;
+        this.notifyObservers();
     }
 
     @Override

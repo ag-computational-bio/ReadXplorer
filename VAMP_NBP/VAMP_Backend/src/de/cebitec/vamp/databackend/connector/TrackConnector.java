@@ -298,8 +298,8 @@ public class TrackConnector {
     public int getAverageReadLength() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_READ_LENGTH, SQLStatements.GET_NUM, con, trackID);
     }
-
-    public int getAverageSeqPairLenght() {
+    
+    public int getAverageSeqPairLength() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_SEQ_PAIR_LENGTH, SQLStatements.GET_NUM, con, trackID);
     }
 
@@ -308,7 +308,7 @@ public class TrackConnector {
     }
 
     public double getPercentRefGenPerfectCovered() {
-        return this.getCoveredPerfectPos() / genomeSize * 100;
+        return (double) this.getCoveredPerfectPos() / genomeSize * 100;
     }
 
     public double getPercentRefGenPerfectCoveredCalculate() {
@@ -322,7 +322,7 @@ public class TrackConnector {
     }
 
     public double getPercentRefGenBmCovered() {
-        return this.getCoveredBestMatchPos() / genomeSize * 100;
+        return  (double) this.getCoveredBestMatchPos() / genomeSize * 100;
     }
 
     public double getPercentRefGenBmCoveredCalculate() {
@@ -335,7 +335,7 @@ public class TrackConnector {
     }
 
     public double getPercentRefGenNErrorCovered() {
-        return this.getCoveredCommonMatchPos() / genomeSize * 100;
+        return (double) this.getCoveredCommonMatchPos() / genomeSize * 100;
     }
 
     public double getPercentRefGenNErrorCoveredCalculate() {
@@ -384,6 +384,10 @@ public class TrackConnector {
                 int covPerf = (int) (coveragePerf / 100 * genomeSize);
                 int covBM = (int) (coverageBM / 100 * genomeSize);
                 int covComplete = (int) (coverageComplete / 100 * genomeSize);
+                
+                //calculate average read length
+                int averageReadLength = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_READ_LENGTH, SQLStatements.GET_NUM, con, trackID);
+                
                 // store track in table
                 insertStatistics.setLong(1, id);
                 insertStatistics.setLong(2, trackID);
@@ -396,6 +400,7 @@ public class TrackConnector {
                 insertStatistics.setInt(9, covComplete);
                 insertStatistics.setInt(10, numUniqueSeq);
                 insertStatistics.setInt(11, numReads);
+                insertStatistics.setLong(12, averageReadLength); //it is -1, if it was not set before.
                 insertStatistics.execute();
                 insertStatistics.close();
             } else {
@@ -445,6 +450,10 @@ public class TrackConnector {
             }
             latestID.close();
             id++;
+            
+            //calculate average seq pair length
+            int averageSeqPairLength = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_SEQ_PAIR_LENGTH, SQLStatements.GET_NUM, con, trackID);
+                
 
             addSeqPairStats.setLong(1, id);
             addSeqPairStats.setInt(2, numSeqPairs);
@@ -452,6 +461,7 @@ public class TrackConnector {
             addSeqPairStats.setInt(4, numUniqueSeqPairs);
             addSeqPairStats.setInt(5, numUniquePerfectSeqPairs);
             addSeqPairStats.setInt(6, numSingleMappings);
+            addSeqPairStats.setLong(7, averageSeqPairLength);
             addSeqPairStats.execute();
             addSeqPairStats.close();
 
@@ -568,6 +578,10 @@ public class TrackConnector {
     }
 
     public int getNumOfSingleMappingsCalculate() {
+        return -1;
+    }
+
+    public int getAverageSeqPairLengthCalculate() {
         return -1;
     }
 

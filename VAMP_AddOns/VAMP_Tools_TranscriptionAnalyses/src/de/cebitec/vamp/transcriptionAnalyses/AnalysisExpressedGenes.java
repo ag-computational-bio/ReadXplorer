@@ -1,5 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.ExpressedGene;
 import de.cebitec.vamp.api.objects.AnalysisI;
 import de.cebitec.vamp.api.objects.JobI;
 import de.cebitec.vamp.databackend.GenomeRequest;
@@ -31,6 +32,7 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     private DataVisualisationI parent;
     private TrackViewer trackViewer;
     private int minNumberReads;
+    private int maxNumberReads;
     private int genomeSize;
     private List<PersistantAnnotation> genomeAnnotations;
     private HashMap<Integer, ExpressedGene> annotationReadCount; //annotation id to count of mappings for annotation
@@ -54,11 +56,12 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
      * @param minNumberReads minimum number of reads which have to be found within
      *      a gene in order to classify it as an expressed gene
      */
-    public AnalysisExpressedGenes(DataVisualisationI parent, TrackViewer trackViewer, int minNumberReads) {
+    public AnalysisExpressedGenes(DataVisualisationI parent, TrackViewer trackViewer, int minNumberReads, int maxNumberReads) {
         this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisGeneStart.class, "MSG_AnalysesWorker.progress.name"));
         this.parent = parent;
         this.trackViewer = trackViewer;
         this.minNumberReads = minNumberReads;
+        this.maxNumberReads = maxNumberReads;
         
         this.nbCarriedOutRequests = 0;
         this.expressedGenes = new ArrayList<ExpressedGene>();
@@ -330,8 +333,10 @@ public class AnalysisExpressedGenes implements ThreadListener, AnalysisI<List<Ex
     }
 
     private void findExpressedGenes() {
+        int readCount;
         for (Integer id : this.annotationReadCount.keySet()) {
-            if (this.annotationReadCount.get(id).getReadCount() > this.minNumberReads) {
+            readCount = this.annotationReadCount.get(id).getReadCount();
+            if (readCount > this.minNumberReads && readCount < this.maxNumberReads) {
                 this.expressedGenes.add(this.annotationReadCount.get(id));
             }
         }

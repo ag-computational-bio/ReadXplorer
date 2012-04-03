@@ -8,12 +8,8 @@ package de.cebitec.vamp.externalSort;
  * will be removed after sorting.
  * 
  */
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 //import java.nio.file.Files;
+import java.io.*;
 import java.util.ArrayList;
 
 public class ExternalSort {
@@ -21,15 +17,14 @@ public class ExternalSort {
     private String sortedFile;
     private String chunkName;
 
-    public ExternalSort(String path) {
+    public ExternalSort(String path) throws IOException {
         long start = System.nanoTime();
         this.externalSort(path);
         long time = System.nanoTime() - start;
         System.out.println("The relation was sorted in " + time);
     }
 
-    private void externalSort(String path) {
-        try {
+    private void externalSort(String path) throws IOException {
             //file input
             File baseFile = new File(path);
             FileReader intialRelationInput = new FileReader(baseFile);
@@ -90,15 +85,9 @@ public class ExternalSort {
             initRelationReader.close();
             intialRelationInput.close();
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
-
     }
 
-    private void mergeFiles(File baseFile, int numFiles, int compareIndex) {
-        try {
+    private void mergeFiles(File baseFile, int numFiles, int compareIndex) throws IOException {
             ArrayList<File> files = new ArrayList<File>();
             ArrayList<FileReader> mergefr = new ArrayList<FileReader>();
             ArrayList<BufferedReader> mergefbr = new ArrayList<BufferedReader>();
@@ -227,12 +216,6 @@ public class ExternalSort {
 //                    e.printStackTrace();
 //                }
 //            }
-
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        }
 
     }
 

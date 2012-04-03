@@ -3,8 +3,8 @@ package de.cebitec.vamp.externalSort;
 import java.io.File;
 //import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 import net.sf.samtools.BAMFileWriter;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
@@ -67,7 +67,7 @@ public class ExternalSortBAM {
     }
     
     private void externalSort(String path) {
-        try {
+//        try {
             //file input
             File baseFile = new File(path);
             countLines(baseFile);
@@ -120,15 +120,15 @@ public class ExternalSortBAM {
 
           
 
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
-                    NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.GeneralError"));
-        }
+//        } catch (Exception ex) {
+//            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
+//                    NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.GeneralError"));
+//        }
 
     }
 
     private void mergeFiles(File baseFile, int numFiles) {
-        try {
+//        try {
 
             ArrayList<File> files= new ArrayList<File>();
             ArrayList<SAMRecordIterator> mergeIt = new ArrayList<SAMRecordIterator>();
@@ -251,11 +251,11 @@ public class ExternalSortBAM {
             mergeIt.clear();
             filerows.clear();
 
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
-                    NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.GeneralError"));
-            System.exit(-1);
-        }
+//        } catch (Exception ex) {
+//            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
+//                    NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.GeneralError"));
+//            System.exit(-1);
+//        }
     }
 
     /**

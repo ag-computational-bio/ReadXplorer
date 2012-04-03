@@ -39,8 +39,8 @@ public final class SNP_DetectionTopComponent extends TopComponent {
     private static SNP_DetectionTopComponent instance;
     /** path to the icon used by the component and its open action */
     private static final String PREFERRED_ID = "SNP_DetectionTopComponent";
-
     
+
     public SNP_DetectionTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(SNP_DetectionTopComponent.class, "CTL_SNP_DetectionTopComponent"));
@@ -71,7 +71,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * all have to belong to the reference genome set in the reference viewer
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, List<Integer> trackIds) {
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, List<Integer> trackIds, final int tabId) {
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
         SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
@@ -89,8 +89,14 @@ public final class SNP_DetectionTopComponent extends TopComponent {
             @Override
             @SuppressWarnings("unchecked")
             public void propertyChange(PropertyChangeEvent evt) {
-                resultPanel.addSNPs((SnpData) evt.getNewValue());
+                SnpData snpData = (SnpData) evt.getNewValue();
+                resultPanel.addSNPs(snpData);
                 ((CardLayout) snpDetectionPanel.getLayout()).show(snpDetectionPanel, "results");
+                if (snpData.getSnpList().size() > 0) {
+                    String title = "SNP Detection for selected tracks ("
+                            + snpData.getSnpList().size() + " hits)";
+                    snpTabs.setTitleAt(tabId, title);
+                }
             }
         });
 
@@ -196,7 +202,9 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      *          detection should be carried out.
      */
     public void openDetectionTab(ReferenceViewer referenceViewer, List<Integer> trackIds) {
-        snpTabs.addTab("SNP Detection for opened Tabs", this.getSnpDetectionPanel(referenceViewer, trackIds));
+        String title = "SNP Detection for selected tracks";
+        JPanel snpDetectionPanel = this.getSnpDetectionPanel(referenceViewer, trackIds, snpTabs.getTabCount());
+        snpTabs.addTab(title, snpDetectionPanel);
         snpTabs.setTabComponentAt(snpTabs.getTabCount() - 1, new TabWithCloseX(snpTabs));
     }
 }

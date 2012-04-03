@@ -1,4 +1,4 @@
-package de.cebitec.vamp.transcriptionAnalyses;
+package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 

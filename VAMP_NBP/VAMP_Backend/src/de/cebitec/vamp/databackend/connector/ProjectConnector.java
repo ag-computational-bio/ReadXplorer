@@ -80,11 +80,15 @@ public class ProjectConnector {
     private static final int GAP_T = 9;
     private static final int GAP_N = 10;
     private static final int DIFFS = 11;
-    private int mappings= 0;
-    private int perfectMappings=0;
-    private int bmMappings=0;
-    private int currentTrackID=-1;
-    private boolean isLastTrack=false;
+    private int numReads = 0;
+    private int noUniqueSeq = 0;
+    private int noUniqueMappings = 0;
+    private int numMappings = 0;
+    private int numPerfectMappings = 0;
+    private int numBmMappings = 0;
+    private int sumReadLength = 0;
+    private int currentTrackID = -1;
+    private boolean isLastTrack = false;
     
     private ProjectConnector() {
         trackConnectors = new HashMap<Integer, TrackConnector>();
@@ -663,25 +667,25 @@ public class ProjectConnector {
 
     private void storeTrackStatistics(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics data...");
-        int numReads = 0;
-        int noUniqueSeq = 0;
-        int noUniqueMappings = 0;
+
         int coveragePerf = 0;
         int coverageBM = 0;
         int coverageComplete = 0;
         long trackID = track.getID();
-        int averageRead=0;
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
-            mappings += mappingInfos.get(1);
-            perfectMappings += mappingInfos.get(2);
-            bmMappings += mappingInfos.get(3);
-            averageRead=mappingInfos.get(7);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the statistics list");
+            numMappings += mappingInfos.get(1);
+            numPerfectMappings += mappingInfos.get(2);
+            numBmMappings += mappingInfos.get(3);
+            noUniqueMappings += mappingInfos.get(4); 
+            noUniqueSeq += mappingInfos.get(5);
+            numReads += mappingInfos.get(6);
+            sumReadLength += mappingInfos.get(7);
+        } catch (NullPointerException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the statistics list (MappingInfos are null)");
         }
         try {
-            if (!track.isStepwise() | isLastTrack) {
+            if (!track.isStepwise() || this.isLastTrack) {
             // get latest id for track
             long id = -1;
             id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
@@ -708,29 +712,33 @@ public class ProjectConnector {
                             SQLStatements.GET_NUM, con, trackID);
                 }
                 
-                noUniqueMappings = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SINGLETON_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-                noUniqueSeq = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-                numReads = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
+                //calculate average read length
+                int averageReadLength = 0;
+                averageReadLength = this.numMappings != 0 ? this.sumReadLength / this.numMappings : 0;
+                
                 PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
                 // store track in table
                 insertStatistics.setLong(1, id);
                 insertStatistics.setLong(2, trackID);
-                insertStatistics.setInt(3, mappings);
-                insertStatistics.setInt(4, perfectMappings);
-                insertStatistics.setInt(5, bmMappings);
-                insertStatistics.setInt(6, noUniqueMappings);
+                insertStatistics.setInt(3, this.numMappings);
+                insertStatistics.setInt(4, this.numPerfectMappings);
+                insertStatistics.setInt(5, this.numBmMappings);
+                insertStatistics.setInt(6, this.noUniqueMappings);
                 insertStatistics.setInt(7, coveragePerf);
                 insertStatistics.setInt(8, coverageBM);
                 insertStatistics.setInt(9, coverageComplete);
-                insertStatistics.setInt(10, noUniqueSeq);
-                insertStatistics.setInt(11, numReads);
-                insertStatistics.setInt(12,averageRead);
+                insertStatistics.setInt(10, this.noUniqueSeq);
+                insertStatistics.setInt(11, this.numReads);
+                insertStatistics.setInt(12, averageReadLength);
                 insertStatistics.execute();
                 insertStatistics.close();
-                mappings = 0;
-                perfectMappings = 0;
-                bmMappings = 0;
-                numReads = 0;
+                this.numMappings = 0;
+                this.numPerfectMappings = 0;
+                this.numBmMappings = 0;
+                this.noUniqueSeq = 0;
+                this.noUniqueMappings = 0;
+                this.numReads = 0;
+                this.sumReadLength = 0;
             }
 
         } catch (SQLException ex) {
@@ -799,7 +807,7 @@ public class ProjectConnector {
                     insertMapping.setInt(2, m.getStart()); //einzigartig im zusammenhang
                     insertMapping.setInt(3, m.getStop()); //einzigartig im zusammenhang
                     insertMapping.setInt(4, (m.isBestMapping() ? 1 : 0));
-                    insertMapping.setInt(5, m.getCount()); //count der gleichen seq (seq id) in reads
+                    insertMapping.setInt(5, m.getNumReplicates()); //count der gleichen seq (seq id) in reads
                     insertMapping.setByte(6, m.getDirection());
                     insertMapping.setInt(7, m.getErrors());
                     insertMapping.setInt(8, sequenceID); // mappings der gleichen seq an anderer stelle enthalten sie auch +
@@ -1318,7 +1326,6 @@ public class ProjectConnector {
 
 
             //storing mapping to pair id data
-            long pivotId = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SEQUENCE_PAIR_PIVOT_ID, con);
             PreparedStatement insertSeqPairPivot = con.prepareStatement(SQLStatements.INSERT_SEQ_PAIR_PIVOT);
             batchCounter = 1;
             long correctSeqPairId;
@@ -1329,10 +1336,9 @@ public class ProjectConnector {
                 Pair<Long, Long> pair = mappingToPairIdIterator.next();
                 interimPairId = pair.getSecond();
                 correctSeqPairId = interimPairId + seqPairId;
-
-                insertSeqPairPivot.setLong(1, pivotId++);
-                insertSeqPairPivot.setLong(2, pair.getFirst()); //mapping id
-                insertSeqPairPivot.setLong(3, correctSeqPairId); //sequence pair id
+                
+                insertSeqPairPivot.setLong(1, pair.getFirst()); //mapping id
+                insertSeqPairPivot.setLong(2, correctSeqPairId); //sequence pair id
 
                 insertSeqPairPivot.addBatch();
 
@@ -1460,6 +1466,7 @@ public class ProjectConnector {
                             double forwCov = track.getCoverageContainer().getBestMappingForwardCoverage(position);
                             double revCov = track.getCoverageContainer().getBestMappingReverseCoverage(position);
                             cov = forwCov + revCov;
+                            cov = cov == 0 ? 1 : cov;
 
                             double frequency = 0;
                             char type = ' ';
@@ -1546,6 +1553,7 @@ public class ProjectConnector {
                         double revCov = (revCov1 + revCov2) / 2;
                         double cov = forwCov + revCov;
                         double coverage = forwCov1 + revCov1;
+                        coverage = coverage == 0 ? 1 : coverage;
 
                         double frequency = coverageValues[11] / coverage * 100;
                         frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation

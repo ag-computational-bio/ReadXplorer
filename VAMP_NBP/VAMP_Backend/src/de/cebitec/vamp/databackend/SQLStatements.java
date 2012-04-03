@@ -18,7 +18,10 @@ public class SQLStatements {
      */
     private SQLStatements() {
     }
+    
+    
     //////////////////  statements for table creation  /////////////////////////
+    
     public final static String SETUP_STATISTICS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
             + "( "
@@ -40,12 +43,17 @@ public class SQLStatements {
             + FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS + " BIGINT UNSIGNED, "
             + FieldNames.STATISTICS_AVERAGE_READ_LENGTH + " INT UNSIGNED "
             + ") ";
-    /**
-     * Only needed as long as older databases are floating around and did not
-     * already drop this table which was replaced by STATISTICS.
-     */
+    
+    
+   /**
+    * Only needed as long as older databases are floating around and did not
+    * already drop this table which was replaced by STATISTICS.
+    */
     public static final String DROP_TABLE_STATICS = "DROP TABLE IF EXISTS STATICS";
-    //////////////////  statements for data insertion  /////////////////////////
+         
+         
+    //////////////////  statements for data insertion  ////////////////////////
+        
     public final static String INSERT_POSITION =
             "INSERT INTO " + FieldNames.TABLE_POSITIONS + " "
             + "("
@@ -65,6 +73,8 @@ public class SQLStatements {
             + FieldNames.POSITIONS_TYPE + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    
+    
     public final static String INSERT_REFGENOME =
             "INSERT INTO " + FieldNames.TABLE_REF_GEN + " "
             + "("
@@ -75,9 +85,11 @@ public class SQLStatements {
             + FieldNames.REF_GEN_TIMESTAMP + " "
             + ") "
             + "VALUES (?,?,?,?,?)";
+    
+    
     public final static String INSERT_ANNOTATION =
             "INSERT INTO " + FieldNames.TABLE_FEATURES + " "
-            + "("
+            + "(" +
             FieldNames.ANNOTATION_ID+", " +
             FieldNames.ANNOTATION_REFGEN_ID+", "+
             FieldNames.ANNOTATION_TYPE+", " +
@@ -87,19 +99,23 @@ public class SQLStatements {
             FieldNames.ANNOTATION_PRODUCT+", " +
             FieldNames.ANNOTATION_EC_NUM+", " +
             FieldNames.ANNOTATION_STRAND+", "+
-            FieldNames.ANNOTATION_GENE+" "+
-            + ") "
+            FieldNames.ANNOTATION_GENE+
+            " ) "
             + "VALUES (?,?,?,?,?,?,?,?,?,?) ";
+    
+    
     public final static String INSERT_SUBANNOTATION =
             "INSERT INTO " + FieldNames.TABLE_SUBFEATURES + " "
-            + "("
+            + "(" +
             FieldNames.SUBANNOTATION_PARENT_ID+", " +
             FieldNames.SUBANNOTATION_REFERENCE_ID+", " +
             FieldNames.SUBANNOTATION_TYPE+", " +
             FieldNames.SUBANNOTATION_START+", " +
-            FieldNames.SUBANNOTATION_STOP+" "+
-            + ") "
+            FieldNames.SUBANNOTATION_STOP+
+            " ) "
             + "VALUES (?,?,?,?,?)";
+    
+    
     public final static String INSERT_TRACK =
             "INSERT INTO " + FieldNames.TABLE_TRACKS + " "
             + "("
@@ -110,6 +126,8 @@ public class SQLStatements {
             //FieldNames.TRACK_RUN+" " +
             ") "
             + "VALUES (?,?,?,?)";//,?)";
+    
+    
     /**
      * @param seqPairId sequence pair id to set for current track
      * @param trackId track id to set the sequence pair id for
@@ -118,6 +136,8 @@ public class SQLStatements {
             "UPDATE " + FieldNames.TABLE_TRACKS
             + " SET " + FieldNames.TRACK_SEQUENCE_PAIR_ID + " = ? "
             + " WHERE " + FieldNames.TRACK_ID + " = ? ";
+    
+    
     public final static String INSERT_MAPPING =
             "INSERT INTO " + FieldNames.TABLE_MAPPINGS
             + " ("
@@ -132,6 +152,8 @@ public class SQLStatements {
             + FieldNames.MAPPING_TRACK + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?)";
+    
+    
     public final static String INSERT_DIFF =
             "INSERT INTO " + FieldNames.TABLE_DIFF + " "
             + "("
@@ -143,6 +165,8 @@ public class SQLStatements {
             + FieldNames.DIFF_ORDER + " "
             + ") "
             + "VALUES (?,?,?,?,?, null)";
+    
+    
     public final static String INSERT_GAP =
             "INSERT INTO " + FieldNames.TABLE_DIFF + " "
             + "("
@@ -154,6 +178,8 @@ public class SQLStatements {
             + FieldNames.DIFF_ORDER + " "
             + ") "
             + "VALUES (?,?,?,?,?,?)";
+    
+    
     public final static String INSERT_COVERAGE =
             "INSERT INTO " + FieldNames.TABLE_COVERAGE + " "
             + "("
@@ -174,6 +200,8 @@ public class SQLStatements {
             + FieldNames.COVERAGE_N_RV_NUM + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+         
+    
     public static final String INSERT_SEQ_PAIR =
             "INSERT INTO " + FieldNames.TABLE_SEQ_PAIRS
             + " ("
@@ -184,6 +212,8 @@ public class SQLStatements {
             + FieldNames.SEQ_PAIR_TYPE + ", "
             + ") "
             + "VALUES (?,?,?,?,?) ";
+         
+    
     public static final String INSERT_SEQ_PAIR_REPLICATE =
             "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ("
@@ -191,14 +221,17 @@ public class SQLStatements {
             + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES + ", "
             + ") "
             + "VALUES (?,?) ";
+         
+    
     public static final String INSERT_SEQ_PAIR_PIVOT =
             "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_PIVOT
             + " ("
-            + FieldNames.SEQ_PAIR_PIVOT_ID + ", "
             + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + ", "
             + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " "
             + ") "
-            + "VALUES (?, ?, ?) ";
+            + "VALUES (?, ?) ";
+    
+    
     /**
      * Insert statistics data of one track into statistics table.
      */
@@ -219,6 +252,8 @@ public class SQLStatements {
             + FieldNames.STATISTICS_AVERAGE_READ_LENGTH + " "
             + ") "
             + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+    
+    
     public final static String UPDATE_STATISTICS =
             "UPDATE " + FieldNames.TABLE_STATISTICS + " "
             + "SET "
@@ -233,6 +268,7 @@ public class SQLStatements {
             + FieldNames.STATISTICS_NUMBER_READS + "=? "
             + " WHERE  "
             + FieldNames.STATISTICS_TRACK_ID + "=? ";
+    
     /**
      * Update exisiting row of track statistics with sequence pair statistics
      */
@@ -247,6 +283,7 @@ public class SQLStatements {
             + FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH + " = ? "
             + " WHERE "
             + FieldNames.STATISTICS_ID + " = ? ";
+    
     /**
      * Insert a new coverage distribution for a track with all 35 distribution
      * fields.
@@ -260,6 +297,7 @@ public class SQLStatements {
             + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " "
             + ") "
             + "VALUES (?,?,?,?)";
+    
     /**
      * Delete the track data.
      */
@@ -275,26 +313,36 @@ public class SQLStatements {
             + "FROM " + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE " + FieldNames.MAPPING_TRACK + " = ? "
             + ")";
+    
+    
     public final static String DELETE_MAPPINGS_FROM_TRACK =
             "DELETE FROM "
             + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE "
             + FieldNames.MAPPING_TRACK + " = ? ";
+    
+    
     public final static String DELETE_COVERAGE_FROM_TRACK =
             "DELETE FROM "
             + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
             + FieldNames.COVERAGE_TRACK + " = ? ";
+    
+    
     public final static String DELETE_TRACK =
             "DELETE FROM "
             + FieldNames.TABLE_TRACKS + " "
             + "WHERE "
             + FieldNames.TRACK_ID + " = ? ";
+    
+    
     public final static String DELETE_STATISTIC_FROM_TRACK =
             "DELETE FROM "
             + FieldNames.TABLE_STATISTICS + " "
             + "WHERE "
             + FieldNames.STATISTICS_TRACK_ID + " = ? ";
+    
+    
     public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete seqpairs
             "DELETE FROM "
             + FieldNames.TABLE_SEQ_PAIRS + " AND "
@@ -309,6 +357,8 @@ public class SQLStatements {
             + " FROM " + FieldNames.TABLE_MAPPINGS
             + " WHERE " + FieldNames.MAPPING_TRACK + " = ? "
             + ")";
+    
+    
     public final static String DELETE_SEQUENCE_PAIR_PIVOT =
             "DELETE FROM "
             + FieldNames.TABLE_SEQ_PAIR_PIVOT
@@ -320,6 +370,8 @@ public class SQLStatements {
             + " FROM " + FieldNames.TABLE_MAPPINGS
             + " WHERE " + FieldNames.MAPPING_TRACK + " = ? "
             + ")";
+    
+    
     public final static String DELETE_SEQUENCE_PAIR_REPLICATE =
             "DELETE FROM "
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
@@ -338,22 +390,31 @@ public class SQLStatements {
             + //                        " OR " +
             //                    FieldNames.SEQ_PAIR_MAPPING2_ID + ") " +
             ")";
+    
+    
     public final static String DELETE_ANNOTATIONS_FROM_GENOME =
             "DELETE FROM "
             + FieldNames.TABLE_FEATURES
-            + " WHERE "
+            + " WHERE " +
                 FieldNames.ANNOTATION_REFGEN_ID+" = ?";
+    
+    
     public final static String DELETE_SUBANNOTATIONS_FROM_GENOME = //TODO: test delete annotation details
             "DELETE FROM "
             + FieldNames.TABLE_SUBFEATURES
-            + " WHERE "
+            + " WHERE " +
                 FieldNames.SUBANNOTATION_REFERENCE_ID + " = ?";
+    
+    
     public final static String DELETE_GENOME =
             "DELETE FROM "
             + FieldNames.TABLE_REF_GEN + " "
             + "WHERE "
             + FieldNames.REF_GEN_ID + " = ?";
+    
+    
     // statements to fetch data from database
+    
     public final static String FETCH_GENOMES =
             "SELECT "
             + "R." + FieldNames.REF_GEN_ID + ", "
@@ -384,7 +445,7 @@ public class SQLStatements {
             + "WHERE "
             + FieldNames.REF_GEN_ID + " = ?";
     public final static String FETCH_ANNOTATIONS_FOR_GENOME_INTERVAL =
-            "SELECT "
+            "SELECT " +
                 FieldNames.ANNOTATION_ID+", "+
                 FieldNames.ANNOTATION_TYPE+", " +
                 FieldNames.ANNOTATION_START+", "+
@@ -394,15 +455,15 @@ public class SQLStatements {
                 FieldNames.ANNOTATION_PRODUCT+", "+
                 FieldNames.ANNOTATION_STRAND+", "+
                 FieldNames.ANNOTATION_GENE +
-            + " FROM "
+            " FROM " 
             + FieldNames.TABLE_FEATURES
-            + " WHERE "
+            + " WHERE " +
                 FieldNames.ANNOTATION_REFGEN_ID+" = ? and " +
                 FieldNames.ANNOTATION_STOP+" >= ? and " +
                 FieldNames.ANNOTATION_START+" <= ? " + 
             " ORDER BY " + FieldNames.ANNOTATION_START;
     public final static String FETCH_ANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
-            "SELECT "
+            "SELECT " +
                 FieldNames.ANNOTATION_ID+", "+
                 FieldNames.ANNOTATION_TYPE+", " +
                 FieldNames.ANNOTATION_START+", "+
@@ -412,41 +473,44 @@ public class SQLStatements {
                 FieldNames.ANNOTATION_PRODUCT+", "+
                 FieldNames.ANNOTATION_STRAND+", "+
                 FieldNames.ANNOTATION_GENE +
-            + " FROM "
+            " FROM "
             + FieldNames.TABLE_FEATURES
-            + " WHERE "
+            + " WHERE " +
                 FieldNames.ANNOTATION_REFGEN_ID + " = ? and " +
                 FieldNames.ANNOTATION_START + " between ? and ? and " +
                 FieldNames.ANNOTATION_STOP + " between ? and ? " +
                 " ORDER BY " + FieldNames.ANNOTATION_START;
-    public static final String FETCH_SUBANNOTATIONS_FOR_GENOME_INTERVAL =
-            "SELECT "
+         public static final String FETCH_SUBANNOTATIONS_FOR_GENOME_INTERVAL =
+            "SELECT " +
                 FieldNames.SUBANNOTATION_PARENT_ID+", "+
                 FieldNames.SUBANNOTATION_START+", "+
                 FieldNames.SUBANNOTATION_STOP+", " +
                 FieldNames.SUBANNOTATION_TYPE+" " +
-            + "FROM "
+            "FROM "
             + FieldNames.TABLE_SUBFEATURES + " "
             + "WHERE "
                 + FieldNames.SUBANNOTATION_REFERENCE_ID + " = ? and "
                 + FieldNames.SUBANNOTATION_STOP+" >= ? and "
                 + FieldNames.SUBANNOTATION_START+" <= ? " +
             "ORDER BY " + FieldNames.SUBANNOTATION_START;
-    public static final String FETCH_SUBANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
-            "SELECT "
+            
+         public static final String FETCH_SUBANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
+            "SELECT " +
                 FieldNames.SUBANNOTATION_PARENT_ID+", "+
                 FieldNames.SUBANNOTATION_START+", "+
                 FieldNames.SUBANNOTATION_STOP+", " +
                 FieldNames.SUBANNOTATION_TYPE+" " +
-            + "FROM "
+            "FROM "
             + FieldNames.TABLE_SUBFEATURES + " "
             + "WHERE "
                 + FieldNames.SUBANNOTATION_REFERENCE_ID + " = ? and "
                 + FieldNames.SUBANNOTATION_START + " between ? and ? and "
                 + FieldNames.SUBANNOTATION_STOP + " between ? and ? " +
                 " ORDER BY " + FieldNames.SUBANNOTATION_START;
+                
+                
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
-            "SELECT "+
+            "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
             + FieldNames.COVERAGE_BM_FW_MULT + ", "
             + FieldNames.COVERAGE_BM_FW_NUM + ", " + //TODO: was ist mit num? wird nie benutzt!!!
@@ -464,7 +528,7 @@ public class SQLStatements {
             + FieldNames.TABLE_COVERAGE + " "
             + "WHERE "
             + FieldNames.COVERAGE_POSITION + " between ? and ? and "
-                FieldNames.COVERAGE_TRACK+" = ? ";
+            + FieldNames.COVERAGE_TRACK + " = ? ";
     
     
         public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART1 =
@@ -510,7 +574,7 @@ public class SQLStatements {
             + FieldNames.TABLE_COVERAGE
             + " WHERE "
             + FieldNames.COVERAGE_TRACK + " = ?  and " + FieldNames.COVERAGE_POSITION + " between ? and ?";
-    public static final String FETCH_COVERAGE_BEST_FOR_INTERVAL =
+         public static final String FETCH_COVERAGE_BEST_FOR_INTERVAL =
             "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
             + FieldNames.COVERAGE_ZERO_FW_MULT + ", "
@@ -701,7 +765,7 @@ public class SQLStatements {
             + "D." + FieldNames.DIFF_TYPE + " = 1 and "
             + "D." + FieldNames.DIFF_MAPPING_ID + " = M." + FieldNames.MAPPING_ID + " and "
             + "M." + FieldNames.MAPPING_TRACK + " = ?";
-    public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL =
+         public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL =
             "SELECT "
             + " MAPPING_ID, "
             + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
@@ -744,7 +808,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
-    public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL2 =
+         public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL2 =
             "SELECT "
             + " MAPPING_ID, "
             + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
@@ -787,7 +851,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
-    public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL_PERFECT =
+         public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL_PERFECT =
             "SELECT "
             + " MAPPING_ID, "
             + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
@@ -831,7 +895,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
-    public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL_PERFECT2 =
+         public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL_PERFECT2 =
             "SELECT "
             + " MAPPING_ID, "
             + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
@@ -875,7 +939,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
-    public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
+         public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
             "SELECT "
             + "MAPPING_ORIG_ID, "
             + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
@@ -1031,6 +1095,8 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
+    
     /**
      * +n for the nb of replicates (n) of each sequence id (also, when sequence
      * id occurs more than once.
@@ -1053,35 +1119,43 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+
+         
     /**
      * +1 for each mapping id = mapping with different positions
      */
-    public static final String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE =
+     public static final String FETCH_NUM_UNIQUE_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT "
             + "COUNT(M." + FieldNames.MAPPING_ID + ") as NUM "
             + "FROM "
             + FieldNames.TABLE_MAPPINGS + " as M "
             + "WHERE "
             + "M." + FieldNames.MAPPING_TRACK + " = ?";
-    public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK =
+    
+         
+     public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK =
             "SELECT "
             + "S." + FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ + " as NUM "
             + "FROM "
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
+    
     /**
-     * Number of real different sequences Number of unique sequences is the same
+     * Number of real different sequence numbers of unique sequences is the same
      * as the number of distinct mapped sequences. The number of all sequences
      * would be the number of reads.
      */
     public final static String FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE =
             "SELECT "
-            + "COUNT(DISTINCT M." + FieldNames.MAPPING_SEQUENCE_ID + ") as NUM "
+                + "COUNT(DISTINCT M." + FieldNames.MAPPING_SEQUENCE_ID + ") as NUM "
             + "FROM "
-            + FieldNames.TABLE_MAPPINGS + " as M "
+                + FieldNames.TABLE_MAPPINGS + " as M "
             + "WHERE "
-            + "M." + FieldNames.MAPPING_TRACK + " = ?";
+                + "M." + FieldNames.MAPPING_TRACK + " = ?";
+    
+    
     public final static String FETCH_NUM_SEQ_PAIRS_FOR_TRACK =
             "SELECT "
             + "S." + FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS + " as NUM "
@@ -1089,6 +1163,7 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.TRACK_ID + " = ?";
+    
     /**
      * Don't use yet, not working!
      */
@@ -1099,6 +1174,8 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_PIVOT + " as S "
             + "WHERE " + //TODO:mappingid holen & track abgleichen...
             "S." + FieldNames.MAPPING_TRACK + " = ?";
+    
+    
     //TODO: add calculate method
     public final static String FETCH_NUM_PERFECT_SEQ_PAIRS_FOR_TRACK =
             "SELECT "
@@ -1107,6 +1184,8 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.TRACK_ID + " = ?";
+    
+    
     public final static String FETCH_NUM_UNIQUE_SEQ_PAIRS_FOR_TRACK =
             "SELECT "
             + "S." + FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS + " as NUM "
@@ -1114,6 +1193,8 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.TRACK_ID + " = ?";
+    
+    
     public final static String FETCH_NUM_UNIQUE_PERFECT_SEQ_PAIRS_FOR_TRACK =
             "SELECT "
             + "S." + FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS + " as NUM "
@@ -1121,6 +1202,7 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.TRACK_ID + " = ?";
+    
     
     public static String FETCH_NUM_SINGLE_MAPPINGS_FOR_TRACK =
             "SELECT "
@@ -1130,29 +1212,33 @@ public class SQLStatements {
             + "WHERE "
             + "S." + FieldNames.TRACK_ID + " = ?";
     
+    
     public static String FETCH_NUM_AVERAGE_READ_LENGTH =
             "SELECT "
-            + FieldNames.STATISTICS_AVERAGE_READ_LENGTH + " as Num "
+                + FieldNames.STATISTICS_AVERAGE_READ_LENGTH + " as NUM "
             + "FROM "
-            + FieldNames.TABLE_STATISTICS + " as S"
+                + FieldNames.TABLE_STATISTICS + " as S"
             + " WHERE "
-            + "S." + FieldNames.STATISTICS_TRACK_ID + " = ? ";
+                + "S." + FieldNames.STATISTICS_TRACK_ID + " = ? ";
     
-    public static String FETCH_NUM_AVERAGE_SEQ_PAIR_LENGTH=
+    
+    public static String FETCH_NUM_AVERAGE_SEQ_PAIR_LENGTH =
             "SELECT "
-            + FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH + " as Num "
+                + FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH + " as NUM "
             + "FROM "
-            + FieldNames.TABLE_STATISTICS + " as S"
+                + FieldNames.TABLE_STATISTICS + " as S"
             + " WHERE "
-            + "S." + FieldNames.STATISTICS_TRACK_ID + " = ? ";
+                + "S." + FieldNames.STATISTICS_TRACK_ID + " = ? ";
+    
     
     public final static String FETCH_NUM_BM_MAPPINGS_FOR_TRACK =
             "SELECT "
-            + FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS + " as Num "
+            + FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS + " as NUM "
             + " FROM "
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
     
     public final static String FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT "
@@ -1162,6 +1248,8 @@ public class SQLStatements {
             + "WHERE "
             + "M." + FieldNames.MAPPING_TRACK + " = ? AND "
             + "M." + FieldNames.MAPPING_IS_BEST_MAPPING + " = 1 ";
+    
+    
     public final static String FETCH_BM_COVERAGE_OF_GENOME =
             "SELECT "
             + FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME + " as NUM "
@@ -1169,6 +1257,8 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
+    
     public final static String FETCH_BM_COVERAGE_OF_GENOME_CALCULATE =
             "SELECT "
             + "COUNT(" + FieldNames.COVERAGE_ID + ") as NUM "
@@ -1177,6 +1267,8 @@ public class SQLStatements {
             + "WHERE "
             + "(" + FieldNames.COVERAGE_BM_FW_MULT + " + " + FieldNames.COVERAGE_BM_RV_MULT + ") != 0 AND "
             + FieldNames.COVERAGE_TRACK + " = ?";
+    
+    
     public final static String FETCH_PERFECT_COVERAGE_OF_GENOME =
             "SELECT "
             + FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME + " as NUM "
@@ -1184,6 +1276,8 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
+    
     public final static String FETCH_COMPLETE_COVERAGE_OF_GENOME =
             "SELECT "
             + FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME + " as NUM "
@@ -1191,21 +1285,27 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
-    //num of singletons = sequences, which were only mapped once, or largest replicate number for seq ids with different replicate nbs
+    
+    
+    /**
+     * Number of singletons = sequences, which were only mapped once, but can have several replicates.
+     * The replicates are summed in this case.
+     */
     public static final String FETCH_NUM_SINGLETON_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT "
-            + "sum(S." + FieldNames.MAPPING_NUM_OF_REPLICATES + ") as NUM " +//DISTINCT SEQUENCE_ID  returns  singleton count for unique sequences
+                + "sum(S." + FieldNames.MAPPING_NUM_OF_REPLICATES + ") as NUM " +//DISTINCT SEQUENCE_ID  returns  singleton count for unique sequences
             "FROM ( SELECT "
-            + FieldNames.MAPPING_NUM_OF_REPLICATES
-            + " FROM "
-            + FieldNames.TABLE_MAPPINGS + " as M "
-            + "WHERE "
-            + "M." + FieldNames.MAPPING_TRACK + " = ? "
-            + "GROUP BY M."
-            + FieldNames.MAPPING_SEQUENCE_ID + ",M." + FieldNames.MAPPING_NUM_OF_REPLICATES
-            + " HAVING COUNT(M." + FieldNames.MAPPING_SEQUENCE_ID + ") =1) AS S";
-////TODO: check if this is not needed anymore
-//    public static final String FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE =
+                + FieldNames.MAPPING_NUM_OF_REPLICATES
+                + " FROM "
+                    + FieldNames.TABLE_MAPPINGS + " as M "
+                + "WHERE "
+                    + "M." + FieldNames.MAPPING_TRACK + " = ? "
+                + "GROUP BY M."
+                    + FieldNames.MAPPING_SEQUENCE_ID + ",M." + FieldNames.MAPPING_NUM_OF_REPLICATES
+                + " HAVING COUNT(M." + FieldNames.MAPPING_SEQUENCE_ID + ") = 1) AS S";
+
+    ////TODO: check if this is not needed anymore
+//         public static final String FETCH_NUM_MAPPED_SEQUENCES_FOR_TRACK_CALCULATE =
 //            "SELECT " +
 //                "SUM(R." + FieldNames.MAPPING_COUNT + ") as NUM " +
 //            "FROM " +
@@ -1217,6 +1317,8 @@ public class SQLStatements {
 //                "WHERE " +
 //                    "M." + FieldNames.MAPPING_TRACK + " = ? " +
 //                ") as R;";
+    
+    
     public final static String FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK =
             "SELECT "
             + FieldNames.STATISTICS_NUMBER_OF_PERFECT_MAPPINGS + " as Num "
@@ -1224,14 +1326,18 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
+    
     public final static String FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE =
             "SELECT "
-            + "COUNT(M." + FieldNames.MAPPING_ID + ") as NUM "
+                + "COUNT(M." + FieldNames.MAPPING_ID + ") as NUM "
             + " FROM "
-            + FieldNames.TABLE_MAPPINGS + " as M "
+                + FieldNames.TABLE_MAPPINGS + " as M "
             + "WHERE "
-            + "M." + FieldNames.MAPPING_TRACK + " = ? and "
-            + "M." + FieldNames.MAPPING_NUM_OF_ERRORS + " = 0 ";
+                + "M." + FieldNames.MAPPING_TRACK + " = ? and "
+                + "M." + FieldNames.MAPPING_NUM_OF_ERRORS + " = 0 ";
+    
+    
     public final static String FETCH_NUM_READS_FOR_TRACK =
             "SELECT "
             + FieldNames.STATISTICS_NUMBER_READS + " as Num "
@@ -1239,24 +1345,31 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS + " as S "
             + "WHERE "
             + "S." + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
     /*
      * eine seq id = mehrere reads & mehrere mappings -> anzahl mappings/seq id
-     * z.b. 10 = 10 versch. pos. = müssen immer dieselben (max. X) reads sein
+     * z.b. 10 = 10 versch. pos. = müssen immer dieselben (max. X) reads sein.
      * z.b. können 20 reads auf selbe seq id kommen + 10 versch pos abdecken =
-     * 10 mappings mit je 20 replicates 20 reads auf 10pos = 10 unique mappings
-     * + je 20 replicates nimm 1 der unique mapping mit gleicher seq id & zähle
+     * 10 mappings mit je 20 replicates. 20 reads auf 10pos = 10 unique mappings
+     * + je 20 replicates. nimm 1 der unique mapping mit gleicher seq id & zähle
      * replicates = 20 hieße 20 reads, kann die 20 noch anderweitig zustande
      * kommen?
+     * 
+     * Ein read wird mehrmals aufs genom gemappt, aber nicht mehrmals auf die selbe
+     * position. D.h. Auswahl eines der mappings aus den 10 mappings mit der selben
+     * sequence id und summieren der replikate.
      */
     public final static String FETCH_NUM_READS_FOR_TRACK_CALCULATE =
             "SELECT "
             + " sum(M." + FieldNames.MAPPING_NUM_OF_REPLICATES + ") AS NUM "
-            + " FROM(SELECT "
-            + "distinct(" + FieldNames.MAPPING_SEQUENCE_ID + ")," + FieldNames.MAPPING_NUM_OF_REPLICATES
-            + " FROM "
-            + FieldNames.TABLE_MAPPINGS
-            + " WHERE "
-            + FieldNames.MAPPING_TRACK + "=?) AS M";
+                + " FROM(SELECT "
+                    + "distinct(" + FieldNames.MAPPING_SEQUENCE_ID + ")," + FieldNames.MAPPING_NUM_OF_REPLICATES
+                + " FROM "
+                    + FieldNames.TABLE_MAPPINGS
+                + " WHERE "
+                    + FieldNames.MAPPING_TRACK + "=?) AS M";
+    
+    
     public final static String FETCH_GENOMEID_FOR_TRACK =
             "SELECT "
             + FieldNames.TRACK_REFERENCE_ID + " "
@@ -1264,6 +1377,8 @@ public class SQLStatements {
             + FieldNames.TABLE_TRACKS + " "
             + "WHERE "
             + FieldNames.TRACK_ID + " = ?";
+    
+    
     public final static String FETCH_GENOME_LENGTH =
             "SELECT "
             + "LENGTH(" + FieldNames.REF_GEN_SEQUENCE + ") as LENGTH "
@@ -1271,6 +1386,8 @@ public class SQLStatements {
             + FieldNames.TABLE_REF_GEN + " "
             + "WHERE "
             + FieldNames.REF_GEN_ID + " = ?";
+    
+    
     public final static String FETCH_NUM_PERFECT_COVERED_POSITIONS_FOR_TRACK =
             "SELECT "
             + "COUNT(" + FieldNames.COVERAGE_ID + ") as NUM "
@@ -1365,28 +1482,47 @@ public class SQLStatements {
             + FieldNames.TABLE_MAPPINGS + " "
             + "WHERE "
             + FieldNames.MAPPING_ID + " = ?";
+   
+    
     public final static String GET_LATEST_COVERAGE_ID =
             "SELECT MAX(" + FieldNames.COVERAGE_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_COVERAGE;
+    
+    
     public final static String GET_LATEST_REFERENCE_ID =
             "SELECT MAX(" + FieldNames.REF_GEN_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_REF_GEN;
+    
+    
     public final static String GET_LATEST_ANNOTATION_ID =
             "SELECT MAX("+FieldNames.ANNOTATION_ID+") AS LATEST_ID FROM "+FieldNames.TABLE_FEATURES;
+    
+    
     public final static String GET_LATEST_TRACK_ID =
             "SELECT MAX(" + FieldNames.TRACK_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_TRACKS;
+    
+    
     public final static String GET_LATEST_MAPPING_ID =
             "SELECT MAX(" + FieldNames.MAPPING_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_MAPPINGS;
+    
+    
     public final static String GET_LATEST_DIFF_ID =
             "SELECT MAX(" + FieldNames.DIFF_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_DIFF;
+         
+    
     public static final String GET_LATEST_SEQUENCE_PAIR_ID =
             "SELECT MAX(" + FieldNames.SEQ_PAIR_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_SEQ_PAIRS;
+         
     public static final String GET_LATEST_SEQUENCE_PAIR_PAIR_ID =
             "SELECT MAX(" + FieldNames.SEQ_PAIR_PAIR_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_SEQ_PAIRS;
-    public static final String GET_LATEST_SEQUENCE_PAIR_PIVOT_ID =
-            "SELECT MAX(" + FieldNames.SEQ_PAIR_PIVOT_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_SEQ_PAIR_PIVOT;
+    
+    
     public final static String GET_LATEST_SNP_ID =
             "SELECT MAX(" + FieldNames.POSITIONS_SNP_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_POSITIONS;
+        
+    
     public static final String GET_LATEST_TRACK_SEQUENCE_PAIR_ID =
             "SELECT MAX(" + FieldNames.TRACK_SEQUENCE_PAIR_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_TRACKS;
+        
+    
     public static final String GET_CURRENT_READLENGTH =
             "SELECT "
             + FieldNames.MAPPING_STOP + ", "
@@ -1397,6 +1533,7 @@ public class SQLStatements {
             + FieldNames.MAPPING_TRACK + " = ? "
             + " LIMIT 1 ";
     
+    
     public static final String FETCH_COVERAGE_DISTRIBUTION =
             "SELECT "
             + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + ", "
@@ -1406,7 +1543,9 @@ public class SQLStatements {
             + " WHERE "
             + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? AND "
             + FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " = ? ";
-//        public static final String COPY_TO_FEATURE_DETAILS_TABLE =
+    
+    
+//             public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("
 //                    + FieldNames.ANNOTATION_ID + ", "
 //                    + FieldNames.ANNOTATION_EC_NUM + ", " 
@@ -1430,13 +1569,17 @@ public class SQLStatements {
 //                    + " AND COLUMN_NAME = '" + FieldNames.ANNOTATION_PRODUCT + "' ) ";
 //        
 //        
-//        public static final String CHECK_FEATURE_TABLE = 
+//   
+//     
+//             public static final String CHECK_FEATURE_TABLE = 
 //                "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" 
 //                    + FieldNames.TABLE_FEATURES + "' AND COLUMN_NAME = '"
 //                    + FieldNames.ANNOTATION_PRODUCT + "' ";
 //   
 //        
-//        public static final String ALTER_FEATURE_TABLE = 
+//    
+//    
+//             public static final String ALTER_FEATURE_TABLE = 
 //                "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_EC_NUM + "; "
 //                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_GENE + "; "
 //                    + "ALTER TABLE " + FieldNames.TABLE_FEATURES + " DROP COLUMN " + FieldNames.ANNOTATION_LOCUS_TAG + "; "

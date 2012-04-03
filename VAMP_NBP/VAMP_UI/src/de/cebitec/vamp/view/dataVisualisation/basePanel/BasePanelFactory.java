@@ -378,7 +378,7 @@ public class BasePanelFactory {
      * @return A new options panel for a track viewer.
      */
     private JPanel getTrackPanelOptions(TrackViewer viewer) {
-        TrackNormalizationPanel options = new TrackNormalizationPanel(viewer);
+        TrackOptionsPanel options = new TrackOptionsPanel(viewer);
         options.setLayout(new BoxLayout(options, BoxLayout.PAGE_AXIS));
         options.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
@@ -410,7 +410,7 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.BEST_MATCH, viewer));
         legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, FeatureType.ORDINARY_MATCH, viewer));
         legend.add(this.getLegendEntry(ColorProperties.ALIGNMENT_A, FeatureType.DIFF, null));
-        legend.add(this.getGradientEntry("Low to high coverage"));
+        legend.add(this.getGradientEntry("Replicates: High to low"));
 
         return legend;
     }

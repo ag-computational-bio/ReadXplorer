@@ -5,7 +5,7 @@
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.ExpressedGene;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
@@ -87,6 +87,8 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         operonLabel = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JSeparator();
         operonDetectionAutomaticBox1 = new javax.swing.JCheckBox();
+        expressedGenesField2 = new javax.swing.JTextField();
+        expressedGenesLabel2 = new javax.swing.JLabel();
         resultTabs = new javax.swing.JTabbedPane();
 
         menuResultSplitPane.setDividerLocation(230);
@@ -227,16 +229,28 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
             }
         });
 
+        expressedGenesField2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesField2.text")); // NOI18N
+        expressedGenesField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                expressedGenesField2ActionPerformed(evt);
+            }
+        });
+
+        expressedGenesLabel2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesLabel2.text")); // NOI18N
+
         javax.swing.GroupLayout menuPanelLayout = new javax.swing.GroupLayout(menuPanel);
         menuPanel.setLayout(menuPanelLayout);
         menuPanelLayout.setHorizontalGroup(
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator2)
+            .addComponent(jSeparator3)
+            .addComponent(jSeparator1)
             .addGroup(menuPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(menuPanelLayout.createSequentialGroup()
                         .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(detectionButton)
                             .addComponent(menuLabel)
                             .addGroup(menuPanelLayout.createSequentialGroup()
                                 .addComponent(geneStartField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -251,31 +265,26 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                                 .addComponent(expressedGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(expressedGenesLabel))
-                            .addComponent(detectionButton)
                             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addGap(10, 10, 10)
                                 .addComponent(geneStartBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(geneStartAutomaticBox)))
-                        .addContainerGap())
-                    .addGroup(menuPanelLayout.createSequentialGroup()
-                        .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(operonBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(operonDetectionAutomaticBox1))
+                                .addComponent(geneStartAutomaticBox))
                             .addGroup(menuPanelLayout.createSequentialGroup()
                                 .addComponent(operonField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(operonLabel)))
-                        .addGap(0, 6, Short.MAX_VALUE))))
-            .addGroup(menuPanelLayout.createSequentialGroup()
-                .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                                .addComponent(operonLabel))
+                            .addGroup(menuPanelLayout.createSequentialGroup()
+                                .addComponent(expressedGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(expressedGenesLabel2)))
+                        .addContainerGap(296, Short.MAX_VALUE))
+                    .addComponent(jSeparator4)
+                    .addGroup(menuPanelLayout.createSequentialGroup()
+                        .addComponent(operonBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(operonDetectionAutomaticBox1)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         menuPanelLayout.setVerticalGroup(
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -306,7 +315,11 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(expressedGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(expressedGenesLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(expressedGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(expressedGenesLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -320,7 +333,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(detectionButton)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         menuResultSplitPane.setLeftComponent(menuPanel);
@@ -430,12 +443,19 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
         }
     }//GEN-LAST:event_operonDetectionAutomaticBox1ActionPerformed
+
+    private void expressedGenesField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expressedGenesField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_expressedGenesField2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel addRestrictionLabel;
     private javax.swing.JButton detectionButton;
     private javax.swing.JCheckBox expressedGenesBox;
     private javax.swing.JTextField expressedGenesField;
+    private javax.swing.JTextField expressedGenesField2;
     private javax.swing.JLabel expressedGenesLabel;
+    private javax.swing.JLabel expressedGenesLabel2;
     private javax.swing.JCheckBox geneStartAutomaticBox;
     private javax.swing.JCheckBox geneStartBox;
     private javax.swing.JTextField geneStartField;
@@ -501,7 +521,8 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         }
         if (this.detectExpressedGenes && !this.doneExpressedGenes) {
             int minNumberReads = Integer.parseInt(this.expressedGenesField.getText());
-            this.analysisExpressedGenes = new AnalysisExpressedGenes(this, this.trackViewer, minNumberReads);
+            int maxNumberReads = Integer.parseInt(this.expressedGenesField2.getText());
+            this.analysisExpressedGenes = new AnalysisExpressedGenes(this, this.trackViewer, minNumberReads, maxNumberReads);
             this.analysisExpressedGenes.startAnalysis();
 
             return;
@@ -524,9 +545,18 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 geneStartResultPanel.addGeneStarts(this.analysisGeneStarts.getResults());
                 System.out.println("Size: " + this.analysisGeneStarts.getResults().size());
                 //TODO: get track name
-                this.resultTabs.addTab("Detected gene starts for track", geneStartResultPanel);
+                this.resultTabs.addTab("Detected gene starts for track (" + geneStartResultPanel.getResultSize() + " hits)", geneStartResultPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
                 this.resultTabs.setSelectedIndex(this.resultTabs.getTabCount() - 1);
+                
+                //TODO: put this in some analysis information panel
+                System.out.println("Minimal increase of read count: " + this.analysisGeneStarts.getIncreaseReadCount());
+                System.out.println("Minimal increase in %: " + this.analysisGeneStarts.getIncreaseReadPercent());
+                if (this.analysisGeneStarts.getIncreaseReadCount2() > 0) {
+                    System.out.println("Additional low coverage restrictions:");
+                    System.out.println("Min. increase of read count: " + this.analysisGeneStarts.getIncreaseReadCount2());
+                    System.out.println("Max. initial read count: " + this.analysisGeneStarts.getMaxInitialReadCount());
+                }
 
                 //start remaining analyses, if there are any
                 this.doneGeneStarts = true;
@@ -541,7 +571,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 expressedGenesResultPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
                 expressedGenesResultPanel.addExpressedGenes(expressedGenes);
 
-                this.resultTabs.addTab("Detected expressed genes for track", expressedGenesResultPanel);
+                this.resultTabs.addTab("Detected expressed genes for track (" + expressedGenesResultPanel.getResultSize() + " hits)", expressedGenesResultPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
                 this.resultTabs.setSelectedIndex(this.resultTabs.getTabCount() - 1);
 
@@ -557,12 +587,12 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
             }
             if (this.detectOperon && !this.doneOperon) {
-            ++this.nbFinishedAnalyses;
+                ++this.nbFinishedAnalyses;
                 OperonDetectionResultPanel operonPanel = new OperonDetectionResultPanel();
                 operonPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
-                operonPanel.addOperonDetections(this.analysisOperon.getResults());
+                operonPanel.addDetectedOperons(this.analysisOperon.getResults());
 
-                this.resultTabs.addTab("Detected operon for track", operonPanel);
+                this.resultTabs.addTab("Operon detection for track (" + operonPanel.getResultSize() + " hits)", operonPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
                 this.resultTabs.setSelectedIndex(this.resultTabs.getTabCount() - 1);
                 

@@ -1,8 +1,5 @@
 package de.cebitec.vamp.parser.common;
 
-import de.cebitec.vamp.util.Observable;
-import de.cebitec.vamp.util.Observer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,119 +11,106 @@ import java.util.List;
  *
  * @author ddoppmeier
  */
-public class ParsedMappingContainer implements Observable, Observer {
+public class ParsedMappingContainer {
+    private int numberOfMappings = 0; //the number of created mappings by the mapper
+    private int numberOfBM = 0;
+    private int numberOfPerfect = 0;
     private int numOfMappings = 0;
-    private int numUniqueSeq ;
-    private int numUniqueMappings;
-    private int numReads;
-    private boolean hasNewRead;
+    private int numUniqueSeq = 0;
+    private int numUniqueMappings = 0;
+    private int numReads = 0;
     private HashMap<Integer, ParsedMappingGroup> mappings;
-    private ArrayList<Observer> observers;
-    private boolean lastMappingContainer=false;
-    private boolean firstMappingContainer=false;
-    private int averageReadLength;
+    private boolean lastMappingContainer = false;
+    private boolean firstMappingContainer = false;
+    private int sumReadLength;
+    private boolean mappingInfosCalculated = false;
+    
     /**
      * Creates an empty mapping container.
      */
     public ParsedMappingContainer(){
-        observers = new ArrayList<Observer>();
-        mappings = new HashMap<Integer, ParsedMappingGroup>();
+        this.mappings = new HashMap<Integer, ParsedMappingGroup>();
+        this.sumReadLength = 0;
     }
 
-    public void addParsedMapping(ParsedMapping mapping, int sequenceID){
-        numOfMappings++;
-        if(!mappings.containsKey(sequenceID)){
+    public void addParsedMapping(ParsedMapping mapping, int sequenceID) {
+        ++this.numOfMappings;
+        if (!this.mappings.containsKey(sequenceID)) {
             ParsedMappingGroup mappingGroup = new ParsedMappingGroup();
-            mappingGroup.registerObserver(this); //need this to check for new reads
             mappings.put(sequenceID, mappingGroup);
+            ++this.numUniqueSeq;
         }
-        mappings.get(sequenceID).addParsedMapping(mapping);
+        this.mappings.get(sequenceID).addParsedMapping(mapping);
+        if (this.mappings.get(sequenceID).getMappings().size() == 2) {
+            --this.numUniqueSeq;
+        }
     }
 
     public Collection<Integer> getMappedSequenceIDs(){
-        return mappings.keySet();
+        return this.mappings.keySet();
     }
 
     public ParsedMappingGroup getParsedMappingGroupBySeqID(int sequenceID){
-        return mappings.get(sequenceID);
+        return this.mappings.get(sequenceID);
     }
 
-    public HashMap<Integer,Integer> getMappingInformations() {
-        HashMap<Integer,Integer> mappingInfos = new HashMap<Integer,Integer>();
-        int numberOfBM = 0;
-        int numberOfPerfect = 0;
-        //the number of created Mappings by the mapper
-        int numberOfMappings = 0;
+    /**
+     * @return Hashmap with following entries:
+     * <br>(1, numberOfMappings);
+     * <br>(2, numberOfPerfect);
+     * <br>(3, numberOfBM);
+     * <br>(4, numUniqueMappings);
+     * <br>(5, numUniqueSeq);
+     * <br>(6, numReads);
+     * <br>(7, sumReadLength);
+     */
+    public HashMap<Integer, Integer> getMappingInformations() {
+        HashMap<Integer, Integer> mappingInfos = new HashMap<Integer, Integer>();
+        
+        if (!mappingInfosCalculated) {
 
-        Collection<ParsedMappingGroup> groups = mappings.values();
-        Iterator<ParsedMappingGroup> it = groups.iterator();
+            Collection<ParsedMappingGroup> groups = mappings.values();
+            Iterator<ParsedMappingGroup> groupsIt = groups.iterator();
 
-        while (it.hasNext()) {
-            ParsedMappingGroup p = it.next();
-            List<ParsedMapping> mappingList = p.getMappings();
-            Iterator<ParsedMapping> maps = mappingList.iterator();
-            while (maps.hasNext()) {
-                ParsedMapping m = maps.next();
-                if(m.isBestMapping() == true) {
-                        numberOfBM++;
-                    if(m.getErrors() == 0){
-                         numberOfPerfect++;
+            while (groupsIt.hasNext()) {
+                ParsedMappingGroup mappingGroup = groupsIt.next();
+                List<ParsedMapping> mappingList = mappingGroup.getMappings();
+                Iterator<ParsedMapping> mappingIt = mappingList.iterator();
+                while (mappingIt.hasNext()) {
+                    ParsedMapping mapping = mappingIt.next();
+                    if (mapping.isBestMapping() == true) {
+                        ++numberOfBM;
+                        if (mapping.getErrors() == 0) {
+                            ++numberOfPerfect;
+                        }
                     }
+                    numberOfMappings += mapping.getNumReplicates();
                 }
-                numberOfMappings += m.getCount();
+
+                //calculate number of unique mappings (map only to one position, but have replicates)
+                if (mappingList.size() == 1) {
+                    this.numUniqueMappings += mappingList.get(0).getNumReplicates();
+                }
+                this.numReads += mappingList.get(0).getNumReplicates();
             }
         }
+        
+//        int averageReadLength = 0;
+//        averageReadLength = this.numOfMappings != 0 ? this.sumReadLength / this.numOfMappings : 0;
 
-        mappingInfos.put(1, numberOfMappings);
-        mappingInfos.put(2, numberOfPerfect);
-        mappingInfos.put(3, numberOfBM);
-        mappingInfos.put(4, numUniqueMappings);
-        mappingInfos.put(5, numUniqueSeq);
-        mappingInfos.put(6, numReads);
-        mappingInfos.put(7,averageReadLength);
+        mappingInfos.put(1, this.numberOfMappings);
+        mappingInfos.put(2, this.numberOfPerfect);
+        mappingInfos.put(3, this.numberOfBM);
+        mappingInfos.put(4, this.numUniqueMappings);
+        mappingInfos.put(5, this.numUniqueSeq);
+        mappingInfos.put(6, this.numReads);
+        mappingInfos.put(7, this.sumReadLength);
 
         return mappingInfos;
     }
 
     public void clear(){
         mappings.clear();
-    }
-
-    public void setNumberOfUniqueMappings(int numUniqueMappings) {
-        this.numUniqueMappings = numUniqueMappings;
-    }
-
-    public void setNumberOfUniqueSeq(int numUniqueSeq) {
-        this.numUniqueSeq = numUniqueSeq;
-    }
-
-    public void setNumberOfReads(int numberOfReads) {
-        this.numReads = numberOfReads;
-    }
-
-    @Override
-    public void registerObserver(Observer observer) {
-        this.observers.add(observer);
-    }
-
-    @Override
-    public void removeObserver(Observer observer) {
-        this.observers.remove(observer);
-    }
-
-    @Override
-    public void notifyObservers() {
-        for (Observer observer : observers) {
-            observer.update(this.hasNewRead);
-        }
-    }
-
-    @Override
-    public void update(Object args) {
-        if (args instanceof Boolean){
-            this.hasNewRead = (Boolean) args;
-            this.notifyObservers();
-        }
     }
 
     public boolean isLastMappingContainer() {
@@ -149,16 +133,19 @@ public class ParsedMappingContainer implements Observable, Observer {
      * @return the averageReadLength
      */
     public int getAverageReadLength() {
-        return averageReadLength;
+        return this.numOfMappings != 0 ? this.sumReadLength / this.numOfMappings : 0;
     }
 
     /**
-     * @param averageReadLength the averageReadLength to set
+     * @param sumReadLength the sumReadLength to set
      */
-    public void setAverageReadLength(int averageReadLength) {
-        this.averageReadLength = averageReadLength;
+    public void setSumReadLength(int sumReadLength) {
+        this.sumReadLength = sumReadLength;
+    }
+
+    
+    public int getSumReadLength() {
+        return this.sumReadLength;
     }
     
-    
-
 }

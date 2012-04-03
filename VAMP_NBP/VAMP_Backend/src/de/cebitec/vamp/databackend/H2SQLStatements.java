@@ -233,7 +233,6 @@ public class H2SQLStatements {
     public static final String SETUP_SEQ_PAIR_PIVOT =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SEQ_PAIR_PIVOT
             + " ("
-            + FieldNames.SEQ_PAIR_PIVOT_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " BIGINT UNSIGNED NOT NULL "
             + ") ";

@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
@@ -26,59 +26,62 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="perfectMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
-                          <Component id="bestMatchMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
-                          <Component id="numberReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="uniqueSequencesLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="singletonMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="bestMatchMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
-                          <Component id="perfectMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-                      <Component id="compPercentageLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="compPercentage" pref="55" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="bmPercentageLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="perfPercentageLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="perfectPercentage" alignment="0" pref="55" max="32767" attributes="0"/>
-                          <Component id="bmPercentage" alignment="0" pref="55" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-          </Group>
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
           <Component id="progressbar" alignment="0" pref="188" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="68" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="labelNameLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="numMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
+          <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="numMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
-                  <Component id="nameLabel" alignment="1" pref="55" max="32767" attributes="0"/>
-                  <Component id="singletonMappingsAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
-                  <Component id="uniqueSequencesAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
-                  <Component id="numberReadsAbsLabel" alignment="1" pref="55" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="perfectMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
+                                  <Component id="bestMatchMappingsLabel" alignment="1" min="-2" max="-2" attributes="1"/>
+                                  <Component id="numberReadsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="uniqueSequencesLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="singletonMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="bestMatchMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
+                                  <Component id="perfectMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                              <Component id="compPercentageLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="compPercentage" pref="55" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="bmPercentageLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="perfPercentageLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="perfectPercentage" alignment="0" pref="55" max="32767" attributes="0"/>
+                                  <Component id="bmPercentage" alignment="0" pref="55" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="68" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="labelNameLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="numMappingsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="numMappingsAbsLabel" pref="55" max="32767" attributes="0"/>
+                          <Component id="nameLabel" alignment="1" pref="55" max="32767" attributes="0"/>
+                          <Component id="singletonMappingsAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
+                          <Component id="uniqueSequencesAbsLabel" alignment="0" pref="55" max="32767" attributes="0"/>
+                          <Component id="numberReadsAbsLabel" alignment="1" pref="55" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>

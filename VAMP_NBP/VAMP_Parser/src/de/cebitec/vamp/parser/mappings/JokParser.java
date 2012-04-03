@@ -15,15 +15,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.openide.util.NbBundle;
 
 /**
  *
  * @author ddoppmeier
  */
-public class JokParser implements MappingParserI, Observer {
+public class JokParser implements MappingParserI {
 
     private static String name = "Jok Output Parser";
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
@@ -32,8 +30,7 @@ public class JokParser implements MappingParserI, Observer {
     private HashMap<String, Integer> seqToIDMap;
 
     private ArrayList<Observer> observers;
-    private String errorMsg;
-    private int noUniqueMappings;
+    private String msg;
 
 
     public JokParser() {
@@ -44,23 +41,18 @@ public class JokParser implements MappingParserI, Observer {
     @Override
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
-        mappingContainer.registerObserver(this);
         this.seqToIDMap = new HashMap<String, Integer>();
         String filepath = trackJob.getFile().getAbsolutePath();
         try {
 
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(JokParser.class,
-                "Parser.Parsing.Start", filepath));
+            this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filepath));
 
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;
             String line = null;
-            int noUniqueSeq = 0;
-            this.noUniqueMappings = 0;
-            int averageOfReadLength=0;
-            int addreadsLength=0;
-            int countofread=br.readLine().length();
+            int seqID = 0;
+            int sumReadLength = 0;
             while ((line = br.readLine()) != null) {
                 lineno++;
                 
@@ -76,15 +68,14 @@ public class JokParser implements MappingParserI, Observer {
                         stop = Integer.parseInt(tokens[2]);
                         start++;
                         stop++; // some people (no names here...) start counting at 0, I count genome position starting with 1
-                        addreadsLength+=(stop-start);
                     } catch (NumberFormatException e) { //
                         if (!tokens[1].equals("*")) {
-                            this.sendErrorMsg("Value for current start position in "
+                            this.sendMsg("Value for current start position in "
                                     + filepath + " line " + lineno + " is not a number or *. "
                                     + "Found start: " + tokens[1]);
                         }
                         if (!tokens[2].equals("*")) {
-                            this.sendErrorMsg("Value for current stop position in "
+                            this.sendMsg("Value for current stop position in "
                                     + filepath  + " line " + lineno + " is not a number or *. "
                                     + "Found stop: " + tokens[2]);
                         }
@@ -103,7 +94,7 @@ public class JokParser implements MappingParserI, Observer {
                     try {
                         errors = Integer.parseInt(tokens[6]);
                     } catch (NumberFormatException e) {
-                        this.sendErrorMsg("Value for current errors in "
+                        this.sendMsg("Value for current errors in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number. "
                                 + "Found error: " + tokens[2]);
                         continue;
@@ -111,43 +102,43 @@ public class JokParser implements MappingParserI, Observer {
                     // check tokens
                     // report empty mappings saruman should not be producing anymore
                 if (readname == null || readname.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorReadname",
                             filepath, lineno, readname));
                     continue;
                 }
 
                 if (start >= stop) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorStartStop",
                             filepath, lineno, start, stop));
                     continue;
                 }
                 if (direction == 0) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorDirectionJok", filepath, lineno));
                     continue;
                 }
                 if (readSeq == null || readSeq.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorReadEmpty",
                             filepath, lineno, readSeq));
                     continue;
                 }
                 if (refSeq == null || refSeq.isEmpty()) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorRef",
                             filepath, lineno, refSeq));
                     continue;
                 }
                 if (readSeq.length() != refSeq.length()) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorReadLength",
                             filepath, lineno, readSeq, refSeq));
                     continue;
                 }
                 if (errors < 0 || errors > readSeq.length()) {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorRead",
                             errors, filepath, lineno));
                     continue;
@@ -172,7 +163,6 @@ public class JokParser implements MappingParserI, Observer {
                     }
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
-                    int seqID;
                     String readwithoutGaps;
                    // XXX:TODO check this
                     if (readSeq.contains("_")) {
@@ -187,17 +177,17 @@ public class JokParser implements MappingParserI, Observer {
                         readwithoutGaps = readSeq;
                     }
                     //Saruman turns only the read string by mapping so we can get the native read direction
-                    readwithoutGaps = (direction==-1 ? SequenceUtils.getReverseComplement(readwithoutGaps): readwithoutGaps);
+                    readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
                     if (this.seqToIDMap.containsKey(readwithoutGaps)) {
                         seqID = this.seqToIDMap.get(readwithoutGaps);
                     } else {
-                        seqID = ++noUniqueSeq; //int seqID = readnameToSequenceID.get(readname);
-                        this.seqToIDMap.put(readwithoutGaps, seqID);
+                        this.seqToIDMap.put(readwithoutGaps, ++seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
+                    sumReadLength += (stop - start);
                     this.processReadname(seqID, readname);
                 } else {
-                    this.sendErrorMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.MissingData", lineno, line));
+                    this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.MissingData", lineno, line));
                 }
             }
 //            Iterator<Integer> it = readnameToSequenceID.values().iterator();
@@ -207,16 +197,14 @@ public class JokParser implements MappingParserI, Observer {
 //                s.add(i);
 //            }
 //            // it.remove();
-            averageOfReadLength=addreadsLength/mappingContainer.getMappingInformations().get(6);
-            mappingContainer.setAverageReadLength(averageOfReadLength);
+            int numberMappings = mappingContainer.getMappingInformations().get(1);
+            numberMappings = numberMappings == 0 ? 1 : numberMappings;
+            mappingContainer.setSumReadLength(sumReadLength);
             
-            mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
-            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq); // = mappingContainer.mappings.size()
 //            s.clear();
             br.close();
 
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO,  NbBundle.getMessage(JokParser.class,
-                    "Parser.Parsing.Finished",filepath));
+            this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Finished", filepath));
             
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -225,9 +213,9 @@ public class JokParser implements MappingParserI, Observer {
             throw new ParsingException(NbBundle.getMessage(JokParser.class, "Parser.Empty.Track.Error"));
         }
 
-        this.seqToIDMap = null; //release resources
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, NbBundle.getMessage(JokParser.class,
-                "Parser.Parsing.Successfully"));
+        this.seqToIDMap = null; //release resources        
+        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Successfully"));
+
         return mappingContainer;
     }
 
@@ -314,24 +302,17 @@ public class JokParser implements MappingParserI, Observer {
     @Override
     public void notifyObservers() {
         for (Observer observer : this.observers){
-            observer.update(this.errorMsg);
+            observer.update(this.msg);
         }
     }
 
     /**
-     * Method setting and sending the error msg to all observers.
-     * @param errorMsg the error msg to send
+     * Method setting and sending the msg to all observers.
+     * @param msg the msg to send (can be an error or any other message).
      */
-    private void sendErrorMsg(final String errorMsg){
-        this.errorMsg = errorMsg;
+    private void sendMsg(final String msg){
+        this.msg = msg;
         this.notifyObservers();
-    }
-
-    @Override
-    public void update(Object args) {
-       if (args instanceof Boolean && (Boolean) args == true){
-            ++this.noUniqueMappings;
-        }
     }
 
     @Override

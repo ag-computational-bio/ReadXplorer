@@ -115,7 +115,7 @@ public class CoverageContainer {
             }
             // increase the values in coverage array
             Integer[] cov = coverage.get(i);
-            cov[coverageIdx] += mapping.getCount();
+            cov[coverageIdx] += mapping.getNumReplicates();
             cov[numIdx] += 1;
         }
     }
@@ -246,28 +246,28 @@ public class CoverageContainer {
                 // increase occurence of bases at position
                 switch (base) {
                     case 'A':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[BASE_A] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[BASE_A] += mapping.getNumReplicates();
                         break;
                     case 'C':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[BASE_C] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[BASE_C] += mapping.getNumReplicates();
                         break;
                     case 'G':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[BASE_G] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[BASE_G] += mapping.getNumReplicates();
                         break;
                     case 'T':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[BASE_T] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[BASE_T] += mapping.getNumReplicates();
                         break;
                     case 'N':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[BASE_N] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[BASE_N] += mapping.getNumReplicates();
                         break;
                     case '_':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[BASE_GAP] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[BASE_GAP] += mapping.getNumReplicates();
                         break;
                 }
             }
@@ -307,24 +307,24 @@ public class CoverageContainer {
 
                 switch (base) {
                     case 'A':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[GAP_A] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[GAP_A] += mapping.getNumReplicates();
                         break;
                     case 'C':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[GAP_C] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[GAP_C] += mapping.getNumReplicates();
                         break;
                     case 'G':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[GAP_G] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[GAP_G] += mapping.getNumReplicates();
                         break;
                     case 'T':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[GAP_T] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[GAP_T] += mapping.getNumReplicates();
                         break;
                     case 'N':
-                        bases[DIFFS] += mapping.getCount();
-                        bases[GAP_N] += mapping.getCount();
+                        bases[DIFFS] += mapping.getNumReplicates();
+                        bases[GAP_N] += mapping.getNumReplicates();
                         break;
                 }
             }

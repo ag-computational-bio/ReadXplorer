@@ -177,116 +177,116 @@ public class DiscreteCountingDistribution {
      * 32 = 701-850
      * 33 = 851-100
      * 34 = 1001+ 
-     * @param covIncrease the currently detected coverage increase at a position
+     * @param increase the currently detected increase at a position
      * in the genome.
      */
-    public void increaseDistribution(int covIncrease) {
-        if (covIncrease < 0) {
+    public void increaseDistribution(int increase) {
+        if (increase < 0) {
             return;
         } else 
-        if (covIncrease == 1) {
+        if (increase == 1) {
             ++this.DiscreteCountingDistribution[idx0];
         } else
-        if (covIncrease == 2) {
+        if (increase == 2) {
             ++this.DiscreteCountingDistribution[idx1];
         } else
-        if (covIncrease <= 4) {
+        if (increase <= 4) {
             ++this.DiscreteCountingDistribution[idx2];
         } else
-        if (covIncrease <= 6) {
+        if (increase <= 6) {
             ++this.DiscreteCountingDistribution[idx3];
         } else
-        if (covIncrease <= 8) {
+        if (increase <= 8) {
             ++this.DiscreteCountingDistribution[idx4];
         } else
-        if (covIncrease <= 10) {
+        if (increase <= 10) {
             ++this.DiscreteCountingDistribution[idx5];
         } else
-        if (covIncrease <= 13) {
+        if (increase <= 13) {
             ++this.DiscreteCountingDistribution[idx6];
         } else
-        if (covIncrease <= 16) {
+        if (increase <= 16) {
             ++this.DiscreteCountingDistribution[idx7];
         } else
-        if (covIncrease <= 19) {
+        if (increase <= 19) {
             ++this.DiscreteCountingDistribution[idx8];
         } else
-        if (covIncrease <= 22) {
+        if (increase <= 22) {
             ++this.DiscreteCountingDistribution[idx9];
         } else
-        if (covIncrease <= 25) {
+        if (increase <= 25) {
             ++this.DiscreteCountingDistribution[idx10];
         } else
-        if (covIncrease <= 28) {
+        if (increase <= 28) {
             ++this.DiscreteCountingDistribution[idx11];
         } else
-        if (covIncrease <= 31) {
+        if (increase <= 31) {
             ++this.DiscreteCountingDistribution[idx12];
         } else
-        if (covIncrease <= 34) {
+        if (increase <= 34) {
             ++this.DiscreteCountingDistribution[idx13];
         } else
-        if (covIncrease <= 38) {
+        if (increase <= 38) {
             ++this.DiscreteCountingDistribution[idx14];
         } else
-        if (covIncrease <= 42) {
+        if (increase <= 42) {
             ++this.DiscreteCountingDistribution[idx15];
         } else
-        if (covIncrease <= 46) {
+        if (increase <= 46) {
             ++this.DiscreteCountingDistribution[idx16];
         } else
-        if (covIncrease <= 50) {
+        if (increase <= 50) {
             ++this.DiscreteCountingDistribution[idx17];
         } else
-        if (covIncrease <= 55) {
+        if (increase <= 55) {
             ++this.DiscreteCountingDistribution[idx18];
         } else
-        if (covIncrease <= 60) {
+        if (increase <= 60) {
             ++this.DiscreteCountingDistribution[idx19];
         } else
-        if (covIncrease <= 70) {
+        if (increase <= 70) {
             ++this.DiscreteCountingDistribution[idx20];
         } else
-        if (covIncrease <= 80) {
+        if (increase <= 80) {
             ++this.DiscreteCountingDistribution[idx21];
         } else
-        if (covIncrease <= 90) {
+        if (increase <= 90) {
             ++this.DiscreteCountingDistribution[idx22];
         } else
-        if (covIncrease <= 100) {
+        if (increase <= 100) {
             ++this.DiscreteCountingDistribution[idx23];
         } else
-        if (covIncrease <= 140) {
+        if (increase <= 140) {
             ++this.DiscreteCountingDistribution[idx24];
         } else
-        if (covIncrease <= 180) {
+        if (increase <= 180) {
             ++this.DiscreteCountingDistribution[idx25];
         } else
-        if (covIncrease <= 240) {
+        if (increase <= 240) {
             ++this.DiscreteCountingDistribution[idx26];
         } else
-        if (covIncrease <= 300) {
+        if (increase <= 300) {
             ++this.DiscreteCountingDistribution[idx27];
         } else
-        if (covIncrease <= 400) {
+        if (increase <= 400) {
             ++this.DiscreteCountingDistribution[idx28];
         } else
-        if (covIncrease <= 500) {
+        if (increase <= 500) {
             ++this.DiscreteCountingDistribution[idx29];
         } else
-        if (covIncrease <= 600) {
+        if (increase <= 600) {
             ++this.DiscreteCountingDistribution[idx30];
         } else
-        if (covIncrease <= 700) {
+        if (increase <= 700) {
             ++this.DiscreteCountingDistribution[idx31];
         } else
-        if (covIncrease <= 850) {
+        if (increase <= 850) {
             ++this.DiscreteCountingDistribution[idx32];
         } else
-        if (covIncrease <= 1000) {
+        if (increase <= 1000) {
             ++this.DiscreteCountingDistribution[idx33];
         } else 
-        if (covIncrease > 1000) {
+        if (increase > 1000) {
             ++this.DiscreteCountingDistribution[idx34];
         } 
         ++this.totalCount;

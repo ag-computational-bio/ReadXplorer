@@ -13,7 +13,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
     private final static long serialVersionUID = 1239345;
     private TrackConnector trackCon;
-    private int trackID=-1;
+    private int trackID = -1;
     /** Creates new form TrackNavigator */
     public TrackStatisticsPanel() {
         initComponents();
@@ -353,6 +353,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 boolean recalculated = false;
                 boolean recalcSeqPair = false;
 
+                //sequence pair stuff
                 int numSeqPairs = trackCon.getNumOfSeqPairs();
                 if (numSeqPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numSeqPairsLabel);
@@ -417,6 +418,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     numPerfUniqSeqPairsAbsLabel.setText(String.valueOf(numUniquePerfectSeqPairs));
                 }
 
+                //single mapping stuff
                 int numSingleMappings = trackCon.getNumOfSingleMappings();
                 if (numSingleMappings == -1) {
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsLabel);
@@ -495,7 +497,6 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
                     recalculated = true;
                 }
-
 
                 if (recalculated) {
                     trackCon.setStatistics(numOfMappings, numUniqueMappings, numUniqueSequences,

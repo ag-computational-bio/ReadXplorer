@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Container for a parsed mapping. It contains all data a mapping should have.
  * ID, start, stop (start is always the smaller value), direction (1 for fwd and -1 for rev), 
- * errors, diffs, gaps, bestmapping and count. Also the read sequence can be stored here, 
+ * errors, diffs, gaps, bestmapping and number of replicates. Also the read sequence can be stored here, 
  * but should be removed when not needed anymore.
  *
  * @author ddoppmeier, rhilker
@@ -20,7 +20,7 @@ public class ParsedMapping {
     private List<ParsedDiff> diffs;
     private List<ParsedReferenceGap> gaps;
     private boolean bestMapping;
-    private int count;
+    private int numOfReplicates;
 
     /**
      * Standard constructor for a parsed mapping.
@@ -39,10 +39,10 @@ public class ParsedMapping {
         this.gaps = gaps;
         this.errors = errors;
         this.bestMapping = false;
-        this.count = 1;
+        this.numOfReplicates = 1;
     }
 
-    public void setIsBestmapping(boolean b){
+    public void setIsBestMapping(boolean b){
         this.bestMapping = b;
     }
 
@@ -50,12 +50,12 @@ public class ParsedMapping {
         return this.bestMapping;
     }
 
-    public int getCount(){
-        return count;
+    public int getNumReplicates(){
+        return numOfReplicates;
     }
 
     public void increaseCounter(){
-        count++;
+        ++numOfReplicates;
     }
 
     /**
@@ -167,7 +167,7 @@ public class ParsedMapping {
 
     
     public void setCount(int count){
-        this.count = count;
+        this.numOfReplicates = count;
     }
 
 }

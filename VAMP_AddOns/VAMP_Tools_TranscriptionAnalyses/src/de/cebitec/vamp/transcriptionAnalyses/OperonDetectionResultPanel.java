@@ -5,6 +5,8 @@ package de.cebitec.vamp.transcriptionAnalyses;
  *
  * Created on 27.01.2012, 14:31:03
  */
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -60,14 +62,14 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Gen1", "Gen2", "Strand", "Position of Gen1", "Position of Gen2", "read cover Gen1", "read cover Gen2", "read cover none", "read cober Gen1 & Gen2"
+                "Gene 1", "Gene 2", "Strand", "Start Gene 1", "Start Gene 2", "Gene 1 Reads", "Gene 2 Reads", "Internal Reads", "Spanning Reads"
             }
         ) {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, true, false, false, true, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -116,7 +118,7 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         OperonColumns operonColumns = new OperonColumns(operonDetection);
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", operonColumns, "Gene Start Table");
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", operonColumns, "Operon Detection Table");
     }//GEN-LAST:event_exportButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
@@ -124,7 +126,7 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
     private javax.swing.JTable operonDetectionTable;
     // End of variables declaration//GEN-END:variables
 
-    public void addOperonDetections(List<Operon> operonDetection) {
+    public void addDetectedOperons(List<Operon> operonDetection) {
         final int nbColumns = 9;
         this.operonDetection = operonDetection;
         DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();
@@ -142,8 +144,8 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
 
 
         for (Operon operon : operonDetection) {
-            String genName1 = "";
-            String genName2 = "";
+            String geneName1 = "";
+            String geneName2 = "";
             String strand = "";
             String pos1 = "";
             String pos2 = "";
@@ -153,19 +155,19 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
             String coverGen1And2 = "";
 
             for (OperonAdjacency ad : operon.getOperon()) {
-                genName1 += ad.getOperonFeature().getLocus() + "\n";
-                genName2 += ad.getOperonFeature2().getLocus() + "\n";
-                strand += (ad.getOperonFeature().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
-                pos1 += ad.getOperonFeature().getStart() + "\n";
-                pos2 += ad.getOperonFeature2().getStart() + "\n";
-                coverGen1 += ad.getRead_cover_Gen1() + "\n";
-                coverGen2 += ad.getRead_cover_Gen2() + "\n";
-                coverNone += ad.getRead_cover_none() + "\n";
-                coverGen1And2 += ad.getRead_cover_Gen1_and_Gen2() + "\n";
+                geneName1 += ad.getOperonAnnotation().getLocus() + "\n";
+                geneName2 += ad.getOperonAnnotation2().getLocus() + "\n";
+                strand += (ad.getOperonAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
+                pos1 += ad.getOperonAnnotation().getStart() + "\n";
+                pos2 += ad.getOperonAnnotation2().getStart() + "\n";
+                coverGen1 += ad.getReadsGene1() + "\n";
+                coverGen2 += ad.getReadsGene2() + "\n";
+                coverNone += ad.getInternalReads() + "\n";
+                coverGen1And2 += ad.getSpanningReads() + "\n";
             }
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = genName1;
-            rowData[1] = genName2;
+            rowData[0] = geneName1;
+            rowData[1] = geneName2;
             rowData[2] = strand;
             rowData[3] = pos1;
             rowData[4] = pos2;
@@ -173,9 +175,9 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
             rowData[6] = coverGen2;
             rowData[7] = coverNone;
             rowData[8] = coverGen1And2;
-           if(!genName1.isEmpty() &&!genName2.isEmpty()){
-            model.addRow(rowData);
-           }
+            if (!geneName1.isEmpty() && !geneName2.isEmpty()) {
+                model.addRow(rowData);
+            }
         }
         
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
@@ -187,16 +189,20 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = this.operonDetectionTable.convertRowIndexToModel(selectedView);
-        String pos = (String) this.operonDetectionTable.getModel().getValueAt(selectedModel, 3);
-        String[] temp;
-        temp = pos.split("\n");
-        //System.out.println(temp[0]);
+        String posString = (String) this.operonDetectionTable.getModel().getValueAt(selectedModel, 4);
+        String[] pos;
+        pos = posString.split("\n");
            
-            bim.navigatorBarUpdated(Integer.parseInt(temp[0]));
+        // Get position of first gene in the array
+        bim.navigatorBarUpdated(Integer.parseInt(pos[0])); 
        
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;
+    }
+    
+    public int getResultSize() {
+        return this.operonDetection.size();
     }
 }

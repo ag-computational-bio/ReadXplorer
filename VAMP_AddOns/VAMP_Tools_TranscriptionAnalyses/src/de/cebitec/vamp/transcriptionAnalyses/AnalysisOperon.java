@@ -1,13 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.transcriptionAnalyses;
 
-/**
- *
- * @author MKD
- */
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.PutativeOperon;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.api.objects.AnalysisI;
 import de.cebitec.vamp.api.objects.JobI;
 import de.cebitec.vamp.databackend.GenomeRequest;
@@ -16,7 +11,7 @@ import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
@@ -27,30 +22,42 @@ import java.util.logging.Logger;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
-import java.util.Iterator;
 
+/**
+ * @author MKD, rhilker
+ * 
+ * Carries out the analysis of a data set for operons.
+ */
 public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
 
     private final ProgressHandle progressHandle;
     private DataVisualisationI parent;
     private TrackViewer trackViewer;
+    private TrackConnector trackCon;
     private int minNumberReads;
     private int genomeSize;
-    private List<PersistantFeature> genomeFeatures;
+    private List<PersistantAnnotation> genomeAnnotations;
     private List<Operon> operonList;
     private MappingThreadAnalyses mappingThread;
     private int nbRequests;
     private int nbCarriedOutRequests;
-    private int WholNumberMappingGenom;
-    private int TranscritomLength;
+    private int numUniqueBmMappingsGenome;
+    private int transcritomeLength;
     private boolean operonDetectionAutomatic;
-    private HashMap<Integer, PutativOperon> featureReadCount; //feature id to count of mappings for feature
-    private List<OperonAdjacency> neighbarOperon;
+    private HashMap<Integer, PutativeOperon> annotationReadCount; //annotation id of mappings to count for annotation
+    private List<OperonAdjacency> operonAdjacencies;
     private int lastGene = 0;
-    private int average_Read_Length = 0;
-    TrackConnector trackCon;
-    private int average_SeqPair_length = 0;
+    private int averageReadLength = 0;
+    private int averageSeqPairLength = 0;
 
+    /**
+     * Carries out the analysis of a data set for operons.
+     * @param parent the parent, which should visualize the results after the analysis
+     * @param trackViewer the trackViewer whose data is to be analyzed
+     * @param minNumberReads the minimal number of spanning reads between neighboring genes
+     * @param operonDetectionAutomatic true, if the minimal number of spanning reads is not given and
+     *      should be calculated by the software
+     */
     public AnalysisOperon(DataVisualisationI parent, TrackViewer trackViewer, int minNumberReads, boolean operonDetectionAutomatic) {
         this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisOperon.class, "MSG_AnalysesWorker.progress.name"));
         this.parent = parent;
@@ -59,8 +66,8 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
         this.operonDetectionAutomatic = operonDetectionAutomatic;
         this.nbCarriedOutRequests = 0;
         this.operonList = new ArrayList<Operon>();
-        this.featureReadCount = new HashMap<Integer, PutativOperon>();
-        this.neighbarOperon = new ArrayList<OperonAdjacency>();
+        this.annotationReadCount = new HashMap<Integer, PutativeOperon>();
+        this.operonAdjacencies = new ArrayList<OperonAdjacency>();
     }
 
     @Override
@@ -70,21 +77,18 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
         this.trackCon = trackViewer.getTrackCon();
         List<Integer> trackIds = new ArrayList<Integer>();
         trackIds.add(trackCon.getTrackID());
-        average_Read_Length = trackCon.getAverageReadLength();
-        average_SeqPair_length = trackCon.getAverageSeqPairLenght();
-        //System.out.println(average_SeqPair_length);
+        averageReadLength = trackCon.getAverageReadLength();
+        averageSeqPairLength = trackCon.getAverageSeqPairLength();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
         this.genomeSize = refConnector.getRefGen().getSequence().length();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
-        int numMappingsTotal = 0;
+        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         int numUnneededMappings = 0;
-        WholNumberMappingGenom = trackCon.getNumOfUniqueBmMappings();
-        TranscritomLength = trackCon.getCoveredBestMatchPos();
+        numUniqueBmMappingsGenome = trackCon.getNumOfUniqueBmMappings();
+        transcritomeLength = trackCon.getCoveredBestMatchPos();
 
         List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
         for (PersistantTrack track : tracksAll) {
             TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
-            numMappingsTotal += connector.getNumOfUniqueMappings();
             if (track.getId() < trackCon.getTrackID()) {
                 numUnneededMappings += connector.getNumOfUniqueMappings();
             }
@@ -92,32 +96,27 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
         int numInterestingMappings = numUnneededMappings
                 + trackCon.getNumOfUniqueMappings();
 
-        for (int i = 0; i < this.genomeFeatures.size() - 1; i++) {
+        for (int i = 0; i < this.genomeAnnotations.size() - 1; i++) {
 
-            PersistantFeature feature1 = this.genomeFeatures.get(i);
-            PersistantFeature feature2 = this.genomeFeatures.get(i + 1);
-            if (feature1.getStrand() == feature2.getStrand()) {
-                if (feature2.getStart() <= feature1.getStop()) {
+            PersistantAnnotation annotation1 = this.genomeAnnotations.get(i);
+            PersistantAnnotation annotation2 = this.genomeAnnotations.get(i + 1);
+            if (annotation1.getStrand() == annotation2.getStrand()) {
+                if (annotation2.getStart() <= annotation1.getStop()) {
                     //do nothing
                 } else {
-
-                    this.featureReadCount.put(feature1.getId(), new PutativOperon(feature1, feature2));
+                    this.annotationReadCount.put(annotation1.getId(), new PutativeOperon(annotation1, annotation2));
                 }
             }
-
         }
-
 
         for (int trackId : trackIds) {
 
             int stepSize = 50000;
             int from = numUnneededMappings;
-            int to = numInterestingMappings - numUnneededMappings > stepSize
-                    ? numUnneededMappings + stepSize : numInterestingMappings;
-            int additionalRequest = numInterestingMappings % stepSize
-                    == 0 ? 0 : 1;
-            this.nbRequests = (numInterestingMappings
-                    - numUnneededMappings) / stepSize + additionalRequest;
+            int to = numInterestingMappings - numUnneededMappings > stepSize ? 
+                    numUnneededMappings + stepSize : numInterestingMappings;
+            int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
+            this.nbRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest;
             this.progressHandle.switchToDeterminate(this.nbRequests + 1); //+ 1 for subsequent calculations
             this.progressHandle.progress("Request " + (nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
 
@@ -136,8 +135,6 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
             to = numInterestingMappings;
             GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
             this.mappingThread.addRequest(mappingRequest);
-
-
         }
     }
 
@@ -145,57 +142,56 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
     public void receiveData(Object data) {
         this.progressHandle.progress("Request " + (++nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
 
-        List<PersistantMapping> mappcoverage = new ArrayList<PersistantMapping>();
-        if (data.getClass() == mappcoverage.getClass()) {
+        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
+        if (data.getClass() == mappings.getClass()) {
 
-            mappcoverage = (List<PersistantMapping>) data;
-            this.operonDetection(mappcoverage);
-
-
+            mappings = (List<PersistantMapping>) data;
+            this.sumReadCounts(mappings);
         }
 
         //when the last request is finished signalize the parent to collect the data
         if (nbCarriedOutRequests >= nbRequests - 1) {
             Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-            //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Collect the data");
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Collect the data", currentTimestamp);
-            this.findOperon();
+            this.findOperons();
             this.parent.showData(true);
             this.nbCarriedOutRequests = 0;
             this.progressHandle.finish();
         }
     }
 
-    public void operonDetection(List<PersistantMapping> mappings) {
-        PersistantFeature feature_Gen1;
-        PersistantFeature feature_Gen2;
+    /**
+     * Sums up the read counts for the annotations the mappings are located in.
+     * @param mappings the set of mappings to be investigated
+     */
+    public void sumReadCounts(List<PersistantMapping> mappings) {
+        PersistantAnnotation annotation1;
+        PersistantAnnotation annotation2;
 
+        for (int i = 0; i < this.genomeAnnotations.size() - 1; i++) {
+            annotation1 = this.genomeAnnotations.get(i);
+            annotation2 = this.genomeAnnotations.get(i + 1);
+            int annotation1Start = annotation1.getStart();
+            int annotation1Stop = annotation1.getStop();
+            int annotation2Start = annotation2.getStart();
+            int annotation2Stop = annotation2.getStop();
+            int readsGene1 = 0;
+            int spanningReads = 0;
+            int readsGene2 = 0;
+            int internalReads = 0;
+            int currentId = annotation1.getId();
 
-
-        for (int i = 0; i < this.genomeFeatures.size() - 1; i++) {
-            feature_Gen1 = this.genomeFeatures.get(i);
-            feature_Gen2 = this.genomeFeatures.get(i + 1);
-            int featStart_Gen1 = feature_Gen1.getStart();
-            int featStop_Gen1 = feature_Gen1.getStop();
-            int featStart_Gen2 = feature_Gen2.getStart();
-            int featStop_Gen2 = feature_Gen2.getStop();
-            int read_cover_Gen1 = 0;
-            int read_cover_Gen1_and_Gen2 = 0;
-            int read_cover_Gen2 = 0;
-            int read_cover_none = 0;
-            int current_ID = feature_Gen1.getId();
-
-            if (featureReadCount.get(current_ID) != null) {
+            if (annotationReadCount.get(currentId) != null) {
                 for (int j = 0; j < mappings.size(); ++j) {
                     PersistantMapping mapping = mappings.get(j);
-                    if (mapping.getStart() >= featStart_Gen1 && mapping.getStart() <= featStop_Gen1 && mapping.getStop() < featStart_Gen2) {
-                        read_cover_Gen1++;
-                    } else if (mapping.getStart() > featStop_Gen1 && mapping.getStop() >= featStart_Gen2 && mapping.getStop() <= featStop_Gen2) {
-                        read_cover_Gen2++;
-                    } else if (mapping.getStart() >= featStart_Gen1 && mapping.getStart() <= featStop_Gen1 && mapping.getStop() >= featStart_Gen2 && mapping.getStop() <= featStop_Gen2) {
-                        read_cover_Gen1_and_Gen2++;
-                    } else if (mapping.getStart() > featStop_Gen1 && mapping.getStop() < featStart_Gen2) {
-                        read_cover_none++;
+                    if (mapping.getStart() >= annotation1Start && mapping.getStart() <= annotation1Stop && mapping.getStop() < annotation2Start) {
+                        readsGene1++;
+                    } else if (mapping.getStart() > annotation1Stop && mapping.getStop() >= annotation2Start && mapping.getStop() <= annotation2Stop) {
+                        readsGene2++;
+                    } else if (mapping.getStart() <= annotation1Stop && mapping.getStop() >= annotation2Start) {
+                        spanningReads++;
+                    } else if (mapping.getStart() > annotation1Stop && mapping.getStop() < annotation2Start) {
+                        internalReads++;
                     }
 //                    if (mapping.getStart() <= featStop_Gen1 && mapping.getStart()>=featStart_Gen1) {
 //                        if (mapping.getStop() >= featStart_Gen2 && mapping.getStop() <=featStop_Gen2) {
@@ -211,133 +207,94 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
 //                    }
 
                 }
-                featureReadCount.get(current_ID).setRead_cover_Gen1(read_cover_Gen1);
-                featureReadCount.get(current_ID).setRead_cover_Gen1_and_Gen2(read_cover_Gen1_and_Gen2);
-                featureReadCount.get(current_ID).setRead_cover_Gen2(read_cover_Gen2);
-                featureReadCount.get(current_ID).setRead_cover_none(read_cover_none);
+                annotationReadCount.get(currentId).setReadsGene1(annotationReadCount.get(currentId).getReadsGene1() + readsGene1);
+                annotationReadCount.get(currentId).setSpanningReads(annotationReadCount.get(currentId).getSpanningReads() + spanningReads);
+                annotationReadCount.get(currentId).setReadsGene2(annotationReadCount.get(currentId).getReadsGene2() + readsGene2);
+                annotationReadCount.get(currentId).setInternalReads(annotationReadCount.get(currentId).getInternalReads() + internalReads);
 
             }
-
-
-
-
         }
     }
-
-    public void findOperon() {
-        Set<Integer> s = featureReadCount.keySet();
+    
+    /**
+     * Method for identifying operons after all read counts were summed up for each
+     * genome annotation.
+     */
+    public void findOperons() {
+        Set<Integer> s = annotationReadCount.keySet();
         Iterator i = s.iterator();
-        Object[] keyss = featureReadCount.keySet().toArray();
+        Object[] keyss = annotationReadCount.keySet().toArray();
         Arrays.sort(keyss);
+        int key;
         for (int z = 0; z < keyss.length; z++) {
-            //System.out.println(featureReadCount.get(keyss[z]).getGenFeature1().getId());
-            //}
-            //for (Integer key : s) {
-            int nb_cover_Gen1_and_Gen2 = featureReadCount.get(keyss[z]).getRead_cover_Gen1_and_Gen2();
-            int nb_cover_Gen1 = featureReadCount.get(keyss[z]).getRead_cover_Gen1();
-            int nb_cover_Gen2 = featureReadCount.get(keyss[z]).getRead_cover_Gen2();
-            int nb_cover_none = featureReadCount.get(keyss[z]).getRead_cover_none();
-            int allReadCover = nb_cover_Gen1_and_Gen2 + nb_cover_Gen1 + nb_cover_Gen2 + nb_cover_none;
-            int numberSignifikant = 0;
-            PersistantFeature feature_Gen1 = featureReadCount.get(keyss[z]).getGenFeature1();
-            PersistantFeature feature_Gen2 = featureReadCount.get(keyss[z]).getGenFeature2();
+            
+            key = (Integer) keyss[z];
+            int spanningReads = annotationReadCount.get(key).getSpanningReads();
+            int readsGene1 = annotationReadCount.get(key).getReadsGene1();
+            int readsGene2 = annotationReadCount.get(key).getReadsGene2();
+            int internalReads = annotationReadCount.get(key).getInternalReads();
+            int allReads = spanningReads + readsGene1 + readsGene2 + internalReads;
+            int threshold = 0;
+            PersistantAnnotation gene1 = annotationReadCount.get(key).getGene1();
+            PersistantAnnotation gene2 = annotationReadCount.get(key).getGene2();
 
             if (trackCon.getNumOfSeqPairs() > 0) {
                 //System.out.println("mkdmkd "+ trackCon.getNumOfSeqPairs());
                 if (!operonDetectionAutomatic) {
-                    numberSignifikant = (WholNumberMappingGenom * average_SeqPair_length) / TranscritomLength;
+                    threshold = (numUniqueBmMappingsGenome * averageSeqPairLength) / transcritomeLength;
                 } else {
-                    numberSignifikant = minNumberReads;
+                    threshold = minNumberReads;
 
                 }
             } else {
                 if (!operonDetectionAutomatic) {
-                    numberSignifikant = (WholNumberMappingGenom * average_Read_Length) / TranscritomLength;
+                    threshold = (numUniqueBmMappingsGenome * averageReadLength) / transcritomeLength;
                 } else {
-                    numberSignifikant = minNumberReads;
+                    threshold = minNumberReads;
 
                 }
             }
 
 
 
+            /* Detect an operon only, if the number of spanning reads is larger than
+             * the threshold. */
+            if (spanningReads > threshold) {
+                OperonAdjacency operonAdjacency = new OperonAdjacency(gene1, gene2);
+                operonAdjacency.setReadsGene1(readsGene1);
+                operonAdjacency.setSpanningReads(spanningReads);
+                operonAdjacency.setReadsGene2(readsGene2);
+                operonAdjacency.setInternalReads(internalReads);
 
-            if (allReadCover > numberSignifikant) {
-                OperonAdjacency operon_gene = new OperonAdjacency(feature_Gen1, feature_Gen2);
-                operon_gene.setRead_cover_Gen1(nb_cover_Gen1);
-                operon_gene.setRead_cover_Gen1_and_Gen2(nb_cover_Gen1_and_Gen2);
-                operon_gene.setRead_cover_Gen2(nb_cover_Gen2);
-                operon_gene.setRead_cover_none(nb_cover_none);
+                if (lastGene == gene1.getId() && lastGene != 0) {
 
-
-                if (lastGene == feature_Gen1.getId() && lastGene != 0) {
-
-                    neighbarOperon.add(operon_gene);
-//                    System.out.println(feature_Gen1.getId() + "==" + feature_Gen2.getId());
-                    lastGene = feature_Gen2.getId();
-                } else if (lastGene != feature_Gen1.getId() && lastGene != 0) {
+                    operonAdjacencies.add(operonAdjacency);
+                    lastGene = gene2.getId();
+                } else if (lastGene != gene1.getId() && lastGene != 0) {
 
                     Operon op = new Operon();
 
-                    for (int y = 0; y < neighbarOperon.size(); y++) {
-                        op.getOperon().add(neighbarOperon.get(y));
+                    for (int y = 0; y < operonAdjacencies.size(); y++) {
+                        op.getOperon().add(operonAdjacencies.get(y));
                     }
                     operonList.add(op);
-                    neighbarOperon.clear();
-                    neighbarOperon.add(operon_gene);
+                    operonAdjacencies.clear();
+                    operonAdjacencies.add(operonAdjacency);
 
-                    lastGene = feature_Gen2.getId();
+                    lastGene = gene2.getId();
 
                 } else if (lastGene == 0) {
-                    neighbarOperon.add(operon_gene);
-                    lastGene = feature_Gen2.getId();
+                    operonAdjacencies.add(operonAdjacency);
+                    lastGene = gene2.getId();
                 }
 
+                // TODO: check if parameter ok or new parameter
+//            } else if (gene2.getStart() - gene1.getStop() > averageReadLength &&
+//                    minimalCoverage > minNumberReads) {
+//                //create operon
             }
 
         }
-
-//        for(int a=0;a<operonList.size();a++){
-//            List<OperonAdjacency> o=operonList.get(a).getOperon();
-//            for(){}
-//            
-//        }
-        //      int allReadCover = read_cover_Gen1 + read_cover_Gen1_and_Gen2 + read_cover_Gen2 + read_cover_none;
-//            //numberSignifikant = (this.WholNumberMappingGenom * 35) / this.TranscritomLength;
-//            if (!operonDetectionAutomatic) {
-//                numberSignifikant = (WholNumberMappingGenom * 35) / TranscritomLength;
-//            } else {
-//                numberSignifikant = minNumberReads;
-//
-//            }
-//
-//            if (allReadCover > numberSignifikant) {
-//                OperonAdjacency operon_gene = new OperonAdjacency(feature_Gen1, feature_Gen2);
-//                operon_gene.setRead_cover_Gen1(read_cover_Gen1);
-//                operon_gene.setRead_cover_Gen1_and_Gen2(read_cover_Gen1_and_Gen2);
-//                operon_gene.setRead_cover_Gen2(read_cover_Gen2);
-//                operon_gene.setRead_cover_Gen1(read_cover_Gen1);
-//
-//                if (lastGene == feature_Gen1.getId() && lastGene != 0) {
-//                    operon.setOperon(operon_gene);
-//                    lastGene = feature_Gen2.getId();
-//
-//
-//                } else if (lastGene != feature_Gen1.getId() && lastGene != 0) {
-//                    operonList.add(operon);
-//
-//                    operon.clearList();
-//
-//                    operon.setOperon(operon_gene);
-//                    lastGene = feature_Gen2.getId();
-//
-//                } else if (lastGene == 0) {
-//                    operon.setOperon(operon_gene);
-//                    lastGene = feature_Gen2.getId();
-//
-//                }
-//
-//            }
     }
 
     @Override

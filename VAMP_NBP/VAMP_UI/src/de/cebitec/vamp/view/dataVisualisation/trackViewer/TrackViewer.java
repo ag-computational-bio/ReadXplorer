@@ -48,7 +48,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private int id1;
     private int id2 ;
     private boolean colorChanges;
-    public boolean hasNormalizationFactor = false;
+    private boolean hasNormalizationFactor = false;
+    private boolean automaticScaling = true;
     
     private JSlider slider = null;
 
@@ -445,15 +446,15 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.computeScaleStep();
             this.covLoaded = true;
         }
-
-        if (this.hasLegend()) {
-            this.add(this.getLegendLabel());
-            this.add(this.getLegendPanel());
-        }
         
         if (this.hasOptions()) {
             this.add(this.getOptionsLabel());
             this.add(this.getOptionsPanel());
+        }
+        
+        if (this.hasLegend()) {
+            this.add(this.getLegendLabel());
+            this.add(this.getLegendPanel());
         }
     }
     
@@ -780,7 +781,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * values range from 1-200.
      */
     private void computeAutomaticScaling() {
-        if (this.cov != null && this.slider != null) {
+        if (this.automaticScaling && this.cov != null && this.slider != null) {
             
             this.scaleFactor = Math.round(this.cov.getHighestCoverage() / 140.0) + 1;
             this.scaleFactor = this.scaleFactor < 1 ? 1.0 : this.scaleFactor;
@@ -848,7 +849,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Method for updating this track viewer, when the normalization value was changed.
      */
     public void normalizationValueChanged() {
-    this.hasNormalizationFactor = this.normSetting.getIdToValue().keySet().size() == 2 ? 
+        this.hasNormalizationFactor = this.normSetting.getIdToValue().keySet().size() == 2 ? 
             (normSetting.getHasNormFac(id1) || normSetting.getHasNormFac(id2)) : normSetting.getHasNormFac(id1);
         this.boundsChangedHook();
         this.repaint();
@@ -907,21 +908,21 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         PersistantCoverage resultCov = new PersistantCoverage(coverages[0].getLeftBound(), coverages[0].getRightBound());
         
         for (int i = coverages[0].getLeftBound(); i < coverages[0].getRightBound(); ++i) {
-            for (PersistantCoverage cov : coverages) {
-                resultCov.setPerfectFwdMult(i, resultCov.getPerfectFwdMult(i) + cov.getPerfectFwdMult(i));
-                resultCov.setPerfectFwdNum(i, resultCov.getPerfectFwdNum(i) + cov.getPerfectFwdNum(i));
-                resultCov.setPerfectRevMult(i, resultCov.getPerfectRevMult(i) + cov.getPerfectRevMult(i));
-                resultCov.setPerfectRevNum(i, resultCov.getPerfectRevNum(i) + cov.getPerfectRevNum(i));
+            for (PersistantCoverage cove : coverages) {
+                resultCov.setPerfectFwdMult(i, resultCov.getPerfectFwdMult(i) + cove.getPerfectFwdMult(i));
+                resultCov.setPerfectFwdNum(i, resultCov.getPerfectFwdNum(i) + cove.getPerfectFwdNum(i));
+                resultCov.setPerfectRevMult(i, resultCov.getPerfectRevMult(i) + cove.getPerfectRevMult(i));
+                resultCov.setPerfectRevNum(i, resultCov.getPerfectRevNum(i) + cove.getPerfectRevNum(i));
                 
-                resultCov.setBestMatchFwdMult(i, resultCov.getBestMatchFwdMult(i) + cov.getBestMatchFwdMult(i));
-                resultCov.setBestMatchFwdNum(i, resultCov.getBestMatchFwdNum(i) + cov.getBestMatchFwdNum(i));
-                resultCov.setBestMatchRevMult(i, resultCov.getBestMatchRevMult(i) + cov.getBestMatchRevMult(i));
-                resultCov.setBestMatchRevNum(i, resultCov.getBestMatchRevNum(i) + cov.getBestMatchRevNum(i));
+                resultCov.setBestMatchFwdMult(i, resultCov.getBestMatchFwdMult(i) + cove.getBestMatchFwdMult(i));
+                resultCov.setBestMatchFwdNum(i, resultCov.getBestMatchFwdNum(i) + cove.getBestMatchFwdNum(i));
+                resultCov.setBestMatchRevMult(i, resultCov.getBestMatchRevMult(i) + cove.getBestMatchRevMult(i));
+                resultCov.setBestMatchRevNum(i, resultCov.getBestMatchRevNum(i) + cove.getBestMatchRevNum(i));
                 
-                resultCov.setCommonFwdMult(i, resultCov.getCommonFwdMult(i) + cov.getCommonFwdMult(i));
-                resultCov.setCommonFwdNum(i, resultCov.getCommonFwdNum(i) + cov.getCommonFwdNum(i));
-                resultCov.setCommonRevMult(i, resultCov.getCommonRevMult(i) + cov.getCommonRevMult(i));
-                resultCov.setCommonRevNum(i, resultCov.getCommonRevNum(i) + cov.getCommonRevNum(i));
+                resultCov.setCommonFwdMult(i, resultCov.getCommonFwdMult(i) + cove.getCommonFwdMult(i));
+                resultCov.setCommonFwdNum(i, resultCov.getCommonFwdNum(i) + cove.getCommonFwdNum(i));
+                resultCov.setCommonRevMult(i, resultCov.getCommonRevMult(i) + cove.getCommonRevMult(i));
+                resultCov.setCommonRevNum(i, resultCov.getCommonRevNum(i) + cove.getCommonRevNum(i));
             }
         }
         
@@ -933,6 +934,16 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     public boolean isTwoTracks() {
         return this.twoTracks;
-    }    
+    }
+
+    /**
+     * @param automaticScaling Set true, if the coverage slider should automatically 
+     * adapt to the coverage shown (the complete coverage in the interval always is 
+     * visible). False, if the slider value should only be changed manually by the user.
+     */
+    public void setAutomaticScaling(boolean automaticScaling) {
+        this.automaticScaling = automaticScaling;
+        this.computeAutomaticScaling();
+    }
 
 }

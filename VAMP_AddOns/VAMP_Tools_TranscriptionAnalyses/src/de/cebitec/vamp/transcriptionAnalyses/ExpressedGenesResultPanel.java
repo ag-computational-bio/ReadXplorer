@@ -5,6 +5,7 @@
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.ExpressedGene;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -148,5 +149,9 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
         this.expressedGenesTable.setRowSorter(sorter);
         sorter.setModel(model);
+    }
+    
+    public int getResultSize() {
+        return this.expressedGenes.size();
     }
 }

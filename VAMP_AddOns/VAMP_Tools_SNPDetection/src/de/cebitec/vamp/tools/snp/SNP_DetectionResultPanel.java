@@ -272,25 +272,28 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 List<PersistantAnnotation> annotationsFound = snpTranslator.checkCoveredByAnnotation(snp.getPosition());
                 String ids = "";
                 if (!annotationsFound.isEmpty()) {
+                    SequenceComparison type = SequenceComparison.UNKNOWN;
                     if (snp.getType().equals(SequenceComparison.INSERTION)) {
-                        rowData[15] = String.valueOf(SequenceComparison.INSERTION.getType());
+                        type = SequenceComparison.INSERTION;
                         
                     } else if (snp.getType().equals(SequenceComparison.DELETION)) {
-                        rowData[15] = String.valueOf(SequenceComparison.DELETION.getType());
+                        type = SequenceComparison.DELETION;
                         
                     } else if (snp.getType().equals(SequenceComparison.MATCH)) {
-                        rowData[15] = String.valueOf(SequenceComparison.MATCH.getType());
+                        type = SequenceComparison.MATCH;
                     }
                     
                     for (PersistantAnnotation annotation : annotationsFound){
                         ids += (annotation.hasGeneName() ? annotation.getGeneName() : annotation.getLocus()) + "\n";
+                        snp.addCodon(new CodonSnp("", "", ' ', ' ', type, ids));
                     }
+                    rowData[15] = String.valueOf(type.getType());
                     rowData[16] = ids;
                     rowData[13] = "-";
                     rowData[14] = "-";
                 } else {
-                    rowData[13] = "no gene";
-                    rowData[14] = "no gene";
+                    rowData[13] = "No gene";
+                    rowData[14] = "No gene";
                     rowData[15] = "";
                     rowData[16] = "";
                 }
@@ -352,5 +355,12 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 NbPreferences.forModule(SNP_DetectionResultPanel.class).put(SNP_Phylogeny.FDNAML_PATH, fileLocation);
             }
         };
+    }
+    
+    /**
+     * @return The size of the SNP data.
+     */
+    public int getSnpDataSize() {
+        return this.snpData.getSnpList().size();
     }
 }

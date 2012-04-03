@@ -61,18 +61,16 @@ public class ExcelExportFileChooser extends VampFileChooser {
 
                         } catch (FileNotFoundException ex) {
                             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE);
-                            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, " Export failed!", ex);
                         } catch (IOException ex) {
                             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE);
-                            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, " Export failed!", ex);
                         } catch (WriteException ex) {
                             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.FailMsg"),
                                     NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.FailHeader"), JOptionPane.ERROR_MESSAGE);
-                            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error writing file{0}", ex.getMessage());
                         } catch (OutOfMemoryError e) {
                             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.OomMsg"),
                                     NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.FailHeader"), JOptionPane.INFORMATION_MESSAGE);
                         }
+                        progressHandle.finish();
                     }
                 }
             });

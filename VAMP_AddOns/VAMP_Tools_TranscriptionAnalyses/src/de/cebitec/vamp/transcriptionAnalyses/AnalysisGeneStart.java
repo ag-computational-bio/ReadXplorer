@@ -1,7 +1,10 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.GeneStart;
 import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.api.objects.AnalysisI;
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.api.objects.JobI;
 import de.cebitec.vamp.databackend.CoverageThreadAnalyses;
 import de.cebitec.vamp.databackend.GenomeRequest;
@@ -306,7 +309,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
 
     /**
      * Detects and returns the genomic annotations, which can be associated to the
-     * given gene start and strand. This can be eiter a annotation starting at the
+     * given gene start and strand. This can be eiter an annotation starting at the
      * predicted gene start, which would be a correct start, or it will contain
      * the maximal two closest annotations found in a vicinity of 500bp up- or 
      * downstream of the gene start.
@@ -336,17 +339,46 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                     }
 
                     if (start < geneStartPos && annotation.getStop() > geneStartPos) {
-                        //store annotation as next smaller annotation, but search for closer
-                        //smaller annotation & correctly annotated gene start
+                        //store annotation as next upstream annotation, but search for closer
+                        //upstream annotation & correctly annotated gene start
+                        
+                        /* 
+                         * Also check, if gene and CDS annotation are available for current SNP
+                         * Handle this case by not storing the current annotation, if it is 
+                         * a CDS annotation completely covered by a gene annotation. In all other
+                         * cases the annotation can be stored.
+                         */
+                        PersistantAnnotation upstreamAnno = detectedAnnotations.getUpstreamAnnotation();
+                        if (    upstreamAnno != null && 
+                                annotation.getType() == FeatureType.CDS && 
+                                upstreamAnno.getType() == FeatureType.GENE &&
+                                upstreamAnno.getStop() >= annotation.getStop()) {
+                            System.out.println("Fwd special case 1");
+                            continue;
+                        }
+                        
                         detectedAnnotations.setUpstreamAnnotation(annotation);
+                        
                     } else if (start == geneStartPos) {
                         //store correctly annotated gene start
                         detectedAnnotations.setCorrectStartAnnotation(annotation);
                         detectedAnnotations.setUpstreamAnnotation(null);
                         break;
                     } else if (start > geneStartPos) {
-                        //store next bigger annotation, translation start is earlier
-                        detectedAnnotations.setDownstreamAnnotation(annotation);
+                        /*
+                         * Store next downstream annotation, transcription start is earlier than annotated,
+                         * except the current annotation is a CDS annotation and no gene annotation is present for
+                         * that gene, starting earlier.
+                         */
+                        if (annotation.getType() == FeatureType.CDS && 
+                                annotation.getStart() == this.genomeAnnotations.get(i+1).getStart() &&
+                                this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE) {
+                            detectedAnnotations.setDownstreamAnnotation(this.genomeAnnotations.get(i+1));
+                            System.out.println("Fwd special case 2");
+                        } else {
+                            detectedAnnotations.setDownstreamAnnotation(annotation);
+                        }
+                        
                         break;
                     }
 
@@ -373,17 +405,47 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                     if (start < geneStartPos) {
                         //store annotation as next bigger annotation, but search for closer
                         //bigger annotation & correctly annotated gene start
+                        
+                        /*
+                         * Store next upstream annotation. transcription start is earlier than annotated,
+                         * except the current annotation is a CDS annotation and no gene annotation is present for
+                         * that gene, starting earlier.
+                         */
+                        PersistantAnnotation upstreamAnno = detectedAnnotations.getUpstreamAnnotation();
+                        if (    upstreamAnno != null && 
+                                annotation.getType() == FeatureType.CDS && 
+                                start == upstreamAnno.getStop() &&
+                                upstreamAnno.getType() == FeatureType.GENE) {
+                            //TODO: this does not work if annotations start at the same position on rev and fwd strand!
+                            System.out.println("Rev special case 1");
+                            continue; // we want to keep the gene instead the CDS annotation
+                        }
+                        
                         detectedAnnotations.setDownstreamAnnotation(annotation);
+                        
                     } else if (start == geneStartPos) {
                         //store correctly annotated gene start
                         detectedAnnotations.setCorrectStartAnnotation(annotation);
                         detectedAnnotations.setDownstreamAnnotation(null);
                         break;
                     } else if (start > geneStartPos && annotation.getStart() < geneStartPos) {
-                        //store next smaller annotation, translation start is further in gene
-                        detectedAnnotations.setUpstreamAnnotation(annotation);
+                        //store next upstream annotation, translation start is further in gene
+                        
+                        /* 
+                         * Also check, if gene and CDS annotation are available for current SNP.
+                         * Handle this case by not storing the current annotation, if it is 
+                         * a CDS annotation completely covered by a gene annotation. In all other
+                         * cases the annotation can be stored.
+                         */
+                        if (    annotation.getType() == FeatureType.CDS && 
+                                this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE &&
+                                this.genomeAnnotations.get(i+1).getStart() <= annotation.getStart()) {
+                            detectedAnnotations.setUpstreamAnnotation(this.genomeAnnotations.get(i+1));
+                            System.out.println("Rev special case 2");
+                        } else {                      
+                            detectedAnnotations.setUpstreamAnnotation(annotation);
+                        }
                         break;
-
                     }
 
                 } else if (start >= maxStartPos) {
@@ -512,4 +574,22 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
             }
         }
     }
+
+    public int getIncreaseReadCount() {
+        return increaseReadCount;
+    }
+
+    public int getIncreaseReadCount2() {
+        return increaseReadCount2;
+    }
+
+    public int getIncreaseReadPercent() {
+        return increaseReadPercent;
+    }
+
+    public int getMaxInitialReadCount() {
+        return maxInitialReadCount;
+    }
+    
+    
 }

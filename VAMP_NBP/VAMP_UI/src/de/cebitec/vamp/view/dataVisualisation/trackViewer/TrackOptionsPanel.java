@@ -17,16 +17,18 @@ import javax.swing.text.NumberFormatter;
 /**
  * @author jstraube, rhilker
  * 
- * Panel for normalizing the coverage.
+ * Panel containing the display options for a track viewer like
+ * automatic sclaing and normalizing the coverage.
  */
-public class TrackNormalizationPanel extends javax.swing.JPanel {
+public class TrackOptionsPanel extends javax.swing.JPanel {
 
     private TrackViewer trackViewer;
 
     /**
-     * Creates a new Panel for normalizing the coverage.
+     * Creates a new Panel containing the display options for a track viewer like
+     * automatic sclaing and normalizing the coverage.
      */
-    public TrackNormalizationPanel(TrackViewer parentTrackViewer) {
+    public TrackOptionsPanel(TrackViewer parentTrackViewer) {
         this.trackViewer = parentTrackViewer;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -63,7 +65,7 @@ public class TrackNormalizationPanel extends javax.swing.JPanel {
      */
     private void initOtherComponents() {
         
-        final JLabel header = new JLabel("Normalization:");
+        final JLabel header = new JLabel("General:");
         header.setBackground(ColorProperties.LEGEND_BACKGROUND);
         header.setFont(new Font("Arial", Font.BOLD, 11));
         final JPanel headerPanel = new JPanel(new BorderLayout());
@@ -71,6 +73,35 @@ public class TrackNormalizationPanel extends javax.swing.JPanel {
         headerPanel.add(header, BorderLayout.CENTER);
         headerPanel.setPreferredSize(new Dimension(headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2));
         this.add(headerPanel);
+        
+        JPanel generalPanel = new JPanel();
+        generalPanel.setLayout(new BorderLayout());
+        generalPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        final JCheckBox scaleBox = new JCheckBox("Automatic scaling enabled");
+        scaleBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        scaleBox.setSelected(true);
+        
+        //automatic scaling enabled event
+        scaleBox.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JCheckBox scaleBox = (JCheckBox) e.getSource();
+                trackViewer.setAutomaticScaling(scaleBox.isSelected());
+            }
+        });
+        generalPanel.add(scaleBox, BorderLayout.WEST);
+        this.add(generalPanel);
+        
+        // normalization options
+        final JLabel header2 = new JLabel("Normalization:");
+        header2.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        header2.setFont(new Font("Arial", Font.BOLD, 11));
+        final JPanel headerPanel2 = new JPanel(new BorderLayout());
+        headerPanel2.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        headerPanel2.add(header2, BorderLayout.CENTER);
+        headerPanel2.setPreferredSize(new Dimension(headerPanel2.getPreferredSize().width, headerPanel2.getPreferredSize().height + 2));
+        this.add(headerPanel2);
 
         if (trackViewer.isTwoTracks() && !trackViewer.isCombineTracks()) {
             int k = 0;

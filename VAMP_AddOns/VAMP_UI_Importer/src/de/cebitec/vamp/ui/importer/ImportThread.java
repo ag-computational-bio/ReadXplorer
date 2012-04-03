@@ -268,7 +268,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         System.gc();
                     }
                 } else if (distance <= 0) {
-                    this.showErrorMsg(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.error"));
+                    this.showMsg(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.error"));
                 }
 
                 it.remove();
@@ -326,12 +326,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void parseStepwiseTrack(TrackJob trackJob, boolean onlyPositionTable) {
         String filename = trackJob.getFile().getName();
         boolean isLastTrack = false;
-        //TODO:make stepsize changable for user
         int start = 1;
         int stepsize = trackJob.getStepSize();
         int stop = stepsize;
         
-        if(!trackJob.isSorted()){
+        if (!trackJob.isSorted()) {
              ExternalSortBAM ex = new ExternalSortBAM(trackJob.getFile().getPath());
              trackJob.setFile(ex.getSortedFile());
              ex = null;
@@ -411,26 +410,26 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     }
 
     @Override
-    public void update(Object errorMsg) {
-        if (errorMsg instanceof String) {
-            this.showErrorMsg((String) errorMsg);
+    public void update(Object msg) {
+        if (msg instanceof String) {
+            this.showMsg((String) msg);
         }
     }
 
     /**
+     * If any other message should be printed to the console, this method is used.
      * If an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
-     * @param errorMsg
+     * @param msg
      */
-    private void showErrorMsg(String errorMsg) {
-        this.io.getOut().println("\"" + errorMsg);
+    private void showMsg(String msg) {
+        this.io.getOut().println("\"" + msg);
     }
 
     private void storeSeqPairs(ParsedSeqPairContainer seqPairContainer, String description) throws StorageException {
-
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing sequence pair data for track data from source \"{0}\"", description);
+        
+        this.io.getOut().println("Start storing sequence pair data for track data from source \""+ description +"\"");
         ProjectConnector.getInstance().addSeqPairData(seqPairContainer);
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing sequence pair data for track data from source \"{0}\"", description);
-
+        this.io.getOut().println("Finished storing sequence pair data for track data from source \""+ description +"\"");
     }
 }

@@ -2,6 +2,7 @@ package de.cebitec.vamp.databackend.dataObjects;
 
 import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
+import de.cebitec.vamp.util.SequenceComparison;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,36 +69,60 @@ public class SnpData implements ExcelExportDataI {
             snpExport.add(snp.getCoverage());
             snpExport.add(snp.getFrequency());
             snpExport.add(snp.getType().getType());
-            snpExport.add(snp.getTRate());
-            snpExport.add(snp.getNRate());
-            snpExport.add(snp.getGapRate());
             
-            List<CodonSnp> codons = snp.getCodons();
+            
             String noGene = "No gene";
             String aminoAcidsSnp = "";
             String aminoAcidsRef = "";
-            if (codons.isEmpty()){
-                aminoAcidsSnp = noGene;
-                aminoAcidsRef = noGene;
-            }
             String effect = "";
             String geneId = "";
-            char aminoSnp;
-            char aminoRef;
-            for (CodonSnp codon : codons) {
-                aminoSnp = codon.getAminoSnp();
-                aminoRef = codon.getAminoRef();
-                aminoAcidsSnp += aminoSnp + " (" + AminoAcidProperties.getPropertyForAA(aminoSnp) + ")\n";
-                aminoAcidsRef += aminoRef + " (" + AminoAcidProperties.getPropertyForAA(aminoRef) + ")\n";
-                effect += codon.getEffect().getType() + "\n";
-                geneId += codon.getGeneId() + "\n";
+            //determine amino acid substitutions among snp substitutions
+            if (snp.getType() == SequenceComparison.SUBSTITUTION) {
+           
+                List<CodonSnp> codons = snp.getCodons();
+                
+                if (codons.isEmpty()) {
+                    aminoAcidsSnp = noGene;
+                    aminoAcidsRef = noGene;
+                }
+                char aminoSnp;
+                char aminoRef;
+                for (CodonSnp codon : codons) {
+                    aminoSnp = codon.getAminoSnp();
+                    aminoRef = codon.getAminoRef();
+                    aminoAcidsSnp += aminoSnp + " (" + AminoAcidProperties.getPropertyForAA(aminoSnp) + ")\n";
+                    aminoAcidsRef += aminoRef + " (" + AminoAcidProperties.getPropertyForAA(aminoRef) + ")\n";
+                    effect += codon.getEffect().getType() + "\n";
+                    geneId += codon.getGeneId() + "\n";
+                }
+            } else {
+                List<CodonSnp> codons = snp.getCodons();
+                String ids = "";
+                if (!codons.isEmpty()) {
+                    if (snp.getType().equals(SequenceComparison.INSERTION)) {
+                        effect = String.valueOf(SequenceComparison.INSERTION.getType());
+
+                    } else if (snp.getType().equals(SequenceComparison.DELETION)) {
+                        effect = String.valueOf(SequenceComparison.DELETION.getType());
+
+                    } else if (snp.getType().equals(SequenceComparison.MATCH)) {
+                        effect = String.valueOf(SequenceComparison.MATCH.getType());
+                    }
+
+                    for (CodonSnp codon : codons) {
+                        ids += codon.getGeneId() + "\n";
+                    }
+                    geneId = ids;
+                    aminoAcidsSnp = "-";
+                    aminoAcidsRef = "-";
+                } else {
+                    aminoAcidsSnp = "No gene";
+                    aminoAcidsRef = "No gene";
+                    effect = "";
+                    geneId = "";
+                }
             }
-            
-            //determine effect on amino acid sequence in case its not a substitution
-            if (!aminoAcidsSnp.equals(noGene) && effect.equals("")) { //only if there is at least on gene here
-                effect += snp.getType().getType(); //it will be identical to type in this case
-            }
-            
+
             snpExport.add(aminoAcidsSnp);
             snpExport.add(aminoAcidsRef);
             snpExport.add(effect);
