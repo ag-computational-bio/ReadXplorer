@@ -5,10 +5,11 @@
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.ExpressedGene;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -22,18 +23,13 @@ import javax.swing.JOptionPane;
 public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements DataVisualisationI {
 
     private TrackViewer trackViewer;
-    private AnalysisGeneStart analysisGeneStarts;
-    private AnalysisExpressedGenes analysisExpressedGenes;
+    private AnalysisTranscriptionStart analysisTSS;
+    private AnalysisFilterGenes analysisFilteredGenes;
     private AnalysisOperon analysisOperon;
-    private boolean detectGeneStarts;
-    private boolean geneStartAutomatic;
-    private boolean doneGeneStarts;
-    private boolean detectExpressedGenes;
-    private boolean doneExpressedGenes;
-    private boolean detectOperon;
-    private boolean doneOperon;
-    private int nbAnalyses;
-    private int nbFinishedAnalyses;
+    private boolean detectTranscriptionStarts;
+    private boolean transcriptionStartAutomatic;
+    private boolean filterGenes;
+    private boolean detectOperons;
     private boolean operonDetectionAutomatic;
     public static final String PROP_ANALYSES_FINISHED = "analysesFinished";
 
@@ -44,11 +40,12 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
      */
     public TranscriptionAnalysesPanel(TrackViewer trackViewer) {
         this.initComponents();
+        this.operonDetectionAutomaticBox.setVisible(false);
         this.trackViewer = trackViewer;
-        this.analysisGeneStarts = null;
-        this.analysisExpressedGenes = null;
-        this.detectGeneStarts = false;
-        this.detectExpressedGenes = false;
+        this.analysisTSS = null;
+        this.analysisFilteredGenes = null;
+        this.detectTranscriptionStarts = false;
+        this.filterGenes = false;
     }
 
     /**
@@ -63,69 +60,69 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         menuResultSplitPane = new javax.swing.JSplitPane();
         menuPanel = new javax.swing.JPanel();
         menuLabel = new javax.swing.JLabel();
-        expressedGenesBox = new javax.swing.JCheckBox();
-        geneStartBox = new javax.swing.JCheckBox();
-        geneStartField = new javax.swing.JTextField();
-        geneStartLabel = new javax.swing.JLabel();
+        filteredGenesBox = new javax.swing.JCheckBox();
+        transcriptionStartBox = new javax.swing.JCheckBox();
+        transcriptionStartField = new javax.swing.JTextField();
+        transcriptionStartLabel = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
-        expressedGenesField = new javax.swing.JTextField();
-        expressedGenesLabel = new javax.swing.JLabel();
+        filteredGenesField = new javax.swing.JTextField();
+        filteredGenesLabel = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         detectionButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        geneStartField3 = new javax.swing.JTextField();
-        geneStartLabel2 = new javax.swing.JLabel();
-        geneStartField4 = new javax.swing.JTextField();
-        geneStartLabel3 = new javax.swing.JLabel();
+        transcriptionStartField3 = new javax.swing.JTextField();
+        transcriptionStartLabel2 = new javax.swing.JLabel();
+        transcriptionStartField4 = new javax.swing.JTextField();
+        transcriptionStartLabel3 = new javax.swing.JLabel();
         addRestrictionLabel = new javax.swing.JLabel();
-        geneStartAutomaticBox = new javax.swing.JCheckBox();
-        geneStartLabel1 = new javax.swing.JLabel();
-        geneStartField2 = new javax.swing.JTextField();
-        operonBox = new javax.swing.JCheckBox();
+        transcriptionStartAutomaticBox = new javax.swing.JCheckBox();
+        transcriptionStartLabel1 = new javax.swing.JLabel();
+        transcriptionStartField2 = new javax.swing.JTextField();
+        operonDetectionBox = new javax.swing.JCheckBox();
         operonField = new javax.swing.JTextField();
         operonLabel = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JSeparator();
-        operonDetectionAutomaticBox1 = new javax.swing.JCheckBox();
-        expressedGenesField2 = new javax.swing.JTextField();
-        expressedGenesLabel2 = new javax.swing.JLabel();
+        operonDetectionAutomaticBox = new javax.swing.JCheckBox();
+        filteredGenesField2 = new javax.swing.JTextField();
+        filteredGenesLabel2 = new javax.swing.JLabel();
         resultTabs = new javax.swing.JTabbedPane();
 
         menuResultSplitPane.setDividerLocation(230);
 
         menuLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.menuLabel.text")); // NOI18N
 
-        expressedGenesBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesBox.text")); // NOI18N
-        expressedGenesBox.addActionListener(new java.awt.event.ActionListener() {
+        filteredGenesBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.filteredGenesBox.text")); // NOI18N
+        filteredGenesBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                expressedGenesBoxActionPerformed(evt);
+                filteredGenesBoxActionPerformed(evt);
             }
         });
 
-        geneStartBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartBox.text")); // NOI18N
-        geneStartBox.addActionListener(new java.awt.event.ActionListener() {
+        transcriptionStartBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartBox.text")); // NOI18N
+        transcriptionStartBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                geneStartBoxActionPerformed(evt);
+                transcriptionStartBoxActionPerformed(evt);
             }
         });
 
-        geneStartField.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartField.text")); // NOI18N
-        geneStartField.addActionListener(new java.awt.event.ActionListener() {
+        transcriptionStartField.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartField.text")); // NOI18N
+        transcriptionStartField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                geneStartFieldActionPerformed(evt);
+                transcriptionStartFieldActionPerformed(evt);
             }
         });
 
-        geneStartLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartLabel.text")); // NOI18N
+        transcriptionStartLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartLabel.text")); // NOI18N
 
-        expressedGenesField.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesField.text")); // NOI18N
-        expressedGenesField.addActionListener(new java.awt.event.ActionListener() {
+        filteredGenesField.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.filteredGenesField.text")); // NOI18N
+        filteredGenesField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                expressedGenesFieldActionPerformed(evt);
+                filteredGenesFieldActionPerformed(evt);
             }
         });
 
-        expressedGenesLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesLabel.text")); // NOI18N
+        filteredGenesLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.filteredGenesLabel.text")); // NOI18N
 
         detectionButton.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.detectionButton.text")); // NOI18N
         detectionButton.addActionListener(new java.awt.event.ActionListener() {
@@ -136,23 +133,23 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        geneStartField3.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartField3.text")); // NOI18N
-        geneStartField3.addActionListener(new java.awt.event.ActionListener() {
+        transcriptionStartField3.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartField3.text")); // NOI18N
+        transcriptionStartField3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                geneStartField3ActionPerformed(evt);
+                transcriptionStartField3ActionPerformed(evt);
             }
         });
 
-        geneStartLabel2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartLabel2.text")); // NOI18N
+        transcriptionStartLabel2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartLabel2.text")); // NOI18N
 
-        geneStartField4.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartField4.text")); // NOI18N
-        geneStartField4.addActionListener(new java.awt.event.ActionListener() {
+        transcriptionStartField4.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartField4.text")); // NOI18N
+        transcriptionStartField4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                geneStartField4ActionPerformed(evt);
+                transcriptionStartField4ActionPerformed(evt);
             }
         });
 
-        geneStartLabel3.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartLabel3.text")); // NOI18N
+        transcriptionStartLabel3.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartLabel3.text")); // NOI18N
 
         addRestrictionLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.addRestrictionLabel.text")); // NOI18N
 
@@ -165,13 +162,13 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(addRestrictionLabel)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(geneStartField3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(transcriptionStartField3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(geneStartLabel2))
+                        .addComponent(transcriptionStartLabel2))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(geneStartField4, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(transcriptionStartField4, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(geneStartLabel3)))
+                        .addComponent(transcriptionStartLabel3)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -181,35 +178,35 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 .addComponent(addRestrictionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(geneStartField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(geneStartLabel2))
+                    .addComponent(transcriptionStartField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transcriptionStartLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(geneStartField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(geneStartLabel3))
+                    .addComponent(transcriptionStartField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transcriptionStartLabel3))
                 .addGap(7, 7, 7))
         );
 
-        geneStartAutomaticBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartAutomaticBox.text")); // NOI18N
-        geneStartAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
+        transcriptionStartAutomaticBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartAutomaticBox.text")); // NOI18N
+        transcriptionStartAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                geneStartAutomaticBoxActionPerformed(evt);
+                transcriptionStartAutomaticBoxActionPerformed(evt);
             }
         });
 
-        geneStartLabel1.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartLabel1.text")); // NOI18N
+        transcriptionStartLabel1.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartLabel1.text")); // NOI18N
 
-        geneStartField2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.geneStartField2.text")); // NOI18N
-        geneStartField2.addActionListener(new java.awt.event.ActionListener() {
+        transcriptionStartField2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptionStartField2.text")); // NOI18N
+        transcriptionStartField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                geneStartField2ActionPerformed(evt);
+                transcriptionStartField2ActionPerformed(evt);
             }
         });
 
-        operonBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.operonBox.text")); // NOI18N
-        operonBox.addActionListener(new java.awt.event.ActionListener() {
+        operonDetectionBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.operonDetectionBox.text")); // NOI18N
+        operonDetectionBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                operonBoxActionPerformed(evt);
+                operonDetectionBoxActionPerformed(evt);
             }
         });
 
@@ -222,21 +219,21 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
         operonLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.operonLabel.text")); // NOI18N
 
-        operonDetectionAutomaticBox1.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.operonDetectionAutomaticBox1.text")); // NOI18N
-        operonDetectionAutomaticBox1.addActionListener(new java.awt.event.ActionListener() {
+        operonDetectionAutomaticBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.operonDetectionAutomaticBox.text")); // NOI18N
+        operonDetectionAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                operonDetectionAutomaticBox1ActionPerformed(evt);
+                operonDetectionAutomaticBoxActionPerformed(evt);
             }
         });
 
-        expressedGenesField2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesField2.text")); // NOI18N
-        expressedGenesField2.addActionListener(new java.awt.event.ActionListener() {
+        filteredGenesField2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.filteredGenesField2.text")); // NOI18N
+        filteredGenesField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                expressedGenesField2ActionPerformed(evt);
+                filteredGenesField2ActionPerformed(evt);
             }
         });
 
-        expressedGenesLabel2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.expressedGenesLabel2.text")); // NOI18N
+        filteredGenesLabel2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.filteredGenesLabel2.text")); // NOI18N
 
         javax.swing.GroupLayout menuPanelLayout = new javax.swing.GroupLayout(menuPanel);
         menuPanel.setLayout(menuPanelLayout);
@@ -253,37 +250,37 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                             .addComponent(detectionButton)
                             .addComponent(menuLabel)
                             .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(geneStartField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(transcriptionStartField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(geneStartLabel))
+                                .addComponent(transcriptionStartLabel))
                             .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(geneStartField2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(transcriptionStartField2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(geneStartLabel1))
-                            .addComponent(expressedGenesBox)
+                                .addComponent(transcriptionStartLabel1))
+                            .addComponent(filteredGenesBox)
                             .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(expressedGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(filteredGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(expressedGenesLabel))
+                                .addComponent(filteredGenesLabel))
                             .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(geneStartBox)
+                                .addComponent(transcriptionStartBox)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(geneStartAutomaticBox))
+                                .addComponent(transcriptionStartAutomaticBox))
                             .addGroup(menuPanelLayout.createSequentialGroup()
                                 .addComponent(operonField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(operonLabel))
                             .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(expressedGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(filteredGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(expressedGenesLabel2)))
-                        .addContainerGap(296, Short.MAX_VALUE))
+                                .addComponent(filteredGenesLabel2)))
+                        .addContainerGap())
                     .addComponent(jSeparator4)
                     .addGroup(menuPanelLayout.createSequentialGroup()
-                        .addComponent(operonBox)
+                        .addComponent(operonDetectionBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(operonDetectionAutomaticBox1)
+                        .addComponent(operonDetectionAutomaticBox)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         menuPanelLayout.setVerticalGroup(
@@ -295,36 +292,36 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(geneStartBox)
-                    .addComponent(geneStartAutomaticBox))
+                    .addComponent(transcriptionStartBox)
+                    .addComponent(transcriptionStartAutomaticBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(geneStartField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(geneStartLabel))
+                    .addComponent(transcriptionStartField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transcriptionStartLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(geneStartField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(geneStartLabel1))
+                    .addComponent(transcriptionStartField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transcriptionStartLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(expressedGenesBox)
+                .addComponent(filteredGenesBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(expressedGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(expressedGenesLabel))
+                    .addComponent(filteredGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filteredGenesLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(expressedGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(expressedGenesLabel2))
+                    .addComponent(filteredGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filteredGenesLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(operonBox)
-                    .addComponent(operonDetectionAutomaticBox1))
+                    .addComponent(operonDetectionBox)
+                    .addComponent(operonDetectionAutomaticBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(operonField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -351,121 +348,107 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void expressedGenesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expressedGenesBoxActionPerformed
-        if (!this.isValidNumberInput(this.expressedGenesField.getText())) {
+    private void filteredGenesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filteredGenesBoxActionPerformed
+        if (!this.isValidNumberInput(this.filteredGenesField.getText())) {
             JOptionPane.showMessageDialog(this, "Please enter a positive number or 0 in the expressed genes fields!", "Number Format Error", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_expressedGenesBoxActionPerformed
+    }//GEN-LAST:event_filteredGenesBoxActionPerformed
 
-    private void geneStartBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_geneStartBoxActionPerformed
-        if (!this.isValidNumberInput(this.geneStartField.getText())
-                || !this.isValidNumberInput(this.geneStartField2.getText())
-                || !this.isValidNumberInput(this.geneStartField3.getText())) {
-            JOptionPane.showMessageDialog(this, "Please enter a positive number or 0 in all gene start fields!", "Number Format Error", JOptionPane.ERROR_MESSAGE);
+    private void transcriptionStartBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartBoxActionPerformed
+        if (!this.isValidNumberInput(this.transcriptionStartField.getText())
+                || (!this.isValidNumberInput(this.transcriptionStartField2.getText()) && !this.transcriptionStartField2.getText().isEmpty())
+                || (!this.isValidNumberInput(this.transcriptionStartField3.getText()) && !this.transcriptionStartField3.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(this, "Please enter a number >= 0 in all transcription start fields!", "Number Format Error", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_geneStartBoxActionPerformed
+    }//GEN-LAST:event_transcriptionStartBoxActionPerformed
 
-    private void geneStartFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_geneStartFieldActionPerformed
+    private void transcriptionStartFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartFieldActionPerformed
         // no action needed
-    }//GEN-LAST:event_geneStartFieldActionPerformed
+    }//GEN-LAST:event_transcriptionStartFieldActionPerformed
 
-    private void expressedGenesFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expressedGenesFieldActionPerformed
+    private void filteredGenesFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filteredGenesFieldActionPerformed
         // no action needed
-    }//GEN-LAST:event_expressedGenesFieldActionPerformed
+    }//GEN-LAST:event_filteredGenesFieldActionPerformed
 
-    private void geneStartField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_geneStartField3ActionPerformed
+    private void transcriptionStartField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartField3ActionPerformed
         // no action needed
-    }//GEN-LAST:event_geneStartField3ActionPerformed
+    }//GEN-LAST:event_transcriptionStartField3ActionPerformed
 
-    private void geneStartField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_geneStartField4ActionPerformed
+    private void transcriptionStartField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartField4ActionPerformed
         // no action needed
-    }//GEN-LAST:event_geneStartField4ActionPerformed
+    }//GEN-LAST:event_transcriptionStartField4ActionPerformed
 
     private void detectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectionButtonActionPerformed
-        if (!this.isValidNumberInput(this.geneStartField.getText())
-                || !this.isValidNumberInput(this.geneStartField2.getText())
-                || !this.isValidNumberInput(this.geneStartField3.getText())
-                || !this.isValidNumberInput(this.expressedGenesField.getText())
-                || !this.isValidNumberInput(this.operonField.getText())) {
-            JOptionPane.showMessageDialog(this, "Please enter a positive number or 0 in all fields!", "Number Format Error", JOptionPane.ERROR_MESSAGE);
+        if ((this.transcriptionStartBox.isSelected() && !this.transcriptionStartAutomaticBox.isSelected()
+                && (!this.isValidNumberInput(this.transcriptionStartField.getText())
+                || !this.isValidNumberInput(this.transcriptionStartField2.getText())
+                || !this.isValidNumberInput(this.transcriptionStartField3.getText())))
+                || ((this.filteredGenesBox.isSelected()) 
+                && !this.isValidNumberInput(this.filteredGenesField.getText()))
+                || (this.operonDetectionBox.isSelected()
+                && !this.isValidNumberInput(this.operonField.getText()))) {
+            JOptionPane.showMessageDialog(this, "Please enter a number >= 0 in all fields!", "Number Format Error", JOptionPane.ERROR_MESSAGE);
         } else {
 
-            this.detectGeneStarts = this.geneStartBox.isSelected();
-            this.geneStartAutomatic = this.geneStartAutomaticBox.isSelected();
-            this.detectExpressedGenes = this.expressedGenesBox.isSelected();
-            this.doneGeneStarts = false;
-            this.doneExpressedGenes = false;
-            this.detectOperon = this.operonBox.isSelected();
-            this.doneOperon = false;
-            this.operonDetectionAutomatic = this.operonDetectionAutomaticBox1.isSelected();
-            this.nbAnalyses = this.detectGeneStarts ? 1 : 0;
-            this.nbAnalyses = this.detectExpressedGenes ? ++this.nbAnalyses : this.nbAnalyses;
-            this.nbFinishedAnalyses = 0;
+            this.detectTranscriptionStarts = this.transcriptionStartBox.isSelected();
+            this.transcriptionStartAutomatic = this.transcriptionStartAutomaticBox.isSelected();
+            this.filterGenes = this.filteredGenesBox.isSelected();
+            this.detectOperons = this.operonDetectionBox.isSelected();
+            this.operonDetectionAutomatic = this.operonDetectionAutomaticBox.isSelected();
             this.startAnalyses();
 
-            if (this.detectGeneStarts || this.detectExpressedGenes||this.detectOperon) {
+            if (this.detectTranscriptionStarts || this.filterGenes || this.detectOperons) {
                 this.detectionButton.setEnabled(false);
             }
         }
     }//GEN-LAST:event_detectionButtonActionPerformed
 
-    private void geneStartAutomaticBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_geneStartAutomaticBoxActionPerformed
-        if (this.geneStartAutomaticBox.isSelected()) {
-            this.geneStartField.setEnabled(false);
-            this.geneStartField2.setEnabled(false);
-            this.geneStartField3.setEnabled(false);
-            this.geneStartField4.setEnabled(false);
+    private void transcriptionStartAutomaticBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartAutomaticBoxActionPerformed
+        if (this.transcriptionStartAutomaticBox.isSelected()) {
+            this.transcriptionStartField.setEnabled(false);
+            this.transcriptionStartField2.setEnabled(false);
+            this.transcriptionStartField3.setEnabled(false);
+            this.transcriptionStartField4.setEnabled(false);
         } else {
-            this.geneStartField.setEnabled(true);
-            this.geneStartField2.setEnabled(true);
-            this.geneStartField3.setEnabled(true);
-            this.geneStartField4.setEnabled(true);
+            this.transcriptionStartField.setEnabled(true);
+            this.transcriptionStartField2.setEnabled(true);
+            this.transcriptionStartField3.setEnabled(true);
+            this.transcriptionStartField4.setEnabled(true);
         }
-    }//GEN-LAST:event_geneStartAutomaticBoxActionPerformed
+    }//GEN-LAST:event_transcriptionStartAutomaticBoxActionPerformed
 
-    private void geneStartField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_geneStartField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_geneStartField2ActionPerformed
+    private void transcriptionStartField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartField2ActionPerformed
+        // add your handling code here:
+    }//GEN-LAST:event_transcriptionStartField2ActionPerformed
 
-    private void operonBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_operonBoxActionPerformed
+    private void operonDetectionBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionBoxActionPerformed
+        // add your handling code here:
+    }//GEN-LAST:event_operonDetectionBoxActionPerformed
 
     private void operonFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonFieldActionPerformed
-        // TODO add your handling code here:
+        // add your handling code here:
     }//GEN-LAST:event_operonFieldActionPerformed
 
-    private void operonDetectionAutomaticBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionAutomaticBox1ActionPerformed
-        if (this.operonDetectionAutomaticBox1.isSelected()) {
+    private void operonDetectionAutomaticBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionAutomaticBoxActionPerformed
+        if (this.operonDetectionAutomaticBox.isSelected()) {
             this.operonField.setEnabled(false);
         } else {
             this.operonField.setEnabled(true);
-
         }
-    }//GEN-LAST:event_operonDetectionAutomaticBox1ActionPerformed
+    }//GEN-LAST:event_operonDetectionAutomaticBoxActionPerformed
 
-    private void expressedGenesField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expressedGenesField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_expressedGenesField2ActionPerformed
+    private void filteredGenesField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filteredGenesField2ActionPerformed
+        // add your handling code here:
+    }//GEN-LAST:event_filteredGenesField2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel addRestrictionLabel;
     private javax.swing.JButton detectionButton;
-    private javax.swing.JCheckBox expressedGenesBox;
-    private javax.swing.JTextField expressedGenesField;
-    private javax.swing.JTextField expressedGenesField2;
-    private javax.swing.JLabel expressedGenesLabel;
-    private javax.swing.JLabel expressedGenesLabel2;
-    private javax.swing.JCheckBox geneStartAutomaticBox;
-    private javax.swing.JCheckBox geneStartBox;
-    private javax.swing.JTextField geneStartField;
-    private javax.swing.JTextField geneStartField2;
-    private javax.swing.JTextField geneStartField3;
-    private javax.swing.JTextField geneStartField4;
-    private javax.swing.JLabel geneStartLabel;
-    private javax.swing.JLabel geneStartLabel1;
-    private javax.swing.JLabel geneStartLabel2;
-    private javax.swing.JLabel geneStartLabel3;
+    private javax.swing.JCheckBox filteredGenesBox;
+    private javax.swing.JTextField filteredGenesField;
+    private javax.swing.JTextField filteredGenesField2;
+    private javax.swing.JLabel filteredGenesLabel;
+    private javax.swing.JLabel filteredGenesLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -474,11 +457,21 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
     private javax.swing.JLabel menuLabel;
     private javax.swing.JPanel menuPanel;
     private javax.swing.JSplitPane menuResultSplitPane;
-    private javax.swing.JCheckBox operonBox;
-    private javax.swing.JCheckBox operonDetectionAutomaticBox1;
+    private javax.swing.JCheckBox operonDetectionAutomaticBox;
+    private javax.swing.JCheckBox operonDetectionBox;
     private javax.swing.JTextField operonField;
     private javax.swing.JLabel operonLabel;
     private javax.swing.JTabbedPane resultTabs;
+    private javax.swing.JCheckBox transcriptionStartAutomaticBox;
+    private javax.swing.JCheckBox transcriptionStartBox;
+    private javax.swing.JTextField transcriptionStartField;
+    private javax.swing.JTextField transcriptionStartField2;
+    private javax.swing.JTextField transcriptionStartField3;
+    private javax.swing.JTextField transcriptionStartField4;
+    private javax.swing.JLabel transcriptionStartLabel;
+    private javax.swing.JLabel transcriptionStartLabel1;
+    private javax.swing.JLabel transcriptionStartLabel2;
+    private javax.swing.JLabel transcriptionStartLabel3;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -508,101 +501,110 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
      * Starts the analyses selected by the user with the given parameters.
      */
     private void startAnalyses() {
-        if (this.detectGeneStarts && !this.doneGeneStarts) {
-            int increaseReadCount = Integer.parseInt(this.geneStartField.getText());
-            int increaseReadPercent = Integer.parseInt(this.geneStartField2.getText());
-            int maxInitialReadCount = Integer.parseInt(this.geneStartField3.getText());
-            int increaseReadCount2 = Integer.parseInt(this.geneStartField4.getText());
-            this.analysisGeneStarts = new AnalysisGeneStart(this, this.trackViewer, increaseReadCount,
-                    increaseReadPercent, maxInitialReadCount, increaseReadCount2, this.geneStartAutomatic);
-            this.analysisGeneStarts.startAnalysis();
+        AnalysesHandler covAnalysisHandler = new AnalysesHandler(this.trackViewer, this);
+        AnalysesHandler mappingAnalysisHandler = new AnalysesHandler(this.trackViewer, this);
+        
+        if (this.detectTranscriptionStarts) {
+            int increaseReadCount = Integer.parseInt(this.transcriptionStartField.getText());
+            int increaseReadPercent = Integer.parseInt(this.transcriptionStartField2.getText());
+            int maxInitialReadCount = Integer.parseInt(this.transcriptionStartField3.getText());
+            int increaseReadCount2 = Integer.parseInt(this.transcriptionStartField4.getText());
+            this.analysisTSS = new AnalysisTranscriptionStart(this.trackViewer, increaseReadCount,
+                    increaseReadPercent, maxInitialReadCount, increaseReadCount2, this.transcriptionStartAutomatic);
             
-            return;
+            covAnalysisHandler.registerObserver(this.analysisTSS);
+            covAnalysisHandler.setCoverageNeeded(true);
         }
-        if (this.detectExpressedGenes && !this.doneExpressedGenes) {
-            int minNumberReads = Integer.parseInt(this.expressedGenesField.getText());
-            int maxNumberReads = Integer.parseInt(this.expressedGenesField2.getText());
-            this.analysisExpressedGenes = new AnalysisExpressedGenes(this, this.trackViewer, minNumberReads, maxNumberReads);
-            this.analysisExpressedGenes.startAnalysis();
-
-            return;
+        if (this.filterGenes) {
+            int minNumberReads = Integer.parseInt(this.filteredGenesField.getText());
+            int maxNumberReads = Integer.parseInt(this.filteredGenesField2.getText());
+            this.analysisFilteredGenes = new AnalysisFilterGenes(this.trackViewer, minNumberReads, maxNumberReads);
+            
+            mappingAnalysisHandler.registerObserver(this.analysisFilteredGenes);
+            mappingAnalysisHandler.setMappingsNeeded(true);
         }
-        if (this.detectOperon && !this.doneOperon) {
+        if (this.detectOperons) {
             int minNumberReads = Integer.parseInt(this.operonField.getText());
-            this.analysisOperon = new AnalysisOperon(this, this.trackViewer, minNumberReads, this.operonDetectionAutomatic);
-            this.analysisOperon.startAnalysis();
-
+            this.analysisOperon = new AnalysisOperon(this.trackViewer, minNumberReads, this.operonDetectionAutomatic);
+            
+            mappingAnalysisHandler.registerObserver(this.analysisOperon);
+            mappingAnalysisHandler.setMappingsNeeded(true);
         }
+        
+        covAnalysisHandler.startAnalysis();
+        mappingAnalysisHandler.startAnalysis();
     }
 
+    /**
+     * Visualizes the data handed over to this method as defined by the implementation.
+     * @param data the data object to visualize.
+     */
     @Override
-    public void showData(Object isDataAvailable) {
+    public void showData(Object dataTypeObject) {
 
-        if (isDataAvailable instanceof Boolean && ((Boolean) isDataAvailable) == true) {
-            if (this.detectGeneStarts && !this.doneGeneStarts) {
-                GeneStartsResultPanel geneStartResultPanel = new GeneStartsResultPanel();
-                geneStartResultPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
-                geneStartResultPanel.addGeneStarts(this.analysisGeneStarts.getResults());
-                System.out.println("Size: " + this.analysisGeneStarts.getResults().size());
-                //TODO: get track name
-                this.resultTabs.addTab("Detected gene starts for track (" + geneStartResultPanel.getResultSize() + " hits)", geneStartResultPanel);
+        if (dataTypeObject instanceof String) {
+            
+            String dataType = (String) dataTypeObject;
+
+            //get track name(s)
+            String trackName = "track";
+            ArrayList<String> trackNames = this.trackViewer.getTrackCon().getAssociatedTrackNames();
+            if (!(trackNames == null) && !trackNames.isEmpty()) {
+                trackName = trackNames.get(0);
+            }
+            
+            if (this.detectTranscriptionStarts && dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
+                
+                ResultPanelTranscriptionStart transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
+                transcriptionStartResultPanel.setTrackViewer(this.trackViewer);
+                transcriptionStartResultPanel.addTSSs(this.analysisTSS.getResults());
+                System.out.println("Size: " + this.analysisTSS.getResults().size());
+                
+                this.resultTabs.addTab("Detected TSSs for " + trackName + 
+                        " (" + transcriptionStartResultPanel.getResultSize() + " hits)", transcriptionStartResultPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
                 this.resultTabs.setSelectedIndex(this.resultTabs.getTabCount() - 1);
                 
                 //TODO: put this in some analysis information panel
-                System.out.println("Minimal increase of read count: " + this.analysisGeneStarts.getIncreaseReadCount());
-                System.out.println("Minimal increase in %: " + this.analysisGeneStarts.getIncreaseReadPercent());
-                if (this.analysisGeneStarts.getIncreaseReadCount2() > 0) {
+                System.out.println("Minimal increase of read count: " + this.analysisTSS.getIncreaseReadCount());
+                System.out.println("Minimal increase in %: " + this.analysisTSS.getIncreaseReadPercent());
+                if (this.analysisTSS.getIncreaseReadCount2() > 0) {
                     System.out.println("Additional low coverage restrictions:");
-                    System.out.println("Min. increase of read count: " + this.analysisGeneStarts.getIncreaseReadCount2());
-                    System.out.println("Max. initial read count: " + this.analysisGeneStarts.getMaxInitialReadCount());
+                    System.out.println("Min. increase of read count: " + this.analysisTSS.getIncreaseReadCount2());
+                    System.out.println("Max. initial read count: " + this.analysisTSS.getMaxInitialReadCount());
                 }
-
-                //start remaining analyses, if there are any
-                this.doneGeneStarts = true;
-                TranscriptionAnalysesPanel.this.startAnalyses();
             }
-            if (this.detectExpressedGenes && !this.doneExpressedGenes) {
+            if (this.filterGenes && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
+                
+                List<FilteredGene> filteredGenes = this.analysisFilteredGenes.getResults();
 
-                List<ExpressedGene> expressedGenes = this.analysisExpressedGenes.getResults();
-                int size = expressedGenes.size();
+                ResultPanelFilteredGenes filteredGenesResultPanel = new ResultPanelFilteredGenes();
+                filteredGenesResultPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
+                filteredGenesResultPanel.addFilteredGenes(filteredGenes);
 
-                ExpressedGenesResultPanel expressedGenesResultPanel = new ExpressedGenesResultPanel();
-                expressedGenesResultPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
-                expressedGenesResultPanel.addExpressedGenes(expressedGenes);
-
-                this.resultTabs.addTab("Detected expressed genes for track (" + expressedGenesResultPanel.getResultSize() + " hits)", expressedGenesResultPanel);
+                this.resultTabs.addTab("Filtered genes for " + trackName + 
+                        " (" + filteredGenesResultPanel.getResultSize() + " hits)", filteredGenesResultPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
                 this.resultTabs.setSelectedIndex(this.resultTabs.getTabCount() - 1);
-
-                //start remaining analyses, if there are any
-                this.doneExpressedGenes = true;
-                TranscriptionAnalysesPanel.this.startAnalyses();
-
-                //add this, when another analysis was added
-                //return;
 
                 //TODO: prozentualer increase
                 //annotation finden/ändern
 
             }
-            if (this.detectOperon && !this.doneOperon) {
-                ++this.nbFinishedAnalyses;
-                OperonDetectionResultPanel operonPanel = new OperonDetectionResultPanel();
+            if (this.detectOperons && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
+                
+                ResultPanelOperonDetection operonPanel = new ResultPanelOperonDetection();
                 operonPanel.setBoundsInfoManager(this.trackViewer.getBoundsInformationManager());
                 operonPanel.addDetectedOperons(this.analysisOperon.getResults());
 
-                this.resultTabs.addTab("Operon detection for track (" + operonPanel.getResultSize() + " hits)", operonPanel);
+                this.resultTabs.addTab("Detected operons for " + trackName + 
+                        " (" + operonPanel.getResultSize() + " hits)", operonPanel);
                 this.resultTabs.setTabComponentAt(this.resultTabs.getTabCount() - 1, new TabWithCloseX(this.resultTabs));
                 this.resultTabs.setSelectedIndex(this.resultTabs.getTabCount() - 1);
-                
-                this.doneOperon = true;
-                TranscriptionAnalysesPanel.this.startAnalyses();
             }
         }
-        if (this.nbFinishedAnalyses >= this.nbAnalyses) {
-            this.detectionButton.setEnabled(true);
-        }
+        
+        this.detectionButton.setEnabled(true);
 
     }
 }

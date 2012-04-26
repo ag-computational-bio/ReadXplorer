@@ -1,11 +1,11 @@
 /*
- * ExpressedGenesResultPanel.java
+ * ResultPanelFilteredGenes.java
  *
  * Created on 27.01.2012, 14:31:15
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.ExpressedGene;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -21,21 +21,21 @@ import javax.swing.table.TableRowSorter;
 /**
  * @author -Rolf Hilker-
  */
-public class ExpressedGenesResultPanel extends javax.swing.JPanel {
+public class ResultPanelFilteredGenes extends javax.swing.JPanel {
 
     private BoundsInfoManager bim;
-    private List<ExpressedGene> expressedGenes;
+    private List<FilteredGene> filteredGenes;
     
-    /** Creates new form ExpressedGenesResultPanel */
-    public ExpressedGenesResultPanel() {
+    /** Creates new form ResultPanelFilteredGenes */
+    public ResultPanelFilteredGenes() {
         initComponents();
         
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.expressedGenesTable.getSelectionModel();
+        DefaultListSelectionModel model = (DefaultListSelectionModel) this.filteredGenesTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showExpressedGenePosition();
+                showFilteredGenePosition();
             }
         });
     }
@@ -50,10 +50,10 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         expressedGenesPane = new javax.swing.JScrollPane();
-        expressedGenesTable = new javax.swing.JTable();
+        filteredGenesTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
 
-        expressedGenesTable.setModel(new javax.swing.table.DefaultTableModel(
+        filteredGenesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -76,12 +76,12 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        expressedGenesPane.setViewportView(expressedGenesTable);
-        expressedGenesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title0")); // NOI18N
-        expressedGenesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title2_1")); // NOI18N
-        expressedGenesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title1")); // NOI18N
+        expressedGenesPane.setViewportView(filteredGenesTable);
+        filteredGenesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredGenes.class, "ResultPanelFilteredGenes.filteredGenesTable.columnModel.title0")); // NOI18N
+        filteredGenesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredGenes.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title2_1")); // NOI18N
+        filteredGenesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredGenes.class, "ExpressedGenesResultPanel.expressedGenesTable.columnModel.title1")); // NOI18N
 
-        exportButton.setText(org.openide.util.NbBundle.getMessage(ExpressedGenesResultPanel.class, "ExpressedGenesResultPanel.exportButton.text")); // NOI18N
+        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelFilteredGenes.class, "ResultPanelFilteredGenes.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -107,21 +107,21 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExpressedGenesColumns expressedGenesData = new ExpressedGenesColumns(this.expressedGenes);
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", expressedGenesData, "Expressed Genes Table"); 
+        FilteredGenesColumns filteredGenesData = new FilteredGenesColumns(this.filteredGenes);
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", filteredGenesData, "Filtered Genes Table"); 
     }//GEN-LAST:event_exportButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane expressedGenesPane;
-    private javax.swing.JTable expressedGenesTable;
+    private javax.swing.JTable filteredGenesTable;
     // End of variables declaration//GEN-END:variables
 
-    private void showExpressedGenePosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.expressedGenesTable.getSelectionModel();
+    private void showFilteredGenePosition() {
+        DefaultListSelectionModel model = (DefaultListSelectionModel) this.filteredGenesTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = this.expressedGenesTable.convertRowIndexToModel(selectedView);
-        PersistantAnnotation annotation = (PersistantAnnotation) this.expressedGenesTable.getModel().getValueAt(selectedModel, 0);
+        int selectedModel = this.filteredGenesTable.convertRowIndexToModel(selectedView);
+        PersistantAnnotation annotation = (PersistantAnnotation) this.filteredGenesTable.getModel().getValueAt(selectedModel, 0);
         int pos = annotation.getStrand() == SequenceUtils.STRAND_FWD ? annotation.getStart() : annotation.getStop();
 
         bim.navigatorBarUpdated(pos);
@@ -131,27 +131,27 @@ public class ExpressedGenesResultPanel extends javax.swing.JPanel {
         this.bim = boundsInformationManager;
     }
 
-    public void addExpressedGenes(List<ExpressedGene> expressedGenes) {
+    public void addFilteredGenes(List<FilteredGene> filteredGenes) {
         final int nbColumns = 3;
-        this.expressedGenes = expressedGenes;
-        DefaultTableModel model = (DefaultTableModel) this.expressedGenesTable.getModel();        
+        this.filteredGenes = filteredGenes;
+        DefaultTableModel model = (DefaultTableModel) this.filteredGenesTable.getModel();        
 
-        for (ExpressedGene expressedGene : this.expressedGenes) {
+        for (FilteredGene filteredGene : this.filteredGenes) {
             
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = expressedGene.getExpressedAnnotation();
-            rowData[1] = expressedGene.getExpressedAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
-            rowData[2] = expressedGene.getReadCount();
+            rowData[0] = filteredGene.getFilteredAnnotation();
+            rowData[1] = filteredGene.getFilteredAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
+            rowData[2] = filteredGene.getReadCount();
 
             model.addRow(rowData);
         }
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
-        this.expressedGenesTable.setRowSorter(sorter);
+        this.filteredGenesTable.setRowSorter(sorter);
         sorter.setModel(model);
     }
     
     public int getResultSize() {
-        return this.expressedGenes.size();
+        return this.filteredGenes.size();
     }
 }

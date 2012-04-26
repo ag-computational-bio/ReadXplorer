@@ -145,7 +145,6 @@ public class ExcelExporter {
                 this.progressHandle.progress("Storing line", row);
             }
         }
-        this.progressHandle.finish();
     }
 
     /**

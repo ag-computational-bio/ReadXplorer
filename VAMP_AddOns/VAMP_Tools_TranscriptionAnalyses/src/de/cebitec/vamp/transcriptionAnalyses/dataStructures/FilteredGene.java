@@ -8,23 +8,23 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
  * Data structure for storing a annotation (gene), which is detected as expressed
  * and its corresponding data.
  */
-public class ExpressedGene {
+public class FilteredGene {
 
     private PersistantAnnotation expressedAnnotation;
     private int readCount;
     
     /**
-     * Creates a new ExpressedGene.
+     * Creates a new FilteredGene.
      * @param expressedAnnotation the annotation (gene) which is detected as expressed.
      */
-    public ExpressedGene(PersistantAnnotation expressedAnnotation) {
+    public FilteredGene(PersistantAnnotation expressedAnnotation) {
         this.expressedAnnotation = expressedAnnotation;
     }
 
     /**
      * @return the annotation (gene) which is detected as expressed.
      */
-    public PersistantAnnotation getExpressedAnnotation() {
+    public PersistantAnnotation getFilteredAnnotation() {
         return this.expressedAnnotation;
     }
 

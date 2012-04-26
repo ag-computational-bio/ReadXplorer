@@ -3,85 +3,86 @@ package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 
 /**
- *
- * @author MKD
+ * @author MKD, rhilker
+ * 
+ * A putative operon is a data structure for storing two neighboring annotations,
+ * which might form an operon. It also contains the read counts only associated to annotation1/2,
+ * the spanning and the internal read counts.
  */
 public class OperonAdjacency {
 
-    private PersistantAnnotation operonAnnotation1;
-    private PersistantAnnotation operonAnnotation2;
-    private int readsGene1 = 0;
-    private int spanningReads = 0;
-    private int readsGene2 = 0;
-    private int internalReads = 0;
-
-    public OperonAdjacency(PersistantAnnotation operonAnnotation1, PersistantAnnotation operonAnnotation2) {
-        this.operonAnnotation1 = operonAnnotation1;
-        this.operonAnnotation2 = operonAnnotation2;
-
-    }
-
+    private PersistantAnnotation annotation1;
+    private PersistantAnnotation annotation2;
+    private int readsAnnotation1;
+    private int spanningReads;
+    private int readsAnnotation2;
+    private int internalReads;
+  
     /**
-     * @return the operonAnnotation
+     * A putative operon is a data structure for storing two neighboring
+     * annotations, which might form an operon. It also contains the read counts
+     * only associated to annotation1/2, the spanning and the internal read
+     * counts.
      */
-    public PersistantAnnotation getOperonAnnotation() {
-        return operonAnnotation1;
+    public OperonAdjacency(PersistantAnnotation annotation1, PersistantAnnotation annotation2) {
+        this.annotation1 = annotation1;
+        this.annotation2 = annotation2;
     }
 
     /**
-     * @param operonAnnotation the operonAnnotation to set
+     * @return the first annotation of the operon
      */
-    public void setOperonAnnotation(PersistantAnnotation operonAnnotation) {
-        this.operonAnnotation1 = operonAnnotation;
+    public PersistantAnnotation getAnnotation1() {
+        return annotation1;
     }
 
     /**
-     * @return the operonAnnotation2
+     * @return the second annotation of the operon
      */
-    public PersistantAnnotation getOperonAnnotation2() {
-        return operonAnnotation2;
+    public PersistantAnnotation getAnnotation2() {
+        return annotation2;
     }
 
     /**
-     * @return the readsGene1
+     * @return the reads associated with Annotation1
      */
-    public int getReadsGene1() {
-        return readsGene1;
+    public int getReadsAnnotation1() {
+        return readsAnnotation1;
     }
 
     /**
-     * @param readsGene1 the readsGene1 to set
+     * @param readsAnnotation1 the reads associated with Annotation1
      */
-    public void setReadsGene1(int readsGene1) {
-        this.readsGene1 = readsGene1;
+    public void setReadsAnnotation1(int readsAnnotation1) {
+        this.readsAnnotation1 = readsAnnotation1;
     }
 
     /**
-     * @return the spanningReads
+     * @return the number of reads spanning from annotation 1 into 2
      */
     public int getSpanningReads() {
         return spanningReads;
     }
 
     /**
-     * @param spanningReads the spanningReads to set
+     * @param spanningReads set the number of reads spanning from annotation 1 into 2
      */
     public void setSpanningReads(int spanningReads) {
         this.spanningReads = spanningReads;
     }
 
     /**
-     * @return the readsGene2
+     * @return the readsAnnotation2
      */
-    public int getReadsGene2() {
-        return readsGene2;
+    public int getReadsAnnotation2() {
+        return readsAnnotation2;
     }
 
     /**
-     * @param readsGene2 the readsGene2 to set
+     * @param readsAnnotation2 the readsAnnotation2 to set
      */
-    public void setReadsGene2(int readsGene2) {
-        this.readsGene2 = readsGene2;
+    public void setReadsAnnotation2(int readsAnnotation2) {
+        this.readsAnnotation2 = readsAnnotation2;
     }
 
     /**

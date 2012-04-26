@@ -83,11 +83,17 @@ public class BasePanelFactory {
 
         // create and set up legend
         JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
-        trackV.setupLegend(new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND), trackPanelLegend);
-        
+        MenuLabel legendLabel = new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND);
+        trackV.setupLegend(legendLabel, trackPanelLegend);
+
         // create and set up options (currently normalization)
         JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
-        trackV.setupOptions(new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS), trackPanelOptions);
+        MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
+        trackV.setupOptions(optionsLabel, trackPanelOptions);
+        
+        //assign observers to handle visualization correctly
+        legendLabel.registerObserver(optionsLabel);
+        optionsLabel.registerObserver(legendLabel);
 
         // create info label
         CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -126,17 +132,23 @@ public class BasePanelFactory {
             MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon, combineTracks);
 
             // create and set up legend
+            JPanel trackPanelLegend;
             if (combineTracks) {
-                JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
-                trackV.setupLegend(new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND), trackPanelLegend);
+                trackPanelLegend = this.getTrackPanelLegend(trackV);
             } else {
-                JPanel trackPanelLegend = this.getDoubleTrackPanelLegend();
-                trackV.setupLegend(new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND), trackPanelLegend);
+                trackPanelLegend = this.getDoubleTrackPanelLegend();
             }
-            
+            MenuLabel legendLabel = new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND);
+            trackV.setupLegend(legendLabel, trackPanelLegend);
+
             // create and set up options (currently normalization)
             JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
-            trackV.setupOptions(new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS), trackPanelOptions);
+            MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
+            trackV.setupOptions(optionsLabel, trackPanelOptions);
+            
+            //assign observers to handle visualization correctly
+            legendLabel.registerObserver(optionsLabel);
+            optionsLabel.registerObserver(legendLabel);
 
             // create info panel
             CoverageInfoLabel cil = new CoverageInfoLabel();

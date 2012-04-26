@@ -4,14 +4,14 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.view.dialogMenus.JTextFieldPasteable;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.StandardMenuEvent;
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,7 +74,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 updateFilter();
 
             }
-        });
+        });        
 
         //Listener for TableSelect-Events
         annotationTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -133,12 +133,12 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jumpTextfield = new javax.swing.JTextField();
+        jumpTextfield = new JTextFieldPasteable();
         jumpButton = new javax.swing.JButton();
         featureGroundPanel = new javax.swing.JPanel();
         filterProperties = new javax.swing.JPanel();
         jumpFilterLabel = new javax.swing.JLabel();
-        filterTextfield = new javax.swing.JTextField();
+        filterTextfield = new JTextFieldPasteable();
         filterForLabel = new javax.swing.JLabel();
         radioProduct = new javax.swing.JRadioButton();
         radioEC = new javax.swing.JRadioButton();
@@ -146,7 +146,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         radioGene = new javax.swing.JRadioButton();
         tableScrollPane = new javax.swing.JScrollPane();
         annotationTable = new javax.swing.JTable();
-        searchPatternField = new javax.swing.JTextField();
+        searchPatternField = new JTextFieldPasteable();
         searchPatternButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Navigation"));
@@ -262,7 +262,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 330, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
             .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         featureGroundPanelLayout.setVerticalGroup(
@@ -330,7 +330,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
         if (isValidNumberInput(this.jumpTextfield.getText())) {
-            this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText());
+            this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText().trim());
             this.boundsManager.navigatorBarUpdated(this.jumpPosition);
         } else {
             JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"+this.refGen.getSequence().length()+")", "Invalid Position", JOptionPane.ERROR_MESSAGE);

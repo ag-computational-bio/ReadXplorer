@@ -164,7 +164,7 @@ public class JokParser implements MappingParserI {
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                     String readwithoutGaps;
-                   // XXX:TODO check this
+                    
                     if (readSeq.contains("_")) {
                         StringBuilder sBuilder = new StringBuilder();
                         String[] read = readSeq.split("_+");
@@ -176,12 +176,13 @@ public class JokParser implements MappingParserI {
                     } else {
                         readwithoutGaps = readSeq;
                     }
-                    //Saruman turns only the read string by mapping so we can get the native read direction
+                    //Saruman flips only the read string by mapping so we can get the native read direction
                     readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
                     if (this.seqToIDMap.containsKey(readwithoutGaps)) {
                         seqID = this.seqToIDMap.get(readwithoutGaps);
                     } else {
-                        this.seqToIDMap.put(readwithoutGaps, ++seqID);
+                        seqID = this.seqToIDMap.size();
+                        this.seqToIDMap.put(readwithoutGaps, seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
@@ -300,7 +301,7 @@ public class JokParser implements MappingParserI {
     }
 
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Object data) {
         for (Observer observer : this.observers){
             observer.update(this.msg);
         }
@@ -312,7 +313,7 @@ public class JokParser implements MappingParserI {
      */
     private void sendMsg(final String msg){
         this.msg = msg;
-        this.notifyObservers();
+        this.notifyObservers(null);
     }
 
     @Override

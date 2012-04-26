@@ -354,7 +354,8 @@ public class PersistantCoverage {
     }
 
     /**
-     * Get the perfect match forward coverage with duplicates.
+     * Get the perfect match forward coverage with duplicates. If the position is not
+     * covered 0 is returned.
      * @param logPos position whose coverage is needed
      */
     public int getPerfectFwdMult(int logPos) {

@@ -1,159 +1,113 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.GeneStart;
-import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.api.objects.AnalysisI;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
+import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.api.objects.JobI;
-import de.cebitec.vamp.databackend.CoverageThreadAnalyses;
-import de.cebitec.vamp.databackend.GenomeRequest;
-import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
-import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.NbBundle;
 
 /**
  * @author -Rolf Hilker-
  * 
- * Carries out the logic behind the gene start anaylsis.
- * When executing the gene start detection increaseReadCount is always active
+ * Carries out the logic behind the transcription start site (TSS) anaylsis.
+ * When executing the transcription start site detection increaseReadCount is always active
  * and maxInitialReadCount + increaseReadCount2 are optional parameters. They can
  * further constrain the search space (e.g. inc = 100, max = 10, inc2 = 50 means 
  * that coverage increases above 50 with an initial read count of 0-10 are detected
- * as gene starts, but also all increases of 100 and bigger. When the parameters are
+ * as transcription start sites, but also all increases of 100 and bigger. When the parameters are
  * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases above 100 
- * with an initial read count of 0-10 are detected as gene starts, but for all positions
+ * with an initial read count of 0-10 are detected as transcription start sites, but for all positions
  * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
  * 
- * 1. Nach Coverage: a) Coverage Increase larger than threshold of 99,9% increases in data set
-		     b) Coverage Increase in percent larger than 98% of the increase percentages
+ * 1. Nach Coverage: a) Coverage Increase larger than threshold of 99,75% increases in data set
+		     b) Coverage Increase in percent larger than 99,75% of the increase percentages
  2. Nach Mappingstarts: a) Nach Chernoff-Formel
 			b) Nach Wahrscheinlichkeitsformel (Binomialverteilung)
 
  */
-public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneStart>>, JobI {
+public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<TranscriptionStart>> {
 
-    private final ProgressHandle progressHandle;
-    private DataVisualisationI parent;
     private TrackViewer trackViewer;
+    private ArrayList<String> trackNames;
     private int genomeSize;
     private int increaseReadCount;
     private int increaseReadPercent;
     private int maxInitialReadCount;
     private int increaseReadCount2;
     private List<PersistantAnnotation> genomeAnnotations;
-    private List<GeneStart> detectedStarts; //stores position and true for fwd, false for rev strand
+    private List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
     private DiscreteCountingDistribution covIncreaseDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
     private boolean calcCoverageDistributions;
-    private boolean geneStartAutomatic;
+    private boolean tssAutomatic;
     
-    //varibles for gene start detection
-    private int nbRequests;
-    private int nbCarriedOutRequests;
+    //varibles for transcription start site detection
     private int covLastFwdPos;
     private int covLastRevPos;
     private int lastAnnotationIdxGenStartsFwd;
     private int lastAnnotationIdxGenStartsRev;
+    
+    private HashMap<Integer, Integer> exactCovIncreaseDist = new HashMap<Integer, Integer>(); //exact coverage increase distribution
+    private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<Integer, Integer>(); //exact coverage increase percent distribution
 
     /**
-     * Carries out the logic behind the gene start analysis.
-     * When executing the gene start detection increaseReadCount is always active
+     * Carries out the logic behind the transcription start site analysis.
+     * When executing the transcription start site detection increaseReadCount is always active
      * and maxInitialReadCount + increaseReadCount2 are optional parameters. They can
      * further constrain the search space (e.g. inc = 100, max = 10, inc2 = 50 means 
      * that coverage increases above 50 with an initial read count of 0-10 are detected
-     * as gene starts, but also all increases of 100 and bigger. When the parameters are
+     * as transcription start sites, but also all increases of 100 and bigger. When the parameters are
      * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases above 100 
-     * with an initial read count of 0-10 are detected as gene starts, but for all positions
+     * with an initial read count of 0-10 are detected as transcription start sites, but for all positions
      * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
      * 
      * @param trackViewer the track viewer for which the analyses should be carried out
      * @param increaseReadCount minimum increase of read counts for two neighboring
-     *          positions. Only when the increase is bigger, a gene start is predicted
+     *          positions. Only when the increase is bigger, a transcription start site is predicted
      * @param maxInitialReadCount maximum number of reads at the left position in 
      *          a pair of tho neighboring positions. Gene starts are only predicted,
      *          if this maximum is not exceeded AND increaseReadCount2 is satisfied
      * @param increaseReadCount2 minimum increase of read counts for two neighboring
-     *          positions. Only when the increase is bigger, a gene start is predicted
+     *          positions. Only when the increase is bigger, a transcription start site is predicted
      */
-    public AnalysisGeneStart(DataVisualisationI parent, TrackViewer trackViewer, int increaseReadCount,
-            int increaseReadPercent, int maxInitialReadCount, int increaseReadCount2, boolean geneStartAutomatic) {
-        this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisGeneStart.class, "MSG_AnalysesWorker.progress.name"));
-        this.parent = parent;
+    public AnalysisTranscriptionStart(TrackViewer trackViewer, int increaseReadCount, int increaseReadPercent, 
+            int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic) {
         this.trackViewer = trackViewer;
         this.increaseReadCount = increaseReadCount;
         this.increaseReadPercent = increaseReadPercent;
         this.maxInitialReadCount = maxInitialReadCount;
         this.increaseReadCount2 = increaseReadCount2;
-        this.geneStartAutomatic = geneStartAutomatic;
+        this.tssAutomatic = tssAutomatic;
         
-        this.nbCarriedOutRequests = 0;
-        this.detectedStarts = new ArrayList<GeneStart>();
+        this.detectedStarts = new ArrayList<TranscriptionStart>();
         this.covLastFwdPos = 0;
         this.covLastRevPos = 0;
         this.lastAnnotationIdxGenStartsFwd = 0;
         this.lastAnnotationIdxGenStartsRev = 0;
+        
+        this.initDatastructures();
     }
 
     /**
-     * Needs to be called in order to start the gene start analysis. Creates the
-     * needed database requests and carries them out. The parent has to be a
-     * ThreadListener in order to receive the coverage
-     * Afterwards the results are returned by {@link getResults()}
+     * Initializes the initial data structures needed for a transcription start site analysis.
      */
-    @Override
-    public void startAnalysis() {
-
-        this.progressHandle.start();
+    private void initDatastructures() {
+        
         TrackConnector trackCon = this.trackViewer.getTrackCon();
-        List<Integer> trackIds = new ArrayList<Integer>();
-        trackIds.add(trackCon.getTrackID());
-        CoverageThreadAnalyses coverageThread = new CoverageThreadAnalyses(trackIds);
-        coverageThread.start();
-        
-        this.initDatastructures(trackCon);
-
-        //decide upon stepSize of a single request and analyse coverage of whole genome
-        int stepSize = 200000;
-        int from = 1;
-        int to = this.genomeSize > stepSize ? stepSize : this.genomeSize;
-        int additionalRequest = this.genomeSize % stepSize == 0 ? 0 : 1;
-        this.nbRequests = this.genomeSize / stepSize + additionalRequest;
-        this.progressHandle.switchToDeterminate(this.nbRequests);
-
-        while (to < this.genomeSize) {
-            GenomeRequest coverageRequest = new GenomeRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
-            coverageThread.addRequest(coverageRequest);
-
-            from = to + 1;
-            to += stepSize;
-        }
-
-        //calc last interval until genomeSize
-        to = this.genomeSize;
-        GenomeRequest coverageRequest = new GenomeRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
-        coverageThread.addRequest(coverageRequest);
-    }
-
-    /**
-     * Initializes the initial data structures needed for a gene start analysis.
-     * @param trackCon the track connector
-     */
-    private void initDatastructures(TrackConnector trackCon) {
-        
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
         this.genomeSize = refConnector.getRefGen().getSequence().length();
@@ -162,47 +116,54 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
         this.covIncPercentDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
         this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
-        if (this.geneStartAutomatic && !this.calcCoverageDistributions) {
-            this.estimateCutoff();
-            this.estimateCutoffPercent();
+        
+        if (this.tssAutomatic) {
+            this.maxInitialReadCount = 10; //set these values as default for the transcription start site automatic
+            this.increaseReadCount2 = 20; //avoids loosing smaller, low coverage increases
+            if (!this.calcCoverageDistributions) {
+                this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0); //+ 0,05%
+                this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);// (int) (this.genomeSize / 1000)); //0,1%
+            }
         }
         
+        //the minimal increase is initially set to 10%, if the coverage distributions were not calculated yet
         this.increaseReadPercent = this.calcCoverageDistributions ? 10 : this.increaseReadPercent;
     }
-
     
+    /**
+     * Detects TSSs for a new PersistantCoverage object or calls the finish method.
+     * @param data the data to handle: Either PersistantCoverage or "1" = coverage querries are done.
+     */
     @Override
-    public List<GeneStart> getResults() {
-        return this.detectedStarts;
-    }
-
-    
-    @Override
-    public void receiveData(Object data) {
-        this.progressHandle.progress("Request " + (++this.nbCarriedOutRequests + 1) + 
-                " of " + this.nbRequests, this.nbCarriedOutRequests);
-
+    public void update(Object data) {
         if (data instanceof PersistantCoverage) {
             PersistantCoverage coverage = (PersistantCoverage) data;
-            this.detectGeneStarts(coverage);
+            this.detectTSSs(coverage);
 
             //TODO: annotation finden/ändern
-        }
-
+        } else 
+        if (data instanceof Byte && ((Byte) data) == 1) {
+            this.finish();
+        } 
+    }
+    
+    /**
+     * Method to be called when the analysis is finished. Stores the distributions and
+     * corrects the results for automatic mode.
+     */
+    public void finish() {
         //when the last request is finished signalize the parent to collect the data
-        if (nbCarriedOutRequests >= nbRequests) {
-            this.storeDistributions();
-            this.parent.showData(true);
-            this.nbCarriedOutRequests = 0;
-            this.progressHandle.finish();
+        this.storeDistributions();
+        if (this.tssAutomatic) {
+            this.correctResult();
         }
     }
 
     /**
-     * Carries out the detection of predicted gene starts.
-     * @param coverage the coverage for predicting the gene starts.
+     * Carries out the detection of predicted transcription start sites.
+     * @param coverage the coverage for predicting the transcription start sites.
      */
-    public void detectGeneStarts(PersistantCoverage coverage) {
+    public void detectTSSs(PersistantCoverage coverage) {
 
         int leftBound = coverage.getLeftBound();
         int fixedLeftBound = leftBound - 1;
@@ -261,7 +222,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     
     /**
      * Method for analysing the coverage of one pair of neighboring positions and
-     * detecting a gene start, if the parameters are satisfied.
+     * detecting a transcription start site, if the parameters are satisfied.
      * @param coverage the PersistantCoverage container
      * @param pos the position defining the pair to analyse: pos and (pos + 1)
      * @param fwdCov1 
@@ -273,7 +234,6 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
      */
     private void detectStart(int pos, int fwdCov1, int fwdCov2, int revCov1, int revCov2, 
                              int diffFwd, int diffRev, int percentDiffFwd, int percentDiffRev) {
-        
 
         if (this.increaseReadCount2 > 0) { //if low coverage read count is calculated separately
             if (diffFwd > this.increaseReadCount 
@@ -283,7 +243,7 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                     && diffFwd > this.increaseReadCount2) {
 
                 DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, SequenceUtils.STRAND_FWD);
-                this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
             }
             if (diffRev > this.increaseReadCount 
                     && percentDiffRev > this.increaseReadPercent 
@@ -292,42 +252,51 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                     && diffRev > this.increaseReadCount2) {
 
                 DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, SequenceUtils.STRAND_REV);
-                this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
             }
 
         } else {
             if (diffFwd > this.increaseReadCount && percentDiffFwd > this.increaseReadPercent) {
                 DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, SequenceUtils.STRAND_FWD);
-                this.detectedStarts.add(new GeneStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
             }
             if (diffRev > this.increaseReadCount && percentDiffRev > this.increaseReadPercent) {
                 DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, SequenceUtils.STRAND_REV);
-                this.detectedStarts.add(new GeneStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
             }
+            
+        }
+        
+        if (this.tssAutomatic) {
+            //add values to exact counting data structures to refine threshold
+            this.increaseDistribution(this.exactCovIncreaseDist, diffFwd, this.increaseReadCount);
+            this.increaseDistribution(this.exactCovIncreaseDist, diffRev, this.increaseReadCount);
+            this.increaseDistribution(this.exactCovIncPercDist, percentDiffFwd, this.increaseReadPercent);
+            this.increaseDistribution(this.exactCovIncPercDist, percentDiffRev, this.increaseReadPercent);
         }
     }
 
     /**
      * Detects and returns the genomic annotations, which can be associated to the
-     * given gene start and strand. This can be eiter an annotation starting at the
-     * predicted gene start, which would be a correct start, or it will contain
+     * given transcription start site and strand. This can be eiter an annotation starting at the
+     * predicted transcription start site, which would be a correct start, or it will contain
      * the maximal two closest annotations found in a vicinity of 500bp up- or 
-     * downstream of the gene start.
-     * @param geneStartPos the predicted gene start position
-     * @param strand the strand, on which the gene start is located
+     * downstream of the transcription start site.
+     * @param tssPos the predicted transcription start site position
+     * @param strand the strand, on which the transcription start site is located
      * @return the genomic annotations, which can be associated to the
-     * given gene start and strand.
+     * given transcription start site and strand.
      */
-    private DetectedAnnotations findNextAnnotation(int geneStartPos, byte strand) {
+    private DetectedAnnotations findNextAnnotation(int tssPos, byte strand) {
         final int maxDeviation = 1000;
-        int minStartPos = geneStartPos - maxDeviation < 0 ? 0 : geneStartPos - maxDeviation;
-        int maxStartPos = geneStartPos + maxDeviation > this.genomeSize ? genomeSize : geneStartPos + maxDeviation;
+        int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
+        int maxStartPos = tssPos + maxDeviation > this.genomeSize ? genomeSize : tssPos + maxDeviation;
         PersistantAnnotation annotation;
         DetectedAnnotations detectedAnnotations = new DetectedAnnotations();
         int start;
         boolean fstFittingAnnotation = true;
         if (strand == SequenceUtils.STRAND_FWD) {
-            for (int i = this.lastAnnotationIdxGenStartsFwd; i < this.genomeAnnotations.size(); ++i) {
+            for (int i = this.lastAnnotationIdxGenStartsFwd; i < this.genomeAnnotations.size()-1; ++i) {
                 annotation = this.genomeAnnotations.get(i);
                 start = annotation.getStart();
 
@@ -338,9 +307,9 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                         fstFittingAnnotation = false;
                     }
 
-                    if (start < geneStartPos && annotation.getStop() > geneStartPos) {
+                    if (start < tssPos && annotation.getStop() > tssPos) {
                         //store annotation as next upstream annotation, but search for closer
-                        //upstream annotation & correctly annotated gene start
+                        //upstream annotation & correctly annotated transcription start site
                         
                         /* 
                          * Also check, if gene and CDS annotation are available for current SNP
@@ -359,12 +328,12 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                         
                         detectedAnnotations.setUpstreamAnnotation(annotation);
                         
-                    } else if (start == geneStartPos) {
-                        //store correctly annotated gene start
+                    } else if (start == tssPos) {
+                        //store correctly annotated transcription start site
                         detectedAnnotations.setCorrectStartAnnotation(annotation);
                         detectedAnnotations.setUpstreamAnnotation(null);
                         break;
-                    } else if (start > geneStartPos) {
+                    } else if (start > tssPos) {
                         /*
                          * Store next downstream annotation, transcription start is earlier than annotated,
                          * except the current annotation is a CDS annotation and no gene annotation is present for
@@ -402,9 +371,9 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                         fstFittingAnnotation = false;
                     }
 
-                    if (start < geneStartPos) {
+                    if (start < tssPos) {
                         //store annotation as next bigger annotation, but search for closer
-                        //bigger annotation & correctly annotated gene start
+                        //bigger annotation & correctly annotated transcription start site
                         
                         /*
                          * Store next upstream annotation. transcription start is earlier than annotated,
@@ -423,12 +392,12 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
                         
                         detectedAnnotations.setDownstreamAnnotation(annotation);
                         
-                    } else if (start == geneStartPos) {
-                        //store correctly annotated gene start
+                    } else if (start == tssPos) {
+                        //store correctly annotated transcription start site
                         detectedAnnotations.setCorrectStartAnnotation(annotation);
                         detectedAnnotations.setDownstreamAnnotation(null);
                         break;
-                    } else if (start > geneStartPos && annotation.getStart() < geneStartPos) {
+                    } else if (start > tssPos && annotation.getStart() < tssPos) {
                         //store next upstream annotation, translation start is further in gene
                         
                         /* 
@@ -458,121 +427,192 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
         }
         return detectedAnnotations;
     }
-
-    @Override
-    public int getNbCarriedOutRequests() {
-        return this.nbCarriedOutRequests;
-    }
-
-    @Override
-    public int getNbTotalRequests() {
-        return this.nbRequests;
+    
+    /**
+     * Before adding a new detected transcription start site to the detected transcription start sites list the method
+     * checks, if the last detected transcription start site is located within 19bp (sRNAs can be short) of the current transcription start site
+     * on the same strand. If that's the case, only the transcription start site with the higher number of
+     * TOTAL coverage increase is kept. This method prevents detecting two transcription start sites for 
+     * the same gene, in case the transcription already starts at a low rate a few bases before the
+     * actual transcription start site. This seems to happen, when the end of the -10 region is further away from
+     * the actual transcription start site than 7 bases.
+     * @param tss the currently detected transcription start site 
+     */
+    private void checkAndAddDetectedStart(TranscriptionStart tss) {        
+        
+        if (this.detectedStarts.size() > 0) {
+            int index = this.detectedStarts.size() - 1;
+            TranscriptionStart lastDetectedStart = this.detectedStarts.get(index);
+            
+            while (lastDetectedStart.getStrand() != tss.getStrand() && index > 0 ) {
+                lastDetectedStart = this.detectedStarts.get(--index);
+            }
+            
+            if (lastDetectedStart.getPos() + 19 >= tss.getPos() && lastDetectedStart.getStrand() == tss.getStrand()) {
+                int covIncreaseLastStart = lastDetectedStart.getStartCoverage() - lastDetectedStart.getInitialCoverage();
+                int covIncreaseTSS = tss.getStartCoverage() - tss.getInitialCoverage();
+                
+                if (covIncreaseLastStart < covIncreaseTSS) {
+                    this.detectedStarts.remove(this.detectedStarts.size() - 1);
+                    this.detectedStarts.add(tss);
+                }
+                //else, we keep the lastDetectedStart, but discard the current transcription start site
+            } else {
+                this.detectedStarts.add(tss);
+            }
+        } else {
+            this.detectedStarts.add(tss);
+        }
     }
 
     /**
      * Used to computationally estimate the optimal cutoff = minimum increase of 
-     * read counts from one position to the next.
+     * read counts from one position to the next in total or in percent.
      * 2 Parameters take care of this task: 
-     * At first calculate the index of the coverage increase distribution, which exceeds 
-     * the threshold of more than 2 genes per 1KB genome size for the first time for this track.
-     * Second, if the number of possible gene starts is still larger than 0,1%
-     * + a 10% correction term, use the 0,1% of largest coverage increases
-     * as threshold. 
-     * These thresholds return an index from the coverage increase distribution
-     * and the increaseReadCount variable is set according to the smallest 
-     * total coverage increase value for the calculated index.
+     * At first the index of the coverage increase distribution, which exceeds the threshold
+     * of more than 2 genes per 1KB genome size for the first time for this track is calculated. 
+     * In prokaryotic genomes gene density is approx 1 per 1kb and max 1,16 in Sulfolobus solfataricus according to
+     * I. B. Rogozin, et al., “Congruent evolution of different classes of non-coding DNA in prokaryotic genomes,” 
+     * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
+     * In this case we allow for 2 genes per kb, because we use two distributions, each leading to one threshold.
+     * Since only positions exceeding both thresholds are reported later, the result set is shrinked again.
+     * In the optimal case we gain very low numbers of false positives, but still find all true positives.
+     * @param distribution the underlying distribution
+     * @param thresholdEnlarger Absolute value 
+     *                      if 0,2% is to tight as a threshold, you can set a value to be added to the standard 0,2% threshold.
+     *                      if 0,3% of the whole distribution should be used as threshold use "this.genomeSize * 3 / 1000"
+     * @return The calculated threshold returns an index from the coverage increase distribution
+     * and the smallest total coverage increase (in total or percent) value for the calculated index is returned by this method.
      */
-    private void estimateCutoff() {
-        long totalCount = this.covIncreaseDistribution.getTotalCount();
-        int fstReferenceValue = this.genomeSize / 500; // 2 Genes per 1KB Genome size
-        long scndReferenceValue = totalCount / 1000; //threshold of 0,1% of largest coverage increases
-        int[] covIncDistribution = this.covIncreaseDistribution.getDiscreteCountingDistribution();
+    private int estimateCutoff(DiscreteCountingDistribution distribution, int thresholdEnlarger) {
+        //genomeSize = total number of positions contributing to the increase distribution
+        int maxEstimatedNbOfActiveGenes = (int) (this.genomeSize * 0.0025) + thresholdEnlarger; // 0,25% = 2,5 Genes per 1KB Genome size. This allows for variability.
+        int[] distributionValues = distribution.getDiscreteCountingDistribution();
         
-        int nbGeneStarts = 0;
+        int nbTSSs = 0;
         int selectedIndex = 0;
-        for (int i = covIncDistribution.length - 1; i > 0; --i) {
-            if (nbGeneStarts < fstReferenceValue) {
-                nbGeneStarts += covIncDistribution[i];
+        for (int i = distributionValues.length - 1; i > 0; --i) {
+            // we use the index which first exceeds maxEstimatedNbOfActiveGenes
+            if (nbTSSs < maxEstimatedNbOfActiveGenes) {
+                nbTSSs += distributionValues[i];
                 selectedIndex = i;
             } else {
                 break;
             }
         }
-        if (nbGeneStarts > scndReferenceValue + (scndReferenceValue / 10)) {
-            for (int i = covIncDistribution.length; i > 0; --i) {
-                if (nbGeneStarts < scndReferenceValue) {
-                    nbGeneStarts += covIncDistribution[i];
-                    selectedIndex = i;
-                } else {
-                    break;
-                }
-            }
-        }
+        /*
+         * number of active genes in the current genome
+         * in prokaryotic genomes gene density approx 1 per 1000bp, max 1,16 in Sulfolobus solfataricus according to
+         * I. B. Rogozin, et al., “Congruent evolution of different classes of non-coding DNA in prokaryotic genomes,” 
+         * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
+         */
         
-        this.increaseReadCount = covIncreaseDistribution.getMinCountForIndex(selectedIndex);
-    }
-    
-    /**
-     * Used to computationally estimate the optimal percentage cutoff = minimum increase of 
-     * read counts at one position in percent.
-     * This threshold returns an index from the coverage percentage increase distribution
-     * and the increaseReadPercent variable is set according to the smallest 
-     * coverage percentage increase value for the calculated index.
-     */
-    private void estimateCutoffPercent() {
-        long totalCount = this.covIncPercentDistribution.getTotalCount();
-        long referenceValue = totalCount / 500; //threshold of 2% of largest coverage increases in percent
-        int[] covIncDistribution = this.covIncPercentDistribution.getDiscreteCountingDistribution();
-        
-//        for (int i : covIncDistribution) {
-//            System.out.println(i);
-//        }
-        
-        int nbCoverageIncreases = 0;
-        int selectedIndex = 0;
-        for (int i = covIncDistribution.length - 1; i > 0; --i) {
-            if (nbCoverageIncreases < referenceValue) {
-                nbCoverageIncreases += covIncDistribution[i];
-                selectedIndex = i;
-            } else {
-                break;
-            }
-        }
-        this.increaseReadPercent = covIncPercentDistribution.getMinCountForIndex(selectedIndex);
+        return distribution.getMinCountForIndex(selectedIndex - 1);
     }
 
     /**
-     * Removes all detected gene starts with a too small coverage increase, in case 
-     * the increaseReadCount was changed after calculating the list of detectedGenes.
+     * Receives a Hashmap, checks if the current value is already present in the map
+     * and increases it by one. If it is not present yet, it is created with a value of 0.
+     * @param map the map whose data should be increased
+     * @param value the value (key) which should be increased
+     * @param threshold the threshold the value has to exceed, to be added to the map
      */
-    private void correctGeneStartList() {
-        int percentDiff;
-        GeneStart geneStart;
-        for (int i = 0; i < this.detectedStarts.size(); ++i) {
-            geneStart = this.detectedStarts.get(i);
-            percentDiff = (int) (((double) geneStart.getStartCoverage() / (double) geneStart.getInitialCoverage()) * 100.0) - 100;
-            if (geneStart.getStartCoverage() - geneStart.getInitialCoverage() < this.increaseReadCount
-                    && percentDiff < this.increaseReadPercent) {
-                this.detectedStarts.remove(geneStart);
+    private void increaseDistribution(HashMap<Integer, Integer> map, int value, int threshold) {
+        if (value > threshold) {
+            if (!map.containsKey(value)) {
+                map.put(value, 0);
             }
+            map.put(value, map.get(value) + 1);
         }
     }
 
     /**
      * If a new distribution was calculated, this method stores it in the DB and
-     * corrects the result list with the new estimated parameters, if the geneStartAutomatic
+     * corrects the result list with the new estimated parameters, if the tssAutomatic
      * was chosen.
      */
     private void storeDistributions() {
         if (this.calcCoverageDistributions) { //if it was calculated, also store it
             this.trackViewer.getTrackCon().insertCoverageDistribution(covIncreaseDistribution);
             this.trackViewer.getTrackCon().insertCoverageDistribution(covIncPercentDistribution);
-            if (this.geneStartAutomatic) {
-                this.estimateCutoff();
-                this.estimateCutoffPercent();
-                this.correctGeneStartList();
+            if (this.tssAutomatic) {
+                this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0);//(int) (this.genomeSize * 0.0005));
+                this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);//(int) (this.genomeSize * 0.0005));
+                this.correctTSSList();
             }
         }
+    }
+
+    /**
+     * Removes all detected transcription start sites with a too small coverage increase, in case 
+     * the increaseReadCount was changed after calculating the list of detectedGenes.
+     */
+    private void correctTSSList() {
+        int percentDiff;
+        TranscriptionStart tss;
+        for (int i = 0; i < this.detectedStarts.size(); ++i) {
+            tss = this.detectedStarts.get(i);
+            percentDiff = (int) (((double) tss.getStartCoverage() / (double) tss.getInitialCoverage()) * 100.0) - 100;
+            if (tss.getStartCoverage() - tss.getInitialCoverage() < this.increaseReadCount
+                    || percentDiff < this.increaseReadPercent) {
+                this.detectedStarts.remove(tss);
+            }
+        }
+    }
+
+    /**
+     * After detecting the transcription start sites the exact distribution of coverage increases
+     * is known and the threshold can be adapted for the automatic parameter estimation
+     * mode. This method calculates the more stringent thresholds first and then removes
+     * all transcription start sites from the detected starts list, which cannot satisfy the new 
+     * thresholds. Prevents false positives.
+     */
+    private void correctResult() {
+        
+        //estimate exact cutoff for readcount increase of 0,25%
+        System.out.println("old threshold read count: " + this.increaseReadCount);
+        System.out.println("old threshold percent: " + this.increaseReadPercent);
+        this.increaseReadCount = this.getNewThreshold(this.exactCovIncreaseDist, 0);//(int) (this.genomeSize * 0.0005));
+        this.increaseReadPercent = this.getNewThreshold(this.exactCovIncPercDist, 0);//(int) (this.genomeSize * 0.0005));
+        
+        //remove detected starts with too low coverage increases
+        List<TranscriptionStart> copiedDetectedStarts = new ArrayList<TranscriptionStart>(this.detectedStarts);
+        int increase;
+        int percentage;
+        for (TranscriptionStart tss : this.detectedStarts) {
+            increase = tss.getStartCoverage() - tss.getInitialCoverage();
+            percentage = GeneralUtils.calculatePercentageIncrease(tss.getInitialCoverage(), tss.getStartCoverage());
+            if ((   increase < this.increaseReadCount ||
+                    percentage < this.increaseReadPercent) &&
+                    tss.getInitialCoverage() > this.maxInitialReadCount) {
+                copiedDetectedStarts.remove(tss);
+                System.out.println(tss.getPos());
+            }
+        }
+        this.detectedStarts = copiedDetectedStarts;
+    }
+    
+    /**
+     * Calculates the exact threshold for a map containing a coverage increase distribution.
+     * The threshold is  set exactly to 0,25% and can be enlarged by setting the threshold enlarger.
+     * @param distribution the exact distribution of coverage increases or cov increases in percent
+     * @param thresholdEnlarger absolute value to be added to the new threshold
+     * @return 
+     */
+    private int getNewThreshold(HashMap<Integer, Integer> distribution, int thresholdEnlarger) {
+        int maxValue = (int) (this.genomeSize * 0.0025 + thresholdEnlarger); // = 0,25% + thresholdEnlarger
+        int nbValues = 0;
+        List<Integer> keyList = new ArrayList<Integer>(distribution.keySet());
+        Collections.sort(keyList);
+        
+        for (int i = keyList.size()-1; i >= 0; --i) {
+            if (nbValues < maxValue) {
+                nbValues += distribution.get(keyList.get(i));
+            } else {
+                return keyList.get(i);
+            }
+        }
+        return keyList.get(0);
     }
 
     public int getIncreaseReadCount() {
@@ -590,6 +630,9 @@ public class AnalysisGeneStart implements ThreadListener, AnalysisI<List<GeneSta
     public int getMaxInitialReadCount() {
         return maxInitialReadCount;
     }
-    
-    
+
+    @Override
+    public List<TranscriptionStart> getResults() {
+        return this.detectedStarts;
+    }
 }

@@ -7,7 +7,7 @@ package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
  * (coverage directly before predicted gene start) and start coverage (coverage 
  * at predicted gene start).
  */
-public class GeneStart {
+public class TranscriptionStart {
     
     private int pos;
     private byte strand;
@@ -23,7 +23,7 @@ public class GeneStart {
      * @param startCoverage The coverage at the detected gene start position (getPos()).
      * @param detAnnotations object containing the annotations associated to this predicted gene start
      */
-    public GeneStart(int pos, byte strand, int initialCoverage, int startCoverage, DetectedAnnotations detAnnotations) {
+    public TranscriptionStart(int pos, byte strand, int initialCoverage, int startCoverage, DetectedAnnotations detAnnotations) {
         this.pos = pos;
         this.strand = strand;
         this.initialCoverage = initialCoverage;

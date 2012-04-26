@@ -422,7 +422,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
     public void update(Object args) {
         if (args instanceof String) {
             this.errorMsg = (String) args;
-            this.notifyObservers();
+            this.notifyObservers(null);
         }
     }
     
@@ -437,7 +437,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
     }
     
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
             observer.update(this.errorMsg);
         }

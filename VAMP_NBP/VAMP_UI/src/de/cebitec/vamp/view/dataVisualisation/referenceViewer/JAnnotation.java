@@ -255,6 +255,9 @@ public class JAnnotation extends JComponent {
                     //add copy option
                     String selAnnotationSequence = viewer.getReference().getSequence().substring(annotation.getStart() - 1, annotation.getStop());
                     popUp.add(menuItemFactory.getCopyItem(selAnnotationSequence));
+                    
+                    //add copy position option
+                    popUp.add(menuItemFactory.getCopyPositionItem(refViewer.getCurrentMousePos()));
 
                     //add store as fasta file option
                     popUp.add(menuItemFactory.getStoreFastaItem(selAnnotationSequence, annotation));

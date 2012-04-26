@@ -36,19 +36,36 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for copying a sequence.
      * The text to copy has to be known, when the method is called.
      * @param sequenceToCopy the sequence to copy
-     * @return the copied sequence string
+     * @return the JMenuItem for copying a sequence.
      */
     public JMenuItem getCopyItem(final String sequenceToCopy){
 
         JMenuItem copyItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.Copy"));
-            copyItem.addActionListener(new ActionListener() {
+        copyItem.addActionListener(new ActionListener() {
 
-                @Override//
-                public void actionPerformed(ActionEvent e) {
-                    clipboard.setContents(new StringSelection(sequenceToCopy), MenuItemFactory.this);
-                }
-            });
-            return copyItem;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clipboard.setContents(new StringSelection(sequenceToCopy), MenuItemFactory.this);
+            }
+        });
+        return copyItem;
+    }
+    
+    /**
+     * Returns a JMenuItem for copying a position.
+     * @param currentPosition the position to copy to the clipboard.
+     * @return JMenuItem for copying a position.
+     */
+    public JMenuItem getCopyPositionItem(final int currentPosition) {
+        JMenuItem copyPositionItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.CopyPosition"));
+        copyPositionItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clipboard.setContents(new StringSelection(Integer.toString(currentPosition)), MenuItemFactory.this);
+            }
+        });
+        return copyPositionItem;
     }
 
     /**

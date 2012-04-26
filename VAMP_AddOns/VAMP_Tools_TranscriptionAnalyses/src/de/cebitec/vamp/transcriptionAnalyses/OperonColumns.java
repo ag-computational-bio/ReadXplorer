@@ -23,13 +23,13 @@ public class OperonColumns implements ExcelExportDataI {
     public List<String> dataColumnDescriptions() {
         List<String> dataColumnDescriptions = new ArrayList();
 
-        dataColumnDescriptions.add("Gene 1");
-        dataColumnDescriptions.add("Gene 2");
+        dataColumnDescriptions.add("Annotation 1");
+        dataColumnDescriptions.add("Annotation 2");
         dataColumnDescriptions.add("Strand");
-        dataColumnDescriptions.add("Start Gene 1");
-        dataColumnDescriptions.add("Start Gene 2");
-        dataColumnDescriptions.add("Gene 1 Reads");
-        dataColumnDescriptions.add("Gene 2 Reads");
+        dataColumnDescriptions.add("Start Anno 1");
+        dataColumnDescriptions.add("Start Anno 2");
+        dataColumnDescriptions.add("Reads Overlap Stop 1");
+        dataColumnDescriptions.add("Reads Overlap Start 2");
         dataColumnDescriptions.add("Internal Reads");
         dataColumnDescriptions.add("Spanning Reads");
 
@@ -41,37 +41,37 @@ public class OperonColumns implements ExcelExportDataI {
         List<List<Object>> operonExport = new ArrayList<List<Object>>();
 
         for (Operon operon : operonDetection) {
-            String geneName1 = "";
-            String geneName2 = "";
+            String annoName1 = "";
+            String annoName2 = "";
             String strand = "";
-            String pos1 = "";
-            String pos2 = "";
-            String coverGen1 = "";
-            String coverGen2 = "";
-            String coverNone = "";
-            String coverGen1And2 = "";
-            for (OperonAdjacency ad : operon.getOperon()) {
-                geneName1 += ad.getOperonAnnotation().getLocus() + "\n";
-                geneName2 += ad.getOperonAnnotation2().getLocus() + "\n";
-                strand += (ad.getOperonAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
-                pos1 += ad.getOperonAnnotation().getStart() + "\n";
-                pos2 += ad.getOperonAnnotation2().getStart() + "\n";
-                coverGen1 += ad.getReadsGene1() + "\n";
-                coverGen2 += ad.getReadsGene2() + "\n";
-                coverNone += ad.getInternalReads() + "\n";
-                coverGen1And2 += ad.getSpanningReads() + "\n";
+            String startAnno1 = "";
+            String startAnno2 = "";
+            String readsAnno1 = "";
+            String readsAnno2 = "";
+            String internalReads = "";
+            String spanningReads = "";
+            for (OperonAdjacency ad : operon.getOperonAdjacencies()) {
+                annoName1 += ad.getAnnotation1().getLocus() + "\n";
+                annoName2 += ad.getAnnotation2().getLocus() + "\n";
+                strand += (ad.getAnnotation1().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
+                startAnno1 += ad.getAnnotation1().getStart() + "\n";
+                startAnno2 += ad.getAnnotation2().getStart() + "\n";
+                readsAnno1 += ad.getReadsAnnotation1() + "\n";
+                readsAnno2 += ad.getReadsAnnotation2() + "\n";
+                internalReads += ad.getInternalReads() + "\n";
+                spanningReads += ad.getSpanningReads() + "\n";
 
             }
             List<Object> operonsRow = new ArrayList<Object>();
-            operonsRow.add(geneName1);
-            operonsRow.add(geneName2);
+            operonsRow.add(annoName1);
+            operonsRow.add(annoName2);
             operonsRow.add(strand);
-            operonsRow.add(pos1);
-            operonsRow.add(pos2);
-            operonsRow.add(coverGen1);
-            operonsRow.add(coverGen2);
-            operonsRow.add(coverNone);
-            operonsRow.add(coverGen1And2);
+            operonsRow.add(startAnno1);
+            operonsRow.add(startAnno2);
+            operonsRow.add(readsAnno1);
+            operonsRow.add(readsAnno2);
+            operonsRow.add(internalReads);
+            operonsRow.add(spanningReads);
 
             operonExport.add(operonsRow);
         }

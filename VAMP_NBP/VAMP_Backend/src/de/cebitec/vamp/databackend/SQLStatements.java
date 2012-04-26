@@ -424,6 +424,8 @@ public class SQLStatements {
             + "R." + FieldNames.REF_GEN_TIMESTAMP + " "
             + "FROM "
             + FieldNames.TABLE_REF_GEN + " AS R ";
+    
+    
     public final static String FETCH_TRACKS =
             "SELECT "
             + "T." + FieldNames.TRACK_ID + ", "
@@ -433,6 +435,8 @@ public class SQLStatements {
             //"T."+FieldNames.TRACK_RUN+" " +
             "FROM "
             + FieldNames.TABLE_TRACKS + " AS T ";
+    
+    
     public final static String FETCH_SINGLE_GENOME =
             "SELECT "
             + FieldNames.REF_GEN_ID + ", "
@@ -444,6 +448,8 @@ public class SQLStatements {
             + FieldNames.TABLE_REF_GEN + " "
             + "WHERE "
             + FieldNames.REF_GEN_ID + " = ?";
+    
+    
     public final static String FETCH_ANNOTATIONS_FOR_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.ANNOTATION_ID+", "+
@@ -462,6 +468,8 @@ public class SQLStatements {
                 FieldNames.ANNOTATION_STOP+" >= ? and " +
                 FieldNames.ANNOTATION_START+" <= ? " + 
             " ORDER BY " + FieldNames.ANNOTATION_START;
+    
+    
     public final static String FETCH_ANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.ANNOTATION_ID+", "+
@@ -480,6 +488,8 @@ public class SQLStatements {
                 FieldNames.ANNOTATION_START + " between ? and ? and " +
                 FieldNames.ANNOTATION_STOP + " between ? and ? " +
                 " ORDER BY " + FieldNames.ANNOTATION_START;
+    
+    
          public static final String FETCH_SUBANNOTATIONS_FOR_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.SUBANNOTATION_PARENT_ID+", "+
@@ -494,6 +504,7 @@ public class SQLStatements {
                 + FieldNames.SUBANNOTATION_START+" <= ? " +
             "ORDER BY " + FieldNames.SUBANNOTATION_START;
             
+         
          public static final String FETCH_SUBANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.SUBANNOTATION_PARENT_ID+", "+
@@ -531,7 +542,7 @@ public class SQLStatements {
             + FieldNames.COVERAGE_TRACK + " = ? ";
     
     
-        public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART1 =
+    public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART1 =
             "SELECT "+
                 FieldNames.COVERAGE_POSITION+", "+
                 FieldNames.COVERAGE_BM_FW_MULT+", " +
@@ -552,9 +563,10 @@ public class SQLStatements {
             " WHERE "+
                 FieldNames.COVERAGE_POSITION+ " between ? and ? and ";
         
-        
-            public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART2 =
-                FieldNames.COVERAGE_TRACK+" = ? ";
+    public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART2 =
+            FieldNames.COVERAGE_TRACK + " = ? ";
+
+            
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK2 =
             "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
@@ -565,6 +577,8 @@ public class SQLStatements {
             + " WHERE "
             + FieldNames.COVERAGE_POSITION + " BETWEEN ? AND ? and "
             + FieldNames.COVERAGE_TRACK + " = ? ";
+    
+    
     public final static String FETCH_COVERAGE_FOR_TRACK =
             "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
@@ -574,7 +588,9 @@ public class SQLStatements {
             + FieldNames.TABLE_COVERAGE
             + " WHERE "
             + FieldNames.COVERAGE_TRACK + " = ?  and " + FieldNames.COVERAGE_POSITION + " between ? and ?";
-         public static final String FETCH_COVERAGE_BEST_FOR_INTERVAL =
+    
+    
+    public static final String FETCH_COVERAGE_BEST_FOR_INTERVAL =
             "SELECT "
             + FieldNames.COVERAGE_POSITION + ", "
             + FieldNames.COVERAGE_ZERO_FW_MULT + ", "
@@ -586,7 +602,9 @@ public class SQLStatements {
             + " WHERE "
             + FieldNames.COVERAGE_TRACK + " = ? AND "
             + FieldNames.COVERAGE_POSITION + " BETWEEN ? AND ?";
-    public final static String FETCH_TRACKS_FOR_GENOME =
+         
+         
+   public final static String FETCH_TRACKS_FOR_GENOME =
             "SELECT "
             + FieldNames.TRACK_ID + ", "
             + FieldNames.TRACK_DESCRIPTION + ", "
@@ -596,6 +614,8 @@ public class SQLStatements {
             + FieldNames.TABLE_TRACKS
             + " WHERE "
             + FieldNames.TRACK_REFERENCE_ID + " = ? ";
+    
+    
     public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
             "SELECT A." + FieldNames.DIFF_POSITION + ", "
             + "A." + FieldNames.DIFF_BASE + ", "
@@ -631,11 +651,15 @@ public class SQLStatements {
             + "WHERE "
             + "C." + FieldNames.COVERAGE_TRACK + " = ? AND "
             + "C." + FieldNames.COVERAGE_POSITION + " = A." + FieldNames.DIFF_POSITION;
+    
+    
     public final static String GET_LATEST_STATISTICS_ID =
             "SELECT "
             + "MAX(" + FieldNames.STATISTICS_ID + ") AS LATEST_ID "
             + "FROM "
             + FieldNames.TABLE_STATISTICS;
+    
+    
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT "
             + "M." + FieldNames.MAPPING_ID + ", "
@@ -696,6 +720,8 @@ public class SQLStatements {
             + ") AS D "
             + "on "
             + "M." + FieldNames.MAPPING_ID + " = D." + FieldNames.DIFF_MAPPING_ID;
+    
+    
     public final static String FETCH_MAPPINGS_WITHOUT_DIFFS =
             "SELECT "
             + FieldNames.MAPPING_ID + ", "
@@ -714,6 +740,12 @@ public class SQLStatements {
             //            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? and "
             + FieldNames.MAPPING_TRACK + " = ? "
             + "ORDER BY " + FieldNames.MAPPING_START;
+    
+    
+    /**
+     * Fetches mappins without diffs where the mapping id is between 2 given values.
+     * The result is sorted by mapping start.
+     */
     public final static String FETCH_MAPPINGS_WITHOUT_DIFFS2 =
             "SELECT "
             + FieldNames.MAPPING_ID + ", "

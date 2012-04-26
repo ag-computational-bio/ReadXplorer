@@ -8,6 +8,7 @@ import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.HighlightAreaListener;
 import de.cebitec.vamp.view.dataVisualisation.HighlightableI;
+import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -16,7 +17,9 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import org.openide.util.NbPreferences;
 
 /**
@@ -81,7 +85,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
         this.patternFilter = new PatternFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
         this.initPrefListener();
-        this.initHighlightListener();
+        this.initMouseListener(); //this order has to be obeyed, otherwise the highlight listener
+        this.initHighlightListener(); //will not be shown in the highlighted area!
     }
 
     /**
@@ -111,6 +116,40 @@ public class SequenceBar extends JComponent implements HighlightableI {
         highlightListener = new HighlightAreaListener(this, this.baseLineY, this.offsetY);
         this.addMouseListener(highlightListener);
         this.addMouseMotionListener(highlightListener);
+    }
+    
+    
+    private void initMouseListener() {
+        this.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    JPopupMenu popUp = new JPopupMenu();
+                    MenuItemFactory menuItemFactory = new MenuItemFactory();
+
+                    //add copy mouse position option
+                    popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
+                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
 
     public void setGenomeGapManager(GenomeGapManager gapManager) {
@@ -587,6 +626,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
     public int getViewerHorizontalMargin() {
         return this.parentViewer.getHorizontalMargin();
     }
+    
+    public int getCurrentMousePosition() {
+        return this.parentViewer.getCurrentMousePos();
+    }
 
     /**
      * This method is to be called, when a mouse listener associated to this component
@@ -619,4 +662,5 @@ public class SequenceBar extends JComponent implements HighlightableI {
             }
         }
     }
+
 }

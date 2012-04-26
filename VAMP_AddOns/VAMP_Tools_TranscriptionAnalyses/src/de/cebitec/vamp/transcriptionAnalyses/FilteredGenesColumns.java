@@ -1,6 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.ExpressedGene;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -13,16 +13,16 @@ import java.util.List;
  * Converts a List of ExpressedGenes into the format readable for the ExcelExporter.
  * Generates both, the header and the data to write.
  */
-class ExpressedGenesColumns implements ExcelExportDataI {
+class FilteredGenesColumns implements ExcelExportDataI {
 
-    List<ExpressedGene> expressedGenes;
+    List<FilteredGene> expressedGenes;
     
     /** 
      * Converts a List of ExpressedGenes into the format readable for the ExcelExporter.
      * Generates both, the header and the data to write.
      * @param expressedGenes the list of expressed genes
      */
-    public ExpressedGenesColumns(List<ExpressedGene> expressedGenes) {
+    public FilteredGenesColumns(List<FilteredGene> expressedGenes) {
         this.expressedGenes = expressedGenes;
     }
     
@@ -44,13 +44,13 @@ class ExpressedGenesColumns implements ExcelExportDataI {
     public List<List<Object>> dataToExcelExportList() {
         List<List<Object>> expressedGenesExport = new ArrayList<List<Object>>();
         
-        for (ExpressedGene expressedGene : this.expressedGenes) {      
+        for (FilteredGene expressedGene : this.expressedGenes) {      
             List<Object> expressedGeneRow = new ArrayList<Object>();
             
-            expressedGeneRow.add(PersistantAnnotation.getAnnotationName(expressedGene.getExpressedAnnotation()));
-            expressedGeneRow.add(expressedGene.getExpressedAnnotation().getStart());
-            expressedGeneRow.add(expressedGene.getExpressedAnnotation().getStop());
-            expressedGeneRow.add(expressedGene.getExpressedAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev");
+            expressedGeneRow.add(PersistantAnnotation.getAnnotationName(expressedGene.getFilteredAnnotation()));
+            expressedGeneRow.add(expressedGene.getFilteredAnnotation().getStart());
+            expressedGeneRow.add(expressedGene.getFilteredAnnotation().getStop());
+            expressedGeneRow.add(expressedGene.getFilteredAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev");
             expressedGeneRow.add(expressedGene.getReadCount());
             
             expressedGenesExport.add(expressedGeneRow);

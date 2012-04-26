@@ -56,7 +56,6 @@ public class ExternalSort {
                             header = header.concat(line + "\n");
                         }
                     } else {
-
                         break;
                     }
 
@@ -79,8 +78,6 @@ public class ExternalSort {
             }
             header = "";
             mergeFiles(baseFile, numFiles, indexToCompare);
-
-
 
             initRelationReader.close();
             intialRelationInput.close();

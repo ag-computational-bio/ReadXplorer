@@ -4,11 +4,9 @@ import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.LogicalBoundsListener;
-import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
+import de.cebitec.vamp.view.dataVisualisation.*;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
@@ -22,11 +20,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 
 /**
  * AbstractViewer ist a superclass for displaying genome related information.
@@ -53,7 +47,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private double basewidth;
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
-    private int currentLogMousePos;
+    private int currentLogMousePos; //the position of the genome, where to mouse is currently hovering
     private int lastPhysPos = 0;
     private boolean printMouseOver;
     private BasePanel basePanel;
@@ -282,6 +276,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     isPanning = true;
                     AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    JPopupMenu popUp = new JPopupMenu();
+                    MenuItemFactory menuItemFactory = new MenuItemFactory();
+
+                    //add copy mouse position option
+                    popUp.add(menuItemFactory.getCopyPositionItem(currentLogMousePos));
+                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
                 }
             }
 
@@ -580,7 +582,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return paintingAreaInfo;
     }
 
-    private int getCurrentMousePos() {
+    public int getCurrentMousePos() {
         return currentLogMousePos;
     }
 

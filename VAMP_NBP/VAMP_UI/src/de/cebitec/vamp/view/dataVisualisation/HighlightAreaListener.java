@@ -140,6 +140,8 @@ public class HighlightAreaListener extends MouseAdapter {
             final String header = HighlightAreaListener.this.getHeader();
             //add copy option
             popUp.add(menuItemFactory.getCopyItem(selSequence));
+            //add copy position option
+            popUp.add(menuItemFactory.getCopyPositionItem(parentComponent.getCurrentMousePosition()));
             //add store as fasta file option
             popUp.add(menuItemFactory.getStoreFastaItem(selSequence, seqStart, seqEnd));
             //add calculate secondary structure option

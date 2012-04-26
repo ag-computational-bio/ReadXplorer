@@ -108,7 +108,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
      * Loads all mappings (without diffs) from the DB with ids within 
      * the given interval of the reference genome.
      * @param request the genome request containing the requested mapping id interval
-     * @return the list of mappings belonging to the given mapping id interval
+     * @return the list of mappings belonging to the given mapping id interval sorted by mapping start
      */
     private List<PersistantMapping> loadMappingsById(GenomeRequest request) {
         

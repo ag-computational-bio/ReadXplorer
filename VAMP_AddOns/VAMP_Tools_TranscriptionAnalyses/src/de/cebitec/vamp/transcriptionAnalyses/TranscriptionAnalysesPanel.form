@@ -54,26 +54,26 @@
                                   <Component id="detectionButton" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="menuLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" attributes="0">
-                                      <Component id="geneStartField" min="-2" pref="56" max="-2" attributes="0"/>
+                                      <Component id="transcriptionStartField" min="-2" pref="56" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="geneStartLabel" min="-2" max="-2" attributes="0"/>
+                                      <Component id="transcriptionStartLabel" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="geneStartField2" min="-2" pref="56" max="-2" attributes="0"/>
+                                      <Component id="transcriptionStartField2" min="-2" pref="56" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="geneStartLabel1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="transcriptionStartLabel1" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="expressedGenesBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="filteredGenesBox" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="expressedGenesField" min="-2" pref="55" max="-2" attributes="0"/>
+                                      <Component id="filteredGenesField" min="-2" pref="55" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="expressedGenesLabel" min="-2" max="-2" attributes="0"/>
+                                      <Component id="filteredGenesLabel" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="geneStartBox" min="-2" max="-2" attributes="0"/>
+                                      <Component id="transcriptionStartBox" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="geneStartAutomaticBox" min="-2" max="-2" attributes="0"/>
+                                      <Component id="transcriptionStartAutomaticBox" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="operonField" min="-2" pref="55" max="-2" attributes="0"/>
@@ -81,18 +81,18 @@
                                       <Component id="operonLabel" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="expressedGenesField2" min="-2" pref="55" max="-2" attributes="0"/>
+                                      <Component id="filteredGenesField2" min="-2" pref="55" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="expressedGenesLabel2" min="-2" max="-2" attributes="0"/>
+                                      <Component id="filteredGenesLabel2" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="296" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                           <Component id="jSeparator4" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="operonBox" min="-2" max="-2" attributes="0"/>
+                              <Component id="operonDetectionBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="operonDetectionAutomaticBox1" min="-2" max="-2" attributes="0"/>
+                              <Component id="operonDetectionAutomaticBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -108,41 +108,41 @@
                       <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="geneStartBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="geneStartAutomaticBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="transcriptionStartBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="transcriptionStartAutomaticBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="geneStartField" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="geneStartLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="transcriptionStartField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="transcriptionStartLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="geneStartField2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="geneStartLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="transcriptionStartField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="transcriptionStartLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="expressedGenesBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="filteredGenesBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="expressedGenesField" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="expressedGenesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="filteredGenesField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="filteredGenesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="expressedGenesField2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="expressedGenesLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="filteredGenesField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="filteredGenesLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jSeparator3" min="-2" pref="10" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="operonBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="operonDetectionAutomaticBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="operonDetectionBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="operonDetectionAutomaticBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -166,40 +166,40 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="expressedGenesBox">
+            <Component class="javax.swing.JCheckBox" name="filteredGenesBox">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.expressedGenesBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.filteredGenesBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="expressedGenesBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filteredGenesBoxActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="geneStartBox">
+            <Component class="javax.swing.JCheckBox" name="transcriptionStartBox">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="geneStartBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transcriptionStartBoxActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JTextField" name="geneStartField">
+            <Component class="javax.swing.JTextField" name="transcriptionStartField">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="geneStartFieldActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transcriptionStartFieldActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="geneStartLabel">
+            <Component class="javax.swing.JLabel" name="transcriptionStartLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </Component>
@@ -207,20 +207,20 @@
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator2">
             </Component>
-            <Component class="javax.swing.JTextField" name="expressedGenesField">
+            <Component class="javax.swing.JTextField" name="filteredGenesField">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.expressedGenesField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.filteredGenesField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="expressedGenesFieldActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filteredGenesFieldActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="expressedGenesLabel">
+            <Component class="javax.swing.JLabel" name="filteredGenesLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.expressedGenesLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.filteredGenesLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </Component>
@@ -253,14 +253,14 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="addRestrictionLabel" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="geneStartField3" min="-2" pref="56" max="-2" attributes="0"/>
+                                  <Component id="transcriptionStartField3" min="-2" pref="56" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="geneStartLabel2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="transcriptionStartLabel2" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="geneStartField4" min="-2" pref="56" max="-2" attributes="0"/>
+                                  <Component id="transcriptionStartField4" min="-2" pref="56" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="geneStartLabel3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="transcriptionStartLabel3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
@@ -274,13 +274,13 @@
                           <Component id="addRestrictionLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="geneStartField3" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="geneStartLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="transcriptionStartField3" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="transcriptionStartLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="geneStartField4" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="geneStartLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="transcriptionStartField4" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="transcriptionStartLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                       </Group>
@@ -288,37 +288,37 @@
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JTextField" name="geneStartField3">
+                <Component class="javax.swing.JTextField" name="transcriptionStartField3">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartField3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartField3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="geneStartField3ActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transcriptionStartField3ActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="javax.swing.JLabel" name="geneStartLabel2">
+                <Component class="javax.swing.JLabel" name="transcriptionStartLabel2">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JTextField" name="geneStartField4">
+                <Component class="javax.swing.JTextField" name="transcriptionStartField4">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartField4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartField4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="geneStartField4ActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transcriptionStartField4ActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="javax.swing.JLabel" name="geneStartLabel3">
+                <Component class="javax.swing.JLabel" name="transcriptionStartLabel3">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -331,41 +331,41 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JCheckBox" name="geneStartAutomaticBox">
+            <Component class="javax.swing.JCheckBox" name="transcriptionStartAutomaticBox">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="geneStartAutomaticBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transcriptionStartAutomaticBoxActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="geneStartLabel1">
+            <Component class="javax.swing.JLabel" name="transcriptionStartLabel1">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="geneStartField2">
+            <Component class="javax.swing.JTextField" name="transcriptionStartField2">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.geneStartField2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.transcriptionStartField2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="geneStartField2ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transcriptionStartField2ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="operonBox">
+            <Component class="javax.swing.JCheckBox" name="operonDetectionBox">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.operonBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.operonDetectionBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operonBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operonDetectionBoxActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="operonField">
@@ -387,30 +387,30 @@
             </Component>
             <Component class="javax.swing.JSeparator" name="jSeparator4">
             </Component>
-            <Component class="javax.swing.JCheckBox" name="operonDetectionAutomaticBox1">
+            <Component class="javax.swing.JCheckBox" name="operonDetectionAutomaticBox">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.operonDetectionAutomaticBox1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.operonDetectionAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operonDetectionAutomaticBox1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operonDetectionAutomaticBoxActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JTextField" name="expressedGenesField2">
+            <Component class="javax.swing.JTextField" name="filteredGenesField2">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.expressedGenesField2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.filteredGenesField2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="expressedGenesField2ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filteredGenesField2ActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="expressedGenesLabel2">
+            <Component class="javax.swing.JLabel" name="filteredGenesLabel2">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.expressedGenesLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="TranscriptionAnalysesPanel.filteredGenesLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </Component>

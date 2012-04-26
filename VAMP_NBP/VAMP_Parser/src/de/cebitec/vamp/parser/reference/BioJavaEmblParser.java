@@ -222,7 +222,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
     }
 
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
             observer.update(this.errorMsg);
         }
@@ -234,6 +234,6 @@ public class BioJavaEmblParser implements ReferenceParserI {
      */
     private void sendErrorMsg(final String errorMsg) {
         this.errorMsg = errorMsg;
-        this.notifyObservers();
+        this.notifyObservers(null);
     }
 }

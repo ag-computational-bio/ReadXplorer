@@ -295,7 +295,7 @@ public class SAMBAMParser implements MappingParserI {
     }
 
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
             observer.update(this.msg);
         }
@@ -307,7 +307,7 @@ public class SAMBAMParser implements MappingParserI {
      */
     private void sendMsg(final String msg) {
         this.msg = msg;
-        this.notifyObservers();
+        this.notifyObservers(null);
     }
 
     

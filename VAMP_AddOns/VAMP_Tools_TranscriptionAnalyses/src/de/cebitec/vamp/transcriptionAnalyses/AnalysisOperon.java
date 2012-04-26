@@ -1,79 +1,67 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.PutativeOperon;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.api.objects.JobI;
-import de.cebitec.vamp.databackend.GenomeRequest;
-import de.cebitec.vamp.databackend.MappingThreadAnalyses;
-import de.cebitec.vamp.databackend.ThreadListener;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
+import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.NbBundle;
 
 /**
  * @author MKD, rhilker
  * 
  * Carries out the analysis of a data set for operons.
  */
-public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
+public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
-    private final ProgressHandle progressHandle;
-    private DataVisualisationI parent;
     private TrackViewer trackViewer;
     private TrackConnector trackCon;
     private int minNumberReads;
     private int genomeSize;
     private List<PersistantAnnotation> genomeAnnotations;
-    private List<Operon> operonList;
-    private MappingThreadAnalyses mappingThread;
-    private int nbRequests;
-    private int nbCarriedOutRequests;
-    private int numUniqueBmMappingsGenome;
-    private int transcritomeLength;
+    private List<Operon> operonList; //final result list of OperonAdjacencies
     private boolean operonDetectionAutomatic;
-    private HashMap<Integer, PutativeOperon> annotationReadCount; //annotation id of mappings to count for annotation
-    private List<OperonAdjacency> operonAdjacencies;
-    private int lastGene = 0;
+    private HashMap<Integer, OperonAdjacency> annoToPutativeOperonMap; //annotation id of mappings to count for annotations
+    private List<OperonAdjacency> operonAdjacencies; 
     private int averageReadLength = 0;
     private int averageSeqPairLength = 0;
+    private int lastMappingIdx;
+    private int readsAnnotation1 = 0;
+    private int spanningReads = 0;
+    private int readsAnnotation2 = 0;
+    private int internalReads = 0;
 
     /**
      * Carries out the analysis of a data set for operons.
-     * @param parent the parent, which should visualize the results after the analysis
      * @param trackViewer the trackViewer whose data is to be analyzed
      * @param minNumberReads the minimal number of spanning reads between neighboring genes
      * @param operonDetectionAutomatic true, if the minimal number of spanning reads is not given and
      *      should be calculated by the software
      */
-    public AnalysisOperon(DataVisualisationI parent, TrackViewer trackViewer, int minNumberReads, boolean operonDetectionAutomatic) {
-        this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisOperon.class, "MSG_AnalysesWorker.progress.name"));
-        this.parent = parent;
+    public AnalysisOperon(TrackViewer trackViewer, int minNumberReads, boolean operonDetectionAutomatic) {
         this.trackViewer = trackViewer;
         this.minNumberReads = minNumberReads;
         this.operonDetectionAutomatic = operonDetectionAutomatic;
-        this.nbCarriedOutRequests = 0;
         this.operonList = new ArrayList<Operon>();
-        this.annotationReadCount = new HashMap<Integer, PutativeOperon>();
+        this.annoToPutativeOperonMap = new HashMap<Integer, OperonAdjacency>();
         this.operonAdjacencies = new ArrayList<OperonAdjacency>();
+        
+        this.initDatastructures();
     }
-
-    @Override
-    public void startAnalysis() {
-
-        this.progressHandle.start();
+        
+    /**
+     * Initializes the initial data structures needed for an operon detection analysis.
+     * This includes the detection of all neighboring annotations before the actual analysis.
+     */
+    private void initDatastructures() {
         this.trackCon = trackViewer.getTrackCon();
         List<Integer> trackIds = new ArrayList<Integer>();
         trackIds.add(trackCon.getTrackID());
@@ -82,82 +70,69 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
         this.genomeSize = refConnector.getRefGen().getSequence().length();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
-        int numUnneededMappings = 0;
-        numUniqueBmMappingsGenome = trackCon.getNumOfUniqueBmMappings();
-        transcritomeLength = trackCon.getCoveredBestMatchPos();
-
-        List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
-        for (PersistantTrack track : tracksAll) {
-            TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
-            if (track.getId() < trackCon.getTrackID()) {
-                numUnneededMappings += connector.getNumOfUniqueMappings();
-            }
-        }
-        int numInterestingMappings = numUnneededMappings
-                + trackCon.getNumOfUniqueMappings();
-
+        
+        ////////////////////////////////////////////////////////////////////////////
+        // detecting all neighboring annotations which are not overlapping more than 20bp as putative operons
+        ////////////////////////////////////////////////////////////////////////////
+        
         for (int i = 0; i < this.genomeAnnotations.size() - 1; i++) {
 
             PersistantAnnotation annotation1 = this.genomeAnnotations.get(i);
             PersistantAnnotation annotation2 = this.genomeAnnotations.get(i + 1);
-            if (annotation1.getStrand() == annotation2.getStrand()) {
-                if (annotation2.getStart() <= annotation1.getStop()) {
-                    //do nothing
-                } else {
-                    this.annotationReadCount.put(annotation1.getId(), new PutativeOperon(annotation1, annotation2));
+            //we currently only exclude exons from the detection 
+            if (annotation1.getType() != FeatureType.EXON) {
+                if (annotation1.getStrand() == annotation2.getStrand() && annotation2.getType() != FeatureType.EXON) {
+                    if (annotation2.getStart() + 20 <= annotation1.getStop()) { //genes may overlap at the ends, happens quite often
+                        //do nothing
+                    } else {
+                        this.annoToPutativeOperonMap.put(annotation1.getId(), new OperonAdjacency(annotation1, annotation2));
+                    }
+                } else { // check next annotations until one on the same strand is found which is not an exon.
+                    /*
+                     * We keep all neighboring annotations on the same strand,
+                     * even if their distance is not larger than 1000bp.
+                     */
+                    int annoIndex = i + 2;
+                    while ((annotation1.getStrand() != annotation2.getStrand() || 
+                            annotation2.getType() == FeatureType.EXON) && 
+                            annoIndex < this.genomeAnnotations.size() - 1) {
+                        
+                        annotation2 = this.genomeAnnotations.get(annoIndex++);
+                    }
+                    if (annotation1.getStrand() == annotation2.getStrand() && annotation2.getStart() - annotation1.getStop() < 1000) {
+                        this.annoToPutativeOperonMap.put(annotation1.getId(), new OperonAdjacency(annotation1, annotation2));
+                    }
                 }
             }
         }
-
-        for (int trackId : trackIds) {
-
-            int stepSize = 50000;
-            int from = numUnneededMappings;
-            int to = numInterestingMappings - numUnneededMappings > stepSize ? 
-                    numUnneededMappings + stepSize : numInterestingMappings;
-            int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
-            this.nbRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest;
-            this.progressHandle.switchToDeterminate(this.nbRequests + 1); //+ 1 for subsequent calculations
-            this.progressHandle.progress("Request " + (nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
-
-            this.mappingThread = new MappingThreadAnalyses(trackId, this.nbRequests);
-            this.mappingThread.start();
-
-            while (to < numInterestingMappings) {
-                GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
-                this.mappingThread.addRequest(mappingRequest);
-
-                from = to + 1;
-                to += stepSize;
-            }
-
-            //calc last interval until genomeSize
-            to = numInterestingMappings;
-            GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
-            this.mappingThread.addRequest(mappingRequest);
-        }
     }
 
+    /**
+     * Sums the read counts for a new list of mappings or calls the finish method.
+     * @param data the data to handle: Either a list of mappings or "2" = mapping querries are done.
+     */
     @Override
-    public void receiveData(Object data) {
-        this.progressHandle.progress("Request " + (++nbCarriedOutRequests) + " of " + nbRequests, nbCarriedOutRequests);
-
+    public void update(Object data) {
+        //the mappings are sorted by their start position!
         List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
         if (data.getClass() == mappings.getClass()) {
 
             mappings = (List<PersistantMapping>) data;
             this.sumReadCounts(mappings);
         }
-
-        //when the last request is finished signalize the parent to collect the data
-        if (nbCarriedOutRequests >= nbRequests - 1) {
-            Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Collect the data", currentTimestamp);
-            this.findOperons();
-            this.parent.showData(true);
-            this.nbCarriedOutRequests = 0;
-            this.progressHandle.finish();
+        if (data instanceof Byte && ((Byte) data) == 2) {
+            this.finish();
         }
+    }
+    
+    /**
+     * Method to be called when the analysis is finished. Starts the detection of
+     * operons after the read counts for all mappings have been stored.
+     */
+    public void finish() {
+        Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Detecting operons", currentTimestamp);
+        this.findOperons();
     }
 
     /**
@@ -165,55 +140,63 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
      * @param mappings the set of mappings to be investigated
      */
     public void sumReadCounts(List<PersistantMapping> mappings) {
+
         PersistantAnnotation annotation1;
         PersistantAnnotation annotation2;
+        boolean fstFittingMapping = true;
 
-        for (int i = 0; i < this.genomeAnnotations.size() - 1; i++) {
+        for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
             annotation1 = this.genomeAnnotations.get(i);
-            annotation2 = this.genomeAnnotations.get(i + 1);
-            int annotation1Start = annotation1.getStart();
-            int annotation1Stop = annotation1.getStop();
-            int annotation2Start = annotation2.getStart();
-            int annotation2Stop = annotation2.getStop();
-            int readsGene1 = 0;
-            int spanningReads = 0;
-            int readsGene2 = 0;
-            int internalReads = 0;
-            int currentId = annotation1.getId();
+            int id1 = annotation1.getId();
+            fstFittingMapping = true;
 
-            if (annotationReadCount.get(currentId) != null) {
-                for (int j = 0; j < mappings.size(); ++j) {
+            //we can already neglect all annotations not forming a putative operon
+            if (this.annoToPutativeOperonMap.containsKey(id1)) {
+                annotation2 = this.annoToPutativeOperonMap.get(id1).getAnnotation2();
+                
+                this.readsAnnotation1 = 0;
+                this.readsAnnotation2 = 0;
+                this.spanningReads = 0;
+                this.internalReads = 0;
+
+                int annotation1Stop = annotation1.getStop();
+                int annotation2Start = annotation2.getStart();
+                int annotation2Stop = annotation2.getStop();
+
+                for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
                     PersistantMapping mapping = mappings.get(j);
-                    if (mapping.getStart() >= annotation1Start && mapping.getStart() <= annotation1Stop && mapping.getStop() < annotation2Start) {
-                        readsGene1++;
-                    } else if (mapping.getStart() > annotation1Stop && mapping.getStop() >= annotation2Start && mapping.getStop() <= annotation2Stop) {
-                        readsGene2++;
-                    } else if (mapping.getStart() <= annotation1Stop && mapping.getStop() >= annotation2Start) {
-                        spanningReads++;
-                    } else if (mapping.getStart() > annotation1Stop && mapping.getStop() < annotation2Start) {
-                        internalReads++;
+
+                    if (mapping.getStart() > annotation2Stop ) {
+                        break; //since the mappings are sorted by start position
+                    } else if (mapping.getStrand() != annotation1.getStrand() || mapping.getStop() < annotation1Stop) {
+                        continue;
                     }
-//                    if (mapping.getStart() <= featStop_Gen1 && mapping.getStart()>=featStart_Gen1) {
-//                        if (mapping.getStop() >= featStart_Gen2 && mapping.getStop() <=featStop_Gen2) {
-//                            read_cover_Gen1_and_Gen2++;
-//                        } else if(mapping.getStop() <featStart_Gen2) {
-//                            read_cover_Gen1++;
-//                        }
-//
-//                    } else if (mapping.getStop() >= featStart_Gen2 && mapping.getStart() > featStop_Gen1 && mapping.getStop()<=featStop_Gen2) {
-//                        read_cover_Gen2++;
-//                    } else if(mapping.getStart() > featStop_Gen1 && mapping.getStop()< featStart_Gen2) {
-//                        read_cover_none++;
-//                    }
 
+                    //mappings identified between both annotations
+                    if (mapping.getStart() <= annotation1Stop && mapping.getStop() > annotation1Stop && mapping.getStop() < annotation2Start) {
+                        readsAnnotation1 += mapping.getNbReplicates();
+                    } else if (mapping.getStart() > annotation1Stop && mapping.getStart() < annotation2Start && mapping.getStop() >= annotation2Start) {
+                        readsAnnotation2 += mapping.getNbReplicates();
+                    } else if (mapping.getStart() <= annotation1Stop && mapping.getStop() >= annotation2Start) {
+                        spanningReads += mapping.getNbReplicates();
+                    } else if (mapping.getStart() > annotation1Stop && mapping.getStop() < annotation2Start) {
+                        internalReads += mapping.getNbReplicates();
+                    }
+
+                    if (fstFittingMapping == true) {
+                        this.lastMappingIdx = j;
+                        fstFittingMapping = false;
+                    }
                 }
-                annotationReadCount.get(currentId).setReadsGene1(annotationReadCount.get(currentId).getReadsGene1() + readsGene1);
-                annotationReadCount.get(currentId).setSpanningReads(annotationReadCount.get(currentId).getSpanningReads() + spanningReads);
-                annotationReadCount.get(currentId).setReadsGene2(annotationReadCount.get(currentId).getReadsGene2() + readsGene2);
-                annotationReadCount.get(currentId).setInternalReads(annotationReadCount.get(currentId).getInternalReads() + internalReads);
 
+                OperonAdjacency putativeOperon = annoToPutativeOperonMap.get(id1);
+                putativeOperon.setReadsAnnotation1(putativeOperon.getReadsAnnotation1() + readsAnnotation1);
+                putativeOperon.setReadsAnnotation2(putativeOperon.getReadsAnnotation2() + readsAnnotation2);
+                putativeOperon.setSpanningReads(putativeOperon.getSpanningReads() + spanningReads);
+                putativeOperon.setInternalReads(putativeOperon.getInternalReads() + internalReads);
             }
         }
+        this.lastMappingIdx = 0;
     }
     
     /**
@@ -221,94 +204,67 @@ public class AnalysisOperon implements ThreadListener, AnalysisI<List>, JobI {
      * genome annotation.
      */
     public void findOperons() {
-        Set<Integer> s = annotationReadCount.keySet();
-        Iterator i = s.iterator();
-        Object[] keyss = annotationReadCount.keySet().toArray();
-        Arrays.sort(keyss);
-        int key;
-        for (int z = 0; z < keyss.length; z++) {
+        Object[] annoIds = annoToPutativeOperonMap.keySet().toArray();
+        Arrays.sort(annoIds);
+        OperonAdjacency putativeOperon;
+
+        /*
+         * If we have sequence pairs, we calculate the average seq pair length
+         * and if we only have single reads, we use the average read length.
+         */
+        //TODO: incorporate sequence pair handling in the detection. currently only reads are used
+        int minimumSpanningReads = 0;
+//        if (trackCon.getNumOfSeqPairs() > 0 && operonDetectionAutomatic) {
+//            minimumSpanningReads = (numUniqueBmMappings * averageSeqPairLength) / transcritomeLength;
+//        } else if (operonDetectionAutomatic) {
+//            minimumSpanningReads = (numUniqueBmMappings * averageReadLength) / transcritomeLength;
+//        } else {
+            minimumSpanningReads = minNumberReads;
+//        }
+//        System.out.println("Threshold: " + minimumSpanningReads + ", = uniqBMM = " + numUniqueBmMappings + ", avReadLength = "
+//                + averageReadLength + ", transcriptome length = " + transcritomeLength + "Result: " + numUniqueBmMappings * 280 / transcritomeLength);
+
+        int count = 0;
+        int lastAnnoId = 0;
+        for (int i = 0; i < annoIds.length; i++) {
             
-            key = (Integer) keyss[z];
-            int spanningReads = annotationReadCount.get(key).getSpanningReads();
-            int readsGene1 = annotationReadCount.get(key).getReadsGene1();
-            int readsGene2 = annotationReadCount.get(key).getReadsGene2();
-            int internalReads = annotationReadCount.get(key).getInternalReads();
-            int allReads = spanningReads + readsGene1 + readsGene2 + internalReads;
-            int threshold = 0;
-            PersistantAnnotation gene1 = annotationReadCount.get(key).getGene1();
-            PersistantAnnotation gene2 = annotationReadCount.get(key).getGene2();
-
-            if (trackCon.getNumOfSeqPairs() > 0) {
-                //System.out.println("mkdmkd "+ trackCon.getNumOfSeqPairs());
-                if (!operonDetectionAutomatic) {
-                    threshold = (numUniqueBmMappingsGenome * averageSeqPairLength) / transcritomeLength;
-                } else {
-                    threshold = minNumberReads;
-
-                }
-            } else {
-                if (!operonDetectionAutomatic) {
-                    threshold = (numUniqueBmMappingsGenome * averageReadLength) / transcritomeLength;
-                } else {
-                    threshold = minNumberReads;
-
-                }
-            }
-
-
+            putativeOperon = annoToPutativeOperonMap.get((Integer) annoIds[i]);
+            spanningReads = putativeOperon.getSpanningReads();
+            internalReads = putativeOperon.getInternalReads();
+            PersistantAnnotation anno1 = putativeOperon.getAnnotation1();
+            PersistantAnnotation anno2 = putativeOperon.getAnnotation2();
 
             /* Detect an operon only, if the number of spanning reads is larger than
              * the threshold. */
-            if (spanningReads > threshold) {
-                OperonAdjacency operonAdjacency = new OperonAdjacency(gene1, gene2);
-                operonAdjacency.setReadsGene1(readsGene1);
-                operonAdjacency.setSpanningReads(spanningReads);
-                operonAdjacency.setReadsGene2(readsGene2);
-                operonAdjacency.setInternalReads(internalReads);
+            if (spanningReads >= minimumSpanningReads) {
 
-                if (lastGene == gene1.getId() && lastGene != 0) {
+                //only in this case a new operon starts:
+                if (lastAnnoId != anno1.getId() && lastAnnoId != 0) {
 
-                    operonAdjacencies.add(operonAdjacency);
-                    lastGene = gene2.getId();
-                } else if (lastGene != gene1.getId() && lastGene != 0) {
-
-                    Operon op = new Operon();
-
-                    for (int y = 0; y < operonAdjacencies.size(); y++) {
-                        op.getOperon().add(operonAdjacencies.get(y));
-                    }
-                    operonList.add(op);
+                    Operon operon = new Operon();
+                    operon.addAllOperonAdjacencies(operonAdjacencies);
+                    operonList.add(operon); //only here the operons are added to final list
                     operonAdjacencies.clear();
-                    operonAdjacencies.add(operonAdjacency);
-
-                    lastGene = gene2.getId();
-
-                } else if (lastGene == 0) {
-                    operonAdjacencies.add(operonAdjacency);
-                    lastGene = gene2.getId();
                 }
+                operonAdjacencies.add(putativeOperon);
+                lastAnnoId = anno2.getId();
 
-                // TODO: check if parameter ok or new parameter
-//            } else if (gene2.getStart() - gene1.getStop() > averageReadLength &&
-//                    minimalCoverage > minNumberReads) {
-//                //create operon
+            // TODO: check if parameter ok or new parameter
+            } else if (anno2.getStart() - anno1.getStop() > averageReadLength &&
+                    internalReads > minNumberReads) {
+                //create operon
+                System.out.println("found case " + ++count);
             }
-
+        }
+        if (!operonAdjacencies.isEmpty()) {
+            Operon operon = new Operon();
+            operon.addAllOperonAdjacencies(operonAdjacencies);
+            operonList.add(operon); //only here the operons are added to final list
         }
     }
 
     @Override
-    public int getNbCarriedOutRequests() {
-        return this.nbCarriedOutRequests;
-    }
-
-    @Override
-    public int getNbTotalRequests() {
-        return this.nbRequests;
-    }
-
-    @Override
-    public List getResults() {
+    public List<Operon> getResults() {
         return this.operonList;
 
     }

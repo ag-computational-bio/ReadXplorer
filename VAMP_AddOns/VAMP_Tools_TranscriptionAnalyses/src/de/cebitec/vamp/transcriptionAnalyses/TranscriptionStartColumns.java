@@ -1,7 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.GeneStart;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -11,20 +11,22 @@ import java.util.List;
 /**
  * @author -Rolf Hilker-
  * 
- * Converts a List of GeneStarts into the format readable for the ExcelExporter.
+ * Converts a List of TranscriptionStarts into the format readable for the ExcelExporter.
  * Generates both, the header and the data to write.
  */
-public class GeneStartColumns implements ExcelExportDataI {
+public class TranscriptionStartColumns implements ExcelExportDataI {
     
-    List<GeneStart> geneStarts;
+    List<TranscriptionStart> tSS;
+    private final List<String> promotorRegions;
 
     /** 
-     * Converts a List of GeneStarts into the format readable for the ExcelExporter.
+     * Converts a List of TranscriptionStarts into the format readable for the ExcelExporter.
      * Generates both, the header and the data to write.
-     * @param geneStarts the list of GeneStarts to convert.
+     * @param tSS the list of TranscriptionStarts to convert.
      */
-    public GeneStartColumns(List<GeneStart> geneStarts) {
-        this.geneStarts = geneStarts;
+    public TranscriptionStartColumns(List<TranscriptionStart> tSS, List<String> promotorRegions) {
+        this.tSS = tSS;
+        this.promotorRegions = promotorRegions;
     }
 
     
@@ -47,6 +49,7 @@ public class GeneStartColumns implements ExcelExportDataI {
         dataColumnDescriptions.add("Next Downstream Annotation");
         dataColumnDescriptions.add("Next Downstream Annotation Start");
         dataColumnDescriptions.add("Next Downstream Annotation Stop");
+        dataColumnDescriptions.add("70bp Upstream of Start");
         
         return dataColumnDescriptions;
     }
@@ -54,9 +57,10 @@ public class GeneStartColumns implements ExcelExportDataI {
     
     @Override
     public List<List<Object>> dataToExcelExportList() {
-        List<List<Object>> geneStartsExport = new ArrayList<List<Object>>();
+        List<List<Object>> tSSExport = new ArrayList<List<Object>>();
         
-        for (GeneStart geneStart : this.geneStarts) {      
+        for (int i = 0; i < this.tSS.size(); ++i) {      
+            TranscriptionStart geneStart = this.tSS.get(i);
             List<Object> geneStartRow = new ArrayList<Object>();
             
             int percentageIncrease;
@@ -88,10 +92,12 @@ public class GeneStartColumns implements ExcelExportDataI {
             geneStartRow.add(annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-");
             geneStartRow.add(annotation != null ? annotation.getStart() : "-");
             geneStartRow.add(annotation != null ? annotation.getStop() : "-");
+           
+            geneStartRow.add(this.promotorRegions.get(i));
             
-            geneStartsExport.add(geneStartRow);
+            tSSExport.add(geneStartRow);
         }
         
-        return geneStartsExport;
+        return tSSExport;
     }
 }

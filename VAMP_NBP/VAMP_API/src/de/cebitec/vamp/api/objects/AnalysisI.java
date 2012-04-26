@@ -9,11 +9,6 @@ package de.cebitec.vamp.api.objects;
 public interface AnalysisI<T> {    
     
     /**
-     * This methods starts the analysis.
-     */
-    public void startAnalysis();
-    
-    /**
      * @return Returns the results of the analysis.
      */
     public T getResults();

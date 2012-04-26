@@ -11,6 +11,7 @@ import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -23,7 +24,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author -Rolf Hilker-
  */
-public class OperonDetectionResultPanel extends javax.swing.JPanel {
+public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
     private BoundsInfoManager bim;
     private List<Operon> operonDetection;
@@ -31,7 +32,7 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
     /**
      * Creates new form GeneStartsResultPanel
      */
-    public OperonDetectionResultPanel() {
+    public ResultPanelOperonDetection() {
         initComponents();
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
@@ -62,11 +63,11 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Gene 1", "Gene 2", "Strand", "Start Gene 1", "Start Gene 2", "Gene 1 Reads", "Gene 2 Reads", "Internal Reads", "Spanning Reads"
+                "Annotation 1", "Annotation 2", "Strand", "Start Anno 1", "Start Anno 2", "Reads Overlap Stop 1", "Reads Overlap Start 2", "Internal Reads", "Spanning Reads"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false, false, false
@@ -81,17 +82,17 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(operonDetectionTable);
-        operonDetectionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title0")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title7")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title1")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title2")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title8")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title3")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title4")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title5")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title6")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title0")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title7")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title1")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title2")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title8")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title3")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title4")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title5")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title6")); // NOI18N
 
-        exportButton.setText(org.openide.util.NbBundle.getMessage(OperonDetectionResultPanel.class, "OperonDetectionResultPanel.exportButton.text")); // NOI18N
+        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
@@ -141,41 +142,39 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
         operonDetectionTable.getColumnModel().getColumn(7).setCellRenderer(lineWrapCellRenderer);
         operonDetectionTable.getColumnModel().getColumn(8).setCellRenderer(lineWrapCellRenderer);
 
-
-
         for (Operon operon : operonDetection) {
-            String geneName1 = "";
-            String geneName2 = "";
+            String annoName1 = "";
+            String annoName2 = "";
             String strand = "";
-            String pos1 = "";
-            String pos2 = "";
-            String coverGen1 = "";
-            String coverGen2 = "";
-            String coverNone = "";
-            String coverGen1And2 = "";
+            String startAnno1 = "";
+            String startAnno2 = "";
+            String readsAnno1 = "";
+            String readsAnno2 = "";
+            String internalReads = "";
+            String spanningReads = "";
 
-            for (OperonAdjacency ad : operon.getOperon()) {
-                geneName1 += ad.getOperonAnnotation().getLocus() + "\n";
-                geneName2 += ad.getOperonAnnotation2().getLocus() + "\n";
-                strand += (ad.getOperonAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
-                pos1 += ad.getOperonAnnotation().getStart() + "\n";
-                pos2 += ad.getOperonAnnotation2().getStart() + "\n";
-                coverGen1 += ad.getReadsGene1() + "\n";
-                coverGen2 += ad.getReadsGene2() + "\n";
-                coverNone += ad.getInternalReads() + "\n";
-                coverGen1And2 += ad.getSpanningReads() + "\n";
+            for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
+                annoName1 += opAdj.getAnnotation1().getLocus() + "\n";
+                annoName2 += opAdj.getAnnotation2().getLocus() + "\n";
+                strand += (opAdj.getAnnotation1().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
+                startAnno1 += opAdj.getAnnotation1().getStart() + "\n";
+                startAnno2 += opAdj.getAnnotation2().getStart() + "\n";
+                readsAnno1 += opAdj.getReadsAnnotation1() + "\n";
+                readsAnno2 += opAdj.getReadsAnnotation2() + "\n";
+                internalReads += opAdj.getInternalReads() + "\n";
+                spanningReads += opAdj.getSpanningReads() + "\n";
             }
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = geneName1;
-            rowData[1] = geneName2;
+            rowData[0] = annoName1;
+            rowData[1] = annoName2;
             rowData[2] = strand;
-            rowData[3] = pos1;
-            rowData[4] = pos2;
-            rowData[5] = coverGen1;
-            rowData[6] = coverGen2;
-            rowData[7] = coverNone;
-            rowData[8] = coverGen1And2;
-            if (!geneName1.isEmpty() && !geneName2.isEmpty()) {
+            rowData[3] = startAnno1;
+            rowData[4] = startAnno2;
+            rowData[5] = readsAnno1;
+            rowData[6] = readsAnno2;
+            rowData[7] = internalReads;
+            rowData[8] = spanningReads;
+            if (!annoName1.isEmpty() && !annoName2.isEmpty()) {
                 model.addRow(rowData);
             }
         }
@@ -183,6 +182,40 @@ public class OperonDetectionResultPanel extends javax.swing.JPanel {
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
         this.operonDetectionTable.setRowSorter(sorter);
         sorter.setModel(model);
+        for (int i = 3; i < 8; ++i) {
+            sorter.setComparator(i, this.getStringComparator());
+        }
+    }
+    
+    /**
+     * Creates a String comparator, that cuts the string after the first line
+     * break "\n" and compares it to the second string afterwards as an Integer.
+     * If one of the values is not an integer, they are compared as strings.
+     * @return the comparator
+     */
+    private Comparator<String> getStringComparator() {
+        
+        Comparator<String> stringComparator = new Comparator<String>() {
+
+            @Override
+            public int compare(String a, String b) {
+                if (a.contains("\n")) {
+                    a = a.substring(0, a.indexOf("\n"));
+                }
+                if (b.contains("\n")) {
+                    b = b.substring(0, b.indexOf("\n"));
+                }
+                try {
+                    Integer intA = Integer.parseInt(a);
+                    Integer intB = Integer.parseInt(b);
+                    return intA.compareTo(intB);
+                } catch (NumberFormatException e) {
+                    return a.compareTo(b);
+                }
+            }
+        };
+        
+        return stringComparator;
     }
 
     private void showOperonDetectionPosition() {

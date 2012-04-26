@@ -1,34 +1,34 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.util.ColorProperties;
-//import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
-import java.awt.event.ActionEvent;
+import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
+import de.cebitec.vamp.view.dialogMenus.RNAFolderI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
 import java.util.Iterator;
-//import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author ddoppmeier
  */
-public class BlockComponent extends JComponent implements ActionListener {
+public class BlockComponent extends JComponent {
 
     private static final long serialVersionUID = 1324672345;
     private BlockI block;
@@ -42,10 +42,6 @@ public class BlockComponent extends JComponent implements ActionListener {
     private int phyRight;
     private float percentSandBPerCovUnit;
     private float minSaturationAndBrightness;
-//    private String nameofRead = "";
-//    private static String COPY_READNAME = "Copy readname"; //no readnames are stored anymore: RUN domain excluded
-    private static String COPY_SEQUENCE = "Copy reference sequence";
-    private JPopupMenu p = new JPopupMenu();
 
     public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
         this.block = block;
@@ -62,7 +58,6 @@ public class BlockComponent extends JComponent implements ActionListener {
         // if there is a gap at the end of this block, phyRight shows the right bound of the gap (in viewer)
         // thus forgetting about every following matches, diffs, gaps whatever....
         this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos(absLogBlockStop).getRightPhysBound();
-        setPopupMenu();
         int numOfGaps = this.gapManager.getNumOfGapsAt(absLogBlockStop);
         int offset = (int) (numOfGaps * bounds.getPhysWidth());
         phyRight += offset;
@@ -75,8 +70,38 @@ public class BlockComponent extends JComponent implements ActionListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    p.show(BlockComponent.this, e.getX(), e.getY());
+                    JPopupMenu popUp = new JPopupMenu();
+                    MenuItemFactory menuItemFactory = new MenuItemFactory();
+
+                    final String mappingSequence = getSequence();
+                    //add copy option
+                    popUp.add(menuItemFactory.getCopyItem(mappingSequence));
+                    //add copy position option
+                    popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
+                    //add calculate secondary structure option
+                    final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
+                    if (rnaFolderControl != null) {
+                        popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, mappingSequence, this.getHeader()));
+                    }
+
+                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
                 }
+            }
+            
+            /**
+             * Creates the header for the highlighted sequence.
+             *
+             * @return the header for the sequence
+             */
+            private String getHeader() {
+                PersistantMapping mapping = (PersistantMapping) BlockComponent.this.block.getPersistantObject();
+                final String strand = mapping.getStrand() == SequenceUtils.STRAND_FWD ? ">>" : "<<";
+                HashMap<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
+                String name = "Reference seq from ";
+                if (trackNames.containsKey(mapping.getTrackId())) {
+                    name += trackNames.get(mapping.getTrackId());
+                }
+                return name + " " + strand + " from " + absLogBlockStart + "-" + absLogBlockStop;
             }
 
             @Override
@@ -102,26 +127,12 @@ public class BlockComponent extends JComponent implements ActionListener {
 
     }
 
-//    public void setReadname() { //no readnames are stored anymore: RUN domain excluded
-//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(b.getPersistantObject().getSequenceID());
-//        JTextField j = new JTextField();
-//        for (String name : names) {
-//            nameofRead = name;
-//        }
-//        j.setText(nameofRead);
-//        j.selectAll();
-//        j.copy();
-//    }
-
-    public void setSequence() {
-        JTextField j = new JTextField();
+    public String getSequence() {
         int start = ((PersistantMapping) block.getPersistantObject()).getStart();
         int stop = ((PersistantMapping) block.getPersistantObject()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getSequence().substring(start-1, stop);
-        j.setText(readSequence);
-        j.selectAll();
-        j.copy();
+        return readSequence;
     }
 
     private String getText() {
@@ -145,44 +156,6 @@ public class BlockComponent extends JComponent implements ActionListener {
 
         return sb.toString();
     }
-
-    private void setPopupMenu() {
-
-        
-        //        JMenuItem copyName = new JMenuItem(); //no readnames are stored anymore: RUN domain excluded
-//        copyName.addActionListener(this);
-//        copyName.setActionCommand(COPY_READNAME);
-//        copyName.setText("Copy readname");
-
-        JMenuItem copySequence = new JMenuItem();
-        copySequence.addActionListener(this);
-        copySequence.setActionCommand(COPY_SEQUENCE);
-        copySequence.setText("Copy sequence");
-        copySequence.setToolTipText("Attention! You copy the genome sequence");
-        
-//        JMenuItem exit = new JMenuItem();
-//        exit.addActionListener(this);
-//        exit.setActionCommand(EXIT_POPUP);
-//        exit.setText("Exit");
-        
- //       p.add(copyName); //no readnames are stored anymore: RUN domain excluded
-        p.add(copySequence);
-//        p.add(exit);
-    }
-
-    //no readnames are stored anymore: RUN domain excluded
-//    private void appendReadnames(PersistantMapping mapping, StringBuilder sb) {
-//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(mapping.getSequenceID());
-//        boolean printLabel = true;
-//        for (String name : names) {
-//            String key = "";
-//            if (printLabel) {
-//                key = "Reads";
-//                printLabel = false;
-//            }
-//            sb.append(createTableRow(key, name));
-//        }
-//    }
 
     private void appendDiffs(PersistantMapping mapping, StringBuilder sb) {
         boolean printLabel = true;
@@ -394,21 +367,6 @@ public class BlockComponent extends JComponent implements ActionListener {
     @Override
     public int getHeight() {
         return height;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-//        if (e.getActionCommand().equals(COPY_READNAME)) {
-//            this.setReadname();
-//            p.setVisible(false);
-//        } //no readnames are stored anymore: RUN domain excluded
-        if (e.getActionCommand().equals(COPY_SEQUENCE)) {
-            this.setSequence();
-//            p.setVisible(false);
-        }
-//        if(e.getActionCommand().equals(EXIT_POPUP)){
-//            p.setVisible(false);
-//        }
     }
     
 }

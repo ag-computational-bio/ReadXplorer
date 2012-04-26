@@ -181,7 +181,7 @@ public class DiscreteCountingDistribution {
      * in the genome.
      */
     public void increaseDistribution(int increase) {
-        if (increase < 0) {
+        if (increase <= 0) {
             return;
         } else 
         if (increase == 1) {
