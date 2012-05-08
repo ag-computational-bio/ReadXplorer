@@ -49,11 +49,11 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
     private void initComponents() {
 
         typeLabel = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        strandLabel = new javax.swing.JLabel();
         typeText = new javax.swing.JTextField();
         productLabel = new javax.swing.JLabel();
         strandText = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
+        ecNumLabel = new javax.swing.JLabel();
         stopLabel = new javax.swing.JLabel();
         ecNumField = new javax.swing.JTextField();
         stopField = new javax.swing.JTextField();
@@ -66,24 +66,34 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
         geneField = new javax.swing.JTextField();
         geneLabel = new javax.swing.JLabel();
 
+        typeLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.typeLabel.text")); // NOI18N
         typeLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.typeLabel.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel3.text")); // NOI18N
-        jLabel3.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel3.toolTipText")); // NOI18N
+        strandLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        org.openide.awt.Mnemonics.setLocalizedText(strandLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.strandLabel.text")); // NOI18N
+        strandLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.strandLabel.toolTipText")); // NOI18N
 
         typeText.setEditable(false);
         typeText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.typeText.toolTipText")); // NOI18N
+        typeText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                typeTextActionPerformed(evt);
+            }
+        });
 
+        productLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(productLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.productLabel.text")); // NOI18N
         productLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.productLabel.toolTipText")); // NOI18N
 
         strandText.setEditable(false);
         strandText.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.strandText.toolTipText")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel4.text")); // NOI18N
-        jLabel4.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.jLabel4.toolTipText")); // NOI18N
+        ecNumLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        org.openide.awt.Mnemonics.setLocalizedText(ecNumLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.ecNumLabel.text")); // NOI18N
+        ecNumLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.ecNumLabel.toolTipText")); // NOI18N
 
+        stopLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(stopLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.stopLabel.text")); // NOI18N
         stopLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.stopLabel.toolTipText")); // NOI18N
 
@@ -96,12 +106,14 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
         locusField.setEditable(false);
         locusField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.locusField.toolTipText")); // NOI18N
 
+        locusLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(locusLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.locusLabel.text")); // NOI18N
         locusLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.locusLabel.toolTipText")); // NOI18N
 
         startField.setEditable(false);
         startField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startField.toolTipText")); // NOI18N
 
+        startLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(startLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startLabel.text")); // NOI18N
         startLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startLabel.toolTipText")); // NOI18N
 
@@ -112,6 +124,7 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
         geneField.setEditable(false);
         geneField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.geneField.toolTipText")); // NOI18N
 
+        geneLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(geneLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.geneLabel.text")); // NOI18N
         geneLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.geneLabel.toolTipText")); // NOI18N
 
@@ -120,80 +133,76 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(strandLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                    .addComponent(productLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(geneLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(stopLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ecNumLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(locusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(typeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(startLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(locusLabel)
-                            .addComponent(typeLabel)
-                            .addComponent(geneLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(geneField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                            .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                            .addComponent(locusField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(stopLabel)
-                            .addComponent(jLabel4)
-                            .addComponent(startLabel)
-                            .addComponent(productLabel)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(strandText, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                            .addComponent(startField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                            .addComponent(stopField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                            .addComponent(ecNumField, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE))))
+                    .addComponent(locusField, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(geneField, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(startField, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(stopField, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(ecNumField)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                    .addComponent(strandText, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(typeText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(typeLabel))
+                    .addComponent(typeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(locusField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(locusLabel))
+                    .addComponent(locusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(geneField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(geneLabel))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(geneField)
+                    .addComponent(geneLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(startLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(stopField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(stopLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ecNumField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(startLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(startField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(productLabel)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(stopField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(stopLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ecNumField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ecNumLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(productLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(strandText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addContainerGap(154, Short.MAX_VALUE))
+                    .addComponent(strandLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(181, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void typeTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_typeTextActionPerformed
+        
+    }//GEN-LAST:event_typeTextActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField ecNumField;
+    private javax.swing.JLabel ecNumLabel;
     private javax.swing.JTextField geneField;
     private javax.swing.JLabel geneLabel;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField locusField;
     private javax.swing.JLabel locusLabel;
@@ -203,6 +212,7 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
     private javax.swing.JLabel startLabel;
     private javax.swing.JTextField stopField;
     private javax.swing.JLabel stopLabel;
+    private javax.swing.JLabel strandLabel;
     private javax.swing.JTextField strandText;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JTextField typeText;

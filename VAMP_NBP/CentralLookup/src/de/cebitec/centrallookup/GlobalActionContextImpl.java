@@ -90,14 +90,14 @@ implements ContextGlobalProvider, Lookup.Provider, java.beans.PropertyChangeList
 
     /** Requests refresh of our lookup everytime component is chagned.
      */
-	@Override
+	   @Override
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        if (TopComponent.Registry.PROP_ACTIVATED.equals (evt.getPropertyName())) {
-			org.openide.util.Utilities.actionsGlobalContext ().lookup (javax.swing.ActionMap.class);
+        if (TopComponent.Registry.PROP_ACTIVATED.equals(evt.getPropertyName())) {
+            org.openide.util.Utilities.actionsGlobalContext().lookup(javax.swing.ActionMap.class);
         }
-		if (TopComponent.Registry.PROP_TC_CLOSED.equals(evt.getPropertyName())) {
-			org.openide.util.Utilities.actionsGlobalContext ().lookup (javax.swing.ActionMap.class);
-		}
+        if (TopComponent.Registry.PROP_TC_CLOSED.equals(evt.getPropertyName())) {
+            org.openide.util.Utilities.actionsGlobalContext().lookup(javax.swing.ActionMap.class);
+        }
     }
 
 }

@@ -41,7 +41,6 @@ public final class ReferenceNavigatorTopComp extends TopComponent implements Loo
         jumpPanel.setReferenceGenome(viewer.getReference());
         jumpPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
         jumpPanel.setGenomeViewer(viewer);
-        codonSelector.setGenomeViewer(viewer);
     }
 
     /** This method is called from within the constructor to
@@ -53,15 +52,12 @@ public final class ReferenceNavigatorTopComp extends TopComponent implements Loo
     private void initComponents() {
 
         jumpPanel = new de.cebitec.vamp.ui.visualisation.reference.JumpPanel();
-        codonSelector = new de.cebitec.vamp.ui.visualisation.reference.CodonSelector();
 
         setLayout(new java.awt.BorderLayout());
         add(jumpPanel, java.awt.BorderLayout.CENTER);
-        add(codonSelector, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.vamp.ui.visualisation.reference.CodonSelector codonSelector;
     private de.cebitec.vamp.ui.visualisation.reference.JumpPanel jumpPanel;
     // End of variables declaration//GEN-END:variables
     /**

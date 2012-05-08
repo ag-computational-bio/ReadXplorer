@@ -783,6 +783,7 @@ public class SQLStatements {
             + "D." + FieldNames.DIFF_TYPE + " = 0 and "
             + "M." + FieldNames.MAPPING_ID + " = D." + FieldNames.DIFF_MAPPING_ID + " and "
             + "M." + FieldNames.MAPPING_TRACK + " = ?";
+    
     public final static String FETCH_DIFFS_IN_TRACK_FOR_INTERVAL =
             "SELECT "
             + "D." + FieldNames.DIFF_POSITION + ", "
@@ -797,49 +798,51 @@ public class SQLStatements {
             + "D." + FieldNames.DIFF_TYPE + " = 1 and "
             + "D." + FieldNames.DIFF_MAPPING_ID + " = M." + FieldNames.MAPPING_ID + " and "
             + "M." + FieldNames.MAPPING_TRACK + " = ?";
+    
          public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL =
             "SELECT "
-            + " MAPPING_ID, "
-            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
-            + " MAPPING_REP, "
-            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
-            + FieldNames.MAPPING_DIRECTION + ", "
-            + FieldNames.MAPPING_SEQUENCE_ID + ", "
-            + FieldNames.MAPPING_START + ", "
-            + FieldNames.MAPPING_STOP + ", "
-            + FieldNames.MAPPING_TRACK + ", "
-            + " ORIG_PAIR_ID, "
-            + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
-            + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
-            + FieldNames.SEQ_PAIR_TYPE + ", "
-            + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES + " "
+                + " MAPPING_ID, "
+                + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+                + " MAPPING_REP, "
+                + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+                + FieldNames.MAPPING_DIRECTION + ", "
+                + FieldNames.MAPPING_SEQUENCE_ID + ", "
+                + FieldNames.MAPPING_START + ", "
+                + FieldNames.MAPPING_STOP + ", "
+                + FieldNames.MAPPING_TRACK + ", "
+                + " ORIG_PAIR_ID, "
+                + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+                + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+                + FieldNames.SEQ_PAIR_TYPE + ", "
+                + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES + " "
             + " FROM ("
-            + "SELECT "
-            + FieldNames.TABLE_MAPPINGS + "." + FieldNames.MAPPING_ID + " AS MAPPING_ID, "
-            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
-            + FieldNames.TABLE_MAPPINGS + "." + FieldNames.MAPPING_NUM_OF_REPLICATES + " AS MAPPING_REP, "
-            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
-            + FieldNames.MAPPING_DIRECTION + ", "
-            + FieldNames.MAPPING_SEQUENCE_ID + ", "
-            + FieldNames.MAPPING_START + ", "
-            + FieldNames.MAPPING_STOP + ", "
-            + FieldNames.MAPPING_TRACK + ", "
-            + FieldNames.TABLE_SEQ_PAIRS + "." + FieldNames.SEQ_PAIR_PAIR_ID + " AS ORIG_PAIR_ID, "
-            + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
-            + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
-            + FieldNames.SEQ_PAIR_TYPE + " "
-            + "FROM "
-            + FieldNames.TABLE_MAPPINGS + " , "
-            + FieldNames.TABLE_SEQ_PAIRS + " "
-            + " WHERE "
-            + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
-            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
-            + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
-            + FieldNames.SEQ_PAIR_MAPPING1_ID + " = " + FieldNames.TABLE_MAPPINGS + "." + FieldNames.MAPPING_ID
+                + "SELECT "
+                    + FieldNames.TABLE_MAPPINGS + "." + FieldNames.MAPPING_ID + " AS MAPPING_ID, "
+                    + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+                    + FieldNames.TABLE_MAPPINGS + "." + FieldNames.MAPPING_NUM_OF_REPLICATES + " AS MAPPING_REP, "
+                    + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+                    + FieldNames.MAPPING_DIRECTION + ", "
+                    + FieldNames.MAPPING_SEQUENCE_ID + ", "
+                    + FieldNames.MAPPING_START + ", "
+                    + FieldNames.MAPPING_STOP + ", "
+                    + FieldNames.MAPPING_TRACK + ", "
+                    + FieldNames.TABLE_SEQ_PAIRS + "." + FieldNames.SEQ_PAIR_PAIR_ID + " AS ORIG_PAIR_ID, "
+                    + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+                    + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+                    + FieldNames.SEQ_PAIR_TYPE + " "
+                + "FROM "
+                    + FieldNames.TABLE_MAPPINGS + " , "
+                    + FieldNames.TABLE_SEQ_PAIRS + " "
+                + " WHERE "
+                    + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
+                    + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
+                    + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
+                    + FieldNames.SEQ_PAIR_MAPPING1_ID + " = " + FieldNames.TABLE_MAPPINGS + "." + FieldNames.MAPPING_ID
             + " ) LEFT OUTER JOIN "
-            + FieldNames.TABLE_SEQ_PAIR_REPLICATES
+                + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
-            + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+                + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+         
          public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL2 =
             "SELECT "
             + " MAPPING_ID, "
@@ -883,6 +886,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+         
          public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL_PERFECT =
             "SELECT "
             + " MAPPING_ID, "
@@ -927,6 +931,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+         
          public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL_PERFECT2 =
             "SELECT "
             + " MAPPING_ID, "
@@ -971,6 +976,7 @@ public class SQLStatements {
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
             + " ON "
             + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+         
          public static final String FETCH_SEQ_PAIRS_PIVOT_DATA_FOR_INTERVAL =
             "SELECT "
             + "MAPPING_ORIG_ID, "
@@ -1007,6 +1013,7 @@ public class SQLStatements {
             + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + " = " + " MAPPING_ORIG_ID "
             + " WHERE "
             + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " != -1;";
+         
     /**
      * Returns all paired mappings belonging to the sequence pair with the given
      * sequence pair id.

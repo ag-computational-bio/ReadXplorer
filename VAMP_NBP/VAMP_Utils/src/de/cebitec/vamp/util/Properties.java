@@ -42,4 +42,14 @@ public class Properties {
     public static final byte COVERAGE_INCREASE_DISTRIBUTION = 1;
     public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 2;
     
+    
+    /** Type value identifying an object as belonging to a "Start".*/
+    public static final int START = 1;
+    /** Type value identifying an object as belonging to a "Stop".*/
+    public static final int STOP = 2;
+    /** Type value identifying an object as belonging to a "pattern".*/
+    public static final int PATTERN = 3;
+    /** Type value identifying an object as belonging to any of the other types.*/
+    public static final int ALL = 0;
+    
 }

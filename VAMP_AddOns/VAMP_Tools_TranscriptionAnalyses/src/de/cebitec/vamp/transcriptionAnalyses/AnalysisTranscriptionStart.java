@@ -42,7 +42,6 @@ import java.util.List;
 public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<TranscriptionStart>> {
 
     private TrackViewer trackViewer;
-    private ArrayList<String> trackNames;
     private int genomeSize;
     private int increaseReadCount;
     private int increaseReadPercent;
@@ -118,11 +117,14 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
         
         if (this.tssAutomatic) {
-            this.maxInitialReadCount = 10; //set these values as default for the transcription start site automatic
-            this.increaseReadCount2 = 20; //avoids loosing smaller, low coverage increases
+            this.maxInitialReadCount = 0; //set these values as default for the transcription start site automatic
+            this.increaseReadCount2 = 0; //avoids loosing smaller, low coverage increases
             if (!this.calcCoverageDistributions) {
                 this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0); //+ 0,05%
                 this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);// (int) (this.genomeSize / 1000)); //0,1%
+            } else {
+                this.increaseReadCount = 10; //lowest default values for new data sets without an inital distribution
+                this.increaseReadPercent = 30; //in the database
             }
         }
         
@@ -183,10 +185,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         if (this.calcCoverageDistributions) { //this way code is duplicated, but if clause only evaluated once
             for (int i = fixedLeftBound; i < rightBound; ++i) {
                 
-                fwdCov1 = coverage.getPerfectFwdMult(i) + coverage.getBestMatchFwdMult(i);
-                revCov1 = coverage.getPerfectRevMult(i) + coverage.getBestMatchRevMult(i);
-                fwdCov2 = coverage.getPerfectFwdMult(i + 1) + coverage.getBestMatchFwdMult(i + 1);
-                revCov2 = coverage.getPerfectRevMult(i + 1) + coverage.getBestMatchRevMult(i + 1);
+                fwdCov1 = coverage.getBestMatchFwdMult(i); //coverage.getPerfectFwdMult(i) + 
+                revCov1 = coverage.getBestMatchRevMult(i); //coverage.getPerfectRevMult(i) + 
+                fwdCov2 = coverage.getBestMatchFwdMult(i + 1); //coverage.getPerfectFwdMult(i + 1) + 
+                revCov2 = coverage.getBestMatchRevMult(i + 1); //coverage.getPerfectRevMult(i + 1) + 
                 diffFwd = fwdCov2 - fwdCov1;
                 diffRev = revCov1 - revCov2;
                 
@@ -202,10 +204,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
         } else {
             for (int i = fixedLeftBound; i < rightBound; ++i) {
-                fwdCov1 = coverage.getPerfectFwdMult(i) + coverage.getBestMatchFwdMult(i);
-                revCov1 = coverage.getPerfectRevMult(i) + coverage.getBestMatchRevMult(i);
-                fwdCov2 = coverage.getPerfectFwdMult(i + 1) + coverage.getBestMatchFwdMult(i + 1);
-                revCov2 = coverage.getPerfectRevMult(i + 1) + coverage.getBestMatchRevMult(i + 1);
+                fwdCov1 = coverage.getBestMatchFwdMult(i); //coverage.getPerfectFwdMult(i) + 
+                revCov1 = coverage.getBestMatchRevMult(i); //coverage.getPerfectRevMult(i) + 
+                fwdCov2 = coverage.getBestMatchFwdMult(i + 1); //coverage.getPerfectFwdMult(i + 1) + 
+                revCov2 = coverage.getBestMatchRevMult(i + 1); //coverage.getPerfectRevMult(i + 1) + 
                 diffFwd = fwdCov2 - fwdCov1;
                 diffRev = revCov1 - revCov2;
                 
@@ -216,8 +218,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
         }
 
-        covLastFwdPos = coverage.getPerfectFwdMult(rightBound) + coverage.getBestMatchFwdMult(rightBound);
-        covLastRevPos = coverage.getPerfectRevMult(rightBound) + coverage.getBestMatchRevMult(rightBound);
+        covLastFwdPos = coverage.getBestMatchFwdMult(rightBound); //coverage.getPerfectFwdMult(rightBound) + 
+        covLastRevPos = coverage.getBestMatchRevMult(rightBound); //coverage.getPerfectRevMult(rightBound) + 
     }
     
     /**
@@ -300,6 +302,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 annotation = this.genomeAnnotations.get(i);
                 start = annotation.getStart();
 
+                /*
+                 * We use all annotations, because also mRNA or rRNA annotations can contribute to TSS detection,
+                 * as they also depict expressed sequences from the reference
+                 */
                 if (start >= minStartPos && annotation.getStrand() == strand && start <= maxStartPos) {
 
                     if (fstFittingAnnotation) {
@@ -312,17 +318,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                         //upstream annotation & correctly annotated transcription start site
                         
                         /* 
-                         * Also check, if gene and CDS annotation are available for current SNP
+                         * Also check, if gene and CDS annotation are available and covering each other.
                          * Handle this case by not storing the current annotation, if it is 
                          * a CDS annotation completely covered by a gene annotation. In all other
-                         * cases the annotation can be stored.
+                         * cases the annotation can be stored, since we also use CDS annotations for TSS detection,
+                         * if no gene annotation is available.
                          */
                         PersistantAnnotation upstreamAnno = detectedAnnotations.getUpstreamAnnotation();
                         if (    upstreamAnno != null && 
                                 annotation.getType() == FeatureType.CDS && 
                                 upstreamAnno.getType() == FeatureType.GENE &&
                                 upstreamAnno.getStop() >= annotation.getStop()) {
-                            System.out.println("Fwd special case 1");
+//                            System.out.println("CDS covered by gene annotation Fwd");
                             continue;
                         }
                         
@@ -343,7 +350,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                                 annotation.getStart() == this.genomeAnnotations.get(i+1).getStart() &&
                                 this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE) {
                             detectedAnnotations.setDownstreamAnnotation(this.genomeAnnotations.get(i+1));
-                            System.out.println("Fwd special case 2");
+//                            System.out.println("Gene covers CDS with same annotated TSS Fwd");
                         } else {
                             detectedAnnotations.setDownstreamAnnotation(annotation);
                         }
@@ -386,7 +393,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                                 start == upstreamAnno.getStop() &&
                                 upstreamAnno.getType() == FeatureType.GENE) {
                             //TODO: this does not work if annotations start at the same position on rev and fwd strand!
-                            System.out.println("Rev special case 1");
+//                            System.out.println("CDS covered by gene annotation Rev");
                             continue; // we want to keep the gene instead the CDS annotation
                         }
                         
@@ -410,7 +417,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                                 this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE &&
                                 this.genomeAnnotations.get(i+1).getStart() <= annotation.getStart()) {
                             detectedAnnotations.setUpstreamAnnotation(this.genomeAnnotations.get(i+1));
-                            System.out.println("Rev special case 2");
+//                            System.out.println("Gene covers CDS with same annotated TSS Rev");
                         } else {                      
                             detectedAnnotations.setUpstreamAnnotation(annotation);
                         }

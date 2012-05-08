@@ -216,7 +216,7 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_MAPPING_START).executeUpdate();
-//            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_STOP).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_STOP).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_MAPPING_SEQ_ID).executeUpdate();
             
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();

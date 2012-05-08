@@ -145,18 +145,17 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         for (Operon operon : operonDetection) {
             String annoName1 = "";
             String annoName2 = "";
-            String strand = "";
+            String strand = (operon.getOperonAdjacencies().get(0).getAnnotation1().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";
             String readsAnno2 = "";
             String internalReads = "";
             String spanningReads = "";
-
+            
             for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
                 annoName1 += opAdj.getAnnotation1().getLocus() + "\n";
                 annoName2 += opAdj.getAnnotation2().getLocus() + "\n";
-                strand += (opAdj.getAnnotation1().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
                 startAnno1 += opAdj.getAnnotation1().getStart() + "\n";
                 startAnno2 += opAdj.getAnnotation2().getStart() + "\n";
                 readsAnno1 += opAdj.getReadsAnnotation1() + "\n";

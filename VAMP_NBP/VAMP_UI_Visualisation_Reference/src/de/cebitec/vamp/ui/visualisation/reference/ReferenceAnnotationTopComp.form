@@ -17,39 +17,27 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Component id="strandLabel" alignment="0" pref="49" max="32767" attributes="0"/>
+                  <Component id="productLabel" max="32767" attributes="0"/>
+                  <Component id="geneLabel" max="32767" attributes="0"/>
+                  <Component id="stopLabel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="ecNumLabel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="locusLabel" alignment="1" max="32767" attributes="0"/>
+                  <Component id="typeLabel" max="32767" attributes="0"/>
+                  <Component id="startLabel" alignment="0" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="locusLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="typeLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="geneLabel" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="geneField" alignment="0" pref="237" max="32767" attributes="2"/>
-                          <Component id="typeText" alignment="1" pref="237" max="32767" attributes="0"/>
-                          <Component id="locusField" alignment="0" pref="237" max="32767" attributes="2"/>
-                      </Group>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="stopLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel4" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="startLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="productLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel3" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="strandText" alignment="0" pref="237" max="32767" attributes="0"/>
-                          <Component id="jScrollPane1" pref="237" max="32767" attributes="0"/>
-                          <Component id="startField" alignment="0" pref="237" max="32767" attributes="2"/>
-                          <Component id="stopField" alignment="0" pref="237" max="32767" attributes="2"/>
-                          <Component id="ecNumField" alignment="0" pref="237" max="32767" attributes="2"/>
-                      </Group>
-                  </Group>
+                  <Component id="locusField" alignment="1" max="32767" attributes="2"/>
+                  <Component id="geneField" alignment="1" max="32767" attributes="2"/>
+                  <Component id="startField" alignment="1" max="32767" attributes="2"/>
+                  <Component id="stopField" alignment="1" max="32767" attributes="2"/>
+                  <Component id="ecNumField" max="32767" attributes="2"/>
+                  <Component id="jScrollPane1" pref="219" max="32767" attributes="0"/>
+                  <Component id="strandText" alignment="1" max="32767" attributes="0"/>
+                  <Component id="typeText" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -59,46 +47,46 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="typeText" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="typeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="typeText" min="-2" max="-2" attributes="0"/>
+                  <Component id="typeLabel" min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="locusField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="locusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="locusField" min="-2" max="-2" attributes="0"/>
+                  <Component id="locusLabel" min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="geneField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="geneLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="geneField" max="32767" attributes="0"/>
+                  <Component id="geneLabel" min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="startField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="startLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="stopField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="stopLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="ecNumField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="startLabel" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="startField" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="productLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" min="-2" pref="53" max="-2" attributes="0"/>
+                  <Component id="stopField" min="-2" max="-2" attributes="0"/>
+                  <Component id="stopLabel" min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="strandText" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="ecNumField" min="-2" max="-2" attributes="0"/>
+                  <Component id="ecNumLabel" min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="154" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane1" min="-2" pref="53" max="-2" attributes="0"/>
+                  <Component id="productLabel" min="-2" pref="16" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="strandText" min="-2" max="-2" attributes="0"/>
+                  <Component id="strandLabel" min="-2" pref="20" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="181" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -106,6 +94,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="typeLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.typeLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
@@ -114,13 +103,14 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel3">
+    <Component class="javax.swing.JLabel" name="strandLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.jLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.strandLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.jLabel3.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.strandLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -131,9 +121,13 @@
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.typeText.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="typeTextActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="productLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.productLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
@@ -150,18 +144,20 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel4">
+    <Component class="javax.swing.JLabel" name="ecNumLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.jLabel4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.ecNumLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.jLabel4.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.ecNumLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="stopLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.stopLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
@@ -196,6 +192,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="locusLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.locusLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
@@ -214,6 +211,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="startLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.startLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
@@ -247,6 +245,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="geneLabel">
       <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceAnnotationTopComp.geneLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>

@@ -28,7 +28,8 @@ public class ColorProperties {
     public static final Color TRACKPANEL_MIDDLE_LINE = new Color(25, 25, 25);
     public static final Color MOUSEOVER = new Color(127, 127, 127);
     public static final Color CURRENT_POSITION = new Color(127, 127, 127);
-    public static final Color START_CODON = new Color(255, 0, 0, 80);
+    public static final Color START_CODON = new Color(39, 116, 116, 80);
+    public static final Color STOP_CODON = new Color(255, 0, 0, 80);
     public static final Color PATTERN = new Color(12, 37, 211, 80);
     public static final Color TITLE_BACKGROUND = Color.gray;
     public static final Color LEGEND_BACKGROUND = Color.white;

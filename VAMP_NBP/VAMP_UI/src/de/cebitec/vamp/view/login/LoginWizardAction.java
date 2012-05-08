@@ -68,7 +68,7 @@ public final class LoginWizardAction implements ActionListener{
                 mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
             } catch (SQLException ex) {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-                nd.setTitle(NbBundle.getBundle(LoginWizardAction.class).getString("MSG_LoginWizardAction.sqlError"));
+                nd.setTitle(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.sqlError"));
                 DialogDisplayer.getDefault().notify(nd);
             }
         }

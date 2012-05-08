@@ -555,6 +555,8 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
             
             if (this.detectTranscriptionStarts && dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
                 
+                //TODO: bp window of neighboring TSS parameter
+                
                 ResultPanelTranscriptionStart transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
                 transcriptionStartResultPanel.setTrackViewer(this.trackViewer);
                 transcriptionStartResultPanel.addTSSs(this.analysisTSS.getResults());

@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +135,7 @@ public class PatternFilter implements RegionFilterI {
 //                        regions.add(new Region(start, absStart - offset + to + 1, isForwardStrand));
 //                    }
 //                } else {
-            this.matchedPatterns.add(new Region(absStart - offset + from + 1, absStart - offset + to + 1, isForwardStrand));
+            this.matchedPatterns.add(new Region(absStart - offset + from + 1, absStart - offset + to + 1, isForwardStrand, Properties.PATTERN));
 //                }
         }
 //        }

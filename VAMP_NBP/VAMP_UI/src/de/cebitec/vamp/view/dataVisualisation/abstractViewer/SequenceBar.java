@@ -17,7 +17,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -101,7 +100,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             @Override
             public void preferenceChange(PreferenceChangeEvent evt) {
                 if (evt.getKey().equals(Properties.SEL_GENETIC_CODE)) {
-                    SequenceBar.this.codonFilter.resetStartCodons();
+                    SequenceBar.this.codonFilter.resetCodons();
                     SequenceBar.this.findCodons();
                 }
             }
@@ -390,30 +389,37 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Identifies the start codons according to the currently selected codons to show.
+     * Identifies the codons according to the currently selected codons to show.
+     * Also removes the kind of region, which is handed in to "type"
+     * @param type the type of the regions which have to be removed before they can
+     * be repainted.
      */
     public void findCodons() {
-        this.removeAll(JRegion.START_CODON);
+        //create the list of component types, that should be removed (only patterns)
+        List<Integer> typeList = new ArrayList<Integer>();
+        typeList.add(Properties.START);
+        typeList.add(Properties.STOP);
+        this.removeAll(typeList);
         this.codonFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
         this.determineFrame();
 
         this.codonFilter.setCurrAnnotationData(frameCurrAnnotation);
         this.codonHitsToHighlight = this.codonFilter.findRegions();
-        for (Region r : this.codonHitsToHighlight) {
+        for (Region region : this.codonHitsToHighlight) {
 
             BoundsInfo bounds = this.parentViewer.getBoundsInfo();
-            int from = this.getStart(bounds, r);
-            int to = this.getStop(bounds, r);
+            int from = this.getStart(bounds, region);
+            int to = this.getStop(bounds, region);
             
             int length = to - from + 1;
             // make sure it is visible when using high zoom levels
             if (length < 3) {
                 length = 3;
             }
-            JRegion jreg = new JRegion(length, 10);
+            JRegion jreg = new JRegion(length, 10, region.getType());
 
 
-            if (r.isForwardStrand()) {
+            if (region.isForwardStrand()) {
                 jreg.setBounds(from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height);
             } else {
                 jreg.setBounds(from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height);
@@ -428,7 +434,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @return position of the next occurence of the pattern from the current position on.
      */
     public int findPattern() {
-        this.removeAll(JRegion.PATTERN);
+        //create the list of component types, that should be removed (only patterns)
+        List<Integer> typeList = new ArrayList<Integer>();
+        typeList.add(Properties.PATTERN);
+        this.removeAll(typeList);
         this.patternFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
         //this.determineFrame();
 
@@ -446,7 +455,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             if (length < 3) {
                 length = 3;
             }
-            JRegion jreg = new JRegion(length, 10, JRegion.PATTERN, ColorProperties.PATTERN);
+            JRegion jreg = new JRegion(length, 10, Properties.PATTERN);
 
 
             if (r.isForwardStrand()) {
@@ -508,12 +517,22 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Calculates which codons should be highlighted and updates the gui.
+     * Calculates which start codons should be highlighted and updates the gui.
      * @param i the index of the codon to update
      * @param isSelected true, if the codon should be selected
      */
-    public void showCodons(final int i, final boolean isSelected) {
-        this.codonFilter.setCodonSelected(i, isSelected);
+    public void showStartCodons(final int i, final boolean isSelected) {
+        this.codonFilter.setStartCodonSelected(i, isSelected);
+        this.findCodons();
+    }
+    
+    /**
+     * Calculates which stop codons should be highlighted and updates the gui.
+     * @param i the index of the codon to update
+     * @param isSelected true, if the codon should be selected
+     */
+    public void showStopCodons(final int i, final boolean isSelected) {
+        this.codonFilter.setStopCodonSelected(i, isSelected);
         this.findCodons();
     }
 
@@ -522,8 +541,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @param i the index of the codon
      * @return true, if the codon with the index i is currently selected
      */
-    public boolean isCodonShown(final int i) {
-        return this.codonFilter.isCodonSelected(i);
+    public boolean isStartCodonShown(final int i) {
+        return this.codonFilter.isStartCodonSelected(i);
     }
 
     /**
@@ -652,13 +671,16 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
     /**
      * Removes all JRegions from this component of a given type.
-     * Currently JRegion supports 1 = Start codon and 2 = pattern types.
-     * @param type type of components to remove
+     * Removed by Properties.START, Properties.STOP, Properties.PATTERN
+     * @param typeList list of types of components to remove
      */
-    private void removeAll(int type) {
-        for (Component comp : this.getComponents()){
-            if (comp instanceof JRegion && ((JRegion) comp).getType() == type){
-                this.remove(comp);
+    private void removeAll(List<Integer> typeList) {
+        for (Component comp : this.getComponents()) {
+            for (int type : typeList) {
+                if (comp instanceof JRegion && ((JRegion) comp).getType() == type) {
+                    this.remove(comp);
+                    break;
+                }
             }
         }
     }
