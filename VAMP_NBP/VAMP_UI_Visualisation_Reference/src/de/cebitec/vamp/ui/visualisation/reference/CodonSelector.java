@@ -157,8 +157,8 @@ public class CodonSelector extends javax.swing.JPanel {
          * @param the list of codons, for which check boxes should be created.
          */
         public CodonFamilyPanel(String familyId, String[] codons) {
-            this.updateComponents(codons);
             this.familyId = familyId;
+            this.updateComponents(codons);
         }
         
         /**

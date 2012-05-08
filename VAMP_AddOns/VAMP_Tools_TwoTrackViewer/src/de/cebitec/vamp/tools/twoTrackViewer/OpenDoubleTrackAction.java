@@ -49,8 +49,7 @@ public final class OpenDoubleTrackAction implements ActionListener {
                 dialogDescriptor.getValue().equals(DialogDescriptor.CLOSED_OPTION))) {
             DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks in standard mode or at least two track in combined mode!", 
                     NotifyDescriptor.INFORMATION_MESSAGE));
-            openRefGenDialog.setVisible(true);
-            okSelected = true;
+            this.actionPerformed(ev);
         }
         if (okSelected) {
             ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);

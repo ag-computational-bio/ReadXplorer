@@ -619,7 +619,12 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 return keyList.get(i);
             }
         }
-        return keyList.get(0);
+        
+        if (keyList.isEmpty()) {
+            return 4;
+        } else {
+            return keyList.get(0);
+        }
     }
 
     public int getIncreaseReadCount() {
