@@ -53,6 +53,7 @@ public class AlignmentViewer extends AbstractViewer {
         maxSaturationAndBrightness = 0.9f;
         this.setHorizontalMargin(10);
         this.setActive(false);
+        this.setAutomaticCentering(true);
         setupComponents();
     }
 
@@ -73,7 +74,7 @@ public class AlignmentViewer extends AbstractViewer {
             setInDrawingMode(true);
         } else {
             setInDrawingMode(false);
-        }
+        }    
 
         this.setupComponents();
     }
@@ -91,6 +92,10 @@ public class AlignmentViewer extends AbstractViewer {
             if (this.hasLegend()) {
                 this.add(this.getLegendLabel());
                 this.add(this.getLegendPanel());
+            }
+            if (this.hasOptions()) {
+                this.add(this.getOptionsLabel());
+                this.add(this.getOptionsPanel());
             }
             // if a sequence viewer was set for this panel, add/show it
             if (this.hasSequenceBar()) {

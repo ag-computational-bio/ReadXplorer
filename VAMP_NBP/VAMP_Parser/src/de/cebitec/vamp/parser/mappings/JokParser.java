@@ -131,12 +131,12 @@ public class JokParser implements MappingParserI {
                             filepath, lineno, refSeq));
                     continue;
                 }
-                if (readSeq.length() != refSeq.length()) {
-                    this.sendMsg(NbBundle.getMessage(JokParser.class,
-                            "Parser.checkMapping.ErrorReadLength",
-                            filepath, lineno, readSeq, refSeq));
-                    continue;
-                }
+//                if (readSeq.length() != refSeq.length()) {
+//                    this.sendMsg(NbBundle.getMessage(JokParser.class,
+//                            "Parser.checkMapping.ErrorReadLength",
+//                            filepath, lineno, readSeq, refSeq));
+//                    continue;
+//                }
                 if (errors < 0 || errors > readSeq.length()) {
                     this.sendMsg(NbBundle.getMessage(JokParser.class,
                             "Parser.checkMapping.ErrorRead",

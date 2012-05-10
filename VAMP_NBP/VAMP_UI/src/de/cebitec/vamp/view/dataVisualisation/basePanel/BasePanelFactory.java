@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
+import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentOptionsPanel;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.util.ColorProperties;
@@ -186,6 +187,11 @@ public class BasePanelFactory {
         // create a legend
         JPanel alignmentPanelLegend = this.getAlignmentViewLegend(viewer);
         viewer.setupLegend(new MenuLabel(alignmentPanelLegend, MenuLabel.TITLE_LEGEND), alignmentPanelLegend);
+        
+        // create and set up options (currently normalization)
+        JPanel alignmentViewerOptions = this.getAlignmentViewerOptions(viewer);
+        MenuLabel optionsLabel = new MenuLabel(alignmentViewerOptions, MenuLabel.TITLE_OPTIONS);
+        viewer.setupOptions(optionsLabel, alignmentViewerOptions);
 
         // add panels to basepanel and add scrollbars
         b.setViewerInScrollpane(viewer);
@@ -391,6 +397,19 @@ public class BasePanelFactory {
      */
     private JPanel getTrackPanelOptions(TrackViewer viewer) {
         TrackOptionsPanel options = new TrackOptionsPanel(viewer);
+        options.setLayout(new BoxLayout(options, BoxLayout.PAGE_AXIS));
+        options.setBackground(ColorProperties.LEGEND_BACKGROUND);
+
+        return options;
+    }
+    
+    
+    /**
+     * @param viewer the alignment viewer for which the options panel should be created.
+     * @return A new options panel for a track viewer.
+     */
+    private JPanel getAlignmentViewerOptions(AlignmentViewer viewer) {
+        AlignmentOptionsPanel options = new AlignmentOptionsPanel(viewer);
         options.setLayout(new BoxLayout(options, BoxLayout.PAGE_AXIS));
         options.setBackground(ColorProperties.LEGEND_BACKGROUND);
 

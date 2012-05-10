@@ -6,7 +6,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- *
  * @author ddoppmeier, rhilker
  */
 public class PersistantMapping implements PersistantObject {
@@ -55,6 +54,9 @@ public class PersistantMapping implements PersistantObject {
         return id;
     }
 
+    /**
+     * @return direction of the mapping: 1 for fwd and -1 for rev
+     */
     public byte getStrand() {
         return strand;
     }
@@ -63,10 +65,16 @@ public class PersistantMapping implements PersistantObject {
         return trackId;
     }
 
+    /**
+     * @return the absolute start position in genome coordinates.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * @return the absolute stop position in genome coordinates.
+     */
     public int getStop() {
         return stop;
     }

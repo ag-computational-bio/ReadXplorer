@@ -70,6 +70,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
     private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
+    private boolean centerScrollBar = false;
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
@@ -445,7 +446,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             this.repaint();
         }
         
-        if (this.scrollBar != null) {
+        if (this.scrollBar != null && this.centerScrollBar) {
             this.scrollBar.setValue(this.scrollBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
         }
     }
@@ -720,10 +721,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
     
     /**
-     * In case a scrollbar was handed over to the viewer, it is returned, otherwise
-     * null. The scrollbar will allow you to change the scrollbar value.
+     * Sets the property for centering the scrollbar around the center (sequence bar) (true)
+     * or not (false).
+     * @param centerScrollBar true, if the scrollbar should center around the sequence bar,
+     *              false otherwise
      */
-    public JScrollBar getScrollBar() {
-        return this.scrollBar;
+    public void setAutomaticCentering(boolean centerScrollBar) {
+        this.centerScrollBar = centerScrollBar;
     }
 }

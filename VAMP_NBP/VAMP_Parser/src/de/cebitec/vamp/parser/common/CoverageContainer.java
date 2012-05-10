@@ -89,7 +89,7 @@ public class CoverageContainer {
             this.increaseCoverage(mapping, BEST_MAPPING_CASE);
         }
         // store zero error coverage
-        if (!mapping.hasDiffs()) {
+        if (!mapping.hasDiffs() && !mapping.hasGenomeGaps()) {
             this.increaseCoverage(mapping, ZERO_ERROR_CASE);
         }
         // store n error coverage
