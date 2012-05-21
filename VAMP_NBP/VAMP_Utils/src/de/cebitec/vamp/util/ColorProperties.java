@@ -33,6 +33,8 @@ public class ColorProperties {
     public static final Color PATTERN = new Color(12, 37, 211, 80);
     public static final Color TITLE_BACKGROUND = Color.gray;
     public static final Color LEGEND_BACKGROUND = Color.white;
+    public static final Color HIGHLIGHT_FILL = new Color(168, 202, 236, 75);
+    public static final Color HIGHLIGHT_BORDER = new Color(51, 153, 255);
     // genome viewer specific colors
     public static final Color ANNOTATION_LABEL = new Color(0, 0, 0);
     public static final Color SELECTED_ANNOTATION = new Color(73, 182, 241);

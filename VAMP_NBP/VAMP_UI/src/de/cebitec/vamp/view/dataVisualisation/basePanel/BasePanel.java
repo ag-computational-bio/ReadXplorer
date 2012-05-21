@@ -91,9 +91,9 @@ public class BasePanel extends JPanel implements MousePositionListener {
         verticalZoom.setOrientation(JSlider.VERTICAL);
         this.boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
-        if(viewer instanceof TrackViewer){
-        TrackViewer tv = (TrackViewer)viewer ;
-        tv.setVerticalZoomValue(verticalZoom);
+        if (viewer instanceof TrackViewer) {
+            TrackViewer tv = (TrackViewer) viewer;
+            tv.setVerticalZoomSlider(verticalZoom);
         }
         centerPanel.add(viewer, BorderLayout.CENTER);
         centerPanel.add(verticalZoom, BorderLayout.WEST);

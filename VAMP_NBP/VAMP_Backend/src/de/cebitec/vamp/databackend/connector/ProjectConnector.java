@@ -944,6 +944,15 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done locking {0} domain tables...", domainName);
     }
 
+    /**
+     * Adds a all track data to the database.
+     * @param track track to add
+     * @param refGenID id of the reference genome
+     * @param seqPairs true, if this is a sequence pair track, false otherwise
+     * @param onlyPosTable true, if only the position table is to be stored, false in the ordinary "import track" scenario
+     * @return the track id used in the database
+     * @throws StorageException 
+     */
     public int addTrack(ParsedTrack track, long refGenID, boolean seqPairs, boolean onlyPosTable) throws StorageException {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
@@ -960,7 +969,7 @@ public class ProjectConnector {
             this.storeDiffs(track);
             this.storeTrackStatistics(track); //needs to be called after storeCoverage
         }
-            this.storePositionTable(track);
+        this.storePositionTable(track);
 
         if (adapter.equalsIgnoreCase("mysql")) {
             this.enableTrackDomainIndices();

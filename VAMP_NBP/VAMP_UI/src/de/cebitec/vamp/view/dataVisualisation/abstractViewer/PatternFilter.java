@@ -50,11 +50,11 @@ public class PatternFilter implements RegionFilterI {
             int start = this.absStart - offset;
             int stop = this.absStop + this.pattern.toString().length()-1;
 
-            if(start < 0 ){
+            if (start < 0 ) {
                 offset -= Math.abs(start);
                 start = 0;
             }
-            if(stop > this.refGen.getSequence().length()){
+            if (stop > this.refGen.getSequence().length()) {
                 stop = this.refGen.getSequence().length();
             }
 
@@ -74,6 +74,7 @@ public class PatternFilter implements RegionFilterI {
      */
     public int findNextOccurrence() {
 
+        int refLength = refGen.getSequence().length();
         int from = -1;
         int from2 = -1;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
@@ -83,11 +84,11 @@ public class PatternFilter implements RegionFilterI {
             if (this.absStart < 0) {
                 this.absStart = 0;
             }
-            if (start > refGen.getSequence().length()) {
+            if (start > refLength) {
                 start = 0;
             }
 
-            String seq = refGen.getSequence().substring(start, refGen.getSequence().length());
+            String seq = refGen.getSequence().substring(start, refLength);
             
             //at first search from current position till end of sequence on both frames
             from = this.matchNextOccurrence(seq, this.pattern);
@@ -107,6 +108,49 @@ public class PatternFilter implements RegionFilterI {
             } else if (from2 != -1) {
                 return from2 + start;
             } else { /* both are -1*/ }
+        }
+        return from;
+    }
+    
+    /**
+     * Identifies next (closest) occurrence from either forward or reverse strand of a pattern 
+     * in the current reference genome.
+     * @return the position of the next occurrence of the pattern
+     */
+    public int findNextOccurrenceOnStrand(boolean isFwdStrand) {
+
+        String genomeSeq = refGen.getSequence();
+        int refLength = genomeSeq.length();
+        int from = -1;
+        int start = this.absStart;
+        if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
+            
+            boolean isCorrectFrame = false;
+            //at first search from current position till end of sequence on selected strand
+            if (isFwdStrand) { //start with the stop pos of current codon
+                while (++start < refLength && !isCorrectFrame) { //++, because otherwise we start at last start pos
+                    String seq = genomeSeq.substring(start, refLength);
+                    from = this.matchNextOccurrence(seq, this.pattern) + 1; // because we don't want index, but pos in genome
+                    start += from;
+                    isCorrectFrame = ((start) % 3 == this.absStart % 3) ? true : false;
+                }
+                ++start; //because we had fst pos of stop, then +2 and when exiting while loop -1. by +1 we move to last pos of stop
+            } else { //reverse complement dna and start with the stop pos of current codon
+                String seq = genomeSeq.substring(0, this.absStart); //sequence we start with
+                String seqRev = SequenceUtils.getReverseComplement(seq).toLowerCase();
+                int nextStart = 0;
+                int fromRev = 0;
+                while (nextStart < this.absStart && fromRev != -1 && !isCorrectFrame) {
+                    seqRev = seqRev.substring(nextStart, seqRev.length());
+                    fromRev = this.matchNextOccurrence(seqRev, this.pattern);
+                    //reverse the position again to determine the pos in the total genome seq
+                    from = seqRev.length() - fromRev;
+                    isCorrectFrame = (from - this.absStart) % 3 == 0 ? true : false;
+                    nextStart = fromRev + 1;
+                }
+                start = from - 2;
+            }
+            return start; 
         }
         return from;
     }
@@ -176,18 +220,4 @@ public class PatternFilter implements RegionFilterI {
         this.pattern = Pattern.compile(pattern);
         this.patternRev = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(pattern)));
     }
-    
-    
-//    public int getFrameCurrAnnotation() {
-//        return this.frameCurrAnnotation;
-//    }
-//    /**
-//     * Sets the data needed for the current annotation. Currently only the frame is
-//     * necessary. This always has to be set first in case the action should only
-//     * show start codons of the correct frame.
-//     * @param frameCurrAnnotation the frame of the currently selected annotation
-//     */
-//    public void setCurrAnnotationData(int frameCurrAnnotation) {
-//        this.frameCurrAnnotation = frameCurrAnnotation;
-//    }
 }

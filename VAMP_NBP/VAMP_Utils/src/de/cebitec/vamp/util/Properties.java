@@ -44,12 +44,14 @@ public class Properties {
     
     
     /** Type value identifying an object as belonging to a "Start".*/
-    public static final int START = 1;
+    public static final byte START = 1;
     /** Type value identifying an object as belonging to a "Stop".*/
-    public static final int STOP = 2;
+    public static final byte STOP = 2;
     /** Type value identifying an object as belonging to a "pattern".*/
-    public static final int PATTERN = 3;
+    public static final byte PATTERN = 3;
+    /** Type value identifying an object as belonging to a "CDS" = coding sequence.*/
+    public static final byte CDS = 4;
     /** Type value identifying an object as belonging to any of the other types.*/
-    public static final int ALL = 0;
+    public static final byte ALL = 0;
     
 }

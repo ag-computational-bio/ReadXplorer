@@ -103,7 +103,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         bounds = new BoundsInfo(0, 0, 0, 0);
 
         this.calcBaseWidth();
-        this.recalcCorrelatioFactor();
+        this.recalcCorrelationFactor();
 
     }
 
@@ -329,12 +329,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * Returns the physical boundaries (left, right) of a single base of the sequence.
-     * @param logPos
-     * @return
+     * @param logPos position in the reference genome
+     * @return the physical boundaries (left, right) of a single base of the sequence
+     * in the viewer.
      */
     public PhysicalBaseBounds getPhysBoundariesForLogPos(int logPos) {
-        double left = transformToPhysicalCoord(logPos);
+        double left = this.transformToPhysicalCoord(logPos);
         double right = left + basewidth - 1;
         return new PhysicalBaseBounds(left, right);
     }
@@ -350,9 +350,19 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         double tmp = (logPos - bounds.getLogLeft()) * correlationFactor + horizontalMargin;
         return tmp;
     }
+    
+    /**
+     * Converts the physical pixel position into the logical sequence position
+     * for a given phyPos.
+     * @param phyPos physical position (pixel) in the reference genome
+     * @return the logical position of a single base in the sequence.
+     */
+    public int getLogicalPosForPixel(int phyPos) {
+        return this.transformToLogicalCoord(phyPos);
+    }
 
     /**
-     * Compute the logical position for any given physical position
+     * Compute the logical position for any given physical position (pixel).
      * @param physPos horizontal position of a pixel
      * @return logical position corresponding to the pixel
      */
@@ -401,10 +411,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     /**
      * Logical position are mapped to physical position by multiplying with a
-     * correlationfactor, which is updated by this method, depending on the
+     * correlation factor, which is updated by this method, depending on the
      * current width of this panel
      */
-    private void recalcCorrelatioFactor() {
+    private void recalcCorrelationFactor() {
         if (pAInfoIsAviable) {
             correlationFactor = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
@@ -431,7 +441,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public void updateLogicalBounds(BoundsInfo bounds) {
         this.bounds = bounds;
         this.calcBaseWidth();
-        this.recalcCorrelatioFactor();
+        this.recalcCorrelationFactor();
 
         if (this.basewidth > 7) {
             this.setIsInMaxZoomLevel(true);

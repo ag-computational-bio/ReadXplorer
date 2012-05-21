@@ -371,7 +371,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 newPos = this.viewer.getSequenceBar().findNextPatternOccurrence();
             } else {
                 this.searchPattern = pattern;
-                newPos = this.viewer.getSequenceBar().setPattern(this.searchPattern);
+                newPos = this.viewer.getSequenceBar().showPattern(this.searchPattern);
             }
 
             if (newPos > -1) {

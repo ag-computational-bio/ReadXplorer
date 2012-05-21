@@ -81,12 +81,16 @@ public class CoverageThread extends Thread implements RequestThreadI {
 
     private int calcCenterLeft(GenomeRequest request) {
         int centerMiddle = calcCenterMiddle(request);
+        int interval = request.getTo() - request.getFrom();
+        coveredWidth = interval > coveredWidth * 2 ? interval / 2 : coveredWidth;
         int result = centerMiddle - coveredWidth;
         return result < 0 ? 0 : result;
     }
 
     private int calcCenterRight(GenomeRequest request) {
         int centerMiddle = calcCenterMiddle(request);
+        int interval = request.getTo() - request.getFrom();
+        coveredWidth = interval > coveredWidth * 2 ? interval / 2 : coveredWidth;
         int result = centerMiddle + coveredWidth;
         return result;
     }

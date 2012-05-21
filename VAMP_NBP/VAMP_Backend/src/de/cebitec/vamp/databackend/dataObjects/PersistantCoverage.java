@@ -481,13 +481,16 @@ public class PersistantCoverage {
         this.twoTracks = twoTracks;
     }
 
-    /*
-     * Setter and Getter for the highest coverage for automatic scaling.
+    /**
+     * Getter for the highest coverage for automatic scaling.
      */
     public int getHighestCoverage() {
         return highestCoverage;
     }
 
+    /**
+     * Setter for the highest coverage for automatic scaling.
+     */
     public void setHighestCoverage(int highestCoverage) {
         this.highestCoverage = highestCoverage;
     }

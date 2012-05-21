@@ -87,8 +87,7 @@ public class BoundsInfo {
     }
 
     /**
-     *
-     * @return the width of the intervall from the genome that is currently visible
+     * @return the width in bases of the interval from the genome that is currently visible
      */
     public int getLogWidth() {
         return logWidth;
@@ -96,7 +95,8 @@ public class BoundsInfo {
 
     /**
      *
-     * @param logWidth the width of the intervall from the genome that is currently visible
+     * @param logWidth the width in bases of the interval from the genome that 
+     * is currently visible
      */
     public void setLogWidth(int logWidth){
         this.logWidth = logWidth;

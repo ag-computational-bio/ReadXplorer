@@ -205,7 +205,7 @@ public class BasePanelFactory {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
-        // create a trackviewer
+        // create a histogram viewer
         HistogramViewer viewer = new HistogramViewer(boundsManager, b, refGenome, connector);
 
         // create a legend

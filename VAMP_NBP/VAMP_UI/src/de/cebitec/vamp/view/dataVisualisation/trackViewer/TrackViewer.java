@@ -51,9 +51,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = true;
     
-    private JSlider slider = null;
-
-
+    private JSlider verticalSlider = null;
  
     private static int height = 300;
     private CoverageInfoI trackInfo;
@@ -229,7 +227,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     
     private double getCoverageValue(boolean isForwardStrand, int covType, int absPos) {
         double value = 0;
-        int currentCoverage = 0;
 
         if (!this.twoTracks || this.twoTracks && this.combineTracks) {
 
@@ -240,7 +237,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                     value = this.cov.getBestMatchFwdMult(absPos);
                 } else if (covType == PersistantCoverage.NERROR) {
                     int ncovFw = this.cov.getCommonFwdMult(absPos);
-                    currentCoverage = ncovFw;
                     value = ncovFw;
 
                 } else {
@@ -254,7 +250,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 } else if (covType == PersistantCoverage.NERROR) {
 
                     int ncovRev = this.cov.getCommonRevMult(absPos);
-                    currentCoverage = ncovRev;
                     value = ncovRev;
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
@@ -277,11 +272,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                     }
                 } else if (covType == PersistantCoverage.TRACK2) {
                     value = cov.getCommonFwdMultTrack2(absPos);
-                    currentCoverage = (int) value;
                     value = this.getNormalizedValue(id2, value);
                 } else if (covType == PersistantCoverage.TRACK1) {
                     value = cov.getCommonFwdMultTrack1(absPos);
-                    currentCoverage = (int) value;
                     value = this.getNormalizedValue(id1, value);
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
@@ -297,12 +290,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                     }
                 } else if (covType == PersistantCoverage.TRACK2) {
                     value = cov.getCommonRevMultTrack2(absPos);
-                    currentCoverage = (int) value;
                     value = this.getNormalizedValue(id2, value);
 
                 } else if (covType == PersistantCoverage.TRACK1) {
                     value = cov.getCommonRevMultTrack1(absPos);
-                    currentCoverage = (int) value;
                     value = this.getNormalizedValue(id1, value);
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
@@ -340,13 +331,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @return GeneralPath representing the coverage of a certain type
      */
     private GeneralPath getCoveragePath(boolean isForwardStrand, int covType) {
-        GeneralPath p = new GeneralPath();
+        GeneralPath covPath = new GeneralPath();
         int orientation = (isForwardStrand ? -1 : 1);
 
         PaintingAreaInfo info = getPaintingAreaInfo();
         int low = (orientation < 0 ? info.getForwardLow() : info.getReverseLow());
         // paint every physical position
-        p.moveTo(info.getPhyLeft(), low);
+        covPath.moveTo(info.getPhyLeft(), low);
         for (int d = info.getPhyLeft(); d < info.getPhyRight(); d++) {
 
             int left = this.transformToLogicalCoord(d);
@@ -382,13 +373,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 }
             }
 
-            p.lineTo(d, low + value * orientation);
+            covPath.lineTo(d, low + value * orientation);
         }
 
-        p.lineTo(info.getPhyRight(), low);
-        p.closePath();
+        covPath.lineTo(info.getPhyRight(), low);
+        covPath.closePath();
 
-        return p;
+        return covPath;
     }
 
     /**
@@ -442,8 +433,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             } else {
                 this.createCoveragePaths();
             }
-            this.computeAutomaticScaling();
             this.computeScaleStep();
+            this.computeAutomaticScaling();
             this.covLoaded = true;
         }
         
@@ -781,14 +772,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * values range from 1-200.
      */
     private void computeAutomaticScaling() {
-        if (this.automaticScaling && this.cov != null && this.slider != null) {
+        if (this.automaticScaling && this.cov != null && this.verticalSlider != null) {
             
             this.scaleFactor = Math.round(this.cov.getHighestCoverage() / 140.0) + 1;
             this.scaleFactor = this.scaleFactor < 1 ? 1.0 : this.scaleFactor;
-            this.scaleFactor = this.scaleFactor > 140000.0 ? this.slider.getMaximum() : this.scaleFactor;
+            this.scaleFactor = this.scaleFactor > 140000.0 ? this.verticalSlider.getMaximum() : this.scaleFactor;
 
             //set the inverse of the value set in verticalZoomLevelUpdated
-            this.slider.setValue((int) Math.round(Math.sqrt(this.scaleFactor * 10)));
+            this.verticalSlider.setValue((int) Math.round(Math.sqrt(this.scaleFactor * 10)));
         }
     }
 
@@ -893,8 +884,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         this.normSetting = normSetting;
     }
 
-    public void setVerticalZoomValue(JSlider vzoom) {
-        slider = vzoom;
+    public void setVerticalZoomSlider(JSlider verticalSlider) {
+        this.verticalSlider = verticalSlider;
     }
 
     /**
