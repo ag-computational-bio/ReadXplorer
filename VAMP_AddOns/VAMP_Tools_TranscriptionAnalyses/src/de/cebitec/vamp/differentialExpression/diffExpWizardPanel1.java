@@ -6,9 +6,10 @@ package de.cebitec.vamp.differentialExpression;
 
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
+import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor> {
+public class diffExpWizardPanel1 implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -62,5 +63,14 @@ public class diffExpWizardPanel1 implements WizardDescriptor.Panel<WizardDescrip
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        wiz.putProperty("genomeID", getComponent().getSelectedReferenceGenomeID());
+        wiz.putProperty("tracks", getComponent().getSelectedTracks());
+    }
+
+    @Override
+    public void validate() throws WizardValidationException {
+        if (!getComponent().selectionFinished()) {
+            throw new WizardValidationException(null, "Please select a reference genome and at least two tracks", null);
+        }
     }
 }

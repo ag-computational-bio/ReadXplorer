@@ -4,6 +4,8 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
@@ -57,6 +59,8 @@ public class diffExpWizardPanel2 implements WizardDescriptor.Panel<WizardDescrip
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        getComponent().updateTrackList(selectedTraks);
     }
 
     @Override

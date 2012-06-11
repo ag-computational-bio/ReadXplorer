@@ -18,7 +18,12 @@ public class PerformAnalysis extends Thread {
     private int genomeSize;
     private List<PersistantAnnotation> persAnno;
     private List<Integer> trackIDs;
-    private Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<Integer, Map<Integer, Integer>>();
+    private Tool tool;
+
+    public static enum Tool {
+
+        BaySeq, EdgeR
+    }
 
     //For debugging and testing:
     public PerformAnalysis() {
@@ -26,12 +31,14 @@ public class PerformAnalysis extends Thread {
         //trackIDs start at 1
         trackIDs.add(1);
         trackIDs.add(2);
-        trackIDs.add(3);
-        trackIDs.add(4);
+//        trackIDs.add(3);
+//        trackIDs.add(4);
+        tool = Tool.BaySeq;
     }
 
-    public PerformAnalysis(List<Integer> trackIDs) {
+    public PerformAnalysis(List<Integer> trackIDs, Tool tool) {
         this.trackIDs = trackIDs;
+        this.tool = tool;
     }
 
     private void startUp() {
@@ -40,20 +47,27 @@ public class PerformAnalysis extends Thread {
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(1);
         genomeSize = referenceConnector.getRefGen().getSequence().length();
         persAnno = referenceConnector.getAnnotationsForRegion(1, genomeSize);
+        Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<Integer, Map<Integer, Integer>>();
         for (Iterator<Integer> it = trackIDs.iterator(); it.hasNext();) {
             Integer trackID = it.next();
             CollectCoverageData collCovData = new CollectCoverageData(trackID, this);
-            collCovData.startCollecting();
+            allCountData.put(trackID, collCovData.startCollecting());
         }
-        BaySeqAnalysisData bseqData = prepareAnnotations();
-        bseqData = prepareData(bseqData);
+        if (tool.equals(Tool.BaySeq)) {
+            processWithBaySeq(allCountData);
+        }
+    }
+
+    private void processWithBaySeq(Map<Integer, Map<Integer, Integer>> allCountData) {
+        BaySeqAnalysisData bseqData = prepareAnnotationsForBaySeq();
+        bseqData = prepareDataForBaySeq(bseqData, allCountData);
         GnuR gnuR = new GnuR();
         gnuR.process(bseqData, persAnno.size(), trackIDs.size());
         gnuR.shutdown();
         System.out.println("FERTIG");
     }
 
-    private BaySeqAnalysisData prepareAnnotations() {
+    private BaySeqAnalysisData prepareAnnotationsForBaySeq() {
         int[] annotationsStart = new int[persAnno.size()];
         int[] annotationsStop = new int[persAnno.size()];
         int i = 0;
@@ -67,7 +81,7 @@ public class PerformAnalysis extends Thread {
         return ret;
     }
 
-    private BaySeqAnalysisData prepareData(BaySeqAnalysisData bSeqData) {
+    private BaySeqAnalysisData prepareDataForBaySeq(BaySeqAnalysisData bSeqData, Map<Integer, Map<Integer, Integer>> allCountData) {
         for (Iterator<Integer> it = trackIDs.iterator(); it.hasNext();) {
             Integer key = it.next();
             Integer[] data = new Integer[persAnno.size()];
@@ -88,12 +102,6 @@ public class PerformAnalysis extends Thread {
 
     public List<PersistantAnnotation> getPersAnno() {
         return persAnno;
-    }
-
-    public void addCountDataResults(Integer trackID, Map<Integer, Integer> result) {
-        allCountData.put(trackID, result);
-        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Saved a result from track with ID " + trackID, currentTimestamp);
     }
 
     @Override

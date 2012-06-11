@@ -15,24 +15,22 @@ import java.util.Map;
 public class CollectCoverageData{
 
     private int trackID;
-    private PerformAnalysis perfAnalysis;
     private List<PersistantAnnotation> genomeAnnotations;
     private Map<Integer, Integer> countData = new HashMap<Integer, Integer>();
     private List<PersistantMapping> mappings;
     private final static int STARTOFFSET = 30;
 
     public CollectCoverageData(int trackID, PerformAnalysis perfAnalysis) {
-        this.perfAnalysis = perfAnalysis;
         this.genomeAnnotations = perfAnalysis.getPersAnno();
         this.trackID = trackID;
     }
 
-    public void startCollecting() {
+    public Map<Integer, Integer> startCollecting() {
         GetMappingsFromTrack getMappings = new GetMappingsFromTrack();
         mappings = getMappings.loadReducedMappingsByTrackID(trackID);
         Collections.sort(mappings);
         updateReadCountForAnnotations(mappings);
-        perfAnalysis.addCountDataResults(trackID, countData);
+        return countData;
     }
 
     /**
