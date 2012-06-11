@@ -764,6 +764,26 @@ public class SQLStatements {
             //            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? and "
             //            + FieldNames.MAPPING_TRACK + " = ? "
             + "ORDER BY " + FieldNames.MAPPING_START;
+    
+    /**
+     * kstaderm: Return all the Mappings belonging to a given track.
+     */
+    public static final String LOAD_MAPPINGS_BY_TRACK_ID =
+            "SELECT "
+            + FieldNames.MAPPING_ID + ", "
+            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+            + FieldNames.MAPPING_NUM_OF_REPLICATES + ", "
+            + FieldNames.MAPPING_DIRECTION + ", "
+            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+            + FieldNames.MAPPING_SEQUENCE_ID + ", "
+            + FieldNames.MAPPING_START + ", "
+            + FieldNames.MAPPING_STOP + ", "
+            + FieldNames.MAPPING_TRACK + " "
+            + "FROM "
+            + FieldNames.TABLE_MAPPINGS + " "
+            + "WHERE "
+            + FieldNames.MAPPING_TRACK + " "
+            + "=?";
     /*
      * <1min variante mit start between ? and ? 3min: variante mit start < ? &
      * start < ? 7min: variante mit start < ? & stop > ?
@@ -1582,7 +1602,7 @@ public class SQLStatements {
             + " WHERE "
             + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? AND "
             + FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " = ? ";
-    
+     
     
 //             public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("

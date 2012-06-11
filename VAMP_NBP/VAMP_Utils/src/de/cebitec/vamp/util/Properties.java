@@ -38,6 +38,7 @@ public class Properties {
     public static final byte PERFECT_COVERAGE = 1;
     public static final byte BEST_MATCH_COVERAGE = 2;
     public static final byte COMPLETE_COVERAGE = 3;
+    public static final byte COUNT_DATA = 4;
     
     public static final byte COVERAGE_INCREASE_DISTRIBUTION = 1;
     public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 2;

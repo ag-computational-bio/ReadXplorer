@@ -8,7 +8,7 @@ import java.util.TreeSet;
 /**
  * @author ddoppmeier, rhilker
  */
-public class PersistantMapping implements PersistantObject {
+public class PersistantMapping implements PersistantObject, Comparable<PersistantMapping> {
 
     private int id;
     private int start;
@@ -34,6 +34,17 @@ public class PersistantMapping implements PersistantObject {
         this.errors = errors;
         this.sequenceID = sequenceID;
         this.isBestMatch = isBestMapping;
+    }
+    
+    /*
+     * A minimal version of the mapping class. It is used to collect the count
+     * data. For this only start, stop and direction are needed. Everything else
+     * isn't needed and can be left out in order to save some memory
+     */
+    public PersistantMapping(int start, int stop, byte direction){
+        this.start = start;
+        this.stop = stop;
+        strand = direction;
     }
 
     public int getNbReplicates() {
@@ -124,6 +135,18 @@ public class PersistantMapping implements PersistantObject {
 
     public void addDiff(PersistantDiff d){
         diffs.put(d.getPosition(), d);
-    }    
+    }
+
+    @Override
+    public int compareTo(PersistantMapping o) {
+        int ret = 0;
+        if(this.start < o.start){
+            ret = -1;
+        }
+        if(this.start > o.start){
+            ret = 1;
+        }
+        return ret;
+    }
 
 }

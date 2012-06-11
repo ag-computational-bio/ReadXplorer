@@ -255,6 +255,9 @@
                 <package>org.japura.task.listener</package>
                 <package>org.japura.util</package>
                 <package>org.japura.util.date</package>
+                <package>org.rosuda.JRI</package>
+                <package>org.rosuda.REngine</package>
+                <package>org.rosuda.REngine.JRI</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
@@ -311,6 +314,18 @@
             <class-path-extension>
                 <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JRI.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/REngine.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/REngine.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>
