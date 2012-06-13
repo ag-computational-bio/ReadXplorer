@@ -20,7 +20,7 @@ import org.openide.awt.ActionRegistration;
 // An example action demonstrating how the wizard could be called from within
 // your code. You can move the code below wherever you need, or register an action:
 @ActionID(category="...", id="de.cebitec.vamp.differentialExpression.diffExpWizardAction")
-@ActionRegistration(displayName="Open diffExp Wizard")
+@ActionRegistration(displayName="Differential expression analysis")
 @ActionReference(path="Menu/Tools")
 public final class diffExpWizardAction implements ActionListener {
 
@@ -29,6 +29,7 @@ public final class diffExpWizardAction implements ActionListener {
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
         panels.add(new diffExpWizardPanel1());
         panels.add(new diffExpWizardPanel2());
+        panels.add(new diffExpWizardPanel3());
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
             Component c = panels.get(i).getComponent();
@@ -48,8 +49,7 @@ public final class diffExpWizardAction implements ActionListener {
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle("Differential expression analysis");
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            PerformAnalysis perfan = new PerformAnalysis();
-            perfan.start();
+
         }
     }
 }

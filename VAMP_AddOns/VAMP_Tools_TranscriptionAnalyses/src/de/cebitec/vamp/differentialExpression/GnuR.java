@@ -60,7 +60,9 @@ public class GnuR implements RMainLoopCallbacks {
         gnuR.eval("seglens <- annotations$stop - annotations$start + 1");
         gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = annotations)");
         gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
-        gnuR.eval("cDPair <- cD[,1:"+numberOfTracks+"]");
+        
+        
+        
         REXP test = gnuR.eval("getwd()");
         System.out.println(test);
         gnuR.eval("save.image(\"testData.RData\")");

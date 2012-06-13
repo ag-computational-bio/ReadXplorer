@@ -3,6 +3,7 @@ package de.cebitec.vamp.differentialExpression;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
@@ -17,52 +18,50 @@ public class PerformAnalysis extends Thread {
     private ReferenceConnector referenceConnector;
     private int genomeSize;
     private List<PersistantAnnotation> persAnno;
-    private List<Integer> trackIDs;
+    private List<PersistantTrack> selectedTraks;
+    private List<Integer[]> groups;
     private Tool tool;
+    private Integer refGenomeID;
+    private IprogressMonitor monitor;
 
     public static enum Tool {
 
         BaySeq, EdgeR
-    }
+    }        
 
-    //For debugging and testing:
-    public PerformAnalysis() {
-        trackIDs = new ArrayList<Integer>();
-        //trackIDs start at 1
-        trackIDs.add(1);
-        trackIDs.add(2);
-//        trackIDs.add(3);
-//        trackIDs.add(4);
-        tool = Tool.BaySeq;
-    }
-
-    public PerformAnalysis(List<Integer> trackIDs, Tool tool) {
-        this.trackIDs = trackIDs;
+    public PerformAnalysis(Tool tool, List<PersistantTrack> selectedTraks, List<Integer[]> groups, Integer refGenomeID, IprogressMonitor monitor) {
+        this.selectedTraks = selectedTraks;
+        this.groups=groups;
         this.tool = tool;
+        this.refGenomeID=refGenomeID;
+        this.monitor=monitor;
     }
 
     private void startUp() {
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
-        referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(1);
+        referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGen().getSequence().length();
         persAnno = referenceConnector.getAnnotationsForRegion(1, genomeSize);
+        monitor.setProgress(10);
         Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<Integer, Map<Integer, Integer>>();
-        for (Iterator<Integer> it = trackIDs.iterator(); it.hasNext();) {
-            Integer trackID = it.next();
-            CollectCoverageData collCovData = new CollectCoverageData(trackID, this);
-            allCountData.put(trackID, collCovData.startCollecting());
+        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+            PersistantTrack currentTrack = it.next();
+            CollectCoverageData collCovData = new CollectCoverageData(currentTrack.getId(), this);
+            allCountData.put(currentTrack.getId(), collCovData.startCollecting());
         }
+        monitor.setProgress(25);
         if (tool.equals(Tool.BaySeq)) {
             processWithBaySeq(allCountData);
         }
+        monitor.setProgress(100);
     }
 
     private void processWithBaySeq(Map<Integer, Map<Integer, Integer>> allCountData) {
         BaySeqAnalysisData bseqData = prepareAnnotationsForBaySeq();
         bseqData = prepareDataForBaySeq(bseqData, allCountData);
         GnuR gnuR = new GnuR();
-        gnuR.process(bseqData, persAnno.size(), trackIDs.size());
+        gnuR.process(bseqData, persAnno.size(), selectedTraks.size());
         gnuR.shutdown();
         System.out.println("FERTIG");
     }
@@ -77,13 +76,13 @@ public class PerformAnalysis extends Thread {
             annotationsStop[i] = persistantAnnotation.getStop();
         }
 
-        BaySeqAnalysisData ret = new BaySeqAnalysisData(annotationsStart, annotationsStop, trackIDs.size());
+        BaySeqAnalysisData ret = new BaySeqAnalysisData(annotationsStart, annotationsStop, selectedTraks.size(), groups);
         return ret;
     }
 
     private BaySeqAnalysisData prepareDataForBaySeq(BaySeqAnalysisData bSeqData, Map<Integer, Map<Integer, Integer>> allCountData) {
-        for (Iterator<Integer> it = trackIDs.iterator(); it.hasNext();) {
-            Integer key = it.next();
+        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+            Integer key = it.next().getId();
             Integer[] data = new Integer[persAnno.size()];
             Map<Integer, Integer> currentTrack = allCountData.get(key);
             int j = 0;

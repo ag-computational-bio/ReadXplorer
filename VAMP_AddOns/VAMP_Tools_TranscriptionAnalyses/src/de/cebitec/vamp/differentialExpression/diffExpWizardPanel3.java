@@ -8,25 +8,27 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
-import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel2 implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class diffExpWizardPanel3 implements WizardDescriptor.Panel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private diffExpVisualPanel2 component;
+    private diffExpVisualPanel3 component;
+    private List<Integer[]> createdGroups;
+    private List<PersistantTrack> selectedTraks;
+    private Integer genomeID;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public diffExpVisualPanel2 getComponent() {
+    public diffExpVisualPanel3 getComponent() {
         if (component == null) {
-            component = new diffExpVisualPanel2();
+            component = new diffExpVisualPanel3(this);
         }
         return component;
     }
@@ -60,20 +62,25 @@ public class diffExpWizardPanel2 implements WizardDescriptor.ValidatingPanel<Wiz
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
-        getComponent().updateTrackList(selectedTraks);
+        createdGroups = (List<Integer[]>) wiz.getProperty("createdGroups");
+        selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        genomeID = (Integer) wiz.getProperty("genomeID");
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty("createdGroups", getComponent().getCreatedGroups());
     }
 
-    @Override
-    public void validate() throws WizardValidationException {
-                if (getComponent().noGroupCreated()) {
-            throw new WizardValidationException(null, "You must create at least one group to continue.", null);
-        }
+    public List<Integer[]> getCreatedGroups() {
+        return createdGroups;
+    }
+
+    public Integer getGenomeID() {
+        return genomeID;
+    }
+
+    public List<PersistantTrack> getSelectedTraks() {
+        return selectedTraks;
     }
 }
