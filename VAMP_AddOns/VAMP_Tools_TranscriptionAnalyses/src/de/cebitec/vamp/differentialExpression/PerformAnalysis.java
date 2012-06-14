@@ -22,19 +22,21 @@ public class PerformAnalysis extends Thread {
     private List<Integer[]> groups;
     private Tool tool;
     private Integer refGenomeID;
+    private int[] replicateStructure;
     private IprogressMonitor monitor;
 
     public static enum Tool {
 
         BaySeq, EdgeR
-    }        
+    }
 
-    public PerformAnalysis(Tool tool, List<PersistantTrack> selectedTraks, List<Integer[]> groups, Integer refGenomeID, IprogressMonitor monitor) {
+    public PerformAnalysis(Tool tool, List<PersistantTrack> selectedTraks, List<Integer[]> groups, Integer refGenomeID, int[] replicateStructure, IprogressMonitor monitor) {
         this.selectedTraks = selectedTraks;
-        this.groups=groups;
+        this.groups = groups;
         this.tool = tool;
-        this.refGenomeID=refGenomeID;
-        this.monitor=monitor;
+        this.refGenomeID = refGenomeID;
+        this.monitor = monitor;
+        this.replicateStructure = replicateStructure;
     }
 
     private void startUp() {
@@ -76,7 +78,7 @@ public class PerformAnalysis extends Thread {
             annotationsStop[i] = persistantAnnotation.getStop();
         }
 
-        BaySeqAnalysisData ret = new BaySeqAnalysisData(annotationsStart, annotationsStop, selectedTraks.size(), groups);
+        BaySeqAnalysisData ret = new BaySeqAnalysisData(annotationsStart, annotationsStop, selectedTraks.size(), groups, replicateStructure);
         return ret;
     }
 

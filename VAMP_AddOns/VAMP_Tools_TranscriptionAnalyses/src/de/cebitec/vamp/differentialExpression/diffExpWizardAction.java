@@ -28,6 +28,7 @@ public final class diffExpWizardAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
         panels.add(new diffExpWizardPanel1());
+        panels.add(new diffExpWizardPanel1b());
         panels.add(new diffExpWizardPanel2());
         panels.add(new diffExpWizardPanel3());
         String[] steps = new String[panels.size()];

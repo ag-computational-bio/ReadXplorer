@@ -104,7 +104,8 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
         startButton.setEnabled(false);
         PerformAnalysis perfan = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, 
                 wizardPanel3.getSelectedTraks(), wizardPanel3.getCreatedGroups(), 
-                wizardPanel3.getGenomeID(), this);
+                wizardPanel3.getGenomeID(), wizardPanel3.getReplicateStructure(), 
+                this);
         perfan.start();
         cancelButton.setEnabled(true);
         writeLineToConsole("Analysis started");

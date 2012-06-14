@@ -60,9 +60,16 @@ public class GnuR implements RMainLoopCallbacks {
         gnuR.eval("seglens <- annotations$stop - annotations$start + 1");
         gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = annotations)");
         gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
-        
-        
-        
+        gnuR.assign("replicates", bseqData.getReplicateStructure());
+        gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
+        concatenate = new StringBuilder();
+        i=1;
+        while(bseqData.hasGroups()){
+            gnuR.assign("group"+i, bseqData.getNextGroup());
+            concatenate.append("group").append(i).append("=").append("group").append(i++).append(",");            
+        }
+        concatenate.deleteCharAt(concatenate.length()-1);
+        gnuR.eval("groups(cD) <- list("+concatenate.toString()+")");
         REXP test = gnuR.eval("getwd()");
         System.out.println(test);
         gnuR.eval("save.image(\"testData.RData\")");
