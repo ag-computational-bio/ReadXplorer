@@ -25,22 +25,25 @@ public class TrackParser implements TrackParserI {
         ParsedTrack track = null;
         MappingParserI mappingp = trackJob.getParser();
         mappingp.registerObserver(observer);
-        ParsedMappingContainer mappings = mappingp.parseInput(trackJob, sequenceString);
-        mappingp = null;
+        Object parsedData = mappingp.parseInput(trackJob, sequenceString);
+        if (parsedData instanceof ParsedMappingContainer) {
+            ParsedMappingContainer mappings = (ParsedMappingContainer) parsedData;
 
-        // compute the coverage for all mappings
-        if (!trackJob.isStepwise() || trackJob.isFirstJob()) {
-            this.coverageContainer = new CoverageContainer();
-        } else {
-            this.coverageContainer = covContainer;
+            // compute the coverage for all mappings
+            if (!trackJob.isStepwise() || trackJob.isFirstJob()) {
+                this.coverageContainer = new CoverageContainer();
+            } else {
+                this.coverageContainer = covContainer;
+            }
+            this.coverageContainer.computeCoverage(mappings);
+
+            track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
+            track.setIsStepwise(trackJob.isStepwise());
+            track.setTimestamp(trackJob.getTimestamp());
+
+            mappings = null;
         }
-        this.coverageContainer.computeCoverage(mappings);
-        
-        track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
-        track.setIsStepwise(trackJob.isStepwise());
-        track.setTimestamp(trackJob.getTimestamp());
-
-        mappings = null;
+        mappingp = null;
         System.gc();
 
         return track;

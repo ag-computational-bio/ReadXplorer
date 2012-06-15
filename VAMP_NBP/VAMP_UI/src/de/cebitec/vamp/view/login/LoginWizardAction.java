@@ -18,9 +18,12 @@ import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
-// An example action demonstrating how the wizard could be called from within
-// your code. You can copy-paste the code below wherever you need.
-public final class LoginWizardAction implements ActionListener{
+/**
+ * Action for opening the login wizard.
+ * 
+ * @author ddoppmeier, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ */
+public final class LoginWizardAction implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +58,12 @@ public final class LoginWizardAction implements ActionListener{
             
             Map<String, Object> loginProps = wizardDescriptor.getProperties();
             try {
-                ProjectConnector.getInstance().connect((String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), (String) loginProps.get(LoginWizardPanel.PROP_HOST), (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), (String) loginProps.get(LoginWizardPanel.PROP_USER), (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
+                ProjectConnector.getInstance().connect(
+                        (String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_HOST), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_USER), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
                 cl.add(new LoginCookie() {
 
                     @Override

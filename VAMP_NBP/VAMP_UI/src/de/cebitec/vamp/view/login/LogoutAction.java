@@ -3,7 +3,6 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.Installer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
@@ -27,9 +26,8 @@ public final class LogoutAction implements ActionListener {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LogoutAction.class, "MSG_LogoutAction.warning.busy"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
-            return;
-        }
-        else {
+        
+        } else {
             for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
                 tc.close();
 //                TopComponent tc1 = WindowManager.getDefault().findTopComponent("RNAFolderTopComponent");
@@ -44,11 +42,14 @@ public final class LogoutAction implements ActionListener {
             }
             //reset main window title
             JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
-            if (mainFrame.getTitle().indexOf('-') > -1){
-                mainFrame.setTitle(mainFrame.getTitle().substring(0, mainFrame.getTitle().indexOf('-')-1));
+            int index = mainFrame.getTitle().indexOf('-');
+            if (index > -1) {
+                mainFrame.setTitle(mainFrame.getTitle().substring(0, index - 1));
             }
             
-            CentralLookup.getDefault().remove(context);
+            if (context != null) {
+                CentralLookup.getDefault().remove(context);
+            }
         }
     }
 }

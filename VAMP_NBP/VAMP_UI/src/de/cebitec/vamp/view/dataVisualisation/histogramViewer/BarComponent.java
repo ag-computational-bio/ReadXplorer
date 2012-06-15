@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import javax.swing.JComponent;
 
 /**
+ * Visual component representing a bar (rectangle) in a certain color.
  *
  * @author ddoppmeier
  */
@@ -17,6 +18,12 @@ public class BarComponent extends JComponent {
     private int width;
     private Color color;
 
+    /**
+     * Visual component representing a bar (rectangle) in a certain color.
+     * @param height height of the rectangle
+     * @param width width of the rectangle
+     * @param color color of the rectangle
+     */
     public BarComponent(int height, int width, Color color){
         super();
         this.height = height;

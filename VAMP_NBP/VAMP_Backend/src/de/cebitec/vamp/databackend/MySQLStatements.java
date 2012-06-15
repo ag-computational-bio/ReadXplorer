@@ -2,16 +2,16 @@
 package de.cebitec.vamp.databackend;
 
 /**
- * @author jstraube, rhilker
- * 
  * This class contains the statements which are only used by the MySQL Database
+ * 
+ * @author jstraube, rhilker
  */
 public class MySQLStatements {
     
     //////////////////  statements for table creation  /////////////////////////
     
     public final static String SETUP_REFERENCE_GENOME =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_REF_GEN+" " +
+            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_REFERENCE+" " +
             "(" +
             FieldNames.REF_GEN_ID+" BIGINT PRIMARY KEY, " +
             FieldNames.REF_GEN_NAME+" VARCHAR(200) NOT NULL, " +
@@ -26,6 +26,7 @@ public class MySQLStatements {
             + FieldNames.POSITIONS_SNP_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.POSITIONS_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_POSITION + " VARCHAR(200) NOT NULL, "
+            + FieldNames.POSITIONS_BASE + " VARCHAR(1) NOT NULL, "
             + FieldNames.POSITIONS_REF_BASE + " VARCHAR(1) NOT NULL, "
             + FieldNames.POSITIONS_A + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_C + " MEDIUMINT UNSIGNED NOT NULL, "
@@ -100,14 +101,14 @@ public class MySQLStatements {
                 + FieldNames.SUBANNOTATION_TYPE + " TINYINT UNSIGNED NOT NULL, "
                 + FieldNames.SUBANNOTATION_START + " BIGINT UNSIGNED NOT NULL, "
                 + FieldNames.SUBANNOTATION_STOP + " BIGINT UNSIGNED NOT NULL, "
-                + FieldNames.ANNOTATION_GENE + " VARCHAR (30) " +
-                "INDEX ("+  FieldNames.SUBANNOTATION_PARENT_ID + ", " + 
-                        FieldNames.SUBANNOTATION_REFERENCE_ID +") " +
+                + FieldNames.ANNOTATION_GENE + " VARCHAR (30), " +
+                "INDEX ("+  FieldNames.SUBANNOTATION_PARENT_ID + "), " + 
+                "INDEX ("+  FieldNames.SUBANNOTATION_REFERENCE_ID +") " +
             ") ";
 
     
     public final static String SETUP_MAPPINGS =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_MAPPINGS+" " +
+            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_MAPPING+" " +
             "(" +
             FieldNames.MAPPING_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
             FieldNames.MAPPING_SEQUENCE_ID+ " BIGINT UNSIGNED NOT NULL, "+
@@ -125,7 +126,7 @@ public class MySQLStatements {
 
     
     public static final String SETUP_TRACKS =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_TRACKS+" " +
+            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_TRACK+" " +
             "( " +
             FieldNames.TRACK_ID+ " BIGINT UNSIGNED PRIMARY KEY, " +
             FieldNames.TRACK_REFERENCE_ID+" BIGINT UNSIGNED NOT NULL, " +
@@ -154,7 +155,7 @@ public class MySQLStatements {
             "(" +
             FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+" BIGINT UNSIGNED PRIMARY KEY, " +
             FieldNames.SEQ_PAIR_NUM_OF_REPLICATES+" SMALLINT UNSIGNED NOT NULL, " +
-            " INDEX ("+FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+"), " + 
+            " INDEX ("+FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID+") " + 
             ") ";
     
     
@@ -203,10 +204,10 @@ public class MySQLStatements {
             "ALTER TABLE "+FieldNames.TABLE_COVERAGE+" ENABLE KEYS";
 
     public final static String DISABLE_MAPPING_INDICES =
-            "ALTER TABLE "+FieldNames.TABLE_MAPPINGS+" DISABLE KEYS";
+            "ALTER TABLE "+FieldNames.TABLE_MAPPING+" DISABLE KEYS";
 
     public final static String ENABLE_MAPPING_INDICES =
-            "ALTER TABLE "+FieldNames.TABLE_MAPPINGS+" ENABLE KEYS";
+            "ALTER TABLE "+FieldNames.TABLE_MAPPING+" ENABLE KEYS";
 
     public final static String DISABLE_DIFF_INDICES =
             "ALTER TABLE "+FieldNames.TABLE_DIFF+" DISABLE KEYS";
@@ -215,10 +216,10 @@ public class MySQLStatements {
             "ALTER TABLE "+FieldNames.TABLE_DIFF+" ENABLE KEYS";
 
     public final static String DISABLE_TRACK_INDICES =
-            "ALTER TABLE "+FieldNames.TABLE_TRACKS+" DISABLE KEYS";
+            "ALTER TABLE "+FieldNames.TABLE_TRACK+" DISABLE KEYS";
 
     public final static String ENABLE_TRACK_INDICES =
-            "ALTER TABLE "+FieldNames.TABLE_TRACKS+" ENABLE KEYS";
+            "ALTER TABLE "+FieldNames.TABLE_TRACK+" ENABLE KEYS";
     
     public final static String DISABLE_SEQUENCE_PAIR_INDICES =
             "ALTER TABLE "+FieldNames.TABLE_SEQ_PAIRS+" DISABLE KEYS";
@@ -246,11 +247,11 @@ public class MySQLStatements {
 
     
     public final static String ENABLE_REFERENCE_INDICES =
-            "ALTER TABLE "+FieldNames.TABLE_REF_GEN+" ENABLE KEYS";
+            "ALTER TABLE "+FieldNames.TABLE_REFERENCE+" ENABLE KEYS";
 
     
     public final static String DISABLE_REFERENCE_INDICES =
-            "ALTER TABLE "+FieldNames.TABLE_REF_GEN+" DISABLE KEYS";
+            "ALTER TABLE "+FieldNames.TABLE_REFERENCE+" DISABLE KEYS";
 
     
     public final static String ENABLE_ANNOTATION_INDICES =
@@ -273,16 +274,18 @@ public class MySQLStatements {
     
     public final static String LOCK_TABLE_REFERENCE_DOMAIN =
             "LOCK TABLE " +
-            FieldNames.TABLE_REF_GEN+ " WRITE, " +
-            FieldNames.TABLE_FEATURES+ " WRITE";
+            FieldNames.TABLE_REFERENCE+ " WRITE, " +
+            FieldNames.TABLE_FEATURES+ " WRITE," +
+            FieldNames.TABLE_SUBFEATURES + " WRITE ";
 
     
     public final static String LOCK_TABLE_TRACK_DOMAIN =
             "LOCK TABLE "
             + FieldNames.TABLE_COVERAGE + " WRITE, "
-            + FieldNames.TABLE_TRACKS + " WRITE, "
-            + FieldNames.TABLE_MAPPINGS + " WRITE, "
+            + FieldNames.TABLE_TRACK + " WRITE, "
+            + FieldNames.TABLE_MAPPING + " WRITE, "
             + FieldNames.TABLE_STATISTICS + " WRITE, "
+            + FieldNames.TABLE_POSITIONS + " WRITE, "
             + FieldNames.TABLE_DIFF + " WRITE ";
     
     
@@ -291,7 +294,21 @@ public class MySQLStatements {
             FieldNames.TABLE_SEQ_PAIRS + " WRITE, " +
             FieldNames.TABLE_SEQ_PAIR_REPLICATES + " WRITE, " + 
             FieldNames.TABLE_SEQ_PAIR_PIVOT + " WRITE ";
-
+    
+    public static final String LOCK_TABLES_ALL =
+            "LOCK TABLE "
+            + FieldNames.TABLE_REFERENCE+ " WRITE, " 
+            + FieldNames.TABLE_FEATURES+ " WRITE,"
+            + FieldNames.TABLE_SUBFEATURES + " WRITE, "
+            + FieldNames.TABLE_COVERAGE + " WRITE, "
+            + FieldNames.TABLE_TRACK + " WRITE, "
+            + FieldNames.TABLE_MAPPING + " WRITE, "
+            + FieldNames.TABLE_STATISTICS + " WRITE, "
+            + FieldNames.TABLE_POSITIONS + " WRITE, "
+            + FieldNames.TABLE_DIFF + " WRITE, "
+            + FieldNames.TABLE_SEQ_PAIRS + " WRITE, " +
+            FieldNames.TABLE_SEQ_PAIR_REPLICATES + " WRITE, " + 
+            FieldNames.TABLE_SEQ_PAIR_PIVOT + " WRITE ";
 
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT " +
@@ -321,7 +338,7 @@ public class MySQLStatements {
                     FieldNames.MAPPING_STOP+", "+
                     FieldNames.MAPPING_TRACK+" "+
                 "FROM "+
-                    FieldNames.TABLE_MAPPINGS +" "+
+                    FieldNames.TABLE_MAPPING +" "+
                 "WHERE " +
                     FieldNames.MAPPING_TRACK+" = ? and  " +
                     FieldNames.MAPPING_STOP+" >= ? and " +
@@ -349,7 +366,7 @@ public class MySQLStatements {
                     FieldNames.MAPPING_DIRECTION+", " +
                     "SUM("+FieldNames.MAPPING_NUM_OF_REPLICATES+") as mult_count  "+
 		"FROM "+
-                    FieldNames.TABLE_MAPPINGS+" M " +
+                    FieldNames.TABLE_MAPPING+" M " +
                     "left join "+FieldNames.TABLE_DIFF+" D " +
                     "on D."+FieldNames.DIFF_MAPPING_ID+" = M."+FieldNames.MAPPING_ID+" " +
 		"WHERE " +
@@ -375,4 +392,63 @@ public class MySQLStatements {
             + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " BIGINT UNSIGNED NOT NULL,"
             + " INDEX (" + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + ")) ";
+        
+        
+        /** Fetches all sequence pair data including replicates for the given interval. */
+        public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL =
+                 "SELECT " +
+                    "MAPPING . ID  AS MAPPING_ID, " +
+                    "IS_BEST_MAPPING , " +
+                    "MAPPING . NUM_OF_REPLICATES  AS MAPPING_REP, " +
+                    "NUM_OF_ERRORS , " +
+                    "DIRECTION , " +
+                    "SEQUENCE_ID , " +
+                    "START , " +
+                    "STOP , " +
+                    "track_id, " +
+                    "SEQ_PAIRS . PAIR_ID AS ORIG_PAIR_ID, " +
+                    "MAPPING1_ID , " +
+                    "MAPPING2_ID , " +
+                    "TYPE,  " +
+                    FieldNames.TABLE_SEQ_PAIR_REPLICATES + "." + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES +
+                " FROM " +
+                    "MAPPING  , " +
+                    "SEQ_PAIRS " +
+                "LEFT OUTER JOIN " +
+                    "SEQ_PAIR_REPLICATES " +
+                "ON " +
+                    "SEQ_PAIRS . PAIR_ID =  SEQ_PAIR_REPLICATES.PAIR_ID " +
+                 "WHERE " +
+                    "START   BETWEEN ? AND ? AND " +
+                    "STOP  BETWEEN ? AND ? AND " +
+                     "(  track_id = ? OR  track_id = ?) AND " +
+                    "(MAPPING1_ID  =  MAPPING . ID or MAPPING2_ID  =  MAPPING . ID)";
+        
+        //         "SELECT "
+//                    + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID + " AS MAPPING_ID, "
+//                    + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+//                    + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_NUM_OF_REPLICATES + " AS MAPPING_REP, "
+//                    + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+//                    + FieldNames.MAPPING_DIRECTION + ", "
+//                    + FieldNames.MAPPING_SEQUENCE_ID + ", "
+//                    + FieldNames.MAPPING_START + ", "
+//                    + FieldNames.MAPPING_STOP + ", "
+//                    + FieldNames.MAPPING_TRACK + ", "
+//                    + FieldNames.TABLE_SEQ_PAIRS + "." + FieldNames.SEQ_PAIR_PAIR_ID + " AS ORIG_PAIR_ID, "
+//                    + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+//                    + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+//                    + FieldNames.SEQ_PAIR_TYPE + " "
+//                + "FROM "
+//                    + FieldNames.TABLE_MAPPING + " , "
+//                    + FieldNames.TABLE_SEQ_PAIRS + " "
+//                + " WHERE "
+//                    + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
+//                    + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
+//                    + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
+//                    + FieldNames.SEQ_PAIR_MAPPING1_ID + " = " + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID
+//            + " LEFT OUTER JOIN "
+//                + FieldNames.TABLE_SEQ_PAIR_REPLICATES
+//            + " ON "
+//                + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+                 
 }

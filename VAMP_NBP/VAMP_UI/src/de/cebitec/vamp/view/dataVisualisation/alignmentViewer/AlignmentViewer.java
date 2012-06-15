@@ -138,9 +138,9 @@ public class AlignmentViewer extends AbstractViewer {
         }
     }
     
-/*
-     *calls the sql requests direct, we have to check if from and to are out of bounds 
-     * in fact that there are errors
+    /**
+     * Calls the sql requests direct, we have to check if from and to are out of bounds 
+     * and skip out of bounds requests.
      */
     private void createAndShowNewLayout(int from, int to) {
         

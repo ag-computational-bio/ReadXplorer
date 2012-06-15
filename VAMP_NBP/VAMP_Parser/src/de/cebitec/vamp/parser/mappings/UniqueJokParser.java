@@ -30,14 +30,12 @@ public class UniqueJokParser implements MappingParserI {
     private static String name = "Unique Reads Jok Output Parser";
     private static String[] fileExtension = new String[]{"out"};
     private static String fileDescription = "Jok Output";
-    private HashMap<Integer, Integer> gapOrderIndex;
     private ArrayList<Observer> observers;
     private String errorMsg;
     private int noUniqueMappings;
     private HashMap<String, Integer> seqToIDMap;
 
     public UniqueJokParser() {
-        this.gapOrderIndex = new HashMap<Integer, Integer>();
         this.observers = new ArrayList<Observer>();
     }
 
@@ -145,12 +143,6 @@ public class UniqueJokParser implements MappingParserI {
                                 + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
                         continue;
                     }
-                    if (errors < 0 || errors > readSeq.length()) {
-                        this.sendErrorMsg("Error number has invalid value " + errors
-                                + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Must be bigger or equal to zero and smaller than alignment length.");
-                        continue;
-                    }
 //                    if (!readnameToSequenceID.containsKey(readname)) {
 //                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
 //                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
@@ -159,9 +151,17 @@ public class UniqueJokParser implements MappingParserI {
 //                    }
 
                     // Reads with an error already skip this part because of "continue" statements
-                    DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
+                    errors = result.getErrors();
+                    
+                    if (errors < 0 || errors > readSeq.length()) {
+                        this.sendErrorMsg("Error number has invalid value " + errors
+                                + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                + "Must be bigger or equal to zero and smaller than alignment length.");
+                        continue;
+                    }
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
                     mapping.setCount(count);
@@ -189,80 +189,6 @@ public class UniqueJokParser implements MappingParserI {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Mapping data successfully parsed");
         return mappingContainer;
-    }
-
-    private int getOrderForGap(int gapPos) {
-        if (!gapOrderIndex.containsKey(gapPos)) {
-            gapOrderIndex.put(gapPos, 0);
-        }
-        int order = gapOrderIndex.get(gapPos);
-
-        // increase order for next request
-        gapOrderIndex.put(gapPos, order + 1);
-
-        return order;
-    }
-
-    private Character getReverseComplement(char base) {
-        Character rev = ' ';
-        if (base == 'A') {
-            rev = 'T';
-        } else if (base == 'C') {
-            rev = 'G';
-        } else if (base == 'G') {
-            rev = 'C';
-        } else if (base == 'T') {
-            rev = 'A';
-        } else if (base == 'N') {
-            rev = 'N';
-        } else if (base == '_') {
-            rev = '_';
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char {0}!", base);
-        }
-
-        return rev;
-    }
-
-    private DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
-        List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
-        List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
-
-        int absPos;
-        gapOrderIndex.clear();
-
-        for (int i = 0, basecounter = 0; i < readSeq.length(); i++) {
-            if (readSeq.charAt(i) != refSeq.charAt(i)) {
-                absPos = start + basecounter;
-                if (refSeq.charAt(i) == '_') {
-                    // store a lower case char, if this is a gap in genome
-                    Character base = readSeq.charAt(i);
-                    base = Character.toUpperCase(base);
-                    if (direction == -1) {
-                        base = getReverseComplement(base);
-                    }
-
-                    ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, this.getOrderForGap(absPos));
-                    gaps.add(gap);
-                    // note: do not increase position. that means that next base of read is mapped
-                    // to the same position as this gap. two subsequent gaps map to the same position!
-                } else {
-                    // store the upper case char from input file, if this is a modification in the read
-                    char c = readSeq.charAt(i);
-                    c = Character.toUpperCase(c);
-                    if (direction == -1) {
-                        c = getReverseComplement(c);
-                    }
-                    ParsedDiff d = new ParsedDiff(absPos, c);
-                    diffs.add(d);
-                    basecounter++;
-                }
-            } else {
-                basecounter++;
-            }
-        }
-
-        return new DiffAndGapResult(diffs, gaps);
     }
 
     @Override

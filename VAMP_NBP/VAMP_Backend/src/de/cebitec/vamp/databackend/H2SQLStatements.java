@@ -41,7 +41,7 @@ public class H2SQLStatements {
     
     
     public final static String SETUP_REFERENCE_GENOME =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REF_GEN
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_REFERENCE
             + " ("
             + FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.REF_GEN_NAME + " VARCHAR(200) NOT NULL, "
@@ -136,7 +136,7 @@ public class H2SQLStatements {
 
     
     public final static String SETUP_MAPPINGS =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_MAPPINGS
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_MAPPING
             + " ("
             + FieldNames.MAPPING_ID + " BIGINT UNSIGNED PRIMARY KEY, "
             + FieldNames.MAPPING_SEQUENCE_ID + " BIGINT UNSIGNED NOT NULL, "
@@ -151,43 +151,43 @@ public class H2SQLStatements {
     
     
     public final static String INDEX_MAPPING_START =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTART ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTART ON " + FieldNames.TABLE_MAPPING + " "
             + "(" + FieldNames.MAPPING_START + " , " + FieldNames.MAPPING_TRACK + " ) ";
     
     
     public final static String INDEX_MAPPING_STOP =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTOP ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSTOP ON " + FieldNames.TABLE_MAPPING + " "
             + "(" + FieldNames.MAPPING_STOP + " ) ";
     
     
     public final static String INDEX_MAPPING_SEQ_ID =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSEQID ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGSEQID ON " + FieldNames.TABLE_MAPPING + " "
             + "(" + FieldNames.MAPPING_SEQUENCE_ID + " ) ";
     
     
     public final static String INDEX_MAPPINGS =
-            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPINGS + " "
+            "CREATE INDEX IF NOT EXISTS INDEXMAPPINGS ON " + FieldNames.TABLE_MAPPING + " "
             + "(" + FieldNames.MAPPING_START + ", " + FieldNames.MAPPING_STOP + "," + FieldNames.MAPPING_TRACK + " ) ";
     
     
     public final static String SETUP_TRACKS =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_TRACKS
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_TRACK
             + " ( "
             + FieldNames.TRACK_ID + " BIGINT UNSIGNED PRIMARY KEY, "
             + FieldNames.TRACK_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.TRACK_SEQUENCE_PAIR_ID + " BIGINT UNSIGNED, " //only for paired sequences
             + FieldNames.TRACK_DESCRIPTION + " VARCHAR (200) NOT NULL, "
-            + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL "//, "
-            //+ FieldNames.TRACK_RUN + " BIGINT UNSIGNED NOT NULL "
+            + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL,  "
+            + FieldNames.TRACK_PATH + " VARCHAR(400) "
             + ") ";
     
     
     public final static String INDEX_TRACK_REFID =
-            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACKS 
+            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK 
             + " (" + FieldNames.TRACK_REFERENCE_ID + ") ";
     
     public final static String INDEX_TRACK_SEQ_PAIR_ID =
-            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACKS 
+            "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK 
             + " (" + FieldNames.TRACK_SEQUENCE_PAIR_ID + ") ";
     
     
@@ -260,5 +260,99 @@ public class H2SQLStatements {
             "CREATE INDEX IF NOT EXISTS INDEX_COVERAGE_DIST ON " + FieldNames.TABLE_COVERAGE_DISTRIBUTION
             + " (" + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " ) ";
   
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //fetch data querries ////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    
+    /** Fetches all entries where the first seq pair id matches the mapping id. */
+    public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL =
+            "SELECT "
+                + " MAPPING_ID, "
+                + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+                + " MAPPING_REP, "
+                + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+                + FieldNames.MAPPING_DIRECTION + ", "
+                + FieldNames.MAPPING_SEQUENCE_ID + ", "
+                + FieldNames.MAPPING_START + ", "
+                + FieldNames.MAPPING_STOP + ", "
+                + FieldNames.MAPPING_TRACK + ", "
+                + " ORIG_PAIR_ID, "
+                + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+                + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+                + FieldNames.SEQ_PAIR_TYPE + ", "
+                + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES + " "
+            + " FROM ("
+                + "SELECT "
+                    + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID + " AS MAPPING_ID, "
+                    + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+                    + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_NUM_OF_REPLICATES + " AS MAPPING_REP, "
+                    + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+                    + FieldNames.MAPPING_DIRECTION + ", "
+                    + FieldNames.MAPPING_SEQUENCE_ID + ", "
+                    + FieldNames.MAPPING_START + ", "
+                    + FieldNames.MAPPING_STOP + ", "
+                    + FieldNames.MAPPING_TRACK + ", "
+                    + FieldNames.TABLE_SEQ_PAIRS + "." + FieldNames.SEQ_PAIR_PAIR_ID + " AS ORIG_PAIR_ID, "
+                    + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+                    + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+                    + FieldNames.SEQ_PAIR_TYPE + " "
+                + "FROM "
+                    + FieldNames.TABLE_MAPPING + " , "
+                    + FieldNames.TABLE_SEQ_PAIRS + " "
+                + " WHERE "
+                    + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
+                    + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
+                    + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
+                    + FieldNames.SEQ_PAIR_MAPPING1_ID + " = " + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID
+            + " ) LEFT OUTER JOIN "
+                + FieldNames.TABLE_SEQ_PAIR_REPLICATES
+            + " ON "
+                + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
+         
+         
+        /** Fetches all entries where the second seq pair id matches the mapping id. */
+        public static final String FETCH_SEQ_PAIRS_W_REPLICATES_FOR_INTERVAL2 =
+            "SELECT "
+            + " MAPPING_ID, "
+            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+            + " MAPPING_REP, "
+            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+            + FieldNames.MAPPING_DIRECTION + ", "
+            + FieldNames.MAPPING_SEQUENCE_ID + ", "
+            + FieldNames.MAPPING_START + ", "
+            + FieldNames.MAPPING_STOP + ", "
+            + FieldNames.MAPPING_TRACK + ", "
+            + " ORIG_PAIR_ID, "
+            + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+            + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+            + FieldNames.SEQ_PAIR_TYPE + ", "
+            + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES + " "
+            + " FROM ("
+            + "SELECT "
+            + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID + " AS MAPPING_ID, "
+            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+            + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_NUM_OF_REPLICATES + " AS MAPPING_REP, "
+            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+            + FieldNames.MAPPING_DIRECTION + ", "
+            + FieldNames.MAPPING_SEQUENCE_ID + ", "
+            + FieldNames.MAPPING_START + ", "
+            + FieldNames.MAPPING_STOP + ", "
+            + FieldNames.MAPPING_TRACK + ", "
+            + FieldNames.TABLE_SEQ_PAIRS + "." + FieldNames.SEQ_PAIR_PAIR_ID + " AS ORIG_PAIR_ID, "
+            + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+            + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+            + FieldNames.SEQ_PAIR_TYPE + " "
+            + "FROM "
+            + FieldNames.TABLE_MAPPING + " , "
+            + FieldNames.TABLE_SEQ_PAIRS + " "
+            + " WHERE "
+            + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
+            + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
+            + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
+            + FieldNames.SEQ_PAIR_MAPPING2_ID + " = " + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID
+            + " ) LEFT OUTER JOIN "
+            + FieldNames.TABLE_SEQ_PAIR_REPLICATES
+            + " ON "
+            + " ORIG_PAIR_ID = " + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID;
 
 }

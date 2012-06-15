@@ -37,7 +37,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jumpTextfield" max="32767" attributes="1"/>
+                  <Component id="jumpTextfield" pref="281" max="32767" attributes="1"/>
                   <Component id="searchPatternField" alignment="0" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -93,7 +93,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="filterProperties" alignment="0" min="0" pref="174" max="32767" attributes="1"/>
+              <Component id="filterProperties" alignment="0" min="0" max="32767" attributes="1"/>
               <Component id="tableScrollPane" alignment="0" pref="0" max="32767" attributes="1"/>
           </Group>
         </DimensionLayout>
@@ -134,11 +134,11 @@
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="radioAnnotationButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="radioGene" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="radioProduct" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="radioEC" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="radioGene" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -169,7 +169,7 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jumpFilterLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Filter:"/>
+                <Property name="text" type="java.lang.String" value="RegEx Filter:"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="filterTextfield">

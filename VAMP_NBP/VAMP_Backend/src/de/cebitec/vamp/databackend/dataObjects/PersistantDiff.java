@@ -1,12 +1,12 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 /**
- * @author ddoppmei
- * 
  * Depicts a difference in a mapping to the reference genome. Therefore, it contains
  * base, position, number of replicates and strand information.
+ * 
+ * @author ddoppmei
  */
-public class PersistantDiff {
+public class PersistantDiff implements Comparable<PersistantDiff> {
 
     private char base;
     private int position;
@@ -24,6 +24,9 @@ public class PersistantDiff {
         this.count = count;
     }
 
+    /**
+     * @return the associated with the diff (mainly bases and gaps)
+     */
     public char getBase() {
         return base;
     }
@@ -42,7 +45,27 @@ public class PersistantDiff {
         return count;
     }
 
-    public boolean isIsForwardStrand() {
+    /**
+     * @return true, if this diff is on the forward strand
+     */
+    public boolean isForwardStrand() {
         return isForwardStrand;
+    }
+
+    /**
+     * Compares the other diff to this diff by position. 
+     * @param other the diff to compare with this diff
+     * @return -1 if this diff has a smaller position than the other, 1 if this 
+     * diff has a larger position than the other, and 0 if the position is equal
+     */
+    @Override
+    public int compareTo(PersistantDiff other) {
+        if (this.getPosition() < other.getPosition()) {
+            return -1;
+        } else if (this.getPosition() > other.getPosition()) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

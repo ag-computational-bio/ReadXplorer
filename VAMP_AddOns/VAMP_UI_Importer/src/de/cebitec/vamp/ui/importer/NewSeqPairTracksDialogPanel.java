@@ -41,6 +41,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private int distance; //distance of the sequences in a sequence pair in bp
     private short deviation; //deviation allowed from that distance in %
     private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
+    private boolean isDbUsed;
 
     /** Creates new form NewSeqPairTracksDialogPanel */
     public NewSeqPairTracksDialogPanel() {
@@ -81,6 +82,8 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         orientation1Button = new javax.swing.JRadioButton();
         orientation3Button = new javax.swing.JRadioButton();
         orientation2Button = new javax.swing.JRadioButton();
+        importTypeLabel = new javax.swing.JLabel();
+        importTypeCombo = new javax.swing.JComboBox(parsers);
 
         refGenLabel.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.refGenLabel.text")); // NOI18N
 
@@ -175,6 +178,25 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
             }
         });
 
+        importTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.importTypeLabel.text")); // NOI18N
+
+        importTypeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Database", "Direct File Access" }));
+        importTypeCombo.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+                if(value instanceof ParserI){
+                    return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);
+                } else {
+                    return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                }
+            }
+        });
+        importTypeCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importTypeComboActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -182,26 +204,33 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(refGenLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGap(35, 35, 35)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel1)
                             .addComponent(descriptionLabel)
                             .addComponent(preferencesLabel)
                             .addComponent(mappingFile2Label)
-                            .addComponent(mappingFile1Label))
+                            .addComponent(mappingFile1Label)
+                            .addComponent(importTypeLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(parserComboBox, 0, 336, Short.MAX_VALUE)
-                            .addComponent(descriptionField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(importTypeCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(parserComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(descriptionField)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(mappingFile2Field, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
-                                    .addComponent(mappingFile1Field, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE))
+                                    .addComponent(mappingFile2Field)
+                                    .addComponent(mappingFile1Field))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chooseButton1, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(chooseButton2, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGroup(layout.createSequentialGroup()
                                 .addGap(2, 2, 2)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
@@ -221,18 +250,17 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(orientation2Button)
                                         .addGap(18, 18, 18)
-                                        .addComponent(orientation3Button))))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(refGenLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(refGenBox, 0, 361, Short.MAX_VALUE)))
+                                        .addComponent(orientation3Button)))))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(19, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(importTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(importTypeLabel))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(parserComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
@@ -310,6 +338,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         this.setOrientation("rf");
     }//GEN-LAST:event_orientation2ButtonActionPerformed
 
+    private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
+        this.isDbUsed = this.importTypeCombo.getSelectedIndex() == 0 ? true : false;
+    }//GEN-LAST:event_importTypeComboActionPerformed
+
     
     private void openFileChooser(boolean isFstFile) {
         JFileChooser fc = new JFileChooser();
@@ -359,6 +391,8 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private javax.swing.JLabel deviationLabel;
     private javax.swing.JTextField distanceField;
     private javax.swing.JLabel distanceLabel;
+    private javax.swing.JComboBox importTypeCombo;
+    private javax.swing.JLabel importTypeLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField mappingFile1Field;
@@ -382,6 +416,14 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         } else {
             return true;
         }
+    }
+
+    /**
+     * @return true, if the track should be stored into the database and false, if 
+     * direct file access is desired
+     */
+    public boolean isDbUsed() {
+        return isDbUsed;
     }
 
     public File getMappingFile1() {

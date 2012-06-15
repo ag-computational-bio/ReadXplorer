@@ -1,5 +1,6 @@
 package de.cebitec.vamp.thumbnail;
 
+import de.cebitec.vamp.databackend.connector.MultiTrackConnector;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -266,7 +267,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller.addMousePositionListener(b);
 
         // create track viewer
-        MultiTrackConnector tc = new MultiTrackConnector(track);
+        MultiTrackConnector tc = ProjectConnector.getInstance().getMultiTrackConnector(track);
 
         final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
         int annotationWidth = (currentAnnotation.getStop() - currentAnnotation.getStart()) / 2;
@@ -324,7 +325,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller.addMousePositionListener(b);
 
         // get double track connector
-        MultiTrackConnector trackCon = new MultiTrackConnector(tracks);
+        MultiTrackConnector trackCon = ProjectConnector.getInstance().getMultiTrackConnector(tracks);
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
 
         int annotationWidth = (annotation.getStop() - annotation.getStart()) / 2;

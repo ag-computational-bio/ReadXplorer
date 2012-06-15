@@ -4,10 +4,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Rolf Hilker
- *
  * Contains all global accessible util methods.
+ * 
+ * @author Rolf Hilker
  */
 public final class SequenceUtils {
 
@@ -28,9 +27,9 @@ public final class SequenceUtils {
      * @param string the string to reverse
      * @return the reversed string
      */
-    public static String reverseString(final String string){
+    public static String reverseString(final String string) {
         StringBuilder revString = new StringBuilder();
-        for (int i=string.length()-1; i>=0; --i){
+        for (int i = string.length() - 1; i >= 0; --i) {
             revString = revString.append(string.charAt(i));
         }
         return revString.toString();
@@ -42,20 +41,20 @@ public final class SequenceUtils {
      * @return the complemented string
      */
     public static String complementDNA(final String sequence){
-        String complement = "";
+        StringBuilder complement = new StringBuilder(sequence.length());
         char currChar;
         for (int i = 0; i < sequence.length(); i++) {
             currChar = sequence.charAt(i);
 
             switch (currChar){
-                case 'c': complement = complement.concat("g"); break;
-                case 'g': complement = complement.concat("c"); break;
-                case 't': complement = complement.concat("a"); break;
-                case 'a': complement = complement.concat("t"); break;
-                default : complement = complement.concat(String.valueOf(currChar));
+                case 'c': complement = complement.append('g'); break;
+                case 'g': complement = complement.append('c'); break;
+                case 't': complement = complement.append('a'); break;
+                case 'a': complement = complement.append('t'); break;
+                default : complement = complement.append(currChar);
             }
         }
-        return complement;
+        return complement.toString();
     }
 
 
@@ -66,7 +65,7 @@ public final class SequenceUtils {
      */
     public static String getReverseComplement(String sequence) {
         StringBuilder revCompSeq = new StringBuilder();
-        for (int i=sequence.length()-1; i>=0; --i) {
+        for (int i = sequence.length() - 1; i >= 0; --i) {
             char base = sequence.charAt(i);
             base = SequenceUtils.getDnaComplement(base, sequence);
             revCompSeq.append(base);
@@ -92,7 +91,7 @@ public final class SequenceUtils {
     public static char getDnaComplement(char base, String sequence) {
         base = Character.toUpperCase(base);
         char comp = ' ';
-        switch (base){
+        switch (base) {
                 case 'C': comp = 'G'; break;
                 case 'G': comp = 'C'; break;
                 case 'T': comp = 'A'; break;
@@ -104,5 +103,14 @@ public final class SequenceUtils {
             }
 
         return comp;
+    }
+    
+    /**
+     * Checks if the input sequence is a valid DNA string (!not RNA!).
+     * @param sequence input sequence to check
+     * @return <code>true</code> if it is a valid DNA string, <code>false</code> otherwise
+     */
+    public static boolean isValidDnaString(String sequence) {
+        return sequence.matches("[acgtnACGTN]+");
     }
 }

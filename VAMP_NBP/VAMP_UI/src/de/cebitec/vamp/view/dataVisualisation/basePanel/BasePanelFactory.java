@@ -65,8 +65,9 @@ public class BasePanelFactory {
         genomeViewer.setupLegend(new MenuLabel(genomePanelLegend, MenuLabel.TITLE_LEGEND), genomePanelLegend);
 
         // add panels to basepanel
+        int maxSliderValue = 500;
         b.setViewer(genomeViewer);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
 
         return b;
     }
@@ -104,9 +105,10 @@ public class BasePanelFactory {
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         // add panels to basepanel
+        int maxSliderValue = 500;
         b.setTopInfoPanel(cil);
         b.setViewer(trackV, slider);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
         b.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
         return b;
@@ -161,9 +163,10 @@ public class BasePanelFactory {
             CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
             // add panels to basepanel
+            int maxSliderValue = 500;
             b.setTopInfoPanel(cil);
             b.setViewer(trackV, slider);
-            b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+            b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
             
             String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
             b.setTitlePanel(this.getTitlePanel(title));
@@ -194,8 +197,9 @@ public class BasePanelFactory {
         viewer.setupOptions(optionsLabel, alignmentViewerOptions);
 
         // add panels to basepanel and add scrollbars
+        int maxSliderValue = 500;
         b.setViewerInScrollpane(viewer);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false, maxSliderValue));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
@@ -213,8 +217,9 @@ public class BasePanelFactory {
         viewer.setupLegend(new MenuLabel(historgramPanelLegend, MenuLabel.TITLE_LEGEND), historgramPanelLegend);
 
         // add panels to basepanel
+        int maxSliderValue = 500;
         b.setViewer(viewer);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false, maxSliderValue));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
@@ -237,18 +242,19 @@ public class BasePanelFactory {
         viewer.setupLegend(new MenuLabel(seqPairPanelLegend, MenuLabel.TITLE_LEGEND), seqPairPanelLegend);
 
         // add panels to basepanel and add scrollbars
+        int maxSliderValue = 50; //smaller than usual
         b.setViewerInScrollpane(viewer);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true));
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
         return b;
     }
 
-    private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider) {
+    private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider, int sliderMax) {
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
         AdjustmentPanel control = new AdjustmentPanel(1, refGenome.getSequence().length(),
-                bounds.getCurrentLogPos(), bounds.getZoomValue(), hasScrollbar, hasSlider);
+                bounds.getCurrentLogPos(), bounds.getZoomValue(), sliderMax, hasScrollbar, hasSlider);
         control.addAdjustmentListener(boundsManager);
         boundsManager.addSynchronousNavigator(control);
         return control;
@@ -384,7 +390,7 @@ public class BasePanelFactory {
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(this.getLegendEntry(ColorProperties.COMPLETE_COV, FeatureType.COMPLETE_COVERAGE, null));
+        legend.add(this.getLegendEntry(ColorProperties.COV_DIFF_COLOR, FeatureType.COMPLETE_COVERAGE, null));
         legend.add(this.getLegendEntry(ColorProperties.TRACK1_COLOR, FeatureType.TRACK1_COVERAGE, null));
         legend.add(this.getLegendEntry(ColorProperties.TRACK2_COLOR, FeatureType.TRACK2_COVERAGE, null));
 

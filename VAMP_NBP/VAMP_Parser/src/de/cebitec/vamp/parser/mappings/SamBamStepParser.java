@@ -26,8 +26,6 @@ public class SamBamStepParser implements MappingParserI {
     private static String name = "SAM/BAM Stepwise Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM Output";
-    private HashMap<Integer, Integer> gapOrderIndex;
-    private int errors = 0;
     private HashMap<String, Integer> seqToIDMap;
     private int noUniqueMappings;
     private ArrayList<Observer> observers;
@@ -40,7 +38,6 @@ public class SamBamStepParser implements MappingParserI {
     private SAMRecord record = null;
 
     public SamBamStepParser() {
-        this.gapOrderIndex = new HashMap<Integer, Integer>();
         this.seqToIDMap = new HashMap<String, Integer>();
         this.observers = new ArrayList<Observer>();
 
@@ -61,13 +58,14 @@ public class SamBamStepParser implements MappingParserI {
         int start;
         int stop;
         int sumReadLength = 0;
+        int refSeqLength = sequenceString.length();
+        int errors = 0;
 
         //     String refSeqfulllength = null;
         String refSeqwithoutgaps = null;
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.setFirstMappingContainer(trackJob.isFirstJob());
         //TODO check why if there is too much output we get a java heap space exception 
-        // mappingContainer.registerObserver(this);
 
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filename));
 
@@ -102,8 +100,6 @@ public class SamBamStepParser implements MappingParserI {
                 stop = 0;
                 errors = 0;
 
-                int length = sequenceString.length();
-
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
                     stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
                     refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
@@ -122,10 +118,10 @@ public class SamBamStepParser implements MappingParserI {
                 direction = first.getReadNegativeStrandFlag() ? (byte) -1 : 1;
 
                 //check parameters
-                if (length < start || length < stop) {
+                if (refSeqLength < start || refSeqLength < stop) {
                     this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorReadPosition",
-                            filename, lineno, start, stop, length));
+                            filename, lineno, start, stop, refSeqLength));
                     continue;
                 }
                 if (readname == null || readname.isEmpty()) {
@@ -159,21 +155,23 @@ public class SamBamStepParser implements MappingParserI {
                             "Parser.checkMapping.ErrorReadLength", filename, lineno, readSeq, refSeq));
                     continue;
                 }
-                if (errors < 0 || errors > readSeq.length()) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorRead", errors, filename, lineno));
-                    continue;
-                }
                 if (!cigar.matches("[MHISDPXN=\\d]+")) {
                     this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
                             "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
                     continue;
                 }
                 //saruman starts genome at 0 other algorithms like bwa start genome at 1
-                DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                 List<ParsedDiff> diffs = result.getDiffs();
                 List<ParsedReferenceGap> gaps = result.getGaps();
+                errors = result.getErrors();
 
+                if (errors < 0 || errors > readSeq.length()) {
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
+                            "Parser.checkMapping.ErrorRead", errors, filename, lineno));
+                    continue;
+                }
+                
                 //saruman starts genome at 0 other algorithms like bwa start genome at 1
                 ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
 
@@ -226,64 +224,6 @@ public class SamBamStepParser implements MappingParserI {
 
         return mappingContainer;
 
-    }
-    /**
-     * This method calculates the order of the gap infact that for a gap we dont include a new position to reference genome
-     *  but we notice the number of gaps to one position of the ref genome
-     */
-    private int getOrderForGap(int gapPos) {
-        if (!gapOrderIndex.containsKey(gapPos)) {
-            gapOrderIndex.put(gapPos, 0);
-        }
-        int order = gapOrderIndex.get(gapPos);
-
-        // increase order for next request
-        gapOrderIndex.put(gapPos, order + 1);
-
-        return order;
-    }
-
-    private DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
-
-        List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
-        List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
-        errors = 0;
-        int absPos;
-        gapOrderIndex.clear();
-
-        for (int i = 0, basecounter = 0; i < readSeq.length(); i++) {
-            if (readSeq.toLowerCase().charAt(i) != refSeq.toLowerCase().charAt(i)) {
-                errors++;
-                absPos = start + basecounter;
-                if (refSeq.charAt(i) == '_') {
-                    // store a lower case char, if this is a gap in genome
-                    Character base = readSeq.charAt(i);
-                    base = Character.toUpperCase(base);
-                    if (direction == -1) {
-                        base = SequenceUtils.getDnaComplement(base, readSeq);
-                    }
-
-                    ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, this.getOrderForGap(absPos));
-                    gaps.add(gap);
-                    // note: do not increase position. that means that next base of read is mapped
-                    // to the same position as this gap. two subsequent gaps map to the same position!
-                } else {
-                    // store the upper case char from input file, if this is a modification in the read
-                    char c = readSeq.charAt(i);
-                    c = Character.toUpperCase(c);
-                    if (direction == -1) {
-                        c = SequenceUtils.getDnaComplement(c, readSeq);
-                    }
-                    ParsedDiff d = new ParsedDiff(absPos, c);
-                    diffs.add(d);
-                    basecounter++;
-                }
-            } else {
-                basecounter++;
-            }
-        }
-
-        return new DiffAndGapResult(diffs, gaps);
     }
 
     @Override

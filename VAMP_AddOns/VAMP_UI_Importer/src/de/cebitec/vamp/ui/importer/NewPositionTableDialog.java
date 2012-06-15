@@ -140,7 +140,8 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
 
             for (int i = 0; i < tracks.length; ++i) {
                 PersistantTrack track = persTracks.get(i);
-                tracks[i] = new TrackJob(track.getId(), null, track.getDescription(), refJob, null, track.getTimestamp());
+                tracks[i] = new TrackJob(track.getId(), !track.getFilePath().isEmpty(), 
+                        null, track.getDescription(), refJob, null, track.getTimestamp());
             }
 
             this.parentTrackCombo.setModel(new DefaultComboBoxModel(tracks));

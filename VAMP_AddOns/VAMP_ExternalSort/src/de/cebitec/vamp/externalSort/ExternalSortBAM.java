@@ -1,5 +1,6 @@
 package de.cebitec.vamp.externalSort;
 
+import de.cebitec.vamp.util.GeneralUtils;
 import java.io.File;
 //import java.nio.file.Files;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class ExternalSortBAM {
         this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.progress.name"));
         externalSort(path);
         long time = System.currentTimeMillis() - start;
-        ArrayList<Integer> list = getTime(time);
+        ArrayList<Integer> list = GeneralUtils.getTime(time);
         io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.sort.finished", list.get(0), list.get(1), list.get(2)));
         ph.finish();
         //  io.getOut().close();
@@ -49,6 +50,7 @@ public class ExternalSortBAM {
     }
 
     private void countLines(File base) {
+        //TODO: teste no lines in file gegen diese methode in zeit
         SAMFileReader samReader = new SAMFileReader(base);
         samheader = samReader.getFileHeader();
         SAMRecordIterator itLine = samReader.iterator();
@@ -121,6 +123,11 @@ public class ExternalSortBAM {
 
     }
 
+    /**
+     * Merges all sorted files into one large sorted file.
+     * @param baseFile the original file to sort
+     * @param numFiles the number of intermediate files which are internally already sorted
+     */
     private void mergeFiles(File baseFile, int numFiles) {
 //        try {
 
@@ -129,8 +136,8 @@ public class ExternalSortBAM {
         ArrayList<SAMRecord> filerows = new ArrayList<SAMRecord>();
         String[] s = baseFile.getName().split("\\.");
         String name = baseFile.getParent() + "/sort_" + s[0] + ".bam";
-        File sorted = new File(name);
-        BAMFileWriter bfw = new BAMFileWriter(sorted);
+        File mergedFile = new File(name);
+        BAMFileWriter bfw = new BAMFileWriter(mergedFile);
         bfw.setHeader(samheader);
         boolean someFileStillHasRows = false;
 
@@ -164,7 +171,7 @@ public class ExternalSortBAM {
                 minIndex = -1;
             }
 
-// check which one is min
+            // check which one is min
             for (int i = 1; i < filerows.size(); i++) {
                 row = filerows.get(i);
                 if (min != null) {
@@ -184,11 +191,11 @@ public class ExternalSortBAM {
             if (minIndex < 0) {
                 someFileStillHasRows = false;
             } else {
-// write to the sorted file
+                // write to the sorted file
                 bfw.addAlignment(filerows.get(minIndex));
                 ph.progress(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.progress.write.sortedFile"), workunits++);
 
-// get another row from the file that had the min
+                // get another row from the file that had the min
                 SAMRecord line = mergeIt.get(minIndex).next();
                 if (line != null) {
                     filerows.set(minIndex, line);
@@ -196,7 +203,7 @@ public class ExternalSortBAM {
                     filerows.set(minIndex, null);
                 }
             }
-// check if one still has rows
+            // check if one still has rows
             for (int i = 0; i < filerows.size(); i++) {
 
                 someFileStillHasRows = false;
@@ -210,10 +217,10 @@ public class ExternalSortBAM {
                 }
             }
 
-// check the actual files one more time
+            // check the actual files one more time
             if (!someFileStillHasRows) {
 
-//write the last one not covered above
+                //write the last one not covered above
                 for (int i = 0; i < filerows.size(); i++) {
                     if (filerows.get(i) == null) {
                         SAMRecord line = mergeIt.get(i).next();
@@ -242,8 +249,14 @@ public class ExternalSortBAM {
 //                    io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.merge.FileDeletionError", files.get(i).getAbsolutePath()));
 //                }
 //            }
+        
+        for (int i = 0; i < numFiles; i++) {
+            mergeIt.get(i).close();
+        }
+        bfw.close();
         mergeIt.clear();
         filerows.clear();
+        this.sortedFile = mergedFile;
 
 //        } catch (Exception ex) {
 //            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, 
@@ -307,23 +320,4 @@ public class ExternalSortBAM {
         return sortedFile;
     }
 
-    private ArrayList<Integer> getTime(long timeInMillis) {
-        ArrayList<Integer> timeList = new ArrayList<Integer>();
-        int remdr = (int) (timeInMillis % (24L * 60 * 60 * 1000));
-
-        final int hours = remdr / (60 * 60 * 1000);
-
-        remdr %= 60 * 60 * 1000;
-
-        final int minutes = remdr / (60 * 1000);
-
-        remdr %= 60 * 1000;
-
-        final int seconds = remdr / 1000;
-        timeList.add(0, hours);
-        timeList.add(1, minutes);
-        timeList.add(2, seconds);
-
-        return timeList;
-    }
 }

@@ -146,7 +146,7 @@ public class BlockComponent extends JComponent {
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
         sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
 //        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
-        sb.append(createTableRow("Mismatches", String.valueOf(mapping.getErrors())));
+        sb.append(createTableRow("Mismatches", String.valueOf(mapping.getDifferences())));
         this.appendDiffs(mapping, sb);
         this.appendGaps(mapping, sb);
 
@@ -267,7 +267,7 @@ public class BlockComponent extends JComponent {
     private Color determineBlockColor() {
         PersistantMapping m = ((PersistantMapping) block.getPersistantObject());
         Color tmp;
-        if (m.getErrors() == 0) {
+        if (m.getDifferences() == 0) {
             tmp = ColorProperties.BLOCK_MATCH;
         } else if (m.isBestMatch()) {
             tmp = ColorProperties.BLOCK_BEST_MATCH;
@@ -282,77 +282,72 @@ public class BlockComponent extends JComponent {
         return tmp;
     }
 
+    /**
+     * Determines the label of a brick. This means the character representing
+     * the base, the given brick stands for.
+     * @param brick the brick whose label is needed
+     * @return the character string representing the base of this brick
+     */
     private String determineBrickLabel(Brick brick) {
         String label = " ";
         int type = brick.getType();
-        if (type == Brick.BASE_A) {
-            label = "A";
-        } else if (type == Brick.BASE_C) {
-            label = "C";
-        } else if (type == Brick.BASE_G) {
-            label = "G";
-        } else if (type == Brick.BASE_T) {
-            label = "T";
-        } else if (type == Brick.BASE_N) {
-            label = "N";
-        } else if (type == Brick.FOREIGN_GENOMEGAP) {
-            label = "";
-        } else if (type == Brick.MATCH) {
-            label = "";
-        } else if (type == Brick.UNDEF) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
-            return "@";
-        } else if (type == Brick.GENOME_GAP_A) {
-            return "A";
-        } else if (type == Brick.GENOME_GAP_C) {
-            return "C";
-        } else if (type == Brick.GENOME_GAP_G) {
-            return "G";
-        } else if (type == Brick.GENOME_GAP_T) {
-            return "T";
-        } else if (type == Brick.GENOME_GAP_N) {
-            return "N";
-        } else if (type == Brick.READGAP) {
-            label = "-";
+        switch (type) {
+            case Brick.MATCH : label = ""; break;
+            case Brick.BASE_A : label = "A"; break;
+            case Brick.BASE_C : label = "C"; break;
+            case Brick.BASE_G : label = "G"; break;
+            case Brick.BASE_T : label = "T"; break;
+            case Brick.BASE_N : label = "N"; break;
+            case Brick.FOREIGN_GENOMEGAP : label = ""; break;
+            case Brick.READGAP : label = "-"; break;
+            case Brick.GENOME_GAP_A : label = "A"; break;
+            case Brick.GENOME_GAP_C : label = "C"; break;
+            case Brick.GENOME_GAP_G : label = "G"; break;
+            case Brick.GENOME_GAP_T : label = "T"; break;
+            case Brick.GENOME_GAP_N : label = "N"; break;
+            case Brick.SKIPPED : label = "."; break;
+            case Brick.UNDEF : label = "@"; 
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+                break;
+            default:
+                label = "@";
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
         }
 
         return label;
     }
 
-    private Color determineBrickColor(Brick b) {
+    /**
+     * Determines the color of a brick, if it deviates from the reference.
+     * Matches are not taken into account in this method.
+     * @param block the non-matching block whose color is needed
+     * @return the color of the non-matching block
+     */
+    private Color determineBrickColor(Brick block) {
         Color c = Color.black;
-        int type = b.getType();
-        if (type == Brick.BASE_A) {
-            c = ColorProperties.ALIGNMENT_A;
-        } else if (type == Brick.BASE_C) {
-            c = ColorProperties.ALIGNMENT_C;
-        } else if (type == Brick.BASE_G) {
-            c = ColorProperties.ALIGNMENT_G;
-        } else if (type == Brick.BASE_T) {
-            c = ColorProperties.ALIGNMENT_T;
-        } else if (type == Brick.BASE_N) {
-            c = ColorProperties.ALIGNMENT_N;
-        } else if (type == Brick.FOREIGN_GENOMEGAP) {
-            c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP;
-        } else if (type == Brick.UNDEF) {
-            c = ColorProperties.ALIGNMENT_BASE_UNDEF;
-        } else if (type == Brick.GENOME_GAP_A) {
-            c = ColorProperties.ALIGNMENT_A;
-        } else if (type == Brick.GENOME_GAP_C) {
-            c = ColorProperties.ALIGNMENT_C;
-        } else if (type == Brick.GENOME_GAP_G) {
-            c = ColorProperties.ALIGNMENT_G;
-        } else if (type == Brick.GENOME_GAP_T) {
-            c = ColorProperties.ALIGNMENT_T;
-        } else if (type == Brick.GENOME_GAP_N) {
-            c = ColorProperties.ALIGNMENT_N;
-        } else if (type == Brick.READGAP) {
-            c = ColorProperties.ALIGNMENT_BASE_READGAP;
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type of brick {0}", b.getType());
-            c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+        int type = block.getType();
+        switch (type) {
+            case Brick.BASE_A : c = ColorProperties.ALIGNMENT_A; break;
+            case Brick.BASE_C : c = ColorProperties.ALIGNMENT_G; break;
+            case Brick.BASE_G : c = ColorProperties.ALIGNMENT_C; break;
+            case Brick.BASE_T : c = ColorProperties.ALIGNMENT_T; break;
+            case Brick.BASE_N : c = ColorProperties.ALIGNMENT_N; break;
+            case Brick.FOREIGN_GENOMEGAP : c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP; break;
+            case Brick.READGAP : c = ColorProperties.ALIGNMENT_BASE_READGAP; break;
+            case Brick.GENOME_GAP_A : c = ColorProperties.ALIGNMENT_A; break;
+            case Brick.GENOME_GAP_C : c = ColorProperties.ALIGNMENT_C; break;
+            case Brick.GENOME_GAP_G : c = ColorProperties.ALIGNMENT_G; break;
+            case Brick.GENOME_GAP_T : c = ColorProperties.ALIGNMENT_T; break;
+            case Brick.GENOME_GAP_N : c = ColorProperties.ALIGNMENT_N; break;
+            case Brick.SKIPPED : c = ColorProperties.SKIPPED; break;
+            case Brick.UNDEF : c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+                break;
+            default:
+                c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
         }
-
+        
         return c;
     }
 

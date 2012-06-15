@@ -23,14 +23,14 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
     private long trackID;
     private long trackID2;
     private Connection con;
-    private ConcurrentLinkedQueue<GenomeRequest> requestQueue;
+    private ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private PersistantCoverage currentCov;
     private double requestCounter;
 
     public CoverageThreadAnalyses(List<Integer> trackIds){
         super();
         // do general stuff
-        this.requestQueue = new ConcurrentLinkedQueue<GenomeRequest>();
+        this.requestQueue = new ConcurrentLinkedQueue<IntervalRequest>();
         con = ProjectConnector.getInstance().getConnection();
         requestCounter = 0;
 
@@ -55,11 +55,11 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
     }
 
     @Override
-    public void addRequest(GenomeRequest request) {
+    public void addRequest(IntervalRequest request) {
         requestQueue.add(request);
     }
 
-    private PersistantCoverage loadCoverage(GenomeRequest request) {
+    private PersistantCoverage loadCoverage(IntervalRequest request) {
         int from = request.getFrom();
         int to = request.getTo();
 
@@ -115,7 +115,7 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
      * @param request the coverage request to carry out
      * @return the best match coverage of an interval of a certain track.
      */
-    private PersistantCoverage loadCoverageBest(GenomeRequest request) {
+    private PersistantCoverage loadCoverageBest(IntervalRequest request) {
         int from = request.getFrom();
         int to = request.getTo();
 
@@ -146,8 +146,12 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
         return cov;
     }
     
-    
-    private PersistantCoverage loadCoverage2(GenomeRequest request) {
+    /**
+     * Loads the coverage for a double track viewer, not combining the coverage.
+     * @param request the request to carry out
+     * @return 
+     */
+    private PersistantCoverage loadCoverage2(IntervalRequest request) {
         int from = request.getFrom();
         int to = request.getTo();
 
@@ -162,8 +166,8 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
             fetch2.setInt(1, from);
             fetch2.setInt(2, to);
             fetch2.setLong(3, trackID2);
-            ResultSet rs2 = fetch2.executeQuery();
             ResultSet rs = fetch.executeQuery();
+            ResultSet rs2 = fetch2.executeQuery();
             //  int counter = 0;
             while (rs2.next()) {
                 int pos = rs2.getInt(FieldNames.COVERAGE_POSITION);
@@ -193,8 +197,8 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
                 cov.setCommonRevMultTrack1(pos, nRvMultTrack1);
 
             }
-            fetch2.close();
             fetch.close();
+            fetch2.close();
             rs.close();
             rs2.close();
         } catch (SQLException ex) {
@@ -208,18 +212,18 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
         
         while (!interrupted()) {
 
-            GenomeRequest request = requestQueue.poll();
+            IntervalRequest request = requestQueue.poll();
             if (request != null) {
                 if (!currentCov.coversBounds(request.getFrom(), request.getTo())) {
                     requestCounter++;
                     if (trackID2 != 0) {
                         currentCov = this.loadCoverage2(request); //at the moment we only need the complete coverage here
                     } else {
-                        if (request.getDesiredCoverage() == Properties.COMPLETE_COVERAGE) {
+                        if (request.getDesiredData() == Properties.COMPLETE_COVERAGE) {
                             currentCov = this.loadCoverage(request);
-                        } else if (request.getDesiredCoverage() == Properties.BEST_MATCH_COVERAGE) {
+                        } else if (request.getDesiredData() == Properties.BEST_MATCH_COVERAGE) {
                             currentCov = this.loadCoverageBest(request);
-                        } //else request.getDesiredCoverage() == Properties.PERFECT_COVERAGE does not exist yet, as it is not needed yet
+                        } //else request.getDesiredData() == Properties.PERFECT_COVERAGE does not exist yet, as it is not needed yet
                     }
                 }
                 request.getSender().receiveData(currentCov);

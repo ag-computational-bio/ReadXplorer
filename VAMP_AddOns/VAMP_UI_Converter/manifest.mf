@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: VAMP_UI_Converter
+OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/ui/converter/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

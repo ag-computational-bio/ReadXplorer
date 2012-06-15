@@ -9,6 +9,7 @@ import de.cebitec.vamp.databackend.SQLStatements;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedAnnotation;
@@ -21,6 +22,7 @@ import de.cebitec.vamp.parser.common.ParsedSeqPairMapping;
 import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -56,6 +58,7 @@ public class ProjectConnector {
     private String password;
     private String adapter;
     private HashMap<Integer, TrackConnector> trackConnectors;
+    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
     private HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
     private final static int ANNOTATION_BATCH_SIZE = BATCH_SIZE;
@@ -64,9 +67,9 @@ public class ProjectConnector {
     private static final int SEQPAIR_BATCH_SIZE = BATCH_SIZE;
     private static final int SEQPAIR_PIVOT_BATCH_SIZE = BATCH_SIZE + 25000;
     private final static int DIFF_BATCH_SIZE = BATCH_SIZE;
-    private final static String VARCHAR_20 = "VARCHAR(20)";
     private final static String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
     private final static String INT_UNSIGNED = "INT UNSIGNED";
+    private static final String VARCHAR400 = "VARCHAR(400)";
     
     private static final int BASE_A = 0;
     private static final int BASE_C = 1;
@@ -92,6 +95,7 @@ public class ProjectConnector {
     
     private ProjectConnector() {
         trackConnectors = new HashMap<Integer, TrackConnector>();
+        multiTrackConnectors = new HashMap<Integer, MultiTrackConnector>();
         refConnectors = new HashMap<Integer, ReferenceConnector>();
     }
 
@@ -107,6 +111,9 @@ public class ProjectConnector {
         return dbConnector;
     }
 
+    /**
+     * @return All tracks stored in the database with all their information.
+     */
     public List<PersistantTrack> getTracks() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading track data from database");
         ArrayList<PersistantTrack> tracks = new ArrayList<PersistantTrack>();
@@ -120,7 +127,9 @@ public class ProjectConnector {
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
                 int refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
-                tracks.add(new PersistantTrack(id, description, date, refGenID));
+                String filePath = rs.getString(FieldNames.TRACK_PATH);
+                int seqPairId = rs.getInt(FieldNames.TRACK_SEQUENCE_PAIR_ID);
+                tracks.add(new PersistantTrack(id, filePath, description, date, refGenID, seqPairId));
             }
 
         } catch (SQLException ex) {
@@ -154,26 +163,37 @@ public class ProjectConnector {
         }
     }
 
-    public void connect(String adapter, String hostname, String database, String user, String password) throws SQLException, JdbcSQLException {
-        if (adapter.equalsIgnoreCase("mysql")) {
-            this.adapter = adapter;
-            this.url = "jdbc:" + adapter + "://" + hostname + "/" + database;
+    /**
+     * Connects to the adapter used for the current project. Can either be a database
+     * adapter for h2 or mysql or an adapter for direct file access.
+     * @param adapter the adapter type to use for the current project
+     * @param projectLocation the project location
+     * @param hostname the hostname, if we connect to a mysql database
+     * @param user the user name, if we connect to a mysql database
+     * @param password the password, if we connect to a mysql database
+     * @throws SQLException
+     * @throws JdbcSQLException 
+     */
+    public void connect(String adapter, String projectLocation, String hostname, String user, String password) throws SQLException, JdbcSQLException {
+        this.adapter = adapter;
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
+            this.url = "jdbc:" + adapter + "://" + hostname + "/" + projectLocation;
             this.user = user;
             this.password = password;
             this.connect(url, user, password);
             this.setupMySQLDatabase();
-        } else {
-            this.adapter = adapter;
-            this.url = "jdbc:" + adapter + ":" + database + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
+        } else if (adapter.equalsIgnoreCase(Properties.ADAPTER_H2)) {
+            this.url = "jdbc:" + adapter + ":" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
             //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
 
             this.connectH2DataBase(url);
             this.setupDatabaseH2();
-
+        } else { //means: if (adapter.equalsIgnoreCase(Properties.ADAPTER_DIRECT_ACCESS)) {
+            this.connectToProject(projectLocation);
         }
-
     }
 
+    
     private void connect(String url, String user, String password) throws SQLException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to database");
         con = DriverManager.getConnection(url, user, password);
@@ -181,13 +201,21 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to database");
     }
 
+    
     private void connectH2DataBase(String url) throws SQLException, JdbcSQLException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to database");
         con = DriverManager.getConnection(url);
         con.setAutoCommit(true);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to database");
     }
+    
+    private void connectToProject(String projectLocation) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to project");
+        //TODO: write code for connecting to a project...
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to project");
+    }
 
+    
     private void setupDatabaseH2() {
 
         try {
@@ -195,6 +223,8 @@ public class ProjectConnector {
 
             con.setAutoCommit(false);
             //create tables if not exist yet
+//            con.prepareStatement(SQLStatements.SETUP_PROJECT_FOLDER).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
             
             con.prepareStatement(H2SQLStatements.SETUP_POSITIONS).executeUpdate();
@@ -258,6 +288,7 @@ public class ProjectConnector {
 
             con.setAutoCommit(false);
             //create tables if not exist yet
+//            con.prepareStatement(SQLStatements.SETUP_PROJECT_FOLDER).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_POSITIONS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_DIFFS).executeUpdate();
@@ -320,7 +351,7 @@ public class ProjectConnector {
 
         //add sequence pair id column in tracks if not existent
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_TRACKS, FieldNames.TRACK_SEQUENCE_PAIR_ID, BIGINT_UNSIGNED));
+                    FieldNames.TABLE_TRACK, FieldNames.TRACK_SEQUENCE_PAIR_ID, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
                     FieldNames.TABLE_FEATURES, FieldNames.ANNOTATION_GENE, "VARCHAR (20)"));
@@ -328,6 +359,9 @@ public class ProjectConnector {
                     FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_READ_LENGTH, INT_UNSIGNED));
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
                     FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH, INT_UNSIGNED));
+        
+        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
+                    FieldNames.TABLE_TRACK, FieldNames.TRACK_PATH, VARCHAR400));
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
@@ -437,6 +471,33 @@ public class ProjectConnector {
         this.enableDomainIndices(MySQLStatements.ENABLE_ANNOTATION_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done enabling reference data domain indexing");
     }
+    
+//    /**
+//     * Stores the project folder location in the database.
+//     * @param projectFolder the path to the project folder associated to this database
+//     */
+//    public boolean storeProjectFolder(String projectFolder) {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing project folder...");
+//        
+//        try {
+//            PreparedStatement insertProjectFolder = con.prepareStatement(SQLStatements.INSERT_PROJECT_FOLDER);
+//
+//            // store project folder
+//            insertProjectFolder.setString(1, projectFolder);
+//            insertProjectFolder.execute();
+//
+//            con.commit();
+//
+//            insertProjectFolder.close();
+//
+//        } catch (SQLException ex) {
+//            this.rollbackOnError(this.getClass().getName(), ex);
+//            return false;
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting project folder"); 
+//        return true;        
+//    }
 
     private void storeGenome(ParsedReference reference) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing reference sequence data...");
@@ -538,7 +599,7 @@ public class ProjectConnector {
         try {
             con.setAutoCommit(false);
 
-            if (adapter.equalsIgnoreCase("mysql")) {
+            if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
                 this.lockReferenceDomainTables();
                 this.disableReferenceIndices();
             }
@@ -546,7 +607,7 @@ public class ProjectConnector {
             this.storeGenome(reference);
             this.storeAnnotations(reference);
 
-            if (adapter.equalsIgnoreCase("mysql")) {
+            if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
                 this.enableReferenceIndices();
                 this.unlockTables();
             }
@@ -634,6 +695,39 @@ public class ProjectConnector {
         }
     }
 
+    /**
+     * Adds a track to the database with its file path. This means, it is stored
+     * as a track for direct file access
+     * @param trackJob the track job containing the track information to store
+     */
+    public int storeDirectAccessTrack(TrackJob trackJob) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");
+        
+        int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_ID, con);
+        this.currentTrackID = ++id;
+        trackJob.setIdPersistant(this.currentTrackID);
+        
+        try {
+            PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
+
+            // store track in table
+            insertTrack.setLong(1, trackJob.getID());
+            insertTrack.setLong(2, trackJob.getRefGen().getID());
+            insertTrack.setString(3, trackJob.getDescription());
+            insertTrack.setTimestamp(4, trackJob.getTimestamp());
+            insertTrack.setString(5, trackJob.getFile().getAbsolutePath());
+            insertTrack.execute();
+            insertTrack.close();
+            
+        } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");
+        return id;
+        
+    }
+    
     private int storeTrack(ParsedTrack track, long refGenID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
         int id = -1;
@@ -647,7 +741,7 @@ public class ProjectConnector {
                 insertTrack.setLong(2, refGenID);
                 insertTrack.setString(3, track.getDescription());
                 insertTrack.setTimestamp(4, track.getTimestamp());
-                //insertTrack.setLong(5, runID);
+                insertTrack.setString(5, ""); //since the path is not stored - not a direct access track
                 insertTrack.execute();
 
                 insertTrack.close();
@@ -957,7 +1051,7 @@ public class ProjectConnector {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
 
-        if (adapter.equalsIgnoreCase("mysql")) {
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.lockTrackDomainTables();
             this.disableTrackDomainIndices();
         }
@@ -971,7 +1065,7 @@ public class ProjectConnector {
         }
         this.storePositionTable(track);
 
-        if (adapter.equalsIgnoreCase("mysql")) {
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.enableTrackDomainIndices();
             this.unlockTables();
         }
@@ -1069,11 +1163,12 @@ public class ProjectConnector {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if (!trackConnectors.containsKey(trackID)) {
-            trackConnectors.put(trackID, new TrackConnector(track));
+            trackConnectors.put(trackID, new TrackConnector(track, adapter));
         }
         return trackConnectors.get(trackID);
     }
 
+    
     public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) {
         // makes sure the track id is not already used
         int id = 9999;
@@ -1081,8 +1176,30 @@ public class ProjectConnector {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-        trackConnectors.put(id, new TrackConnector(id, tracks, combineTracks));
+        trackConnectors.put(id, new TrackConnector(id, tracks, adapter, combineTracks));
         return trackConnectors.get(id);
+    }
+    
+
+    public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) {
+        // only return new object, if no suitable connector was created before
+        int trackID = track.getId();
+        if (!multiTrackConnectors.containsKey(trackID)) {
+            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
+        }
+        return multiTrackConnectors.get(trackID);
+    }
+    
+    
+    public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) {
+        // makes sure the track id is not already used
+        int id = 9999;
+        for (PersistantTrack track : tracks) {
+            id += track.getId();
+        }
+        // only return new object, if no suitable connector was created before
+        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
+        return multiTrackConnectors.get(id);
     }
     
     /**
@@ -1092,6 +1209,16 @@ public class ProjectConnector {
     public void removeTrackConnector(int trackId){
         if (trackConnectors.containsKey(trackId)){
             trackConnectors.remove(trackId);
+        }
+    }
+    
+    /**
+     * Removes the multi track connector for the given trackId.
+     * @param trackId track id of the multi track connector to remove
+     */
+    public void removeMultiTrackConnector(int trackId){
+        if (multiTrackConnectors.containsKey(trackId)){
+            multiTrackConnectors.remove(trackId);
         }
     }
 
@@ -1115,17 +1242,38 @@ public class ProjectConnector {
     public Connection getConnection() {
         return con;
     }
+    
+//    /**
+//     * Fetches the project folder associated to this project. Not every project
+//     * needs to have a project folder. If everything is imported into the database
+//     * this folder is never set.
+//     * @return the project folder associated to this project or an empty string,
+//     * if it was not set yet.
+//     */
+//    public String getProjectFolder() {
+//        
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading project folder from database");
+//        String projectFolder = "";
+//        try {
+//            PreparedStatement fetchProjectFolder = con.prepareStatement(SQLStatements.FETCH_PROJECT_FOLDER);
+//            ResultSet results = fetchProjectFolder.executeQuery();
+//            if (results.next()) {
+//                projectFolder = results.getString(FieldNames.PROJECT_FOLDER_PATH);
+//            }
+//        } catch (SQLException e) {
+//            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, e);
+//        }
+//        
+//        return projectFolder;
+//    }
 
     
     public List<PersistantReference> getGenomes() throws OutOfMemoryError {
-
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
         ArrayList<PersistantReference> refGens = new ArrayList<PersistantReference>();
 
         try {
-            PreparedStatement fetch;
-
-            fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES);
 
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
@@ -1253,7 +1401,7 @@ public class ProjectConnector {
     public void addSeqPairData(ParsedSeqPairContainer seqPairData) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing sequence pair data for track data");
 
-        if (adapter.equalsIgnoreCase("mysql")) {
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.lockSeqPairDomainTables();
             this.disableSeqPairDomainIndices();
         }
@@ -1261,7 +1409,7 @@ public class ProjectConnector {
         this.storeSeqPairTrackStatistics(seqPairData);
         this.storeSeqPairData(seqPairData);
 
-        if (adapter.equalsIgnoreCase("mysql")) {
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.enableSeqPairDomainIndices();
             this.unlockTables();
         }
@@ -1732,6 +1880,13 @@ public class ProjectConnector {
         }
 
         return snps;
+    }
+    
+    /**
+     * @return The database adapter string for this project
+     */
+    public String getAdapter() {
+        return this.adapter;
     }
     
 }

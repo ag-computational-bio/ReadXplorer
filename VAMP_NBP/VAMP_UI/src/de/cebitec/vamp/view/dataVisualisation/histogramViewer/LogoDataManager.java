@@ -9,98 +9,110 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Manager for all diffs in a specific interval defined by absStart and width.
+ * After setting the coverage for each position and adding all diffs and gaps,
+ * it can return the count of each DNA base or gap for each position in the
+ * interval.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class LogoDataManager {
 
-    private static int NUM_OF_BASE_TYPES = 7;
-    private static int HEIGHT = 14;
-    private static int MATCH = 0;
-    private static int A = 1;
-    private static int C = 2;
-    private static int G = 3;
-    private static int T = 4;
-    private static int N = 5;
-    private static int READGAP = 6;
-
-    private Integer[][] counts;
+    private static final int NO_BASE_TYPES = 7;
+    private static final int NO_BASE_FIELDS = NO_BASE_TYPES * 2;
+    private static final int MATCH = 0;
+    private static final int A = 1;
+    private static final int C = 2;
+    private static final int G = 3;
+    private static final int T = 4;
+    private static final int N = 5;
+    private static final int READGAP = 6;
+    
+    private Integer[][] counts; //array for the positions in the interval and all 7 base types (fwd and rev = 14)
     private int absStart;
     private int stop;
     private int width;
     private int upperCutoff;
     private int maxFoundCoverage;
 
-    public LogoDataManager(int absStart, int width){
+    /**
+     * Manager for all diffs in a specific interval defined by absStart and
+     * width. After setting the coverage for each position and adding all diffs
+     * and gaps, it can return the count of each DNA base or gap for each
+     * position in the interval.
+     * @param absStart start position of the currently viewed interval
+     * @param width length of the currently viewed interval
+     */
+    public LogoDataManager(int absStart, int width) {
         this.absStart = absStart;
         this.stop = absStart + width - 1;
         this.width = width;
 
-        if(this.width < 1){
+        if (this.width < 1) {
             this.width = 1;
             this.stop = absStart;
         }
         this.upperCutoff = this.stop;
         this.maxFoundCoverage = 0;
 
-        counts = new Integer[this.width][HEIGHT];
-        for(int i = 0; i < width; i++){
-            for(int j = 0; j<HEIGHT; j++){
+        counts = new Integer[this.width][NO_BASE_FIELDS];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < NO_BASE_FIELDS; j++) {
                 counts[i][j] = 0;
             }
         }
-
     }
 
-    public int getNumOfMatchesAt(int position, boolean forwardStrand){
-        int row = MATCH;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
-    }
-
-    public int getNumOfAAt(int position, boolean forwardStrand){
-        int row = A;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
-    }
-
-    public int getNumOfCAt(int position, boolean forwardStrand){
-        int row = C;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
-    }
-
-    public int getNumOfGAt(int position, boolean forwardStrand){
-        int row = G;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
-    }
-
-    public int getNumOfTAt(int position, boolean forwardStrand){
-        int row = T;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
-    }
     
-    public int getNumOfNAt(int position, boolean forwardStrand){
+    public int getNumOfMatchesAt(int position, boolean forwardStrand) {
+        int row = MATCH;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
+        }
+        position -= absStart;
+        return counts[position][row];
+    }
+
+    public int getNumOfAAt(int position, boolean forwardStrand) {
+        int row = A;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
+        }
+        position -= absStart;
+        return counts[position][row];
+    }
+
+    public int getNumOfCAt(int position, boolean forwardStrand) {
+        int row = C;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
+        }
+        position -= absStart;
+        return counts[position][row];
+    }
+
+    public int getNumOfGAt(int position, boolean forwardStrand) {
+        int row = G;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
+        }
+        position -= absStart;
+        return counts[position][row];
+    }
+
+    public int getNumOfTAt(int position, boolean forwardStrand) {
+        int row = T;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
+        }
+        position -= absStart;
+        return counts[position][row];
+    }
+
+    public int getNumOfNAt(int position, boolean forwardStrand) {
         int row = N;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
         }
         position -= absStart;
         return counts[position][row];
@@ -108,53 +120,52 @@ public class LogoDataManager {
 
     public int getNumOfReadGapsAt(int position, boolean forwardStrand) {
         int row = READGAP;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
         }
         position -= absStart;
         return counts[position][row];
     }
 
-    //sets the coverage value for matching base to the refernce genome
-    public void setCoverageAt(int position, int value, boolean forwardStrand){
+    /**
+     * Sets the coverage value for a matching base to the reference genome.
+     * @param position position whose coverage will be stored now
+     * @param value match coverage value to store
+     * @param forwardStrand true, if this is a coverage value for the fwd strand
+     */
+    public void setCoverageAt(int position, int value, boolean forwardStrand) {
         int row = MATCH;
-        if(!forwardStrand){
-            row += NUM_OF_BASE_TYPES;
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
         }
         position -= absStart;
         maxFoundCoverage = (value > maxFoundCoverage ? value : maxFoundCoverage);
         counts[position][row] = value;
     }
 
-    //if a base differs from the reference genome
     /**
-     * 
-     * @param diff
-     * @param position
+     * If a base differs from the reference genome, add it to this manager.
+     * @param diff diff to add
+     * @param position position at which the diff occurs
      */
-    public void addExtendedPersistantDiff(PersistantDiff diff, int position){
+    public void addExtendedPersistantDiff(PersistantDiff diff, int position) {
         char base = diff.getBase();
         int row = 0;
-        if(base == 'A'){
-            row = A;
-        } else if(base == 'C'){
-            row = C;
-        } else if(base == 'G'){
-            row = G;
-        } else if(base == 'T'){
-            row = T;
-        } else if(base == 'N'){
-            row = N;
-        } else if(base == '_'){
-            row = READGAP;
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
+        switch (base) {
+            case 'A': row = A; break;
+            case 'C': row = C; break;
+            case 'G': row = G; break;
+            case 'T': row = T; break;
+            case 'N': row = N; break;
+            case '_': row = READGAP; break; 
+            default:
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
         }
 
         int column = MATCH;
-        if(!diff.isIsForwardStrand()){
-            row += NUM_OF_BASE_TYPES;
-            column += NUM_OF_BASE_TYPES;
+        if (!diff.isForwardStrand()) {
+            row += NO_BASE_TYPES;
+            column += NO_BASE_TYPES;
         }
 
         int count = diff.getCount();
@@ -168,14 +179,14 @@ public class LogoDataManager {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("width: ").append(width).append(", height: ").append(HEIGHT).append("\n");
+        sb.append("width: ").append(width).append(", height: ").append(NO_BASE_FIELDS).append("\n");
 
-        for(int i = 0; i < width; i++){
+        for (int i = 0; i < width; i++) {
             int pos = absStart + i;
             sb.append("pos: ").append(pos).append("\t");
-            for(int j = 0; j < HEIGHT; j++){
+            for (int j = 0; j < NO_BASE_FIELDS; j++) {
                 sb.append(counts[i][j]).append("\t");
             }
             sb.append("\n");
@@ -184,48 +195,50 @@ public class LogoDataManager {
         return sb.toString();
     }
 
-    void addGaps(Collection<PersistantReferenceGap> gaps, GenomeGapManager gapManager) {
-        for(Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext(); ){
+    public void addGaps(Collection<PersistantReferenceGap> gaps, GenomeGapManager gapManager) {
+        for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
             PersistantReferenceGap gap = it.next();
-            char base = gap.getBase();
             int origPos = gap.getPosition();
-            int count = gap.getCount();
-            int shiftedPos = origPos + gapManager.getNumOfGapsSmaller(origPos);
-            shiftedPos += gap.getOrder();
+            
+            if (origPos > this.absStart && origPos < this.stop) {
 
-            // gaps have been loaded with original bounds
-            // so, some of them may be outside of the intervall, this LogoDataManager
-            // manages. Skip those gaps
-            if(shiftedPos > upperCutoff){
-                continue;
+                char base = gap.getBase();
+                int count = gap.getCount();
+                int shiftedPos = origPos + gapManager.getNumOfGapsSmaller(origPos);
+                shiftedPos += gap.getOrder();
+
+                // gaps have been loaded with original bounds
+                // so, some of them may be outside of the interval, this LogoDataManager
+                // manages. Skip those gaps
+                if (shiftedPos > upperCutoff) {
+                    continue;
+                }
+                shiftedPos -= absStart;
+
+                int row = 0;
+                switch (base) {
+                    case 'A': row = A; break;
+                    case 'C': row = C; break;
+                    case 'G': row = G; break;
+                    case 'T': row = T; break;
+                    case 'N': row = N; break;
+                    default:
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
+                }
+
+                if (!gap.isForwardStrand()) {
+                    row += NO_BASE_TYPES;
+                }
+
+                counts[shiftedPos][row] = counts[shiftedPos][row] + count;
+            
+            } else if (origPos > this.stop) {
+                break;
             }
-            shiftedPos -= absStart;
-
-            int row = 0;
-            if(base == 'A'){
-                row = A;
-            } else if(base == 'C'){
-                row = C;
-            } else if(base == 'G'){
-                row = G;
-            } else if(base == 'T'){
-                row = T;
-            } else if(base == 'N'){
-                row = N;
-            } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
-            }
-
-            if(!gap.isForwardStrand()){
-                row += NUM_OF_BASE_TYPES;
-            }
-
-            counts[shiftedPos][row] = counts[shiftedPos][row] + count;
         }
     }
 
     public int getMaxFoundCoverage() {
         return maxFoundCoverage;
     }
-
 }

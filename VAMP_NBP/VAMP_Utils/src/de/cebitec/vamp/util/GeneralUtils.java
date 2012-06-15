@@ -7,6 +7,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
@@ -53,5 +54,49 @@ public class GeneralUtils {
             }
         }
         return result;
+    }
+    
+    /**
+     * Cecks if the input string is a valid number.
+     * @param input input string to check
+     * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
+     */
+    public static boolean isValidNumberInput(String input) {
+        try {
+            int tmp = Integer.parseInt(input);
+            if (tmp > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Calculates the given time as 3 entries in an array list:
+     * 0 = hours, 1 = minutes, 2 = seconds.
+     * @param timeInMillis given time in milliseconds
+     * @return time as hours, minutes and seconds
+     */
+    public static ArrayList<Integer> getTime(long timeInMillis) {
+        ArrayList<Integer> timeList = new ArrayList<Integer>();
+        int remdr = (int) (timeInMillis % (24L * 60 * 60 * 1000));
+
+        final int hours = remdr / (60 * 60 * 1000);
+
+        remdr %= 60 * 60 * 1000;
+
+        final int minutes = remdr / (60 * 1000);
+
+        remdr %= 60 * 1000;
+
+        final int seconds = remdr / 1000;
+        timeList.add(0, hours);
+        timeList.add(1, minutes);
+        timeList.add(2, seconds);
+
+        return timeList;
     }
 }

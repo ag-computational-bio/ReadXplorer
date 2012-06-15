@@ -22,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
+ * Panel displaying the options for importing new references into VAMP.
  *
  * @author jwinneba
  */
@@ -33,7 +34,7 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
             new BioJavaParser(BioJavaParser.GENBANK), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
-    /** Creates new form NewReferenceDialogPanel */
+    /** Panel displaying the options for importing new references into VAMP. */
     public NewReferenceDialogPanel() {
         initComponents();
         currentParser = availableParsers[0];
@@ -83,6 +84,9 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
         descriptionField = new javax.swing.JTextField();
         nameLabel = new javax.swing.JLabel();
         nameField = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        descriptionLabel1 = new javax.swing.JLabel();
 
         filetypeBox.setRenderer(new DefaultListCellRenderer(){
             @Override
@@ -119,6 +123,17 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
 
         nameLabel.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.nameLabel.text")); // NOI18N
 
+        jTextArea1.setColumns(20);
+        jTextArea1.setEditable(false);
+        jTextArea1.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(5);
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.jTextArea1.text")); // NOI18N
+        jTextArea1.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        descriptionLabel1.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.descriptionLabel1.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -126,6 +141,7 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(descriptionLabel1)
                     .addComponent(filetypeLabel)
                     .addComponent(fileLabel)
                     .addComponent(descriptionLabel)
@@ -136,9 +152,10 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
                         .addComponent(fileField, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
                         .addGap(22, 22, 22)
                         .addComponent(fileChooserButton))
-                    .addComponent(filetypeBox, 0, 274, Short.MAX_VALUE)
-                    .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
+                    .addComponent(filetypeBox, 0, 275, Short.MAX_VALUE)
+                    .addComponent(nameField, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -161,6 +178,10 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(descriptionLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(descriptionLabel1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -214,11 +235,14 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField descriptionField;
     private javax.swing.JLabel descriptionLabel;
+    private javax.swing.JLabel descriptionLabel1;
     private javax.swing.JButton fileChooserButton;
     private javax.swing.JTextField fileField;
     private javax.swing.JLabel fileLabel;
     private javax.swing.JComboBox filetypeBox;
     private javax.swing.JLabel filetypeLabel;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     // End of variables declaration//GEN-END:variables

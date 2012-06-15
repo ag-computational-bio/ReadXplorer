@@ -1,11 +1,10 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
+ * Data structure for storing a mapping on a reference genome.
+ * 
  * @author ddoppmeier, rhilker
  */
 public class PersistantMapping implements PersistantObject {
@@ -15,23 +14,35 @@ public class PersistantMapping implements PersistantObject {
     private int trackId;
     private int stop;
     private byte strand;
-    private Map<Integer, PersistantDiff> diffs;
     private int count;
+    private Map<Integer, PersistantDiff> diffs;
     private TreeMap<Integer, TreeSet<PersistantReferenceGap>> gaps;
-    private int errors;
+    private int differences;
     private int sequenceID;
     private boolean isBestMatch;
 
+    /**
+     * Data structure for storing a mapping on a reference genome.
+     * @param id
+     * @param start
+     * @param stop
+     * @param trackId
+     * @param direction
+     * @param count
+     * @param errors
+     * @param sequenceID
+     * @param isBestMapping 
+     */
     public PersistantMapping(int id, int start, int stop, int trackId, byte direction, int count, int errors, int sequenceID, boolean isBestMapping){
         this.id = id;
         this.start = start;
         this.stop = stop;
         this.count = count;
         this.trackId = trackId;
-        strand = direction;
-        diffs = new HashMap<Integer, PersistantDiff>();
-        gaps = new TreeMap<Integer, TreeSet<PersistantReferenceGap>>();
-        this.errors = errors;
+        this.strand = direction;
+        this.diffs = new HashMap<Integer, PersistantDiff>();
+        this.gaps = new TreeMap<Integer, TreeSet<PersistantReferenceGap>>();
+        this.differences = errors;
         this.sequenceID = sequenceID;
         this.isBestMatch = isBestMapping;
     }
@@ -79,8 +90,19 @@ public class PersistantMapping implements PersistantObject {
         return stop;
     }
 
-    public int getErrors(){
-        return errors;
+    /**
+     * @return the number of differences of this mapping to the reference.
+     */
+    public int getDifferences(){
+        return differences;
+    }
+
+    /**
+     * Sets the number of differences of this mapping to the reference.
+     * @param differences the number of differences of this mapping to the reference
+     */
+    public void setDifferences(int differences) {
+        this.differences = differences;
     }
 
     public int getSequenceID(){
@@ -124,6 +146,6 @@ public class PersistantMapping implements PersistantObject {
 
     public void addDiff(PersistantDiff d){
         diffs.put(d.getPosition(), d);
-    }    
+    } 
 
 }

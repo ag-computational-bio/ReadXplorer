@@ -20,6 +20,10 @@ public class ParsedTrack {
     private boolean isStepwise;
     private boolean isFirstTrack;
 
+    /**
+     * Contains all data (description, mappings and coverageContainer) belonging
+     * to a track, which can be stored into a database now.
+     */
     public ParsedTrack(String description, ParsedMappingContainer mappings, CoverageContainer coverageContainer){
         this.readNameToSeqIDMap = new HashMap<String, Integer>();
         this.description = description;

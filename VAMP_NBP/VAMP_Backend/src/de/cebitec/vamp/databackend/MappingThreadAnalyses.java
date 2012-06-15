@@ -25,7 +25,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
 
     private int trackId;
     private Connection con;
-    private ConcurrentLinkedQueue<GenomeRequest> requestQueue;
+    private ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private List<PersistantMapping> currentMappings;
     private int nbRequests;
     private double requestCounter;
@@ -33,7 +33,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
     public MappingThreadAnalyses(int trackId, int nbRequests) {
         super();
         // do general stuff
-        this.requestQueue = new ConcurrentLinkedQueue<GenomeRequest>();
+        this.requestQueue = new ConcurrentLinkedQueue<IntervalRequest>();
         this.con = ProjectConnector.getInstance().getConnection();
         this.requestCounter = 0;
         this.trackId = trackId;
@@ -41,7 +41,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
     }
 
     @Override
-    public void addRequest(GenomeRequest request) {
+    public void addRequest(IntervalRequest request) {
         requestQueue.add(request);
     }
 
@@ -51,7 +51,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
      * @param request the genome request containing the requested genome interval
      * @return the list of mappings belonging to the given interval
      */
-    private List<PersistantMapping> loadMappings(GenomeRequest request) {
+    private List<PersistantMapping> loadMappings(IntervalRequest request) {
         
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
@@ -110,7 +110,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
      * @param request the genome request containing the requested mapping id interval
      * @return the list of mappings belonging to the given mapping id interval sorted by mapping start
      */
-    private List<PersistantMapping> loadMappingsById(GenomeRequest request) {
+    private List<PersistantMapping> loadMappingsById(IntervalRequest request) {
         
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
@@ -169,7 +169,7 @@ public class MappingThreadAnalyses extends Thread implements RequestThreadI {
         
         while (!interrupted()) {
 
-            GenomeRequest request = requestQueue.poll();
+            IntervalRequest request = requestQueue.poll();
             if (request != null) {
                 this.requestCounter++;
                 this.currentMappings = this.loadMappingsById(request);

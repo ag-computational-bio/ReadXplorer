@@ -6,6 +6,12 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+ /**
+ * The visual component that displays this panel. If you need to access the
+ * component from this class, just use getComponent().
+ * 
+ * @author ddoppmeier
+ */
 public class LoginWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
     /**

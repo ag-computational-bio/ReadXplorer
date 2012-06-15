@@ -21,19 +21,21 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
      * @param navigatorMax 
      * @param positionInit 
      * @param zoomInit 
+     * @param sliderMax maximal value of the zoom slider
      * @param hasZoomslider 
      * @param hasScrollbar 
      */
-    public AdjustmentPanel(int navigatorMin, int navigatorMax, int positionInit, int zoomInit, boolean hasScrollbar, boolean hasZoomslider){
+    public AdjustmentPanel(int navigatorMin, int navigatorMax, int positionInit, int zoomInit,
+            int sliderMax, boolean hasScrollbar, boolean hasZoomslider){
         super();
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        if(hasScrollbar){
+        if (hasScrollbar) {
             scrollbar = new ExtendedScroller(navigatorMin, navigatorMax, positionInit);
             this.add(scrollbar);
         }
-        if(hasZoomslider){
-            slider = new ExtendedSlider(1, 500, zoomInit);
+        if (hasZoomslider) {
+            slider = new ExtendedSlider(1, sliderMax, zoomInit);
             this.add(slider);
         }
         

@@ -9,7 +9,6 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -548,7 +547,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
             //get track name(s)
             String trackName = "track";
-            ArrayList<String> trackNames = this.trackViewer.getTrackCon().getAssociatedTrackNames();
+            List<String> trackNames = this.trackViewer.getTrackCon().getAssociatedTrackNames();
             if (!(trackNames == null) && !trackNames.isEmpty()) {
                 trackName = trackNames.get(0);
             }

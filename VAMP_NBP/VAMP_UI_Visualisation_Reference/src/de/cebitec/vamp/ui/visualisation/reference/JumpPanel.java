@@ -174,7 +174,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
         filterProperties.setBorder(javax.swing.BorderFactory.createTitledBorder("FilterProperties"));
 
-        jumpFilterLabel.setText("Filter:");
+        jumpFilterLabel.setText("RegEx Filter:");
 
         filterTextfield.setMinimumSize(jumpTextfield.getPreferredSize());
 
@@ -232,11 +232,11 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(radioAnnotationButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioGene)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioProduct)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioEC)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioGene)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -262,7 +262,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         featureGroundPanelLayout.setVerticalGroup(
@@ -302,7 +302,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addComponent(searchPatternButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jumpTextfield)
+                    .addComponent(jumpTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
                     .addComponent(searchPatternField))
                 .addContainerGap())
             .addComponent(featureGroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -364,7 +364,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private void searchPatternButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternButtonActionPerformed
 
         String pattern = this.searchPatternField.getText().toLowerCase();
-        if (this.isValidSearchInput(pattern)) {
+//        if (SequenceUtils.isValidDnaString(pattern)) {
             int newPos;
 
             if (this.searchPattern != null && this.searchPattern.equals(pattern)) {
@@ -378,9 +378,9 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 this.boundsManager.navigatorBarUpdated(newPos);
             }
 
-        } else {
-            JOptionPane.showMessageDialog(this, "Please enter a valid DNA string!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-        }
+//        } else {
+//            JOptionPane.showMessageDialog(this, "Please enter a valid DNA string!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+//        }
     }//GEN-LAST:event_searchPatternButtonActionPerformed
 
 private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioGeneActionPerformed
@@ -405,14 +405,6 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         }
     }
 
-    /**
-     * Cecks if the input string is a valid DNA string.
-     * @param s input string to check
-     * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
-     */
-    private boolean isValidSearchInput(String s) {
-        return s.matches("[acgtn]+");
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable annotationTable;
     private javax.swing.ButtonGroup buttonGroup1;

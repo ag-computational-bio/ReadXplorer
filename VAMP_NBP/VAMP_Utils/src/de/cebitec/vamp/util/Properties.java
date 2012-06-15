@@ -1,21 +1,29 @@
 package de.cebitec.vamp.util;
 
 /**
- * @author Rolf Hilker
- *
  * Contains non language specific global constants.
+ * 
+ * @author Rolf Hilker
  */
 public class Properties {
 
+    // different adapter types for a project and or database
+    public static final String ADAPTER_MYSQL = "mysql";
+    public static final String ADAPTER_H2 = "h2";
+    public static final String ADAPTER_DIRECT_ACCESS = "direct";
+    
+    // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";
     public static final String STANDARD_CODE_INDEX = "1";
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
 
+    // VAMP file chooser properties
     public static final String VAMP_FILECHOOSER_DIRECTORY = "VampFileChooser.Directory";
     public static final String VAMP_DATABASE_DIRECTORY = "Vamp.Database.Directory";
     
+    // Sequence pair properties
     public static final byte TYPE_PERFECT_PAIR = 0;
     public static final byte TYPE_DIST_LARGE_PAIR = 1;
     public static final byte TYPE_DIST_SMALL_PAIR = 2;
@@ -35,8 +43,11 @@ public class Properties {
     public static final byte SEQ_PAIRS = 1;
     public static final byte SINGLE_MAPPINGS = 2;
     
+    /** Perfect coverage value (1).*/
     public static final byte PERFECT_COVERAGE = 1;
+    /** Best match coverage value (2). */
     public static final byte BEST_MATCH_COVERAGE = 2;
+    /** Common match coverage value (3). */
     public static final byte COMPLETE_COVERAGE = 3;
     
     public static final byte COVERAGE_INCREASE_DISTRIBUTION = 1;

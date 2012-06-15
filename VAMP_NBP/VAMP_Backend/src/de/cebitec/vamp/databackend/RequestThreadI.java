@@ -12,6 +12,6 @@ public interface RequestThreadI {
      * Adds a request to the request queue.
      * @param request the request to add to the queue.
      */
-    public void addRequest(GenomeRequest request);
+    public void addRequest(IntervalRequest request);
     
 }

@@ -7,33 +7,39 @@ import java.sql.Timestamp;
 /**
  * A track job is a container for all necessary data for a track to be parsed.
  *
- * @author jstraube
+ * @author jstraube, rhilker
  */
 public class TrackJob implements Job {
 
+    private boolean isDbUsed;
     private File file;
     private String description;
     private Timestamp timestamp;
     private MappingParserI parser;
     private int trackID;
     private ReferenceJob refGen;
-    private boolean stepwise=false;
-    private boolean firstJob=false;
+    private boolean stepwise = false;
+    private boolean firstJob = false;
     private int start;
     private int stop;
     private int stepSize;
-    private boolean isSorted=true;
+    private boolean isSorted = true;
+    
     /**
      * Creates a new track job along with its data.
      * @param trackID id of the track to create
+     * @param isDbUsed true, if the track should be stored into the database and false, if 
+     * direct file access is desired
      * @param file the file to be parsed as track
      * @param description the description of the track
      * @param refGen the ReferenceJob with all information about the reference
      * @param parser the parser to use for parsing
      * @param timestamp the timestamp when it was created
      */
-    public TrackJob(int trackID, File file, String description, ReferenceJob refGen, MappingParserI parser, Timestamp timestamp) {
+    public TrackJob(int trackID, boolean isDbUsed, File file, String description,
+            ReferenceJob refGen, MappingParserI parser, Timestamp timestamp) {
         this.trackID = trackID;
+        this.isDbUsed = isDbUsed;
         this.file = file;
         this.description = description;
         this.timestamp = timestamp;
@@ -41,9 +47,12 @@ public class TrackJob implements Job {
         this.refGen = refGen;
     }
 
-    public TrackJob(int trackID, File file, String description, ReferenceJob refGen,
-            MappingParserI parser, Timestamp timestamp, int distance, int deviation) {
-        this(trackID, file, description, refGen, parser, timestamp);
+    /**
+     * @return true, if the track should be stored into the database and false, if 
+     * direct file access is desired
+     */
+    public boolean isDbUsed() {
+        return isDbUsed;
     }
 
     public MappingParserI getParser() {
@@ -92,7 +101,7 @@ public class TrackJob implements Job {
         return description + ":" + timestamp;
     }
 
-    public void setPersistant(int trackID) {
+    public void setIdPersistant(int trackID) {
         this.trackID = trackID;
     }
     
@@ -104,18 +113,30 @@ public class TrackJob implements Job {
         this.stepwise = isStepwise;
     }
 
+    /**
+     * @return the start position in the genome, if this is a stepwise parser.
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * @param start the start position in the genome, if this is a stepwise parser.
+     */
     public void setStart(int start) {
         this.start = start;
     }
 
+    /**
+     * @return the stop position in the genome, if this is a stepwise parser.
+     */
     public int getStop() {
         return stop;
     }
 
+    /**
+     * @param stop the stop position in the genome, if this is a stepwise parser.
+     */
     public void setStop(int stop) {
         this.stop = stop;
     }

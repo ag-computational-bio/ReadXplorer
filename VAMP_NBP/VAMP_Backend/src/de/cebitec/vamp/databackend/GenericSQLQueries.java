@@ -81,15 +81,16 @@ public class GenericSQLQueries {
     
 
     /**
-     * Adds a new column with a varchar 20 value to the table.
+     * Adds a new column to the table.
      * @param table table
      * @param column column to add
+     * @param type the type of the column
      * @return SQL command
      */
-    public static String genAddColumnString(String table, String column,String type) {
+    public static String genAddColumnString(String table, String column, String type) {
         return "ALTER TABLE "
                 + table
                 + " ADD COLUMN "
-                + column + " "+type;
+                + column + " " + type;
     }
 }

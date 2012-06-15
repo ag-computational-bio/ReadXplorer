@@ -265,10 +265,6 @@
                 <binary-origin>release/modules/ext/jxl.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/sam-1.43.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/sam-1.43.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
             </class-path-extension>
@@ -311,6 +307,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/sam-1.69.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/sam-1.69.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

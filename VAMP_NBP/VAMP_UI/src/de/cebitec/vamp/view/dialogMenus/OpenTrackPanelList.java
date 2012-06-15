@@ -17,10 +17,10 @@ import org.japura.gui.model.DefaultListCheckModel;
 import org.japura.gui.model.ListCheckModel;
 
 /**
- * @author rhilker
- * 
  * A JPanel which contains a list of tracks and displays them as a list of checkboxes and
  * is capable of returning the selected PersistantTracks.
+ * 
+ * @author rhilker
  */
 public class OpenTrackPanelList extends javax.swing.JPanel {
 
@@ -92,6 +92,9 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
     }
 
     
+    /**
+     * @return The tracks selected in the selection list.
+     */
     public List<PersistantTrack> getSelectedTracks() {
         List<PersistantTrack> selectedTracks = new ArrayList<PersistantTrack>();
 

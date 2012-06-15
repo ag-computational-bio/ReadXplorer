@@ -1,17 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
+import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.databackend.GenomeRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
-import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
-import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
+//import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -23,11 +19,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
@@ -35,6 +27,8 @@ import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
 /**
+ * The histogram viewer. Showing the match an deviating coverage for each position
+ * in a reference genome as a histogram.
  *
  * @author ddoppmeier
  */
@@ -49,19 +43,20 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private int lowerBound;
     private int upperBound;
     private int width;
-    private Collection<PersistantReferenceGap> gaps;
-    private Collection<PersistantDiff> diffs;
+    private List<PersistantReferenceGap> gaps;
+    private List<PersistantDiff> diffs;
     private LogoDataManager logoData;
     private PersistantCoverage cov;
     private boolean dataLoaded;
     private boolean isColored = false;
-    private ZoomLevelExcusePanel zoomExcuse;
+//    private ZoomLevelExcusePanel zoomExcuse;
     // maximum coverage found in interval, regarding both strands
     private int maxCoverage;
     private List<Integer> scaleValues;
     private double pxPerCoverageUnit;
+
     private enum Bases {
-        m,a, c, t, g, n,_,
+        m, a, c, t, g, n, _,
     }
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
@@ -71,12 +66,13 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         this.setInDrawingMode(false);
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
-        scaleValues = new ArrayList<Integer>();
-        zoomExcuse = new ZoomLevelExcusePanel();
+        this.scaleValues = new ArrayList<Integer>();
+//        zoomExcuse = new ZoomLevelExcusePanel();
 
         logoData = new LogoDataManager(lowerBound, upperBound);
         gapManager = new GenomeGapManager(lowerBound, upperBound);
         gaps = new ArrayList<PersistantReferenceGap>();
+        diffs = new ArrayList<PersistantDiff>();
         cov = new PersistantCoverage(lowerBound, lowerBound);
         this.showSequenceBar(true, true);
     }
@@ -188,15 +184,34 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"right\">" + String.valueOf(value) + "</td><td align=\"right\"></td></tr>";
     }
 
+    /**
+     * Requests the data to show from the DB.
+     */
+    private void requestData() {
+        if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
+            trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
+            this.setupData();
+        } else {
+            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            trackConnector.addCoverageRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
+        }
+    }
+
     @Override
-    public synchronized void receiveData(Object coverageData) {
-        if (coverageData instanceof PersistantCoverage) {
-            final PersistantCoverage coverage = (PersistantCoverage) coverageData;
+    public synchronized void receiveData(Object data) {
+        if (data instanceof CoverageAndDiffResultPersistant) {
+            final CoverageAndDiffResultPersistant resultData = (CoverageAndDiffResultPersistant) data;
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    cov = coverage;
+                    cov = resultData.getCoverage();
+                    if (resultData.isDiffsAndGapsUsed()) {
+                        diffs = resultData.getDiffs();
+                        gaps = resultData.getGaps();
+                        Collections.sort(diffs);
+                        Collections.sort(gaps);
+                    }
                     setupData();
                     repaint();
                 }
@@ -210,17 +225,10 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private synchronized void setupData() {
         gapManager = new GenomeGapManager(lowerBound, upperBound);
 
-        try {
-            gaps = trackConnector.getExtendedReferenceGapsForIntervalOrderedByMappingID(lowerBound, upperBound);
-        } catch (Exception ex) {
-            this.io.getOut().println(NbBundle.getBundle(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.gap.error")+ ": " + ex));
-            gaps = new ArrayList<PersistantReferenceGap>();
-        }
         this.fillGapManager();
         this.getSequenceBar().setGenomeGapManager(gapManager);
         this.adjustAbsStop();
 
-        this.diffs = trackConnector.getDiffsForInterval(lowerBound, upperBound);
         this.setUpLogoData();
         if (logoData.getMaxFoundCoverage() != 0) {
             this.createLogoBlocks();
@@ -228,15 +236,6 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         }
         this.dataLoaded = true;
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
-
-    private void requestData() {
-        if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
-            this.setupData();
-        } else {
-            setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            trackConnector.addCoverageRequest(new GenomeRequest(lowerBound, upperBound, this, Properties.COMPLETE_COVERAGE));
-        }
     }
 
     @Override
@@ -524,11 +523,15 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
         }
 
-        // store diff information from the refernce genome in logo data
+        // store diff information from the reference genome in logo data
         for (Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext();) {
             PersistantDiff d = it.next();
             int position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
-            logoData.addExtendedPersistantDiff(d, position);
+            if (position > lowerBound && position < upperBound) {
+                logoData.addExtendedPersistantDiff(d, position);
+            } else if (position > upperBound) {
+                break; //TODO: store last index to speed up clac
+            }
         }
 
         // store gap information in logo data

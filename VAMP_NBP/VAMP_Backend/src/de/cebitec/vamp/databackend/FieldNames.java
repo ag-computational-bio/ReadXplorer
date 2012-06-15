@@ -13,13 +13,14 @@ public class FieldNames {
     }
 
     // names for various database tables
-    public final static String TABLE_REF_GEN = "REFERENCE";
+    public static final String TABLE_PROJECT_FOLDER = "PROJECT_FOLDER";
+    public final static String TABLE_REFERENCE = "REFERENCE";
     public final static String TABLE_DIFF = "DIFF";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
     public static final String TABLE_SUBFEATURES = "SUBFEATURES";
-    public final static String TABLE_MAPPINGS = "MAPPING";
-    public final static String TABLE_TRACKS = "TRACK";
+    public final static String TABLE_MAPPING = "MAPPING";
+    public final static String TABLE_TRACK = "TRACK";
     public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
     public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
@@ -31,6 +32,9 @@ public class FieldNames {
     
     ////////////////////////  tables fields  //////////////////////////////// 
         
+    // project folder field
+//    public static final String PROJECT_FOLDER_PATH = "PATH";
+    
     // position table fields
     public final static String POSITIONS_SNP_ID = "ID";
     public final static String POSITIONS_TRACK_ID = "TRACK_ID";
@@ -135,6 +139,7 @@ public class FieldNames {
     public static final String TRACK_SEQUENCE_PAIR_ID = "SEQUENCE_PAIR_ID";
     public final static String TRACK_DESCRIPTION = "DESCRIPTION";
     public final static String TRACK_TIMESTAMP = "CREATIONTIME";
+    public final static String TRACK_PATH = "PATH";
     
     //paired data table fields (mate pairs and paired end data)
     public static final String SEQ_PAIR_ID = "ID";

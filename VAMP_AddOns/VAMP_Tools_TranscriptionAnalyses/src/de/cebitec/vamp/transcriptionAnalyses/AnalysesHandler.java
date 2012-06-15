@@ -2,7 +2,7 @@ package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.JobI;
 import de.cebitec.vamp.databackend.CoverageThreadAnalyses;
-import de.cebitec.vamp.databackend.GenomeRequest;
+import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.MappingThreadAnalyses;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -101,7 +101,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
             coverageThread.start();
             while (to < this.genomeSize) {
-                GenomeRequest coverageRequest = new GenomeRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
+                IntervalRequest coverageRequest = new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
                 coverageThread.addRequest(coverageRequest);
 
                 from = to + 1;
@@ -110,7 +110,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
             //calc last interval until genomeSize
             to = this.genomeSize;
-            GenomeRequest coverageRequest = new GenomeRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
+            IntervalRequest coverageRequest = new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
             coverageThread.addRequest(coverageRequest);
         } else
         
@@ -141,7 +141,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             mappingThread.start();
 
             while (to < numInterestingMappings) {
-                GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
+                IntervalRequest mappingRequest = new IntervalRequest(from, to, this);
                 mappingThread.addRequest(mappingRequest);
 
                 from = to + 1;
@@ -150,7 +150,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
             //calc last interval until genomeSize
             to = numInterestingMappings;
-            GenomeRequest mappingRequest = new GenomeRequest(from, to, this);
+            IntervalRequest mappingRequest = new IntervalRequest(from, to, this);
             mappingThread.addRequest(mappingRequest);
         } else {
             this.progressHandle.finish();

@@ -137,12 +137,6 @@ public class JokParser implements MappingParserI {
 //                            filepath, lineno, readSeq, refSeq));
 //                    continue;
 //                }
-                if (errors < 0 || errors > readSeq.length()) {
-                    this.sendMsg(NbBundle.getMessage(JokParser.class,
-                            "Parser.checkMapping.ErrorRead",
-                            errors, filepath, lineno));
-                    continue;
-                }
 //                    if (!readnameToSequenceID.containsKey(readname)) {
 //                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
 //                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
@@ -154,12 +148,20 @@ public class JokParser implements MappingParserI {
                     // Reads with an error already skip this part because of "continue" statements
                     //++noReads; //would be the count mappings
                     // parse read
-                    DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
+                    errors = result.getErrors();
                     //dont ask me why but we have to do it
                     if (!gaps.isEmpty() || !diffs.isEmpty()) {
                         stop -= 1;
+                    }
+             
+                    if (errors < 0 || errors > readSeq.length()) {
+                        this.sendMsg(NbBundle.getMessage(JokParser.class,
+                                "Parser.checkMapping.ErrorRead",
+                                errors, filepath, lineno));
+                        continue;
                     }
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
@@ -218,61 +220,6 @@ public class JokParser implements MappingParserI {
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Successfully"));
 
         return mappingContainer;
-    }
-
-    
-    private int getOrderForGap(int gapPos) {
-        if (!gapOrderIndex.containsKey(gapPos)) {
-            gapOrderIndex.put(gapPos, 0);
-        }
-        int order = gapOrderIndex.get(gapPos);
-
-        // increase order for next request
-        gapOrderIndex.put(gapPos, order + 1);
-
-        return order;
-    }
-
-    
-    private DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
-        List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
-        List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
-
-        int absPos;
-        gapOrderIndex.clear();
-
-        for (int i = 0, basecounter = 0; i < readSeq.length(); i++) {
-            if (readSeq.charAt(i) != refSeq.charAt(i)) {
-                absPos = start + basecounter;
-                if (refSeq.charAt(i) == '_') {
-                    // store a lower case char, if this is a gap in genome
-                    Character base = readSeq.charAt(i);
-                    base = Character.toUpperCase(base);
-                    if (direction == -1) {
-                        base = SequenceUtils.getDnaComplement(base, readSeq);
-                    }
-
-                    ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, this.getOrderForGap(absPos));
-                    gaps.add(gap);
-                    // note: do not increase position. that means that next base of read is mapped
-                    // to the same position as this gap. two subsequent gaps map to the same position!
-                } else {
-                    // store the upper case char from input file, if this is a modification in the read
-                    char c = readSeq.charAt(i);
-                    c = Character.toUpperCase(c);
-                    if (direction == -1) {
-                        c = SequenceUtils.getDnaComplement(c, readSeq);
-                    }
-                    ParsedDiff d = new ParsedDiff(absPos, c);
-                    diffs.add(d);
-                    basecounter++;
-                }
-            } else {
-                basecounter++;
-            }
-        }
-
-        return new DiffAndGapResult(diffs, gaps);
     }
 
     @Override

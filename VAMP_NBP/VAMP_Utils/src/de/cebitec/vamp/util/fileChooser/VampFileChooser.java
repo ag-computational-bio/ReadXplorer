@@ -12,8 +12,8 @@ import de.cebitec.vamp.util.Properties;
 
 /**
  * Vamps file chooser. Contains all options and values of how to open a specific
- * file chooser for saving or opening different files
- *
+ * file chooser for saving or opening different files.
+ * 
  * @author Rolf Hilker
  */
 public abstract class VampFileChooser  extends JFileChooser {
@@ -22,10 +22,23 @@ public abstract class VampFileChooser  extends JFileChooser {
     protected String fileExtension;
     protected Preferences pref;
 
+    /**
+     * Creates a new vamp file chooser.
+     * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
+     * VampFileChooser.SAVE_DIALOG for storing a file.
+     * @param fileExtension the file extension to use
+     */
     public VampFileChooser(final int option, final String fileExtension){
         this(option, fileExtension, null);
     }
 
+    /**
+     * Creates a new vamp file chooser.
+     * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
+     * VampFileChooser.SAVE_DIALOG for storing a file.
+     * @param fileExtension the file extension to use
+     * @param data the data which might be used for file choosers storing data
+     */
     public VampFileChooser(final int option, final String fileExtension, final Object data) {
         this.data = data;
         this.fileExtension = fileExtension.toLowerCase();

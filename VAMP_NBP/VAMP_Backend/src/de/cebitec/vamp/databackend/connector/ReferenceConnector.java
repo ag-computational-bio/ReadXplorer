@@ -27,10 +27,15 @@ public class ReferenceConnector {
     
     private int refGenID;
     private Connection con;
+//    private String projectFolder;
+//    private boolean isFolderSet = false;
 
     ReferenceConnector(int refGenID){
         this.refGenID = refGenID;
-        con = ProjectConnector.getInstance().getConnection();
+        ProjectConnector projectConnector = ProjectConnector.getInstance();
+        this.con = projectConnector.getConnection();
+//        this.projectFolder = projectConnector.getProjectFolder();
+//        this.isFolderSet = !this.projectFolder.isEmpty();
     }
 
     public PersistantReference getRefGen(){
@@ -177,8 +182,13 @@ public class ReferenceConnector {
         return subAnnotations;
     }
 
+    /**
+     * @return the tracks associated to this reference connector.
+     */
     public List<PersistantTrack> getAssociatedTracks() {
         List<PersistantTrack> list = new ArrayList<PersistantTrack>();
+        
+        //fetch tracks from db
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME);
             fetch.setLong(1, refGenID);
@@ -189,7 +199,9 @@ public class ReferenceConnector {
                 String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
                 int refGenomeID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
-                list.add(new PersistantTrack(id, description, date, refGenomeID));
+                String filePath = rs.getString(FieldNames.TRACK_PATH);
+                int seqPairId = rs.getInt(FieldNames.TRACK_SEQUENCE_PAIR_ID);
+                list.add(new PersistantTrack(id, filePath, description, date, refGenomeID, seqPairId));
             }
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);

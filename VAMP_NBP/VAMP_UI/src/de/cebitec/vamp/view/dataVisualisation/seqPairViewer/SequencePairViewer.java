@@ -24,8 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Viewer for sequence pairs.
  *
- * @author ddoppmeier
+ * @author rhilker
  */
 public class SequencePairViewer extends AbstractViewer {
 

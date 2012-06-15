@@ -19,7 +19,7 @@ public class ColorProperties {
     public static final Color COMMON_MATCH = new Color(180, 41, 36);
     public static final Color PERFECT_MATCH = new Color(38, 180, 36);
     // double track panel specific colors
-    public static final Color COMPLETE_COV = Color.BLUE;
+    public static final Color COV_DIFF_COLOR = Color.BLUE;
     public static final Color TRACK1_COLOR = new Color(255,117,48);
     public static final Color TRACK2_COLOR = Color.cyan;
 
@@ -79,8 +79,9 @@ public class ColorProperties {
     public static final Color ALIGNMENT_T = new Color(255, 255, 255);
     public static final Color ALIGNMENT_N = new Color(255, 255, 255);
     public static final Color ALIGNMENT_FOREIGN_GENOMEGAP = Color.LIGHT_GRAY;
-    public static final Color ALIGNMENT_BASE_UNDEF = UNDEF_ANNOTATION;
     public static final Color ALIGNMENT_BASE_READGAP = new Color(255, 255, 255);
+    public static final Color ALIGNMENT_BASE_UNDEF = new Color(255, 255, 255);
+    public static final Color SKIPPED = new Color(255, 255, 255);
     // sequence pair specific colors
     public static final Color BLOCK_PERFECT = Color.GREEN;
     public static final Color BLOCK_DIST_LARGE = Color.YELLOW;

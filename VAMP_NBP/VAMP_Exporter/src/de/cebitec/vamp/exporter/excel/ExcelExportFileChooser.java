@@ -4,8 +4,6 @@ import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import jxl.write.WriteException;
 import org.netbeans.api.progress.ProgressHandle;

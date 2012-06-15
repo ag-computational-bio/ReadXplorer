@@ -187,7 +187,7 @@ public class SeqPairPopup extends JPopupMenu {
         
 
 
-//        sb.append(createTableRow("Mismatches", String.valueOf(seqPair.getErrors())));
+//        sb.append(createTableRow("Mismatches", String.valueOf(seqPair.getDifferences())));
 //        this.appendDiffs(seqPair, sb);
 //        this.appendGaps(seqPair, sb);
 
@@ -261,7 +261,7 @@ public class SeqPairPopup extends JPopupMenu {
      */
     private String getMappingTypeString(PersistantMapping mapping) {
         String mappingType;
-        if (mapping.getErrors() == 0) {
+        if (mapping.getDifferences() == 0) {
             mappingType = "Perfect Match";
         } else if (mapping.isBestMatch()) {
             mappingType = "Best Match";

@@ -9,10 +9,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.mappings.SAMBAMParser;
-import de.cebitec.vamp.parser.mappings.JokParser;
-import de.cebitec.vamp.parser.mappings.MappingParserI;
-import de.cebitec.vamp.parser.mappings.SamBamStepParser;
+import de.cebitec.vamp.parser.mappings.*;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -22,19 +19,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import org.openide.util.NbBundle;
 
 /**
+ * Panel displaying the options for importing new tracks into VAMP.
  *
  * @author jwinneba
  */
@@ -43,17 +34,29 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMBAMParser(), new SamBamStepParser()};
+    
+    private final JokParser jokParser;
+    private final SAMBAMParser samBamParser;
+    private final SamBamStepParser samBamStepParser;
+    private final SamBamDirectParser samBamDirectParser;
+    private MappingParserI[] parsers;
+    
     private MappingParserI currentParser;
     private int stepSize = 0;
     private static final int maxVal = 1000000000;
     private static final int minVal = 10000;
     private static final int step = 1000;
     private static final int defaultVal = 300000;
+    private boolean useDB = true;
 
-    /** Creates new form NewTrackDialogPanel */
+    /** Panel displaying the options for importing new tracks into VAMP. */
     public NewTrackDialogPanel() {
-        refGenJobs = this.getRefGenJobs();
+        this.refGenJobs = this.getRefGenJobs();
+        this.jokParser = new JokParser();
+        this.samBamParser = new SAMBAMParser();
+        this.samBamStepParser = new SamBamStepParser();
+        this.samBamDirectParser = new SamBamDirectParser();
+        this.parsers = new MappingParserI[] { this.jokParser, this.samBamParser, this.samBamStepParser };
         initComponents();
         // choose the default parser. first entry is shown in combobox by default
         this.currentParser = this.parsers[0];
@@ -69,6 +72,14 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         } else {
             return true;
         }
+    }
+    
+    /**
+     * @return true, if the track should be stored into the database and false, if 
+     * direct file access is desired.
+     */
+    public boolean isDbUsed() {
+        return this.useDB;
     }
 
     public File getMappingFile() {
@@ -169,7 +180,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        mappingTypeLabel = new javax.swing.JLabel();
         mappingFileLabel = new javax.swing.JLabel();
         descriptionLabel = new javax.swing.JLabel();
         refGenLabel = new javax.swing.JLabel();
@@ -177,12 +188,14 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         mappingFileField = new javax.swing.JTextField();
         chooseButton = new javax.swing.JButton();
         descriptionField = new javax.swing.JTextField();
-        outputTypeCombo = new javax.swing.JComboBox(parsers);
+        mappingTypeCombo = new javax.swing.JComboBox(parsers);
         stepSizeLabel = new javax.swing.JLabel();
         stepSizeSpinner = new javax.swing.JSpinner();
         fileSorted = new javax.swing.JCheckBox();
+        importTypeCombo = new javax.swing.JComboBox(parsers);
+        importTypeLabel = new javax.swing.JLabel();
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.jLabel1.text")); // NOI18N
+        mappingTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.mappingTypeLabel.text")); // NOI18N
 
         mappingFileLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.mappingFileLabel.text")); // NOI18N
 
@@ -200,7 +213,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
             }
         });
 
-        outputTypeCombo.setRenderer(new DefaultListCellRenderer(){
+        mappingTypeCombo.setRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
                 if(value instanceof ParserI){
@@ -210,9 +223,9 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                 }
             }
         });
-        outputTypeCombo.addActionListener(new java.awt.event.ActionListener() {
+        mappingTypeCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                outputTypeComboActionPerformed(evt);
+                mappingTypeComboActionPerformed(evt);
             }
         });
 
@@ -221,42 +234,75 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         fileSorted.setSelected(true);
         fileSorted.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.fileSorted.text")); // NOI18N
 
+        importTypeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Database", "Direct File Access" }));
+        importTypeCombo.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+                if(value instanceof ParserI){
+                    return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);
+                } else {
+                    return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                }
+            }
+        });
+        importTypeCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importTypeComboActionPerformed(evt);
+            }
+        });
+
+        importTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.importTypeLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(refGenLabel))
-                    .addComponent(stepSizeLabel)
-                    .addComponent(descriptionLabel)
-                    .addComponent(mappingFileLabel)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(outputTypeCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, 311, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(mappingFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                        .addGap(10, 10, 10)
+                        .addComponent(importTypeLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chooseButton))
-                    .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
-                    .addComponent(refGenBox, 0, 311, Short.MAX_VALUE)
+                        .addComponent(importTypeCombo, 0, 311, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(refGenLabel)
+                            .addComponent(stepSizeLabel)
+                            .addComponent(descriptionLabel)
+                            .addComponent(mappingFileLabel)
+                            .addComponent(mappingTypeLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fileSorted)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mappingTypeCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, 311, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(mappingFileField, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chooseButton))
+                            .addComponent(descriptionField, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+                            .addComponent(refGenBox, 0, 311, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fileSorted)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(outputTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(importTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(importTypeLabel))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(refGenLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(mappingTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(mappingTypeLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(mappingFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -266,16 +312,12 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(descriptionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(descriptionLabel))
-                .addGap(2, 2, 2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fileSorted)
                     .addComponent(stepSizeLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(refGenLabel))
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(113, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -313,8 +355,57 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         }
 }//GEN-LAST:event_chooseButtonActionPerformed
 
-    private void outputTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_outputTypeComboActionPerformed
-        MappingParserI newparser = (MappingParserI) this.outputTypeCombo.getSelectedItem();
+    private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
+        //identification of import method by index
+        int selIndex = this.importTypeCombo.getSelectedIndex();
+        this.useDB = selIndex == 0 ? true : false;
+
+        this.mappingTypeCombo.removeAllItems();
+        if (!this.useDB) {
+            //update the parsers to only display the bam parser.
+            this.mappingTypeCombo.addItem(this.samBamDirectParser);
+        } else {
+            this.mappingTypeCombo.addItem(this.jokParser);
+            this.mappingTypeCombo.addItem(this.samBamParser);
+            this.mappingTypeCombo.addItem(this.samBamStepParser);
+        }
+            
+            //has to be placed in the !useDB block of the if clause, if used
+        
+            //check if the project folder is already set and if not, set it now!
+//            String projectFolder = ProjectConnector.getInstance().getProjectFolder();
+//            if (projectFolder.isEmpty()) {
+//                ProjectFolderDialogPanel panel = new ProjectFolderDialogPanel();
+//                DialogDescriptor newDialog = new DialogDescriptor(panel, "Select Project Folder");
+//
+//                Dialog dialog = DialogDisplayer.getDefault().createDialog(newDialog);
+//                dialog.setVisible(true);
+//
+//                // keep the dialog open until the required info is provided or the dialog is canceled
+//                while (newDialog.getValue() == DialogDescriptor.OK_OPTION && !panel.isRequiredInfoSet()) {
+//                    DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message(NbBundle.getMessage(NewTrackDialogPanel.class, "MSG_ImportSetupCard.dialog.fillout"), NotifyDescriptor.INFORMATION_MESSAGE));
+//                    dialog.setVisible(true);
+//                }
+//
+//                // do dialog specific stuff
+//                if (newDialog.getValue() == DialogDescriptor.OK_OPTION && panel.isRequiredInfoSet()) {
+//                    if (panel instanceof ProjectFolderDialogPanel) {
+//                        ProjectFolderDialogPanel folderPanel = (ProjectFolderDialogPanel) panel;
+//                        boolean success = ProjectConnector.getInstance().storeProjectFolder(folderPanel.getProjectFolder());
+//                        String msg;
+//                        if (success) {
+//                            msg = "Project folder successfully stored!";
+//                        } else {
+//                            msg = "An error occured during storage of the project folder. Please try again!";
+//                        }
+//                        JOptionPane.showMessageDialog(this, msg, "Success", JOptionPane.INFORMATION_MESSAGE);
+//                    }
+//                }
+//            }
+    }//GEN-LAST:event_importTypeComboActionPerformed
+
+    private void mappingTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mappingTypeComboActionPerformed
+        MappingParserI newparser = (MappingParserI) this.mappingTypeCombo.getSelectedItem();
         if (this.currentParser != newparser) {
             this.currentParser = newparser;
             this.mappingFile = null;
@@ -330,16 +421,19 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
                         JOptionPane.WARNING_MESSAGE);
             }
         }
-}//GEN-LAST:event_outputTypeComboActionPerformed
+    }//GEN-LAST:event_mappingTypeComboActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseButton;
     private javax.swing.JTextField descriptionField;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JCheckBox fileSorted;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox importTypeCombo;
+    private javax.swing.JLabel importTypeLabel;
     private javax.swing.JTextField mappingFileField;
     private javax.swing.JLabel mappingFileLabel;
-    private javax.swing.JComboBox outputTypeCombo;
+    private javax.swing.JComboBox mappingTypeCombo;
+    private javax.swing.JLabel mappingTypeLabel;
     private javax.swing.JComboBox refGenBox;
     private javax.swing.JLabel refGenLabel;
     private javax.swing.JLabel stepSizeLabel;

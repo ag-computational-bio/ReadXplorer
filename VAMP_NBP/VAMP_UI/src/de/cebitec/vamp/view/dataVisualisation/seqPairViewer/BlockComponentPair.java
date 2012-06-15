@@ -199,7 +199,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     private Color adjustBlockColorAndStoreMappingType(Color blockColor, PersistantMapping mapping) {
         // order of addition to blockList and mappingTypeList has to be correct always!
         float hue = Color.RGBtoHSB(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue(), null)[0];
-        if (mapping.getErrors() == 0) {
+        if (mapping.getDifferences() == 0) {
             blockColor = Color.getHSBColor(hue, minSatAndBright, minSatAndBright);
             this.mappingTypeList.add("Perfect Match");
         } else if (mapping.isBestMatch()) {

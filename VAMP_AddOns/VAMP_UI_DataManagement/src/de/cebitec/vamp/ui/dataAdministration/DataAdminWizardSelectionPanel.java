@@ -10,6 +10,7 @@ import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -92,16 +93,16 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
     private Map<String, List<? extends Job>> getDeletableReferencesAndTracks(){
         List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
         List<TrackJob> trackJobs = new ArrayList<TrackJob>();
-        HashMap<Integer, ReferenceJob> indexedGens = new HashMap<Integer, ReferenceJob>();
+        HashMap<Integer, ReferenceJob> indexedRefs = new HashMap<Integer, ReferenceJob>();
         
         try {
 
             List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
             for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
                 PersistantReference dbGen = it.next();
-                // File and parser parameter meaningles in this context
+                // File and parser parameter meaningless in this context
                 ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
-                indexedGens.put(r.getID(), r);
+                indexedRefs.put(r.getID(), r);
                 refJobs.add(r);
             }
 
@@ -109,13 +110,14 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
             for (Iterator<PersistantTrack> it = dbTracks.iterator(); it.hasNext();) {
                 PersistantTrack dbTrack = it.next();
 
-                // File and parser, refgenjob, runjob parameters meaningles in this context
-                TrackJob t = new TrackJob(dbTrack.getId(), null, dbTrack.getDescription(),
-                        indexedGens.get(dbTrack.getRefGenID()),
+                // File and parser, refgenjob, runjob parameters meaningless in this context
+                boolean isDbUsed = dbTrack.getFilePath().isEmpty();
+                TrackJob t = new TrackJob(dbTrack.getId(), isDbUsed, new File(dbTrack.getFilePath()), 
+                        dbTrack.getDescription(), indexedRefs.get(dbTrack.getRefGenID()),
                         null, dbTrack.getTimestamp());
 
                 // register dependent tracks at genome and run
-                ReferenceJob gen = indexedGens.get(dbTrack.getRefGenID());
+                ReferenceJob gen = indexedRefs.get(dbTrack.getRefGenID());
                 gen.registerTrackWithoutRunJob(t);
                 trackJobs.add(t);
             }

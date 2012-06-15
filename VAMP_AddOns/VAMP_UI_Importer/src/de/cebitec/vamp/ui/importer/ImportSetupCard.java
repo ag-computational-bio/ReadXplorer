@@ -203,8 +203,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 } else if (dialogPane instanceof NewSeqPairTracksDialogPanel) {
                     NewSeqPairTracksDialogPanel seqPairPane = (NewSeqPairTracksDialogPanel) dialogPane;
                     ReferenceJob refJob = seqPairPane.getReferenceJob();
-                    TrackJob trackJob1 = new TrackJob(trackID++, seqPairPane.getMappingFile1(), seqPairPane.getDescription() + " Track 1", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
-                    TrackJob trackJob2 = new TrackJob(trackID++, seqPairPane.getMappingFile2(), seqPairPane.getDescription() + " Track 2", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob1 = new TrackJob(trackID++, seqPairPane.isDbUsed(), seqPairPane.getMappingFile1(), seqPairPane.getDescription() + " Track 1", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
+                    TrackJob trackJob2 = new TrackJob(trackID++, seqPairPane.isDbUsed(), seqPairPane.getMappingFile2(), seqPairPane.getDescription() + " Track 2", refJob, seqPairPane.getParser(), new Timestamp(System.currentTimeMillis()));
                     refJob.registerTrackWithoutRunJob(trackJob1);
                     refJob.registerTrackWithoutRunJob(trackJob2);
                     this.seqPairTrackJobsView.add(new SeqPairJobContainer(trackJob1, trackJob2,
@@ -213,7 +213,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 } else if (dialogPane instanceof NewTrackDialogPanel) {
                     NewTrackDialogPanel ntdp = (NewTrackDialogPanel) dialogPane;
                     ReferenceJob refJob = ntdp.getReferenceJob();
-                    TrackJob trackJob = new TrackJob(trackID++, ntdp.getMappingFile(), ntdp.getDescription(), 
+                    TrackJob trackJob = new TrackJob(trackID++, ntdp.isDbUsed(), ntdp.getMappingFile(), ntdp.getDescription(), 
                             refJob, ntdp.getParser(), new Timestamp(System.currentTimeMillis()));
                     trackJob.setIsStepwise((ntdp.getParser() instanceof SamBamStepParser ? true : false));
                     trackJob.setStepSize(ntdp.getstepSize());
@@ -225,7 +225,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                     NewPositionTableDialog posTableDialog = (NewPositionTableDialog) dialogPane;
                     ReferenceJob refJob = posTableDialog.getReferenceJob();
                     TrackJob parentTrackJob = posTableDialog.getParentTrack();
-                    TrackJob trackJob = new TrackJob(parentTrackJob.getID(), posTableDialog.getMappingFile(), "", refJob, 
+                    TrackJob trackJob = new TrackJob(parentTrackJob.getID(), parentTrackJob.isDbUsed(), posTableDialog.getMappingFile(), "", refJob, 
                             posTableDialog.getParser(), new Timestamp(System.currentTimeMillis()));
                     trackJob.setIsStepwise((posTableDialog.getParser() instanceof SamBamStepParser));
                     trackJob.setStepSize(posTableDialog.getStepSize());

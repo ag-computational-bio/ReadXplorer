@@ -24,7 +24,6 @@ public class PatternFilter implements RegionFilterI {
     private int absStop;
     private PersistantReference refGen;
     private String sequence;
-    //private int frameCurrAnnotation;
     private Pattern pattern;
     private Pattern patternRev;
 
@@ -33,8 +32,6 @@ public class PatternFilter implements RegionFilterI {
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
-
-        //this.frameCurrAnnotation = StartCodonFilter.INIT; //because this is not a frame value
     }
 
     /**
@@ -59,9 +56,8 @@ public class PatternFilter implements RegionFilterI {
             }
 
             this.sequence = this.refGen.getSequence().substring(start, stop);
-//            boolean isAnnotationSelected = this.frameCurrAnnotation != INIT;
-            this.matchPattern(this.sequence, this.pattern, true, offset);//, isAnnotationSelected);
-            this.matchPattern(this.sequence, this.patternRev, false, offset);//, isAnnotationSelected);
+            this.matchPattern(this.sequence, this.pattern, true, offset);
+            this.matchPattern(this.sequence, this.patternRev, false, offset);
         }
         return this.matchedPatterns;
 
@@ -163,26 +159,14 @@ public class PatternFilter implements RegionFilterI {
      * @param isForwardStrand if pattern is fwd or rev
      * @param offset offset needed for storing the correct region positions
      */
-     //* @param restricted determining if the visualization should be restricted to a certain frame
-    private void matchPattern(String sequence, Pattern p, boolean isForwardStrand,
-            int offset) { //, boolean restricted){
-        // match forward
-//        final boolean codonFwdStrand = this.frameCurrAnnotation > 0 ? true : false;
-//        if (!restricted || restricted && codonFwdStrand == isForwardStrand){
+    private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, int offset) {
+
         Matcher m = p.matcher(sequence);
         while (m.find()) {
             int from = m.start();
             int to = m.end() - 1;
-//                if (restricted) {
-//                    final int start = absStart - offset + from + 1;
-//                    if (((start % 3) + 1 == this.frameCurrAnnotation || -(start % 3) == (-this.frameCurrAnnotation) - 3)) {
-//                        regions.add(new Region(start, absStart - offset + to + 1, isForwardStrand));
-//                    }
-//                } else {
             this.matchedPatterns.add(new Region(absStart - offset + from + 1, absStart - offset + to + 1, isForwardStrand, Properties.PATTERN));
-//                }
         }
-//        }
     }
     
     /**

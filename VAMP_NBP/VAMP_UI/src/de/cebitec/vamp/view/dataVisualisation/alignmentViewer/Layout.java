@@ -26,7 +26,7 @@ public class Layout implements LayoutI {
     private BlockContainer reverseBlockContainer;
     private List<FeatureType> exclusionList;
 
-    public Layout(int absStart, int absStop, Collection<PersistantMapping> mappings, List<FeatureType> exclusionList){
+    public Layout(int absStart, int absStop, Collection<PersistantMapping> mappings, List<FeatureType> exclusionList) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.forwardLayers = new ArrayList<LayerI>();
@@ -34,7 +34,7 @@ public class Layout implements LayoutI {
         this.forwardBlockContainer = new BlockContainer();
         this.reverseBlockContainer = new BlockContainer();
         this.exclusionList = exclusionList;
-        
+
         this.storeGaps(mappings);
         this.createBlocks(mappings);
         this.layoutBlocks(forwardLayers, forwardBlockContainer);
@@ -46,12 +46,12 @@ public class Layout implements LayoutI {
      * type classes in the exclusion list.
      * @param mappings mappings covering current part of the genome
      */
-    private void storeGaps(Collection<PersistantMapping> mappings){
+    private void storeGaps(Collection<PersistantMapping> mappings) {
         gapManager = new GenomeGapManager(absStart, absStop);
         Iterator<PersistantMapping> it = mappings.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             PersistantMapping mapping = it.next();
-            if (!this.inExclusionList(mapping)){
+            if (!this.inExclusionList(mapping)) {
                 gapManager.addGapsFromMapping(mapping.getGenomeGaps());
             }
         }
@@ -60,16 +60,16 @@ public class Layout implements LayoutI {
         // so absStop has to be decreased, to fit to old width
 
         // count the number of gaps occuring in visible area
-        int width = absStop - absStart +1;
+        int width = absStop - absStart + 1;
         int gapNo = 0; // count the number of gaps
         int widthCount = 0; // count the number of bases
         int i = 0; // count variable till max width
-        while(widthCount < width){
-            int num = gapManager.getNumOfGapsAt(absStart+i); // get the number of gaps at current position
-            widthCount++; // current position needs 1 base space in visual alignment
+        while (widthCount < width) {
+            int num = gapManager.getNumOfGapsAt(absStart + i); // get the number of gaps at current position
+            ++widthCount; // current position needs 1 base space in visual alignment
             widthCount += num; // if gaps occured at current position, they need some space, too
             gapNo += num;
-            i++;
+            ++i;
         }
         absStop -= gapNo;
     }
@@ -78,12 +78,12 @@ public class Layout implements LayoutI {
      * Each mapping gets one block, if it is not in a type class in the exclusion list.
      * @param mappings mappings in current interval
      */
-    private void createBlocks(Collection<PersistantMapping> mappings){
+    private void createBlocks(Collection<PersistantMapping> mappings) {
         Iterator<PersistantMapping> mappingIt = mappings.iterator();
-        while(mappingIt.hasNext()) {
+        while (mappingIt.hasNext()) {
             PersistantMapping mapping = mappingIt.next();
             if (!this.inExclusionList(mapping)) {
-                
+
                 // get start position
                 int start = mapping.getStart();
                 if (start < this.absStart) {
@@ -160,9 +160,9 @@ public class Layout implements LayoutI {
      * @return true, if the mapping should be excluded from being displayed, false otherwise
      */
     private boolean inExclusionList(PersistantMapping m) {
-        if ((m.getErrors() == 0 && this.exclusionList.contains(FeatureType.PERFECT_MATCH))
-                || (m.getErrors() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH)) 
-                || (m.getErrors() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.ORDINARY_MATCH))){
+        if ((m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_MATCH))
+                || (m.getDifferences() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH)) 
+                || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.ORDINARY_MATCH))){
             return true;
         } else {
             return false;
