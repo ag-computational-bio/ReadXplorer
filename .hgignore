@@ -7,3 +7,5 @@
 \.chg\..*$
 \.rej$
 \.conflict\~$
+syntax: glob
+VAMP_NBP/testData.RData
