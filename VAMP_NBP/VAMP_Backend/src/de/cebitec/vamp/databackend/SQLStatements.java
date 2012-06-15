@@ -791,7 +791,7 @@ public class SQLStatements {
             + FieldNames.MAPPING_STOP + ", "
             + FieldNames.MAPPING_TRACK + " "
             + "FROM "
-            + FieldNames.TABLE_MAPPINGS + " "
+            + FieldNames.TABLE_MAPPING + " "
             + "WHERE "
             + FieldNames.MAPPING_TRACK + " "
             + "=?";
