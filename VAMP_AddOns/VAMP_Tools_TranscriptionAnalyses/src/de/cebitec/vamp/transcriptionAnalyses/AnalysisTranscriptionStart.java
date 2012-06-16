@@ -168,7 +168,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     public void detectTSSs(PersistantCoverage coverage) {
 
         int leftBound = coverage.getLeftBound();
-        int fixedLeftBound = leftBound - 1;
+        int fixedLeftBound = leftBound <= 0 ? 0 : leftBound - 1;
         int rightBound = coverage.getRightBound();
         int fwdCov1;
         int revCov1;
@@ -178,9 +178,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int diffRev;
         int percentDiffFwd;
         int percentDiffRev;
-
-        coverage.setBestMatchFwdMult(fixedLeftBound, covLastFwdPos);
-        coverage.setBestMatchRevMult(fixedLeftBound, covLastRevPos);
+        
+        coverage.setLeftBound(fixedLeftBound);
+        int[] fwdMultCov = coverage.getBestMatchFwdMult();
+        int[] revMultCov = coverage.getBestMatchFwdMult();
+        int[] newFwdMultCov = new int[fwdMultCov.length + 1];
+        int[] newRevMultCov = new int[revMultCov.length + 1];
+        newFwdMultCov[0] = this.covLastFwdPos;
+        newRevMultCov[0] = this.covLastRevPos;
+        System.arraycopy(fwdMultCov, 0, newFwdMultCov, 1, fwdMultCov.length);
+        System.arraycopy(revMultCov, 0, newRevMultCov, 1, revMultCov.length);
+        coverage.setBestMatchFwdMult(newFwdMultCov);
+        coverage.setBestMatchRevMult(newRevMultCov);
 
         if (this.calcCoverageDistributions) { //this way code is duplicated, but if clause only evaluated once
             for (int i = fixedLeftBound; i < rightBound; ++i) {
@@ -593,7 +602,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     percentage < this.increaseReadPercent) &&
                     tss.getInitialCoverage() > this.maxInitialReadCount) {
                 copiedDetectedStarts.remove(tss);
-                System.out.println(tss.getPos());
             }
         }
         this.detectedStarts = copiedDetectedStarts;

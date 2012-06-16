@@ -1,7 +1,9 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 /**
- * Container for all different coverage types for a given interval.
+ * Container for all different coverage types for a given interval. If you want
+ * to set each coverage position separately you have to call
+ * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length 0.
  *
  * @author ddoppmeier, rhilker
  */
@@ -64,6 +66,8 @@ public class PersistantCoverage {
 
     /**
      * Container for all different coverage types for a given interval.
+     * If you want to set each coverage position separately you have to call
+     * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length 0.
      * @param leftBound left bound of the interval
      * @param rightBound right bound of the interval
      */
@@ -73,6 +77,8 @@ public class PersistantCoverage {
 
     /**
      * Container for all different coverage types for a given interval.
+     * If you want to set each coverage position separately you have to call
+     * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length 0.
      * @param leftBound left bound of the interval
      * @param rightBound right bound of the interval
      * @param twoTracks true, if this is a container for storing the coverage of two tracks
@@ -134,6 +140,14 @@ public class PersistantCoverage {
 
     public int getRightBound() {
         return rightBound;
+    }
+
+    public void setLeftBound(int leftBound) {
+        this.leftBound = leftBound;
+    }
+
+    public void setRightBound(int rightBound) {
+        this.rightBound = rightBound;
     }
 
     public void setFinished() {
@@ -532,7 +546,37 @@ public class PersistantCoverage {
         } else {
             return 0;
         }
-    }   
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given interval.
+     */
+    public int[] getBestMatchFwdMult() {
+        return this.bestMatchFwdMultCov;
+    }
+
+    /**
+     * @return Get whole best match fwd coverage array without replicates for 
+     * the given interval.
+     */    
+    public int[] getBestMatchFwdNum() {
+        return this.bestMatchFwdNumCov;
+    }
+
+    /**
+     * @return Get whole best match rev mult coverage array for the given interval.
+     */    
+    public int[] getBestMatchRevMult() {
+        return this.bestMatchRevMultCov;
+    }
+
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getBestMatchRevNum() {
+        return this.bestMatchRevNumCov;
+    }
     
     /**
      * @return Get whole common fwd mult coverage array for the given interval
@@ -678,7 +722,8 @@ public class PersistantCoverage {
     
     /**
      * Increase the size of all arrays whose size is currently 0 to the interval
-     * size covered by this PersistantCoverage.
+     * size covered by this PersistantCoverage. This behaviour prevents overwriting
+     * coverage data already stored in this coverage object.
      */
     public void incArraysToIntervalSize() {
         int size = this.rightBound - this.leftBound + 1;
@@ -708,6 +753,39 @@ public class PersistantCoverage {
             bestMatchRevNumCov = new int[size];
         }
         
+        this.incCommonCovArraysToIntervalSize(size);
+    }
+    
+    /**
+     * Increase the size of all arrays, needed for the double track viewer,
+     * whose size is currently 0 to the interval size covered by this
+     * PersistantCoverage. This behaviour prevents overwriting coverage data
+     * already stored in this coverage object.
+     */
+    public void incDoubleTrackArraysToIntervalSize() {
+        int size = this.rightBound - this.leftBound + 1;
+        if (this.commonFwdMultCovTrack1.length == 0) {
+            commonFwdMultCovTrack1 = new int[size];
+        }
+        if (this.commonRevMultCovTrack1.length == 0) {
+            commonRevMultCovTrack1 = new int[size];
+        }
+        if (this.commonFwdMultCovTrack2.length == 0) {
+            commonFwdMultCovTrack2 = new int[size];
+        }
+        if (this.commonRevMultCovTrack2.length == 0) {
+            commonRevMultCovTrack2 = new int[size];
+        }
+        this.incCommonCovArraysToIntervalSize(size);
+    }
+    
+    /**
+     * Increase the size of all common coverage arrays whose size is currently 0
+     * to the interval size covered by this PersistantCoverage. This behaviour
+     * prevents overwriting coverage data already stored in this coverage
+     * object.
+     */
+    private void incCommonCovArraysToIntervalSize(int size) {
         if (this.commonFwdMultCov.length == 0) {
             commonFwdMultCov = new int[size];
         }

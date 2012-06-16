@@ -64,7 +64,7 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
         int to = request.getTo();
 
         PersistantCoverage cov = new PersistantCoverage(from, to);
-        cov.setTwoTracks(false);
+        cov.incArraysToIntervalSize();
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
             fetch.setInt(1, from);
@@ -120,7 +120,7 @@ public class CoverageThreadAnalyses extends Thread implements RequestThreadI {
         int to = request.getTo();
 
         PersistantCoverage cov = new PersistantCoverage(from, to);
-        cov.setTwoTracks(false);
+        cov.incArraysToIntervalSize();
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_BEST_FOR_INTERVAL);
             fetch.setLong(1, trackID);

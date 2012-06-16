@@ -244,7 +244,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         List<Boolean> hasNorm = new ArrayList<Boolean>();
         for (int i = 0; i < trackViewer.getTrackCon().getTrackIds().size(); ++i) {
             bools.add(i, false);
-            factors.add(i, 0.0);
+            factors.add(i, 1.0);
             hasNorm.add(i, false);
         }
         return new NormalizationSettings(trackViewer.getTrackCon().getTrackIds(), bools, factors, hasNorm);

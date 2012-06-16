@@ -31,7 +31,7 @@ public class Benchmark {
 
         millis = (int) diff;
 
-        System.out.println(message+" dauerte "+minutes+" minuten, "+seconds+" sekunden, "+millis+" millisekunden");
+        System.out.println(message+" took "+minutes+" minutes, "+seconds+" seconds, "+millis+" milliseconds");
     }
 
 }

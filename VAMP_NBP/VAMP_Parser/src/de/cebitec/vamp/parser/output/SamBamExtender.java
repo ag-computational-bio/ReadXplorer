@@ -186,9 +186,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                         this.notifyObservers("Cannot contain less than the lowest diff rate number of errors!");
                     }
                     record.setAttribute("Yt", seqMatches);
-                    if (record.getReferenceIndex() != 0) {
-                        System.out.println("Ref index: " + record.getReferenceIndex());
-                    }
 
                 }
 

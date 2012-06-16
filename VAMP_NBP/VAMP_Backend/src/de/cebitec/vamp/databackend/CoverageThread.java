@@ -160,7 +160,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
         
         CoverageAndDiffResultPersistant result;
         PersistantCoverage cov = new PersistantCoverage(from, to);
-        cov.setTwoTracks(false);
+        cov.incArraysToIntervalSize();
 
         if (this.isDbUsed) {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
@@ -220,7 +220,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
         int to = this.calcCenterRight(request);
 
         PersistantCoverage cov = new PersistantCoverage(from, to);
-        cov.setTwoTracks(false);
+        cov.incArraysToIntervalSize();
         PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_BEST_FOR_INTERVAL);
         fetch.setLong(1, trackID);
         fetch.setInt(2, from);
@@ -258,6 +258,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
         int from = this.calcCenterLeft(request);
         int to = this.calcCenterRight(request);
         PersistantCoverage cov = new PersistantCoverage(from, to, true);
+        cov.incDoubleTrackArraysToIntervalSize();
         cov.setTwoTracks(true);
 
         if (tracks.get(1).isDbUsed()) {
@@ -355,6 +356,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
         int to = this.calcCenterRight(request);
 
         PersistantCoverage cov = new PersistantCoverage(from, to);
+        cov.incArraysToIntervalSize();
 
         if (this.isDbUsed) {
             //create the sql statement dynamically according to the number of tracks combined
@@ -441,7 +443,9 @@ public class CoverageThread extends Thread implements RequestThreadI {
         PersistantCoverage[] covArray = new PersistantCoverage[this.tracks.size()];
         Map<Integer, PersistantCoverage> covMap = new HashMap<Integer, PersistantCoverage>();
         for (int i = 0; i < this.tracks.size(); ++i) {
-            covArray[i] = new PersistantCoverage(from, to);
+            PersistantCoverage coverage = new PersistantCoverage(from, to);
+            coverage.incArraysToIntervalSize();
+            covArray[i] = coverage;
             covMap.put(this.tracks.get(i).getId(), new PersistantCoverage(from, to));
         }
 
