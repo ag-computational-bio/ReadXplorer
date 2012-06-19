@@ -23,14 +23,16 @@ public class PerformAnalysis extends Thread {
     private Tool tool;
     private Integer refGenomeID;
     private int[] replicateStructure;
-    private IprogressMonitor monitor;
+    private diffExpVisualPanel3 monitor;
+    
+    public static final boolean TESTING_MODE = true;
 
     public static enum Tool {
 
         BaySeq, EdgeR
     }
 
-    public PerformAnalysis(Tool tool, List<PersistantTrack> selectedTraks, List<Integer[]> groups, Integer refGenomeID, int[] replicateStructure, IprogressMonitor monitor) {
+    public PerformAnalysis(Tool tool, List<PersistantTrack> selectedTraks, List<Integer[]> groups, Integer refGenomeID, int[] replicateStructure, diffExpVisualPanel3 monitor) {
         this.selectedTraks = selectedTraks;
         this.groups = groups;
         this.tool = tool;
@@ -62,7 +64,7 @@ public class PerformAnalysis extends Thread {
     private void processWithBaySeq(Map<Integer, Map<Integer, Integer>> allCountData) {
         BaySeqAnalysisData bseqData = prepareAnnotationsForBaySeq();
         bseqData = prepareDataForBaySeq(bseqData, allCountData);
-        GnuR gnuR = new GnuR();
+        GnuR gnuR = new GnuR(monitor);
         gnuR.process(bseqData, persAnno.size(), selectedTraks.size());
         gnuR.shutdown();
         System.out.println("FERTIG");

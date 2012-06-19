@@ -4,9 +4,13 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
 import javax.swing.JPanel;
+import org.rosuda.JRI.RMainLoopCallbacks;
+import org.rosuda.JRI.Rengine;
 
-public final class diffExpVisualPanel3 extends JPanel implements IprogressMonitor{
+public final class diffExpVisualPanel3 extends JPanel implements IprogressMonitor, RMainLoopCallbacks{
     
     
     private diffExpWizardPanel3 wizardPanel3;
@@ -87,16 +91,16 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startButton)
                     .addComponent(cancelButton))
                 .addGap(18, 18, 18)
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -134,5 +138,50 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
     public void setProgress(int n){
         progressBar.setValue(n);
     }
+
+    @Override
+    public void rWriteConsole(Rengine rngn, String string, int i) {
+            writeLineToConsole(string);
+    }
+
+    @Override
+    public void rBusy(Rengine rngn, int i) {
+        writeLineToConsole("rBusy(" + i + ")");
+    }
+
+    @Override
+    public String rReadConsole(Rengine rngn, String string, int i) {
+        return "";
+    }
+
+    @Override
+    public void rShowMessage(Rengine rngn, String string) {
+        writeLineToConsole(string);
+    }
+
+    @Override
+    public String rChooseFile(Rengine rngn, int i) {
+                FileDialog fd = new FileDialog(new Frame(), (i == 0) ? "Select a file" : "Select a new file", (i == 0) ? FileDialog.LOAD : FileDialog.SAVE);
+        fd.show();
+        String res = null;
+        if (fd.getDirectory() != null) {
+            res = fd.getDirectory();
+        }
+        if (fd.getFile() != null) {
+            res = (res == null) ? fd.getFile() : (res + fd.getFile());
+        }
+        return res;
+    }
+
+    @Override
+    public void rFlushConsole(Rengine rngn) {
+        outputField.setText("");
+    }
+
+    @Override
+    public void rSaveHistory(Rengine rngn, String string) {}
+
+    @Override
+    public void rLoadHistory(Rengine rngn, String string) {}
 
 }
