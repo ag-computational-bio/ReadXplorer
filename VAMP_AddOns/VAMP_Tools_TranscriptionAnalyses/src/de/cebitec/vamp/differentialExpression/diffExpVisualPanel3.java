@@ -6,6 +6,8 @@ package de.cebitec.vamp.differentialExpression;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.JPanel;
 import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.JRI.Rengine;
@@ -14,6 +16,7 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
     
     
     private diffExpWizardPanel3 wizardPanel3;
+    private List<Vector> result = null;
 
     /**
      * Creates new form diffExpVisualPanel3
@@ -128,6 +131,18 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
     private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
 
+    public void addResult(List<Vector> result){
+        this.result = result;
+    }
+    
+    public boolean hasResult(){
+        return (result!=null);
+    }
+    
+    public List<Vector> getResult(){
+        return result;
+    }
+    
     @Override
     public void writeLineToConsole(String line) {
         outputField.append("\n");

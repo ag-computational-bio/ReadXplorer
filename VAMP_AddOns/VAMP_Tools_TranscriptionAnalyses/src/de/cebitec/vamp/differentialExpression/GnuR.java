@@ -1,10 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
@@ -84,13 +81,13 @@ public class GnuR {
             gnuR.eval("data(testData)");
             numberofGroups = 2;
         }
-        List<RVector> results = new ArrayList<RVector>();
+        List<Vector> results = new ArrayList<Vector>();
         for (int j = 1; j <= numberofGroups; j++) {
             REXP result = gnuR.eval("topCounts(cD, group = " + j + ")");
             RVector rvec = result.asVector();
             results.add(rvec);
         }
-        REXP picture = gnuR.eval(" plotPosteriors(cD, group = 1, samplesA = 1, samplesB = 2)");
+        monitor.addResult(results);
         monitor.writeLineToConsole("Found " + results.size() + " results.");
     }
 

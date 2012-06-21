@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -71,7 +67,7 @@ public class diffExpWizardPanel3 implements WizardDescriptor.Panel<WizardDescrip
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state
+        wiz.putProperty("topCounts", getComponent().getResult());
     }
 
     public List<Integer[]> getCreatedGroups() {

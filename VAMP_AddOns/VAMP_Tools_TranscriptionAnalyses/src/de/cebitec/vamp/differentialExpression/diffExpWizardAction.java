@@ -50,7 +50,9 @@ public final class diffExpWizardAction implements ActionListener {
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle("Differential expression analysis");
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-
+            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent();
+            diffExpResultViewerTopComponent.open();
+            diffExpResultViewerTopComponent.requestActive();
         }
     }
 }
