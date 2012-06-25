@@ -4,26 +4,17 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.util.List;
-import java.util.Vector;
 import javax.swing.JPanel;
-import org.rosuda.JRI.RMainLoopCallbacks;
-import org.rosuda.JRI.Rengine;
 
-public final class diffExpVisualPanel3 extends JPanel implements IprogressMonitor, RMainLoopCallbacks{
+public final class diffExpVisualPanel3 extends JPanel {
     
-    
-    private diffExpWizardPanel3 wizardPanel3;
-    private List<Vector> result = null;
+    private boolean checkBoxchecked = false;
 
     /**
      * Creates new form diffExpVisualPanel3
      */
     public diffExpVisualPanel3(diffExpWizardPanel3 wizardPanel3) {
         initComponents();
-        this.wizardPanel3=wizardPanel3;
         jScrollPane1.setBorder(null);
     }
     
@@ -40,39 +31,36 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        startButton = new javax.swing.JButton();
-        cancelButton = new javax.swing.JButton();
-        progressBar = new javax.swing.JProgressBar();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        outputField = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        fileNameField = new javax.swing.JTextField();
+        fileChooserButton = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(startButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.startButton.text")); // NOI18N
-        startButton.addActionListener(new java.awt.event.ActionListener() {
+        jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
+        jTextArea1.setColumns(20);
+        jTextArea1.setEditable(false);
+        jTextArea1.setRows(5);
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.jTextArea1.text")); // NOI18N
+        jScrollPane1.setViewportView(jTextArea1);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.jCheckBox1.text")); // NOI18N
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startButtonActionPerformed(evt);
+                jCheckBox1ActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(cancelButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.cancelButton.text")); // NOI18N
-        cancelButton.setEnabled(false);
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+        fileNameField.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.fileNameField.text")); // NOI18N
+        fileNameField.setEnabled(false);
+
+        org.openide.awt.Mnemonics.setLocalizedText(fileChooserButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.fileChooserButton.text")); // NOI18N
+        fileChooserButton.setEnabled(false);
+        fileChooserButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtonActionPerformed(evt);
+                fileChooserButtonActionPerformed(evt);
             }
         });
-
-        outputField.setColumns(20);
-        outputField.setEditable(false);
-        outputField.setRows(5);
-        jScrollPane2.setViewportView(outputField);
-
-        jTextPane1.setBackground(new java.awt.Color(240, 240, 240));
-        jTextPane1.setBorder(null);
-        jTextPane1.setEditable(false);
-        jTextPane1.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.jTextPane1.text")); // NOI18N
-        jScrollPane1.setViewportView(jTextPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -81,122 +69,48 @@ public final class diffExpVisualPanel3 extends JPanel implements IprogressMonito
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(startButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
-                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(fileNameField)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(fileChooserButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(startButton)
-                    .addComponent(cancelButton))
-                .addGap(18, 18, 18)
-                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
-                .addContainerGap())
+                    .addComponent(fileNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fileChooserButton))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        startButton.setEnabled(false);
-        PerformAnalysis perfan = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, 
-                wizardPanel3.getSelectedTraks(), wizardPanel3.getCreatedGroups(), 
-                wizardPanel3.getGenomeID(), wizardPanel3.getReplicateStructure(), 
-                this);
-        perfan.start();
-        cancelButton.setEnabled(true);
-        writeLineToConsole("Analysis started");
-    }//GEN-LAST:event_startButtonActionPerformed
+    private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
+        new CustomFileSaver(this).setVisible(true);
+    }//GEN-LAST:event_fileChooserButtonActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        checkBoxchecked = (!checkBoxchecked);
+        fileChooserButton.setEnabled(checkBoxchecked);
+        fileNameField.setEnabled(checkBoxchecked);
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
     
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cancelButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cancelButton;
+    private javax.swing.JButton fileChooserButton;
+    private javax.swing.JTextField fileNameField;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JTextArea outputField;
-    private javax.swing.JProgressBar progressBar;
-    private javax.swing.JButton startButton;
+    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
-    public void addResult(List<Vector> result){
-        this.result = result;
+    void setPath(String path) {
+        fileNameField.setText(path);
     }
-    
-    public boolean hasResult(){
-        return (result!=null);
-    }
-    
-    public List<Vector> getResult(){
-        return result;
-    }
-    
-    @Override
-    public void writeLineToConsole(String line) {
-        outputField.append("\n");
-        outputField.append(line);
-    }
-    
-    @Override
-    public void setProgress(int n){
-        progressBar.setValue(n);
-    }
-
-    @Override
-    public void rWriteConsole(Rengine rngn, String string, int i) {
-            writeLineToConsole(string);
-    }
-
-    @Override
-    public void rBusy(Rengine rngn, int i) {
-        writeLineToConsole("rBusy(" + i + ")");
-    }
-
-    @Override
-    public String rReadConsole(Rengine rngn, String string, int i) {
-        return "";
-    }
-
-    @Override
-    public void rShowMessage(Rengine rngn, String string) {
-        writeLineToConsole(string);
-    }
-
-    @Override
-    public String rChooseFile(Rengine rngn, int i) {
-                FileDialog fd = new FileDialog(new Frame(), (i == 0) ? "Select a file" : "Select a new file", (i == 0) ? FileDialog.LOAD : FileDialog.SAVE);
-        fd.show();
-        String res = null;
-        if (fd.getDirectory() != null) {
-            res = fd.getDirectory();
-        }
-        if (fd.getFile() != null) {
-            res = (res == null) ? fd.getFile() : (res + fd.getFile());
-        }
-        return res;
-    }
-
-    @Override
-    public void rFlushConsole(Rengine rngn) {
-        outputField.setText("");
-    }
-
-    @Override
-    public void rSaveHistory(Rengine rngn, String string) {}
-
-    @Override
-    public void rLoadHistory(Rengine rngn, String string) {}
-
 }

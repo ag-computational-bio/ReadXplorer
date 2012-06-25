@@ -18,7 +18,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
 
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<PersistantTrack>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<String>();
-    private List<Integer[]> createdGroups = new ArrayList<Integer[]>();
+    private List<Group> createdGroups = new ArrayList<Group>();
     private List<PersistantTrack> selectedTraks = null;
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
@@ -184,7 +184,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
 
     private void addGroupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGroupButtonActionPerformed
 
-        createdGroups.add(currentGroupBeingCreated);
+        createdGroups.add(new Group(currentGroupBeingCreated, groupCreationField.getText()));
         currentGroupBeingCreated = null;
         groupListModel.addElement(groupCreationField.getText());
         groupCreationField.setText("");
@@ -221,7 +221,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
         }
     }
 
-    public List<Integer[]> getCreatedGroups() {
+    public List<Group> getCreatedGroups() {
         return createdGroups;
     }
     

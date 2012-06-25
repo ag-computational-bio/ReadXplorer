@@ -1,10 +1,14 @@
 package de.cebitec.vamp.differentialExpression;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RMainLoopCallbacks;
 import org.rosuda.JRI.RVector;
 import org.rosuda.JRI.Rengine;
 
@@ -12,19 +16,17 @@ import org.rosuda.JRI.Rengine;
  *
  * @author kstaderm
  */
-public class GnuR {
+public class GnuR implements RMainLoopCallbacks {
 
     private Rengine gnuR;
-    diffExpVisualPanel3 monitor;
 
-    public GnuR(diffExpVisualPanel3 monitor) {
-        this.monitor = monitor;
+    public GnuR() {
     }
 
-    public void process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks) {
+    public List<RVector> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks) {
         String[] args = new String[0];
         int numberofGroups;
-        gnuR = new Rengine(args, false, monitor);
+        gnuR = new Rengine(args, false, this);
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
         REXP baySeq = gnuR.eval("library(baySeq)");
@@ -67,10 +69,11 @@ public class GnuR {
             gnuR.assign("replicates", bseqData.getReplicateStructure());
             gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
             concatenate = new StringBuilder();
-            numberofGroups = 1;
+            numberofGroups = 0;
             while (bseqData.hasGroups()) {
+                numberofGroups++;
                 gnuR.assign("group" + numberofGroups, bseqData.getNextGroup());
-                concatenate.append("group").append(numberofGroups).append("=").append("group").append(numberofGroups++).append(",");
+                concatenate.append("group").append(numberofGroups).append("=").append("group").append(numberofGroups).append(",");
             }
             concatenate.deleteCharAt(concatenate.length() - 1);
             gnuR.eval("groups(cD) <- list(" + concatenate.toString() + ")");
@@ -81,17 +84,56 @@ public class GnuR {
             gnuR.eval("data(testData)");
             numberofGroups = 2;
         }
-        List<Vector> results = new ArrayList<Vector>();
+        List<RVector> results = new ArrayList<RVector>();
         for (int j = 1; j <= numberofGroups; j++) {
-            REXP result = gnuR.eval("topCounts(cD, group = " + j + ")");
+            REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
             RVector rvec = result.asVector();
             results.add(rvec);
         }
-        monitor.addResult(results);
-        monitor.writeLineToConsole("Found " + results.size() + " results.");
+        for (int j = 1; j <= numberofGroups; j++) {
+            REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
+            RVector rvec = result.asVector();
+            results.add(rvec);
+        }
+        return results;
     }
 
     public void shutdown() {
         gnuR.end();
+    }
+
+    @Override
+    public void rWriteConsole(Rengine rngn, String string, int i) {
+        System.out.println(string);
+    }
+
+    @Override
+    public void rBusy(Rengine rngn, int i) {
+    }
+
+    @Override
+    public String rReadConsole(Rengine rngn, String string, int i) {
+        return "";
+    }
+
+    @Override
+    public void rShowMessage(Rengine rngn, String string) {
+    }
+
+    @Override
+    public String rChooseFile(Rengine rngn, int i) {
+        return "";
+    }
+
+    @Override
+    public void rFlushConsole(Rengine rngn) {
+    }
+
+    @Override
+    public void rSaveHistory(Rengine rngn, String string) {
+    }
+
+    @Override
+    public void rLoadHistory(Rengine rngn, String string) {
     }
 }

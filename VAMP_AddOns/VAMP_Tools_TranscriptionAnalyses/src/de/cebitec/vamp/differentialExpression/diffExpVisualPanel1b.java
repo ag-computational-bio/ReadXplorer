@@ -149,7 +149,7 @@ public final class diffExpVisualPanel1b extends JPanel {
     private void removeReplicatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeReplicatesActionPerformed
         removeReplicates.setEnabled(false);
         replicateStructureField.setText("");
-        replicateStructure = null;
+        replicateStructure = new int[1];
         updateTrackList(selectedTraks);
         addAsReplicates.setEnabled(true);
     }//GEN-LAST:event_removeReplicatesActionPerformed

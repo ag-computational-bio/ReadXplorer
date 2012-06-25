@@ -1,7 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
@@ -13,10 +11,6 @@ public class diffExpWizardPanel3 implements WizardDescriptor.Panel<WizardDescrip
      * component from this class, just use getComponent().
      */
     private diffExpVisualPanel3 component;
-    private List<Integer[]> createdGroups;
-    private List<PersistantTrack> selectedTraks;
-    private int[] replicateStructure;
-    private Integer genomeID;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -59,30 +53,9 @@ public class diffExpWizardPanel3 implements WizardDescriptor.Panel<WizardDescrip
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        createdGroups = (List<Integer[]>) wiz.getProperty("createdGroups");
-        selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
-        genomeID = (Integer) wiz.getProperty("genomeID");
-        replicateStructure = (int[]) wiz.getProperty("replicateStructure");
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        wiz.putProperty("topCounts", getComponent().getResult());
-    }
-
-    public List<Integer[]> getCreatedGroups() {
-        return createdGroups;
-    }
-
-    public Integer getGenomeID() {
-        return genomeID;
-    }
-
-    public List<PersistantTrack> getSelectedTraks() {
-        return selectedTraks;
-    }
-
-    public int[] getReplicateStructure() {
-        return replicateStructure;
     }
 }

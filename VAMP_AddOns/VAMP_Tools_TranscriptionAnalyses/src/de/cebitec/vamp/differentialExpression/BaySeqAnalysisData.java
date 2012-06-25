@@ -13,10 +13,10 @@ public class BaySeqAnalysisData {
     private int[] start;
     private int[] stop;
     private Queue<Integer[]> countData;
-    private List<Integer[]> groups;
+    private List<Group> groups;
     private int[] replicateStructure;
 
-    public BaySeqAnalysisData(int[] start, int[] stop, int capacity, List<Integer[]> groups, int[] replicateStructure) {
+    public BaySeqAnalysisData(int[] start, int[] stop, int capacity, List<Group> groups, int[] replicateStructure) {
         this.start = start;
         this.stop = stop;
         countData = new ArrayBlockingQueue<Integer[]>(capacity);
@@ -52,12 +52,13 @@ public class BaySeqAnalysisData {
     public int[] getStop() {
         return stop;
     }
+    
+    private int nextGroup = 0;
 
     public int[] getNextGroup() {
         int[] ret = new int[0];
-        if (!groups.isEmpty()) {
-            Integer[] current = groups.get(0);
-            groups.remove(0);
+        if (!(nextGroup>=groups.size())) {
+            Integer[] current = groups.get(nextGroup++).getIntegerRepresentation();
             ret = new int[current.length];
             for (int i = 0; i < current.length; i++) {
                 ret[i] = current[i].intValue();
@@ -67,7 +68,7 @@ public class BaySeqAnalysisData {
     }
 
     public boolean hasGroups() {
-        return !groups.isEmpty();
+        return !(nextGroup>=groups.size());
     }
 
     public int[] getReplicateStructure() {
