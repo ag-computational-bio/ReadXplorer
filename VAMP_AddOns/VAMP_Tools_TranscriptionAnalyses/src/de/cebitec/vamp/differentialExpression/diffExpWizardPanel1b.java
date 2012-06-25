@@ -7,22 +7,22 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel2 implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class diffExpWizardPanel1b implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private diffExpVisualPanel2 component;
+    private diffExpVisualPanel1b component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public diffExpVisualPanel2 getComponent() {
+    public diffExpVisualPanel1b getComponent() {
         if (component == null) {
-            component = new diffExpVisualPanel2();
+            component = new diffExpVisualPanel1b();
         }
         return component;
     }
@@ -63,13 +63,13 @@ public class diffExpWizardPanel2 implements WizardDescriptor.ValidatingPanel<Wiz
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty("createdGroups", getComponent().getCreatedGroups());
+        wiz.putProperty("replicateStructure", getComponent().getCreatedReplicates());
     }
 
     @Override
     public void validate() throws WizardValidationException {
-                if (getComponent().noGroupCreated()) {
-            throw new WizardValidationException(null, "You must create at least one group to continue.", null);
+        if (getComponent().noReplicatesCreated()) {
+            throw new WizardValidationException(null, "You must define the replicate structure.", null);
         }
     }
 }

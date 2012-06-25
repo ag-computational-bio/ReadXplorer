@@ -68,6 +68,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList(references.toArray())"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);&#xa;referenceList.addListSelectionListener(this);"/>
           </AuxValues>
         </Component>
       </SubComponents>

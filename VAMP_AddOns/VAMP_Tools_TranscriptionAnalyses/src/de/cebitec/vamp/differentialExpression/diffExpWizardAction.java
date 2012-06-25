@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,16 +20,18 @@ import org.openide.awt.ActionRegistration;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can move the code below wherever you need, or register an action:
-@ActionID(category="...", id="de.cebitec.vamp.differentialExpression.diffExpWizardAction")
-@ActionRegistration(displayName="Open diffExp Wizard")
-@ActionReference(path="Menu/Tools")
+@ActionID(category = "...", id = "de.cebitec.vamp.differentialExpression.diffExpWizardAction")
+@ActionRegistration(displayName = "Differential expression analysis")
+@ActionReference(path = "Menu/Tools")
 public final class diffExpWizardAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
         panels.add(new diffExpWizardPanel1());
+        panels.add(new diffExpWizardPanel1b());
         panels.add(new diffExpWizardPanel2());
+        panels.add(new diffExpWizardPanel3());
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
             Component c = panels.get(i).getComponent();
@@ -48,8 +51,17 @@ public final class diffExpWizardAction implements ActionListener {
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle("Differential expression analysis");
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            PerformAnalysis perfan = new PerformAnalysis();
-            perfan.start();
+            List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
+            List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
+            Integer genomeID = (Integer) wiz.getProperty("genomeID");
+            int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
+            PerformAnalysis perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure);
+            
+            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent();
+            diffExpResultViewerTopComponent.open();
+            diffExpResultViewerTopComponent.requestActive();
+            perfAnalysis.registerObserver(diffExpResultViewerTopComponent);
+            perfAnalysis.start();
         }
     }
 }

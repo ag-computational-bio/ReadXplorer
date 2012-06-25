@@ -10,15 +10,19 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public final class diffExpVisualPanel2 extends JPanel {
+public final class diffExpVisualPanel2 extends JPanel implements ListSelectionListener {
 
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<PersistantTrack>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<String>();
-    private List<Integer[]> createdGroups = new ArrayList<Integer[]>();
+    private List<Group> createdGroups = new ArrayList<Group>();
     private List<PersistantTrack> selectedTraks = null;
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
+    private int selectedIndex = -1;
 
     /**
      * Creates new form diffExpVisualPanel2
@@ -57,7 +61,7 @@ public final class diffExpVisualPanel2 extends JPanel {
         groupCreationField = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList(groupListModel);
+        createdGroupsList = new javax.swing.JList(groupListModel);
         jLabel2 = new javax.swing.JLabel();
         addGroupButton = new javax.swing.JButton();
         removeGroupButton = new javax.swing.JButton();
@@ -76,11 +80,14 @@ public final class diffExpVisualPanel2 extends JPanel {
             }
         });
 
-        jScrollPane2.setViewportView(jList1);
+        createdGroupsList.addListSelectionListener(this);
+        createdGroupsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane2.setViewportView(createdGroupsList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.jLabel2.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(addGroupButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.addGroupButton.text")); // NOI18N
+        addGroupButton.setEnabled(false);
         addGroupButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addGroupButtonActionPerformed(evt);
@@ -88,6 +95,12 @@ public final class diffExpVisualPanel2 extends JPanel {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(removeGroupButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.removeGroupButton.text")); // NOI18N
+        removeGroupButton.setEnabled(false);
+        removeGroupButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeGroupButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -152,7 +165,7 @@ public final class diffExpVisualPanel2 extends JPanel {
             for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
                 PersistantTrack persistantTrack = it.next();
                 currentGroupBeingCreated[selectedTraks.indexOf(persistantTrack)] = currentGroupNumber;
-                strBuilder.append(persistantTrack.getId());
+                strBuilder.append(persistantTrack.getDescription());
                 trackListModel.removeElement(persistantTrack);
                 if (it.hasNext()) {
                     strBuilder.append(",");
@@ -163,27 +176,57 @@ public final class diffExpVisualPanel2 extends JPanel {
             groupCreationField.setText(strBuilder.toString());
             currentGroupNumber++;
         }
+        if (trackListModel.isEmpty()) {
+            addGroupButton.setEnabled(true);
+            addButton.setEnabled(false);
+        }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void addGroupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGroupButtonActionPerformed
-        if (trackListModel.isEmpty()) {
-            createdGroups.add(currentGroupBeingCreated);
-            currentGroupBeingCreated = null;
-            groupListModel.addElement(groupCreationField.getText());
-            groupCreationField.setText("");
-            updateTrackList(selectedTraks);
-        }
+
+        createdGroups.add(new Group(currentGroupBeingCreated, groupCreationField.getText()));
+        currentGroupBeingCreated = null;
+        groupListModel.addElement(groupCreationField.getText());
+        groupCreationField.setText("");
+        updateTrackList(selectedTraks);
+        addButton.setEnabled(true);
+        addGroupButton.setEnabled(false);
     }//GEN-LAST:event_addGroupButtonActionPerformed
+
+    private void removeGroupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeGroupButtonActionPerformed
+        createdGroups.remove(selectedIndex);
+        groupListModel.remove(selectedIndex);
+        selectedIndex = -1;
+        removeGroupButton.setEnabled(false);        
+    }//GEN-LAST:event_removeGroupButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton addGroupButton;
+    private javax.swing.JList createdGroupsList;
     private javax.swing.JTextField groupCreationField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton removeGroupButton;
     private javax.swing.JList trackList;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (selectedIndex != e.getFirstIndex()) {
+            selectedIndex = e.getFirstIndex();
+            removeGroupButton.setEnabled(true);
+        }
+    }
+
+    public List<Group> getCreatedGroups() {
+        return createdGroups;
+    }
+    
+    public boolean noGroupCreated(){
+        return createdGroups.isEmpty();
+    }
+    
 }

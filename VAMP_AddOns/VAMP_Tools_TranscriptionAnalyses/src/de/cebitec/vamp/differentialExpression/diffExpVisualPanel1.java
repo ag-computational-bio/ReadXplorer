@@ -30,12 +30,6 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
         ProjectConnector con = ProjectConnector.getInstance();
         references = con.getGenomes();
         initComponents();
-        setUp();
-    }
-
-    private void setUp() {
-        referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        referenceList.addListSelectionListener(this);
     }
 
     @Override
@@ -59,6 +53,8 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
         trackList = new javax.swing.JList(trackListModel);
 
         referenceList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        referenceList.addListSelectionListener(this);
         jScrollPane1.setViewportView(referenceList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1.class, "diffExpVisualPanel1.jLabel1.text")); // NOI18N
