@@ -57,9 +57,11 @@ public final class diffExpWizardAction implements ActionListener {
             int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
             PerformAnalysis perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure);
             
-            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent();
+            DiffExpGraficsTopComponent diffExpGraficsTopComponent = new DiffExpGraficsTopComponent();
+            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(diffExpGraficsTopComponent);            
             diffExpResultViewerTopComponent.open();
             diffExpResultViewerTopComponent.requestActive();
+            perfAnalysis.registerObserver(diffExpGraficsTopComponent);
             perfAnalysis.registerObserver(diffExpResultViewerTopComponent);
             perfAnalysis.start();
         }

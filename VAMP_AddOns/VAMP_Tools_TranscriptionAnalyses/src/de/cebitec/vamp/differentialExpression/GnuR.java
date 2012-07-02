@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,7 +41,7 @@ public class GnuR implements RMainLoopCallbacks {
             gnuR.eval("install.packages(\"snow\")");
             gnuR.eval("library(snow)");
         }
-        //Gnu R is configured to use all your processor cores but one. So the
+        //Gnu R is configured to use all your processor cores aside from one. So the
         //computation will speed up a little bit but still leave you one core
         //for your other work.
         int processors = Runtime.getRuntime().availableProcessors();
@@ -100,6 +101,54 @@ public class GnuR implements RMainLoopCallbacks {
 
     public void shutdown() {
         gnuR.end();
+    }
+
+    public void plotMACD(File file, int[] samplesA, int[] samplesB) {
+        setUpSvgOutput();
+        StringBuilder samplesABuilder = new StringBuilder();
+        samplesABuilder.append((samplesA[0]+1)).append(":").append((samplesA[samplesA.length - 1]+1));
+        StringBuilder samplesBBuilder = new StringBuilder();
+        samplesBBuilder.append((samplesB[0]+1)).append(":").append((samplesB[samplesB.length - 1]+1));
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
+                + "samplesB = " + samplesBBuilder.toString() + ",col = "
+                + "rgb(red = exp(cD@posteriors[,2]), green = 0, blue = 0))");
+        gnuR.eval("dev.off()");
+    }
+
+    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) {
+        setUpSvgOutput();
+        StringBuilder samplesABuilder = new StringBuilder();
+        samplesABuilder.append((samplesA[0]+1)).append(":").append((samplesA[samplesA.length - 1]+1));
+        StringBuilder samplesBBuilder = new StringBuilder();
+        samplesBBuilder.append((samplesB[0]+1)).append(":").append((samplesB[samplesB.length - 1]+1));
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID() + ", samplesA = " 
+                + samplesABuilder.toString() + ", samplesB = " 
+                + samplesBBuilder.toString() + ")");
+        gnuR.eval("dev.off()");
+    }
+
+    public void plotPriors(File file, Group group) {
+        setUpSvgOutput();
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        System.out.println(file.getAbsolutePath());
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotPriors(cD, group = " + group.getGnuRID() + ")");
+        gnuR.eval("dev.off()");
+    }
+
+    private void setUpSvgOutput() {
+        REXP svg = gnuR.eval("library(RSvgDevice)");
+        if (svg == null) {
+            gnuR.eval("install.packages(\"RSvgDevice\")");
+            gnuR.eval("library(RSvgDevice)");
+        }
     }
 
     @Override
