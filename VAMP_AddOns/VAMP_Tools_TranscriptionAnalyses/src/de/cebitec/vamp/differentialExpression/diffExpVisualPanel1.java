@@ -21,7 +21,7 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
     private List<PersistantReference> references;
     private int selectedIndex = -1;
     private PersistantReference selectedRef;
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<PersistantTrack>();
+    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
 
     /**
      * Creates new form diffExpVisualPanel1

@@ -24,7 +24,7 @@ public class GnuR implements RMainLoopCallbacks {
     public GnuR() {
     }
 
-    public List<RVector> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks) {
+    public List<RVector> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) {
         String[] args = new String[0];
         int numberofGroups;
         gnuR = new Rengine(args, false, this);
@@ -85,7 +85,7 @@ public class GnuR implements RMainLoopCallbacks {
             gnuR.eval("data(testData)");
             numberofGroups = 2;
         }
-        List<RVector> results = new ArrayList<RVector>();
+        List<RVector> results = new ArrayList<>();
         for (int j = 1; j <= numberofGroups; j++) {
             REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
             RVector rvec = result.asVector();
@@ -95,6 +95,11 @@ public class GnuR implements RMainLoopCallbacks {
             REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
             RVector rvec = result.asVector();
             results.add(rvec);
+        }
+        if (saveFile != null) {
+            String path = saveFile.getAbsolutePath();
+            path = path.replace("\\", "\\\\");
+            gnuR.eval("save.image(\"" + path + "\")");
         }
         return results;
     }
@@ -106,29 +111,28 @@ public class GnuR implements RMainLoopCallbacks {
     public void plotMACD(File file, int[] samplesA, int[] samplesB) {
         setUpSvgOutput();
         StringBuilder samplesABuilder = new StringBuilder();
-        samplesABuilder.append((samplesA[0]+1)).append(":").append((samplesA[samplesA.length - 1]+1));
+        samplesABuilder.append((samplesA[0] + 1)).append(":").append((samplesA[samplesA.length - 1] + 1));
         StringBuilder samplesBBuilder = new StringBuilder();
-        samplesBBuilder.append((samplesB[0]+1)).append(":").append((samplesB[samplesB.length - 1]+1));
+        samplesBBuilder.append((samplesB[0] + 1)).append(":").append((samplesB[samplesB.length - 1] + 1));
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
         gnuR.eval("devSVG(file=\"" + path + "\")");
         gnuR.eval("plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
-                + "samplesB = " + samplesBBuilder.toString() + ",col = "
-                + "rgb(red = exp(cD@posteriors[,2]), green = 0, blue = 0))");
+                + "samplesB = " + samplesBBuilder.toString() + ")");
         gnuR.eval("dev.off()");
     }
 
     public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) {
         setUpSvgOutput();
         StringBuilder samplesABuilder = new StringBuilder();
-        samplesABuilder.append((samplesA[0]+1)).append(":").append((samplesA[samplesA.length - 1]+1));
+        samplesABuilder.append((samplesA[0] + 1)).append(":").append((samplesA[samplesA.length - 1] + 1));
         StringBuilder samplesBBuilder = new StringBuilder();
-        samplesBBuilder.append((samplesB[0]+1)).append(":").append((samplesB[samplesB.length - 1]+1));
+        samplesBBuilder.append((samplesB[0] + 1)).append(":").append((samplesB[samplesB.length - 1] + 1));
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
         gnuR.eval("devSVG(file=\"" + path + "\")");
-        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID() + ", samplesA = " 
-                + samplesABuilder.toString() + ", samplesB = " 
+        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID() + ", samplesA = "
+                + samplesABuilder.toString() + ", samplesB = "
                 + samplesBBuilder.toString() + ")");
         gnuR.eval("dev.off()");
     }
@@ -137,7 +141,6 @@ public class GnuR implements RMainLoopCallbacks {
         setUpSvgOutput();
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
-        System.out.println(file.getAbsolutePath());
         gnuR.eval("devSVG(file=\"" + path + "\")");
         gnuR.eval("plotPriors(cD, group = " + group.getGnuRID() + ")");
         gnuR.eval("dev.off()");

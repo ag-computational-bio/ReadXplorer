@@ -8,6 +8,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public final class diffExpWizardAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new diffExpWizardPanel1());
         panels.add(new diffExpWizardPanel1b());
         panels.add(new diffExpWizardPanel2());
@@ -46,7 +47,7 @@ public final class diffExpWizardAction implements ActionListener {
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
             }
         }
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<WizardDescriptor>(panels));
+        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle("Differential expression analysis");
@@ -55,10 +56,15 @@ public final class diffExpWizardAction implements ActionListener {
             List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
             Integer genomeID = (Integer) wiz.getProperty("genomeID");
             int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
-            PerformAnalysis perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure);
-            
+            File saveFile = (File) wiz.getProperty("saveFile");
+            PerformAnalysis perfAnalysis;
+            if (saveFile != null) {
+                perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure, saveFile);
+            } else {
+                perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure);
+            }
             DiffExpGraficsTopComponent diffExpGraficsTopComponent = new DiffExpGraficsTopComponent();
-            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(diffExpGraficsTopComponent);            
+            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(diffExpGraficsTopComponent);
             diffExpResultViewerTopComponent.open();
             diffExpResultViewerTopComponent.requestActive();
             perfAnalysis.registerObserver(diffExpGraficsTopComponent);

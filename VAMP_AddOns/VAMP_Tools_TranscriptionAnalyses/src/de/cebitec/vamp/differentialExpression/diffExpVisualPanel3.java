@@ -4,6 +4,8 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import java.io.File;
 import javax.swing.JPanel;
 
 public final class diffExpVisualPanel3 extends JPanel {
@@ -16,6 +18,7 @@ public final class diffExpVisualPanel3 extends JPanel {
     public diffExpVisualPanel3(diffExpWizardPanel3 wizardPanel3) {
         initComponents();
         jScrollPane1.setBorder(null);
+        fileNameField.setText(System.getProperty("user.home")+File.separator+"DiffExpResult.rdata");
     }
     
     @Override
@@ -93,7 +96,16 @@ public final class diffExpVisualPanel3 extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        new CustomFileSaver(this).setVisible(true);
+        new VampFileChooser(VampFileChooser.SAVE_DIALOG, "rdata") {
+
+            @Override
+            public void save(String fileLocation) {
+                fileNameField.setText(fileLocation);                
+            }
+
+            @Override
+            public void open(String fileLocation) {}
+        };
     }//GEN-LAST:event_fileChooserButtonActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
@@ -110,7 +122,11 @@ public final class diffExpVisualPanel3 extends JPanel {
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
-    void setPath(String path) {
-        fileNameField.setText(path);
+    public String getSavePath(){
+        return fileNameField.getText();
+    }
+
+    public boolean isCheckBoxchecked() {
+        return checkBoxchecked;
     }
 }

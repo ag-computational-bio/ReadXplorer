@@ -33,7 +33,7 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
-    "CTL_DiffExpResultViewerTopComponent=DiffExpResultViewer Window",
+    "CTL_DiffExpResultViewerTopComponent=Differential expression analysis - results",
     "HINT_DiffExpResultViewerTopComponent=This is a DiffExpResultViewer window"
 })
 public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
@@ -41,7 +41,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private String[] columnNames;
     private TableModel tm;
     private ComboBoxModel cbm;
-    private ArrayList<TableModel> tableModels = new ArrayList<TableModel>();
+    private ArrayList<TableModel> tableModels = new ArrayList<>();
     private int offset;
     private boolean showNormalizedData = false;
     private DiffExpGraficsTopComponent diffExpGraficsTopComponent;
@@ -65,6 +65,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         initComponents();
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
+        jProgressBar1.setIndeterminate(true);
     }
 
     private void addResults(List<Object[][]> results, List<Group> groups) {
@@ -84,6 +85,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         normalizedCheckBox.setEnabled(true);
         jLabel1.setEnabled(true);
         jLabel2.setEnabled(false);
+        jProgressBar1.setIndeterminate(false);
         jProgressBar1.setValue(100);
         jProgressBar1.setEnabled(false);
 

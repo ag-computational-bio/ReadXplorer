@@ -1,10 +1,12 @@
 package de.cebitec.vamp.differentialExpression;
 
+import java.io.File;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
+import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel3 implements WizardDescriptor.Panel<WizardDescriptor> {
+public class diffExpWizardPanel3 implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -57,5 +59,15 @@ public class diffExpWizardPanel3 implements WizardDescriptor.Panel<WizardDescrip
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
+        if (getComponent().isCheckBoxchecked()) {
+            //TODO: Input validation
+            String path = getComponent().getSavePath();
+            File file = new File(path);
+            wiz.putProperty("saveFile", file);
+        }
+    }
+
+    @Override
+    public void validate() throws WizardValidationException {
     }
 }

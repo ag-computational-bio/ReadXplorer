@@ -28,8 +28,9 @@ public class PerformAnalysis extends Thread implements Observable {
     private Integer refGenomeID;
     private int[] replicateStructure;
     private List<Object[][]> results;
-    private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<de.cebitec.vamp.util.Observer>();
+    private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private GnuR gnuR;
+    private File saveFile = null;
     public static final boolean TESTING_MODE = true;
 
     public static enum Tool {
@@ -50,8 +51,17 @@ public class PerformAnalysis extends Thread implements Observable {
         this.replicateStructure = replicateStructure;
     }
 
+    public PerformAnalysis(Tool tool, List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure, File saveFile) {
+        this.selectedTraks = selectedTraks;
+        this.groups = groups;
+        this.tool = tool;
+        this.refGenomeID = refGenomeID;
+        this.replicateStructure = replicateStructure;
+        this.saveFile = saveFile;
+    }
+
     private void startUp() {
-        Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<Integer, Map<Integer, Integer>>();
+        Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<>();
         if (!TESTING_MODE) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
@@ -79,17 +89,17 @@ public class PerformAnalysis extends Thread implements Observable {
         gnuR = new GnuR();
         List<RVector> ret;
         if (!TESTING_MODE) {
-            ret = gnuR.process(bseqData, persAnno.size(), selectedTraks.size());
+            ret = gnuR.process(bseqData, persAnno.size(), selectedTraks.size(), saveFile);
         } else {
             //You must enter the number of annatations by hand for the
             //testing scenario.
-            ret = gnuR.process(bseqData, 3232, selectedTraks.size());
+            ret = gnuR.process(bseqData, 3232, selectedTraks.size(), saveFile);
         }
         return convertRresults(ret);
     }
 
     private List<Object[][]> convertRresults(List<RVector> results) {
-        List<Object[][]> ret = new ArrayList<Object[][]>();
+        List<Object[][]> ret = new ArrayList<>();
         for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
             RVector currentRVector = it.next();
             Object[][] current = new Object[currentRVector.at(0).asIntArray().length][currentRVector.size()];
@@ -137,7 +147,7 @@ public class PerformAnalysis extends Thread implements Observable {
         return bSeqData;
     }
 
-    public String plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException {
+    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {
@@ -149,7 +159,7 @@ public class PerformAnalysis extends Thread implements Observable {
         if (plot == Plot.Priors) {
             gnuR.plotPriors(file, group);
         }
-        return file.toURI().toString();
+        return file;
     }
 
     public List<PersistantAnnotation> getPersAnno() {

@@ -16,9 +16,9 @@ import javax.swing.event.ListSelectionListener;
 
 public final class diffExpVisualPanel2 extends JPanel implements ListSelectionListener {
 
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<PersistantTrack>();
-    private DefaultListModel<String> groupListModel = new DefaultListModel<String>();
-    private List<Group> createdGroups = new ArrayList<Group>();
+    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
+    private DefaultListModel<String> groupListModel = new DefaultListModel<>();
+    private List<Group> createdGroups = new ArrayList<>();
     private List<PersistantTrack> selectedTraks = null;
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;

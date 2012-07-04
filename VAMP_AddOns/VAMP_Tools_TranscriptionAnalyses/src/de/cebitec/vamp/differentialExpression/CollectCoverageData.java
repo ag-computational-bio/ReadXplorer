@@ -16,7 +16,7 @@ public class CollectCoverageData{
 
     private int trackID;
     private List<PersistantAnnotation> genomeAnnotations;
-    private Map<Integer, Integer> countData = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> countData = new HashMap<>();
     private List<PersistantMapping> mappings;
     private final static int STARTOFFSET = 30;
 

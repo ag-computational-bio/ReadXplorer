@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 public final class diffExpVisualPanel1b extends JPanel {
 
     private List<PersistantTrack> selectedTraks = null;
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<PersistantTrack>();
+    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
     private int[] replicateStructure = new int[1];
     private int currentReplicateNumber = 1;
 

@@ -2,10 +2,16 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.ComboBoxModel;
@@ -36,7 +42,7 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 preferredID = "DiffExpGraficsTopComponent")
 @Messages({
     "CTL_DiffExpGraficsAction=DiffExpGrafics",
-    "CTL_DiffExpGraficsTopComponent=DiffExpGrafics Window",
+    "CTL_DiffExpGraficsTopComponent=Create graphics",
     "HINT_DiffExpGraficsTopComponent=This is a DiffExpGrafics window"
 })
 public final class DiffExpGraficsTopComponent extends TopComponent implements Observer, ItemListener {
@@ -44,8 +50,9 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private PerformAnalysis perfAn;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel cbm;
-    private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<PersistantTrack>();
-    private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<PersistantTrack>();
+    private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<>();
+    private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<>();
+    private File currentlyDisplayed;
 
     public DiffExpGraficsTopComponent() {
         cbm = new DefaultComboBoxModel(PerformAnalysis.Plot.values());
@@ -88,6 +95,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         samplesAList = new javax.swing.JList(samplesA);
         jScrollPane2 = new javax.swing.JScrollPane();
         samplesBList = new javax.swing.JList(samplesB);
+        saveButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.jLabel1.text")); // NOI18N
 
@@ -119,6 +127,14 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         samplesBList.setEnabled(false);
         jScrollPane2.setViewportView(samplesBList);
 
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.saveButton.text")); // NOI18N
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -140,7 +156,8 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(samplesBLabel)
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(plotButton))
+                    .addComponent(plotButton)
+                    .addComponent(saveButton))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 686, Short.MAX_VALUE)
                 .addContainerGap())
@@ -170,7 +187,9 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                         .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(plotButton)
-                        .addGap(0, 189, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(saveButton)
+                        .addGap(0, 148, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -201,9 +220,14 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         if (inputValid) {
             try {
                 messages.setText("");
-                svgCanvas.setURI(perfAn.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB));
+                plotButton.setEnabled(false);
+                saveButton.setEnabled(false);
+                currentlyDisplayed = perfAn.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
+                svgCanvas.setURI(currentlyDisplayed.toURI().toString());
                 svgCanvas.setVisible(true);
                 svgCanvas.repaint();
+                saveButton.setEnabled(true);
+                plotButton.setEnabled(true);
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -212,6 +236,27 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         }
 
     }//GEN-LAST:event_plotButtonActionPerformed
+
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        new VampFileChooser(VampFileChooser.SAVE_DIALOG, "svg") {
+
+            @Override
+            public void save(String fileLocation) {
+                Path from = currentlyDisplayed.toPath();
+                Path to = FileSystems.getDefault().getPath(fileLocation, "");
+                try {
+                    Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+                    messages.setText("SVG image saved to "+outputFile.toString());
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+
+            @Override
+            public void open(String fileLocation) {
+            }
+        };
+    }//GEN-LAST:event_saveButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox groupComboBox;
     private javax.swing.JLabel jLabel1;
@@ -226,6 +271,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private javax.swing.JList samplesAList;
     private javax.swing.JLabel samplesBLabel;
     private javax.swing.JList samplesBList;
+    private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
     @Override
