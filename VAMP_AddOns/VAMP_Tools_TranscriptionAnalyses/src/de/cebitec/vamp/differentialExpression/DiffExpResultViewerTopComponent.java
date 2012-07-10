@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Observer;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -51,14 +52,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     public DiffExpResultViewerTopComponent(DiffExpGraficsTopComponent diffExpGraficsTopComponent) {
         this.diffExpGraficsTopComponent=diffExpGraficsTopComponent;
         
-        columnNames = new String[6];
-        columnNames[0] = "start";
-        columnNames[1] = "stop";
-        columnNames[2] = "X1.1";
-        columnNames[3] = "X2.1";
-        columnNames[4] = "Likelihood";
-        columnNames[5] = "FDR";
-
         tm = new DefaultTableModel();
         cbm = new DefaultComboBoxModel();
 
@@ -68,8 +61,17 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         jProgressBar1.setIndeterminate(true);
     }
 
-    private void addResults(List<Object[][]> results, List<Group> groups) {
+    private void addResults(List<Object[][]> results, List<Group> groups, List<PersistantTrack> selectedTracks) {
         offset = groups.size();
+        columnNames = new String[(4+selectedTracks.size())];
+        columnNames[0] = "start";
+        columnNames[1] = "stop";
+        int i=0;
+        for(; i<selectedTracks.size();i++){
+            columnNames[i+2] = selectedTracks.get(i).getDescription();
+        }
+        columnNames[i+2] = "Likelihood";
+        columnNames[i+3] = "FDR";
         for (Iterator<Object[][]> it = results.iterator(); it.hasNext();) {
             Object[][] currentResult = it.next();
             TableModel tmpTableModel = new DefaultTableModel(currentResult, columnNames);
@@ -232,7 +234,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     @Override
     public void update(Object args) {
         PerformAnalysis perfAn = (PerformAnalysis) args;
-        addResults(perfAn.getResults(), perfAn.getGroups());
+        addResults(perfAn.getResults(), perfAn.getGroups(), perfAn.getSelectedTraks());
     }
 
     @Override

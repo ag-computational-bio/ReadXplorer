@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -34,6 +30,21 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
     public void updateTrackList(List<PersistantTrack> selectedTraks) {
         if (this.selectedTraks == null) {
             this.selectedTraks = selectedTraks;
+            Integer[] defaultGroup = new Integer[selectedTraks.size()];
+            StringBuilder strBuilder = new StringBuilder("{");
+            for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+                PersistantTrack persistantTrack = it.next();
+                defaultGroup[selectedTraks.indexOf(persistantTrack)] = currentGroupNumber;
+                strBuilder.append(persistantTrack.getDescription());
+                if (it.hasNext()) {
+                    strBuilder.append(",");
+                } else {
+                    strBuilder.append("}");
+                }
+            }
+            currentGroupNumber++;
+            createdGroups.add(new Group(defaultGroup, strBuilder.toString()));
+            infoText.setText("The group "+strBuilder.toString()+" is created automatically.");
         }
         trackListModel.clear();
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
@@ -65,6 +76,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
         jLabel2 = new javax.swing.JLabel();
         addGroupButton = new javax.swing.JButton();
         removeGroupButton = new javax.swing.JButton();
+        infoText = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.jLabel1.text")); // NOI18N
 
@@ -102,6 +114,8 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(infoText, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.infoText.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,9 +123,6 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -128,7 +139,11 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
                                         .addComponent(addGroupButton)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(removeGroupButton))
-                                    .addComponent(groupCreationField))))))
+                                    .addComponent(groupCreationField)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(infoText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -137,7 +152,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(groupCreationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -149,8 +164,10 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
                         .addGap(18, 18, 18)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(infoText, javax.swing.GroupLayout.DEFAULT_SIZE, 14, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -197,14 +214,14 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
         createdGroups.remove(selectedIndex);
         groupListModel.remove(selectedIndex);
         selectedIndex = -1;
-        removeGroupButton.setEnabled(false);        
+        removeGroupButton.setEnabled(false);
     }//GEN-LAST:event_removeGroupButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton addGroupButton;
     private javax.swing.JList createdGroupsList;
     private javax.swing.JTextField groupCreationField;
+    private javax.swing.JLabel infoText;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -224,9 +241,8 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
     public List<Group> getCreatedGroups() {
         return createdGroups;
     }
-    
-    public boolean noGroupCreated(){
+
+    public boolean noGroupCreated() {
         return createdGroups.isEmpty();
     }
-    
 }

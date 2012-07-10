@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -21,10 +22,16 @@ import org.openide.awt.ActionRegistration;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can move the code below wherever you need, or register an action:
-@ActionID(category = "...", id = "de.cebitec.vamp.differentialExpression.diffExpWizardAction")
+@ActionID(category = "Tools", id = "de.cebitec.vamp.differentialExpression.diffExpWizardAction")
 @ActionRegistration(displayName = "Differential expression analysis")
 @ActionReference(path = "Menu/Tools")
 public final class diffExpWizardAction implements ActionListener {
+
+    private final LoginCookie context;
+
+    public diffExpWizardAction(LoginCookie context) {
+        this.context = context;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {

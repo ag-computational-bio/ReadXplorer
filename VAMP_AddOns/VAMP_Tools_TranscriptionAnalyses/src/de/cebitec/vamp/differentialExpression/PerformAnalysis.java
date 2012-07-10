@@ -31,7 +31,7 @@ public class PerformAnalysis extends Thread implements Observable {
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private GnuR gnuR;
     private File saveFile = null;
-    public static final boolean TESTING_MODE = true;
+    public static final boolean TESTING_MODE = false;
 
     public static enum Tool {
 

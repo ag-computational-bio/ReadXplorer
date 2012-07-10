@@ -57,8 +57,8 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     public DiffExpGraficsTopComponent() {
         cbm = new DefaultComboBoxModel(PerformAnalysis.Plot.values());
         initComponents();
-        setName(Bundle.CTL_DiffExpGraficsTopComponent());
-        setToolTipText(Bundle.HINT_DiffExpGraficsTopComponent());
+//        setName(Bundle.CTL_DiffExpGraficsTopComponent());
+//        setToolTipText(Bundle.HINT_DiffExpGraficsTopComponent());
         svgCanvas = new JSVGCanvas();
         jPanel1.add(svgCanvas, BorderLayout.CENTER);
 
