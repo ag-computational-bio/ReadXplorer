@@ -131,9 +131,11 @@ public class GnuR implements RMainLoopCallbacks {
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
         gnuR.eval("devSVG(file=\"" + path + "\")");
-        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID() + ", samplesA = "
-                + samplesABuilder.toString() + ", samplesB = "
-                + samplesBBuilder.toString() + ")");
+        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID()
+                + ", samplesA = "+ samplesABuilder.toString() 
+                + ", samplesB = " + samplesBBuilder.toString() 
+                + ", col = c(rep(\"blue\", 100), rep(\"black\", 900))"
+                + ")");
         gnuR.eval("dev.off()");
     }
 
