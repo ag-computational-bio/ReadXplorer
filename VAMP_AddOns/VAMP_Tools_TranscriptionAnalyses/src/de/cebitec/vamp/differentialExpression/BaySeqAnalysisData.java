@@ -20,6 +20,10 @@ public class BaySeqAnalysisData {
      */
     private int[] stop;
     /**
+     * ID of the reference annotations.
+     */
+    private String[] loci;
+    /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
      * secound Integer array holds the count data for the selected track with
@@ -43,9 +47,10 @@ public class BaySeqAnalysisData {
      * @param groups The groups which should be taken into account by the analysis step.
      * @param replicateStructure The replicate structure of the selected tracks.
      */
-    public BaySeqAnalysisData(int[] start, int[] stop, int capacity, List<Group> groups, int[] replicateStructure) {
+    public BaySeqAnalysisData(int[] start, int[] stop, String[] loci, int capacity, List<Group> groups, int[] replicateStructure) {
         this.start = start;
         this.stop = stop;
+        this.loci = loci;
         countData = new ArrayBlockingQueue<>(capacity);
         this.groups = groups;
         this.replicateStructure = replicateStructure;
@@ -105,9 +110,20 @@ public class BaySeqAnalysisData {
     public int[] getStop() {
         return stop;
     }
+    /**
+     * Return the Loci of the reference annotations.
+     * @return Loci of the reference annotations as an String Array.
+     */
+    public String[] getLoci() {
+        return loci;
+    }
     
     private int nextGroup = 0;
 
+    /**
+     * Returns the next group that has not been returned yet.
+     * @return the next unreturned group.
+     */
     public int[] getNextGroup() {
         int[] ret = new int[0];
         if (!(nextGroup >= groups.size())) {
@@ -120,10 +136,18 @@ public class BaySeqAnalysisData {
         return ret;
     }
 
+    /**
+     * Checks if there is still an unreturned group.
+     * @return true if there is still at least one unreturned group otherwise false
+     */
     public boolean hasGroups() {
         return !(nextGroup >= groups.size());
     }
 
+    /**
+     * Return the replicate structure.
+     * @return int array representing the replicate structure of the data.
+     */
     public int[] getReplicateStructure() {
         return replicateStructure;
     }

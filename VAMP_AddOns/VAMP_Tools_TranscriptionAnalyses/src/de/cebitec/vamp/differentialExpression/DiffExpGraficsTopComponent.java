@@ -18,6 +18,8 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
+import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -31,13 +33,10 @@ import org.openide.windows.TopComponent;
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.differentialExpression//DiffExpGrafics//EN",
 autostore = false)
 @TopComponent.Description(preferredID = "DiffExpGraficsTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpGraficsTopComponent")
-@ActionReference(path = "Menu/Window" /*
- * , position = 333
- */)
+@ActionReference(path = "Menu/Window")
 @TopComponent.OpenActionRegistration(displayName = "#CTL_DiffExpGraficsAction",
 preferredID = "DiffExpGraficsTopComponent")
 @Messages({
@@ -57,11 +56,32 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     public DiffExpGraficsTopComponent() {
         cbm = new DefaultComboBoxModel(PerformAnalysis.Plot.values());
         initComponents();
-//        setName(Bundle.CTL_DiffExpGraficsTopComponent());
-//        setToolTipText(Bundle.HINT_DiffExpGraficsTopComponent());
         svgCanvas = new JSVGCanvas();
         jPanel1.add(svgCanvas, BorderLayout.CENTER);
+        svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
 
+            @Override
+            public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
+                progressBar.setIndeterminate(true);
+            }
+
+            @Override
+            public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(100);
+                saveButton.setEnabled(true);
+                plotButton.setEnabled(true);
+            }
+
+            @Override
+            public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
+            }
+
+            @Override
+            public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
+                messages.setText("Could not load SVG file. Please try again.");
+            }
+        });
     }
 
     private void addResults(List<Group> groups) {
@@ -96,6 +116,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         jScrollPane2 = new javax.swing.JScrollPane();
         samplesBList = new javax.swing.JList(samplesB);
         saveButton = new javax.swing.JButton();
+        progressBar = new javax.swing.JProgressBar();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.jLabel1.text")); // NOI18N
 
@@ -141,23 +162,23 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(groupComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(plotTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel2)
-                        .addComponent(jLabel1)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(samplesALabel))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(samplesBLabel)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(groupComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(plotTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(samplesALabel))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(samplesBLabel)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(plotButton)
-                    .addComponent(saveButton))
+                    .addComponent(saveButton)
+                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 686, Short.MAX_VALUE)
                 .addContainerGap())
@@ -189,7 +210,9 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                         .addComponent(plotButton)
                         .addGap(18, 18, 18)
                         .addComponent(saveButton)
-                        .addGap(0, 148, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 116, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -198,43 +221,25 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     }// </editor-fold>//GEN-END:initComponents
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
-        boolean inputValid = false;
         PerformAnalysis.Plot selectedPlot = (PerformAnalysis.Plot) plotTypeComboBox.getSelectedItem();
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
 
-        if (selectedPlot == PerformAnalysis.Plot.Priors) {
-            inputValid = true;
-        } else {
-            if (samplA.length != samplB.length) {
-                inputValid = true;
-            } else {
-                for (int i = 0; i < samplA.length; i++) {
-                    if (samplA[i] != samplB[i]) {
-                        inputValid = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if (inputValid) {
-            try {
-                messages.setText("");
-                plotButton.setEnabled(false);
-                saveButton.setEnabled(false);
-                currentlyDisplayed = perfAn.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
-                svgCanvas.setURI(currentlyDisplayed.toURI().toString());
-                svgCanvas.setVisible(true);
-                svgCanvas.repaint();
-                saveButton.setEnabled(true);
-                plotButton.setEnabled(true);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        } else {
-            messages.setText("Samples A and B must not be the same!");
-        }
 
+        try {
+            messages.setText("");
+            plotButton.setEnabled(false);
+            saveButton.setEnabled(false);
+            currentlyDisplayed = perfAn.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
+            svgCanvas.setURI(currentlyDisplayed.toURI().toString());
+            svgCanvas.setVisible(true);
+            svgCanvas.repaint();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (BaySeq.SamplesNotValidException ex) {
+            messages.setText("Samples A and B must not be the same!");
+            plotButton.setEnabled(true);
+        }
     }//GEN-LAST:event_plotButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
@@ -246,7 +251,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
                 try {
                     Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-                    messages.setText("SVG image saved to "+outputFile.toString());
+                    messages.setText("SVG image saved to " + outputFile.toString());
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
@@ -267,6 +272,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private javax.swing.JLabel messages;
     private javax.swing.JButton plotButton;
     private javax.swing.JComboBox plotTypeComboBox;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JLabel samplesALabel;
     private javax.swing.JList samplesAList;
     private javax.swing.JLabel samplesBLabel;
@@ -305,16 +311,26 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     @Override
     public void itemStateChanged(ItemEvent e) {
         PerformAnalysis.Plot item = (PerformAnalysis.Plot) e.getItem();
-        if (item == PerformAnalysis.Plot.MACD || item == PerformAnalysis.Plot.Posteriors) {
+        if (item == PerformAnalysis.Plot.MACD) {
             samplesAList.setEnabled(true);
             samplesALabel.setEnabled(true);
             samplesBList.setEnabled(true);
             samplesBLabel.setEnabled(true);
-        } else {
+            groupComboBox.setEnabled(false);
+        }
+        if (item == PerformAnalysis.Plot.Posteriors) {
+            samplesAList.setEnabled(true);
+            samplesALabel.setEnabled(true);
+            samplesBList.setEnabled(true);
+            samplesBLabel.setEnabled(true);
+            groupComboBox.setEnabled(true);
+        }
+        if (item == PerformAnalysis.Plot.Priors) {
             samplesAList.setEnabled(false);
             samplesALabel.setEnabled(false);
             samplesBList.setEnabled(false);
             samplesBLabel.setEnabled(false);
+            groupComboBox.setEnabled(true);
         }
     }
 }

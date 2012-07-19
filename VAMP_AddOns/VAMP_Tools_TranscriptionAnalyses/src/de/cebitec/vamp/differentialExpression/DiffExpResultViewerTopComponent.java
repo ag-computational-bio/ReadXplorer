@@ -63,15 +63,17 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     private void addResults(List<Object[][]> results, List<Group> groups, List<PersistantTrack> selectedTracks) {
         offset = groups.size();
-        columnNames = new String[(4+selectedTracks.size())];
-        columnNames[0] = "start";
-        columnNames[1] = "stop";
+        columnNames = new String[(5+selectedTracks.size())];
         int i=0;
-        for(; i<selectedTracks.size();i++){
-            columnNames[i+2] = selectedTracks.get(i).getDescription();
+        columnNames[i++] = "locus";
+        columnNames[i++] = "start";
+        columnNames[i++] = "stop";
+        int j=i;
+        for(; j<i+selectedTracks.size();j++){
+            columnNames[j] = selectedTracks.get(j-i).getDescription();
         }
-        columnNames[i+2] = "Likelihood";
-        columnNames[i+3] = "FDR";
+        columnNames[j++] = "Likelihood";
+        columnNames[j] = "False discovery rate";
         for (Iterator<Object[][]> it = results.iterator(); it.hasNext();) {
             Object[][] currentResult = it.next();
             TableModel tmpTableModel = new DefaultTableModel(currentResult, columnNames);

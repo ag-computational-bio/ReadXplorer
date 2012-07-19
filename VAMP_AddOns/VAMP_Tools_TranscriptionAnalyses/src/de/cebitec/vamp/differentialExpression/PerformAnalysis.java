@@ -4,6 +4,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.BaySeq.SamplesNotValidException;
 import de.cebitec.vamp.util.Observable;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rosuda.JRI.RFactor;
 import org.rosuda.JRI.RVector;
 
 /**
@@ -29,7 +31,7 @@ public class PerformAnalysis extends Thread implements Observable {
     private int[] replicateStructure;
     private List<Object[][]> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
-    private GnuR gnuR;
+    private BaySeq baySeq;
     private File saveFile = null;
     public static final boolean TESTING_MODE = false;
 
@@ -86,14 +88,14 @@ public class PerformAnalysis extends Thread implements Observable {
             bseqData = prepareAnnotationsForBaySeq();
             bseqData = prepareDataForBaySeq(bseqData, allCountData);
         }
-        gnuR = new GnuR();
+        baySeq = new BaySeq();
         List<RVector> ret;
         if (!TESTING_MODE) {
-            ret = gnuR.process(bseqData, persAnno.size(), selectedTraks.size(), saveFile);
+            ret = baySeq.processWithBaySeq(bseqData, persAnno.size(), selectedTraks.size(), saveFile);
         } else {
             //You must enter the number of annatations by hand for the
             //testing scenario.
-            ret = gnuR.process(bseqData, 3232, selectedTraks.size(), saveFile);
+            ret = baySeq.processWithBaySeq(bseqData, 3232, selectedTraks.size(), saveFile);
         }
         return convertRresults(ret);
     }
@@ -102,11 +104,23 @@ public class PerformAnalysis extends Thread implements Observable {
         List<Object[][]> ret = new ArrayList<>();
         for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
             RVector currentRVector = it.next();
-            Object[][] current = new Object[currentRVector.at(0).asIntArray().length][currentRVector.size()];
-            for (int i = 0; i < currentRVector.size(); i++) {
-                double[] currentValues = currentRVector.at(i).asDoubleArray();
-                for (int j = 0; j < currentValues.length; j++) {
-                    current[j][i] = currentValues[j];
+            int i = 0;
+            Object[][] current = new Object[currentRVector.at(1).asIntArray().length][currentRVector.size()];
+            RFactor currentStringValues = currentRVector.at(i).asFactor();
+            for (int j = 0; j < currentStringValues.size(); j++) {
+                current[j][i] = currentStringValues.at(i);
+            }
+            i++;
+            for (; i < 3; i++) {
+                int[] currentIntValues = currentRVector.at(i).asIntArray();
+                for (int j = 0; j < currentIntValues.length; j++) {
+                    current[j][i] = currentIntValues[j];
+                }
+            }
+            for (; i < currentRVector.size(); i++) {
+                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
+                for (int j = 0; j < currentDoubleValues.length; j++) {
+                    current[j][i] = currentDoubleValues[j];
                 }
             }
             ret.add(current);
@@ -117,14 +131,16 @@ public class PerformAnalysis extends Thread implements Observable {
     private BaySeqAnalysisData prepareAnnotationsForBaySeq() {
         int[] annotationsStart = new int[persAnno.size()];
         int[] annotationsStop = new int[persAnno.size()];
+        String[] loci = new String[persAnno.size()];
         int i = 0;
         for (Iterator<PersistantAnnotation> it = persAnno.iterator(); it.hasNext(); i++) {
             PersistantAnnotation persistantAnnotation = it.next();
             annotationsStart[i] = persistantAnnotation.getStart();
             annotationsStop[i] = persistantAnnotation.getStop();
+            loci[i] = persistantAnnotation.getLocus();
         }
 
-        BaySeqAnalysisData ret = new BaySeqAnalysisData(annotationsStart, annotationsStop, selectedTraks.size(), groups, replicateStructure);
+        BaySeqAnalysisData ret = new BaySeqAnalysisData(annotationsStart, annotationsStop, loci, selectedTraks.size(), groups, replicateStructure);
         return ret;
     }
 
@@ -147,17 +163,17 @@ public class PerformAnalysis extends Thread implements Observable {
         return bSeqData;
     }
 
-    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException {
+    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {
-            gnuR.plotMACD(file, samplesA, samplesB);
+            baySeq.plotMACD(file, samplesA, samplesB);
         }
         if (plot == Plot.Posteriors) {
-            gnuR.plotPosteriors(file, group, samplesA, samplesB);
+            baySeq.plotPosteriors(file, group, samplesA, samplesB);
         }
         if (plot == Plot.Priors) {
-            gnuR.plotPriors(file, group);
+            baySeq.plotPriors(file, group);
         }
         return file;
     }

@@ -66,4 +66,7 @@ public class Properties {
     /** Type value identifying an object as belonging to any of the other types.*/
     public static final byte ALL = 0;
     
+    /** The CRAN Mirror used by Gnu R to load missing packages */
+    public static final String CRAN_MIRROR = "CRAN_MIRROR";
+    
 }
