@@ -21,7 +21,7 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
     private List<PersistantReference> references;
     private int selectedIndex = -1;
     private PersistantReference selectedRef;
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<PersistantTrack>();
+    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
 
     /**
      * Creates new form diffExpVisualPanel1
@@ -30,12 +30,6 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
         ProjectConnector con = ProjectConnector.getInstance();
         references = con.getGenomes();
         initComponents();
-        setUp();
-    }
-
-    private void setUp() {
-        referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        referenceList.addListSelectionListener(this);
     }
 
     @Override
@@ -59,6 +53,8 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
         trackList = new javax.swing.JList(trackListModel);
 
         referenceList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        referenceList.addListSelectionListener(this);
         jScrollPane1.setViewportView(referenceList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1.class, "diffExpVisualPanel1.jLabel1.text")); // NOI18N
@@ -76,11 +72,11 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane2))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel2))
+                        .addGap(0, 13, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

@@ -56,6 +56,12 @@
                 <package>jxl.read.biff</package>
                 <package>jxl.write</package>
                 <package>jxl.write.biff</package>
+                <package>net.sf.picard</package>
+                <package>net.sf.picard.cmdline</package>
+                <package>net.sf.picard.io</package>
+                <package>net.sf.picard.metrics</package>
+                <package>net.sf.picard.sam</package>
+                <package>net.sf.picard.util</package>
                 <package>net.sf.samtools</package>
                 <package>net.sf.samtools.apps</package>
                 <package>net.sf.samtools.example</package>
@@ -115,6 +121,9 @@
                 <package>org.apache.axis.wsdl.gen</package>
                 <package>org.apache.axis.wsdl.symbolTable</package>
                 <package>org.apache.axis.wsdl.toJava</package>
+                <package>org.apache.batik.swing</package>
+                <package>org.apache.batik.swing.gvt</package>
+                <package>org.apache.batik.swing.svg</package>
                 <package>org.apache.commons.discovery</package>
                 <package>org.apache.commons.discovery.ant</package>
                 <package>org.apache.commons.discovery.jdk</package>
@@ -125,6 +134,7 @@
                 <package>org.apache.commons.discovery.tools</package>
                 <package>org.apache.commons.logging</package>
                 <package>org.apache.commons.logging.impl</package>
+                <package>org.apache.tools.bzip2</package>
                 <package>org.biojava.bibliography</package>
                 <package>org.biojava.bio</package>
                 <package>org.biojava.bio.alignment</package>
@@ -258,7 +268,92 @@
                 <package>org.rosuda.JRI</package>
                 <package>org.rosuda.REngine</package>
                 <package>org.rosuda.REngine.JRI</package>
+                <package>org.xerial.snappy</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-transcoder.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-transcoder.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xerces_2_5_0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xerces_2_5_0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-css.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-css.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xml-apis-ext.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xml-apis-ext.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/SequenceTools-1.0-SNAPSHOT.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/SequenceTools-1.0-SNAPSHOT.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/mysql-connector-java-5.1.7-bin.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/mysql-connector-java-5.1.7-bin.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/pdf-transcoder.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/pdf-transcoder.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-swing.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-swing.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xalan-2.6.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xalan-2.6.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-script.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-script.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-gvt.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-gvt.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xml-apis.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xml-apis.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/BuildBamIndex.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/BuildBamIndex.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JRI.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-xml.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-xml.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/REngine.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/REngine.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-util.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-util.jar</binary-origin>
+            </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/biojava-core-1.8.1.jar</binary-origin>
@@ -266,10 +361,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/jxl.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jxl.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-logging-1.0.4.jar</runtime-relative-path>
@@ -284,12 +375,16 @@
                 <binary-origin>release/modules/ext/axis.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/SequenceTools-1.0-SNAPSHOT.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/SequenceTools-1.0-SNAPSHOT.jar</binary-origin>
+                <runtime-relative-path>ext/batik-gui-util.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-gui-util.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/mysql-connector-java-5.1.7-bin.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/mysql-connector-java-5.1.7-bin.jar</binary-origin>
+                <runtime-relative-path>ext/batik-codec.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-codec.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-dom.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-dom.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>
@@ -300,32 +395,48 @@
                 <binary-origin>release/modules/ext/bytecode.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/batik-ext.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-ext.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/js.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/js.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-extension.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-extension.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/h2-1.3.163.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/h2-1.3.163.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
+                <runtime-relative-path>ext/batik-awt-util.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-awt-util.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/sam-1.69.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/sam-1.69.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
+                <runtime-relative-path>ext/batik-svg-dom.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-svg-dom.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/JRI.jar</binary-origin>
+                <runtime-relative-path>ext/batik-anim.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-anim.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/REngine.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/REngine.jar</binary-origin>
+                <runtime-relative-path>ext/batik-bridge.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-bridge.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

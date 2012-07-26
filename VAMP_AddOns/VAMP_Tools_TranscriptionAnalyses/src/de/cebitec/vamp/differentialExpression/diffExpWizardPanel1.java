@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.differentialExpression;
 
 import javax.swing.event.ChangeListener;
@@ -63,8 +59,10 @@ public class diffExpWizardPanel1 implements WizardDescriptor.ValidatingPanel<Wiz
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty("genomeID", getComponent().getSelectedReferenceGenomeID());
-        wiz.putProperty("tracks", getComponent().getSelectedTracks());
+        if (getComponent().selectionFinished()) {
+            wiz.putProperty("genomeID", getComponent().getSelectedReferenceGenomeID());
+            wiz.putProperty("tracks", getComponent().getSelectedTracks());
+        }
     }
 
     @Override

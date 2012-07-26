@@ -63,8 +63,11 @@ public class GetMappingsFromTrack {
         return mappings;
     }
     
-        /**
-     * Receives all the mappings belonging to the given trackID.
+    /**
+     * Receives all the mappings belonging to the given trackID. In order to
+     * save space only Start, Stop and Direction are received by this method.
+     * If you need the full set of information use the loadMappingsByTrackID(final int trackID)
+     * method.
      * @param trackID the ID of the track the received mappings should be from
      * @return list of mappings
      */

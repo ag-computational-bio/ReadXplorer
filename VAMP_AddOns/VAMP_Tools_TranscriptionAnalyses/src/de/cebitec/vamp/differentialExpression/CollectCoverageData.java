@@ -9,22 +9,52 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Collect the coverage data for a given track.
  * @author kstaderm
  */
 public class CollectCoverageData{
 
+    /**
+     * The ID of the track the coverage data should be collected for.
+     */
     private int trackID;
+    /**
+     * The whole sete of annotations for the current genome.
+     */
     private List<PersistantAnnotation> genomeAnnotations;
-    private Map<Integer, Integer> countData = new HashMap<Integer, Integer>();
+    /**
+     * The storage holding the collected coverage data, also named count data.
+     * The Key value of this HashMap is the ID of the annotation. The value value
+     * represents the corresponding number of counted coverage data.
+     */
+    private Map<Integer, Integer> countData = new HashMap<>();
+    /**
+     * The whole mappings for the track with the given track ID.
+     */
     private List<PersistantMapping> mappings;
+    /**
+     * Adjusts how many bases downstream from the start position of an annotation
+     * a mapping should still be considered a hit. The annotation in the database
+     * are manly CDS positions. So it is normal that a lot of mappings will start
+     * in an are downstream of the start position of the annotation.
+     */
     private final static int STARTOFFSET = 30;
 
+    
+    /**
+     * Constructor of the class.
+     * @param trackID The ID of the track the instance of this class should collect the coverage data for
+     * @param perfAnalysis Instance of the calling instance of PerformAnalysis.
+     */
     public CollectCoverageData(int trackID, PerformAnalysis perfAnalysis) {
         this.genomeAnnotations = perfAnalysis.getPersAnno();
         this.trackID = trackID;
     }
 
+    /**
+     * Starts collecting the coverage Data.
+     * @return a Map containig the coverage data for the track provided to the instance of this class at creation time.
+     */
     public Map<Integer, Integer> startCollecting() {
         GetMappingsFromTrack getMappings = new GetMappingsFromTrack();
         mappings = getMappings.loadReducedMappingsByTrackID(trackID);

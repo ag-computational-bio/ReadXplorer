@@ -4,9 +4,12 @@
  */
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.api.cookies.LoginCookie;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +22,24 @@ import org.openide.awt.ActionRegistration;
 
 // An example action demonstrating how the wizard could be called from within
 // your code. You can move the code below wherever you need, or register an action:
-@ActionID(category="...", id="de.cebitec.vamp.differentialExpression.diffExpWizardAction")
-@ActionRegistration(displayName="Open diffExp Wizard")
-@ActionReference(path="Menu/Tools")
+@ActionID(category = "Tools", id = "de.cebitec.vamp.differentialExpression.diffExpWizardAction")
+@ActionRegistration(displayName = "Differential expression analysis")
+@ActionReference(path = "Menu/Tools")
 public final class diffExpWizardAction implements ActionListener {
+
+    private final LoginCookie context;
+
+    public diffExpWizardAction(LoginCookie context) {
+        this.context = context;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new diffExpWizardPanel1());
+        panels.add(new diffExpWizardPanel1b());
         panels.add(new diffExpWizardPanel2());
+        panels.add(new diffExpWizardPanel3());
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
             Component c = panels.get(i).getComponent();
@@ -43,13 +54,29 @@ public final class diffExpWizardAction implements ActionListener {
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
             }
         }
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<WizardDescriptor>(panels));
+        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle("Differential expression analysis");
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            PerformAnalysis perfan = new PerformAnalysis();
-            perfan.start();
+            List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
+            List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
+            Integer genomeID = (Integer) wiz.getProperty("genomeID");
+            int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
+            File saveFile = (File) wiz.getProperty("saveFile");
+            PerformAnalysis perfAnalysis;
+            if (saveFile != null) {
+                perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure, saveFile);
+            } else {
+                perfAnalysis = new PerformAnalysis(PerformAnalysis.Tool.BaySeq, selectedTraks, createdGroups, genomeID, replicateStructure);
+            }
+            DiffExpGraficsTopComponent diffExpGraficsTopComponent = new DiffExpGraficsTopComponent();
+            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(diffExpGraficsTopComponent);
+            diffExpResultViewerTopComponent.open();
+            diffExpResultViewerTopComponent.requestActive();
+            perfAnalysis.registerObserver(diffExpGraficsTopComponent);
+            perfAnalysis.registerObserver(diffExpResultViewerTopComponent);
+            perfAnalysis.start();
         }
     }
 }
