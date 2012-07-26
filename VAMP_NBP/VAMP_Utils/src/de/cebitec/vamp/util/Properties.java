@@ -24,12 +24,19 @@ public class Properties {
     public static final String VAMP_DATABASE_DIRECTORY = "Vamp.Database.Directory";
     
     // Sequence pair properties
+    /** 0 = perfect sequence pair (distance and orientation correct). */
     public static final byte TYPE_PERFECT_PAIR = 0;
+    /** 1 = distance too large sequence pair. */
     public static final byte TYPE_DIST_LARGE_PAIR = 1;
+    /** 2 = distance too small sequence pair. */
     public static final byte TYPE_DIST_SMALL_PAIR = 2;
+    /** 3 = orientation wrong sequence pair (distance is correct). */
     public static final byte TYPE_ORIENT_WRONG_PAIR = 3;
+    /** 4 = distance too large and orientation wrong sequence pair. */
     public static final byte TYPE_OR_DIST_LARGE_PAIR = 4;
+    /** 5 = distance too small and orientation wrong sequence pair. */
     public static final byte TYPE_OR_DIST_SMALL_PAIR = 5;
+    /** 6 = a single mapping whose partner did not map on the reference. */
     public static final byte TYPE_UNPAIRED_PAIR = 6;
     
     //Properties to set different viewers active

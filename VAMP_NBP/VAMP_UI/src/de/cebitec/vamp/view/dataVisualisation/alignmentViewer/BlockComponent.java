@@ -5,7 +5,6 @@ import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -95,7 +94,7 @@ public class BlockComponent extends JComponent {
              */
             private String getHeader() {
                 PersistantMapping mapping = (PersistantMapping) BlockComponent.this.block.getPersistantObject();
-                final String strand = mapping.getStrand() == SequenceUtils.STRAND_FWD ? ">>" : "<<";
+                final String strand = mapping.isFwdStrand() ? ">>" : "<<";
                 HashMap<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
                 String name = "Reference seq from ";
                 if (trackNames.containsKey(mapping.getTrackId())) {

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * A track connector for a single track. It handles all data requests for this track.
  *
  * @author ddoppmeier, rhilker
  */
@@ -33,8 +34,6 @@ public class TrackConnector {
      * A track connector for a single track. It handles all data requests for this track.
      * @param track the track for which this connector is created
      * @param adapter the database adapter type (mysql or h2)
-     * @param getFilePath true, if the data is to be retrieved from a DB, false if it
-     *      is retrieved from some other source
      */
     protected TrackConnector(PersistantTrack track, String adapter) {
         this.associatedTracks = new ArrayList<PersistantTrack>();
@@ -57,10 +56,9 @@ public class TrackConnector {
 
     /**
      * A track connector for a list of tracks. It handles all data requests for these tracks.
+     * @param id id of the track
      * @param tracks the list of tracks for which this connector is created
      * @param adapter the database adapter type (mysql or h2)
-     * @param getFilePath true, if the data is to be retrieved from a DB, false if it
-     *      is retrieved from some other source
      * @param combineTracks true, if the data of these tracks is to be combined, false if 
      *      it should be kept separated
      */
@@ -99,7 +97,6 @@ public class TrackConnector {
      * of the request (the object that wants to receive the coverage) is handed
      * over to the CoverageThread, who will carry out the request as soon as
      * possible. Afterwards the coverage result is handed over to the receiver.
-     *
      * @param request the coverage request including the receiving object
      */
     public void addCoverageRequest(IntervalRequest request) {
@@ -107,11 +104,19 @@ public class TrackConnector {
         //Currently we can only catch the diffs for one track, but not, if this is a multiple track connector
     }
     
-    public void addDiffRequest(IntervalRequest request) {
+    /**
+     * Handles a diff request. This means the request is carried out by the TrackConnector
+     * and afterwards the diff result is handed over to the receiver.
+     * @param request the diff request including the receiving object
+     * @return request unneeded: true, if this is not a direct access track, false, if the request had to be carried out
+     */
+    public boolean addDiffRequest(IntervalRequest request) {
         if (request instanceof CoverageAndDiffRequest && this.associatedTracks.get(0).isDbUsed()) {
             CoverageAndDiffResultPersistant result = this.getDiffsAndGapsForInterval(request.getFrom(), request.getTo());
             request.getSender().receiveData(result);
+            return false;
         }
+        return true;
     }
     
     /**
@@ -181,7 +186,7 @@ public class TrackConnector {
                         int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                         int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
                         boolean isBestMapping = (bestMapping == 1 ? true : false);
-                        PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+                        PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, isForwardStrand, count, errors, sequenceID, isBestMapping);
 
                         // add new mapping if not exists
                         if (!mappings.containsKey(m.getId())) {
@@ -267,7 +272,7 @@ public class TrackConnector {
             }
         }
 
-        return new CoverageAndDiffResultPersistant(null, diffs, gaps, true);
+        return new CoverageAndDiffResultPersistant(null, diffs, gaps, true, from, to);
     }
     
 
@@ -671,6 +676,7 @@ public class TrackConnector {
                             int start = rs3.getInt(FieldNames.MAPPING_START);
                             int stop = rs3.getInt(FieldNames.MAPPING_STOP);
                             byte direction = rs3.getByte(FieldNames.MAPPING_DIRECTION);
+                            boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
                             int count = rs3.getInt("MAPPING_REP");
                             int errors = rs3.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                             int bestMapping = rs3.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
@@ -680,7 +686,7 @@ public class TrackConnector {
                             long mapping2Id = rs3.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
                             byte seqPairType = rs3.getByte(FieldNames.SEQ_PAIR_TYPE);
                             int seqPairReplicates = rs3.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
-                            PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+                            PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, isFwdStrand, count, errors, sequenceID, isBestMapping);
 
                             // add new seqPair if not exists
                             if (!seqPairs.containsKey(seqPairID)) {
@@ -712,6 +718,7 @@ public class TrackConnector {
                         int start = rs.getInt(FieldNames.MAPPING_START);
                         int stop = rs.getInt(FieldNames.MAPPING_STOP);
                         byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                        boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
                         int count = rs.getInt("MAPPING_REP");
                         int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                         int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
@@ -721,7 +728,7 @@ public class TrackConnector {
                         long mapping2Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
                         byte seqPairType = rs.getByte(FieldNames.SEQ_PAIR_TYPE);
                         int seqPairReplicates = rs.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
-                        PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+                        PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, isFwdStrand, count, errors, sequenceID, isBestMapping);
 
                         // add new seqPair if not exists
                         if (!seqPairs.containsKey(seqPairID)) {
@@ -757,12 +764,13 @@ public class TrackConnector {
                         int start = rs2.getInt(FieldNames.MAPPING_START);
                         int stop = rs2.getInt(FieldNames.MAPPING_STOP);
                         byte direction = rs2.getByte(FieldNames.MAPPING_DIRECTION);
+                        boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
                         int count = rs2.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
                         int errors = rs2.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                         int bestMapping = rs2.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
                         boolean isBestMapping = (bestMapping == 1 ? true : false);
                         long seqPairID = rs2.getLong(FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID);
-                        PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, direction, count, errors, sequenceID, isBestMapping);
+                        PersistantMapping mapping = new PersistantMapping(mappingID, start, stop, mappingTrack, isFwdStrand, count, errors, sequenceID, isBestMapping);
 
                         // add to seqPair container
                         if (!seqPairs.containsKey(seqPairID)) {
@@ -846,16 +854,17 @@ public class TrackConnector {
                 int start = rs.getInt(FieldNames.MAPPING_START);
                 int stop = rs.getInt(FieldNames.MAPPING_STOP);
                 byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
                 int count = rs.getInt("MAPPING_REPLICATES");
                 int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                 int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                boolean isBestMapping = (bestMapping == 1 ? true : false);
+                boolean isBestMapping = bestMapping == 1;
                 long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING1_ID);
                 long mapping2Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
                 byte seqPairType = rs.getByte(FieldNames.SEQ_PAIR_TYPE);
                 int seqPairReplicates = rs.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
 
-                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, direction, count, errors, -1, isBestMapping);
+                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
                 seqPairData.addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
 
             }
@@ -869,16 +878,17 @@ public class TrackConnector {
                 int start = rs2.getInt(FieldNames.MAPPING_START);
                 int stop = rs2.getInt(FieldNames.MAPPING_STOP);
                 byte direction = rs2.getByte(FieldNames.MAPPING_DIRECTION);
+                boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
                 int count = rs2.getInt("MAPPING_REPLICATES");
                 int errors = rs2.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                 int bestMapping = rs2.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                boolean isBestMapping = (bestMapping == 1 ? true : false);
+                boolean isBestMapping = bestMapping == 1;
                 long mapping1Id = rs2.getLong(FieldNames.SEQ_PAIR_MAPPING1_ID);
                 long mapping2Id = rs2.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
                 byte seqPairType = rs2.getByte(FieldNames.SEQ_PAIR_TYPE);
                 int seqPairReplicates = rs2.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
 
-                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, direction, count, errors, -1, isBestMapping);
+                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
                 seqPairData.addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
 
             }
@@ -895,12 +905,13 @@ public class TrackConnector {
                 int start = rs.getInt(FieldNames.MAPPING_START);
                 int stop = rs.getInt(FieldNames.MAPPING_STOP);
                 byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
                 int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
                 int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                 int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                boolean isBestMapping = (bestMapping == 1 ? true : false);
+                boolean isBestMapping = bestMapping == 1;
                 long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID);
-                PersistantMapping mapping = new PersistantMapping((int) mapping1Id, start, stop, -1, direction, count, errors, -1, isBestMapping);
+                PersistantMapping mapping = new PersistantMapping((int) mapping1Id, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
 
                 seqPairData.addPersistantMapping(mapping, Properties.TYPE_UNPAIRED_PAIR, -1, -1, -1);
 
@@ -918,7 +929,7 @@ public class TrackConnector {
     /**
      * Fetches a {@link DiscreteCountingDistribution} for this track.
      *
-     * @param the type of distribution either
+     * @param type the type of distribution either
      * Properties.COVERAGE_INCREASE_DISTRIBUTION or
      * Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
      * @return a {@link DiscreteCountingDistribution} for this track.

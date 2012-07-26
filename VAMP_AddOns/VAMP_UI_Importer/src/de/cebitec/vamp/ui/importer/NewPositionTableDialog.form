@@ -89,7 +89,7 @@
           <StringArray count="0"/>
         </Property>
         <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new DefaultListCellRenderer(){&#xa;    @Override&#xa;    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){&#xa;        if(value instanceof ParserI){&#xa;            return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);&#xa;        } else {&#xa;            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);&#xa;        }&#xa;    }&#xa;}" type="code"/>
+          <Connection code="new DefaultListCellRenderer(){&#xa;    @Override&#xa;    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){&#xa;        if(value instanceof ParserI){&#xa;            return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);&#xa;        } else {&#xa;            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);&#xa;        }&#xa;    }&#xa;}" type="code"/>
         </Property>
       </Properties>
       <Events>

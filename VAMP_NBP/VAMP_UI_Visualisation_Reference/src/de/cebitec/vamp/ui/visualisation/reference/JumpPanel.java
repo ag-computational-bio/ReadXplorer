@@ -85,7 +85,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 if (selectedRows.length > 0) {
                     int correctedRow = annotationTable.convertRowIndexToModel(selectedRows[0]);
                     PersistantAnnotation annotation = (PersistantAnnotation) annotationTable.getModel().getValueAt(correctedRow, 0);
-                    if (annotation.getStrand() == 1) {
+                    if (annotation.isFwdStrand()) {
                         boundsManager.navigatorBarUpdated(annotation.getStart());
                     } else {
                         boundsManager.navigatorBarUpdated(annotation.getStop());
@@ -190,7 +190,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         });
 
         buttonGroup1.add(radioEC);
-        radioEC.setText("EC-Number");
+        radioEC.setText("EC-Num");
         radioEC.setActionCommand("ec");
         radioEC.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -221,14 +221,13 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         filterPropertiesLayout.setHorizontalGroup(
             filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(filterPropertiesLayout.createSequentialGroup()
-                .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jumpFilterLabel)
-                    .addComponent(filterForLabel))
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(filterPropertiesLayout.createSequentialGroup()
+                        .addComponent(jumpFilterLabel)
                         .addGap(10, 10, 10)
                         .addComponent(filterTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(filterPropertiesLayout.createSequentialGroup()
+                        .addComponent(filterForLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(radioAnnotationButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -246,14 +245,14 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jumpFilterLabel)
                     .addComponent(filterTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(filterForLabel)
                     .addComponent(radioProduct)
                     .addComponent(radioEC)
                     .addComponent(radioAnnotationButton)
                     .addComponent(radioGene))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         tableScrollPane.setViewportView(annotationTable);
@@ -270,7 +269,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             .addGroup(featureGroundPanelLayout.createSequentialGroup()
                 .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE))
+                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
         );
 
         searchPatternField.addActionListener(new java.awt.event.ActionListener() {
@@ -302,7 +301,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addComponent(searchPatternButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jumpTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                    .addComponent(jumpTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
                     .addComponent(searchPatternField))
                 .addContainerGap())
             .addComponent(featureGroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

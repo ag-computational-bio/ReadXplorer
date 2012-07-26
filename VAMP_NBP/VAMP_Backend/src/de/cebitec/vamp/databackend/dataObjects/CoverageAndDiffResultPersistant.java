@@ -15,6 +15,8 @@ public class CoverageAndDiffResultPersistant {
     private List<PersistantDiff> diffs;
     private List<PersistantReferenceGap> gaps;
     private boolean diffsAndGapsUsed;
+    private int lowerBound;
+    private int upperBound;
 
     /**
      * Data storage for coverage, diffs and gaps.
@@ -25,11 +27,14 @@ public class CoverageAndDiffResultPersistant {
      * @param gaps the list of gaps to store, if they are not use, you can add null
      *      or an empty list
      */
-    public CoverageAndDiffResultPersistant(PersistantCoverage coverage, List<PersistantDiff> diffs, List<PersistantReferenceGap> gaps, boolean diffsAndGapsUsed) {
+    public CoverageAndDiffResultPersistant(PersistantCoverage coverage, List<PersistantDiff> diffs, List<PersistantReferenceGap> gaps, 
+            boolean diffsAndGapsUsed, int lowerBound, int upperBound) {
         this.coverage = coverage;
         this.diffs = diffs;
         this.gaps = gaps;
         this.diffsAndGapsUsed = diffsAndGapsUsed;
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
     }
     
     /**
@@ -73,6 +78,20 @@ public class CoverageAndDiffResultPersistant {
      */
     public boolean isDiffsAndGapsUsed() {
         return this.diffsAndGapsUsed;
+    }    
+    
+    /**
+     * @return the lower bound of the interval of this request
+     */
+    public int getLowerBound() {
+        return this.lowerBound;
+    }
+
+    /**
+     * @return the upper bound of the interval of this request
+     */
+    public int getUpperBound() {
+        return this.upperBound;
     }
     
     

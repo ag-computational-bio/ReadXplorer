@@ -118,7 +118,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
                     PersistantMapping mapping = mappings.get(j);
 
                     //mappings identified within a annotation
-                    if (mapping.getStop() > featStart && annotation.getStrand() == mapping.getStrand()
+                    if (mapping.getStop() > featStart && annotation.isFwdStrand() == mapping.isFwdStrand()
                             && mapping.getStart() < featStop) {
 
                         if (fstFittingMapping == true) {

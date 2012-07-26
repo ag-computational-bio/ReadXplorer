@@ -81,7 +81,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             PersistantAnnotation annotation2 = this.genomeAnnotations.get(i + 1);
             //we currently only exclude exons from the detection 
             if (annotation1.getType() != FeatureType.EXON) {
-                if (annotation1.getStrand() == annotation2.getStrand() && annotation2.getType() != FeatureType.EXON) {
+                if (annotation1.isFwdStrand() == annotation2.isFwdStrand() && annotation2.getType() != FeatureType.EXON) {
                     if (annotation2.getStart() + 20 <= annotation1.getStop()) { //genes may overlap at the ends, happens quite often
                         //do nothing
                     } else {
@@ -93,13 +93,13 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                      * even if their distance is not larger than 1000bp.
                      */
                     int annoIndex = i + 2;
-                    while ((annotation1.getStrand() != annotation2.getStrand() || 
+                    while ((annotation1.isFwdStrand() != annotation2.isFwdStrand() || 
                             annotation2.getType() == FeatureType.EXON) && 
                             annoIndex < this.genomeAnnotations.size() - 1) {
                         
                         annotation2 = this.genomeAnnotations.get(annoIndex++);
                     }
-                    if (annotation1.getStrand() == annotation2.getStrand() && annotation2.getStart() - annotation1.getStop() < 1000) {
+                    if (annotation1.isFwdStrand() == annotation2.isFwdStrand() && annotation2.getStart() - annotation1.getStop() < 1000) {
                         this.annoToPutativeOperonMap.put(annotation1.getId(), new OperonAdjacency(annotation1, annotation2));
                     }
                 }
@@ -168,7 +168,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
                     if (mapping.getStart() > annotation2Stop ) {
                         break; //since the mappings are sorted by start position
-                    } else if (mapping.getStrand() != annotation1.getStrand() || mapping.getStop() < annotation1Stop) {
+                    } else if (mapping.isFwdStrand() != annotation1.isFwdStrand() || mapping.getStop() < annotation1Stop) {
                         continue;
                     }
 

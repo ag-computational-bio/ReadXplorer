@@ -2,21 +2,19 @@ package de.cebitec.vamp.externalSort;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ExternalSortBAMTest {
+public class ExternalSortBAMReadSeqTest {
     
-    public ExternalSortBAMTest() {
+    public ExternalSortBAMReadSeqTest() {
     }
 
     @BeforeClass
@@ -37,9 +35,10 @@ public class ExternalSortBAMTest {
     
     @Test
     public void testExternalSort() {
-        System.out.println("externalSort");
-        String origPath = "D:\\Programmieren & Studieren\\Vamp\\Testdata\\Neuer Ordner\\1read_1-C40A-80bp-15filtered-part.jok._sort.bam";
-        ExternalSortBAM sort = new ExternalSortBAM(origPath);
+        System.out.println("externalSort bam by read seq");
+        String origPath = "E:\\Programmieren & Studieren\\Vamp\\Burkhard\\454Contigs.bam";
+        File inputFile = new File(origPath);
+        ExternalSortBAM sort = new ExternalSortBamReadSeq(inputFile);
         
         SAMFileReader inputReader = new SAMFileReader(new File(origPath));
         SAMFileReader sortedReader = new SAMFileReader(sort.getSortedFile());

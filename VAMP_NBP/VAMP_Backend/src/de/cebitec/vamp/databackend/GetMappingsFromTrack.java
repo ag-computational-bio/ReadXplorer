@@ -2,6 +2,7 @@ package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +39,7 @@ public class GetMappingsFromTrack {
                 int id = rs.getInt(FieldNames.MAPPING_ID);
                 int start = rs.getInt(FieldNames.MAPPING_START);
                 int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
                 int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
                 int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                 int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
@@ -46,7 +47,7 @@ public class GetMappingsFromTrack {
 
 
                 PersistantMapping mapping = new PersistantMapping(id, start, stop, trackID,
-                        direction, count, errors, seqId, isBestMapping);
+                        isFwdStrand, count, errors, seqId, isBestMapping);
                 mappings.add(mapping);
             }
             rs.close();
@@ -83,10 +84,10 @@ public class GetMappingsFromTrack {
             while (rs.next()) {
                 int start = rs.getInt(FieldNames.MAPPING_START);
                 int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
+                boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
 
 
-                PersistantMapping mapping = new PersistantMapping(start, stop, direction);
+                PersistantMapping mapping = new PersistantMapping(start, stop, isFwdStrand);
                 mappings.add(mapping);
             }
             rs.close();

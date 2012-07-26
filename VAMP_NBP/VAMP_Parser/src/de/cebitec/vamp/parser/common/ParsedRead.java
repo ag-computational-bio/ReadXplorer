@@ -3,6 +3,7 @@ package de.cebitec.vamp.parser.common;
 /**
  *
  * @author ddoppmeier
+ * @deprecated not used anymore, since read names are not stored in the db.
  */
 public class ParsedRead {
 

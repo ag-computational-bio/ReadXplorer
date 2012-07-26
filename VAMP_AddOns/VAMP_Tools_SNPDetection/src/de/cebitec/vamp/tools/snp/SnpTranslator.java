@@ -198,7 +198,7 @@ public class SnpTranslator {
              * the neighboring subannotations for the refrence sequence of the translation triplet and also
              * the distance along all subannotations up to our snp position.
              */
-            boolean fwdStrand = annotation.getStrand() == SequenceUtils.STRAND_FWD;
+            boolean fwdStrand = annotation.isFwdStrand();
             boolean posAtLeftSubBorder = false;
             boolean posAtRightSubBorder = false;
             boolean snpInSubannotation = false; //if not and we have subannotations, then this snp will not be translated

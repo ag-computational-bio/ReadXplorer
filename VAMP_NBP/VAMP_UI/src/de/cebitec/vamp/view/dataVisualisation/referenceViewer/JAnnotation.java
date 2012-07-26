@@ -74,7 +74,7 @@ public class JAnnotation extends JComponent {
 
         sb.append(createTableRow("Locus", annotation.getLocus()));
         sb.append(createTableRow("Type", annotation.getType().getTypeString()));
-        sb.append(createTableRow("Strand", (annotation.getStrand() == 1 ? "forward" : "reverse")));
+        sb.append(createTableRow("Strand", (annotation.isFwdStrand() ? "forward" : "reverse")));
         sb.append(createTableRow("Start", String.valueOf(annotation.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(annotation.getStop())));
         if (annotation.getProduct() != null && !annotation.getProduct().isEmpty()) {

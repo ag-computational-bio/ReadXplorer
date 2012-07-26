@@ -11,13 +11,7 @@ import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -114,7 +108,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
                 boolean isDbUsed = dbTrack.getFilePath().isEmpty();
                 TrackJob t = new TrackJob(dbTrack.getId(), isDbUsed, new File(dbTrack.getFilePath()), 
                         dbTrack.getDescription(), indexedRefs.get(dbTrack.getRefGenID()),
-                        null, dbTrack.getTimestamp());
+                        null, false, dbTrack.getTimestamp());
 
                 // register dependent tracks at genome and run
                 ReferenceJob gen = indexedRefs.get(dbTrack.getRefGenID());

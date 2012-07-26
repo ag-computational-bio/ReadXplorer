@@ -10,7 +10,7 @@ package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 public class TranscriptionStart {
     
     private int pos;
-    private byte strand;
+    private boolean isFwdStrand;
     private int initialCoverage;
     private int startCoverage;
     private DetectedAnnotations detAnnotations;
@@ -18,14 +18,14 @@ public class TranscriptionStart {
     /**
      * Data structure for storing a gene start.
      * @param pos The position at which the gene start was detected
-     * @param strand The strand on which the gene start was detected.
+     * @param isFwdStrand true, if the transcript start was detected on the fwd strand, false otherwise.
      * @param initialCoverage The coverage directly before the detected gene start
      * @param startCoverage The coverage at the detected gene start position (getPos()).
      * @param detAnnotations object containing the annotations associated to this predicted gene start
      */
-    public TranscriptionStart(int pos, byte strand, int initialCoverage, int startCoverage, DetectedAnnotations detAnnotations) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, DetectedAnnotations detAnnotations) {
         this.pos = pos;
-        this.strand = strand;
+        this.isFwdStrand = isFwdStrand;
         this.initialCoverage = initialCoverage;
         this.startCoverage = startCoverage;
         this.detAnnotations = detAnnotations;
@@ -39,10 +39,10 @@ public class TranscriptionStart {
     }
 
     /**
-     * @return The strand on which the gene start was detected.
+     * @return true, if the transcript start was detected on the fwd strand, false otherwise.
      */
-    public byte getStrand() {
-        return this.strand;
+    public boolean isFwdStrand() {
+        return this.isFwdStrand;
     }
 
     /**

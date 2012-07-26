@@ -1,39 +1,34 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
-import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentOptionsPanel;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.StorageException;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.MenuLabel;
+import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentOptionsPanel;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.*;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import de.cebitec.vamp.view.dialogMenus.ResetTrackFilePanel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
+import net.sf.samtools.util.RuntimeIOException;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.util.NbBundle;
 
 /**
  * Factory used to initialize all different kinds of base panels.
@@ -79,7 +74,13 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create track viewer
-        TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track);
+        TrackConnector tc;
+        ProjectConnector connector = ProjectConnector.getInstance();
+        try {
+            tc = connector.getTrackConnector(track);
+        } catch (RuntimeIOException e) {
+            tc = this.openResetFilePathDialog(track, connector, b);
+        }
         TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc, false);
         trackV.setName(track.getDescription());
 
@@ -117,10 +118,9 @@ public class BasePanelFactory {
     /**
      * Method to get one <code>BasePanel</code> for multiple tracks.
      * Only 2 tracks at once are currently supported.
-     *
      * @param tracks to visualize on this <code>BasePanel</code>.
      * @param refGen reference the tracks belong to.
-     * @param boolean combineTracks true, if the coverage of two or more tracks should be combined
+     * @param combineTracks true, if the coverage of two or more tracks should be combined
      * @return
      */
     public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks, PersistantReference refGen, boolean combineTracks) {
@@ -311,6 +311,45 @@ public class BasePanelFactory {
         checker.setBorder(BorderFactory.createLineBorder(ColorProperties.LEGEND_BACKGROUND));
         checker.addActionListener(new FeatureTypeListener(type, viewer));
         return checker;
+    }
+
+    /**
+     * In case a direct access track was moved to another place and cannot be found
+     * this method opens a dialog for resetting the file path to the current location
+     * of the file.
+     * @param track the track whose path has to be resetted
+     * @param connector the connector
+     * @param b the base panel
+     * @return the track connector for the updated track or null, if it did not work
+     */
+    private TrackConnector openResetFilePathDialog(PersistantTrack track, ProjectConnector connector, BasePanel b) {
+        TrackConnector trackConnector;
+        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel();
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
+        Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+        resetFileDialog.setVisible(true);
+
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
+            try {
+                PersistantTrack newTrack = new PersistantTrack(track.getId(),
+                        resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
+                        track.getRefGenID(), track.getSeqPairId());
+                connector.resetTrackPath(newTrack);
+                try {
+                    trackConnector = connector.getTrackConnector(newTrack);
+                    return trackConnector;
+                } catch (RuntimeIOException ex) {
+                    ex.printStackTrace(); //TODO: correct error handling
+                }
+            } catch (StorageException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset");
+            String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
+            JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
+        }
+        return null;
     }
     
 

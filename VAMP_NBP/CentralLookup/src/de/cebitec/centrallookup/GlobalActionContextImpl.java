@@ -44,8 +44,8 @@
 
 package de.cebitec.centrallookup;
 
-import org.openide.util.Lookup;
 import org.openide.util.ContextGlobalProvider;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
 

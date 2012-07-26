@@ -16,13 +16,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 
 /**
@@ -123,7 +120,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                     String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ").concat(String.valueOf(seqEnd));
                     output = OutputParser.generateFasta(sequence, header);
                 }
-                new FastaFileChooser("fasta", output);
+                new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
             }
 
             /**
@@ -166,7 +163,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                             + "bp, Amino Acids: " + length / 3;
                     output += OutputParser.generateFasta(sequencesToStore.get(i), header);
                 }
-                new FastaFileChooser("fasta", output);
+                new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
             }
         });
         return storeFastaCdsItem;
@@ -249,7 +246,11 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!cdsRegions.isEmpty()) {
-                    boundsManager.navigatorBarUpdated(cdsRegions.get(0).getStop());
+                    if (cdsRegions.get(0).isForwardStrand()) {
+                        boundsManager.navigatorBarUpdated(cdsRegions.get(0).getStop());
+                    } else {
+                        boundsManager.navigatorBarUpdated(cdsRegions.get(0).getStart());
+                    }
                 }
             }
         });

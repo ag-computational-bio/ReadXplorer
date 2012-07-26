@@ -1,12 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.DiffAndGapResult;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.BufferedReader;
@@ -18,6 +13,7 @@ import java.util.List;
 import org.openide.util.NbBundle;
 
 /**
+ * Parser for parsing jok data files for vamp.
  *
  * @author ddoppmeier
  */
@@ -28,14 +24,29 @@ public class JokParser implements MappingParserI {
     private static String fileDescription = "Jok Output";
     private HashMap<Integer, Integer> gapOrderIndex;
     private HashMap<String, Integer> seqToIDMap;
+    private SeqPairProcessorI seqPairProcessor;
 
     private ArrayList<Observer> observers;
     private String msg;
 
-
+    /**
+     * Parser for parsing jok data files for vamp.
+     */
     public JokParser() {
         this.gapOrderIndex = new HashMap<Integer, Integer>();
         this.observers = new ArrayList<Observer>();
+        this.seqPairProcessor = new SeqPairProcessorDummy();
+    }
+    
+    /**
+     * Parser for parsing jok data files for vamp. Use this constructor for
+     * parsing sequence pair data along with the ordinary track data.
+     * @param seqPairProcessor the specific sequence pair processor for handling
+     *      sequence pair data
+     */
+    public JokParser(SeqPairProcessorI seqPairProcessor) {
+        this();
+        this.seqPairProcessor = seqPairProcessor;
     }
 
     @Override
@@ -50,9 +61,17 @@ public class JokParser implements MappingParserI {
             BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
 
             int lineno = 0;
-            String line = null;
-            int seqID = 0;
+            String line;
+            int seqID;
             int sumReadLength = 0;
+            int start;
+            int stop;
+            byte direction;
+            String readSeq;
+            String refSeq;
+            int errors;
+            DiffAndGapResult result;
+            String readwithoutGaps;
             while ((line = br.readLine()) != null) {
                 lineno++;
                 
@@ -61,8 +80,6 @@ public class JokParser implements MappingParserI {
                 if (tokens.length == 7) { // if the length is not correct the read is not parsed
                     // cast tokens
                     String readname = tokens[0];
-                    int start = -2;
-                    int stop = -1;
                     try {
                         start = Integer.parseInt(tokens[1]);
                         stop = Integer.parseInt(tokens[2]);
@@ -82,17 +99,16 @@ public class JokParser implements MappingParserI {
                         continue; //*'s are ignored = unmapped read
                     }
 
-                    byte direction = 0;
+                    direction = 0;
                     if (tokens[3].equals(">>")) {
                         direction = 1;
                     } else if (tokens[3].equals("<<")) {
                         direction = -1;
                     }
-                    String readSeq = tokens[4];
-                    String refSeq = tokens[5];
-                    int errors;
+                    readSeq = tokens[4];
+                    refSeq = tokens[5];
                     try {
-                        errors = Integer.parseInt(tokens[6]);
+                        errors = Integer.parseInt(tokens[6]); //TODO: check why errors set twice
                     } catch (NumberFormatException e) {
                         this.sendMsg("Value for current errors in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number. "
@@ -148,7 +164,7 @@ public class JokParser implements MappingParserI {
                     // Reads with an error already skip this part because of "continue" statements
                     //++noReads; //would be the count mappings
                     // parse read
-                    DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
                     errors = result.getErrors();
@@ -165,7 +181,6 @@ public class JokParser implements MappingParserI {
                     }
 
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
-                    String readwithoutGaps;
                     
                     if (readSeq.contains("_")) {
                         StringBuilder sBuilder = new StringBuilder();
@@ -188,7 +203,7 @@ public class JokParser implements MappingParserI {
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
-                    this.processReadname(seqID, readname);
+                    this.seqPairProcessor.processReadname(seqID, readname);
                 } else {
                     this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.MissingData", lineno, line));
                 }
@@ -228,7 +243,7 @@ public class JokParser implements MappingParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 
@@ -264,9 +279,17 @@ public class JokParser implements MappingParserI {
     }
 
     @Override
-    public void processReadname(final int seqID, final String readName) {
-//        //TODO: count reads
+    public SeqPairProcessorI getSeqPairProcessor() {
+        return this.seqPairProcessor;
     }
-    
+
+    /**
+     * Dummy method.
+     * @return null, because it is not needed here.
+     */
+    @Override
+    public Object getAdditionalData() {
+        return null;
+    }
     
 }

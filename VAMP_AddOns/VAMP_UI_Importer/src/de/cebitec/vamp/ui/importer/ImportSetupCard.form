@@ -69,7 +69,7 @@
         <Component class="de.cebitec.vamp.ui.importer.SeqPairJobView" name="seqPairTrackJobsView">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="}"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="final ISeqPairClassifier seqPairCalculator = Lookup.getDefault().lookup(ISeqPairClassifier.class);&#xa;if (seqPairCalculator != null) {"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="final de.cebitec.vamp.parser.mappings.SeqPairClassifierI seqPairCalculator = Lookup.getDefault().lookup(de.cebitec.vamp.parser.mappings.SeqPairClassifierI.class);&#xa;if (seqPairCalculator != null) {"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">

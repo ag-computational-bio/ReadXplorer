@@ -2,17 +2,17 @@ package de.cebitec.vamp.options;
 
 import de.cebitec.common.sequencetools.GeneticCode;
 import de.cebitec.common.sequencetools.GeneticCodeFactory;
-import javax.swing.event.ListSelectionEvent;
-import org.openide.util.NbPreferences;
 import de.cebitec.vamp.util.Properties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.AbstractListModel;
-import javax.swing.ListSelectionModel;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractListModel;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.openide.util.NbPreferences;
 
 /**
  * @author Rolf Hilker

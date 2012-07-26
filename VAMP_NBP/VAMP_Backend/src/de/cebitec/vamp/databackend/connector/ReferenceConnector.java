@@ -7,11 +7,8 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import de.cebitec.vamp.util.SequenceUtils;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -79,11 +76,11 @@ public class ReferenceConnector {
                 String product = rs.getString(FieldNames.ANNOTATION_PRODUCT);
                 int start = rs.getInt(FieldNames.ANNOTATION_START);
                 int stop = rs.getInt(FieldNames.ANNOTATION_STOP);
-                int strand = rs.getInt(FieldNames.ANNOTATION_STRAND);
+                boolean isFwdStrand = rs.getInt(FieldNames.ANNOTATION_STRAND) == SequenceUtils.STRAND_FWD;
                 FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.ANNOTATION_TYPE));
                 String gene = rs.getString(FieldNames.ANNOTATION_GENE);
 
-                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, strand, type, gene));
+                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
             }
 
         } catch (SQLException ex) {
@@ -113,11 +110,11 @@ public class ReferenceConnector {
                 String product = rs.getString(FieldNames.ANNOTATION_PRODUCT);
                 int start = rs.getInt(FieldNames.ANNOTATION_START);
                 int stop = rs.getInt(FieldNames.ANNOTATION_STOP);
-                int strand = rs.getInt(FieldNames.ANNOTATION_STRAND);
+                boolean isFwdStrand = rs.getInt(FieldNames.ANNOTATION_STRAND) == SequenceUtils.STRAND_FWD;
                 FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.ANNOTATION_TYPE));
                 String gene = rs.getString(FieldNames.ANNOTATION_GENE);
 
-                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, strand, type, gene));
+                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
             }
 
         } catch (SQLException ex) {

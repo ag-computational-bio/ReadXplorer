@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public class FastaReferenceParser implements ReferenceParserI {
 
     private static String parsername = "Fasta Reference Parser";
-    private static String[] fileExtension = new String[]{"fas", "fasta", "fna"};
+    private static String[] fileExtension = new String[]{"fas", "fasta", "fna", "fa"};
     private static String fileDescription = "Fasta File";
     private ArrayList<Observer> observers = new ArrayList<Observer>();
     private String errorMsg;
@@ -65,7 +65,7 @@ public class FastaReferenceParser implements ReferenceParserI {
      * get the name of the used parser
      */
     @Override
-    public String getParserName() {
+    public String getName() {
         return parsername;
     }
 

@@ -10,12 +10,14 @@ import java.util.HashMap;
  *
  * @author Rolf Hilker
  */
-public class JokSeqPairParser extends JokParser implements SequencePairParserI {
+public class JokSeqPairParser implements SeqPairProcessorI {
 
-    private HashMap<String, Integer> seqIDToReadNameMap;
+    private HashMap<String, Integer> seqIDToReadNameMap1;
+    private HashMap<String, Integer> seqIDToReadNameMap2;
+    //TODO: check if implementation of seqIdToReadNameMap2 is needed and seq pair import is still ok with only one map
 
     public JokSeqPairParser(){
-        this.seqIDToReadNameMap = new HashMap<String, Integer>();
+        this.seqIDToReadNameMap1 = new HashMap<String, Integer>();
     }
 
     @Override
@@ -29,21 +31,26 @@ public class JokSeqPairParser extends JokParser implements SequencePairParserI {
 //            readnames.add(readName);
 //            this.seqIDToReadNameMap.put(seqID, readnames);
 //        }
-        if (!this.seqIDToReadNameMap.containsKey(readName)){
+        if (!this.seqIDToReadNameMap1.containsKey(readName)){
             //since seqID will always be the same for all reads with identical sequence
             //there will be more than one readName with the same sequence id (if sequence is identical)
-            this.seqIDToReadNameMap.put(readName, seqID);
+            this.seqIDToReadNameMap1.put(readName, seqID);
         }
     }
 
     @Override
-    public HashMap<String, Integer> getSeqIDToReadNameMap() {
-        return (HashMap<String, Integer>) this.seqIDToReadNameMap.clone();
+    public HashMap<String, Integer> getReadNameToSeqIDMap1() {
+        return (HashMap<String, Integer>) this.seqIDToReadNameMap1.clone();
+    }
+
+    @Override
+    public HashMap<String, Integer> getReadNameToSeqIDMap2() {
+        return (HashMap<String, Integer>) this.seqIDToReadNameMap2.clone();
     }
     
     @Override
-    public void resetSeqIdToReadnameMap(){
-        this.seqIDToReadNameMap = new HashMap<String, Integer>();
+    public void resetSeqIdToReadnameMaps(){
+        this.seqIDToReadNameMap1 = new HashMap<String, Integer>();
     }
 
 }

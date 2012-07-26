@@ -2,16 +2,16 @@ package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -261,7 +261,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      */
     private Color determineBlockColor(PersistantSequencePair seqPair) {
 
-        Color blockColor = Color.black;
+        Color blockColor;
         int type = seqPair.getSeqPairType();
         if (type == Properties.TYPE_PERFECT_PAIR) {
             blockColor = ColorProperties.BLOCK_PERFECT;

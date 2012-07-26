@@ -1,12 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.DiffAndGapResult;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
@@ -15,29 +10,42 @@ import java.util.List;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
-
-
 import org.openide.util.NbBundle;
 
 /**
  * 
  * @author jstraube, rhilker
  */
-public class SAMBAMParser implements MappingParserI {
+public class SamBamParser implements MappingParserI {
 
     private static String name = "SAM/BAM Parser";
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam", "sam", "SAM", "Sam"};
     private static String fileDescription = "BAM or SAM Output";
+    
+    private SeqPairProcessorI seqPairProcessor;
     private HashMap<String, Integer> seqToIDMap;
     private String msg;
     private int noUniqueMappings;
     private ArrayList<String> readnames;
     private ArrayList<Observer> observers;
 
-    public SAMBAMParser() {
+    public SamBamParser() {
         this.seqToIDMap = new HashMap<String, Integer>();
         this.readnames = new ArrayList<String>();
         this.observers = new ArrayList<Observer>();
+        this.seqPairProcessor = new SeqPairProcessorDummy();
+    }
+    
+    /**
+     * Parser for parsing sam and bam data files for direct access in vamp. Use
+     * this constructor for parsing sequence pair data along with the ordinary
+     * track data.
+     * @param seqPairProcessor the specific sequence pair processor for handling
+     * sequence pair data
+     */
+    public SamBamParser(SeqPairProcessorI seqPairProcessor) {
+        this();
+        this.seqPairProcessor = seqPairProcessor;
     }
 
     @Override
@@ -45,18 +53,27 @@ public class SAMBAMParser implements MappingParserI {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError {
         int lineno = 0;
         String filepath = trackJob.getFile().getAbsolutePath();
-        String readname = null;
-        String refSeq = null;
-        String readSeq = null;
-        String readSeqwithoutGaps = null;
-        String cigar = null;
-        String refSeqwithoutgaps = null;
+        String readname;
+        String refSeq;
+        String readSeq;
+        String readSeqwithoutGaps;
+        String cigar;
+        String refSeqwithoutgaps;
         noUniqueMappings = 0;
         int noUniqueReads = 0;
         int counterUnmapped = 0;
         int sumReadLength = 0;
         HashMap<Integer, Integer> gapOrderIndex = new HashMap<Integer, Integer>();
-        int errors = 0;
+        int errors;
+        int start;
+        int stop;
+        SAMRecord first;
+        boolean isReverseStrand;
+        byte direction;
+        int length;
+        DiffAndGapResult result;
+        ParsedMapping mapping;
+        int seqID;
 
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filepath));
@@ -70,19 +87,17 @@ public class SAMBAMParser implements MappingParserI {
         }
         try {
             while (itor.hasNext()) {
-                SAMRecord first = itor.next();
-                int start = first.getAlignmentStart();
+                first = itor.next();
+                start = first.getAlignmentStart();
                 if (!first.getReadUnmappedFlag()) {
 
-                    int stop = 0;
-                    boolean isReverseStrand = first.getReadNegativeStrandFlag();
-                    byte direction = (byte) (isReverseStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
+                    isReverseStrand = first.getReadNegativeStrandFlag();
+                    direction = isReverseStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
                     readname = first.getReadName();
                     cigar = first.getCigarString();
                     readSeqwithoutGaps = first.getReadString().toLowerCase();
-                    errors = 0;
 
-                    int length = sequenceString.length();
+                    length = sequenceString.length();
                     if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
                         stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
                         refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
@@ -97,49 +112,49 @@ public class SAMBAMParser implements MappingParserI {
                     }
                     //check parameters
                     if (length < start || length < stop) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorReadPosition",
                                 filepath, lineno, start, stop, length));
                         continue;
                     }
                     if (readname == null || readname.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorReadname",
                                 filepath, lineno, readname));
                         continue;
                     }
 
                     if (start >= stop) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorStartStop",
                                 filepath, lineno, start, stop));
                         continue;
                     }
                     if (direction == 0) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorDirection", filepath, lineno));
                         continue;
                     }
                     if (readSeq == null || readSeq.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorReadEmpty",
                                 filepath, lineno, readSeq));
                         continue;
                     }
                     if (refSeq == null || refSeq.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorRef",
                                 filepath, lineno, refSeq));
                         continue;
                     }
                     if (readSeq.length() != refSeq.length()) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorReadLength",
                                 filepath, lineno, readSeq, refSeq));
                         continue;
                     }
                     if (!cigar.matches("[MHISDPXN=\\d]+")) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorCigar", cigar, filepath, lineno));
                         continue;
                     }
@@ -151,20 +166,19 @@ public class SAMBAMParser implements MappingParserI {
                     //TODO: calc reads for stats bam parser
                     // Reads with an error already skip this part because of "continue" statements
                     //!!Thats wrong you can have one read mapped on different positions
-                    DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
                     errors = result.getErrors();
                     
                     if (errors < 0 || errors > readSeq.length()) {
-                        this.sendMsg(NbBundle.getMessage(SAMBAMParser.class,
+                        this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorRead",
                                 errors, filepath, lineno));
                         continue;
                     }
 
-                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
-                    int seqID;
+                    mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
 
                     //  readSeq=isReverseStrand?SequenceUtils.getReverseComplement(readSeq):readSeq;
                     readSeqwithoutGaps = isReverseStrand ? SequenceUtils.getReverseComplement(readSeqwithoutGaps) : readSeqwithoutGaps;
@@ -176,8 +190,8 @@ public class SAMBAMParser implements MappingParserI {
                     } //readnameToSequenceID.get(readname);
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
-
-                    //            this.processReadname(seqID, readname);
+                    this.seqPairProcessor.processReadname(seqID, readname);
+                    
                     if (!itor.hasNext()) {
                         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Iterator.noMoreData", filepath));
                     }
@@ -189,15 +203,15 @@ public class SAMBAMParser implements MappingParserI {
             this.sendMsg(e.getMessage());
         }
 
-        int numberMappings = mappingContainer.getMappingInformations().get(1);
-        numberMappings = numberMappings == 0 ? 1 : numberMappings;
+//        int numberMappings = mappingContainer.getMappingInformations().get(1);
+//        numberMappings = numberMappings == 0 ? 1 : numberMappings;
         mappingContainer.setSumReadLength(sumReadLength);
 
         this.seqToIDMap = null; //release resources
         this.readnames = null;
         
         if (mappingContainer.getMappedSequenceIDs().isEmpty()) { //if track does not contain any reads
-            throw new ParsingException(NbBundle.getMessage(SAMBAMParser.class, "Parser.Empty.Track.Error"));
+            throw new ParsingException(NbBundle.getMessage(SamBamParser.class, "Parser.Empty.Track.Error"));
         }
         if (counterUnmapped > 0){
             this.sendMsg("Number of unmapped reads in file: "+counterUnmapped);
@@ -210,7 +224,7 @@ public class SAMBAMParser implements MappingParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 
@@ -250,12 +264,18 @@ public class SAMBAMParser implements MappingParserI {
         this.notifyObservers(null);
     }
 
-    
     @Override
-    public void processReadname(int seqID, String readName) {
-        //count reads
-        if (!this.readnames.contains(readName)){
-            this.readnames.add(readName);
-        }
+    public SeqPairProcessorI getSeqPairProcessor() {
+        return this.seqPairProcessor;
     }
+
+    /**
+     * Dummy method.
+     * @return null, because it is not needed here.
+     */
+    @Override
+    public Object getAdditionalData() {
+        return null;
+    }
+    
 }

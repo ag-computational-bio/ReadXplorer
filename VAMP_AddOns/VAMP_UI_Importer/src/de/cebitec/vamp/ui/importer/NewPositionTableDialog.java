@@ -12,9 +12,9 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.mappings.SAMBAMParser;
 import de.cebitec.vamp.parser.mappings.JokParser;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
+import de.cebitec.vamp.parser.mappings.SamBamParser;
 import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import java.awt.Component;
 import java.io.File;
@@ -40,7 +40,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SAMBAMParser(), new SamBamStepParser()};
+    private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SamBamParser(), new SamBamStepParser()};
     private MappingParserI currentParser;
     private int stepSize = 0;
     private static final int maxVal = 1000000000;
@@ -141,7 +141,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
             for (int i = 0; i < tracks.length; ++i) {
                 PersistantTrack track = persTracks.get(i);
                 tracks[i] = new TrackJob(track.getId(), !track.getFilePath().isEmpty(), 
-                        null, track.getDescription(), refJob, null, track.getTimestamp());
+                        null, track.getDescription(), refJob, null, true, track.getTimestamp());
             }
 
             this.parentTrackCombo.setModel(new DefaultComboBoxModel(tracks));
@@ -178,7 +178,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
                 if(value instanceof ParserI){
-                    return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);
+                    return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);
                 } else {
                     return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }
@@ -225,13 +225,10 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1)
-                            .addComponent(mappingFileLabel)))
+                    .addComponent(jLabel1)
+                    .addComponent(mappingFileLabel)
                     .addComponent(parentTrackLabel)
                     .addComponent(stepSizeLabel)
                     .addComponent(refGenLabel))

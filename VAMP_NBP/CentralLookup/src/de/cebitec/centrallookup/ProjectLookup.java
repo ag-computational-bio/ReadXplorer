@@ -20,6 +20,7 @@ import org.openide.windows.TopComponent;
  */
 public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
+    private static final long serialVersionUID = 8835898;
     private InstanceContent content;
     /** registry to work with */
     private TopComponent.Registry registry;
@@ -76,6 +77,8 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
     /**
      * Removes all instances of clazz from the lookup and adds instance to the lookup.
+     * @param <T> 
+     * @param clazz 
      * @param instance
      */
     public <T> void replace(Class<T> clazz, Object instance) {
@@ -118,7 +121,10 @@ public class ProjectLookup extends AbstractLookup implements Lookup.Provider {
 
     private static class Empty extends ProjectLookup {
 
+        
         private static final Result NO_RESULT = new Result() {
+            
+            private static final long serialVersionUID = 8835899;
 
             @Override
             public void addLookupListener(LookupListener l) {

@@ -8,7 +8,6 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
@@ -108,7 +107,7 @@ public class ResultPanelFilteredGenes extends javax.swing.JPanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         FilteredGenesColumns filteredGenesData = new FilteredGenesColumns(this.filteredGenes);
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", filteredGenesData, "Filtered Genes Table"); 
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", filteredGenesData, "Filtered Genes Table"); 
     }//GEN-LAST:event_exportButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -122,7 +121,7 @@ public class ResultPanelFilteredGenes extends javax.swing.JPanel {
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = this.filteredGenesTable.convertRowIndexToModel(selectedView);
         PersistantAnnotation annotation = (PersistantAnnotation) this.filteredGenesTable.getModel().getValueAt(selectedModel, 0);
-        int pos = annotation.getStrand() == SequenceUtils.STRAND_FWD ? annotation.getStart() : annotation.getStop();
+        int pos = annotation.isFwdStrand() ? annotation.getStart() : annotation.getStop();
 
         bim.navigatorBarUpdated(pos);
     }
@@ -140,7 +139,7 @@ public class ResultPanelFilteredGenes extends javax.swing.JPanel {
             
             Object[] rowData = new Object[nbColumns];
             rowData[0] = filteredGene.getFilteredAnnotation();
-            rowData[1] = filteredGene.getFilteredAnnotation().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
+            rowData[1] = filteredGene.getFilteredAnnotation().isFwdStrand() ? "Fwd" : "Rev";
             rowData[2] = filteredGene.getReadCount();
 
             model.addRow(rowData);

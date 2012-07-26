@@ -22,12 +22,12 @@ public class ExcelExportFileChooser extends VampFileChooser {
     
     /**
      * Creates a new file chooser for saving ExcelExportDataI data into an excel file.
-     * @param fileExtension the file extension of the excel file (typically xls)
+     * @param fileExtensions the file extension of the excel file (typically xls)
      * @param exportData the data object to be exported (needs to implement {@link ExcelExportDataI}).
      * @param tableName the name of the table to write
      */
-    public ExcelExportFileChooser(final String fileExtension, ExcelExportDataI exportData, String tableName) {
-        super(VampFileChooser.SAVE_DIALOG, fileExtension, exportData);
+    public ExcelExportFileChooser(final String[] fileExtensions, String fileDescription, ExcelExportDataI exportData, String tableName) {
+        super(VampFileChooser.SAVE_DIALOG, fileExtensions, fileDescription, exportData);
         
         this.tableName = tableName;
     }

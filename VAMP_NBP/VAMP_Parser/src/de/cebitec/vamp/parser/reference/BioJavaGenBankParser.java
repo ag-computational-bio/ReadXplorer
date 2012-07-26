@@ -193,7 +193,7 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
     }
 
     @Override
-    public String getParserName(){
+    public String getName(){
         return parserName;
     }
 

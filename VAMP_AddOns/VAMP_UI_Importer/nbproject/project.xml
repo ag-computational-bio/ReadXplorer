@@ -39,7 +39,23 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>de.cebitec.vamp.libs</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>de.cebitec.vamp.parser</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>de.cebitec.vamp.seqPairClassifier</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

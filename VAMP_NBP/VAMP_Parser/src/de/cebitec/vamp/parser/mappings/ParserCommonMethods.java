@@ -36,13 +36,45 @@ public final class ParserCommonMethods {
     }
     
     /**
+     * Counts the differences to the reference sequence for a cigar string and
+     * the belonging read sequence. If the operation "M" is not used in the
+     * cigar, then the read and reference sequence can be null (it is not used
+     * in this case). Read and reference sequence are treated case insensitively,
+     * so there is no need to transform the case beforehand.
+     * @param cigar the cigar string containing the alignment operations
+     * @param readSeq the read sequence belonging to the cigar and without gaps
+     * @param refSeq the reference sequence belonging to the cigar and without
+     * gaps
+     * @param isRevStrand true, if the ref seq has to be reverse complemented,
+     *      false if the read is on the fwd strand.
+     * @return number of differences to the reference sequence
+     * @throws NumberFormatException  
+     */
+    public static int countDifferencesToRef(String cigar, String readSeq, String refSeq, boolean isRevStrand) throws NumberFormatException {
+        if (cigar.contains("M")) {
+            return ParserCommonMethods.countDiffsToRefWithM(cigar, readSeq, refSeq, isRevStrand);
+
+        } else //the convenient case, that no "M"'s are present in the cigar
+        if (cigar.contains("X") || cigar.contains("D") || cigar.contains("I")
+                || cigar.contains("S") || cigar.contains("N") || cigar.contains("P")) {
+
+            return ParserCommonMethods.countDiffsToRefWithoutM(cigar);
+
+        } else {
+            return 0;
+        }
+    }
+    
+    /**
      * Counts the differences to the reference sequence for a cigar string. 
      * This only works, if no "M" operation is used in the cigar! But it is more
      * efficient, than the other version of this method including read and reference
      * sequences.
      * @param cigar the cigar string containing the alignment operations
+     * @return number of differences to the reference sequence
+     * @throws NumberFormatException  
      */
-    public static int countDifferencesToRef(String cigar) throws NumberFormatException {
+    public static int countDiffsToRefWithoutM(String cigar) throws NumberFormatException {
         
         int differences = 0;
         String[] num = cigar.split(cigarRegex);
@@ -50,11 +82,9 @@ public final class ParserCommonMethods {
         String c;
         for (int i = 0; i < charCigar.length; ++i) {
             c = charCigar[i];
-            if (c.matches(cigarRegex)) {
-                if (c.equals("X") || c.equals("D") || c.equals("N") || c.equals("P") || c.equals("S")) {
-                    differences += Integer.valueOf(num[i - 1]);
-                } //P and H = padding and hard clipping do not contribute to differences
-            }
+            if (c.equals("X") || c.equals("D") || c.equals("N") || c.equals("P") || c.equals("S")) {
+                differences += Integer.valueOf(num[i - 1]);
+            } //P and H = padding and hard clipping do not contribute to differences
         }
         
         return differences;
@@ -64,11 +94,21 @@ public final class ParserCommonMethods {
      * Counts the differences to the reference sequence for a cigar string and
      * the belonging read sequence. If the operation "M" is not used in the cigar,
      * then the read and reference sequence can be null (it is not used in this case).
+     * The method transforms both read and reference sequence to lower case.
      * @param cigar the cigar string containing the alignment operations
      * @param readSeq the read sequence belonging to the cigar and without gaps
      * @param refSeq the reference sequence belonging to the cigar and without gaps
+     * @param isRevStrand true, if the ref seq has to be reverse complemented,
+     *      false if the read is on the fwd strand.
+     * @return the differences to the reference sequence for a cigar string and
+     * the belonging read sequence
+     * @throws NumberFormatException  
      */
-    public static int countDifferencesToRef(String cigar, String readSeq, String refSeq) throws NumberFormatException {
+    public static int countDiffsToRefWithM(String cigar, String readSeq, String refSeq, boolean isRevStrand) throws NumberFormatException {
+        
+        if (isRevStrand) {
+            refSeq = SequenceUtils.getReverseComplement(refSeq);
+        }
         
         int differences = 0;
         String[] num = cigar.split(cigarRegex);
@@ -77,6 +117,8 @@ public final class ParserCommonMethods {
         String bases; //bases of the read interval under investigation
         int baseNo = 0;
         int count = 0;
+        readSeq = readSeq.toLowerCase();
+        refSeq = refSeq.toLowerCase();
         for (int i = 0; i < charCigar.length; ++i) {
             op = charCigar[i];
             if (op.matches(cigarRegex)) {
@@ -156,6 +198,10 @@ public final class ParserCommonMethods {
      * This method calculates the order of the gaps. For a gap we don't include a new 
      * position in the reference genome, but we store the number of gaps for one 
      * position of the ref genome.
+     * @param gapPos position of the gap
+     * @param gapOrderIndex the gap order index for the current gap (larger the more gaps
+     *      in a row
+     * @return the new gap order index for the gap
      */
     public static int getOrderForGap(int gapPos, Map<Integer, Integer> gapOrderIndex) {
         if (!gapOrderIndex.containsKey(gapPos)) {
@@ -185,8 +231,8 @@ public final class ParserCommonMethods {
         String newreadSeq = null;
     
         int refpos = 0;
-        int numberOfInsertions = 0;
-        int numberofDeletion = 0;
+        int numberOfInsertions;
+        int numberofDeletion;
         //int pos = 0;
         int readPos = 0;
         int softclipped = 0;
@@ -203,7 +249,7 @@ public final class ParserCommonMethods {
                     //deletion of the read
                     numberofDeletion = Integer.parseInt(numOfBases);
 
-                    refpos = refpos + numberofDeletion;
+                    refpos += numberofDeletion;
 
                     while (numberofDeletion > 0) {
                         if (readSeq.length() != readPos) {
@@ -221,7 +267,7 @@ public final class ParserCommonMethods {
                     //insertion of the  read
                     numberOfInsertions = Integer.parseInt(numOfBases);
 
-                    readPos = readPos + numberOfInsertions;
+                    readPos += numberOfInsertions;
                     while (numberOfInsertions > 0) {
 
                         if (refpos != refSeq.length()) {
@@ -231,7 +277,7 @@ public final class ParserCommonMethods {
                         }
                         newRefSeqwithGaps = refSeq;
                         numberOfInsertions--;
-                        refpos = refpos + 1;
+                        refpos += 1;
 
                         //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                     }
@@ -350,13 +396,13 @@ public final class ParserCommonMethods {
 
         if (snp == 1) {
             beforeSNP = genome.substring(snp - 1, snp);
-        }
+        } else 
         if (snp == 2) {
             beforeSNP = genome.substring(snp - 2, snp);
-        }
+        } else 
         if (snp == 3) {
             beforeSNP = genome.substring(snp - 3, snp);
-        }
+        } else 
         if (snp >= 4) {
             beforeSNP = genome.substring(snp - 4, snp);
         }

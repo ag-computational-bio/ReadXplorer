@@ -20,7 +20,7 @@ public class PersistantAnnotation implements PersistantAnnotationI {
     private String product;
     private int start;
     private int stop;
-    private int strand;
+    private boolean isFwdStrand;
     private FeatureType type;
     private String geneName;
     private List<PersistantSubAnnotation> subAnnotations;
@@ -31,14 +31,14 @@ public class PersistantAnnotation implements PersistantAnnotationI {
               FeatureType.T_RNA, FeatureType.MISC_RNA, FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA
      * @param start start position
      * @param stop stop position
-     * @param strand SequenceUtils.STRAND_FWD for featues on forward and SequenceUtils.STRAND_REV on reverse strand
+     * @param isFwdStrand SequenceUtils.STRAND_FWD for featues on forward and SequenceUtils.STRAND_REV on reverse strand
      * @param locus locus information
      * @param product description of the protein product
      * @param ecnum ec number
      * @param geneName name of the gene, if it exists (e.g. "dnaA")
      */
     public PersistantAnnotation(int id, String ecnum, String locus, String product, 
-                int start, int stop, int strand, FeatureType type, String geneName) {
+                int start, int stop, boolean isFwdStrand, FeatureType type, String geneName) {
         this.subAnnotations = new ArrayList<PersistantSubAnnotation>();
         this.id = id;
         this.ecNumber = ecnum;
@@ -46,7 +46,7 @@ public class PersistantAnnotation implements PersistantAnnotationI {
         this.product = product;
         this.start = start;
         this.stop = stop;
-        this.strand = strand;
+        this.isFwdStrand = isFwdStrand;
         this.type = type;
         this.geneName = geneName;
     }
@@ -87,10 +87,10 @@ public class PersistantAnnotation implements PersistantAnnotationI {
 
     /**
      * Returns if the annotation is located on the fwd or rev strand.
-     * @return SequenceUtils.STRAND_FWD for featues on forward and SequenceUtils.STRAND_REV on reverse strand
+     * @return true for featues on forward and false on reverse strand
      */
-    public int getStrand() {
-        return strand;
+    public boolean isFwdStrand() {
+        return isFwdStrand;
     }
 
     @Override

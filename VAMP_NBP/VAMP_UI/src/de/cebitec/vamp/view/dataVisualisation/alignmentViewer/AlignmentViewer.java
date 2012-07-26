@@ -4,7 +4,6 @@ import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -178,7 +177,7 @@ public class AlignmentViewer extends AbstractViewer {
             if (coverage > maxCountInInterval) {
                 maxCountInInterval = coverage;
             }
-            if (m.getStrand() == SequenceUtils.STRAND_FWD) {
+            if (m.isFwdStrand()) {
                 ++this.fwdMappingsInInterval;
             }
         }

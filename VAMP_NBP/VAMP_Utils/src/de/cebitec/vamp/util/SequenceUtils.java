@@ -28,10 +28,8 @@ public final class SequenceUtils {
      * @return the reversed string
      */
     public static String reverseString(final String string) {
-        StringBuilder revString = new StringBuilder();
-        for (int i = string.length() - 1; i >= 0; --i) {
-            revString = revString.append(string.charAt(i));
-        }
+        StringBuilder revString = new StringBuilder(string);
+        revString.reverse();
         return revString.toString();
     }
 
@@ -59,9 +57,9 @@ public final class SequenceUtils {
 
 
     /**
-     * Produces the reverse complement of a sequence.
-     * @param sequence the sequence to reverse and complement
-     * @return the reversed and complemented sequence
+     * Produces the reverse complement of a dna sequence.
+     * @param sequence the dna sequence to reverse and complement
+     * @return the reversed and complemented dna sequence
      */
     public static String getReverseComplement(String sequence) {
         StringBuilder revCompSeq = new StringBuilder();

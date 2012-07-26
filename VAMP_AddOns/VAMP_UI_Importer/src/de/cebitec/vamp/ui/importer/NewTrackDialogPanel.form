@@ -22,7 +22,7 @@
                       <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       <Component id="importTypeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="importTypeCombo" pref="311" max="32767" attributes="0"/>
+                      <Component id="importTypeCombo" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
@@ -35,18 +35,23 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="mappingTypeCombo" alignment="1" pref="311" max="32767" attributes="0"/>
+                          <Component id="mappingTypeCombo" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="mappingFileField" pref="246" max="32767" attributes="0"/>
+                              <Component id="mappingFileField" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="descriptionField" alignment="0" pref="311" max="32767" attributes="0"/>
-                          <Component id="refGenBox" alignment="0" pref="311" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="stepSizeSpinner" min="-2" pref="95" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="fileSorted" min="-2" max="-2" attributes="0"/>
+                          <Component id="descriptionField" alignment="0" max="32767" attributes="0"/>
+                          <Component id="refGenBox" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="alreadyImportedBox" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="stepSizeSpinner" min="-2" pref="95" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="fileSorted" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -91,7 +96,9 @@
                   <Component id="fileSorted" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="stepSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="113" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="alreadyImportedBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="85" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -161,7 +168,7 @@
           <StringArray count="0"/>
         </Property>
         <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new DefaultListCellRenderer(){&#xa;    @Override&#xa;    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){&#xa;        if(value instanceof ParserI){&#xa;            return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);&#xa;        } else {&#xa;            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);&#xa;        }&#xa;    }&#xa;}" type="code"/>
+          <Connection code="new DefaultListCellRenderer(){&#xa;    @Override&#xa;    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){&#xa;        if(value instanceof ParserI){&#xa;            return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);&#xa;        } else {&#xa;            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);&#xa;        }&#xa;    }&#xa;}" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -196,8 +203,9 @@
             <StringItem index="1" value="Direct File Access"/>
           </StringArray>
         </Property>
+        <Property name="selectedIndex" type="int" value="1"/>
         <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new DefaultListCellRenderer(){&#xa;    @Override&#xa;    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){&#xa;        if(value instanceof ParserI){&#xa;            return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);&#xa;        } else {&#xa;            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);&#xa;        }&#xa;    }&#xa;}" type="code"/>
+          <Connection code="new DefaultListCellRenderer(){&#xa;    @Override&#xa;    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){&#xa;        if(value instanceof ParserI){&#xa;            return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);&#xa;        } else {&#xa;            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);&#xa;        }&#xa;    }&#xa;}" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -211,6 +219,13 @@
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/importer/Bundle.properties" key="NewTrackDialogPanel.importTypeLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="alreadyImportedBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/importer/Bundle.properties" key="NewTrackDialogPanel.alreadyImportedBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

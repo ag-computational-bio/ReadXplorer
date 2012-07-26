@@ -121,10 +121,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
             for (PersistantTrack track : tracksAll) {
                 TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
-                if (track.getId() < trackCon.getTrackID()) {
-                    numUnneededMappings += connector.getNumOfUniqueMappings();
+                    if (track.getId() < trackCon.getTrackID()) {
+                        numUnneededMappings += connector.getNumOfUniqueMappings();
+                    }
                 }
-            }
             int numInterestingMappings = numUnneededMappings + trackCon.getNumOfUniqueMappings();
             int stepSize = 50000;
             int from = numUnneededMappings;

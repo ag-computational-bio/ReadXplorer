@@ -1,24 +1,13 @@
 package de.cebitec.vamp.seqPairClassifier;
 
-import java.util.HashMap;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.CoverageContainer;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedSeqPairMapping;
-import java.util.List;
-import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedTrack;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Pair;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import junit.framework.Assert;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * @author Rolf Hilker
@@ -286,6 +275,7 @@ public class SeqPairClassifierTest {
 
     /**
      * Test of classifySeqPairs method, of class SeqPairClassifier.
+     * @throws Exception 
      */
     @Test
     public void testClassifySeqPairs() throws Exception {

@@ -182,7 +182,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 if (centerSeqBar) {
                     int y1 = this.getSize().height / 2 - seqBar.getSize().height / 2;
                     int y2 = this.getSize().height / 2 + seqBar.getSize().height / 2;
-                    seqBar.setBounds(0, y1, this.getSize().width, seqBar.getSize().height);
+                    seqBar.setBounds(0, y1, paintingAreaInfo.getPhyRight(), seqBar.getSize().height);
                     paintingAreaInfo.setForwardLow(y1 - 1);
                     paintingAreaInfo.setReverseLow(y2 + 1);
                 } else {
@@ -230,12 +230,16 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             public void mouseWheelMoved(MouseWheelEvent e) {
 
                 if ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) {
+                    int oldZoom = zoom;
                     zoom += e.getUnitsToScroll();
                     if (zoom > 500) {
                         zoom = 500;
                     }
                     if (zoom < 1) {
                         zoom = 1;
+                    }
+                    if (zoom < oldZoom) {
+                        boundsManager.navigatorBarUpdated(currentLogMousePos);
                     }
                     boundsManager.zoomLevelUpdated(zoom);
                 }
@@ -439,23 +443,25 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     @Override
     public void updateLogicalBounds(BoundsInfo bounds) {
-        this.bounds = bounds;
-        this.calcBaseWidth();
-        this.recalcCorrelationFactor();
+//        if (!this.bounds.equals(bounds)) {
+            this.bounds = bounds;
+            this.calcBaseWidth();
+            this.recalcCorrelationFactor();
 
-        if (this.basewidth > 7) {
-            this.setIsInMaxZoomLevel(true);
-        } else {
-            this.setIsInMaxZoomLevel(false);
-        }
-        if (this.seqBar != null) {
-            this.seqBar.boundsChanged();
-        }
-        if (this.isActive()) {
-            this.boundsChangedHook();
-            this.repaint();
-        }
-        
+            if (this.basewidth > 7) {
+                this.setIsInMaxZoomLevel(true);
+            } else {
+                this.setIsInMaxZoomLevel(false);
+            }
+            if (this.seqBar != null) {
+                this.seqBar.boundsChanged();
+            }
+            if (this.isActive()) {
+                this.boundsChangedHook();
+                this.repaint();
+            }
+//        }
+
         if (this.scrollBar != null && this.centerScrollBar) {
             this.scrollBar.setValue(this.scrollBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
         }

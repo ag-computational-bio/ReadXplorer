@@ -9,6 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
  * the annotations belonging to a gene start position. It can contain three different
  * types of annotations: A correctStartAnnotation, starting at the position belonging to
  * this element. An upstream- and a downstreamAnnotation.
+ * If they are not stored the return methods return null.
  */
 public class DetectedAnnotations {
     
@@ -16,6 +17,17 @@ public class DetectedAnnotations {
     private PersistantAnnotation correctStartAnnotation;
     private PersistantAnnotation downstreamAnnotation;
 
+    /**
+     * Data structure for storing the annotations belonging to a certain
+     * position. E.g. the annotations belonging to a gene start position. It can
+     * contain three different types of annotations: A correctStartAnnotation,
+     * starting at the position belonging to this element. An upstream- and a
+     * downstreamAnnotation. If they are not stored the return methods return
+     * null.
+     */
+    public DetectedAnnotations() {
+    }
+    
     public PersistantAnnotation getDownstreamAnnotation() {
         return this.downstreamAnnotation;
     }

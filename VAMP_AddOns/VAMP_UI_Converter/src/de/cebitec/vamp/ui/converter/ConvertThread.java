@@ -56,7 +56,7 @@ public class ConvertThread extends Thread implements Observer {
      */
     private ConverterI getConverter() {
         ConverterI converter = null;
-        if (converterType.equals(NbBundle.getMessage(ConvertThread.class, "ConverterPanel.JokToBamConverter"))) {
+        if (converterType.equals(NbBundle.getMessage(ConvertThread.class, "ConverterSetupCard.JokToBamConverter"))) {
             JokToBamConverter jokConverter = new JokToBamConverter();
             jokConverter.registerObserver(this);
             jokConverter.setDataToConvert(new File(filePath), referenceName, referenceLength);

@@ -24,6 +24,7 @@ public class TrackJob implements Job {
     private int stop;
     private int stepSize;
     private boolean isSorted = true;
+    private boolean isAlreadyImported;
     
     /**
      * Creates a new track job along with its data.
@@ -34,16 +35,19 @@ public class TrackJob implements Job {
      * @param description the description of the track
      * @param refGen the ReferenceJob with all information about the reference
      * @param parser the parser to use for parsing
+     * @param isAlreadyImported true, if this direct access track was already imported in another
+     * vamp db.
      * @param timestamp the timestamp when it was created
      */
     public TrackJob(int trackID, boolean isDbUsed, File file, String description,
-            ReferenceJob refGen, MappingParserI parser, Timestamp timestamp) {
+            ReferenceJob refGen, MappingParserI parser, boolean isAlreadyImported, Timestamp timestamp) {
         this.trackID = trackID;
         this.isDbUsed = isDbUsed;
         this.file = file;
         this.description = description;
         this.timestamp = timestamp;
         this.parser = parser;
+        this.isAlreadyImported = isAlreadyImported;
         this.refGen = refGen;
     }
 
@@ -55,60 +59,103 @@ public class TrackJob implements Job {
         return isDbUsed;
     }
 
+    /**
+     * @return the parser, which shall be used for parsing this track job.
+     */
     public MappingParserI getParser() {
         return parser;
     }
 
+    /**
+     * @return the description of this track job.
+     */
     @Override
     public String getDescription() {
         return description;
     }
 
+    /**
+     * @return the reference genome associated with this track job.
+     */
     public ReferenceJob getRefGen() {
         return refGen;
     }
 
+    /**
+     * @return the file, which contains the track data and which should be
+     * parsed and stored into the db / as direct access track.
+     */
     @Override
     public File getFile() {
         return file;
     }
 
+    /**
+     * @param file the file, which contains the track data and which should be
+     * parsed and stored into the db / as direct access track.
+     */
     public void setFile(File file) {
         this.file = file;
     }
 
+    /**
+     * @param refGen the reference genome associated with this track job.
+     */
     public void setRefGen(ReferenceJob refGen) {
         this.refGen = refGen;
     }
 
+    /**
+     * @return the timestamp at which this track job was created.
+     */
     @Override
     public Timestamp getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
+    /**
+     * @return the track id of this track job.
+     */
     @Override
     public int getID() {
-        return trackID;
+        return this.trackID;
     }
 
+    /**
+     * @return the description of this track job.
+     */
     @Override
     public String getName() {
-        return getDescription();
+        return this.getDescription();
     }
     
+    /**
+     * @return Modified to return the description and the timestamp.
+     */
     @Override
     public String toString() {
-        return description + ":" + timestamp;
+        return this.description + ":" + this.timestamp;
     }
 
+    /**
+     * @param trackID the track id also used in the db for this track job.
+     */
     public void setIdPersistant(int trackID) {
         this.trackID = trackID;
     }
     
+    /**
+     * @return true, if this trackjob should be imported stepwise. 
+     * This allows to adjust the ram load.
+     */
     public boolean isStepwise() {
-        return stepwise;
+        return this.stepwise;
     }
 
+    /**
+     * @param isStepwise true, if this trackjob should be imported stepwise. 
+     * This allows to adjust the ram load.
+     */
     public void setIsStepwise(boolean isStepwise) {
         this.stepwise = isStepwise;
     }
@@ -117,7 +164,7 @@ public class TrackJob implements Job {
      * @return the start position in the genome, if this is a stepwise parser.
      */
     public int getStart() {
-        return start;
+        return this.start;
     }
 
     /**
@@ -131,7 +178,7 @@ public class TrackJob implements Job {
      * @return the stop position in the genome, if this is a stepwise parser.
      */
     public int getStop() {
-        return stop;
+        return this.stop;
     }
 
     /**
@@ -141,32 +188,61 @@ public class TrackJob implements Job {
         this.stop = stop;
     }
 
+    /**
+     * @return true, if this is the first job of a stepwise import
+     * track job, false otherwise.
+     */
     public boolean isFirstJob() {
         return firstJob;
     }
 
+    /**
+     * @param isFirstJob true, if this is the first job of a stepwise import
+     * track job, false otherwise.
+     */
     public void setIsFirstJob(boolean isFirstJob) {
         this.firstJob = isFirstJob;
     }
 
+    /**
+     * @return true, if this trackJob is already sorted by read sequence, 
+     * false otherwise.
+     */
     public boolean isSorted() {
-        return isSorted;
+        return this.isSorted;
     }
 
+    /**
+     * @param isSorted true, if this trackJob is already sorted by readsequence, 
+     * false otherwise.
+     */
     public void setIsSorted(boolean isSorted) {
         this.isSorted = isSorted;
     }
 
-    
-    
+    /**
+     * @return stepSize the setp size of the import. The step size depicts the chunk of data,
+     * which is read in one chunk.
+     */
     public int getStepSize() {
-        return stepSize;
+        return this.stepSize;
     }
 
+    /**
+     * @param stepSize the setp size of the import. The step size depicts the chunk of data,
+     * which is read in one chunk.
+     */
     public void setStepSize(int stepSize) {
         this.stepSize = stepSize;
     }
-    
+
+    /**
+     * @return true, if this direct access track was already imported in another
+     * vamp db, false otherwise.
+     */
+    public boolean isAlreadyImported() {
+        return this.isAlreadyImported;
+    }
     
 
 }

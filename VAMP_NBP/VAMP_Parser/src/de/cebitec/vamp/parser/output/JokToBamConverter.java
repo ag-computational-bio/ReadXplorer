@@ -19,7 +19,7 @@ import org.openide.util.NbBundle;
  * 
  * @author -Rolf Hilker-
  */
-public class JokToBamConverter implements ConverterI, ParserI, Observable, Observer {
+public class JokToBamConverter implements ConverterI, Observable, Observer {
 
     private File jokFile;
     private String refSeqName;
@@ -27,7 +27,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
     
     private static String name = "Jok to BAM Converter";
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
-    private static String fileDescription = "Jok Input, BAM Output";
+    private static String fileDescription = "Saruman Output (jok)";
     private ArrayList<Observer> observers;
     private String msg;
 
@@ -235,7 +235,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
             SAMFileReader samFileReader = new SAMFileReader(outputFile);
             SamUtils samUtils = new SamUtils();
             samUtils.registerObserver(this);
-            samUtils.createIndex(samFileReader, new File(outputFile + ".bai"), this);
+            samUtils.createIndex(samFileReader, new File(outputFile + ".bai"));
             samFileReader.close();
 
             this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Finished", outFileName));
@@ -324,7 +324,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 

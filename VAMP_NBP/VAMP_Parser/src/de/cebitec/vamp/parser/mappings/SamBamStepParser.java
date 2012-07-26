@@ -1,21 +1,16 @@
 package de.cebitec.vamp.parser.mappings;
 
-import java.util.ArrayList;
-import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.DiffAndGapResult;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
-import org.openide.util.NbBundle;
 import java.util.List;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -26,6 +21,8 @@ public class SamBamStepParser implements MappingParserI {
     private static String name = "SAM/BAM Stepwise Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM Output";
+    
+    private SeqPairProcessorI seqPairProcessor;
     private HashMap<String, Integer> seqToIDMap;
     private int noUniqueMappings;
     private ArrayList<Observer> observers;
@@ -37,35 +34,50 @@ public class SamBamStepParser implements MappingParserI {
     private int shift = 0;
     private SAMRecord record = null;
 
+    /**
+     * Parser for stepwise parsing of sam and bam data files in vamp.
+     */
     public SamBamStepParser() {
         this.seqToIDMap = new HashMap<String, Integer>();
         this.observers = new ArrayList<Observer>();
-
+        this.seqPairProcessor = new SeqPairProcessorDummy();
+    }
+    
+    /**
+     * Parser for stepwise parsing of sam and bam data files in vamp. Use
+     * this constructor for parsing sequence pair data along with the ordinary
+     * track data.
+     * @param seqPairProcessor the specific sequence pair processor for handling
+     *      sequence pair data
+     */
+    public SamBamStepParser(SeqPairProcessorI seqPairProcessor) {
+        this();
+        this.seqPairProcessor = seqPairProcessor;
     }
 
     @Override
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         this.seqToIDMap = new HashMap<String, Integer>();
-        String readname = null;
+        String readname;
 //        String refName = null;
-        String refSeq = null;
-        String readSeq = null;
+        String refSeq;
+        String readSeq;
         //  int flag = 0;
-        String readSeqwithoutGaps = null;
-        String cigar = null;
+        String readSeqwithoutGaps;
+        String cigar;
         String filename = trackJob.getFile().getName();
         this.noUniqueMappings = 0;
         int start;
         int stop;
         int sumReadLength = 0;
         int refSeqLength = sequenceString.length();
-        int errors = 0;
+        int errors;
+        byte direction;
 
         //     String refSeqfulllength = null;
-        String refSeqwithoutgaps = null;
+        String refSeqwithoutgaps;
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.setFirstMappingContainer(trackJob.isFirstJob());
-        //TODO check why if there is too much output we get a java heap space exception 
 
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filename));
 
@@ -74,9 +86,9 @@ public class SamBamStepParser implements MappingParserI {
             SAMRecordIterator itor = sam.iterator();
             itorAll = itor;
         }
-        SAMRecord first = null;
+        SAMRecord first;
         int end = trackJob.getStop();
-        end = end + shift;
+        end += shift;
 
         while (lineno < end) {
             lineno++;
@@ -97,9 +109,6 @@ public class SamBamStepParser implements MappingParserI {
                 cigar = first.getCigarString();
                 readSeqwithoutGaps = first.getReadString().toLowerCase();
 
-                stop = 0;
-                errors = 0;
-
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
                     stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
                     refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
@@ -112,10 +121,8 @@ public class SamBamStepParser implements MappingParserI {
                     refSeq = refSeqwithoutgaps;
                     readSeq = readSeqwithoutGaps;
                 }
-
-                byte direction = 0;
-                // 1 = fwd, -1 = rev
-                direction = first.getReadNegativeStrandFlag() ? (byte) -1 : 1;
+                
+                direction = first.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
 
                 //check parameters
                 if (refSeqLength < start || refSeqLength < stop) {
@@ -188,7 +195,7 @@ public class SamBamStepParser implements MappingParserI {
 
                 mappingContainer.addParsedMapping(mapping, seqID);
                 sumReadLength += (stop - start);
-
+                this.seqPairProcessor.processReadname(seqID, readname);
 
                 if (lineno == end) {
                     
@@ -201,7 +208,7 @@ public class SamBamStepParser implements MappingParserI {
                         String read = record.getReadString().toLowerCase();
                         read = record.getReadNegativeStrandFlag() ? SequenceUtils.getReverseComplement(read) : read;
                         if (this.seqToIDMap.containsKey(read)) {
-                            end = end + 1;
+                            end += 1;
                         }
 
                     } else {
@@ -227,7 +234,7 @@ public class SamBamStepParser implements MappingParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 
@@ -268,7 +275,16 @@ public class SamBamStepParser implements MappingParserI {
     }
 
     @Override
-    public void processReadname(int seqID, String readName) {
-        //TODO:Readnames
+    public SeqPairProcessorI getSeqPairProcessor() {
+        return this.seqPairProcessor;
+    }
+    
+    /**
+     * Dummy method.
+     * @return null, because it is not needed here.
+     */
+    @Override
+    public Object getAdditionalData() {
+        return null;
     }
 }

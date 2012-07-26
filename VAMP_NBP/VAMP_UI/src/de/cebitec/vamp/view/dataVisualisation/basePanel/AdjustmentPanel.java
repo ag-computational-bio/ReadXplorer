@@ -8,7 +8,7 @@ import javax.swing.JPanel;
  * A Panel to control zoom-level and the currently shown positions of listeners
  * @author ddoppmeier
  */
-public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
+public class AdjustmentPanel extends JPanel implements SynchronousNavigator {
 
     public static final long serialVersionUID = 623482568;
 
@@ -26,7 +26,7 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
      * @param hasScrollbar 
      */
     public AdjustmentPanel(int navigatorMin, int navigatorMax, int positionInit, int zoomInit,
-            int sliderMax, boolean hasScrollbar, boolean hasZoomslider){
+            int sliderMax, boolean hasScrollbar, boolean hasZoomslider) {
         super();
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
@@ -35,6 +35,7 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
             this.add(scrollbar);
         }
         if (hasZoomslider) {
+            zoomInit = sliderMax < zoomInit ? sliderMax : zoomInit;
             slider = new ExtendedSlider(1, sliderMax, zoomInit);
             this.add(slider);
         }
@@ -45,7 +46,7 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
      *
      * @param listener register this listener to be notified of changes
      */
-    public void addAdjustmentListener(AdjustmentPanelListenerI listener){
+    public void addAdjustmentListener(AdjustmentPanelListenerI listener) {
         if(scrollbar != null){
             scrollbar.addAdjustmentListener(listener);
         }
@@ -59,7 +60,7 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator{
      * @param listener remove the listener, so it is not updated anymore on
      * occurring changes
      */
-    public void removeAdjustmentListener(AdjustmentPanelListenerI listener){
+    public void removeAdjustmentListener(AdjustmentPanelListenerI listener) {
         if(scrollbar != null){
             scrollbar.removeAdjustmentListener(listener);
         }

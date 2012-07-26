@@ -1,4 +1,4 @@
-package de.cebitec.vamp.ui.importer;
+package de.cebitec.vamp.parser;
 
 import de.cebitec.vamp.parser.TrackJob;
 

@@ -1,19 +1,18 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
-import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Carries out the logic behind the transcription start site (TSS) anaylsis.
  * When executing the transcription start site detection increaseReadCount is always active
  * and maxInitialReadCount + increaseReadCount2 are optional parameters. They can
@@ -38,6 +35,8 @@ import java.util.List;
  2. Nach Mappingstarts: a) Nach Chernoff-Formel
 			b) Nach Wahrscheinlichkeitsformel (Binomialverteilung)
 
+ * @author -Rolf Hilker-
+ * 
  */
 public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<TranscriptionStart>> {
 
@@ -48,7 +47,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private int maxInitialReadCount;
     private int increaseReadCount2;
     private List<PersistantAnnotation> genomeAnnotations;
-    private List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
+    protected List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
     private DiscreteCountingDistribution covIncreaseDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
     private boolean calcCoverageDistributions;
@@ -62,6 +61,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     
     private HashMap<Integer, Integer> exactCovIncreaseDist = new HashMap<Integer, Integer>(); //exact coverage increase distribution
     private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<Integer, Integer>(); //exact coverage increase percent distribution
+    
+    protected PersistantCoverage currentCoverage;
 
     /**
      * Carries out the logic behind the transcription start site analysis.
@@ -77,11 +78,15 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param trackViewer the track viewer for which the analyses should be carried out
      * @param increaseReadCount minimum increase of read counts for two neighboring
      *          positions. Only when the increase is bigger, a transcription start site is predicted
+     * @param increaseReadPercent minimum increase of read counts for two neighboring
+     *          positions in percent. Only when the increase in percent is bigger, a transcription 
+     *          start site is predicted
      * @param maxInitialReadCount maximum number of reads at the left position in 
      *          a pair of tho neighboring positions. Gene starts are only predicted,
      *          if this maximum is not exceeded AND increaseReadCount2 is satisfied
      * @param increaseReadCount2 minimum increase of read counts for two neighboring
      *          positions. Only when the increase is bigger, a transcription start site is predicted
+     * @param tssAutomatic  true, if the parameters should be estimated automatically, false otherwise
      */
     public AnalysisTranscriptionStart(TrackViewer trackViewer, int increaseReadCount, int increaseReadPercent, 
             int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic) {
@@ -166,7 +171,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param coverage the coverage for predicting the transcription start sites.
      */
     public void detectTSSs(PersistantCoverage coverage) {
-
+        
+        this.currentCoverage = coverage;
+        
         int leftBound = coverage.getLeftBound();
         int fixedLeftBound = leftBound <= 0 ? 0 : leftBound - 1;
         int rightBound = coverage.getRightBound();
@@ -181,7 +188,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         
         coverage.setLeftBound(fixedLeftBound);
         int[] fwdMultCov = coverage.getBestMatchFwdMult();
-        int[] revMultCov = coverage.getBestMatchFwdMult();
+        int[] revMultCov = coverage.getBestMatchRevMult();
         int[] newFwdMultCov = new int[fwdMultCov.length + 1];
         int[] newRevMultCov = new int[revMultCov.length + 1];
         newFwdMultCov[0] = this.covLastFwdPos;
@@ -253,8 +260,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     || fwdCov1 <= this.maxInitialReadCount 
                     && diffFwd > this.increaseReadCount2) {
 
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, SequenceUtils.STRAND_FWD);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, true);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detAnnotations));
             }
             if (diffRev > this.increaseReadCount 
                     && percentDiffRev > this.increaseReadPercent 
@@ -262,18 +269,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     || revCov2 <= this.maxInitialReadCount 
                     && diffRev > this.increaseReadCount2) {
 
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, SequenceUtils.STRAND_REV);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, false);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detAnnotations));
             }
 
         } else {
             if (diffFwd > this.increaseReadCount && percentDiffFwd > this.increaseReadPercent) {
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, SequenceUtils.STRAND_FWD);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, SequenceUtils.STRAND_FWD, fwdCov1, fwdCov2, detAnnotations));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, true);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detAnnotations));
             }
             if (diffRev > this.increaseReadCount && percentDiffRev > this.increaseReadPercent) {
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, SequenceUtils.STRAND_REV);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, SequenceUtils.STRAND_REV, revCov2, revCov1, detAnnotations));
+                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, false);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detAnnotations));
             }
             
         }
@@ -294,11 +301,11 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * the maximal two closest annotations found in a vicinity of 500bp up- or 
      * downstream of the transcription start site.
      * @param tssPos the predicted transcription start site position
-     * @param strand the strand, on which the transcription start site is located
+     * @param isFwdStrand the strand, on which the transcription start site is located
      * @return the genomic annotations, which can be associated to the
      * given transcription start site and strand.
      */
-    private DetectedAnnotations findNextAnnotation(int tssPos, byte strand) {
+    private DetectedAnnotations findNextAnnotation(int tssPos, boolean isFwdStrand) {
         final int maxDeviation = 1000;
         int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
         int maxStartPos = tssPos + maxDeviation > this.genomeSize ? genomeSize : tssPos + maxDeviation;
@@ -306,7 +313,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         DetectedAnnotations detectedAnnotations = new DetectedAnnotations();
         int start;
         boolean fstFittingAnnotation = true;
-        if (strand == SequenceUtils.STRAND_FWD) {
+        if (isFwdStrand) {
             for (int i = this.lastAnnotationIdxGenStartsFwd; i < this.genomeAnnotations.size()-1; ++i) {
                 annotation = this.genomeAnnotations.get(i);
                 start = annotation.getStart();
@@ -315,7 +322,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                  * We use all annotations, because also mRNA or rRNA annotations can contribute to TSS detection,
                  * as they also depict expressed sequences from the reference
                  */
-                if (start >= minStartPos && annotation.getStrand() == strand && start <= maxStartPos) {
+                if (start >= minStartPos && annotation.isFwdStrand() && start <= maxStartPos) {
 
                     if (fstFittingAnnotation) {
                         this.lastAnnotationIdxGenStartsFwd = i; //this is the first annotation in the interval
@@ -380,7 +387,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 annotation = this.genomeAnnotations.get(i);
                 start = annotation.getStop();
 
-                if (start >= minStartPos && annotation.getStrand() == strand && start <= maxStartPos) {
+                if (start >= minStartPos && annotation.isFwdStrand() == isFwdStrand && start <= maxStartPos) {
 
                     if (fstFittingAnnotation) {
                         this.lastAnnotationIdxGenStartsRev = i; //this is the first annotation in the interval
@@ -445,13 +452,17 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     }
     
     /**
-     * Before adding a new detected transcription start site to the detected transcription start sites list the method
-     * checks, if the last detected transcription start site is located within 19bp (sRNAs can be short) of the current transcription start site
-     * on the same strand. If that's the case, only the transcription start site with the higher number of
-     * TOTAL coverage increase is kept. This method prevents detecting two transcription start sites for 
-     * the same gene, in case the transcription already starts at a low rate a few bases before the
-     * actual transcription start site. This seems to happen, when the end of the -10 region is further away from
-     * the actual transcription start site than 7 bases.
+     * Before adding a new detected transcription start site to the detected
+     * transcription start sites list the method checks, if the last detected
+     * transcription start site is located within 19bp (sRNAs can be short) of
+     * the current transcription start site on the same strand. If that's the
+     * case, only the transcription start site with the higher number of TOTAL
+     * coverage increase is kept. This method prevents detecting two
+     * transcription start sites for the same gene, in case the transcription
+     * already starts at a low rate a few bases before the actual transcription
+     * start site. This seems to happen, when the end of the -10 region is
+     * further away from the actual transcription start site than 7 bases in 
+     * procaryotes. There might exist more reasons, of course.
      * @param tss the currently detected transcription start site 
      */
     private void checkAndAddDetectedStart(TranscriptionStart tss) {        
@@ -460,25 +471,33 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             int index = this.detectedStarts.size() - 1;
             TranscriptionStart lastDetectedStart = this.detectedStarts.get(index);
             
-            while (lastDetectedStart.getStrand() != tss.getStrand() && index > 0 ) {
+            while (lastDetectedStart.isFwdStrand() != tss.isFwdStrand() && index > 0 ) {
                 lastDetectedStart = this.detectedStarts.get(--index);
             }
             
-            if (lastDetectedStart.getPos() + 19 >= tss.getPos() && lastDetectedStart.getStrand() == tss.getStrand()) {
+            if (lastDetectedStart.getPos() + 19 >= tss.getPos() && lastDetectedStart.isFwdStrand() == tss.isFwdStrand()) {
                 int covIncreaseLastStart = lastDetectedStart.getStartCoverage() - lastDetectedStart.getInitialCoverage();
                 int covIncreaseTSS = tss.getStartCoverage() - tss.getInitialCoverage();
                 
                 if (covIncreaseLastStart < covIncreaseTSS) {
                     this.detectedStarts.remove(this.detectedStarts.size() - 1);
-                    this.detectedStarts.add(tss);
+                    this.addDetectStart(tss);
                 }
                 //else, we keep the lastDetectedStart, but discard the current transcription start site
             } else {
-                this.detectedStarts.add(tss);
+                this.addDetectStart(tss);
             }
         } else {
-            this.detectedStarts.add(tss);
+            this.addDetectStart(tss);
         }
+    }
+    
+    /**
+     * Acutally adds the detected TSS to the list of detected TSSs.
+     * @param tss the transcription start site to add to the list
+     */
+    protected void addDetectStart(TranscriptionStart tss) {
+        this.detectedStarts.add(tss);
     }
 
     /**

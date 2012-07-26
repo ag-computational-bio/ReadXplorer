@@ -6,7 +6,11 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.File;
 import java.util.*;
-import net.sf.samtools.*;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
+import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMRecordIterator;
+import net.sf.samtools.util.RuntimeIOException;
 
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
@@ -28,8 +32,9 @@ public class SamBamFileReader {
      * A SamBamFileReader has different methods to read data from a bam or sam file.
      * @param dataFile the file to read from
      * @param trackId the track id of the track whose data is stored in the given file
+     * @throws RuntimeIOException  
      */
-    public SamBamFileReader(File dataFile, int trackId) {
+    public SamBamFileReader(File dataFile, int trackId) throws RuntimeIOException {
         this.dataFile = dataFile;
         this.trackId = trackId;
         
@@ -61,7 +66,7 @@ public class SamBamFileReader {
             SAMRecord record = samRecordIterator.next();
             int start = record.getUnclippedStart();
             int stop = record.getUnclippedEnd();
-            byte direction = record.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+            boolean isFwdStrand = !record.getReadNegativeStrandFlag();
             Integer classification = (Integer) record.getAttribute("Yc");
             Integer count = (Integer) record.getAttribute("Yt");            
             
@@ -77,13 +82,13 @@ public class SamBamFileReader {
             if (classification != null && count != null) { //since both data fields are always written together
                 boolean classify = classification == (int) Properties.PERFECT_COVERAGE || 
                                   (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                mapping = new PersistantMapping(id++, start, stop, trackId, direction, count, 0, 0, classify); 
+                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify); 
             } else {
                 count = 1;
-                mapping = new PersistantMapping(id++, start, stop, trackId, direction, count, 0, 0, true);
+                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, true);
             }
             
-            this.createDiffsAndGaps(record.getCigarString(), start, direction, count, 
+            this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count, 
                     record.getReadString(), refSubSeq, mapping);
             
             mappings.add(mapping);
@@ -149,14 +154,14 @@ public class SamBamFileReader {
             int insertFrom = from - offset;
             
             SAMRecord record;
-            byte direction;
+            boolean isFwdStrand;
             Integer classification;
             int pos;
             int start;
             int stop;
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
-                direction = record.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                isFwdStrand = !record.getReadNegativeStrandFlag();
                 classification = (Integer) record.getAttribute("Yc");
                 start = record.getAlignmentStart();
                 stop = record.getAlignmentEnd();
@@ -165,7 +170,7 @@ public class SamBamFileReader {
                         if (trackNeeded == 0) {
                             if (classification != null) {
                                 if (classification == Properties.PERFECT_COVERAGE) {
-                                    if (direction == SequenceUtils.STRAND_FWD) {
+                                    if (isFwdStrand) {
                                         ++perfectCoverageFwd[pos];
                                         ++bestMatchCoverageFwd[pos];
                                         ++commonCoverageFwd[pos];
@@ -176,7 +181,7 @@ public class SamBamFileReader {
                                     }
 
                                 } else if (classification == Properties.BEST_MATCH_COVERAGE) {
-                                    if (direction == SequenceUtils.STRAND_FWD) {
+                                    if (isFwdStrand) {
                                         ++bestMatchCoverageFwd[pos];
                                         ++commonCoverageFwd[pos];
                                     } else {
@@ -185,7 +190,7 @@ public class SamBamFileReader {
                                     }
 
                                 } else { //meaning: if (classification == Properties.COMPLETE_COVERAGE) {
-                                    if (direction == SequenceUtils.STRAND_FWD) {
+                                    if (isFwdStrand) {
                                         ++commonCoverageFwd[pos];
                                     } else {
                                         ++commonCoverageRev[pos];
@@ -193,7 +198,7 @@ public class SamBamFileReader {
                                 }
 
                             } else {
-                                if (direction == SequenceUtils.STRAND_FWD) {
+                                if (isFwdStrand) {
                                     ++commonCoverageFwd[pos];
                                 } else {
                                     ++commonCoverageRev[pos];
@@ -202,14 +207,14 @@ public class SamBamFileReader {
 
                             //part for double track coverage, where we need to store it in map for track 1 or 2
                         } else if (trackNeeded == PersistantCoverage.TRACK1) {
-                            if (direction == SequenceUtils.STRAND_FWD) {
+                            if (isFwdStrand) {
                                 ++commonCoverageFwdTrack1[pos];
                             } else {
                                 ++commonCoverageRevTrack1[pos];
                             }
                         
                         } else if (trackNeeded == PersistantCoverage.TRACK2) {
-                            if (direction == SequenceUtils.STRAND_FWD) {
+                            if (isFwdStrand) {
                                 ++commonCoverageFwdTrack2[pos];
                             } else {
                                 ++commonCoverageRevTrack2[pos];
@@ -220,7 +225,7 @@ public class SamBamFileReader {
                 
                 if (diffsAndGapsNeeded) {
                     PersistantDiffAndGapResult diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(), 
-                            record.getUnclippedStart(), direction, 1, record.getReadString(), 
+                            record.getUnclippedStart(), isFwdStrand, 1, record.getReadString(), 
                             refSeq.substring(record.getUnclippedStart(), record.getUnclippedEnd()), null);
                     diffs.addAll(diffsAndGaps.getDiffs());
                     gaps.addAll(diffsAndGaps.getGaps());
@@ -265,7 +270,7 @@ public class SamBamFileReader {
         } catch (SAMFormatException e) {
             System.err.println(e);
         }
-        return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true);
+        return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
     }
      
     /**
@@ -282,14 +287,13 @@ public class SamBamFileReader {
      *      the diff and gap data.
      * @return PersistantDiffAndGapResult containing all the diffs and gaps
      */
-    private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, byte direction, int nbReplicates, 
+    private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, boolean isFwdStrand, int nbReplicates, 
                     String readSeq, String refSeq, PersistantMapping mapping) throws NumberFormatException {
         
         Map<Integer, Integer> gapOrderIndex = new HashMap<Integer, Integer>();
         List<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
         List<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
         int differences = 0;
-        boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD ? true : false;
         
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
@@ -313,7 +317,7 @@ public class SamBamFileReader {
                         for (int j = 0; j < count; ++j) {
                             pos = baseNo + j;
                             base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
-                            base = direction == SequenceUtils.STRAND_FWD ? base : SequenceUtils.getDnaComplement(base, readSeq);
+                            base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base, readSeq);
                             PersistantDiff d = new PersistantDiff(start + pos + dels, base, isFwdStrand , nbReplicates);
                             if (mapping != null) {
                                 mapping.addDiff(d);
