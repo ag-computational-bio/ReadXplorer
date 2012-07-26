@@ -100,7 +100,7 @@ public final class diffExpVisualPanel3 extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, "rdata") {
+        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"rdata"}, "RData") {
 
             @Override
             public void save(String fileLocation) {
