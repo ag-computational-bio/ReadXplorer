@@ -114,9 +114,11 @@ public class SamUtils implements Observable {
      *      writing as the first element and the new file as the second element
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter(File oldFile, SAMFileHeader header, boolean presorted, String newEnding) {
-        String[] nameParts = oldFile.getName().split(".");
+        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
+        String newFileName = oldFile.getAbsolutePath();
         String extension;
         try {
+            newFileName = nameParts[0];
             extension = nameParts[nameParts.length - 1];
         } catch (ArrayIndexOutOfBoundsException e) {
             extension = "bam";
@@ -124,10 +126,10 @@ public class SamUtils implements Observable {
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         File outputFile;
         if (extension.toLowerCase().contains("sam")) {
-            outputFile = new File(oldFile.getAbsolutePath() + newEnding + ".sam");
+            outputFile = new File(newFileName + newEnding + ".sam");
             return new Pair<SAMFileWriter, File>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
         } else {
-            outputFile = new File(oldFile.getAbsolutePath() + newEnding + ".bam");
+            outputFile = new File(newFileName + newEnding + ".bam");
             return new Pair<SAMFileWriter, File>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
         }
     }

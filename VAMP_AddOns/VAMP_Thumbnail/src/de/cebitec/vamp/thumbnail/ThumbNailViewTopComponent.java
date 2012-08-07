@@ -159,7 +159,7 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version here
     }
 
     @Override

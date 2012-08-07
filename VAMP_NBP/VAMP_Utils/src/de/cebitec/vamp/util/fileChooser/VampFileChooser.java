@@ -1,5 +1,6 @@
 package de.cebitec.vamp.util.fileChooser;
 
+import de.cebitec.vamp.util.Properties;
 import java.io.File;
 import java.io.IOException;
 import java.util.prefs.Preferences;
@@ -8,7 +9,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import de.cebitec.vamp.util.Properties;
 
 /**
  * Vamps file chooser. Contains all options and values of how to open a specific

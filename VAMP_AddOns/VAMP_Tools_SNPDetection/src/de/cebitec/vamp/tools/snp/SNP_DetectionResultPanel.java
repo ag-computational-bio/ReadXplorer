@@ -204,18 +204,17 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) snpTable.getModel();        
 
         //get all annotations from the reference to determine amino acid 
-        String refSeq = this.reference.getSequence();
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
-        List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, refSeq.length());
+        List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, reference.getRefLength());
         Map<Integer, PersistantAnnotation> annotationMap = new HashMap<Integer, PersistantAnnotation>();
         for (PersistantAnnotation annotation : annotationsSorted){
             annotationMap.put(annotation.getId(), annotation); //ids are unique
         }
-        List<PersistantSubAnnotation> subAnnotationsSorted = refGenCon.getSubAnnotationsForClosedInterval(0, refSeq.length());
+        List<PersistantSubAnnotation> subAnnotationsSorted = refGenCon.getSubAnnotationsForClosedInterval(0, reference.getRefLength());
         PersistantAnnotation.addSubAnnotations(annotationMap, subAnnotationsSorted);
         annotationMap.clear();
         
-        SnpTranslator snpTranslator = new SnpTranslator(annotationsSorted, refSeq);
+        SnpTranslator snpTranslator = new SnpTranslator(annotationsSorted, reference);
         
         for (SnpI snpi : snps) {
             

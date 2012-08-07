@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 import net.sf.samtools.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -31,7 +32,7 @@ public abstract class ExternalSortBAM {
     private File sortedFile;
     private String chunkName;
     private InputOutput io;
-    private final int chunkSize = 100000;
+    private final int chunkSize = 500000;
     private int workunits;
     private ProgressHandle ph;
 
@@ -84,7 +85,7 @@ public abstract class ExternalSortBAM {
             }
         }
         workunits = lines *2;
-        ph.start(workunits); //TODO: own thread for progress handle...
+        ph.start(workunits);
         itLine.close();
         samReader.close();
     }
@@ -102,7 +103,6 @@ public abstract class ExternalSortBAM {
         ArrayList<SAMRecord> chunkSizeRows = new ArrayList<SAMRecord>();
 
         int numFiles = 0;
-        SAMRecord record;
         workunits = 0;
         File f;
         BAMFileWriter bfw;
@@ -161,12 +161,12 @@ public abstract class ExternalSortBAM {
     private void mergeFiles(File baseFile, int numFiles) {
         try {
 
-            ArrayList<File> files = new ArrayList<File>();
-            ArrayList<SAMRecordIterator> mergeIt = new ArrayList<SAMRecordIterator>();
-            ArrayList<SAMFileReader> readerList = new ArrayList<SAMFileReader>();
-            ArrayList<SAMRecord> filerows = new ArrayList<SAMRecord>();
+            List<File> files = new ArrayList<File>();
+            List<SAMRecordIterator> mergeIt = new ArrayList<SAMRecordIterator>();
+            List<SAMFileReader> readerList = new ArrayList<SAMFileReader>();
+            List<SAMRecord> filerows = new ArrayList<SAMRecord>();
             String[] s = baseFile.getName().split("\\.");
-            String name = baseFile.getParent() + "/" + s[0] + "_sort_" + CRITERION + ".bam";
+            String name = baseFile.getParent() + "/" + s[0] + ".sort_" + CRITERION + ".bam";
             File mergedFile = new File(name);
             BAMFileWriter bfw = new BAMFileWriter(mergedFile);
             bfw.setHeader(samHeader);
@@ -196,7 +196,7 @@ public abstract class ExternalSortBAM {
             String min;
             int minIndex;
             while (someFileStillHasRows) {
-
+                
                 row = filerows.get(0);
                 if (row != null) {
                     min = row.getReadString();

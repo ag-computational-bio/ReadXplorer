@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.output;
 
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
@@ -44,7 +45,7 @@ public class SamBamCombiner implements Observable, Observer {
         this.trackJob1 = trackJob1;
         this.trackJob2 = trackJob2;
         this.sortCoordinate = sortCoordinate;
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
     }
     
     /**
@@ -54,13 +55,14 @@ public class SamBamCombiner implements Observable, Observer {
      * prevent reuse of it after the combination.
      */
     public void combineTracks() {
+        long startTime = System.currentTimeMillis();
         //only proceed if the second track job contains a file
         File fileToExtend = trackJob1.getFile();
         File file2 = trackJob2.getFile();
         if (file2.exists()) { //if all reads already in same file this file is null and no combination needed
             String fileName = fileToExtend.getName();
 
-            this.notifyObservers(NbBundle.getMessage(SamBamExtender.class, "Converter.Convert.Start", fileName));
+            this.notifyObservers(NbBundle.getMessage(SamBamCombiner.class, "Combiner.Combine.Start", fileName + " and " + file2.getName()));
 
             SAMFileReader samBamReader = new SAMFileReader(fileToExtend);
             SAMRecordIterator samBamItor = samBamReader.iterator();
@@ -89,14 +91,17 @@ public class SamBamCombiner implements Observable, Observer {
             samBamReader.close();
             samBamFileWriter.close();
 
-            if (sortCoordinate) { //we can only create an index if sorted by coordinate
-                SAMFileReader samReaderNew = new SAMFileReader(outputFile);
-                SamUtils utils = new SamUtils();
-                utils.registerObserver(this);
-                utils.createIndex(samReaderNew, new File(outputFile + ".bai"));
+            if (sortCoordinate) { 
+                try (SAMFileReader samReaderNew = new SAMFileReader(outputFile)) { //close is performed by try statement
+                    SamUtils utils = new SamUtils();
+                    utils.registerObserver(this);
+                    utils.createIndex(samReaderNew, new File(outputFile + ".bai"));
+                }
             }
             
-            this.notifyObservers(NbBundle.getMessage(SamBamExtender.class, "Converter.Convert.Finished", fileName));
+            long finish = System.currentTimeMillis();
+            String msg = NbBundle.getMessage(SamBamCombiner.class, "Combiner.Combine.Finished", fileName + " and " + file2.getName());
+            this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
         }
     }
     

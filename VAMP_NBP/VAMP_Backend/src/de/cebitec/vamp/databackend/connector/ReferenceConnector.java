@@ -26,6 +26,8 @@ public class ReferenceConnector {
     private Connection con;
 //    private String projectFolder;
 //    private boolean isFolderSet = false;
+    private PersistantReference reference;
+    
 
     ReferenceConnector(int refGenID){
         this.refGenID = refGenID;
@@ -35,29 +37,33 @@ public class ReferenceConnector {
 //        this.isFolderSet = !this.projectFolder.isEmpty();
     }
 
-    public PersistantReference getRefGen(){
-        PersistantReference gen = null;
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
-            fetch.setLong(1, refGenID);
-            ResultSet rs = fetch.executeQuery();
+    /**
+     * @return fetches the reference genome of the reference associated with this
+     * connector.
+     */
+    public PersistantReference getRefGen() {
+        if (this.reference == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
+            try {
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
+                fetch.setLong(1, refGenID);
+                ResultSet rs = fetch.executeQuery();
 
-            if(rs.next()){
-                int id = rs.getInt(FieldNames.REF_GEN_ID);
-                String name = rs.getString(FieldNames.REF_GEN_NAME);
-                String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
-                String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
-                Timestamp time = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
+                if (rs.next()) {
+                    String name = rs.getString(FieldNames.REF_GEN_NAME);
+                    String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
+                    String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
+                    Timestamp time = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
 
-                gen = new PersistantReference(id, name, description, sequence, time);
+                    this.reference = new PersistantReference(refGenID, name, description, sequence, time);
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return gen;
+        return this.reference;
     }
 
     public List<PersistantAnnotation> getAnnotationsForRegion(int from, int to){

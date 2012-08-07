@@ -4,11 +4,11 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.view.dialogMenus.JTextFieldPasteable;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dialogMenus.JTextFieldPasteable;
 import de.cebitec.vamp.view.dialogMenus.StandardMenuEvent;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -332,7 +332,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText().trim());
             this.boundsManager.navigatorBarUpdated(this.jumpPosition);
         } else {
-            JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"+this.refGen.getSequence().length()+")", "Invalid Position", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"+this.refGen.getRefLength()+")", "Invalid Position", JOptionPane.ERROR_MESSAGE);
         }
 }//GEN-LAST:event_jumpButtonActionPerformed
 
@@ -430,7 +430,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     }
 
     private void fillAnnotationList() {
-        List<PersistantAnnotation> annotations = refGenCon.getAnnotationsForRegion(0, refGen.getSequence().length());
+        List<PersistantAnnotation> annotations = refGenCon.getAnnotationsForRegion(0, refGen.getRefLength());
         
         List<PersistantAnnotation> featList = new ArrayList<PersistantAnnotation>(annotations);
         Collections.sort(featList, new AnnotationNameSorter());

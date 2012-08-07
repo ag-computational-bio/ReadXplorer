@@ -1,20 +1,20 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.util.SequenceComparison;
-import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -168,7 +168,7 @@ public class SnpTranslatorTest {
         snps.add(snp19);
         snps.add(snp20);        
                 
-        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, refSeq);
+        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantReference(1, "genome", "genome", refSeq, null));
         for (Snp snp : snps){
             snpTranslator.checkForAnnotation(snp);
         }

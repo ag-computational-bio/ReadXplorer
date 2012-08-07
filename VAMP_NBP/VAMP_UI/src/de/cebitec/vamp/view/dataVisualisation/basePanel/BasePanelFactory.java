@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.util.List;
 import javax.swing.*;
 import net.sf.samtools.util.RuntimeIOException;
@@ -69,9 +70,9 @@ public class BasePanelFactory {
 
     public BasePanel getTrackBasePanel(PersistantTrack track, PersistantReference refGen) {
 
-        BasePanel b = new BasePanel(boundsManager, viewController);
-        b.setName(track.getDescription());
-        viewController.addMousePositionListener(b);
+        BasePanel basePanel = new BasePanel(boundsManager, viewController);
+        basePanel.setName(track.getDescription());
+        viewController.addMousePositionListener(basePanel);
 
         // create track viewer
         TrackConnector tc;
@@ -79,9 +80,10 @@ public class BasePanelFactory {
         try {
             tc = connector.getTrackConnector(track);
         } catch (RuntimeIOException e) {
-            tc = this.openResetFilePathDialog(track, connector, b);
+            PersistantTrack newTrack = this.openResetFilePathDialog(track, connector, basePanel);
+            tc = connector.getTrackConnector(newTrack);
         }
-        TrackViewer trackV = new TrackViewer(boundsManager, b, refGen, tc, false);
+        TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
         trackV.setName(track.getDescription());
 
         // create and set up legend
@@ -107,12 +109,12 @@ public class BasePanelFactory {
 
         // add panels to basepanel
         int maxSliderValue = 500;
-        b.setTopInfoPanel(cil);
-        b.setViewer(trackV, slider);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
-        b.setTitlePanel(this.getTitlePanel(track.getDescription()));
+        basePanel.setTopInfoPanel(cil);
+        basePanel.setViewer(trackV, slider);
+        basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
+        basePanel.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
-        return b;
+        return basePanel;
     }
 
     /**
@@ -127,12 +129,26 @@ public class BasePanelFactory {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported in non-combined mode.");
         } else if (tracks.size() == 2 && !combineTracks || combineTracks) {
-            BasePanel b = new BasePanel(boundsManager, viewController);
-            viewController.addMousePositionListener(b);
+            BasePanel basePanel = new BasePanel(boundsManager, viewController);
+            viewController.addMousePositionListener(basePanel);
 
             // get double track connector
-            TrackConnector trackCon = ProjectConnector.getInstance().getTrackConnector(tracks, combineTracks);
-            MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, refGen, trackCon, combineTracks);
+            TrackConnector trackCon;
+            ProjectConnector connector = ProjectConnector.getInstance();
+            try {
+                trackCon = connector.getTrackConnector(tracks, combineTracks);
+            } catch (RuntimeIOException e) {
+                for (int i = 0; i < tracks.size(); ++i) {
+                    PersistantTrack track = tracks.get(i);
+                    if (!(new File(track.getFilePath())).exists()) {
+                        tracks.set(i, this.openResetFilePathDialog(track, connector, basePanel));
+                        
+                    }
+                }
+                trackCon = connector.getTrackConnector(tracks, combineTracks);
+            }
+            
+            MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, basePanel, refGen, trackCon, combineTracks);
 
             // create and set up legend
             JPanel trackPanelLegend;
@@ -164,15 +180,15 @@ public class BasePanelFactory {
 
             // add panels to basepanel
             int maxSliderValue = 500;
-            b.setTopInfoPanel(cil);
-            b.setViewer(trackV, slider);
-            b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
+            basePanel.setTopInfoPanel(cil);
+            basePanel.setViewer(trackV, slider);
+            basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
             
             String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
-            b.setTitlePanel(this.getTitlePanel(title));
+            basePanel.setTitlePanel(this.getTitlePanel(title));
             
-            viewController.openTrack2(b);
-            return b;
+            viewController.openTrack2(basePanel);
+            return basePanel;
         } else if (tracks.size() == 1) {
             return this.getTrackBasePanel(tracks.get(0), refGen);
         } else {
@@ -253,7 +269,7 @@ public class BasePanelFactory {
     private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider, int sliderMax) {
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
-        AdjustmentPanel control = new AdjustmentPanel(1, refGenome.getSequence().length(),
+        AdjustmentPanel control = new AdjustmentPanel(1, refGenome.getRefLength(),
                 bounds.getCurrentLogPos(), bounds.getZoomValue(), sliderMax, hasScrollbar, hasSlider);
         control.addAdjustmentListener(boundsManager);
         boundsManager.addSynchronousNavigator(control);
@@ -322,8 +338,8 @@ public class BasePanelFactory {
      * @param b the base panel
      * @return the track connector for the updated track or null, if it did not work
      */
-    private TrackConnector openResetFilePathDialog(PersistantTrack track, ProjectConnector connector, BasePanel b) {
-        TrackConnector trackConnector;
+    private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector, BasePanel b) {
+        PersistantTrack newTrack = null;
         ResetTrackFilePanel resetPanel = new ResetTrackFilePanel();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
         Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
@@ -331,25 +347,28 @@ public class BasePanelFactory {
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
             try {
-                PersistantTrack newTrack = new PersistantTrack(track.getId(),
+                newTrack = new PersistantTrack(track.getId(),
                         resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
                         track.getRefGenID(), track.getSeqPairId());
                 connector.resetTrackPath(newTrack);
                 try {
-                    trackConnector = connector.getTrackConnector(newTrack);
-                    return trackConnector;
+                    TrackConnector trackConnector = connector.getTrackConnector(newTrack);
                 } catch (RuntimeIOException ex) {
-                    ex.printStackTrace(); //TODO: correct error handling
+                    String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.Error");
+                    String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
+                    JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (StorageException ex) {
-                ex.printStackTrace();
+                String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.StorageError");
+                String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
+                JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset");
             String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
             JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
-        return null;
+        return newTrack;
     }
     
 

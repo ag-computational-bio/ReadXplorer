@@ -114,7 +114,7 @@ public class TrackJob implements Job {
     }
 
     /**
-     * @return the track id of this track job.
+     * @return the track id of this track job used in the db later on.
      */
     @Override
     public int getID() {
@@ -135,13 +135,6 @@ public class TrackJob implements Job {
     @Override
     public String toString() {
         return this.description + ":" + this.timestamp;
-    }
-
-    /**
-     * @param trackID the track id also used in the db for this track job.
-     */
-    public void setIdPersistant(int trackID) {
-        this.trackID = trackID;
     }
     
     /**

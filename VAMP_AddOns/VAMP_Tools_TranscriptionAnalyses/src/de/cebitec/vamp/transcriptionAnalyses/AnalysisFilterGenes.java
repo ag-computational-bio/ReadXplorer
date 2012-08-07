@@ -43,15 +43,17 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      * @param trackViewer the track viewer for which the analyses should be carried out
      * @param minNumberReads minimum number of reads which have to be found within
      *      a gene in order to classify it as an filtered gene
+     * @param maxNumberReads  maximum number of reads which are allowed to be 
+     *      found within a gene in order to classify it as an filtered gene
      */
     public AnalysisFilterGenes(TrackViewer trackViewer, int minNumberReads, int maxNumberReads) {
         this.trackViewer = trackViewer;
         this.minNumberReads = minNumberReads;
         this.maxNumberReads = maxNumberReads;
         
-        this.filteredGenes = new ArrayList<FilteredGene>();
-        this.mappingsAll = new ArrayList<PersistantMapping>();
-        this.annotationReadCount = new HashMap<Integer, FilteredGene>();
+        this.filteredGenes = new ArrayList<>();
+        this.mappingsAll = new ArrayList<>();
+        this.annotationReadCount = new HashMap<>();
         this.lastMappingIdx = 0;
         this.lastMappingIdx = 0;
         
@@ -63,10 +65,10 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      */
     private void initDatastructures() {
         TrackConnector trackCon = trackViewer.getTrackCon();
-        List<Integer> trackIds = new ArrayList<Integer>();
+        List<Integer> trackIds = new ArrayList<>();
         trackIds.add(trackCon.getTrackID());
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getSequence().length();
+        this.genomeSize = refConnector.getRefGen().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         
         for (PersistantAnnotation annotation : this.genomeAnnotations) {
@@ -89,7 +91,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      */
     @Override
     public void update(Object data) {
-        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
+        List<PersistantMapping> mappings = new ArrayList<>();
         
         if (data.getClass() == mappings.getClass()) {
             mappings = (List<PersistantMapping>) data;
@@ -106,7 +108,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      */
     public void updateReadCountForAnnotations(List<PersistantMapping> mappings) {
             PersistantAnnotation annotation;
-            boolean fstFittingMapping = true;
+            boolean fstFittingMapping;
             
             for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
                 annotation = this.genomeAnnotations.get(i);
@@ -169,7 +171,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      * @param mappingsAll mapping list to sort by start position
      */
     private void sortMappings(List<PersistantMapping> mappingsAll) {
-        HashMap<Integer, ArrayList<PersistantMapping>> mappingsToPos = new HashMap<Integer, ArrayList<PersistantMapping>>();
+        HashMap<Integer, ArrayList<PersistantMapping>> mappingsToPos = new HashMap<>();
         int start;
         
         for (PersistantMapping mapping : mappingsAll) {

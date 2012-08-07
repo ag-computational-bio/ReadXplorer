@@ -3,6 +3,7 @@ package de.cebitec.vamp.parser.mappings;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
+import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -39,112 +41,173 @@ public final class ParserCommonMethods {
      * Counts the differences to the reference sequence for a cigar string and
      * the belonging read sequence. If the operation "M" is not used in the
      * cigar, then the read and reference sequence can be null (it is not used
-     * in this case). Read and reference sequence are treated case insensitively,
-     * so there is no need to transform the case beforehand.
+     * in this case). Read and reference sequence are treated case
+     * insensitively, so there is no need to transform the case beforehand.
+     *
      * @param cigar the cigar string containing the alignment operations
      * @param readSeq the read sequence belonging to the cigar and without gaps
      * @param refSeq the reference sequence belonging to the cigar and without
      * gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
-     *      false if the read is on the fwd strand.
-     * @return number of differences to the reference sequence
-     * @throws NumberFormatException  
+     * false if the read is on the fwd strand.
+     * @param start start of the alignment of read and reference in the
+     * reference
+     * @return diff and gap result for the read and reference seq pair
+     * @throws NumberFormatException
      */
-    public static int countDifferencesToRef(String cigar, String readSeq, String refSeq, boolean isRevStrand) throws NumberFormatException {
-        if (cigar.contains("M")) {
-            return ParserCommonMethods.countDiffsToRefWithM(cigar, readSeq, refSeq, isRevStrand);
+    public static int countDiffsAndGaps(String cigar, String readSeq, String refSeq, boolean isRevStrand, int start) throws NumberFormatException {
 
-        } else //the convenient case, that no "M"'s are present in the cigar
-        if (cigar.contains("X") || cigar.contains("D") || cigar.contains("I")
-                || cigar.contains("S") || cigar.contains("N") || cigar.contains("P")) {
-
-            return ParserCommonMethods.countDiffsToRefWithoutM(cigar);
-
-        } else {
-            return 0;
-        }
-    }
-    
-    /**
-     * Counts the differences to the reference sequence for a cigar string. 
-     * This only works, if no "M" operation is used in the cigar! But it is more
-     * efficient, than the other version of this method including read and reference
-     * sequences.
-     * @param cigar the cigar string containing the alignment operations
-     * @return number of differences to the reference sequence
-     * @throws NumberFormatException  
-     */
-    public static int countDiffsToRefWithoutM(String cigar) throws NumberFormatException {
-        
-        int differences = 0;
-        String[] num = cigar.split(cigarRegex);
-        String[] charCigar = cigar.split("\\d+");
-        String c;
-        for (int i = 0; i < charCigar.length; ++i) {
-            c = charCigar[i];
-            if (c.equals("X") || c.equals("D") || c.equals("N") || c.equals("P") || c.equals("S")) {
-                differences += Integer.valueOf(num[i - 1]);
-            } //P and H = padding and hard clipping do not contribute to differences
-        }
-        
-        return differences;
-    }
-    
-    /**
-     * Counts the differences to the reference sequence for a cigar string and
-     * the belonging read sequence. If the operation "M" is not used in the cigar,
-     * then the read and reference sequence can be null (it is not used in this case).
-     * The method transforms both read and reference sequence to lower case.
-     * @param cigar the cigar string containing the alignment operations
-     * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence belonging to the cigar and without gaps
-     * @param isRevStrand true, if the ref seq has to be reverse complemented,
-     *      false if the read is on the fwd strand.
-     * @return the differences to the reference sequence for a cigar string and
-     * the belonging read sequence
-     * @throws NumberFormatException  
-     */
-    public static int countDiffsToRefWithM(String cigar, String readSeq, String refSeq, boolean isRevStrand) throws NumberFormatException {
-        
-        if (isRevStrand) {
-            refSeq = SequenceUtils.getReverseComplement(refSeq);
-        }
-        
         int differences = 0;
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
-        int baseNo = 0;
-        int count = 0;
-        readSeq = readSeq.toLowerCase();
-        refSeq = refSeq.toLowerCase();
+        int currentDiffs;
+        int absPos = start;
+        int diffPos;
+        if (!refSeq.isEmpty()) {
+            readSeq = readSeq.toUpperCase();
+            refSeq = refSeq.toUpperCase();
+        }
+
         for (int i = 0; i < charCigar.length; ++i) {
             op = charCigar[i];
-            if (op.matches(cigarRegex)) {
-                count = Integer.valueOf(num[i - 1]);
-                if (op.equals("X") || op.equals("D") || op.equals("I") 
-                                   || op.equals("N") || op.equals("S")) {
-                    differences += count;
-                } else 
-                if (op.equals("M")) {
-                    bases = readSeq.substring(baseNo, baseNo + count);
-                    for (int j = 0; j < bases.length(); ++j) {
-                        if (bases.charAt(j) != refSeq.charAt(baseNo + j)) {
-                            ++differences;
-                        }
+
+            if (op.equals("=")) { //only increase position for matches
+                absPos += Integer.valueOf(num[i - 1]);
+
+            } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                differences += currentDiffs;
+                absPos += currentDiffs;
+
+            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                differences += currentDiffs;
+                absPos += currentDiffs;
+
+            } else if (op.equals("I")) { // count and add reference gaps for insertions
+                differences += Integer.valueOf(num[i - 1]);
+                //abs pos remains the same
+
+            } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                bases = readSeq.substring(absPos, absPos + currentDiffs);
+                for (int j = 0; j < bases.length(); ++j) {
+                    diffPos = absPos + j;
+                    if (bases.charAt(j) != refSeq.charAt(diffPos)) {
+                        ++differences;
                     }
-                    
-                } //P and H = padding and hard clipping do not contribute to differences
-                baseNo += count;
-            }
+                }
+                absPos += currentDiffs;
+
+            } //P and H = padding and hard clipping do not contribute to differences
         }
-        
+
         return differences;
     }
     
     /**
-     * Creaters diffs and gaps for a given read and reference sequence.
+     * Counts the differences to the reference sequence for a cigar string and
+     * the belonging read sequence. If the operation "M" is not used in the
+     * cigar, then the read and reference sequence can be null (it is not used
+     * in this case). Read and reference sequence are treated case
+     * insensitively, so there is no need to transform the case beforehand. All
+     * cigar operations need to be uppercase!
+     * @param cigar the cigar string containing the alignment operations
+     * @param readSeq the read sequence belonging to the cigar and without gaps
+     * @param refSeq the reference sequence belonging to the cigar and without
+     * gaps
+     * @param isRevStrand true, if the ref seq has to be reverse complemented,
+     * false if the read is on the fwd strand.
+     * @param start start of the alignment of read and reference in the reference
+     * @return diff and gap result for the read and reference seq pair
+     * @throws NumberFormatException
+     */
+    public static DiffAndGapResult createDiffsAndGaps(String cigar, String readSeq, String refSeq, boolean isRevStrand, int start) throws NumberFormatException {
+
+        Map<Integer, Integer> gapOrderIndex = new HashMap<>();
+        List<ParsedDiff> diffs = new ArrayList<>();
+        List<ParsedReferenceGap> gaps = new ArrayList<>();
+        int differences = 0;
+        String[] num = cigar.split(cigarRegex);
+        String[] charCigar = cigar.split("\\d+");
+        String op;
+        String bases; //bases of the read interval under investigation
+        int currentDiffs;
+        int absPos = start;
+        int diffPos;
+        char base;
+        if (!refSeq.isEmpty()) {
+            readSeq = readSeq.toUpperCase();
+            refSeq = refSeq.toUpperCase();
+        }
+        
+        for (int i = 0; i < charCigar.length; ++i) {
+            op = charCigar[i];
+            
+            if (op.equals("=")) { //only increase position for matches
+                absPos += Integer.valueOf(num[i - 1]);
+                
+            } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                differences += currentDiffs;
+                for (int j = 0; j < currentDiffs; ++j) {
+                    diffPos = absPos + j;
+                    base = readSeq.charAt(diffPos - start);
+                    if (isRevStrand) {
+                        base = SequenceUtils.getDnaComplement(base);
+                    }
+                    diffs.add(new ParsedDiff(diffPos, base));
+                }
+                absPos += currentDiffs;
+
+            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                differences += currentDiffs;
+                for (int j = 0; j < currentDiffs; ++j) {
+                    diffs.add(new ParsedDiff(absPos + j, '_'));
+                }
+            
+            } else if (op.equals("I")) { // count and add reference gaps for insertions
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                differences += currentDiffs;
+                for (int j = 0; j < currentDiffs; ++j) {
+                    diffPos = absPos + j;
+                    base = readSeq.charAt(diffPos - start);
+                    if (isRevStrand) {
+                        base = SequenceUtils.getDnaComplement(base);
+                    }
+                    gaps.add(new ParsedReferenceGap(diffPos, base, getOrderForGap(diffPos, gapOrderIndex)));
+                }
+                //abs pos remains the same
+
+            } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
+                currentDiffs = Integer.valueOf(num[i - 1]);
+                bases = readSeq.substring(absPos, absPos + currentDiffs);
+                for (int j = 0; j < bases.length(); ++j) {
+                    diffPos = absPos + j;
+                    base = readSeq.charAt(j);
+                    if (base != refSeq.charAt(diffPos)) {
+                        ++differences;
+                        if (isRevStrand) {
+                            base = SequenceUtils.getDnaComplement(base);
+                        }
+                        diffs.add(new ParsedDiff(diffPos, base));
+                    }
+                }
+                absPos += currentDiffs;
+
+            } //P and H = padding and hard clipping do not contribute to differences
+        }
+
+        return new DiffAndGapResult(diffs, gaps, differences);
+    }
+    
+    /**
+     * Creates diffs and gaps for a given read and reference sequence. Both are
+     * treated case insensitively, so there is no need to transform the case
+     * beforehand.
      * @param readSeq read whose diffs and gaps are calculated
      * @param refSeq reference sequence aligned to the read sequence
      * @param start start position on the whole chromosome (absolute position)
@@ -153,45 +216,41 @@ public final class ParserCommonMethods {
      */
     public static DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
 
-        Map<Integer, Integer> gapOrderIndex = new HashMap<Integer, Integer>();
-        List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
-        List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
+        Map<Integer, Integer> gapOrderIndex = new HashMap<>();
+        List<ParsedDiff> diffs = new ArrayList<>();
+        List<ParsedReferenceGap> gaps = new ArrayList<>();
         int errors = 0;
-        int absPos;
+        char base;
+        ParsedReferenceGap gap;
+        ParsedDiff diff;
+        readSeq = readSeq.toUpperCase();
+        refSeq = refSeq.toUpperCase();
 
-        for (int i = 0, basecounter = 0; i < readSeq.length(); i++) {
-            if (readSeq.toLowerCase().charAt(i) != refSeq.toLowerCase().charAt(i)) {
+        for (int i = 0; i < readSeq.length(); i++) {
+            if (readSeq.charAt(i) != refSeq.charAt(i)) {
                 ++errors;
-                absPos = start + basecounter;
+                base = readSeq.charAt(i);
+                if (direction == -1) {
+                    base = SequenceUtils.getDnaComplement(base);
+                }
                 if (refSeq.charAt(i) == '_') {
                     // store a lower case char, if this is a gap in genome
-                    Character base = readSeq.charAt(i);
-                    base = Character.toUpperCase(base);
-                    if (direction == -1) {
-                        base = SequenceUtils.getDnaComplement(base, readSeq);
-                    }
-
-                    ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, getOrderForGap(absPos, gapOrderIndex));
+                    gap = new ParsedReferenceGap(start, base, getOrderForGap(start, gapOrderIndex));
                     gaps.add(gap);
                     // note: do not increase position. that means that next base of read is mapped
                     // to the same position as this gap. two subsequent gaps map to the same position!
                 } else {
-                    // store the upper case char from input file, if this is a modification in the read
-                    char c = readSeq.charAt(i);
-                    c = Character.toUpperCase(c);
-                    if (direction == -1) {
-                        c = SequenceUtils.getDnaComplement(c, readSeq);
-                    }
-                    ParsedDiff d = new ParsedDiff(absPos, c);
-                    diffs.add(d);
-                    basecounter++;
+                    // store the char from input file, if this is a modification in the read
+                    diff = new ParsedDiff(start, base);
+                    diffs.add(diff);
+                    ++start;
                 }
             } else {
-                basecounter++;
+                ++start;
             }
         }
 
-        return new DiffAndGapResult(diffs, gaps, gapOrderIndex, errors);
+        return new DiffAndGapResult(diffs, gaps, errors);
     }
         
     /**
@@ -233,69 +292,70 @@ public final class ParserCommonMethods {
         int refpos = 0;
         int numberOfInsertions;
         int numberofDeletion;
-        //int pos = 0;
         int readPos = 0;
         int softclipped = 0;
 
         
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
+        String c;
+        String numOfBases;
         for (int i = 1; i < charCigar.length; i++) {
-            String c = charCigar[i];
-            String numOfBases = num[i - 1];
-            if (c.matches(cigarRegex)) {
+            c = charCigar[i];
+            numOfBases = num[i - 1];
 
-                if (c.equals("D") || c.equals("N") || c.equals("P")) {
-                    //deletion of the read
-                    numberofDeletion = Integer.parseInt(numOfBases);
+            if (c.equals("D") || c.equals("N") || c.equals("P")) {
+                //deletion of the read
+                numberofDeletion = Integer.parseInt(numOfBases);
 
-                    refpos += numberofDeletion;
+                refpos += numberofDeletion;
 
-                    while (numberofDeletion > 0) {
-                        if (readSeq.length() != readPos) {
-                            readSeq = readSeq.substring(0, readPos).concat("_") + readSeq.substring(readPos, readSeq.length());
-                        } else {
-                            readSeq = readSeq.substring(0, readPos).concat("_");
-                        }
-                        numberofDeletion--;
-                        newreadSeq = readSeq;
-                        readPos  += 1;
-                        //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
-                    }
-
-                } else if (c.equals("I") ) {
-                    //insertion of the  read
-                    numberOfInsertions = Integer.parseInt(numOfBases);
-
-                    readPos += numberOfInsertions;
-                    while (numberOfInsertions > 0) {
-
-                        if (refpos != refSeq.length()) {
-                            refSeq = refSeq.substring(0, refpos).concat("_") + refSeq.substring(refpos, refSeq.length());
-                        } else {
-                            refSeq = refSeq.substring(0, refpos).concat("_");
-                        }
-                        newRefSeqwithGaps = refSeq;
-                        numberOfInsertions--;
-                        refpos += 1;
-
-                        //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
-                    }
-                } else if (c.equals("M") || c.equals("=") || c.equals("X")) {
-                    //for match/mismatch thr positions just move forward
-                    readPos += Integer.parseInt(numOfBases);
-                    refpos +=Integer.parseInt(numOfBases);
-                    newRefSeqwithGaps = refSeq;
-                    newreadSeq = readSeq;
-                } else if (c.equals("S") ) {
-                    if (i > 1) {
-                        //soft clipping of the last bases
-                        newreadSeq = newreadSeq.substring(0, readSeq.length() - Integer.parseInt(numOfBases));
+                while (numberofDeletion > 0) {
+                    if (readSeq.length() != readPos) {
+                        readSeq = readSeq.substring(0, readPos).concat("_") + readSeq.substring(readPos, readSeq.length());
                     } else {
-                        //soft clipping of the first bases
-                        readPos += Integer.parseInt(numOfBases);
-                        softclipped = Integer.parseInt(numOfBases);
+                        readSeq = readSeq.substring(0, readPos).concat("_");
                     }
+                    --numberofDeletion;
+                    newreadSeq = readSeq;
+                    ++readPos;
+                    //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
+                }
+
+            } else if (c.equals("I")) {
+                //insertion of the  read
+                numberOfInsertions = Integer.parseInt(numOfBases);
+
+                readPos += numberOfInsertions;
+                while (numberOfInsertions > 0) {
+
+                    if (refpos != refSeq.length()) {
+                        refSeq = refSeq.substring(0, refpos).concat("_") + refSeq.substring(refpos, refSeq.length());
+                    } else {
+                        refSeq = refSeq.substring(0, refpos).concat("_");
+                    }
+                    newRefSeqwithGaps = refSeq;
+                    --numberOfInsertions;
+                    ++refpos;
+
+                    //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
+                }
+                
+            } else if (c.equals("M") || c.equals("=") || c.equals("X")) {
+                //for match/mismatch thr positions just move forward
+                readPos += Integer.parseInt(numOfBases);
+                refpos += Integer.parseInt(numOfBases);
+                newRefSeqwithGaps = refSeq;
+                newreadSeq = readSeq;
+                
+            } else if (c.equals("S")) {
+                if (i > 1) {
+                    //soft clipping of the last bases
+                    newreadSeq = newreadSeq.substring(0, readSeq.length() - Integer.parseInt(numOfBases));
+                } else {
+                    //soft clipping of the first bases
+                    readPos += Integer.parseInt(numOfBases);
+                    softclipped = Integer.parseInt(numOfBases);
                 }
             } else {
                 Logger.getLogger(ParserCommonMethods.class.getName()).log(Level.WARNING, NbBundle.getMessage(ParserCommonMethods.class, "CommonMethod.CIGAR ", c));
@@ -303,12 +363,60 @@ public final class ParserCommonMethods {
         }
         newreadSeq = newreadSeq.substring(softclipped, newreadSeq.length());
         String[] refAndRead = new String[2];
-        refAndRead[0] =newRefSeqwithGaps;
+        refAndRead[0] = newRefSeqwithGaps;
         refAndRead[1] =  newreadSeq;
         return  refAndRead;
     }
-
     
+    /**
+     * Checks whether a given read contains no inconsistent information. Tests
+     * whether: readSeq or refSeq is null or empty, cigar only contains valid
+     * operations, start and stop are in reference range.
+     * @param parent parent observable, which is notified on inconsistent information
+     * @param readSeq 
+     * @param refSeqLength
+     * @param cigar
+     * @param start
+     * @param stop
+     * @param filename
+     * @param lineno
+     * @return true, if the read is consistent, false otherwise
+     */
+    public static boolean checkRead(
+            Observable parent, 
+            String readSeq, 
+            int refSeqLength, 
+            String cigar,
+            int start, 
+            int stop, 
+            String filename, 
+            int lineno) {
+        
+        boolean isConsistent = true;
+        if (readSeq == null || readSeq.isEmpty()) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
+            isConsistent = false;
+        }
+        if (!cigar.matches("[MHISDPXN=\\d]+")) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
+            isConsistent = false;
+        }
+        if (refSeqLength < start || refSeqLength < stop) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorReadPosition",
+                    filename, lineno, start, stop, refSeqLength));
+            isConsistent = false;
+        }
+        if (start >= stop) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
+            isConsistent = false;
+        }
+        
+        return isConsistent;
+    }    
 
     /**
      * In fact deletions in the read shift the stop position of the
@@ -342,8 +450,8 @@ public final class ParserCommonMethods {
         return stopPosition;
     }
 
-        /**
-     *  converts the the decimal number(flag) into binary code and checks if 4 is 1 or 0
+    /**
+     * Converts the the decimal number(flag) into binary code and checks if 4 is 1 or 0
      * @param flag
      * @param startPosition of mapping
      * @return
@@ -364,26 +472,28 @@ public final class ParserCommonMethods {
         return isMapped;
     }
     
-    /**
-     * converts the the decimal number into binary code and checks if 16 is 1 or 0
-     * @param flag contains information wheater the read is mapped on the rev or fw stream
-     * @return wheater the read is mapped on the rev or fw stream
-     */
-    public static boolean isForwardRead(int flag) {
-        boolean isForward = true;
-        if (flag >= 16) {
-            String binaryValue = Integer.toBinaryString(flag);
-            int binaryLength = binaryValue.length();
-            String b = binaryValue.substring(binaryLength - 5, binaryLength - 4);
-
-            if (b.equals("1")) {
-                isForward = false;
-            } else {
-                isForward = true;
-            }
-        }
-        return isForward;
-    }
+//    /**
+//     * converts the the decimal number into binary code and checks if 16 is 1 or 0
+//     * @param flag contains information wheater the read is mapped on the rev or fw strand
+//     * @return wheater the read is mapped on the rev or fw strand
+//     */
+//    public static boolean isForwardRead(int flag) {
+//        boolean isForward = true;
+//        if (flag >= 16) {
+//            String binaryValue = Integer.toBinaryString(flag);
+//            int binaryLength = binaryValue.length();
+//            String b = binaryValue.substring(binaryLength - 5, binaryLength - 4);
+//
+//            if (b.equals("1")) {
+//                isForward = false;
+//            } else {
+//                isForward = true;
+//            }
+//        }
+//        return isForward;
+//    }
+    
+    
     
     /**
      * TODO: Can be used for homopolymer snp detection, to flag snps in homopolymers. needed?

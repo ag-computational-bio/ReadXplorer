@@ -1,14 +1,14 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.*;
@@ -50,9 +50,9 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         this.trackViewer = trackViewer;
         this.minNumberReads = minNumberReads;
         this.operonDetectionAutomatic = operonDetectionAutomatic;
-        this.operonList = new ArrayList<Operon>();
-        this.annoToPutativeOperonMap = new HashMap<Integer, OperonAdjacency>();
-        this.operonAdjacencies = new ArrayList<OperonAdjacency>();
+        this.operonList = new ArrayList<>();
+        this.annoToPutativeOperonMap = new HashMap<>();
+        this.operonAdjacencies = new ArrayList<>();
         
         this.initDatastructures();
     }
@@ -63,12 +63,12 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      */
     private void initDatastructures() {
         this.trackCon = trackViewer.getTrackCon();
-        List<Integer> trackIds = new ArrayList<Integer>();
+        List<Integer> trackIds = new ArrayList<>();
         trackIds.add(trackCon.getTrackID());
         averageReadLength = trackCon.getAverageReadLength();
         averageSeqPairLength = trackCon.getAverageSeqPairLength();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getSequence().length();
+        this.genomeSize = refConnector.getRefGen().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         
         ////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     @Override
     public void update(Object data) {
         //the mappings are sorted by their start position!
-        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
+        List<PersistantMapping> mappings = new ArrayList<>();
         if (data.getClass() == mappings.getClass()) {
 
             mappings = (List<PersistantMapping>) data;
@@ -143,7 +143,9 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
         PersistantAnnotation annotation1;
         PersistantAnnotation annotation2;
-        boolean fstFittingMapping = true;
+        boolean fstFittingMapping;
+        PersistantMapping mapping;
+        OperonAdjacency putativeOperon;
 
         for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
             annotation1 = this.genomeAnnotations.get(i);
@@ -164,7 +166,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 int annotation2Stop = annotation2.getStop();
 
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
-                    PersistantMapping mapping = mappings.get(j);
+                    mapping = mappings.get(j);
 
                     if (mapping.getStart() > annotation2Stop ) {
                         break; //since the mappings are sorted by start position
@@ -189,7 +191,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                     }
                 }
 
-                OperonAdjacency putativeOperon = annoToPutativeOperonMap.get(id1);
+                putativeOperon = annoToPutativeOperonMap.get(id1);
                 putativeOperon.setReadsAnnotation1(putativeOperon.getReadsAnnotation1() + readsAnnotation1);
                 putativeOperon.setReadsAnnotation2(putativeOperon.getReadsAnnotation2() + readsAnnotation2);
                 putativeOperon.setSpanningReads(putativeOperon.getSpanningReads() + spanningReads);
@@ -213,7 +215,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
          * and if we only have single reads, we use the average read length.
          */
         //TODO: incorporate sequence pair handling in the detection. currently only reads are used
-        int minimumSpanningReads = 0;
+        int minimumSpanningReads;
 //        if (trackCon.getNumOfSeqPairs() > 0 && operonDetectionAutomatic) {
 //            minimumSpanningReads = (numUniqueBmMappings * averageSeqPairLength) / transcritomeLength;
 //        } else if (operonDetectionAutomatic) {
@@ -226,13 +228,16 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
         int count = 0;
         int lastAnnoId = 0;
+        PersistantAnnotation anno1;
+        PersistantAnnotation anno2;
+        Operon operon;
         for (int i = 0; i < annoIds.length; i++) {
             
             putativeOperon = annoToPutativeOperonMap.get((Integer) annoIds[i]);
             spanningReads = putativeOperon.getSpanningReads();
             internalReads = putativeOperon.getInternalReads();
-            PersistantAnnotation anno1 = putativeOperon.getAnnotation1();
-            PersistantAnnotation anno2 = putativeOperon.getAnnotation2();
+            anno1 = putativeOperon.getAnnotation1();
+            anno2 = putativeOperon.getAnnotation2();
 
             /* Detect an operon only, if the number of spanning reads is larger than
              * the threshold. */
@@ -241,7 +246,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 //only in this case a new operon starts:
                 if (lastAnnoId != anno1.getId() && lastAnnoId != 0) {
 
-                    Operon operon = new Operon();
+                    operon = new Operon();
                     operon.addAllOperonAdjacencies(operonAdjacencies);
                     operonList.add(operon); //only here the operons are added to final list
                     operonAdjacencies.clear();
@@ -257,7 +262,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             }
         }
         if (!operonAdjacencies.isEmpty()) {
-            Operon operon = new Operon();
+            operon = new Operon();
             operon.addAllOperonAdjacencies(operonAdjacencies);
             operonList.add(operon); //only here the operons are added to final list
         }

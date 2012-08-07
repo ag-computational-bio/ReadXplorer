@@ -65,7 +65,7 @@ public class UniqueJokParser implements MappingParserI {
             int lineno = 0;
             int start;
             int stop;
-            int errors;
+            int differences;
             this.noUniqueMappings = 0;
             int noUniqueSeq = 0;
             String line;
@@ -105,7 +105,7 @@ public class UniqueJokParser implements MappingParserI {
                     String readSeq = tokens[4];
                     String refSeq = tokens[5];
                     try {
-                        errors = Integer.parseInt(tokens[6]);
+                        differences = Integer.parseInt(tokens[6]);
                     } catch (NumberFormatException e){
                         this.sendErrorMsg("Value for errors in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number. "
@@ -165,16 +165,21 @@ public class UniqueJokParser implements MappingParserI {
                     DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
-                    errors = result.getErrors();
+                    if (differences != result.getDifferences()) {
+                        this.sendErrorMsg("Value for current differences in "
+                                + trackJob.getFile().getName() + " line " + lineno + " is differing from newly calculated number of differences."
+                                + "Found differences: " + differences + " versus: " + result.getDifferences());
+                        continue;
+                    }
                     
-                    if (errors < 0 || errors > readSeq.length()) {
-                        this.sendErrorMsg("Error number has invalid value " + errors
+                    if (differences < 0 || differences > readSeq.length()) {
+                        this.sendErrorMsg("Error number has invalid value " + differences
                                 + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Must be bigger or equal to zero and smaller than alignment length.");
                         continue;
                     }
 
-                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
+                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
                     mapping.setCount(count);
 
                     int seqID;
@@ -241,15 +246,6 @@ public class UniqueJokParser implements MappingParserI {
     private void sendErrorMsg(final String errorMsg) {
         this.errorMsg = errorMsg;
         this.notifyObservers(null);
-    }
-    
-    /**
-     * Dummy method.
-     * @return null, because it is not needed here.
-     */
-    @Override
-    public Object getAdditionalData() {
-        return this.seqPairProcessor;
     }
 
     @Override

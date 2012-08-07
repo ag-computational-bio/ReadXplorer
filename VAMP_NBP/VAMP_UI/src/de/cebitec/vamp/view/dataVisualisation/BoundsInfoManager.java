@@ -85,13 +85,13 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
     private BoundsInfo computeBounds(Dimension d) {
         int logWidth = (int) (d.getWidth() * 0.1 * zoomfactor);
 
-        BoundsInfo bounds = new BoundsInfo(1, currentRefGen.getSequence().length(), currentHorizontalPosition, zoomfactor, logWidth);
+        BoundsInfo bounds = new BoundsInfo(1, currentRefGen.getRefLength(), currentHorizontalPosition, zoomfactor, logWidth);
         return bounds;
     }
 
     /**
      * Notify listeners of changes of the zoom level.
-     * @param zoomValue new zoom value to be applied
+     * @param sliderValue new zoom value to be applied
      */
     @Override
     public void zoomLevelUpdated(int sliderValue) {

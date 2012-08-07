@@ -59,8 +59,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private int lastAnnotationIdxGenStartsFwd;
     private int lastAnnotationIdxGenStartsRev;
     
-    private HashMap<Integer, Integer> exactCovIncreaseDist = new HashMap<Integer, Integer>(); //exact coverage increase distribution
-    private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<Integer, Integer>(); //exact coverage increase percent distribution
+    private HashMap<Integer, Integer> exactCovIncreaseDist = new HashMap<>(); //exact coverage increase distribution
+    private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
     
     protected PersistantCoverage currentCoverage;
 
@@ -97,7 +97,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.increaseReadCount2 = increaseReadCount2;
         this.tssAutomatic = tssAutomatic;
         
-        this.detectedStarts = new ArrayList<TranscriptionStart>();
+        this.detectedStarts = new ArrayList<>();
         this.covLastFwdPos = 0;
         this.covLastRevPos = 0;
         this.lastAnnotationIdxGenStartsFwd = 0;
@@ -114,7 +114,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         TrackConnector trackCon = this.trackViewer.getTrackCon();
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        this.genomeSize = refConnector.getRefGen().getSequence().length();
+        this.genomeSize = refConnector.getRefGen().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, this.genomeSize);   
         
         this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
@@ -611,7 +611,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.increaseReadPercent = this.getNewThreshold(this.exactCovIncPercDist, 0);//(int) (this.genomeSize * 0.0005));
         
         //remove detected starts with too low coverage increases
-        List<TranscriptionStart> copiedDetectedStarts = new ArrayList<TranscriptionStart>(this.detectedStarts);
+        List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>(this.detectedStarts);
         int increase;
         int percentage;
         for (TranscriptionStart tss : this.detectedStarts) {
@@ -636,7 +636,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private int getNewThreshold(HashMap<Integer, Integer> distribution, int thresholdEnlarger) {
         int maxValue = (int) (this.genomeSize * 0.0025 + thresholdEnlarger); // = 0,25% + thresholdEnlarger
         int nbValues = 0;
-        List<Integer> keyList = new ArrayList<Integer>(distribution.keySet());
+        List<Integer> keyList = new ArrayList<>(distribution.keySet());
         Collections.sort(keyList);
         
         for (int i = keyList.size()-1; i >= 0; --i) {

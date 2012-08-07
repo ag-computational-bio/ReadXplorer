@@ -1,7 +1,12 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.common.CoverageContainer;
+import de.cebitec.vamp.parser.common.DiffAndGapResult;
+import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
+import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import java.util.ArrayList;
@@ -26,16 +31,17 @@ public class SamBamDirectParser implements MappingParserI {
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM/BAM Output";
     
+    private CoverageContainer coverageContainer;
     private SeqPairProcessorI seqPairProcessor;
-    private Map<String, Pair<Integer, Integer>> classificationMap;
     private List<Observer> observers;
 
     /**
      * Parser for parsing sam and bam data files for direct access in vamp.
      */
     public SamBamDirectParser() {
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
         this.seqPairProcessor = new SeqPairProcessorDummy();
+        this.coverageContainer = new CoverageContainer();
     }
     
     /**
@@ -70,7 +76,8 @@ public class SamBamDirectParser implements MappingParserI {
      * Parses the input determined by the track job.
      * @param trackJob the track job to parse
      * @param refSeqWhole the reference sequence
-     * @return a classification map: The key is the readname and each name
+     * @return a direct access data container constisting of:
+     * a classification map: The key is the readname and each name
      * links to a pair consisting of the number of occurences of the read name
      * in the dataset (no mappings) and the lowest diff rate among all hits.
      * Remember that replicates are not needed, they can be deduced from the 
@@ -79,13 +86,13 @@ public class SamBamDirectParser implements MappingParserI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Map<String, Pair<Integer, Integer>> parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
+    public DirectAccessDataContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
 
-        String filename = trackJob.getFile().getName();
-        this.notifyObservers(NbBundle.getMessage(JokParser.class, "Parser.Parsing.Start", filename));
+        String fileName = trackJob.getFile().getName();
+        long startTime = System.currentTimeMillis();
+        this.notifyObservers(NbBundle.getMessage(JokParser.class, "Parser.Parsing.Start", fileName));
 
         int lineno = 0;
-        int refSeqLength = refSeqWhole.length();
 
         /*
          * id of each read sequence. Since the same file is used in both
@@ -95,17 +102,21 @@ public class SamBamDirectParser implements MappingParserI {
          */
         String lastReadSeq = "";
         int seqId = -1;
-        Map<String, Pair<Integer, Integer>> dataMap = new HashMap<String, Pair<Integer, Integer>>();
+        //mapping of read name to number of occurences of the read and the lowest error number
+        Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
 
+        ParsedMapping mapping;
         String refSeq;
         int start;
         int stop;
         int differences;
+        boolean isRevStrand;
+        byte direction;
         String readSeq;
         String cigar;
         String readName;
         Pair<Integer, Integer> classificationPair;
-
+        DiffAndGapResult diffGapResult;
 
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());
         SAMRecordIterator samItor = sam.iterator();
@@ -119,45 +130,13 @@ public class SamBamDirectParser implements MappingParserI {
                 if (!record.getReadUnmappedFlag()) {
 
                     cigar = record.getCigarString();
-                    readSeq = record.getReadString().toLowerCase();
-
-                    if (readSeq == null || readSeq.isEmpty()) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                                "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
-                        continue;
-                    }
-                    if (!cigar.matches("[MHISDPXN=\\d]+")) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                                "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
-                        continue;
-                    }
-                    
+                    readSeq = record.getReadString();
                     start = record.getAlignmentStart();
                     stop = record.getAlignmentEnd();
-
-                    if (refSeqLength < start || refSeqLength < stop) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                                "Parser.checkMapping.ErrorReadPosition",
-                                filename, lineno, start, stop, refSeqLength));
-                        continue;
-                    }
-                    if (start >= stop) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                                "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
-                        continue;
-                    }
-
-                    refSeq = refSeqWhole.substring(start - 1, stop); //TODO: test if -1 is correct
-
-                    if (refSeq == null || refSeq.isEmpty()) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                                "Parser.checkMapping.ErrorRef", filename, lineno, refSeq));
-                        continue;
-                    }
-                    if (readSeq.length() != refSeq.length()) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                                "Parser.checkMapping.ErrorReadLength", filename, lineno, readSeq, refSeq));
-                        continue;
+                    refSeq = refSeqWhole.substring(start - 1, stop);
+                    
+                    if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                        continue; //continue, and ignore read, if it contains inconsistent information
                     }
 
                     /*
@@ -169,14 +148,16 @@ public class SamBamDirectParser implements MappingParserI {
                      * bases are not present in the read sequence!
                      */
                     //count differences to reference
-                    differences = ParserCommonMethods.countDifferencesToRef(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
-
+                    isRevStrand = record.getReadNegativeStrandFlag();
+                    diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+                    differences = diffGapResult.getDifferences();
+                    
                     // add data to map
                     readName = record.getReadName();
-                    if (!dataMap.containsKey(readName)) {
-                        dataMap.put(readName, new Pair<Integer, Integer>(0, Integer.MAX_VALUE));
+                    if (!classificationMap.containsKey(readName)) {
+                        classificationMap.put(readName, new Pair<>(0, Integer.MAX_VALUE));
                     }
-                    classificationPair = dataMap.get(readName);
+                    classificationPair = classificationMap.get(readName);
                     classificationPair.setFirst(classificationPair.getFirst() + 1);
                     if (classificationPair.getSecond() > differences) {
                         classificationPair.setSecond(differences);
@@ -189,6 +170,12 @@ public class SamBamDirectParser implements MappingParserI {
                     lastReadSeq = readSeq;
                     
                     this.seqPairProcessor.processReadname(seqId, readName);
+                    
+                    //store data for position table
+                    direction = isRevStrand ? (byte) -1 : 1;
+                    mapping = new ParsedMapping(start, stop, direction, diffGapResult.getDiffs(), diffGapResult.getGaps(), differences);
+                    this.coverageContainer.addMapping(mapping);
+                    this.coverageContainer.savePositions(mapping);
 
                     //saruman starts genome at 0 other algorithms like bwa start genome at 1
 
@@ -205,10 +192,11 @@ public class SamBamDirectParser implements MappingParserI {
         samItor.close();
         sam.close();
 
-        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Finished", filename));
-        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully"));
+        long finish = System.currentTimeMillis();
+        String msg = NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully", fileName);
+        this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
 
-        return dataMap;
+        return new DirectAccessDataContainer(this.coverageContainer, classificationMap);
     }
 
     @Override
@@ -229,23 +217,10 @@ public class SamBamDirectParser implements MappingParserI {
     }
 
     /**
-     * @return the sequence pair processor of this parser. It processes and 
-     *      contains all necessary information for a sequence pair import.
+     * @return an empty sequence pair processor, since direct access tracks do not need it.
      */
     @Override
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
-    }
-
-    /**
-     * @return The classification map claculated during the parsing: The key is
-     * the readname and each name links to a pair consisting of the number of
-     * occurences of the read name in the dataset (no mappings) and the lowest
-     * diff rate among all hits. Remember that replicates are not needed, they
-     * can be deduced from the reads querried from an interval!
-     */
-    @Override
-    public Map<String, Pair<Integer, Integer>> getAdditionalData() {
-        return this.classificationMap;
     }
 }

@@ -1,25 +1,24 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
 import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.*;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
-//import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
@@ -403,9 +402,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     @SuppressWarnings("fallthrough")
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean isColored) {
-        double value = 0;
+        double value;
         int featureHeight;
-        Color c = null;
+        Color c;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
         char base= refGen.getSequence().charAt(absPos-1);
 

@@ -299,7 +299,7 @@ public final class LoginVisualPanel extends JPanel {
 }//GEN-LAST:event_dbChooseButtonActionPerformed
 
     private void databaseFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_databaseFieldActionPerformed
-        // TODO add your handling code here:
+        // add your handling code here:
     }//GEN-LAST:event_databaseFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

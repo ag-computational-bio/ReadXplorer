@@ -197,15 +197,16 @@ public class HighlightAreaListener extends MouseAdapter {
         BoundsInfo bounds = parentComponent.getViewerBoundsInfo();
         final double baseWidth = parentComponent.getBaseWidth();
         final String seq = parentComponent.getPersistantReference().getSequence();
+        final int refLength = parentComponent.getPersistantReference().getRefLength();
         int logleft = bounds.getLogLeft() - 1 + Math.round((float) ((highlightRect.x - parentComponent.getViewerHorizontalMargin()) / baseWidth));
         int logright = logleft + (int) (Math.round(highlightRect.width / baseWidth));
         logleft = logleft < 0 ? 0 : logleft;
-        logleft = logleft > seq.length() ? seq.length() : logleft;
+        logleft = logleft > refLength ? refLength : logleft;
         logright = logright < 0 ? 0 : logright;
-        logright = logright > seq.length() ? seq.length() : logright;
+        logright = logright > refLength ? refLength : logright;
         String selSequence = seq.substring(logleft, logright);
         if (!isFwdStrand) {
-            selSequence = SequenceUtils.complementDNA(SequenceUtils.reverseString(selSequence));
+            selSequence = SequenceUtils.getReverseComplement(selSequence);
         }
         this.seqStart = logleft + 1;
         this.seqEnd = logright;
@@ -214,7 +215,6 @@ public class HighlightAreaListener extends MouseAdapter {
 
     /**
      * Creates the header for the highlighted sequence.
-     *
      * @return the header for the sequence
      */
     private String getHeader() {
@@ -336,7 +336,7 @@ public class HighlightAreaListener extends MouseAdapter {
         List<Integer> results = new ArrayList<Integer>();
         
         int searchStart = isFwdStrand ? start + 3 : start - 3;
-        PatternFilter patternFilter = new PatternFilter(searchStart, reference.getSequence().length(), reference);
+        PatternFilter patternFilter = new PatternFilter(searchStart, reference.getRefLength(), reference);
         for (String stop : stopCodons) {
             patternFilter.setPattern(stop.toLowerCase());
             int stopPos = patternFilter.findNextOccurrenceOnStrand(isFwdStrand);

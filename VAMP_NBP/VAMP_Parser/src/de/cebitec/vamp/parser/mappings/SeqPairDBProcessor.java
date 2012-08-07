@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Properties;
 import java.util.HashMap;
 
 /**
@@ -23,8 +24,8 @@ public class SeqPairDBProcessor implements SeqPairProcessorI {
      * belonging to a sequence pair sequencing run.
      */
     public SeqPairDBProcessor() {
-        this.seqIDToReadNameMap1 = new HashMap<String, Integer>();
-        this.seqIDToReadNameMap2 = new HashMap<String, Integer>();
+        this.seqIDToReadNameMap1 = new HashMap<>();
+        this.seqIDToReadNameMap2 = new HashMap<>();
     }
 
     /**
@@ -44,12 +45,12 @@ public class SeqPairDBProcessor implements SeqPairProcessorI {
         //TODO: plug in readname endshorter and only store relevant part of read name, if possible
         pairInfo = readName.charAt(readName.length() - 1);
         readName = readName.substring(0, readName.length()-2);
-        if (pairInfo == EXT_A1 || pairInfo == EXT_B1) {
+        if (pairInfo == Properties.EXT_A1 || pairInfo == Properties.EXT_B1) {
             if (!this.seqIDToReadNameMap1.containsKey(readName)) {
                 //since seqID will always be the same for all reads with identical sequence
                 this.seqIDToReadNameMap1.put(readName, seqID);
             }
-        } else if (pairInfo == EXT_A2 || pairInfo == EXT_B2) {
+        } else if (pairInfo == Properties.EXT_A2 || pairInfo == Properties.EXT_B2) {
             if (!this.seqIDToReadNameMap2.containsKey(readName)) {
                 this.seqIDToReadNameMap2.put(readName, seqID);
             }

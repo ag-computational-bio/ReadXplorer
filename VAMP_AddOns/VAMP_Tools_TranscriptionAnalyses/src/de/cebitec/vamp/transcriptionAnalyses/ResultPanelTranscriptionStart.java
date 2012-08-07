@@ -135,7 +135,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         
-        this.promotorRegions = new ArrayList<String>();
+        this.promotorRegions = new ArrayList<>();
         
         //get reference sequence for promotor regions
         int refId = this.trackViewer.getReference().getId();
@@ -147,7 +147,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         for (TranscriptionStart tSS : this.tSSs) {
             if (tSS.isFwdStrand()) {
                 promotor = sequence.substring(tSS.getPos() - 70, tSS.getPos());
-            } else { //for your info: tSS.isFwdStrand() == SequenceUtils.STRAND_REV
+            } else {
                 promotor = sequence.substring(tSS.getPos(), tSS.getPos() + 70);
             }
             this.promotorRegions.add(promotor);
@@ -211,7 +211,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
             model.addRow(rowData);
             
-            TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
             this.tSSTable.setRowSorter(sorter);
             sorter.setModel(model);
         }

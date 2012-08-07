@@ -1,10 +1,11 @@
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.parser.SeqPairJobContainer;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
 import de.cebitec.vamp.parser.mappings.SamBamStepParser;
+import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -37,6 +38,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         trackJobView.addPropertyChangeListener(this.getJobPropListener());
         seqPairTrackJobsView.addPropertyChangeListener(this.getJobPropListener());
         positionTableJobView.addPropertyChangeListener(this.getJobPropListener());
+        trackID = ProjectConnector.getInstance().getLatestTrackId();
     }
 
     private PropertyChangeListener getJobPropListener() {
@@ -157,6 +159,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Automatically uses the correct track id for the trackjobs which are created here.
+     * @param evt 
+     */
     private void addJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addJobActionPerformed
         Component c = jTabbedPane1.getSelectedComponent();
         if (c != null) {

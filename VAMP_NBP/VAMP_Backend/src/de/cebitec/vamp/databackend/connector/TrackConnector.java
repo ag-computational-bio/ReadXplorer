@@ -45,7 +45,7 @@ public class TrackConnector {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGen();
-        this.genomeSize = this.refGenome.getSequence().length();
+        this.genomeSize = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
             this.externalDataReader = new SamBamFileReader(file, this.trackID);
@@ -73,7 +73,7 @@ public class TrackConnector {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGen();
-        this.genomeSize = this.refGenome.getSequence().length(); //TODO: store size, dont recalculate
+        this.genomeSize = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
             this.externalDataReader = new SamBamFileReader(file, this.trackID);

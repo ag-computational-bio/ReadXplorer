@@ -9,25 +9,6 @@ import java.util.HashMap;
  * @author Rolf Hilker
  */
 public interface SeqPairProcessorI {
-
-    /** 'Yc' = Tag for read classification in one of the three vamp classes. */
-    public static final String TAG_READ_CLASS = "Yc";
-    /** 'Yt' = Tag for number of positions a sequence maps to in a reference. */
-    public static final String TAG_MAP_COUNT = "Yt";
-    /** 'Yi' = Tag for the sequence pair id. */
-    public static final String TAG_SEQ_PAIR_ID = "Yi";
-    /** 'Ys' = Tag for the sequence pair type. */
-    public static final String TAG_SEQ_PAIR_TYPE = "Ys";
-    
-    //Supported sequence pair extensions.
-    /** 1 = Supported extension of read 1. */
-    public static final char EXT_A1 = '1';
-    /** 2 = Supported extension of read 2. */
-    public static final char EXT_A2 = '2';
-    /** f = Supported extension of read 1. */
-    public static final char EXT_B1 = 'f';
-    /** r = Supported extension of read 2. */
-    public static final char EXT_B2 = 'r';
     
     /**
      * Processes the read name according to the specific sequence pair processor

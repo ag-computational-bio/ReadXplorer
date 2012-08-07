@@ -101,8 +101,8 @@ public class SeqPairClassifierTest {
     private ParsedMappingContainer mappings2 = new ParsedMappingContainer();
     private CoverageContainer coverageContainer = new CoverageContainer();
     private CoverageContainer coverageContainer2 = new CoverageContainer();
-    private ParsedTrack fwdTrack = new ParsedTrack("fwd track", mappings, coverageContainer);
-    private ParsedTrack revTrack = new ParsedTrack("rev track", mappings2, coverageContainer2);
+    private ParsedTrack fwdTrack = new ParsedTrack(1, "fwd track", mappings, coverageContainer, 1);
+    private ParsedTrack revTrack = new ParsedTrack(2, "rev track", mappings2, coverageContainer2, 1);
     
     private List<HashMap<String,Integer>> readnameToSeqIDMap = new ArrayList<HashMap<String,Integer>>();
     HashMap<String,Integer> map1 = new HashMap<String,Integer>();
@@ -280,6 +280,7 @@ public class SeqPairClassifierTest {
     @Test
     public void testClassifySeqPairs() throws Exception {
         System.out.println("calculateSeqPairs");
+        
         short orientation = 0; // 0 = fr, 1 = rf, 2 = ff/rr
         SeqPairClassifier seqPaircalc = new SeqPairClassifier(fwdTrack, revTrack, 500, 10, orientation);
         ParsedSeqPairContainer result = seqPaircalc.classifySeqPairs();

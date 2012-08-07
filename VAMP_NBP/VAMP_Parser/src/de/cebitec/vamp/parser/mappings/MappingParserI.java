@@ -28,10 +28,5 @@ public interface MappingParserI extends ParserI, Observable {
      *      contains all necessary information for a sequence pair import.
      */
     public SeqPairProcessorI getSeqPairProcessor();
-    
-    /**
-     * @return Additional data calculated in this parser.
-     */
-    public abstract Object getAdditionalData();
 
 }

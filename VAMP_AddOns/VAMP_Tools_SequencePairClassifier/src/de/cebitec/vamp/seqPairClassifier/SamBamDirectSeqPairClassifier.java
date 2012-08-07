@@ -5,7 +5,6 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
 import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
 import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
-import de.cebitec.vamp.parser.mappings.SeqPairProcessorI;
 import de.cebitec.vamp.util.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      */
     public SamBamDirectSeqPairClassifier(SeqPairJobContainer seqPairJobContainer, String refSeq, 
             Map<String,Pair<Integer,Integer>> classificationMap) {
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
         this.trackJob1 = seqPairJobContainer.getTrackJob1();
         this.dist = seqPairJobContainer.getDistance();
         this.calculateMinAndMaxDist(dist, seqPairJobContainer.getDeviation());
@@ -74,8 +73,8 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             long start = System.currentTimeMillis();
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Start"));
             
-            List<SAMRecord> currentRecords1 = new ArrayList<SAMRecord>();
-            List<SAMRecord> currentRecords2 = new ArrayList<SAMRecord>();            
+            List<SAMRecord> currentRecords1 = new ArrayList<>();
+            List<SAMRecord> currentRecords2 = new ArrayList<>();            
             
             int lineno = 0;
             SAMFileReader samBamReader = new SAMFileReader(trackJob1.getFile());
@@ -114,9 +113,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                         ++seqPairId;
                         
                     }
-                    if (pairTag == SeqPairProcessorI.EXT_A1 || pairTag == SeqPairProcessorI.EXT_B1) {
+                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1) {
                         currentRecords1.add(record);
-                    } else if (pairTag == SeqPairProcessorI.EXT_A2 || pairTag == SeqPairProcessorI.EXT_B2) {
+                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2) {
                         currentRecords2.add(record);
                     }
                     lastReadName = readName;
@@ -175,15 +174,15 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         int dir = this.orienation == 2 ? 1 : -1;
         boolean case1;
         
-        List<DirectSeqPair> potPairList = new ArrayList<DirectSeqPair>(); //also perfect
-        List<DirectSeqPair> potSmallPairList = new ArrayList<DirectSeqPair>();        
-        List<DirectSeqPair> potPotSmallPairList = new ArrayList<DirectSeqPair>();        
-        List<DirectSeqPair> unorPairList = new ArrayList<DirectSeqPair>();
-        List<DirectSeqPair> potUnorPairList = new ArrayList<DirectSeqPair>();
-        List<DirectSeqPair> unorSmallPairList = new ArrayList<DirectSeqPair>();
-        List<DirectSeqPair> potUnorSmallPairList = new ArrayList<DirectSeqPair>();
+        List<DirectSeqPair> potPairList = new ArrayList<>(); //also perfect
+        List<DirectSeqPair> potSmallPairList = new ArrayList<>();        
+        List<DirectSeqPair> potPotSmallPairList = new ArrayList<>();        
+        List<DirectSeqPair> unorPairList = new ArrayList<>();
+        List<DirectSeqPair> potUnorPairList = new ArrayList<>();
+        List<DirectSeqPair> unorSmallPairList = new ArrayList<>();
+        List<DirectSeqPair> potUnorSmallPairList = new ArrayList<>();
         
-        List<SAMRecord> omitList = new ArrayList<SAMRecord>(); //(enthält alle und werden step by step rausgelöscht)
+        List<SAMRecord> omitList = new ArrayList<>(); //(enthält alle und werden step by step rausgelöscht)
 
         /*
          * 0 = fr -r1(1)-> <-r2(-1)- (stop1<start2) oder -r2(1)-> <-r1(-1)-
@@ -263,11 +262,12 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                         start1 = recordA.getAlignmentStart();
                         stop1 = recordA.getAlignmentEnd();
                         class1 = this.classificationMap.get(recordA.getReadName());
-                        diffs1 = ParserCommonMethods.countDifferencesToRef(
+                        diffs1 = ParserCommonMethods.countDiffsAndGaps(
                                 recordA.getCigarString(),
                                 recordA.getReadString(),
                                 this.refSeq.substring(start1 - 1, stop1),
-                                recordA.getReadNegativeStrandFlag());
+                                recordA.getReadNegativeStrandFlag(),
+                                start1);
 
                         for (SAMRecord recordB : currentRecords2) {
 
@@ -279,11 +279,12 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                     direction2 = recordB.getReadNegativeStrandFlag() ? (byte) -1 : 1;
 
                                     class2 = this.classificationMap.get(recordB.getReadName());
-                                    diffs2 = ParserCommonMethods.countDifferencesToRef(
+                                    diffs2 = ParserCommonMethods.countDiffsAndGaps(
                                             recordB.getCigarString(),
                                             recordB.getReadString(),
                                             this.refSeq.substring(start2 - 1, stop2),
-                                            recordB.getReadNegativeStrandFlag());
+                                            recordB.getReadNegativeStrandFlag(),
+                                            start2);
 
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
@@ -426,10 +427,10 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
 //            readName2 = readName2.substring(0, readName2.length() - 1);
 //            if (    !readNameToSeqIdMap1.containsKey(
 //                        readName2.concat(
-//                            String.valueOf(SeqPairProcessorI.EXT_A1))) && 
+//                            String.valueOf(Properties.EXT_A1))) && 
 //                    !readNameToSeqIdMap1.containsKey(
 //                        readName2.concat(
-//                            String.valueOf(SeqPairProcessorI.EXT_B1)))) { //only scnd side of the sequence pair could be mapped
+//                            String.valueOf(Properties.EXT_B1)))) { //only scnd side of the sequence pair could be mapped
 //                //pos and direction can deviate
 //                this.seqPairContainer.addMappingToPairId(new Pair<Long, Long>((long) seqID2, seqPairId));
 //            }
@@ -455,11 +456,11 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      */
     private void addPairedRecord(SAMRecord mapping1, SAMRecord mapping2, int seqPairId, byte type) {
         
-        mapping1.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_TYPE, type);
-        mapping1.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_ID, seqPairId);
+        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, type);
+        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPairId);
         mapping1.setMateAlignmentStart(mapping2.getAlignmentStart());
-        mapping2.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_TYPE, type);
-        mapping2.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_ID, seqPairId);
+        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, type);
+        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPairId);
         mapping2.setMateAlignmentStart(mapping1.getAlignmentStart());
         this.samBamFileWriter.addAlignment(mapping1);
         this.samBamFileWriter.addAlignment(mapping2);
@@ -494,8 +495,8 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      */
     private void addSingleRecord(SAMRecord record, int seqPairId) {
         this.addClassificationData(record);
-        record.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_TYPE, Properties.TYPE_UNPAIRED_PAIR);
-        record.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_ID, seqPairId);
+        record.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, Properties.TYPE_UNPAIRED_PAIR);
+        record.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPairId);
         this.samBamFileWriter.addAlignment(record);
     }
 
@@ -547,18 +548,18 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             int lowestDiffRate = this.classificationMap.get(record.getReadName()).getSecond();
 
             if (differences == 0) { //perfect mapping
-                record.setAttribute(SeqPairProcessorI.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
 
             } else if (differences == lowestDiffRate) { //best match mapping
-                record.setAttribute(SeqPairProcessorI.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
 
             } else if (differences > lowestDiffRate) { //common mapping
-                record.setAttribute(SeqPairProcessorI.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
 
             } else { //meaning: differences < lowestDiffRate
                 this.notifyObservers("Cannot contain less than the lowest diff rate number of errors!");
             }
-            record.setAttribute(SeqPairProcessorI.TAG_MAP_COUNT, this.classificationMap.get(record.getReadName()).getFirst());
+            record.setAttribute(Properties.TAG_MAP_COUNT, this.classificationMap.get(record.getReadName()).getFirst());
         } else {
             //TODO: currently no data is added to reads with errors, since they are not contained in the classification map
         }
@@ -570,11 +571,12 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * @param record the sam record to update
      */
     private void addClassificationData(SAMRecord record) {
-        int differences = ParserCommonMethods.countDifferencesToRef(
+        int differences = ParserCommonMethods.countDiffsAndGaps(
                 record.getCigarString(), 
                 record.getReadString(), 
                 this.refSeq.substring(record.getAlignmentStart() - 1, record.getAlignmentEnd()),
-                record.getReadNegativeStrandFlag());
+                record.getReadNegativeStrandFlag(),
+                record.getAlignmentStart());
         this.addClassificationData(record, differences);
     }
 

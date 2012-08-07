@@ -50,9 +50,9 @@ public class ParsedReferenceGap {
             return false;
         }
         final ParsedReferenceGap other = (ParsedReferenceGap) obj;
-        if (    this.absPos != other.absPos ||
-                this.base   != other.base ||
-                this.order  != other.order) {
+        if (    this.absPos != other.getAbsPos() ||
+                this.base   != other.getBase() ||
+                this.order  != other.getOrder()) {
             return false;
         }
         return true;

@@ -4,6 +4,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
 import java.io.File;
@@ -43,6 +44,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
     private double requestCounter;
     private double skippedCounter;
     private boolean isDbUsed = false;
+    private PersistantReference referenceGenome;
 
     public CoverageThread(List<PersistantTrack> tracks, boolean combineTracks) {
         super();
@@ -141,10 +143,13 @@ public class CoverageThread extends Thread implements RequestThreadI {
     private CoverageAndDiffResultPersistant getCoverageAndDiffsFromFile(IntervalRequest request, int from, int to, PersistantTrack track) {
         boolean diffsAndGapsNeeded = request instanceof CoverageAndDiffRequest;
         File file = new File(track.getFilePath());
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
+        if (this.referenceGenome == null) {
+            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
+            this.referenceGenome = refConnector.getRefGen();
+        }
         SamBamFileReader externalDataReader;
         externalDataReader = new SamBamFileReader(file, track.getId());
-        return externalDataReader.getCoverageFromBam(refConnector.getRefGen(), from, to, diffsAndGapsNeeded, request.getDesiredData());
+        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
 
     }
 

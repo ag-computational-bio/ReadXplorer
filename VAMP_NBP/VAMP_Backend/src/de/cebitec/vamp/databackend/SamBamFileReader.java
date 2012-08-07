@@ -101,9 +101,10 @@ public class SamBamFileReader {
      * Retrieves the coverage for the given interval from the bam file set for 
      * this data reader and the reference sequence with the given name.
      * If reads become longer than 1000bp the offset in this method has to be enlarged!
-     * @param refSeqName name of the reference sequence in the bam file
+     * @param refGenome the reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
+     * @param diffsAndGapsNeeded true, if the diffs and gaps are needed, false otherwise
      * @param trackNeeded value among 0, if it is an ordinary request, 
      *          PersistantCoverage.TRACK1 and PersistantCoverage.TRACK2 if it is a
      *          part of a double track request
@@ -300,7 +301,7 @@ public class SamBamFileReader {
         String op; //operation
         char base; //currently visited base
         int baseNo = 0; //number of first base of consecutive operation types
-        int count = 0; //number of consecutive bases with same operation type
+        int count; //number of consecutive bases with same operation type
         int pos; //baseNo + current position in list of consecutive bases
         int dels = 0; //number of deletions in read until current base
 //        int ins = 0; //number of insertions in read until current base
@@ -317,7 +318,7 @@ public class SamBamFileReader {
                         for (int j = 0; j < count; ++j) {
                             pos = baseNo + j;
                             base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
-                            base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base, readSeq);
+                            base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base);
                             PersistantDiff d = new PersistantDiff(start + pos + dels, base, isFwdStrand , nbReplicates);
                             if (mapping != null) {
                                 mapping.addDiff(d);

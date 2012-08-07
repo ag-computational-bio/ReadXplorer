@@ -51,8 +51,8 @@ public class PatternFilter implements RegionFilterI {
                 offset -= Math.abs(start);
                 start = 0;
             }
-            if (stop > this.refGen.getSequence().length()) {
-                stop = this.refGen.getSequence().length();
+            if (stop > this.refGen.getRefLength()) {
+                stop = this.refGen.getRefLength();
             }
 
             this.sequence = this.refGen.getSequence().substring(start, stop);
@@ -71,7 +71,7 @@ public class PatternFilter implements RegionFilterI {
      */
     public int findNextOccurrence() {
 
-        int refLength = refGen.getSequence().length();
+        int refLength = refGen.getRefLength();
         int from = -1;
         int from2 = -1;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
@@ -113,12 +113,13 @@ public class PatternFilter implements RegionFilterI {
     /**
      * Identifies next (closest) occurrence from either forward or reverse strand of a pattern 
      * in the current reference genome.
+     * @param isFwdStrand true, if the next occurrence on the fwd strand is needed
      * @return the position of the next occurrence of the pattern
      */
     public int findNextOccurrenceOnStrand(boolean isFwdStrand) {
 
         String genomeSeq = refGen.getSequence();
-        int refLength = genomeSeq.length();
+        int refLength = refGen.getRefLength();
         int from = -1;
         int start = this.absStart;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
