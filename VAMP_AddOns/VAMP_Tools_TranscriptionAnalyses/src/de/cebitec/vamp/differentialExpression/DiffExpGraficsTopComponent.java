@@ -46,7 +46,7 @@ preferredID = "DiffExpGraficsTopComponent")
 })
 public final class DiffExpGraficsTopComponent extends TopComponent implements Observer, ItemListener {
 
-    private PerformAnalysis perfAn;
+    private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel cbm;
     private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<>();
@@ -54,12 +54,15 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private File currentlyDisplayed;
 
     public DiffExpGraficsTopComponent() {
-        cbm = new DefaultComboBoxModel(PerformAnalysis.Plot.values());
+    }
+
+    public DiffExpGraficsTopComponent(AnalysisHandler handler) {
+        baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
+        cbm = new DefaultComboBoxModel(BaySeqAnalysisHandler.Plot.values());
         initComponents();
         svgCanvas = new JSVGCanvas();
         jPanel1.add(svgCanvas, BorderLayout.CENTER);
         svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
-
             @Override
             public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
                 progressBar.setIndeterminate(true);
@@ -82,11 +85,13 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                 messages.setText("Could not load SVG file. Please try again.");
             }
         });
+
     }
 
-    private void addResults(List<Group> groups) {
+    private void addResults() {
+        List<Group> groups = baySeqAnalysisHandler.getGroups();
         groupComboBox.setModel(new DefaultComboBoxModel(groups.toArray()));
-        List<PersistantTrack> tracks = perfAn.getSelectedTraks();
+        List<PersistantTrack> tracks = baySeqAnalysisHandler.getSelectedTraks();
         for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
             PersistantTrack persistantTrack = it.next();
             samplesA.addElement(persistantTrack);
@@ -221,7 +226,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     }// </editor-fold>//GEN-END:initComponents
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
-        PerformAnalysis.Plot selectedPlot = (PerformAnalysis.Plot) plotTypeComboBox.getSelectedItem();
+        BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
 
@@ -230,7 +235,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
             messages.setText("");
             plotButton.setEnabled(false);
             saveButton.setEnabled(false);
-            currentlyDisplayed = perfAn.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
+            currentlyDisplayed = baySeqAnalysisHandler.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
             svgCanvas.setURI(currentlyDisplayed.toURI().toString());
             svgCanvas.setVisible(true);
             svgCanvas.repaint();
@@ -244,7 +249,6 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         new VampFileChooser(VampFileChooser.SAVE_DIALOG, "svg") {
-
             @Override
             public void save(String fileLocation) {
                 Path from = currentlyDisplayed.toPath();
@@ -282,12 +286,12 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
 
     @Override
     public void componentOpened() {
-        // TODO add custom code on component opening
+        addResults();
     }
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        baySeqAnalysisHandler.removeObserver(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -298,34 +302,33 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     }
 
     void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+//        String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
 
     @Override
     public void update(Object args) {
-        this.perfAn = (PerformAnalysis) args;
-        addResults(perfAn.getGroups());
+        addResults();
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        PerformAnalysis.Plot item = (PerformAnalysis.Plot) e.getItem();
-        if (item == PerformAnalysis.Plot.MACD) {
+        BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
+        if (item == BaySeqAnalysisHandler.Plot.MACD) {
             samplesAList.setEnabled(true);
             samplesALabel.setEnabled(true);
             samplesBList.setEnabled(true);
             samplesBLabel.setEnabled(true);
             groupComboBox.setEnabled(false);
         }
-        if (item == PerformAnalysis.Plot.Posteriors) {
+        if (item == BaySeqAnalysisHandler.Plot.Posteriors) {
             samplesAList.setEnabled(true);
             samplesALabel.setEnabled(true);
             samplesBList.setEnabled(true);
             samplesBLabel.setEnabled(true);
             groupComboBox.setEnabled(true);
         }
-        if (item == PerformAnalysis.Plot.Priors) {
+        if (item == BaySeqAnalysisHandler.Plot.Priors) {
             samplesAList.setEnabled(false);
             samplesALabel.setEnabled(false);
             samplesBList.setEnabled(false);

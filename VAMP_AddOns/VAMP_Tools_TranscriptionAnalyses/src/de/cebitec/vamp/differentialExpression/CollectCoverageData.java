@@ -44,9 +44,9 @@ public class CollectCoverageData{
     /**
      * Constructor of the class.
      * @param trackID The ID of the track the instance of this class should collect the coverage data for
-     * @param perfAnalysis Instance of the calling instance of PerformAnalysis.
+     * @param perfAnalysis Instance of the calling instance of AnalysisHandler.
      */
-    public CollectCoverageData(int trackID, PerformAnalysis perfAnalysis) {
+    public CollectCoverageData(int trackID, AnalysisHandler perfAnalysis) {
         this.genomeAnnotations = perfAnalysis.getPersAnno();
         this.trackID = trackID;
     }

@@ -26,11 +26,13 @@
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="normalizedCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
+                      <Component id="saveTableButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="createGraphicsButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jProgressBar1" min="-2" pref="269" max="-2" attributes="0"/>
+                      <Component id="jProgressBar1" min="-2" pref="195" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane1" pref="961" max="32767" attributes="0"/>
               </Group>
@@ -50,6 +52,7 @@
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="normalizedCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="createGraphicsButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="saveTableButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -131,6 +134,17 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createGraphicsButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="saveTableButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/differentialExpression/Bundle.properties" key="DiffExpResultViewerTopComponent.saveTableButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveTableButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

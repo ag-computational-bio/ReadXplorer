@@ -16,7 +16,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public final class diffExpVisualPanel1 extends JPanel implements ListSelectionListener {
+public final class SelectTrackVisualPanel extends JPanel implements ListSelectionListener {
 
     private List<PersistantReference> references;
     private int selectedIndex = -1;
@@ -24,9 +24,9 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
 
     /**
-     * Creates new form diffExpVisualPanel1
+     * Creates new form SelectTrackVisualPanel
      */
-    public diffExpVisualPanel1() {
+    public SelectTrackVisualPanel() {
         ProjectConnector con = ProjectConnector.getInstance();
         references = con.getGenomes();
         initComponents();
@@ -57,9 +57,9 @@ public final class diffExpVisualPanel1 extends JPanel implements ListSelectionLi
         referenceList.addListSelectionListener(this);
         jScrollPane1.setViewportView(referenceList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1.class, "diffExpVisualPanel1.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SelectTrackVisualPanel.class, "SelectTrackVisualPanel.jLabel1.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1.class, "diffExpVisualPanel1.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SelectTrackVisualPanel.class, "SelectTrackVisualPanel.jLabel2.text")); // NOI18N
 
         jScrollPane2.setViewportView(trackList);
 

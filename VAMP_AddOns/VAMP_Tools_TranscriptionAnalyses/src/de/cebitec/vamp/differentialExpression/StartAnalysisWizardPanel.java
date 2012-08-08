@@ -1,28 +1,27 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.util.List;
+import java.io.File;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel1b implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private diffExpVisualPanel1b component;
+    private StartAnalysisVisualPanel component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public diffExpVisualPanel1b getComponent() {
+    public StartAnalysisVisualPanel getComponent() {
         if (component == null) {
-            component = new diffExpVisualPanel1b();
+            component = new StartAnalysisVisualPanel(this);
         }
         return component;
     }
@@ -56,20 +55,19 @@ public class diffExpWizardPanel1b implements WizardDescriptor.ValidatingPanel<Wi
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
-        getComponent().updateTrackList(selectedTraks);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state
-        wiz.putProperty("replicateStructure", getComponent().getCreatedReplicates());
+        if (getComponent().isCheckBoxchecked()) {
+            //TODO: Input validation
+            String path = getComponent().getSavePath();
+            File file = new File(path);
+            wiz.putProperty("saveFile", file);
+        }
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().noReplicatesCreated()) {
-            throw new WizardValidationException(null, "You must define the replicate structure.", null);
-        }
     }
 }

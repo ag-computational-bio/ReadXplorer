@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 
-public final class diffExpVisualPanel1b extends JPanel {
+public final class BaySeqVisualPanel2 extends JPanel {
 
     private List<PersistantTrack> selectedTraks = null;
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
@@ -20,7 +20,7 @@ public final class diffExpVisualPanel1b extends JPanel {
     /**
      * Creates new form bspVisualPanel2
      */
-    public diffExpVisualPanel1b() {
+    public BaySeqVisualPanel2() {
         initComponents();
     }
 
@@ -56,23 +56,23 @@ public final class diffExpVisualPanel1b extends JPanel {
         addAsReplicates = new javax.swing.JButton();
         removeReplicates = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1b.class, "diffExpVisualPanel1b.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel1.text")); // NOI18N
 
         jScrollPane1.setViewportView(trackList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1b.class, "diffExpVisualPanel1b.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel2.text")); // NOI18N
 
         replicateStructureField.setEditable(false);
-        replicateStructureField.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel1b.class, "diffExpVisualPanel1b.replicateStructureField.text")); // NOI18N
+        replicateStructureField.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.replicateStructureField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(addAsReplicates, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1b.class, "diffExpVisualPanel1b.addAsReplicates.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addAsReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.addAsReplicates.text")); // NOI18N
         addAsReplicates.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addAsReplicatesActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeReplicates, org.openide.util.NbBundle.getMessage(diffExpVisualPanel1b.class, "diffExpVisualPanel1b.removeReplicates.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.removeReplicates.text")); // NOI18N
         removeReplicates.setEnabled(false);
         removeReplicates.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
-import org.rosuda.JRI.Rengine;
 
 /**
  *
@@ -19,14 +18,10 @@ import org.rosuda.JRI.Rengine;
 public class BaySeq {
 
     private GnuR gnuR;
-    private Rengine engine;
-    private String cranMirror;
-    
-    public BaySeq(){
-        gnuR=new GnuR();
-        gnuR.startUp();
-        engine=gnuR.getEngine();
-        cranMirror=gnuR.getCranMirror();
+    private int numberOfAnnotations;
+
+    public BaySeq() {
+        gnuR = GnuR.getInstance();
     }
 
     /**
@@ -49,22 +44,24 @@ public class BaySeq {
      * represent the normalised result for group two. So you will first get all
      * not normalised results and then all the normalised ones.
      */
-    public List<RVector> processWithBaySeq(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) {
+    public List<RVector> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) throws IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
+        this.numberOfAnnotations = numberOfAnnotations;
         int numberofGroups;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
-        REXP baySeq = engine.eval("library(baySeq)");
+        REXP baySeq = gnuR.eval("library(baySeq)");
         if (baySeq == null) {
-            engine.eval("source(\"http://bioconductor.org/biocLite.R\")");
-            engine.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
-            engine.eval("biocLite(\"baySeq\")");
-            engine.eval("library(baySeq)");
+            gnuR.eval("source(\"http://bioconductor.org/biocLite.R\")");
+            gnuR.eval("biocLite(\"baySeq\")");
+            gnuR.eval("library(baySeq)");
         }
-        REXP snow = engine.eval("library(snow)");
+        REXP snow = gnuR.eval("library(snow)");
         if (snow == null) {
-            engine.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
-            engine.eval("install.packages(\"snow\")");
-            engine.eval("library(snow)");
+            gnuR.eval("install.packages(\"snow\")");
+            gnuR.eval("library(snow)");
         }
         //Gnu R is configured to use all your processor cores aside from one. So the
         //computation will speed up a little bit but still leave you one core
@@ -74,68 +71,66 @@ public class BaySeq {
             processors--;
         }
         System.out.println("Gnu R running on " + processors + " cores.");
-        engine.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
-        if (!PerformAnalysis.TESTING_MODE) {
+        gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
+        if (!AnalysisHandler.TESTING_MODE) {
             int i = 1;
             StringBuilder concatenate = new StringBuilder("c(");
             while (bseqData.hasCountData()) {
-                engine.assign("inputData" + i, bseqData.pollFirstCountData());
+                gnuR.assign("inputData" + i, bseqData.pollFirstCountData());
                 concatenate.append("inputData").append(i++).append(",");
             }
             concatenate.deleteCharAt(concatenate.length() - 1);
             concatenate.append(")");
-            engine.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfAnnotations + ")");
-            engine.assign("inputAnnotationsStart", bseqData.getStart());
-            engine.assign("inputAnnotationsStop", bseqData.getStop());
-            engine.assign("inputAnnotationsID", bseqData.getLoci());
-            engine.eval("annotations <- data.frame(inputAnnotationsID,inputAnnotationsStart,inputAnnotationsStop)");
-            engine.eval("colnames(annotations) <- c(\"locus\", \"start\", \"stop\")");
-            engine.eval("seglens <- annotations$stop - annotations$start + 1");
-            engine.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = annotations)");
-            engine.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
-            engine.assign("replicates", bseqData.getReplicateStructure());
-            engine.eval("replicates(cD) <- as.factor(c(replicates))");
+            gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfAnnotations + ")");
+            gnuR.assign("inputAnnotationsStart", bseqData.getStart());
+            gnuR.assign("inputAnnotationsStop", bseqData.getStop());
+            gnuR.assign("inputAnnotationsID", bseqData.getLoci());
+            gnuR.eval("annotations <- data.frame(inputAnnotationsID,inputAnnotationsStart,inputAnnotationsStop)");
+            gnuR.eval("colnames(annotations) <- c(\"locus\", \"start\", \"stop\")");
+            gnuR.eval("seglens <- annotations$stop - annotations$start + 1");
+            gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = annotations)");
+            gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
+            gnuR.assign("replicates", bseqData.getReplicateStructure());
+            gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
             concatenate = new StringBuilder();
             numberofGroups = 0;
             while (bseqData.hasGroups()) {
                 numberofGroups++;
-                engine.assign("group" + numberofGroups, bseqData.getNextGroup());
+                gnuR.assign("group" + numberofGroups, bseqData.getNextGroup());
                 concatenate.append("group").append(numberofGroups).append("=").append("group").append(numberofGroups).append(",");
             }
             concatenate.deleteCharAt(concatenate.length() - 1);
-            engine.eval("groups(cD) <- list(" + concatenate.toString() + ")");
+            gnuR.eval("groups(cD) <- list(" + concatenate.toString() + ")");
             //parameter samplesize could be added.
-            engine.eval("cD <- getPriors.NB(cD, cl = cl)");
-            engine.eval("cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)");
+            gnuR.eval("cD <- getPriors.NB(cD, cl = cl)");
+            gnuR.eval("cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)");
         } else {
-            engine.eval("data(testData)");
+            gnuR.eval("data(testData)");
             numberofGroups = 2;
         }
         List<RVector> results = new ArrayList<>();
         for (int j = 1; j <= numberofGroups; j++) {
-            REXP result = engine.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
+            REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
             RVector rvec = result.asVector();
             results.add(rvec);
         }
         for (int j = 1; j <= numberofGroups; j++) {
-            REXP result = engine.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
+            REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
             RVector rvec = result.asVector();
             results.add(rvec);
         }
         if (saveFile != null) {
-            String path = saveFile.getAbsolutePath();
-            path = path.replace("\\", "\\\\");
-            engine.eval("save.image(\"" + path + "\")");
+            gnuR.saveDataToFile(saveFile);
         }
         return results;
     }
 
     /**
-     * Creates an MACD plot of the current data. The processWithBaySeq(...)
-     * method must be called before. If this is not done there will be no data
-     * in the Gnu R memory which can be plotted. So this method will also not
-     * work after calling clearGnuR() at least not until you have called
-     * processWithBaySeq(...) again.
+     * Creates an MACD plot of the current data. The process(...) method must be
+     * called before. If this is not done there will be no data in the Gnu R
+     * memory which can be plotted. So this method will also not work after
+     * calling clearGnuR() at least not until you have called process(...)
+     * again.
      *
      * @param file a File the created SVG image should be saved to.
      * @param samplesA an int array representing the first sample group that
@@ -144,29 +139,32 @@ public class BaySeq {
      * should be plotted. SamplesA and samplesB must not be the same!
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
-    public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException {
+    public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException, IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
         if (!validateSamples(samplesA, samplesB)) {
             throw new SamplesNotValidException();
         }
-        setUpSvgOutput();
+        gnuR.setUpSvgOutput();
         StringBuilder samplesABuilder = new StringBuilder();
         samplesABuilder.append((samplesA[0] + 1)).append(":").append((samplesA[samplesA.length - 1] + 1));
         StringBuilder samplesBBuilder = new StringBuilder();
         samplesBBuilder.append((samplesB[0] + 1)).append(":").append((samplesB[samplesB.length - 1] + 1));
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
-        engine.eval("devSVG(file=\"" + path + "\")");
-        engine.eval("plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
                 + "samplesB = " + samplesBBuilder.toString() + ")");
-        engine.eval("dev.off()");
+        gnuR.eval("dev.off()");
     }
 
     /**
-     * Plots the posterior values of the current data. The
-     * processWithBaySeq(...) method must be called before. If this is not done
-     * there will be no data in the Gnu R memory which can be plotted. So this
-     * method will also not work after calling clearGnuR() at least not until
-     * you have called processWithBaySeq(...) again.
+     * Plots the posterior values of the current data. The process(...) method
+     * must be called before. If this is not done there will be no data in the
+     * Gnu R memory which can be plotted. So this method will also not work
+     * after calling clearGnuR() at least not until you have called process(...)
+     * again.
      *
      * @param file a File the created SVG image should be saved to.
      * @param group the underlying group for the plot.
@@ -176,55 +174,57 @@ public class BaySeq {
      * should be plotted. SamplesA and samplesB must not be the same!
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
-    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException {
+    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException, IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
         if (!validateSamples(samplesA, samplesB)) {
             throw new SamplesNotValidException();
         }
-        setUpSvgOutput();
+        gnuR.setUpSvgOutput();
         StringBuilder samplesABuilder = new StringBuilder();
         samplesABuilder.append((samplesA[0] + 1)).append(":").append((samplesA[samplesA.length - 1] + 1));
         StringBuilder samplesBBuilder = new StringBuilder();
         samplesBBuilder.append((samplesB[0] + 1)).append(":").append((samplesB[samplesB.length - 1] + 1));
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
-        engine.eval("devSVG(file=\"" + path + "\")");
-        engine.eval("plotPosteriors(cD, group = " + group.getGnuRID()
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID()
                 + ", samplesA = " + samplesABuilder.toString()
                 + ", samplesB = " + samplesBBuilder.toString()
                 + ", col = c(rep(\"blue\", 100), rep(\"black\", 900))"
                 + ")");
-        engine.eval("dev.off()");
+        gnuR.eval("dev.off()");
     }
 
     /**
-     * Plots the prior values of the current data. The processWithBaySeq(...)
-     * method must be called before. If this is not done there will be no data
-     * in the Gnu R memory which can be plotted. So this method will also not
-     * work after calling clearGnuR() at least not until you have called
-     * processWithBaySeq(...) again.
+     * Plots the prior values of the current data. The process(...) method must
+     * be called before. If this is not done there will be no data in the Gnu R
+     * memory which can be plotted. So this method will also not work after
+     * calling clearGnuR() at least not until you have called process(...)
+     * again.
      *
      * @param file a File the created SVG image should be saved to.
      * @param group the underlying group for the plot.
      */
-    public void plotPriors(File file, Group group) {
-        setUpSvgOutput();
+    public void plotPriors(File file, Group group) throws IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
+        gnuR.setUpSvgOutput();
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
-        engine.eval("devSVG(file=\"" + path + "\")");
-        engine.eval("plotPriors(cD, group = " + group.getGnuRID() + ")");
-        engine.eval("dev.off()");
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotPriors(cD, group = " + group.getGnuRID() + ")");
+        gnuR.eval("dev.off()");
     }
 
-    /**
-     * Used by all the plotting methods to set up Gnu R to create SVGs.
-     */
-    private void setUpSvgOutput() {
-        REXP svg = engine.eval("library(RSvgDevice)");
-        if (svg == null) {
-            engine.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
-            engine.eval("install.packages(\"RSvgDevice\")");
-            engine.eval("library(RSvgDevice)");
-        }
+    public void saveResultsAsCSV(Group group, File saveFile, Boolean normalized) {
+        String path = saveFile.getAbsolutePath();
+        path = path.replace("\\", "/");
+        gnuR.eval("write.csv(topCounts(cD, group=" + group.getGnuRID()
+                + ",number = " + numberOfAnnotations + ", normaliseData="
+                + normalized.toString().toUpperCase() + "),file=\"" + path + "\")");
     }
 
     /**
@@ -251,9 +251,17 @@ public class BaySeq {
     }
 
     /**
+     * Releases the Gnu R instance and removes the reference to it.
+     */
+    public void shutdown() {
+        gnuR.releaseGnuRInstance();
+        gnuR = null;
+    }
+
+    /**
      * The SamplesNotValidException is thrown by the plotting methods.
      */
-    public class SamplesNotValidException extends Exception {
+    public static class SamplesNotValidException extends Exception {
 
         public SamplesNotValidException() {
             super();

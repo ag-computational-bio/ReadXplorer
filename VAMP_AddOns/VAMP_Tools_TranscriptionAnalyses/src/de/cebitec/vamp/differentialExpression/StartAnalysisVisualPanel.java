@@ -8,14 +8,14 @@ import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
 import javax.swing.JPanel;
 
-public final class diffExpVisualPanel3 extends JPanel {
+public final class StartAnalysisVisualPanel extends JPanel {
     
     private boolean checkBoxchecked = false;
 
     /**
-     * Creates new form diffExpVisualPanel3
+     * Creates new form StartAnalysisVisualPanel
      */
-    public diffExpVisualPanel3(diffExpWizardPanel3 wizardPanel3) {
+    public StartAnalysisVisualPanel(StartAnalysisWizardPanel wizardPanel3) {
         initComponents();
         jScrollPane1.setBorder(null);
         fileNameField.setText(System.getProperty("user.home")+File.separator+"DiffExpResult.rdata");
@@ -45,20 +45,20 @@ public final class diffExpVisualPanel3 extends JPanel {
         jTextArea1.setEditable(false);
         jTextArea1.setFont(jTextArea1.getFont());
         jTextArea1.setRows(5);
-        jTextArea1.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.jTextArea1.text")); // NOI18N
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.jTextArea1.text")); // NOI18N
         jScrollPane1.setViewportView(jTextArea1);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.jCheckBox1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.jCheckBox1.text")); // NOI18N
         jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBox1ActionPerformed(evt);
             }
         });
 
-        fileNameField.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.fileNameField.text")); // NOI18N
+        fileNameField.setText(org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.fileNameField.text")); // NOI18N
         fileNameField.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(fileChooserButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel3.class, "diffExpVisualPanel3.fileChooserButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(fileChooserButton, org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.fileChooserButton.text")); // NOI18N
         fileChooserButton.setEnabled(false);
         fileChooserButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
