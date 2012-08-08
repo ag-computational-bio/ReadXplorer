@@ -1,6 +1,5 @@
-package de.cebitec.vamp.differentialExpression.wizard;
+package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.differentialExpression.AnalysisData;
 import java.util.List;
 
 /**
