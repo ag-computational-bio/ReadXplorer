@@ -248,7 +248,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     }//GEN-LAST:event_plotButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, "svg") {
+        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"svg"},"svg") {
             @Override
             public void save(String fileLocation) {
                 Path from = currentlyDisplayed.toPath();

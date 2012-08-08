@@ -222,7 +222,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, "csv") {
+        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"csv"}, "csv") {
             @Override
             public void save(String fileLocation) {              
                 BaySeqAnalysisHandler.saveResultsAsCSV((Group)groupComboBox.getSelectedItem(), fileLocation, showNormalizedData);
