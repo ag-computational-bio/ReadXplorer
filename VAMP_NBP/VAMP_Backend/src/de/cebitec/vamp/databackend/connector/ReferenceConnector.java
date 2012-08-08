@@ -7,11 +7,8 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import de.cebitec.vamp.util.SequenceUtils;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,6 +26,8 @@ public class ReferenceConnector {
     private Connection con;
 //    private String projectFolder;
 //    private boolean isFolderSet = false;
+    private PersistantReference reference;
+    
 
     ReferenceConnector(int refGenID){
         this.refGenID = refGenID;
@@ -38,29 +37,33 @@ public class ReferenceConnector {
 //        this.isFolderSet = !this.projectFolder.isEmpty();
     }
 
-    public PersistantReference getRefGen(){
-        PersistantReference gen = null;
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
-            fetch.setLong(1, refGenID);
-            ResultSet rs = fetch.executeQuery();
+    /**
+     * @return fetches the reference genome of the reference associated with this
+     * connector.
+     */
+    public PersistantReference getRefGen() {
+        if (this.reference == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
+            try {
+                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
+                fetch.setLong(1, refGenID);
+                ResultSet rs = fetch.executeQuery();
 
-            if(rs.next()){
-                int id = rs.getInt(FieldNames.REF_GEN_ID);
-                String name = rs.getString(FieldNames.REF_GEN_NAME);
-                String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
-                String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
-                Timestamp time = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
+                if (rs.next()) {
+                    String name = rs.getString(FieldNames.REF_GEN_NAME);
+                    String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
+                    String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
+                    Timestamp time = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
 
-                gen = new PersistantReference(id, name, description, sequence, time);
+                    this.reference = new PersistantReference(refGenID, name, description, sequence, time);
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return gen;
+        return this.reference;
     }
 
     public List<PersistantAnnotation> getAnnotationsForRegion(int from, int to){
@@ -79,11 +82,11 @@ public class ReferenceConnector {
                 String product = rs.getString(FieldNames.ANNOTATION_PRODUCT);
                 int start = rs.getInt(FieldNames.ANNOTATION_START);
                 int stop = rs.getInt(FieldNames.ANNOTATION_STOP);
-                int strand = rs.getInt(FieldNames.ANNOTATION_STRAND);
+                boolean isFwdStrand = rs.getInt(FieldNames.ANNOTATION_STRAND) == SequenceUtils.STRAND_FWD;
                 FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.ANNOTATION_TYPE));
                 String gene = rs.getString(FieldNames.ANNOTATION_GENE);
 
-                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, strand, type, gene));
+                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
             }
 
         } catch (SQLException ex) {
@@ -113,11 +116,11 @@ public class ReferenceConnector {
                 String product = rs.getString(FieldNames.ANNOTATION_PRODUCT);
                 int start = rs.getInt(FieldNames.ANNOTATION_START);
                 int stop = rs.getInt(FieldNames.ANNOTATION_STOP);
-                int strand = rs.getInt(FieldNames.ANNOTATION_STRAND);
+                boolean isFwdStrand = rs.getInt(FieldNames.ANNOTATION_STRAND) == SequenceUtils.STRAND_FWD;
                 FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.ANNOTATION_TYPE));
                 String gene = rs.getString(FieldNames.ANNOTATION_GENE);
 
-                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, strand, type, gene));
+                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
             }
 
         } catch (SQLException ex) {

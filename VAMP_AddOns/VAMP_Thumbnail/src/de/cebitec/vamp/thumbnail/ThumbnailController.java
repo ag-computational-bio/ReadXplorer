@@ -14,6 +14,7 @@ import de.cebitec.vamp.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceAnnotationTopComp;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
@@ -132,7 +133,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             drawScene();
             //Cookie Stuff
             removeThumbSpecificCookies();
-            addSynchCookieToLookup();
+            addSyncCookieToLookup();
         }
     }
 
@@ -165,7 +166,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             drawScene();
             removeThumbSpecificCookies();
             //Activate Synchronize-Action for ZoomSliders
-            addSynchCookieToLookup();
+            addSyncCookieToLookup();
         }
 
     }
@@ -173,7 +174,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     /**
      * Activates synchronize-Sliders Action in Menu.
      */
-    private void addSynchCookieToLookup() {
+    private void addSyncCookieToLookup() {
         getLookup().add(new SyncSliderCookie() {
 
             @Override
@@ -196,16 +197,16 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             public void async() {
                 sliderSynchronisation(false);
                 getLookup().removeAll(ASyncSliderCookie.class);
-                addSynchCookieToLookup();
+                addSyncCookieToLookup();
             }
         });
     }
 
     /**
-     * Sets all Sliders based on synch-Value
-     * @param synch Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
+     * Sets all Sliders based on sync-Value
+     * @param sync Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
      */
-    private void sliderSynchronisation(boolean synch) {
+    private void sliderSynchronisation(boolean sync) {
         //synchronize all Sliders for all RefrenceViewer's ThumbnailViewTopComponents
         for (ReferenceViewer oneViewer : refThumbTopComponents.keySet()) {
             if (selectedAnnotations.containsKey(oneViewer)) {
@@ -216,7 +217,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                             JPanel panel = (JPanel) bp.getComponent(0);
                             if (panel != null) {
                                 CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent(1);
-                                if (synch) {
+                                if (sync) {
                                     slider.addChangeListener(zoomChangeListener);
                                     zoomChangeListener.addMapValue((TrackViewer) panel.getComponent(0), slider);
                                 } else {
@@ -236,7 +237,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
 
-    /*
+    /**
      * Draws all Thumbnail-Widgets for all annotations
      */
     private void drawScene() {
@@ -257,7 +258,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         }
     }
 
-    /*
+    /**
      * Creates BasePanel for one Track with TrackViewer and ZoomSlider for wrapping into ComponentWidget.
      */
     private BasePanel createTrackPanel(PersistantTrack track, ViewController controller, CheckBoxActionListener cbListener) {
@@ -270,15 +271,15 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         MultiTrackConnector tc = ProjectConnector.getInstance().getMultiTrackConnector(track);
 
         final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
-        int annotationWidth = (currentAnnotation.getStop() - currentAnnotation.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(annotationWidth);
+        int annotationCenter = (currentAnnotation.getStop() - currentAnnotation.getStart()) / 2;
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(annotationCenter);
 
         trackV.setName(track.getDescription());
 
         CoverageInfoLabel cil = new CoverageInfoLabel();
         trackV.setTrackInfoPanel(cil);
 
-        //eigener ComponentListener für TrackV
+        //own ComponentListener for TrackViewer
         trackV.addComponentListener(new TrackViewerCompListener(currentAnnotation, trackV));
 
 
@@ -311,6 +312,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //Größe ändern
         b.setMinimumSize(new Dimension(200, 150));
         b.setPreferredSize(new Dimension(200, 150));
+        
+        //show data in viewer
+//        trackV.updateLogicalBounds(new BoundsInfo(currentAnnotation.getStart(), currentAnnotation.getStop(), 
+//                currentAnnotation.getStart() + annotationCenter, 1, annotationCenter * 2));
+        trackV.boundsChangedHook();
+        
         return b;
     }
 

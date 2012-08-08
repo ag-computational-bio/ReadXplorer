@@ -51,11 +51,12 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     /**
      * CAUTION: You cannot query coverage and mapping tables with the same AnalysisHandler at
      * the same time.
-     * @param noAnalyses the total number of analyses to carry out (e.g. TSS and Operon analysis = 2 analyses)
+     * @param trackViewer the track viewer for which the analysis is carried out
+     * @param parent the parent for visualization of the results
      */
     public AnalysesHandler (TrackViewer trackViewer, DataVisualisationI parent) {
         this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisTranscriptionStart.class, "MSG_AnalysesWorker.progress.name"));
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
         this.parent = parent;
         this.trackViewer = trackViewer;
         this.coverageNeeded = false;
@@ -82,10 +83,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        this.genomeSize = refConnector.getRefGen().getSequence().length();
+        this.genomeSize = refConnector.getRefGen().getRefLength();
 
         if (this.coverageNeeded) {
-            List<Integer> trackIds = new ArrayList<Integer>();
+            List<Integer> trackIds = new ArrayList<>();
             trackIds.add(trackId);
             CoverageThreadAnalyses coverageThread = new CoverageThreadAnalyses(trackIds);
 
@@ -121,10 +122,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
             for (PersistantTrack track : tracksAll) {
                 TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
-                if (track.getId() < trackCon.getTrackID()) {
-                    numUnneededMappings += connector.getNumOfUniqueMappings();
+                    if (track.getId() < trackCon.getTrackID()) {
+                        numUnneededMappings += connector.getNumOfUniqueMappings();
+                    }
                 }
-            }
             int numInterestingMappings = numUnneededMappings + trackCon.getNumOfUniqueMappings();
             int stepSize = 50000;
             int from = numUnneededMappings;

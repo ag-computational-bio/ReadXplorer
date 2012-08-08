@@ -271,7 +271,7 @@ public class BioJavaParser implements ReferenceParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return parserName;
     }
 

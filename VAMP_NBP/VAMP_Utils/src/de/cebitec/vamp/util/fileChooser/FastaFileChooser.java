@@ -15,11 +15,11 @@ public class FastaFileChooser extends VampFileChooser {
 
     /**
      * Creates a new file chooser for saving a sequence in fasta format.
-     * @param fileExtension
+     * @param fileExtensions
      * @param sequence
      */
-    public FastaFileChooser(final String fileExtension, final String sequence){
-        super(VampFileChooser.SAVE_DIALOG, fileExtension, sequence);
+    public FastaFileChooser(final String[] fileExtension, final String fileDescription, final String sequence){
+        super(VampFileChooser.SAVE_DIALOG, fileExtension, fileDescription, sequence);
     }
 
 

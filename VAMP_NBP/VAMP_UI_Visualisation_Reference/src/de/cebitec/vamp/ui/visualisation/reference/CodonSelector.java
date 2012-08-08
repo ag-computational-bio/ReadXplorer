@@ -6,14 +6,17 @@ import de.cebitec.vamp.util.CodonUtilities;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.BorderLayout;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.io.IOException;
+import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
-import javax.swing.*;
+import java.util.prefs.Preferences;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 /**
  *

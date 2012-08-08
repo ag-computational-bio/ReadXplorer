@@ -1,20 +1,20 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.util.SequenceComparison;
-import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -70,13 +70,13 @@ public class SnpTranslatorTest {
     @Test
     public void testCalcSnpList() {
         System.out.println("CalcSnpListTest");
-        PersistantAnnotation feat1 = new PersistantAnnotation(1, "ec1", "locus1", "product1", 1, 205, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name1");
-        PersistantAnnotation feat2 = new PersistantAnnotation(2, "ec2", "locus2", "product2", 2, 320, SequenceUtils.STRAND_REV, FeatureType.CDS, "name2");
-        PersistantAnnotation feat3 = new PersistantAnnotation(3, "ec3", "locus3", "product3", 430, 650, SequenceUtils.STRAND_REV, FeatureType.CDS, "name3");
-        PersistantAnnotation feat4 = new PersistantAnnotation(4, "ec4", "locus4", "product4", 570, 810, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name4");
-        PersistantAnnotation feat5 = new PersistantAnnotation(5, "ec5", "miRnaL5", "miRnaP5", 1000, 1100, SequenceUtils.STRAND_FWD, FeatureType.MIRNA, "miRnaN5");
-        PersistantAnnotation feat6 = new PersistantAnnotation(6, "ec6", "locus6", "product6", 11000, 11130, SequenceUtils.STRAND_FWD, FeatureType.CDS, "name6");
-        PersistantAnnotation feat7 = new PersistantAnnotation(7, "ec7", "locus7", "product7", 10800, 11129, SequenceUtils.STRAND_REV, FeatureType.CDS, "name7");
+        PersistantAnnotation feat1 = new PersistantAnnotation(1, "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
+        PersistantAnnotation feat2 = new PersistantAnnotation(2, "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
+        PersistantAnnotation feat3 = new PersistantAnnotation(3, "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
+        PersistantAnnotation feat4 = new PersistantAnnotation(4, "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
+        PersistantAnnotation feat5 = new PersistantAnnotation(5, "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
+        PersistantAnnotation feat6 = new PersistantAnnotation(6, "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
+        PersistantAnnotation feat7 = new PersistantAnnotation(7, "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
         PersistantSubAnnotation subfeat1 = new PersistantSubAnnotation(1, 1, 7, FeatureType.EXON); //ttt aaa g
         PersistantSubAnnotation subfeat2 = new PersistantSubAnnotation(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
         PersistantSubAnnotation subfeat3 = new PersistantSubAnnotation(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt
@@ -168,7 +168,7 @@ public class SnpTranslatorTest {
         snps.add(snp19);
         snps.add(snp20);        
                 
-        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, refSeq);
+        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantReference(1, "genome", "genome", refSeq, null));
         for (Snp snp : snps){
             snpTranslator.checkForAnnotation(snp);
         }

@@ -9,17 +9,9 @@
 package de.cebitec.vamp.tools.referenceEditor;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import de.cebitec.vamp.util.SequenceUtils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
 import org.openide.NotifyDescriptor;
 
 /**
@@ -77,6 +69,7 @@ public class ReferenceEditor extends javax.swing.JFrame {
 
         getSequenceButton.setText(org.openide.util.NbBundle.getMessage(ReferenceEditor.class, "ReferenceEditor.getSequenceButton.text")); // NOI18N
         getSequenceButton.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getSequenceButtonActionPerformed(evt);
             }
@@ -250,33 +243,12 @@ public class ReferenceEditor extends javax.swing.JFrame {
         for (int i = 0; i < readSeq.length(); i++) {
             Character base = readSeq.charAt(i);
             base = Character.toUpperCase(base);
-            base = getReverseComplement(base, readSeq);
-            revBase = revBase + base;
+            base = SequenceUtils.getDnaComplement(base);
+            revBase += base;
         }
         return revBase.toLowerCase();
     }
 
-
-private Character getReverseComplement(char base, String readSeq) {
-        Character rev = ' ';
-        if (base == 'A') {
-            rev = 'T';
-        } else if (base == 'C') {
-            rev = 'G';
-        } else if (base == 'G') {
-            rev = 'C';
-        } else if (base == 'T') {
-            rev = 'A';
-        } else if (base == 'N') {
-            rev = 'N';
-        } else if (base == '_') {
-            rev = '_';
-        } else {
-            rev = base;
-        }
-
-        return rev;
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner fromSpinner;

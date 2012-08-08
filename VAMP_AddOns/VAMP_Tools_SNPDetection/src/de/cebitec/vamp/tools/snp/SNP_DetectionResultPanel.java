@@ -176,7 +176,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", snpData, "SNP Table");
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", snpData, "SNP Table");
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
@@ -204,18 +204,17 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) snpTable.getModel();        
 
         //get all annotations from the reference to determine amino acid 
-        String refSeq = this.reference.getSequence();
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
-        List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, refSeq.length());
+        List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, reference.getRefLength());
         Map<Integer, PersistantAnnotation> annotationMap = new HashMap<Integer, PersistantAnnotation>();
         for (PersistantAnnotation annotation : annotationsSorted){
             annotationMap.put(annotation.getId(), annotation); //ids are unique
         }
-        List<PersistantSubAnnotation> subAnnotationsSorted = refGenCon.getSubAnnotationsForClosedInterval(0, refSeq.length());
+        List<PersistantSubAnnotation> subAnnotationsSorted = refGenCon.getSubAnnotationsForClosedInterval(0, reference.getRefLength());
         PersistantAnnotation.addSubAnnotations(annotationMap, subAnnotationsSorted);
         annotationMap.clear();
         
-        SnpTranslator snpTranslator = new SnpTranslator(annotationsSorted, refSeq);
+        SnpTranslator snpTranslator = new SnpTranslator(annotationsSorted, reference);
         
         for (SnpI snpi : snps) {
             
@@ -259,8 +258,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 }
 
                 if (codons.isEmpty()) {
-                    aminosRef = aminosRef.equals("") ? "No gene" : aminosRef;
-                    aminosSnp = aminosSnp.equals("") ? "No gene" : aminosSnp;
+                    aminosRef = aminosRef.isEmpty() ? "No gene" : aminosRef;
+                    aminosSnp = aminosSnp.isEmpty() ? "No gene" : aminosSnp;
 
                 }
                 rowData[13] = aminosSnp;
@@ -330,6 +329,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         this.reference = reference;
     }
 
+    /**
+     * Centers the position of the selected SNP in the bounds information manager.
+     * This leads to an update of alle viewers, sharing this bim.
+     */
     private void showSnpPosition() {
         DefaultListSelectionModel model = (DefaultListSelectionModel) snpTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
@@ -343,7 +346,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
      * Allows to set the path to the fdnaml executable to be used for tree reconstructions.
      */
     private void setFdnamlPath() {
-        VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, "") {
+        VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, new String[1], "") {
 
             @Override
             public void save(String fileLocation) {

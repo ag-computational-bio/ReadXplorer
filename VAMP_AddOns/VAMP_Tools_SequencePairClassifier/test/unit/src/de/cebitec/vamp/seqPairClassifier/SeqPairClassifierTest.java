@@ -1,24 +1,13 @@
 package de.cebitec.vamp.seqPairClassifier;
 
-import java.util.HashMap;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.CoverageContainer;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedSeqPairMapping;
-import java.util.List;
-import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedTrack;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Pair;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import junit.framework.Assert;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * @author Rolf Hilker
@@ -112,8 +101,8 @@ public class SeqPairClassifierTest {
     private ParsedMappingContainer mappings2 = new ParsedMappingContainer();
     private CoverageContainer coverageContainer = new CoverageContainer();
     private CoverageContainer coverageContainer2 = new CoverageContainer();
-    private ParsedTrack fwdTrack = new ParsedTrack("fwd track", mappings, coverageContainer);
-    private ParsedTrack revTrack = new ParsedTrack("rev track", mappings2, coverageContainer2);
+    private ParsedTrack fwdTrack = new ParsedTrack(1, "fwd track", mappings, coverageContainer, 1);
+    private ParsedTrack revTrack = new ParsedTrack(2, "rev track", mappings2, coverageContainer2, 1);
     
     private List<HashMap<String,Integer>> readnameToSeqIDMap = new ArrayList<HashMap<String,Integer>>();
     HashMap<String,Integer> map1 = new HashMap<String,Integer>();
@@ -286,10 +275,12 @@ public class SeqPairClassifierTest {
 
     /**
      * Test of classifySeqPairs method, of class SeqPairClassifier.
+     * @throws Exception 
      */
     @Test
     public void testClassifySeqPairs() throws Exception {
         System.out.println("calculateSeqPairs");
+        
         short orientation = 0; // 0 = fr, 1 = rf, 2 = ff/rr
         SeqPairClassifier seqPaircalc = new SeqPairClassifier(fwdTrack, revTrack, 500, 10, orientation);
         ParsedSeqPairContainer result = seqPaircalc.classifySeqPairs();

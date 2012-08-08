@@ -3,7 +3,6 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
-import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class OperonColumns implements ExcelExportDataI {
         for (Operon operon : operonDetection) {
             String annoName1 = "";
             String annoName2 = "";
-            String strand = (operon.getOperonAdjacencies().get(0).getAnnotation1().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
+            String strand = (operon.getOperonAdjacencies().get(0).getAnnotation1().isFwdStrand() ? "Fwd" : "Rev") + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";

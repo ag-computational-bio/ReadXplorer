@@ -8,6 +8,9 @@ package de.cebitec.vamp.ui.importer;
  */
 public interface NewJobDialogI {
 
+    /**
+     * @return true, if all required info for this job dialog is set, false otherwise.
+     */
     public boolean isRequiredInfoSet();
 
 }

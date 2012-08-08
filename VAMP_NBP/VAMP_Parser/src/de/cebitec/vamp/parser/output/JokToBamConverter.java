@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.output;
 
 import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SamUtils;
@@ -19,7 +20,7 @@ import org.openide.util.NbBundle;
  * 
  * @author -Rolf Hilker-
  */
-public class JokToBamConverter implements ConverterI, ParserI, Observable, Observer {
+public class JokToBamConverter implements ConverterI, Observable, Observer {
 
     private File jokFile;
     private String refSeqName;
@@ -27,7 +28,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
     
     private static String name = "Jok to BAM Converter";
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
-    private static String fileDescription = "Jok Input, BAM Output";
+    private static String fileDescription = "Saruman Output (jok)";
     private ArrayList<Observer> observers;
     private String msg;
 
@@ -36,12 +37,13 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
      * on the reference genome. 
      */
     public JokToBamConverter() {
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
     }
 
     /**
      * @param jokFile Sets the jok file to convert into BAM format.
      * @param refSeqName name of the reference sequence
+     * @param refSeqLength length of the reference sequence 
      */
     public void setDataToConvert(File jokFile, String refSeqName, int refSeqLength) {
         this.jokFile = jokFile;
@@ -58,6 +60,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
      * Actually converts the jok file into a bam file.
      */
     private void convertJokToBam() throws ParsingException {
+        long startTime = System.currentTimeMillis();
         String fileName = jokFile.getName();
         int noReads = 0;
         try {
@@ -73,7 +76,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
             //Create the bam file header
             SAMFileHeader fileHeader = new SAMFileHeader();
 //            fileHeader.addComment("");
-            List<SAMSequenceRecord> samRecords = new ArrayList<SAMSequenceRecord>();
+            List<SAMSequenceRecord> samRecords = new ArrayList<>();
             SAMSequenceRecord seqRecord = new SAMSequenceRecord(refSeqName, refSeqLength);
             samRecords.add(seqRecord);
             
@@ -85,23 +88,34 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
 //            SAMFileWriter samFileWriter = factory.makeSAMWriter(fileHeader, false, new File(outputFile + ".sam"));
 
             //read the input file
+            String[] tokens;
             int lineno = 0;
             String line = null;
+            byte direction;
+            String readSeq;
+            String refSeq;
+            int errors;
+            String readwithoutGaps;
+            String readName;
+            int start;
+            int stop;
+            String cigar;
+            SAMRecord samRecord;
             while ((line = br.readLine()) != null) {
                 lineno++;
 
                 // tokenize input line
-                String[] tokens = line.split("\\t+", 8);
+                tokens = line.split("\\t+", 8);
                 if (tokens.length == 7) { // if the length is not correct the read is not parsed
                     // cast tokens
-                    String readName = tokens[0];
-                    int start = -2;
-                    int stop = -1;
+                    readName = tokens[0];
+                    start = -2;
+                    stop = -1;
                     try {
                         start = Integer.parseInt(tokens[1]);
                         stop = Integer.parseInt(tokens[2]);
-                        start++;
-                        stop++; // some people (no names here...) start counting at 0, I count genome position starting with 1
+                        ++start;
+                        ++stop; // some people (no names here...) start counting at 0, I count genome position starting with 1
                     } catch (NumberFormatException e) { //
                         if (!tokens[1].equals("*")) {
                             this.sendMsg("Value for current start position in "
@@ -116,15 +130,14 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
                         continue; //*'s are ignored = unmapped read
                     }
 
-                    byte direction = 0;
+                    direction = 0;
                     if (tokens[3].equals(">>")) {
                         direction = 1;
                     } else if (tokens[3].equals("<<")) {
                         direction = -1;
                     }
-                    String readSeq = tokens[4];
-                    String refSeq = tokens[5];
-                    int errors;
+                    readSeq = tokens[4];
+                    refSeq = tokens[5];
                     try {
                         errors = Integer.parseInt(tokens[6]);
                     } catch (NumberFormatException e) {
@@ -179,7 +192,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
                     }
                     
                     // parse read        
-                    String readwithoutGaps; //generate read without gaps
+                     //generate read without gaps
                     if (readSeq.contains("_")) {
                         readwithoutGaps = readSeq.replaceAll("_+", "");
                     } else {
@@ -188,12 +201,12 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
                     //Saruman flips only the read string by mapping so we can get the native read direction
 //                    readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
                     
-                    String cigar = this.createCigar(readSeq, refSeq);
+                    cigar = this.createCigar(readSeq, refSeq);
                     
                     
                     //Calculate flags to set for this read as hexadecimal number
                     
-                    SAMRecord samRecord = new SAMRecord(fileHeader);
+                    samRecord = new SAMRecord(fileHeader);
                     samRecord.setReadName(readName);
                     
                     samRecord.setReadNegativeStrandFlag(direction == 1 ? false : true); //needed or set with flags?
@@ -235,10 +248,12 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
             SAMFileReader samFileReader = new SAMFileReader(outputFile);
             SamUtils samUtils = new SamUtils();
             samUtils.registerObserver(this);
-            samUtils.createIndex(samFileReader, new File(outputFile + ".bai"), this);
+            samUtils.createIndex(samFileReader, new File(outputFile + ".bai"));
             samFileReader.close();
 
-            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Finished", outFileName));
+            long finish = System.currentTimeMillis();
+            String msg = NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Finished", outFileName);
+            this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
 
         } catch (IOException ex) {
             throw new ParsingException(ex);
@@ -324,7 +339,7 @@ public class JokToBamConverter implements ConverterI, ParserI, Observable, Obser
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 

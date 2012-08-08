@@ -1,8 +1,8 @@
 package de.cebitec.vamp.controller;
 
+import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
@@ -10,11 +10,7 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dialogMenus.OpenRefGenPanel;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import java.awt.Dialog;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
@@ -85,6 +81,10 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
     }
 
+    /**
+     * Opens a dialog with all available tracks for the current reference genome.
+     * After selecting a track, the associated track viewer is opened.
+     */
     public void openTrack() {
         OpenTrackPanelList otp = new OpenTrackPanelList(currentRefGen.getId());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Track");
@@ -96,11 +96,13 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 // create basepanel
                 BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
-                currentTracks.add(trackPanel);
-                trackToPanel.put(track, trackPanel);
-                
-                // show the panel and the track
-                getApp().showTrackPanel(trackPanel);
+                if (trackPanel != null) {
+                    currentTracks.add(trackPanel);
+                    trackToPanel.put(track, trackPanel);
+
+                    // show the panel and the track
+                    getApp().showTrackPanel(trackPanel);
+                }
                 
             }
         } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {

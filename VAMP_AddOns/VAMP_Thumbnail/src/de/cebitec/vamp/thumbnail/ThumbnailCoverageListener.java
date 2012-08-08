@@ -1,6 +1,7 @@
 package de.cebitec.vamp.thumbnail;
 
 import de.cebitec.vamp.databackend.ThreadListener;
+import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
@@ -17,10 +18,11 @@ class ThumbnailCoverageListener implements ThreadListener{
     }
 
    @Override
-    public void receiveData(Object coverageData) {
-       if (coverageData instanceof PersistantCoverage) {
+    public void receiveData(Object resultData) {
+       if (resultData instanceof CoverageAndDiffResultPersistant) {
            //Grenzen neu malen
-           PersistantCoverage coverage = (PersistantCoverage) coverageData;
+           CoverageAndDiffResultPersistant coverageResult = (CoverageAndDiffResultPersistant) resultData;
+           PersistantCoverage coverage = coverageResult.getCoverage();
            int middle = coverage.getLeftBound() + ((coverage.getRightBound() - coverage.getLeftBound()) / 2);
            int width = coverage.getRightBound() - coverage.getLeftBound();
            trackViewer.receiveData(coverage);

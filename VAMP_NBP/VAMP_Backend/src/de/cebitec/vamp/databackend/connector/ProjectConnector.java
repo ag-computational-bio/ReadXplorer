@@ -1,42 +1,19 @@
 package de.cebitec.vamp.databackend.connector;
 
-import de.cebitec.vamp.databackend.dataObjects.Snp;
-import de.cebitec.vamp.databackend.FieldNames;
-import de.cebitec.vamp.databackend.GenericSQLQueries;
-import de.cebitec.vamp.databackend.H2SQLStatements;
-import de.cebitec.vamp.databackend.MySQLStatements;
-import de.cebitec.vamp.databackend.SQLStatements;
+import de.cebitec.vamp.databackend.*;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.CoverageContainer;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedAnnotation;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
-import de.cebitec.vamp.parser.common.ParsedReference;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedTrack;
-import de.cebitec.vamp.parser.common.ParsedSeqPairMapping;
-import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -58,7 +35,8 @@ public class ProjectConnector {
     private String password;
     private String adapter;
     private HashMap<Integer, TrackConnector> trackConnectors;
-    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
+//    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
+    private List<MultiTrackConnector> multiTrackConnectors;
     private HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
     private final static int ANNOTATION_BATCH_SIZE = BATCH_SIZE;
@@ -94,9 +72,10 @@ public class ProjectConnector {
     private boolean isLastTrack = false;
     
     private ProjectConnector() {
-        trackConnectors = new HashMap<Integer, TrackConnector>();
-        multiTrackConnectors = new HashMap<Integer, MultiTrackConnector>();
-        refConnectors = new HashMap<Integer, ReferenceConnector>();
+        trackConnectors = new HashMap<>();
+//        multiTrackConnectors = new HashMap<Integer, MultiTrackConnector>();
+        multiTrackConnectors = new ArrayList<>();
+        refConnectors = new HashMap<>();
     }
 
     private void cleanUp() {
@@ -116,7 +95,7 @@ public class ProjectConnector {
      */
     public List<PersistantTrack> getTracks() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading track data from database");
-        ArrayList<PersistantTrack> tracks = new ArrayList<PersistantTrack>();
+        List<PersistantTrack> tracks = new ArrayList<>();
 
         try {
             PreparedStatement fetchTracks = con.prepareStatement(SQLStatements.FETCH_TRACKS);
@@ -188,8 +167,8 @@ public class ProjectConnector {
 
             this.connectH2DataBase(url);
             this.setupDatabaseH2();
-        } else { //means: if (adapter.equalsIgnoreCase(Properties.ADAPTER_DIRECT_ACCESS)) {
-            this.connectToProject(projectLocation);
+//        } else { //means: if (adapter.equalsIgnoreCase(Properties.ADAPTER_DIRECT_ACCESS)) {
+//            this.connectToProject(projectLocation);
         }
     }
 
@@ -209,11 +188,11 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to database");
     }
     
-    private void connectToProject(String projectLocation) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to project");
-        //TODO: write code for connecting to a project...
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to project");
-    }
+//    private void connectToProject(String projectLocation) {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to project");
+//        //TODO: write code for connecting to a project...
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to project");
+//    }
 
     
     private void setupDatabaseH2() {
@@ -627,8 +606,7 @@ public class ProjectConnector {
             try {
                 PreparedStatement insertCoverage = con.prepareStatement(SQLStatements.INSERT_COVERAGE);
                 // get the latest used coverage id
-                int id = -1;
-                id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_COVERAGE_ID, con);
+                int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_COVERAGE_ID, con);
 
                 // insert coverage for track
                 int batchCounter = 1;
@@ -697,15 +675,12 @@ public class ProjectConnector {
 
     /**
      * Adds a track to the database with its file path. This means, it is stored
-     * as a track for direct file access
+     * as a track for direct file access and adds the persistant track id to the 
+     * track job.
      * @param trackJob the track job containing the track information to store
      */
-    public int storeDirectAccessTrack(TrackJob trackJob) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");
-        
-        int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_ID, con);
-        this.currentTrackID = ++id;
-        trackJob.setIdPersistant(this.currentTrackID);
+    public void storeDirectAccessTrack(TrackJob trackJob) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");       
         
         try {
             PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
@@ -723,48 +698,44 @@ public class ProjectConnector {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");
-        return id;
-        
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");        
     }
     
-    private int storeTrack(ParsedTrack track, long refGenID) {
+    /**
+     * Method explicitly storing a track in the database. This means all basic
+     * information of a track, which is stored in the track table of the db.
+     * @param track the track whose data is to be stored
+     */
+    private void storeTrack(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        int id = -1;
         try {
-            if (track.isFirstTrack() | !track.isStepwise()) {
-                id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_ID, con);
+            if (track.isFirstTrack() || !track.isStepwise()) {
                 PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
 
                 // store track in table
-                insertTrack.setLong(1, id);
-                insertTrack.setLong(2, refGenID);
+                insertTrack.setLong(1, track.getID());
+                insertTrack.setLong(2, track.getRefId());
                 insertTrack.setString(3, track.getDescription());
                 insertTrack.setTimestamp(4, track.getTimestamp());
                 insertTrack.setString(5, ""); //since the path is not stored - not a direct access track
                 insertTrack.execute();
 
                 insertTrack.close();
-                currentTrackID = id;
-                track.setID(id);
-            } else {
-                track.setID(currentTrackID);
             }
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
-        return id;
     }
 
 
     private void storeTrackStatistics(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics data...");
 
-        int coveragePerf = 0;
-        int coverageBM = 0;
-        int coverageComplete = 0;
+        int coveragePerf;
+        int coverageBM;
+        int coverageComplete;
         long trackID = track.getID();
         try {
             HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
@@ -781,8 +752,7 @@ public class ProjectConnector {
         try {
             if (!track.isStepwise() || this.isLastTrack) {
             // get latest id for track
-            long id = -1;
-            id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
+            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
 
                 CoverageContainer cov = track.getCoverageContainer();
                 if (cov.getCoveredPerfectPositions() > 0) {
@@ -807,8 +777,7 @@ public class ProjectConnector {
                 }
                 
                 //calculate average read length
-                int averageReadLength = 0;
-                averageReadLength = this.numMappings != 0 ? this.sumReadLength / this.numMappings : 0;
+                int averageReadLength = this.numMappings != 0 ? this.sumReadLength / this.numMappings : 0;
                 
                 PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
                 // store track in table
@@ -1041,13 +1010,12 @@ public class ProjectConnector {
     /**
      * Adds a all track data to the database.
      * @param track track to add
-     * @param refGenID id of the reference genome
      * @param seqPairs true, if this is a sequence pair track, false otherwise
      * @param onlyPosTable true, if only the position table is to be stored, false in the ordinary "import track" scenario
      * @return the track id used in the database
      * @throws StorageException 
      */
-    public int addTrack(ParsedTrack track, long refGenID, boolean seqPairs, boolean onlyPosTable) throws StorageException {
+    public int addTrack(ParsedTrack track, boolean seqPairs, boolean onlyPosTable) throws StorageException {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
 
@@ -1057,7 +1025,7 @@ public class ProjectConnector {
         }
         isLastTrack = track.getParsedMappingContainer().isLastMappingContainer();
         if (!onlyPosTable) {
-            this.storeTrack(track, refGenID);
+            this.storeTrack(track);
             this.storeCoverage(track);
             this.storeMappings(track);
             this.storeDiffs(track);
@@ -1183,11 +1151,12 @@ public class ProjectConnector {
 
     public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) {
         // only return new object, if no suitable connector was created before
-        int trackID = track.getId();
-        if (!multiTrackConnectors.containsKey(trackID)) {
-            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
-        }
-        return multiTrackConnectors.get(trackID);
+//        int trackID = track.getId();
+//        if (!multiTrackConnectors.containsKey(trackID)) { //old solution, which does not work anymore
+//            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
+//        }
+//        return multiTrackConnectors.get(trackID);
+        return new MultiTrackConnector(track, adapter);
     }
     
     
@@ -1198,7 +1167,7 @@ public class ProjectConnector {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
+//        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
         return multiTrackConnectors.get(id);
     }
     
@@ -1212,14 +1181,22 @@ public class ProjectConnector {
         }
     }
     
+//    /**
+//     * Removes the multi track connector for the given trackId.
+//     * @param trackId track id of the multi track connector to remove
+//     */
+//    public void removeMultiTrackConnector(int trackId){
+//        if (multiTrackConnectors.containsKey(trackId)){
+//            multiTrackConnectors.remove(trackId);
+//        }
+//    }
+    
     /**
      * Removes the multi track connector for the given trackId.
-     * @param trackId track id of the multi track connector to remove
+     * @param trackCon track connector of the multi track connector to remove
      */
-    public void removeMultiTrackConnector(int trackId){
-        if (multiTrackConnectors.containsKey(trackId)){
-            multiTrackConnectors.remove(trackId);
-        }
+    public void removeMultiTrackConnector(MultiTrackConnector trackCon) {
+        multiTrackConnectors.remove(trackCon);
     }
 
     /**
@@ -1228,9 +1205,9 @@ public class ProjectConnector {
      * @return the names of all currently opened tracks hashed to their track id.
      */
     public HashMap<Integer, String> getOpenedTrackNames() {
-        HashMap<Integer, String> namesList = new HashMap<Integer, String>();
+        HashMap<Integer, String> namesList = new HashMap<>();
         Iterator<Integer> it = this.trackConnectors.keySet().iterator();
-        int nextId = -1;
+        int nextId;
         while (it.hasNext()) {
             nextId = it.next();
             namesList.put(nextId, this.trackConnectors.get(nextId).getAssociatedTrackName());
@@ -1270,7 +1247,7 @@ public class ProjectConnector {
     
     public List<PersistantReference> getGenomes() throws OutOfMemoryError {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
-        ArrayList<PersistantReference> refGens = new ArrayList<PersistantReference>();
+        ArrayList<PersistantReference> refGens = new ArrayList<>();
 
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES);
@@ -1280,8 +1257,7 @@ public class ProjectConnector {
                 int id = rs.getInt(FieldNames.REF_GEN_ID);
                 String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
                 String name = rs.getString(FieldNames.REF_GEN_NAME);
-                String sequence = null;
-                sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
+                String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
                 Timestamp timestamp = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
                 refGens.add(new PersistantReference(id, name, description, sequence, timestamp));
             }
@@ -1419,6 +1395,10 @@ public class ProjectConnector {
 
     }
 
+    /**
+     * Helper method for storing the sequence pair data to the database.
+     * @param seqPairData sequence pair data container holding the data to store
+     */
     private void storeSeqPairData(ParsedSeqPairContainer seqPairData) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair data...");
         try {
@@ -1560,31 +1540,20 @@ public class ProjectConnector {
      * one with the most occurrences at a certain position.
      * @param track 
      */
-    private void storePositionTable(ParsedTrack track) {
+    public void storePositionTable(ParsedTrack track) {
 
-        if (!track.isStepwise() | isLastTrack) {
+        if (!track.isStepwise() || isLastTrack) { //NEXT STEP: check where id of track is set wrongly!
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, String.valueOf(currentTimestamp));
             try {
                 long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
-                PreparedStatement getGenomeID = con.prepareStatement(SQLStatements.FETCH_GENOMEID_FOR_TRACK);
                 PreparedStatement getRefSeq = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
                 PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION);
                 // get latest snpID used
 
-                String refSeq = "";
-
                 //get reference sequence
-                getGenomeID.setLong(1, track.getID());
-                long genomeID = 0;
-                ResultSet qs = getGenomeID.executeQuery();
-                if (qs.next()) {
-                    genomeID = qs.getLong(FieldNames.TRACK_REFERENCE_ID);
-                }
-                getRefSeq.setLong(1, genomeID);
-                refSeq = "";
+                getRefSeq.setLong(1, track.getRefId());
+                String refSeq = "";
                 ResultSet os = getRefSeq.executeQuery();
                 if (os.next()) {
                     refSeq = os.getString(FieldNames.REF_GEN_SEQUENCE);
@@ -1595,43 +1564,54 @@ public class ProjectConnector {
                 int counterUncoveredGaps = 0;
 
                 // go through positionTable
-                HashMap<String, Integer[]> positionTable = track.getCoverageContainer().getPositionTable();
+                CoverageContainer coverageContainer = track.getCoverageContainer();
+                HashMap<String, Integer[]> positionTable = coverageContainer.getPositionTable();
                 Iterator<String> positionIterator = positionTable.keySet().iterator();
 
+                //all parameters needed in while loop (efficiency)
+                String posString;
+                Integer[] coverageValues;
+                int maxCount;
+                int typeInt;
+                int position;
+                double cov;
+                double coverage;
+                double forwCov;
+                double revCov;
+                double frequency;
+                char type;
+                char base;
+                String refBase;
+                int baseInt;
+                
                 while (positionIterator.hasNext()) {
 
-                    String posString = positionIterator.next();
-                    Integer[] coverageValues = positionTable.get(posString);
+                    posString = positionIterator.next();
+                    coverageValues = positionTable.get(posString);
 
                     // i=0..5 is ACGTN_GAP (DIFFS) ...
-                    int maxCount = 0;
-                    int typeInt = 0;
+                    maxCount = 0;
+                    typeInt = 0;
                     for (int i = 0; i <= BASE_GAP; i++) {
                         if (maxCount < coverageValues[i]) {
                             maxCount = coverageValues[i];
                             typeInt = i;
                         }
                     }
-
-                    int position = -1;
+                    
                     if (maxCount != 0) {
 
                         position = PositionUtils.convertPosition(posString);
-                        double cov = 0;
                         // get coverage
-                        if (track.getCoverageContainer().positionCovered(position)) {
-                            double forwCov = track.getCoverageContainer().getBestMappingForwardCoverage(position);
-                            double revCov = track.getCoverageContainer().getBestMappingReverseCoverage(position);
+                        if (coverageContainer.positionCovered(position)) {
+                            forwCov = coverageContainer.getBestMappingForwardCoverage(position);
+                            revCov = coverageContainer.getBestMappingReverseCoverage(position);
                             cov = forwCov + revCov;
                             cov = cov == 0 ? 1 : cov;
 
-                            double frequency = 0;
-                            char type = ' ';
-                            char base = ' ';
-                            String refBase = "";
                             // get consensus base
                             refBase = String.valueOf(refSeq.charAt(position - 1)).toUpperCase();
-                            int baseInt = this.getBaseInt(refBase);
+                            baseInt = this.getBaseInt(refBase);
                             coverageValues[baseInt] = (int) cov - coverageValues[11];
                             coverageValues[baseInt] = coverageValues[baseInt] < 0 ? 0 : coverageValues[baseInt]; //check if negative
                             if (maxCount < coverageValues[baseInt]) {
@@ -1694,25 +1674,25 @@ public class ProjectConnector {
                         double revCov1 = 0;
                         double forwCov2 = 0;
                         double revCov2 = 0;
-                        if (track.getCoverageContainer().positionCovered(position)) {
-                            forwCov1 = track.getCoverageContainer().getBestMappingForwardCoverage(position);
-                            revCov1 = track.getCoverageContainer().getBestMappingReverseCoverage(position);
+                        if (coverageContainer.positionCovered(position)) {
+                            forwCov1 = coverageContainer.getBestMappingForwardCoverage(position);
+                            revCov1 = coverageContainer.getBestMappingReverseCoverage(position);
                         } else {
                             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredGaps + " uncovered position in gaps: {0}", position);
                         }
 
-                        if (track.getCoverageContainer().positionCovered(position + 1)) {
-                            forwCov2 = track.getCoverageContainer().getBestMappingForwardCoverage(position + 1);
-                            revCov2 = track.getCoverageContainer().getBestMappingReverseCoverage(position + 1);
+                        if (coverageContainer.positionCovered(position + 1)) {
+                            forwCov2 = coverageContainer.getBestMappingForwardCoverage(position + 1);
+                            revCov2 = coverageContainer.getBestMappingReverseCoverage(position + 1);
                         }
 
-                        double forwCov = (forwCov1 + forwCov2) / 2;
-                        double revCov = (revCov1 + revCov2) / 2;
-                        double cov = forwCov + revCov;
-                        double coverage = forwCov1 + revCov1;
+                        forwCov = (forwCov1 + forwCov2) / 2;
+                        revCov = (revCov1 + revCov2) / 2;
+                        cov = forwCov + revCov;
+                        coverage = forwCov1 + revCov1;
                         coverage = coverage == 0 ? 1 : coverage;
 
-                        double frequency = coverageValues[11] / coverage * 100;
+                        frequency = coverageValues[11] / coverage * 100;
                         frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
 
                         insertPosition.setLong(1, snpID);
@@ -1806,19 +1786,13 @@ public class ProjectConnector {
     private int getBaseInt(String base) {
 
         int baseInt = 0;
-
-        if (base.toUpperCase().equals("A")) {
-            baseInt = BASE_A;
-        } else if (base.toUpperCase().equals("C")) {
-            baseInt = BASE_C;
-        } else if (base.toUpperCase().equals("G")) {
-            baseInt = BASE_G;
-        } else if (base.toUpperCase().equals("T")) {
-            baseInt = BASE_T;
-        } else if (base.toUpperCase().equals("N")) {
-            baseInt = BASE_N;
-        } else if (base.toUpperCase().equals("_")) {
-            baseInt = BASE_GAP;
+        switch (base.toUpperCase()) {
+            case "A": baseInt = BASE_A; break;
+            case "C": baseInt = BASE_C; break;
+            case "G": baseInt = BASE_G; break;
+            case "T": baseInt = BASE_T; break;
+            case "N": baseInt = BASE_N; break;
+            case "_": baseInt = BASE_GAP; break;
         }
 
         return baseInt;
@@ -1833,7 +1807,7 @@ public class ProjectConnector {
      * @return list of snps found in the opened tracks for the given criteria
      */
     public List<SnpI> findSNPs(int percentageThreshold, int absThreshold, List<Integer> trackIds) {
-        ArrayList<SnpI> snps = new ArrayList<SnpI>();
+        List<SnpI> snps = new ArrayList<>();
         if (trackIds.isEmpty()){
             String msg = NbBundle.getMessage(ProjectConnector.class, "ProjectConnector.NoTracksMsg", 
                         "When no track are opened/chosen, no result can be returned!");
@@ -1870,7 +1844,7 @@ public class ProjectConnector {
                     snps.add(new Snp(position, trackId, base, refBase, aRate, cRate, gRate,
                             tRate, nRate, gapRate, coverage, frequency, type));
                     if (coverage == 0){
-                        int a=0; //TODO: remove this
+                        System.out.println("Coverage is zero"); //TODO: remove this
                     }
                 }
 
@@ -1887,6 +1861,43 @@ public class ProjectConnector {
      */
     public String getAdapter() {
         return this.adapter;
+    }
+
+    /**
+     * Resets the file path of a direct access track.
+     * @param track track whose file path has to be resetted.
+     * @throws StorageException 
+     */
+    public void resetTrackPath(PersistantTrack track) throws StorageException {
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
+
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
+            this.lockTrackDomainTables();
+            this.disableTrackDomainIndices();
+        }
+        
+        try (PreparedStatement resetTrackPath = con.prepareStatement(SQLStatements.RESET_TRACK)) {
+                resetTrackPath.setString(1, track.getFilePath());
+                resetTrackPath.setLong(2, track.getId());
+                resetTrackPath.execute();
+        } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
+            this.enableTrackDomainIndices();
+            this.unlockTables();
+        }
+        
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription());
+    }
+    
+    /**
+     * @return the latest track id used in the database + 1 = the next id to use.
+     */
+    public int getLatestTrackId() {
+        return (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_ID, con);
     }
     
 }

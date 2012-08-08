@@ -16,6 +16,7 @@ import org.openide.util.lookup.InstanceContent;
  */
 public class CentralLookup extends AbstractLookup {
 
+    private static final long serialVersionUID = 8835897;
     private InstanceContent content = null;
     private static CentralLookup def = new CentralLookup();
 

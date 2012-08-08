@@ -1,12 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.DiffAndGapResult;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -30,6 +25,8 @@ public class UniqueJokParser implements MappingParserI {
     private static String name = "Unique Reads Jok Output Parser";
     private static String[] fileExtension = new String[]{"out"};
     private static String fileDescription = "Jok Output";
+    
+    private SeqPairProcessorI seqPairProcessor;
     private ArrayList<Observer> observers;
     private String errorMsg;
     private int noUniqueMappings;
@@ -37,6 +34,23 @@ public class UniqueJokParser implements MappingParserI {
 
     public UniqueJokParser() {
         this.observers = new ArrayList<Observer>();
+        this.seqPairProcessor = new SeqPairProcessorDummy();
+    }
+    
+    /**
+     * Parser for parsing jok data files for vamp in a slightly different
+     * version of the JokParser. In contrast to the JokParser, this parser
+     * expects filtered mapping results, such that each duplicate read was
+     * filtered BEFORE the mapping and the abundance of this read is encoded in
+     * the readname by adding #x to the readname, with x being the number of
+     * equal sequences found during the filtering step.. Use this constructor
+     * for parsing sequence pair data along with the ordinary track data.
+     * @param seqPairProcessor the specific sequence pair processor for handling
+     *      sequence pair data
+     */
+    public UniqueJokParser(SeqPairProcessorI seqPairProcessor) {
+        this();
+        this.seqPairProcessor = seqPairProcessor;
     }
 
     @Override
@@ -51,10 +65,10 @@ public class UniqueJokParser implements MappingParserI {
             int lineno = 0;
             int start;
             int stop;
-            int errors;
+            int differences;
             this.noUniqueMappings = 0;
             int noUniqueSeq = 0;
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) { //reads the input file line per line
                 lineno++;
 
@@ -64,8 +78,6 @@ public class UniqueJokParser implements MappingParserI {
 
                     // cast tokens
                     String readname = tokens[0];
-                    start = -2;
-                    stop = -1;
                     try {
                         start = Integer.parseInt(tokens[1]);
                         stop = Integer.parseInt(tokens[2]);
@@ -92,9 +104,8 @@ public class UniqueJokParser implements MappingParserI {
                     }
                     String readSeq = tokens[4];
                     String refSeq = tokens[5];
-                    errors = 0;
                     try {
-                        errors = Integer.parseInt(tokens[6]);
+                        differences = Integer.parseInt(tokens[6]);
                     } catch (NumberFormatException e){
                         this.sendErrorMsg("Value for errors in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number. "
@@ -154,16 +165,21 @@ public class UniqueJokParser implements MappingParserI {
                     DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
-                    errors = result.getErrors();
+                    if (differences != result.getDifferences()) {
+                        this.sendErrorMsg("Value for current differences in "
+                                + trackJob.getFile().getName() + " line " + lineno + " is differing from newly calculated number of differences."
+                                + "Found differences: " + differences + " versus: " + result.getDifferences());
+                        continue;
+                    }
                     
-                    if (errors < 0 || errors > readSeq.length()) {
-                        this.sendErrorMsg("Error number has invalid value " + errors
+                    if (differences < 0 || differences > readSeq.length()) {
+                        this.sendErrorMsg("Error number has invalid value " + differences
                                 + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
                                 + "Must be bigger or equal to zero and smaller than alignment length.");
                         continue;
                     }
 
-                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
+                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
                     mapping.setCount(count);
 
                     int seqID;
@@ -174,7 +190,7 @@ public class UniqueJokParser implements MappingParserI {
                         this.seqToIDMap.put(readSeq, seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
-                    this.processReadname(seqID, readname);
+                    this.seqPairProcessor.processReadname(seqID, readname);
                 } else {
                     this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
                 }
@@ -197,7 +213,7 @@ public class UniqueJokParser implements MappingParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 
@@ -233,7 +249,7 @@ public class UniqueJokParser implements MappingParserI {
     }
 
     @Override
-    public void processReadname(int seqID, String readName) {
-        //nothing to do here
+    public SeqPairProcessorI getSeqPairProcessor() {
+        return this.seqPairProcessor;
     }
 }

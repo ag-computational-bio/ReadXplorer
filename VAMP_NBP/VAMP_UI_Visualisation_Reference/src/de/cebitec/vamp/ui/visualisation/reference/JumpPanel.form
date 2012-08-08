@@ -37,7 +37,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jumpTextfield" pref="281" max="32767" attributes="1"/>
+                  <Component id="jumpTextfield" pref="206" max="32767" attributes="1"/>
                   <Component id="searchPatternField" alignment="0" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -93,7 +93,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="filterProperties" alignment="0" min="0" max="32767" attributes="1"/>
+              <Component id="filterProperties" alignment="0" min="0" pref="174" max="32767" attributes="1"/>
               <Component id="tableScrollPane" alignment="0" pref="0" max="32767" attributes="1"/>
           </Group>
         </DimensionLayout>
@@ -102,7 +102,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="filterProperties" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tableScrollPane" pref="334" max="32767" attributes="0"/>
+                  <Component id="tableScrollPane" pref="330" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -120,17 +120,15 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jumpFilterLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="filterForLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
+                              <Component id="jumpFilterLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                               <Component id="filterTextfield" max="32767" attributes="1"/>
                           </Group>
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="filterForLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="radioAnnotationButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -153,7 +151,7 @@
                           <Component id="jumpFilterLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="filterTextfield" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace pref="6" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="filterForLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioProduct" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -161,7 +159,7 @@
                           <Component id="radioAnnotationButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioGene" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -204,7 +202,7 @@
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="buttonGroup1"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="EC-Number"/>
+                <Property name="text" type="java.lang.String" value="EC-Num"/>
                 <Property name="actionCommand" type="java.lang.String" value="ec"/>
               </Properties>
               <Events>

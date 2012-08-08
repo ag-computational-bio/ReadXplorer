@@ -197,7 +197,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return parserName;
     }
 

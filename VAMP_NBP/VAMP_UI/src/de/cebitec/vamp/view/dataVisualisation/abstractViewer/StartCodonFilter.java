@@ -43,6 +43,9 @@ public class StartCodonFilter implements RegionFilterI {
      * Filters for start and stop codons in two ways: First for all available start 
      * codons in a specified region and second for all start codons of a given frame 
      * for a specified region.
+     * @param absStart start of the region to search in
+     * @param absStop end of the region to search in
+     * @param refGen the reference in which to search
      */
     public StartCodonFilter(int absStart, int absStop, PersistantReference refGen){
         this.pref = NbPreferences.forModule(Object.class);
@@ -75,7 +78,7 @@ public class StartCodonFilter implements RegionFilterI {
             int offset = 3;
             int start = absStart - offset;
             int stop = absStop + 2;
-            int genomeLength = refGen.getSequence().length();
+            int genomeLength = refGen.getRefLength();
 
             if (stop > 0) {
                 if (start < 0) {

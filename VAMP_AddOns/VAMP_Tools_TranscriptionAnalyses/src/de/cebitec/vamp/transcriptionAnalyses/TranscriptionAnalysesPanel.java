@@ -26,6 +26,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
     private AnalysisFilterGenes analysisFilteredGenes;
     private AnalysisOperon analysisOperon;
     private boolean detectTranscriptionStarts;
+    private boolean detectUnannotatedTranscripts;
     private boolean transcriptionStartAutomatic;
     private boolean filterGenes;
     private boolean detectOperons;
@@ -44,6 +45,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         this.analysisTSS = null;
         this.analysisFilteredGenes = null;
         this.detectTranscriptionStarts = false;
+        this.detectUnannotatedTranscripts = false;
         this.filterGenes = false;
     }
 
@@ -85,6 +87,9 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         operonDetectionAutomaticBox = new javax.swing.JCheckBox();
         filteredGenesField2 = new javax.swing.JTextField();
         filteredGenesLabel2 = new javax.swing.JLabel();
+        unannotatedTranscriptsBox = new javax.swing.JCheckBox();
+        transcriptExtensionField = new javax.swing.JTextField();
+        transcriptExtensionLabel = new javax.swing.JLabel();
         resultTabs = new javax.swing.JTabbedPane();
 
         menuResultSplitPane.setDividerLocation(230);
@@ -234,53 +239,68 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
         filteredGenesLabel2.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.filteredGenesLabel2.text")); // NOI18N
 
+        unannotatedTranscriptsBox.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.unannotatedTranscriptsBox.text")); // NOI18N
+
+        transcriptExtensionField.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptExtensionField.text")); // NOI18N
+
+        transcriptExtensionLabel.setText(org.openide.util.NbBundle.getMessage(TranscriptionAnalysesPanel.class, "TranscriptionAnalysesPanel.transcriptExtensionLabel.text_1")); // NOI18N
+
         javax.swing.GroupLayout menuPanelLayout = new javax.swing.GroupLayout(menuPanel);
         menuPanel.setLayout(menuPanelLayout);
         menuPanelLayout.setHorizontalGroup(
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator2)
-            .addComponent(jSeparator3)
-            .addComponent(jSeparator1)
             .addGroup(menuPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(menuPanelLayout.createSequentialGroup()
-                        .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(detectionButton)
-                            .addComponent(menuLabel)
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(transcriptionStartField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptionStartLabel))
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(transcriptionStartField2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptionStartLabel1))
-                            .addComponent(filteredGenesBox)
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(filteredGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(filteredGenesLabel))
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(transcriptionStartBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptionStartAutomaticBox))
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(operonField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(operonLabel))
-                            .addGroup(menuPanelLayout.createSequentialGroup()
-                                .addComponent(filteredGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(filteredGenesLabel2)))
-                        .addContainerGap())
-                    .addComponent(jSeparator4)
+                        .addComponent(unannotatedTranscriptsBox)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(menuPanelLayout.createSequentialGroup()
-                        .addComponent(operonDetectionBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(operonDetectionAutomaticBox)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator3)
+                            .addComponent(jSeparator1)
+                            .addComponent(jSeparator4)
+                            .addGroup(menuPanelLayout.createSequentialGroup()
+                                .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(menuLabel)
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(transcriptionStartBox)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(transcriptionStartAutomaticBox))
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(transcriptionStartField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(transcriptionStartLabel))
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(transcriptionStartField2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(transcriptionStartLabel1))
+                                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(transcriptExtensionLabel))
+                                    .addComponent(detectionButton)
+                                    .addComponent(filteredGenesBox)
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(filteredGenesField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(filteredGenesLabel))
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(operonField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(operonLabel))
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(filteredGenesField2, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(filteredGenesLabel2))
+                                    .addGroup(menuPanelLayout.createSequentialGroup()
+                                        .addComponent(operonDetectionBox)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(operonDetectionAutomaticBox)))
+                                .addGap(0, 260, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         menuPanelLayout.setVerticalGroup(
             menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,6 +323,12 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                     .addComponent(transcriptionStartLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(unannotatedTranscriptsBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(menuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(transcriptExtensionLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -329,7 +355,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(detectionButton)
-                .addContainerGap(165, Short.MAX_VALUE))
+                .addContainerGap(118, Short.MAX_VALUE))
         );
 
         menuResultSplitPane.setLeftComponent(menuPanel);
@@ -343,7 +369,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(menuResultSplitPane)
+            .addComponent(menuResultSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -390,6 +416,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
         } else {
 
             this.detectTranscriptionStarts = this.transcriptionStartBox.isSelected();
+            this.detectUnannotatedTranscripts = this.unannotatedTranscriptsBox.isSelected();
             this.transcriptionStartAutomatic = this.transcriptionStartAutomaticBox.isSelected();
             this.filterGenes = this.filteredGenesBox.isSelected();
             this.detectOperons = this.operonDetectionBox.isSelected();
@@ -461,6 +488,8 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
     private javax.swing.JTextField operonField;
     private javax.swing.JLabel operonLabel;
     private javax.swing.JTabbedPane resultTabs;
+    private javax.swing.JTextField transcriptExtensionField;
+    private javax.swing.JLabel transcriptExtensionLabel;
     private javax.swing.JCheckBox transcriptionStartAutomaticBox;
     private javax.swing.JCheckBox transcriptionStartBox;
     private javax.swing.JTextField transcriptionStartField;
@@ -471,6 +500,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
     private javax.swing.JLabel transcriptionStartLabel1;
     private javax.swing.JLabel transcriptionStartLabel2;
     private javax.swing.JLabel transcriptionStartLabel3;
+    private javax.swing.JCheckBox unannotatedTranscriptsBox;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -508,8 +538,16 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
             int increaseReadPercent = Integer.parseInt(this.transcriptionStartField2.getText());
             int maxInitialReadCount = Integer.parseInt(this.transcriptionStartField3.getText());
             int increaseReadCount2 = Integer.parseInt(this.transcriptionStartField4.getText());
-            this.analysisTSS = new AnalysisTranscriptionStart(this.trackViewer, increaseReadCount,
+            
+            if (this.detectUnannotatedTranscripts) {
+                int minCoverage = Integer.parseInt(this.transcriptExtensionField.getText());
+                this.analysisTSS = new AnalysisUnannotatedTransStart(this.trackViewer, increaseReadCount,
+                        increaseReadPercent, maxInitialReadCount, increaseReadCount2, 
+                        this.transcriptionStartAutomatic, minCoverage);
+            } else {
+                this.analysisTSS = new AnalysisTranscriptionStart(this.trackViewer, increaseReadCount,
                     increaseReadPercent, maxInitialReadCount, increaseReadCount2, this.transcriptionStartAutomatic);
+            }
             
             covAnalysisHandler.registerObserver(this.analysisTSS);
             covAnalysisHandler.setCoverageNeeded(true);

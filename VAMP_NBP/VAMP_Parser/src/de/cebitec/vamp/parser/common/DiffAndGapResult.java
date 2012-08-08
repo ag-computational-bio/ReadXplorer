@@ -1,7 +1,6 @@
 package de.cebitec.vamp.parser.common;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Stores the parsed results for diffs and gaps for one mapping.
@@ -10,34 +9,40 @@ import java.util.Map;
  */
 public class DiffAndGapResult {
 
-    private int errors;
-    private Map<Integer, Integer> gapOrderIndex;
+    private int differences;
     private List<ParsedDiff> diffs;
     private List<ParsedReferenceGap> gaps;
 
     /**
      * Stores the parsed results for diffs and gaps for one mapping.
+     * @param diffs differences to the reference
+     * @param gaps gaps in the reference (insertions of the read)
+     * @param differences number of differences between the read and the reference
      */
-    public DiffAndGapResult(List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps, Map<Integer, Integer> gapOrderIndex, int errors) {
+    public DiffAndGapResult(List<ParsedDiff> diffs, List<ParsedReferenceGap> gaps, int differences) {
         this.diffs = diffs;
         this.gaps = gaps;
-        this.gapOrderIndex = gapOrderIndex;
-        this.errors = errors;
+        this.differences = differences;
     }
 
+    /**
+     * @return differences to the reference
+     */
     public List<ParsedDiff> getDiffs() {
         return diffs;
     }
 
+    /**
+     * @return gaps in the reference (insertions of the read)
+     */
     public List<ParsedReferenceGap> getGaps() {
         return gaps;
     }
 
-    public Map<Integer, Integer> getGapOrderIndex() {
-        return gapOrderIndex;
-    }
-
-    public int getErrors() {
-        return errors;
+    /**
+     * @return number of differences between the read and the reference
+     */
+    public int getDifferences() {
+        return differences;
     }
 }

@@ -46,12 +46,12 @@ public class CoverageContainer {
     private int coveredCommonMatchPositions;
 
     /**
-     * Creates a new CoverageContainer.
+     * Creates a new and empty CoverageContainer.
      */
     public CoverageContainer() {
-        coverage = new HashMap<Integer, Integer[]>();
-        positionTable = new HashMap<String, Integer[]>();
-        coverageArrayLength = NUM_OF_CASES * FIELDS_PER_CASE;
+        this.coverage = new HashMap<Integer, Integer[]>();
+        this.positionTable = new HashMap<String, Integer[]>();
+        this.coverageArrayLength = CoverageContainer.NUM_OF_CASES * CoverageContainer.FIELDS_PER_CASE;
         this.coveredPerfectPositions = 0;
         this.coveredBestMatchPositions = 0;
         this.coveredCommonMatchPositions = 0;
@@ -61,7 +61,6 @@ public class CoverageContainer {
     /**
      * Computes the coverage and the position table for the given mappings.
      * @param mappings The mappings whose coverage has to be computed 
-     * @param onlyPositionTable true, if only the position table should be calculated.
      */
     public void computeCoverage(ParsedMappingContainer mappings){
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start computing the coverage");
@@ -82,7 +81,13 @@ public class CoverageContainer {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished computing the coverage");
     }
 
-    private void addMapping(ParsedMapping mapping) {
+    /**
+     * Adds a mapping to the coverage container and increases the coverage of 
+     * all positions covered by this mapping in the correct classification
+     * classes.
+     * @param mapping mapping to add
+     */
+    public void addMapping(ParsedMapping mapping) {
         
         // store best mapping coverage
         if (mapping.isBestMapping()) {
@@ -200,7 +205,7 @@ public class CoverageContainer {
     }
 
     /**
-     * Clears the coverage container.
+     * Clears the coverage container (coverage and position table).
      */
     public void clearCoverageContainer() {
         coverage.clear();
@@ -230,7 +235,7 @@ public class CoverageContainer {
                 position = String.valueOf(positionInt);
                 base = diff.getBase();
                 if (mapping.getDirection() == -1) {
-                    base = SequenceUtils.getDnaComplement(base, "");
+                    base = SequenceUtils.getDnaComplement(base);
                 }
                 // init positionTable if not done yet 
                 Integer[] bases;
@@ -244,56 +249,56 @@ public class CoverageContainer {
                 bases = positionTable.get(position);
 
                 // increase occurence of bases at position
-                switch (base) {
-                    case 'A':
+                if (base == 'A' || base == 'a') { 
                         bases[DIFFS] += mapping.getNumReplicates();
                         bases[BASE_A] += mapping.getNumReplicates();
-                        break;
-                    case 'C':
+                
+                } else if (base == 'C' || base == 'c') {
                         bases[DIFFS] += mapping.getNumReplicates();
                         bases[BASE_C] += mapping.getNumReplicates();
-                        break;
-                    case 'G':
+                
+                } else if (base == 'G' || base == 'g') {
                         bases[DIFFS] += mapping.getNumReplicates();
                         bases[BASE_G] += mapping.getNumReplicates();
-                        break;
-                    case 'T':
+                  
+                } else if (base == 'T' || base == 't') {
                         bases[DIFFS] += mapping.getNumReplicates();
                         bases[BASE_T] += mapping.getNumReplicates();
-                        break;
-                    case 'N':
+                
+                } else if (base == 'N' || base == 'n') {
                         bases[DIFFS] += mapping.getNumReplicates();
                         bases[BASE_N] += mapping.getNumReplicates();
-                        break;
-                    case '_':
+                    
+                } else if (base == '_') {
                         bases[DIFFS] += mapping.getNumReplicates();
                         bases[BASE_GAP] += mapping.getNumReplicates();
-                        break;
                 }
             }
 
             //save gaps
+            int order;
+            char value;
+            Integer[] bases;
             for (int i = 0; i < gaps.size(); i++) {
                 gap = gaps.get(i);
                 positionInt = gap.getAbsPos();
                 position = String.valueOf(positionInt);
                 base = gap.getBase();
-                int order = gap.getOrder();
+                order = gap.getOrder();
                 if (mapping.getDirection() == -1) {
-                    base = SequenceUtils.getDnaComplement(base, "");
+                    base = SequenceUtils.getDnaComplement(base);
                 }
-                char value = 'a';
+                value = 'a';
                 for (int j = 0; j <= order; j++) {
-                    if (value > 'a') {
+                    if (value > 'a') { //a = gap order value
                         position = position.substring(0, position.length() - 2);
                     }
                     position = position + "_" + value;
-                    value++;
+                    ++value;
                 }
 
                 // init positionTable if not done yet 
 //                String posString = String.valueOf(positionInt);
-                Integer[] bases;
                 if (!positionTable.containsKey(position)) {
                     bases = new Integer[12];
                     for (int j = 0; j < bases.length; ++j) {
@@ -305,32 +310,33 @@ public class CoverageContainer {
                 // increase occurence of gap bases at position
                 bases = positionTable.get(position);
 
-                switch (base) {
-                    case 'A':
-                        bases[DIFFS] += mapping.getNumReplicates();
-                        bases[GAP_A] += mapping.getNumReplicates();
-                        break;
-                    case 'C':
-                        bases[DIFFS] += mapping.getNumReplicates();
-                        bases[GAP_C] += mapping.getNumReplicates();
-                        break;
-                    case 'G':
-                        bases[DIFFS] += mapping.getNumReplicates();
-                        bases[GAP_G] += mapping.getNumReplicates();
-                        break;
-                    case 'T':
-                        bases[DIFFS] += mapping.getNumReplicates();
-                        bases[GAP_T] += mapping.getNumReplicates();
-                        break;
-                    case 'N':
-                        bases[DIFFS] += mapping.getNumReplicates();
-                        bases[GAP_N] += mapping.getNumReplicates();
-                        break;
+                if (base == 'A' || base == 'a') {
+                    bases[DIFFS] += mapping.getNumReplicates();
+                    bases[GAP_A] += mapping.getNumReplicates();
+
+                } else if (base == 'C' || base == 'c') {
+                    bases[DIFFS] += mapping.getNumReplicates();
+                    bases[GAP_C] += mapping.getNumReplicates();
+
+                } else if (base == 'G' || base == 'g') {
+                    bases[DIFFS] += mapping.getNumReplicates();
+                    bases[GAP_G] += mapping.getNumReplicates();
+
+                } else if (base == 'T' || base == 't') {
+                    bases[DIFFS] += mapping.getNumReplicates();
+                    bases[GAP_T] += mapping.getNumReplicates();
+
+                } else if (base == 'N' || base == 'n') {
+                    bases[DIFFS] += mapping.getNumReplicates();
+                    bases[GAP_N] += mapping.getNumReplicates();
                 }
             }
         }
     }
 
+    /**
+     * @return the position table
+     */
     public HashMap<String, Integer[]> getPositionTable() {
         return this.positionTable;
     }
@@ -392,6 +398,47 @@ public class CoverageContainer {
      */
     public int getCoveredCommonMatchPositions() {
         return this.coveredCommonMatchPositions;
+    }
+
+    public HashMap<Integer, Integer[]> getCoverage() {
+        return coverage;
+    }
+
+    public void setCoverage(HashMap<Integer, Integer[]> coverage) {
+        this.coverage = coverage;
+    }
+
+    /**
+     * Clears the position table and the coverage container up to given position.
+     * Saving memory, because only positions with at least one diff or gap are
+     * kept in the coverage map. All other positions in the coverage map are
+     * dismissed!
+     * The clear position itself is still included in the remaining data, if there is a diff
+     * at that position!
+     * @param clearPos the position up to which the coverage container should be cleared.
+     */
+    public void clearCoverageContainerUpTo(int clearPos) {
+        HashMap<Integer, Integer[]> newCoverage = new HashMap<Integer, Integer[]>();
+        HashMap<String, Integer[]> newPositionTable = new HashMap<String, Integer[]>();
+        Iterator<String> posIterator = positionTable.keySet().iterator();
+        String posString;
+        int pos;
+        while (posIterator.hasNext()) {
+            posString = posIterator.next();
+            if (!posString.contains("_")) {
+                pos = Integer.valueOf(posString);
+            } else {
+                pos = Integer.valueOf(posString.substring(0, posString.length() - 2));
+            }
+            if (pos >= clearPos) {
+                newCoverage.put(pos, this.coverage.get(pos));
+                newPositionTable.put(posString, positionTable.get(posString));
+            }
+        }
+        this.coverage.clear();
+        this.positionTable.clear();
+        this.coverage = newCoverage;
+        this.positionTable = newPositionTable;
     }
     
     

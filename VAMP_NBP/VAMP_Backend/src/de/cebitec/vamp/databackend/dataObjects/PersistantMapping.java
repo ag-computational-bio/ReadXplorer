@@ -13,7 +13,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     private int start;
     private int trackId;
     private int stop;
-    private byte strand;
+    private boolean isFwdStrand;
     private int count;
     private Map<Integer, PersistantDiff> diffs;
     private TreeMap<Integer, TreeSet<PersistantReferenceGap>> gaps;
@@ -27,19 +27,19 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * @param start
      * @param stop
      * @param trackId
-     * @param direction
+     * @param isFwdStrand
      * @param count
      * @param errors
      * @param sequenceID
      * @param isBestMapping 
      */
-    public PersistantMapping(int id, int start, int stop, int trackId, byte direction, int count, int errors, int sequenceID, boolean isBestMapping){
+    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int count, int errors, int sequenceID, boolean isBestMapping){
         this.id = id;
         this.start = start;
         this.stop = stop;
         this.count = count;
         this.trackId = trackId;
-        this.strand = direction;
+        this.isFwdStrand = isFwdStrand;
         this.diffs = new HashMap<Integer, PersistantDiff>();
         this.gaps = new TreeMap<Integer, TreeSet<PersistantReferenceGap>>();
         this.differences = errors;
@@ -52,10 +52,10 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * data. For this only start, stop and direction are needed. Everything else
      * isn't needed and can be left out in order to save some memory
      */
-    public PersistantMapping(int start, int stop, byte direction){
+    public PersistantMapping(int start, int stop, boolean isFwdStrand){
         this.start = start;
         this.stop = stop;
-        strand = direction;
+        this.isFwdStrand = isFwdStrand;
     }
 
     public int getNbReplicates() {
@@ -79,8 +79,8 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     /**
      * @return direction of the mapping: 1 for fwd and -1 for rev
      */
-    public byte getStrand() {
-        return strand;
+    public boolean isFwdStrand() {
+        return isFwdStrand;
     }
 
     public int getTrackId() {

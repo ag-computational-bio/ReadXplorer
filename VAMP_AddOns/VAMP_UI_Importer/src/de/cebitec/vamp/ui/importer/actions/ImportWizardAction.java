@@ -7,7 +7,7 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.ImportThread;
 import de.cebitec.vamp.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.vamp.ui.importer.ImportWizardOverviewPanel;
-import de.cebitec.vamp.ui.importer.SeqPairJobContainer;
+import de.cebitec.vamp.parser.SeqPairJobContainer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;

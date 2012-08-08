@@ -24,12 +24,19 @@ public class Properties {
     public static final String VAMP_DATABASE_DIRECTORY = "Vamp.Database.Directory";
     
     // Sequence pair properties
+    /** 0 = perfect sequence pair (distance and orientation correct). */
     public static final byte TYPE_PERFECT_PAIR = 0;
+    /** 1 = distance too large sequence pair. */
     public static final byte TYPE_DIST_LARGE_PAIR = 1;
+    /** 2 = distance too small sequence pair. */
     public static final byte TYPE_DIST_SMALL_PAIR = 2;
+    /** 3 = orientation wrong sequence pair (distance is correct). */
     public static final byte TYPE_ORIENT_WRONG_PAIR = 3;
+    /** 4 = distance too large and orientation wrong sequence pair. */
     public static final byte TYPE_OR_DIST_LARGE_PAIR = 4;
+    /** 5 = distance too small and orientation wrong sequence pair. */
     public static final byte TYPE_OR_DIST_SMALL_PAIR = 5;
+    /** 6 = a single mapping whose partner did not map on the reference. */
     public static final byte TYPE_UNPAIRED_PAIR = 6;
     
     //Properties to set different viewers active
@@ -65,6 +72,25 @@ public class Properties {
     public static final byte CDS = 4;
     /** Type value identifying an object as belonging to any of the other types.*/
     public static final byte ALL = 0;
+    
+    /** 'Yc' = Tag for read classification in one of the three vamp classes. */
+    public static final String TAG_READ_CLASS = "Yc";
+    /** 'Yt' = Tag for number of positions a sequence maps to in a reference. */
+    public static final String TAG_MAP_COUNT = "Yt";
+    /** 'Yi' = Tag for the sequence pair id. */
+    public static final String TAG_SEQ_PAIR_ID = "Yi";
+    /** 'Ys' = Tag for the sequence pair type. */
+    public static final String TAG_SEQ_PAIR_TYPE = "Ys";
+    
+    //Supported sequence pair extensions.
+    /** 1 = Supported extension of read 1. */
+    public static final char EXT_A1 = '1';
+    /** 2 = Supported extension of read 2. */
+    public static final char EXT_A2 = '2';
+    /** f = Supported extension of read 1. */
+    public static final char EXT_B1 = 'f';
+    /** r = Supported extension of read 2. */
+    public static final char EXT_B2 = 'r';
     
     /** The CRAN Mirror used by Gnu R to load missing packages */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";

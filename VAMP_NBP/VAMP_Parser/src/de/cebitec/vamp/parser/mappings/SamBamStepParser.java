@@ -1,21 +1,16 @@
 package de.cebitec.vamp.parser.mappings;
 
-import java.util.ArrayList;
-import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.DiffAndGapResult;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
-import org.openide.util.NbBundle;
 import java.util.List;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -26,6 +21,8 @@ public class SamBamStepParser implements MappingParserI {
     private static String name = "SAM/BAM Stepwise Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM Output";
+    
+    private SeqPairProcessorI seqPairProcessor;
     private HashMap<String, Integer> seqToIDMap;
     private int noUniqueMappings;
     private ArrayList<Observer> observers;
@@ -37,35 +34,53 @@ public class SamBamStepParser implements MappingParserI {
     private int shift = 0;
     private SAMRecord record = null;
 
+    /**
+     * Parser for stepwise parsing of sam and bam data files in vamp.
+     */
     public SamBamStepParser() {
-        this.seqToIDMap = new HashMap<String, Integer>();
-        this.observers = new ArrayList<Observer>();
-
+        this.seqToIDMap = new HashMap<>();
+        this.observers = new ArrayList<>();
+        this.seqPairProcessor = new SeqPairProcessorDummy();
+    }
+    
+    /**
+     * Parser for stepwise parsing of sam and bam data files in vamp. Use
+     * this constructor for parsing sequence pair data along with the ordinary
+     * track data.
+     * @param seqPairProcessor the specific sequence pair processor for handling
+     *      sequence pair data
+     */
+    public SamBamStepParser(SeqPairProcessorI seqPairProcessor) {
+        this();
+        this.seqPairProcessor = seqPairProcessor;
     }
 
     @Override
-    public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
-        this.seqToIDMap = new HashMap<String, Integer>();
-        String readname = null;
-//        String refName = null;
-        String refSeq = null;
-        String readSeq = null;
+    public ParsedMappingContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException {
+        this.seqToIDMap = new HashMap<>();
+        String readname;
+        String refSeq;
+        String readSeq;
         //  int flag = 0;
-        String readSeqwithoutGaps = null;
-        String cigar = null;
+        String readSeqWithoutGaps;
+        String cigar;
         String filename = trackJob.getFile().getName();
         this.noUniqueMappings = 0;
         int start;
         int stop;
         int sumReadLength = 0;
-        int refSeqLength = sequenceString.length();
-        int errors = 0;
-
-        //     String refSeqfulllength = null;
-        String refSeqwithoutgaps = null;
+        int differences;
+        boolean isRevStrand;
+        byte direction;
+        int seqID;
+        DiffAndGapResult result;
+        List<ParsedDiff> diffs;
+        List<ParsedReferenceGap> gaps;
+        String[] refAndRead;
+        
+        String refSeqWithoutGaps;
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.setFirstMappingContainer(trackJob.isFirstJob());
-        //TODO check why if there is too much output we get a java heap space exception 
 
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filename));
 
@@ -74,134 +89,95 @@ public class SamBamStepParser implements MappingParserI {
             SAMRecordIterator itor = sam.iterator();
             itorAll = itor;
         }
-        SAMRecord first = null;
+        SAMRecord nextRecord;
         int end = trackJob.getStop();
-        end = end + shift;
+        end += shift;
 
         while (lineno < end) {
             lineno++;
 
 
-            first = (record == null) ? (itorAll.hasNext() ? itorAll.next() : null) : record;
+            nextRecord = (record == null) ? (itorAll.hasNext() ? itorAll.next() : null) : record;
             //no more mappings
-            if (first == null) {
+            if (nextRecord == null) {
                 mappingContainer.setLastMappingContainer(true);
                 break;
             }
             record = null;
 
-            if (!first.getReadUnmappedFlag()) {
+            if (!nextRecord.getReadUnmappedFlag()) {
 
-                readname = first.getReadName();
-                start = first.getAlignmentStart();
-                cigar = first.getCigarString();
-                readSeqwithoutGaps = first.getReadString().toLowerCase();
-
-                stop = 0;
-                errors = 0;
+                readname = nextRecord.getReadName();
+                start = nextRecord.getAlignmentStart();
+                cigar = nextRecord.getCigarString();
+                readSeqWithoutGaps = nextRecord.getReadString();
 
                 if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
-                    stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqwithoutGaps.length());
-                    refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
-                    String[] refAndRead = ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqwithoutgaps, readSeqwithoutGaps);
+                    stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqWithoutGaps.length());
+                    refSeqWithoutGaps = refSeqWhole.substring(start - 1, stop);
+                    refAndRead = ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqWithoutGaps, readSeqWithoutGaps);
                     refSeq = refAndRead[0];
                     readSeq = refAndRead[1];
                 } else {
-                    stop = start + readSeqwithoutGaps.length() - 1;
-                    refSeqwithoutgaps = sequenceString.substring(start - 1, stop).toLowerCase();
-                    refSeq = refSeqwithoutgaps;
-                    readSeq = readSeqwithoutGaps;
+                    stop = start + readSeqWithoutGaps.length() - 1;
+                    refSeqWithoutGaps = refSeqWhole.substring(start - 1, stop);
+                    refSeq = refSeqWithoutGaps;
+                    readSeq = readSeqWithoutGaps;
                 }
-
-                byte direction = 0;
-                // 1 = fwd, -1 = rev
-                direction = first.getReadNegativeStrandFlag() ? (byte) -1 : 1;
+                
+                isRevStrand = record.getReadNegativeStrandFlag();
 
                 //check parameters
-                if (refSeqLength < start || refSeqLength < stop) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorReadPosition",
-                            filename, lineno, start, stop, refSeqLength));
-                    continue;
+                if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filename, lineno)) {
+                    continue; //continue, and ignore read, if it contains inconsistent information
                 }
-                if (readname == null || readname.isEmpty()) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorReadname", filename, lineno, readname));
-                    continue;
-                }
-
-                if (start >= stop) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
-                    continue;
-                }
-                if (direction == 0) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorDirection", filename, lineno));
-                    continue;
-                }
-                if (readSeq == null || readSeq.isEmpty()) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
-                    continue;
-                }
-                if (refSeq == null || refSeq.isEmpty()) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorRef", filename, lineno, refSeq));
-                    continue;
-                }
-                if (readSeq.length() != refSeq.length()) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorReadLength", filename, lineno, readSeq, refSeq));
-                    continue;
-                }
-                if (!cigar.matches("[MHISDPXN=\\d]+")) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
-                    continue;
-                }
+                
                 //saruman starts genome at 0 other algorithms like bwa start genome at 1
-                DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
-                List<ParsedDiff> diffs = result.getDiffs();
-                List<ParsedReferenceGap> gaps = result.getGaps();
-                errors = result.getErrors();
+                result = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+                diffs = result.getDiffs();
+                gaps = result.getGaps();
+                differences = result.getDifferences();
 
-                if (errors < 0 || errors > readSeq.length()) {
+                if (differences < 0 || differences > readSeq.length()) {
                     this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorRead", errors, filename, lineno));
+                            "Parser.checkMapping.ErrorRead", differences, filename, lineno));
                     continue;
                 }
                 
                 //saruman starts genome at 0 other algorithms like bwa start genome at 1
-                ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
+                direction = isRevStrand ? (byte) -1 : 1;
+                ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
 
-
-
-                readSeqwithoutGaps = first.getReadNegativeStrandFlag() ? SequenceUtils.getReverseComplement(readSeqwithoutGaps) : readSeqwithoutGaps;
-                int seqID;
-                if (this.seqToIDMap.containsKey(readSeqwithoutGaps)) {
-                    seqID = this.seqToIDMap.get(readSeqwithoutGaps);
+                if (nextRecord.getReadNegativeStrandFlag()) {
+                    readSeqWithoutGaps = SequenceUtils.getReverseComplement(readSeqWithoutGaps);
+                }
+                
+                if (this.seqToIDMap.containsKey(readSeqWithoutGaps)) {
+                    seqID = this.seqToIDMap.get(readSeqWithoutGaps);
                 } else {
                     seqID = ++noUniqueSeq;
-                    this.seqToIDMap.put(readSeqwithoutGaps, seqID);
+                    this.seqToIDMap.put(readSeqWithoutGaps, seqID);
                 } //int seqID = readnameToSequenceID.get(readname);
 
                 mappingContainer.addParsedMapping(mapping, seqID);
                 sumReadLength += (stop - start);
-
+                this.seqPairProcessor.processReadname(seqID, readname);
 
                 if (lineno == end) {
                     
                     mappingContainer.setSumReadLength(mappingContainer.getSumReadLength() + sumReadLength);
                     
-                    shift++;
+                    ++shift;
                     record = itorAll.hasNext() ? itorAll.next() : null;
                     if (record != null) {
 
-                        String read = record.getReadString().toLowerCase();
-                        read = record.getReadNegativeStrandFlag() ? SequenceUtils.getReverseComplement(read) : read;
+                        String read = record.getReadString();
+                        if (record.getReadNegativeStrandFlag()) { 
+                            read = SequenceUtils.getReverseComplement(read); 
+                        }
+                        
                         if (this.seqToIDMap.containsKey(read)) {
-                            end = end + 1;
+                            end += 1;
                         }
 
                     } else {
@@ -212,7 +188,7 @@ public class SamBamStepParser implements MappingParserI {
 
             } else {
                 this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                        "Parser.Parsing.CorruptData", lineno, first.getReadName()));
+                        "Parser.Parsing.CorruptData", lineno, nextRecord.getReadName()));
             }
 
         }
@@ -227,7 +203,7 @@ public class SamBamStepParser implements MappingParserI {
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 
@@ -268,7 +244,7 @@ public class SamBamStepParser implements MappingParserI {
     }
 
     @Override
-    public void processReadname(int seqID, String readName) {
-        //TODO:Readnames
+    public SeqPairProcessorI getSeqPairProcessor() {
+        return this.seqPairProcessor;
     }
 }

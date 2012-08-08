@@ -17,6 +17,10 @@ and open the template in the editor.
             <br>A) The <u>minimal coverage increase</u> (absolute read counts) from one position to the neighboring one
             (default = 50 reads).<br> B) The <u>minimal coverage increase in percent</u> from one position 
             to the neighboring one (default = 50%). <!-- TODO: add help page with details on models-->
+            <br><br>In order to output currently unannotated transcript information along with the detected TSS, you can choose the
+            "<b>Unannotated transcript detection</b>". For detected TSS, which do not have neighboring annotations, it adds the information,
+            that this is an unannotated transcript and further a transcript stop is inferred by a coverage threshold (<b>Minimal transcript 
+            extension coverage</b>, which has to be set, if the unannotated transcript detection checkbox is selected.
             <br><br>Additionally, two more parameters can be set: 
             <br> C) The <u>maximal initial read count</u> (default = 8 reads) can be set
             <br> D) The <u>minimal coverage increase</u> (default = 23%) for predicted TSS with less 

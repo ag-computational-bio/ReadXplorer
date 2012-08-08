@@ -171,12 +171,14 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @param g Graphics2D object to print on
      */
     private void drawSequence(Graphics2D g) {
-        // get the font metrics
-        g.setFont(font);
-        metrics = g.getFontMetrics(font);
 
         // print sequence if sufficient space
         if (printSeq) {
+            
+            // get the font metrics
+            g.setFont(font);
+            metrics = g.getFontMetrics(font);
+            
             BoundsInfo bounds = parentViewer.getBoundsInfo();
             int logleft = bounds.getLogLeft();
             if (logleft < 1) { //might happen for very short reference sequences

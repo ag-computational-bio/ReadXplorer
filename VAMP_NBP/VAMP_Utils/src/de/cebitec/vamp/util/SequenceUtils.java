@@ -1,10 +1,7 @@
 package de.cebitec.vamp.util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * Contains all global accessible util methods.
+ * Contains all global accessible sequence util methods.
  * 
  * @author Rolf Hilker
  */
@@ -28,15 +25,13 @@ public final class SequenceUtils {
      * @return the reversed string
      */
     public static String reverseString(final String string) {
-        StringBuilder revString = new StringBuilder();
-        for (int i = string.length() - 1; i >= 0; --i) {
-            revString = revString.append(string.charAt(i));
-        }
+        StringBuilder revString = new StringBuilder(string);
+        revString.reverse();
         return revString.toString();
     }
 
     /**
-     * Complements a sequence String. Requires only lower case characters!
+     * Complements a sequence String.
      * @param sequence the string to complement
      * @return the complemented string
      */
@@ -47,11 +42,15 @@ public final class SequenceUtils {
             currChar = sequence.charAt(i);
 
             switch (currChar){
-                case 'c': complement = complement.append('g'); break;
-                case 'g': complement = complement.append('c'); break;
-                case 't': complement = complement.append('a'); break;
-                case 'a': complement = complement.append('t'); break;
-                default : complement = complement.append(currChar);
+                case 'c': complement.append('g'); break;
+                case 'g': complement.append('c'); break;
+                case 't': complement.append('a'); break;
+                case 'a': complement.append('t'); break;
+                case 'C': complement.append('G'); break;
+                case 'G': complement.append('C'); break;
+                case 'T': complement.append('A'); break;
+                case 'A': complement.append('T'); break;
+                default : complement.append(currChar);
             }
         }
         return complement.toString();
@@ -59,47 +58,42 @@ public final class SequenceUtils {
 
 
     /**
-     * Produces the reverse complement of a sequence.
-     * @param sequence the sequence to reverse and complement
-     * @return the reversed and complemented sequence
+     * Produces the reverse complement of a dna sequence.
+     * @param sequence the dna sequence to reverse and complement
+     * @return the reversed and complemented dna sequence
      */
     public static String getReverseComplement(String sequence) {
-        StringBuilder revCompSeq = new StringBuilder();
-        for (int i = sequence.length() - 1; i >= 0; --i) {
-            char base = sequence.charAt(i);
-            base = SequenceUtils.getDnaComplement(base, sequence);
-            revCompSeq.append(base);
-        }
-        return revCompSeq.toString();
+        String revCompSeq = SequenceUtils.complementDNA(SequenceUtils.reverseString(sequence));
+        return revCompSeq;
     }
 
 
-
-
     /**
-     * Produces the complement of a single base. For error handling
-     * also the whole sequence has to be passed. Returns only upper
-     * case values.
-     * A = T
-     * G = C
-     * N = N
-     * _ = _
+     * Produces the complement of a single base. Bases not present in the DNA or
+     * RNA alphabet are not replaced and RNA sequences are translated in DNA
+     * sequences.
+     * A = T / a = t
+     * U = A / u = a
+     * G = C / g = c
+     * all other characters are returned as they were
      * @param base the base to complement
-     * @param sequence the sequence the base originates from or an empty string if the sequence is not accessible
      * @return the complemented base
      */
-    public static char getDnaComplement(char base, String sequence) {
+    public static char getDnaComplement(char base) {
         base = Character.toUpperCase(base);
-        char comp = ' ';
+        char comp;
         switch (base) {
                 case 'C': comp = 'G'; break;
                 case 'G': comp = 'C'; break;
                 case 'T': comp = 'A'; break;
                 case 'A': comp = 'T'; break;
-                case 'N': comp = 'N'; break;
-                case '_': comp = '_'; break;
-                default : Logger.getLogger(SequenceUtils.class.getName()).log(Level.SEVERE, 
-                        "Found unknown char {0}!Sequence: {1}", new Object[]{base, sequence});
+                case 'U': comp = 'A'; break;
+                case 'c': comp = 'g'; break;
+                case 'g': comp = 'c'; break;
+                case 't': comp = 'a'; break;
+                case 'a': comp = 't'; break;
+                case 'u': comp = 'a'; break;
+                default : comp = base;
             }
 
         return comp;

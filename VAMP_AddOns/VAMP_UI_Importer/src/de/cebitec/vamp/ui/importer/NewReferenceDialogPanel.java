@@ -92,7 +92,7 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
                 if(value instanceof ParserI){
-                    return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);
+                    return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);
                 } else {
                     return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }

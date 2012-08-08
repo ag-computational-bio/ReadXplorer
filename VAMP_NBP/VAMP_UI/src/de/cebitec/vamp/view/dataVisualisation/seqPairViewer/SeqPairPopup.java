@@ -3,21 +3,12 @@ package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.AbstractListModel;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -25,11 +16,11 @@ import javax.swing.event.ListSelectionListener;
 import org.openide.util.NbBundle;
 
 /**
- * @author Rolf Hilker
- * 
  * An extension of JPopupMenu for displaying information regarding a sequence pair.
  * It shows all details of the sequence pair and all mappings belonging to that pair.
  * Furthermore it offers the possibility to jump to a certain mapping by clicking on it.
+ * 
+ * @author Rolf Hilker
  */
 public class SeqPairPopup extends JPopupMenu {
     
@@ -44,6 +35,7 @@ public class SeqPairPopup extends JPopupMenu {
      * Furthermore it offers the possibility to jump to a certain mapping by clicking on it.
      * @param parentViewer the parent viewer
      * @param pairType the type of the sequence pair already in user readable string format
+     * @param pairColors 
      * @param seqPairId the id of the sequence pair
      */
     public SeqPairPopup(AbstractViewer parentViewer, String pairType, ArrayList<Color> pairColors, long seqPairId) {
@@ -242,7 +234,7 @@ public class SeqPairPopup extends JPopupMenu {
     }
     
     private String getMappingInfos(PersistantMapping mapping){
-        String strand = mapping.getStrand() == SequenceUtils.STRAND_FWD ? 
+        String strand = mapping.isFwdStrand() ? 
                     NbBundle.getMessage(BlockComponentPair.class, "Fwd") : 
                     NbBundle.getMessage(BlockComponentPair.class, "Rev");
         return NbBundle.getMessage(BlockComponentPair.class, "Type").concat(" ").

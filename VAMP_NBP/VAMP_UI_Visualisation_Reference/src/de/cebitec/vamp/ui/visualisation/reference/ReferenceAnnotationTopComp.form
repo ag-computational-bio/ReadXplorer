@@ -19,7 +19,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                  <Component id="strandLabel" alignment="0" pref="49" max="32767" attributes="0"/>
+                  <Component id="strandLabel" alignment="0" max="32767" attributes="0"/>
                   <Component id="productLabel" max="32767" attributes="0"/>
                   <Component id="geneLabel" max="32767" attributes="0"/>
                   <Component id="stopLabel" alignment="0" max="32767" attributes="0"/>

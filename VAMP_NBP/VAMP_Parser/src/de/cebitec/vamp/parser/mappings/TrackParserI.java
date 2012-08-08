@@ -24,8 +24,10 @@ public interface TrackParserI {
          * @param trackJob the track job to parse
          * @param sequenceString the sequence string of the reference
          * @param observer an observer of the parsing
+         * @param covContainer coverage container
          * @return the parsed track with all track information
          * @throws ParsingException exectption if something went wrong during parsing process
+         * @throws OutOfMemoryError  
          */
        public abstract ParsedTrack parseMappings(TrackJob trackJob, String sequenceString,
                Observer observer,CoverageContainer covContainer) throws ParsingException, OutOfMemoryError;

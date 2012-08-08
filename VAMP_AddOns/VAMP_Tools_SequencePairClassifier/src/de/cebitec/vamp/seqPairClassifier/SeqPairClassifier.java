@@ -1,21 +1,17 @@
 package de.cebitec.vamp.seqPairClassifier;
 
-import de.cebitec.vamp.util.Pair;
-import de.cebitec.vamp.parser.common.ParsedSeqPairMapping;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
-import de.cebitec.vamp.parser.common.ParsedTrack;
-import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.mappings.ISeqPairClassifier;
+import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
@@ -32,8 +28,8 @@ import org.openide.util.lookup.ServiceProvider;
  *
  * @author Rolf Hilker
  */
-@ServiceProvider(service = ISeqPairClassifier.class)
-public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observable {
+@ServiceProvider(service = SeqPairClassifierI.class)
+public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observable {
     
     private ArrayList<Observer> observers;
     private ParsedTrack track1;
@@ -54,6 +50,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
      */
     public SeqPairClassifier() {
         //set data later
+        this.observers = new ArrayList<Observer>();
     }
 
     /**
@@ -69,6 +66,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
     public SeqPairClassifier(ParsedTrack track1, ParsedTrack track2, int dist,
             int deviation, short orientation) throws ParsingException, IOException {
         
+        this.observers = new ArrayList<Observer>();
         this.track1 = track1;
         this.track2 = track2;
         this.dist = dist;
@@ -76,7 +74,15 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
         this.calculateMinAndMaxDist(dist, deviation);
     }
     
-    @Override
+    /**
+     * Before classification can start the data has to be set.
+     * @param track1 fst track with read 1
+     * @param track2 scnd track with read 2
+     * @param distance insert distance depicting distance of insert between both
+     * ADAPTER sequences = whole fragment length
+     * @param deviation maximal deviation in % of the distance
+     * @param orientation orientation of the pairs: 0 = fr, 1 = rf, 2 = ff/rr
+     */
     public void setData(ParsedTrack track1, ParsedTrack track2, int distance, short deviation, byte orientation) {
         this.track1 = track1;
         this.track2 = track2;
@@ -102,6 +108,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
     @Override
     public ParsedSeqPairContainer classifySeqPairs() {
         
+        this.notifyObservers(NbBundle.getMessage(SeqPairClassifier.class, "Classifier.Classification.Start"));
         
         this.seqPairContainer = new ParsedSeqPairContainer();
         this.seqPairContainer.setTrackId1(this.track1.getID());
@@ -126,7 +133,7 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
         int start2;
         int stop2;
         int currDist;
-        boolean pairSize = false;
+        boolean pairSize;
         long interimSeqPairId = 1;
         
         int largestSmallerDist = Integer.MIN_VALUE;
@@ -252,7 +259,6 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
                                             omitIdList.add(parsedMappingB.getID());
                                             add_Seq_Pair_length += currDist;
                                             count_Seq_Pair++;
-                                            break; //jump to next mapping1
                                         } else {//////////////// store potential perfect pair //////////////////////////
                                             potPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR));
                                         }
@@ -377,11 +383,10 @@ public class SeqPairClassifier implements ISeqPairClassifier, Observer, Observab
         this.seqPairContainer.setNumOfSingleMappings(this.seqPairContainer.getMappingToPairIdList().size());
         average_Seq_Pair_Length = add_Seq_Pair_length / count_Seq_Pair;
         this.seqPairContainer.setAverage_Seq_Pair_length(average_Seq_Pair_Length);
+        
+        this.notifyObservers(NbBundle.getMessage(SeqPairClassifier.class, "Classifier.Classification.Finish"));
+        
         return seqPairContainer;
-        
-        
-        
-        
         
     }
 

@@ -9,7 +9,6 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.util.Comparator;
 import java.util.List;
@@ -119,7 +118,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         OperonColumns operonColumns = new OperonColumns(operonDetection);
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", operonColumns, "Operon Detection Table");
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", operonColumns, "Operon Detection Table");
     }//GEN-LAST:event_exportButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
@@ -145,7 +144,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         for (Operon operon : operonDetection) {
             String annoName1 = "";
             String annoName2 = "";
-            String strand = (operon.getOperonAdjacencies().get(0).getAnnotation1().getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev") + "\n";
+            String strand = (operon.getOperonAdjacencies().get(0).getAnnotation1().isFwdStrand() ? "Fwd" : "Rev") + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";
@@ -199,10 +198,10 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
             @Override
             public int compare(String a, String b) {
                 if (a.contains("\n")) {
-                    a = a.substring(0, a.indexOf("\n"));
+                    a = a.substring(0, a.indexOf('\n'));
                 }
                 if (b.contains("\n")) {
-                    b = b.substring(0, b.indexOf("\n"));
+                    b = b.substring(0, b.indexOf('\n'));
                 }
                 try {
                     Integer intA = Integer.parseInt(a);

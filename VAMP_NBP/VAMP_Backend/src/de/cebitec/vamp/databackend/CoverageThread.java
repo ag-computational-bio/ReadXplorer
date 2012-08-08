@@ -4,6 +4,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
 import java.io.File;
@@ -43,6 +44,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
     private double requestCounter;
     private double skippedCounter;
     private boolean isDbUsed = false;
+    private PersistantReference referenceGenome;
 
     public CoverageThread(List<PersistantTrack> tracks, boolean combineTracks) {
         super();
@@ -68,21 +70,21 @@ public class CoverageThread extends Thread implements RequestThreadI {
     private void singleCoverageThread(long trackID) {
         this.trackID = trackID;
         trackID2 = 0;
-        currentCov = new CoverageAndDiffResultPersistant(null, null, null, false);
+        currentCov = new CoverageAndDiffResultPersistant(null, null, null, false, 0, 0);
         this.isDbUsed = this.tracks.get(0).isDbUsed();
     }
 
     private void doubleCoverageThread(long trackID, long trackID2) {
         this.trackID = trackID;
         this.trackID2 = trackID2;
-        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0, true), null, null, false);
+        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0, true), null, null, false, 0, 0);
         this.isDbUsed = this.tracks.get(0).isDbUsed() || this.tracks.get(1).isDbUsed();
     }
 
     private void multipleCoverageThread() {
         this.trackID = 0;
         this.trackID2 = 0;
-        currentCov = new CoverageAndDiffResultPersistant(null, null, null, false);
+        currentCov = new CoverageAndDiffResultPersistant(null, null, null, false, 0, 0);
         for (PersistantTrack track : this.tracks) {
             this.isDbUsed = track.isDbUsed() ? true : this.isDbUsed;
         }
@@ -141,9 +143,14 @@ public class CoverageThread extends Thread implements RequestThreadI {
     private CoverageAndDiffResultPersistant getCoverageAndDiffsFromFile(IntervalRequest request, int from, int to, PersistantTrack track) {
         boolean diffsAndGapsNeeded = request instanceof CoverageAndDiffRequest;
         File file = new File(track.getFilePath());
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
-        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId());
-        return externalDataReader.getCoverageFromBam(refConnector.getRefGen(), from, to, diffsAndGapsNeeded, request.getDesiredData());
+        if (this.referenceGenome == null) {
+            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
+            this.referenceGenome = refConnector.getRefGen();
+        }
+        SamBamFileReader externalDataReader;
+        externalDataReader = new SamBamFileReader(file, track.getId());
+        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
+
     }
 
     /**
@@ -200,7 +207,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
             }
             fetch.close();
             rs.close();
-            result = new CoverageAndDiffResultPersistant(cov, null, null, false);
+            result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
             
         } else {
             result = this.getCoverageAndDiffsFromFile(request, from, to, tracks.get(0));
@@ -240,7 +247,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
         fetch.close();
         rs.close();
 
-        return new CoverageAndDiffResultPersistant(cov, null, null, false);
+        return new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
     }
 
     /**
@@ -339,7 +346,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
             
         }
         
-        return new CoverageAndDiffResultPersistant(cov, null, null, false);
+        return new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
     }
 
     /**
@@ -425,7 +432,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
             }
         }
 
-        return new CoverageAndDiffResultPersistant(cov, null, null, false);
+        return new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
     }
 
     /**

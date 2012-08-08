@@ -197,7 +197,7 @@ public class ReferenceViewer extends AbstractViewer {
 
                 PersistantAnnotation subAnnotationAnnotation = new PersistantAnnotation(annotation.getId(), annotation.getEcNumber(),
                         annotation.getLocus(), annotation.getProduct(), subAnnotation.getStart(), subAnnotation.getStop(),
-                        annotation.getStrand(), subAnnotation.getType(), annotation.getGeneName());
+                        annotation.isFwdStrand(), subAnnotation.getType(), annotation.getGeneName());
                 JAnnotation jSubAnnotation = new JAnnotation(subAnnotationAnnotation, length, this, border);
                 int yFrom = yCoord - (jSubAnnotation.getHeight() / 2);
                 jSubAnnotation.setBounds((int) phyStart, yFrom, jSubAnnotation.getSize().width, jSubAnnotation.getHeight());
@@ -264,12 +264,11 @@ public class ReferenceViewer extends AbstractViewer {
      */
     public int determineFrame(PersistantAnnotation annotation) {
         int frame = 0;
-        int direction = annotation.getStrand();
 
-        if (direction == 1) {
+        if (annotation.isFwdStrand()) {
             // forward strand
             frame = (annotation.getStart() - 1) % 3 + 1;
-        } else if (direction == -1) {
+        } else {
             // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
             frame = (annotation.getStop() - 1) % 3 - 3;
         }

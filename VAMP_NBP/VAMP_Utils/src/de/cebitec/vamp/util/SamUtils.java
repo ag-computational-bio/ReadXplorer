@@ -1,11 +1,9 @@
 package de.cebitec.vamp.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.BAMIndexer;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
+import net.sf.samtools.*;
 import net.sf.samtools.util.RuntimeEOFException;
 
 /*
@@ -40,6 +38,11 @@ import net.sf.samtools.util.RuntimeEOFException;
 public class SamUtils implements Observable {
     
     private List<Observer> observers;
+
+    public SamUtils() {
+        this.observers = new ArrayList<Observer>();
+    }
+    
     
     /**
      * Generates a BAM index file from an input BAM file
@@ -49,7 +52,7 @@ public class SamUtils implements Observable {
      *
      * @author Martha Borkan
      */
-    public void createIndex(SAMFileReader reader, File output, Observer parent) {
+    public void createIndex(SAMFileReader reader, File output) {
 
         BAMIndexer indexer = new BAMIndexer(output, reader.getFileHeader());
         reader.enableFileSource(true);
@@ -62,13 +65,19 @@ public class SamUtils implements Observable {
             try {
                 record = samItor.next();
                 if (++totalRecords % 500000 == 0) {
-                    parent.update(totalRecords + " reads indexed ...");
+                    this.notifyObservers(totalRecords + " reads indexed ...");
                 }
                 indexer.processAlignment(record);
             } catch (RuntimeEOFException e) {
-                notifyObservers(e);
+                this.notifyObservers(e);
+            } catch (SAMException e) {
+                this.notifyObservers("If you tried to create an index on a sam "
+                        + "file this is the reason for the exception. Indexes"
+                        + "can only be created for bam files!");
+                this.notifyObservers(e);
             }
         }
+        this.notifyObservers("All " + totalRecords + " reads indexed!");
         indexer.finish();
     }
 
@@ -86,6 +95,42 @@ public class SamUtils implements Observable {
     public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
             observer.update(data);
+        }
+    }
+    
+    /**
+     * Creates either a sam or a bam file writer depending on the ending of the 
+     * oldFile. The output file of the new writer is the old file name + the new
+     * ending and the appropriate file extension (.sam or .bam).
+     * @param oldFile the old file (if data is not stored in a file, just create
+     *      a file with a name of your choice
+     * @param header the header of the new file
+     * @p
+     * @param presorted if true, SAMRecords must be added to the SAMFileWriter
+     *      in order that agrees with header.sortOrder.
+     * @param newEnding the ending is added to the end of the file name of the 
+     *      old file
+     * @return a pair consisting of: the sam or bam file writer ready for 
+     *      writing as the first element and the new file as the second element
+     */
+    public static Pair<SAMFileWriter, File> createSamBamWriter(File oldFile, SAMFileHeader header, boolean presorted, String newEnding) {
+        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
+        String newFileName = oldFile.getAbsolutePath();
+        String extension;
+        try {
+            newFileName = nameParts[0];
+            extension = nameParts[nameParts.length - 1];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            extension = "bam";
+        }
+        SAMFileWriterFactory factory = new SAMFileWriterFactory();
+        File outputFile;
+        if (extension.toLowerCase().contains("sam")) {
+            outputFile = new File(newFileName + newEnding + ".sam");
+            return new Pair<SAMFileWriter, File>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
+        } else {
+            outputFile = new File(newFileName + newEnding + ".bam");
+            return new Pair<SAMFileWriter, File>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
         }
     }
 }

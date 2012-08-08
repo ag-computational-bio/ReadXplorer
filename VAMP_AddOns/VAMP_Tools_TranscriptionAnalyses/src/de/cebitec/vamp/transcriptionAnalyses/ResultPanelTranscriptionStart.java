@@ -7,11 +7,11 @@ package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
-import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
@@ -79,14 +79,14 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Position", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Annotation", "Next Upstream Annotation", "Next Downstream Annotation"
+                "Position", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Annotation", "Next Upstream Annotation", "Next Downstream Annotation", "Unannotated Transcript", "Transcript Stop"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -135,7 +135,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         
-        this.promotorRegions = new ArrayList<String>();
+        this.promotorRegions = new ArrayList<>();
         
         //get reference sequence for promotor regions
         int refId = this.trackViewer.getReference().getId();
@@ -145,16 +145,16 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         
         //get the promotor region for each TSS
         for (TranscriptionStart tSS : this.tSSs) {
-            if (tSS.getStrand() == SequenceUtils.STRAND_FWD) {
+            if (tSS.isFwdStrand()) {
                 promotor = sequence.substring(tSS.getPos() - 70, tSS.getPos());
-            } else { //for your info: tSS.getStrand() == SequenceUtils.STRAND_REV
+            } else {
                 promotor = sequence.substring(tSS.getPos(), tSS.getPos() + 70);
             }
             this.promotorRegions.add(promotor);
         }
         
         TranscriptionStartColumns tSSColumns = new TranscriptionStartColumns(this.tSSs, this.promotorRegions); 
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser("xls", tSSColumns, "Transcription Start Site Table"); 
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", tSSColumns, "Transcription Start Site Table"); 
     }//GEN-LAST:event_exportButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -163,15 +163,23 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
     private javax.swing.JTable tSSTable;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Adds a list of transcription start site objects to this panel's table.
+     * @param tSSs transcription start sites to add
+     */
     public void addTSSs(List<TranscriptionStart> tSSs) {
-        final int nbColumns = 9;
+        final int nbColumns = 11;
         
         this.tSSs = tSSs;
-        DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();        
+        DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();  
+        String strand;
+        DetectedAnnotations detAnnotations;
+        PersistantAnnotation annotation;
+        TransStartUnannotated tSSU;
 
         for (TranscriptionStart tSS : this.tSSs) {
             
-            String strand = tSS.getStrand() == SequenceUtils.STRAND_FWD ? "Fwd" : "Rev";
+            strand = tSS.isFwdStrand() ? "Fwd" : "Rev";
             
             Object[] rowData = new Object[nbColumns];
             rowData[0] = tSS.getPos();
@@ -185,17 +193,25 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                 rowData[5] = Integer.MAX_VALUE;
             }
             
-            DetectedAnnotations detAnnotations = tSS.getDetAnnotations();
-            PersistantAnnotation annotation = detAnnotations.getCorrectStartAnnotation();
+            detAnnotations = tSS.getDetAnnotations();
+            annotation = detAnnotations.getCorrectStartAnnotation();
             rowData[6] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
             annotation = detAnnotations.getUpstreamAnnotation();
             rowData[7] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
             annotation = detAnnotations.getDownstreamAnnotation();
             rowData[8] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
+            
+            if (tSS instanceof TransStartUnannotated) {
+                tSSU = (TransStartUnannotated) tSS;
+                rowData[9] = true;
+                rowData[10] = tSSU.getDetectedStop();
+            } else {
+                
+            }
 
             model.addRow(rowData);
             
-            TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
             this.tSSTable.setRowSorter(sorter);
             sorter.setModel(model);
         }

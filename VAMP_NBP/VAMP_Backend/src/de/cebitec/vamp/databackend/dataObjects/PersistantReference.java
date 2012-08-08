@@ -14,6 +14,7 @@ public class PersistantReference {
     private String name;
     private String description;
     private String sequence;
+    private int refLength;
     private Timestamp timestamp;
 
     /**
@@ -29,6 +30,7 @@ public class PersistantReference {
         this.name = name;
         this.description = description;
         this.sequence = sequence;
+        this.refLength = sequence.length();
         this.timestamp = timestamp;
     }
 
@@ -58,6 +60,13 @@ public class PersistantReference {
      */
     public String getSequence() {
         return sequence;
+    }
+
+    /**
+     * @return the length of the reference sequence
+     */
+    public int getRefLength() {
+        return refLength;
     }
 
     /**

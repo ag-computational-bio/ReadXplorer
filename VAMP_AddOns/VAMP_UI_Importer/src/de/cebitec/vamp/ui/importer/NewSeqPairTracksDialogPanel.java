@@ -9,9 +9,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.mappings.SAMBAMSeqPairParser;
-import de.cebitec.vamp.parser.mappings.MappingParserI;
-import de.cebitec.vamp.parser.mappings.JokSeqPairParser;
+import de.cebitec.vamp.parser.mappings.*;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -36,7 +34,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private File mappingFile1;
     private File mappingFile2;
     private ReferenceJob[] refGenJobs;
-    private MappingParserI[] parsers = new MappingParserI[]{new JokSeqPairParser(), new SAMBAMSeqPairParser()};
+    private final JokParser jokParser;
+    private final SamBamParser samBamParser;
+    private final SamBamDirectParser samBamDirecParser;
+    private MappingParserI[] parsers;
     private MappingParserI currentParser;
     private int distance; //distance of the sequences in a sequence pair in bp
     private short deviation; //deviation allowed from that distance in %
@@ -45,10 +46,15 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
 
     /** Creates new form NewSeqPairTracksDialogPanel */
     public NewSeqPairTracksDialogPanel() {
-        refGenJobs = getRefGenJobs();
-        initComponents();
+        this.refGenJobs = getRefGenJobs();
         // choose the default parser. first entry is shown in combobox by default
-        currentParser = parsers[0];
+        this.jokParser = new JokParser(new SeqPairDBProcessor());
+        this.samBamParser = new SamBamParser(new SeqPairDBProcessor());
+        this.samBamDirecParser = new SamBamDirectParser();
+        this.parsers = new MappingParserI[] { this.samBamDirecParser };
+        this.currentParser = parsers[0];
+        initComponents();
+        this.alreadyImportedBox.setVisible(true);
     }
 
     /** This method is called from within the constructor to
@@ -84,6 +90,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         orientation2Button = new javax.swing.JRadioButton();
         importTypeLabel = new javax.swing.JLabel();
         importTypeCombo = new javax.swing.JComboBox(parsers);
+        alreadyImportedBox = new javax.swing.JCheckBox();
 
         refGenLabel.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.refGenLabel.text")); // NOI18N
 
@@ -107,7 +114,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
                 if(value instanceof ParserI){
-                    return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);
+                    return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);
                 } else {
                     return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }
@@ -181,11 +188,12 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         importTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.importTypeLabel.text")); // NOI18N
 
         importTypeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Database", "Direct File Access" }));
+        importTypeCombo.setSelectedIndex(1);
         importTypeCombo.setRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
                 if(value instanceof ParserI){
-                    return super.getListCellRendererComponent(list, ((ParserI) value).getParserName(), index, isSelected, cellHasFocus);
+                    return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);
                 } else {
                     return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }
@@ -197,17 +205,14 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
             }
         });
 
+        alreadyImportedBox.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.alreadyImportedBox.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(refGenLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(35, 35, 35)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -241,7 +246,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                                         .addComponent(jLabel2)
                                         .addGap(18, 18, 18)
                                         .addComponent(orientation1Button)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(deviationLabel)
@@ -250,13 +255,22 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(orientation2Button)
                                         .addGap(18, 18, 18)
-                                        .addComponent(orientation3Button)))))))
+                                        .addComponent(orientation3Button))))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(37, 37, 37)
+                        .addComponent(refGenLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(alreadyImportedBox)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(19, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(importTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(importTypeLabel))
@@ -294,7 +308,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refGenBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(refGenLabel)))
+                    .addComponent(refGenLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(alreadyImportedBox)
+                .addContainerGap(44, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -339,10 +356,23 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     }//GEN-LAST:event_orientation2ButtonActionPerformed
 
     private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
-        this.isDbUsed = this.importTypeCombo.getSelectedIndex() == 0 ? true : false;
+        this.isDbUsed = this.importTypeCombo.getSelectedIndex() == 0;
+        this.alreadyImportedBox.setVisible(!this.isDbUsed);
+        this.parserComboBox.removeAllItems();
+        if (!this.isDbUsed) {
+            //update the parsers to only display the bam parser.
+            this.parserComboBox.addItem(this.samBamDirecParser);
+        } else {
+            this.parserComboBox.addItem(this.samBamParser);
+            this.parserComboBox.addItem(this.jokParser);
+        }
     }//GEN-LAST:event_importTypeComboActionPerformed
 
     
+    /**
+     * Opens a file chooser for selecting a sequence pair mapping file.
+     * @param isFstFile true, if this is the first file, false if it is the second.
+     */
     private void openFileChooser(boolean isFstFile) {
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
@@ -354,11 +384,9 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         }
         int result = fc.showOpenDialog(this);
 
-        File file = null;
-
         if (result == 0) {
             // file chosen
-            file = fc.getSelectedFile();
+            File file = fc.getSelectedFile();
 
             if (file.canRead()) {
                 if (isFstFile){
@@ -382,6 +410,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox alreadyImportedBox;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton chooseButton1;
     private javax.swing.JButton chooseButton2;
@@ -408,14 +437,34 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private javax.swing.JLabel refGenLabel;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * @return true, if all required info for this sequence pair track job dialog is set,
+     * false otherwise.
+     */
     @Override
     public boolean isRequiredInfoSet() {
         if (mappingFile1 == null || mappingFile2 == null || refGenBox.getSelectedItem() == null 
-            || descriptionField.getText().isEmpty() || !distancehasValidInput()  || !deviationHasValidInput()) {
+            || descriptionField.getText().isEmpty() || !distanceHasValidInput()  || !deviationHasValidInput()) {
             return false;
         } else {
             return true;
         }
+    }
+    
+    /**
+     * @return true, if the distance is larger than 0, false otherwise
+     */
+    private boolean distanceHasValidInput() {
+        this.setDistance();
+        return this.distance > 0;
+    }
+    
+    /**
+     * @return true, if the deviation is >= 0, false otherwise
+     */
+    private boolean deviationHasValidInput() {
+        this.setDeviation();
+        return this.deviation >= 0;
     }
 
     /**
@@ -434,14 +483,23 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         return this.mappingFile2;
     }
 
+    /**
+     * @return the description of this track job.
+     */
     public String getDescription() {
         return descriptionField.getText();
     }
 
+    /**
+     * @return the reference genome associated with this track job.
+     */
     public ReferenceJob getReferenceJob() {
         return (ReferenceJob) refGenBox.getSelectedItem();
     }
 
+    /**
+     * @return the parser, which shall be used for parsing this track job.
+     */
     public MappingParserI getParser() {
         return currentParser;
     }
@@ -468,8 +526,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         return this.orientation;
     }
     
-    
-
+    /**
+     * @param jobs list of reference jobs which shall be imported now and thus
+     * have to be available for the import of new tracks too.
+     */
     public void setReferenceJobs(List<ReferenceJob> jobs) {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
 
@@ -496,7 +556,9 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         refGenBox.setModel(new DefaultComboBoxModel(gens));
     }
 
-
+    /**
+     * @return all reference genomes which are stored in the db until now.
+     */
     private ReferenceJob[] getRefGenJobs() {
         List<ReferenceJob> list = new ArrayList<ReferenceJob>();
         
@@ -520,20 +582,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
 
         return gens;
     }
-
     
-    private boolean distancehasValidInput() {
-        this.setDistance();
-        return this.distance > 0;
-    }
-
-    
-    private boolean deviationHasValidInput() {
-        this.setDeviation();
-        return this.deviation >= 0;
-    }
-    
-    
+    /**
+     * sets the average distance of the sequence pairs.
+     */
     private void setDistance(){
         try {
             this.distance = Integer.valueOf(this.distanceField.getText());
@@ -542,7 +594,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         }
     }
     
-    
+    /**
+     * Sets the maximum deviation a sequence pair can have in percent of the sequence
+     * pair distance.
+     */
     private void setDeviation(){
         try {
             this.deviation = Short.valueOf(this.deviationField.getText());
@@ -552,6 +607,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         }
     }
 
+    /**
+     * @param orientString the orientation of the sequence pairs: "fr", "rf",
+     * "ff/rr".
+     */
     private void setOrientation(String orientString) {
         if (orientString.equals("fr")) {
             this.orientation = 0;
@@ -562,7 +621,15 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         if (orientString.equals("ff/rr")){
             this.orientation = 2;
         }
-        
+    }
+    
+    /**
+     * @return true, if this direct access track was already imported in another
+     * vamp db. In that case the sam/bam file does not have to be extended
+     * anymore, because all needed data is already stored in the file.
+     */
+    public boolean isAlreadyImported() {
+        return this.alreadyImportedBox.isSelected();
     }
 
 }

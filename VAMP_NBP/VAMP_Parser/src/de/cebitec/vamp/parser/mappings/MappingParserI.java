@@ -13,16 +13,20 @@ import de.cebitec.vamp.util.Observable;
 public interface MappingParserI extends ParserI, Observable {
 
     //public abstract ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException;
+    /**
+     * Parses the input determined by the track job.
+     * @param trackJob the track job to parse
+     * @param sequenceString the reference sequence
+     * @return the parsed data object
+     * @throws ParsingException
+     * @throws OutOfMemoryError 
+     */
     public abstract Object parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError;
     
     /**
-     * Handles readnames. In an ordinary parser it only counts the reads while
-     * in a sequence pair parser it stores a mapping of readname to sequence id to
-     * identify pairs later. The last two characters of the readname are cutted, as it is
-     * assumed that they contain the read pair information (e.g. /1 & /2 or -1 & -2 for read1 and read2).
-     * @param seqID sequence id of current read
-     * @param readName readname of current read
+     * @return the sequence pair processor of this parser. It processes and
+     *      contains all necessary information for a sequence pair import.
      */
-    public void processReadname(final int seqID, final String readName);
+    public SeqPairProcessorI getSeqPairProcessor();
 
 }

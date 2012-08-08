@@ -4,12 +4,11 @@ package de.cebitec.vamp.databackend;
 /**
  * IntervalRequest implying that the coverage and diffs have to be obtained.
  * By using this class and checking the instance when carrying out the request,
- * it becomes clear if coverage and diffs are needed or not.
+ * it becomes clear if coverage and diffs are needed or not. 
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class CoverageAndDiffRequest extends IntervalRequest {
-    
 
     /**
      * An instance of CoverageAndDiffRequest implies, that the diffs are needed.

@@ -5,7 +5,9 @@ import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observer;
+import org.openide.util.NbBundle;
 
 /**
  * The parser to use for parsing a track.
@@ -17,10 +19,10 @@ public class TrackParser implements TrackParserI {
     CoverageContainer coverageContainer ;
 
     @Override
-//    public ParsedTrack parseMappings(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID,
-//            String sequenceString, Observer observer) throws ParsingException {
     public ParsedTrack parseMappings(TrackJob trackJob, String sequenceString, Observer observer, 
                     CoverageContainer covContainer) throws ParsingException, OutOfMemoryError {
+        long start = System.currentTimeMillis();
+        
         // parse mapping files and store them in appropriate source objects
         ParsedTrack track = null;
         MappingParserI mappingp = trackJob.getParser();
@@ -37,7 +39,7 @@ public class TrackParser implements TrackParserI {
             }
             this.coverageContainer.computeCoverage(mappings);
 
-            track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
+            track = new ParsedTrack(trackJob.getID(), trackJob.getDescription(), mappings, coverageContainer, trackJob.getRefGen().getID());
             track.setIsStepwise(trackJob.isStepwise());
             track.setTimestamp(trackJob.getTimestamp());
 
@@ -45,6 +47,10 @@ public class TrackParser implements TrackParserI {
         }
         mappingp = null;
         System.gc();
+        
+        long finish = System.currentTimeMillis();
+        String msg = NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully", trackJob.getFile().getName());
+        observer.update(Benchmark.calculateDuration(start, finish, msg));
 
         return track;
     }

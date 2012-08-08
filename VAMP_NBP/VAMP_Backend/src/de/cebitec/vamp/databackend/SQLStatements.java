@@ -130,8 +130,8 @@ public class SQLStatements {
     
     
     public final static String INSERT_TRACK =
-            "INSERT INTO " + FieldNames.TABLE_TRACK + " "
-            + "("
+            "INSERT INTO " + FieldNames.TABLE_TRACK
+            + " ("
             + FieldNames.TRACK_ID + ", "
             + FieldNames.TRACK_REFERENCE_ID + ", "
             + FieldNames.TRACK_DESCRIPTION + ", "
@@ -139,6 +139,12 @@ public class SQLStatements {
             + FieldNames.TRACK_PATH
             + ") "
             + "VALUES (?,?,?,?,?)";
+    
+    
+    public static final String RESET_TRACK = 
+            "UPDATE " + FieldNames.TABLE_TRACK 
+            + " SET " + FieldNames.TRACK_PATH + " = ? " 
+            + "WHERE " + FieldNames.TRACK_ID + " = ?;";
     
     
     /**

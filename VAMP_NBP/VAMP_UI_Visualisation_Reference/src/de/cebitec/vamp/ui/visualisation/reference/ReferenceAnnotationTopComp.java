@@ -319,7 +319,7 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
 
         String strand = "";
         if (f != null){
-            strand = f.getStrand() == SequenceUtils.STRAND_FWD ? "forward" : "reverse";
+            strand = f.isFwdStrand() ? "forward" : "reverse";
         }
         this.strandText.setText(strand);
     }

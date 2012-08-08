@@ -1,24 +1,19 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
-import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.HashMap;
@@ -79,6 +74,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param basePanel 
      * @param refGen reference genome
      * @param trackCon database connection to one track, that is displayed
+     * @param combineTracks true, if the coverage of the tracks contained in the
+     *      track connector should be combined.
      */
     public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
             TrackConnector trackCon, boolean combineTracks){

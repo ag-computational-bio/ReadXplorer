@@ -4,9 +4,10 @@ import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.common.sequencetools.GeneticCode;
 import de.cebitec.common.sequencetools.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
-import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
@@ -34,6 +35,7 @@ public class SnpTranslator {
     
     private final Preferences pref;
     private final String refSeq;
+    private int refLength;
     private final List<PersistantAnnotation> genomicAnnotations;
     private GeneticCode code;
     private int lastIndex;
@@ -51,9 +53,10 @@ public class SnpTranslator {
      * @param genomicAnnotations all annotations of the reference genome
      * @param refSeq the reference sequence
      */
-    public SnpTranslator(List<PersistantAnnotation> genomicAnnotations, String refSeq) {
+    public SnpTranslator(List<PersistantAnnotation> genomicAnnotations, PersistantReference reference) {
         this.genomicAnnotations = genomicAnnotations;
-        this.refSeq = refSeq;
+        this.refSeq = reference.getSequence();
+        this.refLength = reference.getRefLength();
         lastIndex = 0;
         lastPos = Integer.MAX_VALUE;
         pos = -1;
@@ -179,8 +182,8 @@ public class SnpTranslator {
         
         boolean posDirectAtLeftBorder = this.pos < 2; //pos is never smaller than 1, 1 is min
         boolean posAtLeftBorder = this.pos < 3; 
-        boolean posAtRightBorder = this.pos + 2 > this.refSeq.length();
-        boolean posDirectAtRightBorder = this.pos + 1 > this.refSeq.length();
+        boolean posAtRightBorder = this.pos + 2 > this.refLength;
+        boolean posDirectAtRightBorder = this.pos + 1 > this.refLength;
                 
         //handle annotation knowledge:
         //get each strand and triplet for correct reading frame for translation
@@ -198,7 +201,7 @@ public class SnpTranslator {
              * the neighboring subannotations for the refrence sequence of the translation triplet and also
              * the distance along all subannotations up to our snp position.
              */
-            boolean fwdStrand = annotation.getStrand() == SequenceUtils.STRAND_FWD;
+            boolean fwdStrand = annotation.isFwdStrand();
             boolean posAtLeftSubBorder = false;
             boolean posAtRightSubBorder = false;
             boolean snpInSubannotation = false; //if not and we have subannotations, then this snp will not be translated

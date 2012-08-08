@@ -26,6 +26,9 @@ public class ParsedSeqPairContainer {
     private List<Pair<Long, Long>> mappingToPairIDList;
 
     
+    /**
+     * Creates a new and empty sequence pair container.
+     */
     public ParsedSeqPairContainer(){
         this.parsedSeqPairs = new HashMap<Pair<Long, Long>, ParsedSeqPairMapping>();
         this.mappingToPairIDList = new ArrayList<Pair<Long, Long>>();
@@ -37,8 +40,8 @@ public class ParsedSeqPairContainer {
      * Mapping = is unique to a sequence and position
      */
     public void addParsedSeqPair(Pair<Long, Long> mappingIDs, ParsedSeqPairMapping parsedSeqPair) {
-        if(!this.parsedSeqPairs.containsKey(mappingIDs)){
-            this.parsedSeqPairs.put(mappingIDs, parsedSeqPair);   
+        if (!this.parsedSeqPairs.containsKey(mappingIDs)) {
+            this.parsedSeqPairs.put(mappingIDs, parsedSeqPair); //TODO: mappingIDs can be vice versa
             if (parsedSeqPair.getType() == Properties.TYPE_PERFECT_PAIR) {
                 ++this.numUniquePerfectSPs;
                 ++this.numOfPerfectSPs;

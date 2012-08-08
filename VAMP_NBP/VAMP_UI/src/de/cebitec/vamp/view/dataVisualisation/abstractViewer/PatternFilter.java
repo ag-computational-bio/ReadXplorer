@@ -25,7 +25,7 @@ public class PatternFilter implements RegionFilterI {
     private PersistantReference refGen;
     private String sequence;
     private Pattern pattern;
-    private Pattern patternRev;
+//    private Pattern patternRev;
 
     public PatternFilter(int absStart, int absStop, PersistantReference refGen) {
         this.matchedPatterns = new ArrayList<Region>();
@@ -43,21 +43,22 @@ public class PatternFilter implements RegionFilterI {
 
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
 
-            int offset = this.pattern.toString().length();
+            int offset = this.pattern.toString().length(); //shift by pattern length to left
             int start = this.absStart - offset;
-            int stop = this.absStop + this.pattern.toString().length()-1;
+            int stop = this.absStop + offset - 1;
 
             if (start < 0 ) {
                 offset -= Math.abs(start);
                 start = 0;
             }
-            if (stop > this.refGen.getSequence().length()) {
-                stop = this.refGen.getSequence().length();
+            if (stop > this.refGen.getRefLength()) {
+                stop = this.refGen.getRefLength();
             }
 
             this.sequence = this.refGen.getSequence().substring(start, stop);
             this.matchPattern(this.sequence, this.pattern, true, offset);
-            this.matchPattern(this.sequence, this.patternRev, false, offset);
+            this.sequence = SequenceUtils.getReverseComplement(this.sequence).toLowerCase();
+            this.matchPattern(this.sequence, this.pattern, false, offset);
         }
         return this.matchedPatterns;
 
@@ -70,7 +71,7 @@ public class PatternFilter implements RegionFilterI {
      */
     public int findNextOccurrence() {
 
-        int refLength = refGen.getSequence().length();
+        int refLength = refGen.getRefLength();
         int from = -1;
         int from2 = -1;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
@@ -85,24 +86,25 @@ public class PatternFilter implements RegionFilterI {
             }
 
             String seq = refGen.getSequence().substring(start, refLength);
+            String seqRev = SequenceUtils.getReverseComplement(seq);
             
             //at first search from current position till end of sequence on both frames
             from = this.matchNextOccurrence(seq, this.pattern);
-            from2 = this.matchNextOccurrence(seq, this.patternRev);
+            from2 = this.matchNextOccurrence(seqRev, this.pattern);
             
             //then search from 0 to current position on both frames
-            if (from == -1 && from2 == -1 && start > 0){
+            if (from == -1 && from2 == -1 && start > 0) {
                 seq = refGen.getSequence().substring(0, start);
                 start = 0;
                 
                 from = this.matchNextOccurrence(seq, this.pattern);
-                from2 = this.matchNextOccurrence(seq, this.patternRev);
+                from2 = this.matchNextOccurrence(seqRev, this.pattern);
             }
             
             if (from < from2 && from != -1 || from2 == -1 && from > from2) {
                 return from + start; //2.631.133
             } else if (from2 != -1) {
-                return from2 + start;
+                return seq.length() - from2 + start;
             } else { /* both are -1*/ }
         }
         return from;
@@ -111,12 +113,13 @@ public class PatternFilter implements RegionFilterI {
     /**
      * Identifies next (closest) occurrence from either forward or reverse strand of a pattern 
      * in the current reference genome.
+     * @param isFwdStrand true, if the next occurrence on the fwd strand is needed
      * @return the position of the next occurrence of the pattern
      */
     public int findNextOccurrenceOnStrand(boolean isFwdStrand) {
 
         String genomeSeq = refGen.getSequence();
-        int refLength = genomeSeq.length();
+        int refLength = refGen.getRefLength();
         int from = -1;
         int start = this.absStart;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
@@ -162,10 +165,21 @@ public class PatternFilter implements RegionFilterI {
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, int offset) {
 
         Matcher m = p.matcher(sequence);
+        int from;
+        int to;
+        int end;
         while (m.find()) {
-            int from = m.start();
-            int to = m.end() - 1;
-            this.matchedPatterns.add(new Region(absStart - offset + from + 1, absStart - offset + to + 1, isForwardStrand, Properties.PATTERN));
+            from = m.start();
+            to = m.end() - 1;
+            if (isForwardStrand) {
+                from = absStart - offset + from + 1;
+                to = absStart - offset + to + 1;
+            } else {
+                end = from;
+                from = absStart - offset + sequence.length() - (to );
+                to = absStart -offset + sequence.length() - (end);
+            }
+            this.matchedPatterns.add(new Region(from, to, isForwardStrand, Properties.PATTERN));
         }
     }
     
@@ -202,6 +216,6 @@ public class PatternFilter implements RegionFilterI {
      */
     public final void setPattern(String pattern) {
         this.pattern = Pattern.compile(pattern);
-        this.patternRev = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(pattern)));
+//        this.patternRev = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(pattern)));
     }
 }

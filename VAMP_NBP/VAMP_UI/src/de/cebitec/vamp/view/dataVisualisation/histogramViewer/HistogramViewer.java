@@ -1,25 +1,24 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
 import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.*;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
-//import de.cebitec.vamp.view.dataVisualisation.ZoomLevelExcusePanel;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.SequenceBar;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.openide.util.NbBundle;
@@ -49,6 +48,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private PersistantCoverage cov;
     private boolean dataLoaded;
     private boolean isColored = false;
+    private boolean diffsLoaded;
+    private boolean coverageLoaded;
+//    private boolean isUpperBoundCorrected;
 //    private ZoomLevelExcusePanel zoomExcuse;
     // maximum coverage found in interval, regarding both strands
     private int maxCoverage;
@@ -189,31 +191,43 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     private void requestData() {
         if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
-            trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
-            this.setupData();
+            this.coverageLoaded = true;
+            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
+            if (this.diffsLoaded) {
+                this.setupData();
+            }
         } else {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            this.coverageLoaded = false;
+            this.diffsLoaded = false;
             trackConnector.addCoverageRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
+            trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
         }
     }
 
     @Override
     public synchronized void receiveData(Object data) {
         if (data instanceof CoverageAndDiffResultPersistant) {
-            final CoverageAndDiffResultPersistant resultData = (CoverageAndDiffResultPersistant) data;
+            final CoverageAndDiffResultPersistant result = (CoverageAndDiffResultPersistant) data;
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    cov = resultData.getCoverage();
-                    if (resultData.isDiffsAndGapsUsed()) {
-                        diffs = resultData.getDiffs();
-                        gaps = resultData.getGaps();
+                    if (!coverageLoaded && result.getCoverage().getRightBound() != 0 && result.getLowerBound() <= lowerBound && result.getUpperBound() >= upperBound) {
+                        cov = result.getCoverage();
+                        coverageLoaded = true;
+                    }
+                    if (result.isDiffsAndGapsUsed() && !diffsLoaded && result.getLowerBound() <= lowerBound && result.getUpperBound() >= upperBound) {
+                        diffs = result.getDiffs();
+                        gaps = result.getGaps();
                         Collections.sort(diffs);
                         Collections.sort(gaps);
+                        diffsLoaded = true;
                     }
-                    setupData();
-                    repaint();
+                    if (coverageLoaded && diffsLoaded) {
+                        setupData();
+                        repaint();
+                    }
                 }
             });
         }
@@ -240,27 +254,29 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public void boundsChangedHook() {
-        this.lowerBound = super.getBoundsInfo().getLogLeft();
-        this.upperBound = super.getBoundsInfo().getLogRight();
-        this.width = upperBound - lowerBound + 1;
-        this.dataLoaded = false;
-        this.removeAll();
+        if (super.getBoundsInfo().getLogLeft() != lowerBound || super.getBoundsInfo().getLogRight() != upperBound) {
+            this.lowerBound = super.getBoundsInfo().getLogLeft();
+            this.upperBound = super.getBoundsInfo().getLogRight();
+            this.width = upperBound - lowerBound + 1;
+            this.dataLoaded = false;
+            this.removeAll();
 
-        if (!this.isInMaxZoomLevel()) {
-            this.getBoundsInformationManager().zoomLevelUpdated(1);
-        }
-        
-        this.setInDrawingMode(true);
+            if (!this.isInMaxZoomLevel()) {
+                this.getBoundsInformationManager().zoomLevelUpdated(1);
+            }
 
-        if (this.hasLegend()) {
-            this.add(this.getLegendLabel());
-            this.add(this.getLegendPanel());
-        }
-        if (this.hasSequenceBar()) {
-            this.add(this.getSequenceBar());
-        }
+            this.setInDrawingMode(true);
 
-        this.requestData();
+            if (this.hasLegend()) {
+                this.add(this.getLegendLabel());
+                this.add(this.getLegendPanel());
+            }
+            if (this.hasSequenceBar()) {
+                this.add(this.getSequenceBar());
+            }
+
+            this.requestData();
+        }
     }
 
     private List<Integer> getCoverageScaleLineValues() {
@@ -386,9 +402,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     @SuppressWarnings("fallthrough")
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean isColored) {
-        double value = 0;
+        double value;
         int featureHeight;
-        Color c = null;
+        Color c;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
         char base= refGen.getSequence().charAt(absPos-1);
 
@@ -470,14 +486,18 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         }
     }
 
+    /**
+     * Adjusts the absolute stop position, if gaps are involved.
+     */
     private void adjustAbsStop() {
         // count the number of gaps occuring in visible area
         int tmpWidth = upperBound - lowerBound + 1;
         int gapNo = 0; // count the number of gaps
         int widthCount = 0; // count the number of bases
         int i = 0; // count variable till max width
+        int num;
         while (widthCount < tmpWidth) {
-            int num = gapManager.getNumOfGapsAt(lowerBound + i); // get the number of gaps at current position
+            num = gapManager.getNumOfGapsAt(lowerBound + i); // get the number of gaps at current position
             widthCount++; // current position needs 1 base space in visual alignment
             widthCount += num; // if gaps occured at current position, they need some space, too
             gapNo += num;
@@ -550,6 +570,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
             drawBaseLines(g);
 
+            // draw coverage values and lines for the coverage values depending
+            // on the maximum coverage in the given interval
             PaintingAreaInfo info = getPaintingAreaInfo();
             for (Integer i : scaleValues) {
                 String label = String.valueOf(i);
@@ -569,6 +591,10 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         }
     }
 
+    /**
+     * Draw the base lines for fwd and rev strand in the middle of the viewer.
+     * @param graphics 
+     */
     private void drawBaseLines(Graphics2D graphics) {
         PaintingAreaInfo info = getPaintingAreaInfo();
         graphics.drawLine(info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow());
