@@ -1,7 +1,11 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.AnalysisHandler;
+import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
+import de.cebitec.vamp.differentialExpression.Group;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

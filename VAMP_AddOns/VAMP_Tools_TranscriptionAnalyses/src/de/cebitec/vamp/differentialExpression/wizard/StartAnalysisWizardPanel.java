@@ -1,26 +1,27 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
+import java.io.File;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class SelectTrackWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private SelectTrackVisualPanel component;
+    private StartAnalysisVisualPanel component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public SelectTrackVisualPanel getComponent() {
+    public StartAnalysisVisualPanel getComponent() {
         if (component == null) {
-            component = new SelectTrackVisualPanel();
+            component = new StartAnalysisVisualPanel(this);
         }
         return component;
     }
@@ -58,17 +59,15 @@ public class SelectTrackWizardPanel implements WizardDescriptor.ValidatingPanel<
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state
-        if (getComponent().selectionFinished()) {
-            wiz.putProperty("genomeID", getComponent().getSelectedReferenceGenomeID());
-            wiz.putProperty("tracks", getComponent().getSelectedTracks());
+        if (getComponent().isCheckBoxchecked()) {
+            //TODO: Input validation
+            String path = getComponent().getSavePath();
+            File file = new File(path);
+            wiz.putProperty("saveFile", file);
         }
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (!getComponent().selectionFinished()) {
-            throw new WizardValidationException(null, "Please select a reference genome and at least two tracks", null);
-        }
     }
 }

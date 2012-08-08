@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.wizard.DeSeqAnalysisData;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;

@@ -1,6 +1,8 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.AnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeSeq;
 import java.io.File;
 import java.util.List;
 import java.util.Map;

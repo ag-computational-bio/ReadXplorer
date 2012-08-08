@@ -1,6 +1,8 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.Group;
+import de.cebitec.vamp.differentialExpression.Group;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

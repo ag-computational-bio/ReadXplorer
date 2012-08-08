@@ -1,5 +1,6 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
+import de.cebitec.vamp.differentialExpression.AnalysisHandler;
 import de.cebitec.vamp.differentialExpression.AnalysisHandler.Tool;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;

@@ -1,27 +1,36 @@
-package de.cebitec.vamp.differentialExpression;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package de.cebitec.vamp.differentialExpression.wizard;
 
-import java.io.File;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private StartAnalysisVisualPanel component;
+    private DeSeqVisualPanelDesign component;
+    private List<PersistantTrack> tracks;
+    private List<String[]> design;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public StartAnalysisVisualPanel getComponent() {
+    public DeSeqVisualPanelDesign getComponent() {
         if (component == null) {
-            component = new StartAnalysisVisualPanel(this);
+            component = new DeSeqVisualPanelDesign();
         }
         return component;
     }
@@ -54,20 +63,34 @@ public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPane
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state
+        tracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        getComponent().setTracks(tracks);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        if (getComponent().isCheckBoxchecked()) {
-            //TODO: Input validation
-            String path = getComponent().getSavePath();
-            File file = new File(path);
-            wiz.putProperty("saveFile", file);
-        }
+        wiz.putProperty("design", design);
     }
 
     @Override
     public void validate() throws WizardValidationException {
+        design = new ArrayList<>();
+        Vector tableData = getComponent().getTableData();
+        for (int j = 0; j < tableData.size(); j++) {
+            Vector row = (Vector) tableData.elementAt(j);
+            String[] rowAsString = new String[tracks.size()];
+            for (int i = 0; i < tracks.size(); i++) {
+                String currentCell = (String) row.elementAt(i);
+                if (currentCell == null) {
+                    if (j == 0) {
+                        throw new WizardValidationException(null, "At least one design element must be specified.", null);
+                    } else {
+                        throw new WizardValidationException(null, "Please fill out the complete row or remove it.", null);
+                    }
+                }
+                rowAsString[i] = currentCell;
+            }
+            design.add(rowAsString);
+        }
     }
 }
