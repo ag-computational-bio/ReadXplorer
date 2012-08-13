@@ -14,10 +14,12 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
 
     private List<String[]> design;
     private DeSeq deSeq = new DeSeq();
-
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<String[]> design, Integer refGenomeID, File saveFile) {
+    private boolean workingWithoutReplicates;
+    
+    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<String[]> design, Integer refGenomeID, boolean workingWithoutReplicates, File saveFile) {
         super(selectedTraks, refGenomeID, saveFile);
         this.design = design;
+        this.workingWithoutReplicates = workingWithoutReplicates;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         List<RVector> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            DeSeqAnalysisData deSeqAnalysisData = new DeSeqAnalysisData(getSelectedTraks().size(), this.design);
+            DeSeqAnalysisData deSeqAnalysisData = new DeSeqAnalysisData(getSelectedTraks().size(), this.design, this.workingWithoutReplicates);
             prepareAnnotations(deSeqAnalysisData);
             prepareCountData(deSeqAnalysisData, allCountData);
             results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTraks().size(), getSaveFile());

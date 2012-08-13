@@ -25,7 +25,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     private List<Object[][]> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private File saveFile = null;
-    public static final boolean TESTING_MODE = true;
+    public static final boolean TESTING_MODE = false;
 
     public static enum Tool {
 

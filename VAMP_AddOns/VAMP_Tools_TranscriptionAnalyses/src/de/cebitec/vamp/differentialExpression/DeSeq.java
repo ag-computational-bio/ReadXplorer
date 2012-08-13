@@ -82,23 +82,39 @@ public class DeSeq {
         }
         concatenate.deleteCharAt(concatenate.length() - 1);
 
-        //The individual variables are then used to create the design element
-        gnuR.eval("design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")");
-
-        //Now everything is set up and the count data object on which the main
-        //analysis will be performed can be created
-        gnuR.eval("cD <- newCountDataSet(inputData, design)");
+        if (numberOfSubDesigns > 1) {
+            //The individual variables are then used to create the design element
+            gnuR.eval("design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")");
+            //Now everything is set up and the count data object on which the main
+            //analysis will be performed can be created
+            gnuR.eval("cD <- newCountDataSet(inputData, design)");
+        } else {
+            //If this is just a two conditons experiment we only create the conds array
+            gnuR.eval("conds <- factor(subDesign1)");
+            //Now everything is set up and the count data object on which the main
+            //analysis will be performed can be created
+            gnuR.eval("cD <- newCountDataSet(inputData, conds)");
+        }
 
         //We estimate the size factor
         gnuR.eval("cD <- estimateSizeFactors(cD)");
 
-        //The dispersion is estimated
-        gnuR.eval("cD <- estimateDispersions(cD)");
+        if (analysisData.isWorkingWithoutReplicates()) {
+            // If there are no replicates for each condition we need to tell
+            // the function to ignore this fact.
+            gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+        } else {
+            //The dispersion is estimated
+            gnuR.eval("cD <- estimateDispersions(cD)");
+        }
 
 
-        //Perform the Test.
-        //TODO: Test for multi experiments
-        gnuR.eval("res <- nbinomTest( cD, \"1\", \"2\" )");
+        if (numberOfSubDesigns > 1) {
+            //TODO: Test for multi experiments
+        } else {
+            //Perform the normal test.
+            gnuR.eval("res <- nbinomTest( cD, \"ONE\", \"TWO\" )");
+        }
 
         List<RVector> results = new ArrayList<>();
         try {
