@@ -2,8 +2,12 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RFactor;
 import org.rosuda.JRI.RVector;
 
 /**
@@ -35,12 +39,40 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
             results = deSeq.process(null, 3232, getSelectedTraks().size(), getSaveFile());
         }
 
-//        setResults(convertRresults(results));
+        setResults(convertRresults(results));
         notifyObservers(this);
+    }
+    
+        private List<Object[][]> convertRresults(List<RVector> results) {
+        List<Object[][]> ret = new ArrayList<>();
+        for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
+            RVector currentRVector = it.next();
+            int i = 0;
+            Object[][] current = new Object[currentRVector.at(1).asDoubleArray().length][currentRVector.size()];
+            String[] currentStringValues = currentRVector.at(i).asStringArray();
+            for (int j = 0; j < currentStringValues.length; j++) {
+                current[j][i] = currentStringValues[j];
+            }
+            i++;
+            for (; i < currentRVector.size(); i++) {
+                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
+                for (int j = 0; j < currentDoubleValues.length; j++) {
+                    current[j][i] = currentDoubleValues[j];
+                }
+            }
+            ret.add(current);
+        }
+        return ret;
     }
 
     @Override
     public void endAnalysis() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        deSeq.shutdown();
+        deSeq = null;
+    }
+
+    void saveResultsAsCSV(int selectedIndex, String path) {
+        File saveFile = new File(path);
+        deSeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 }

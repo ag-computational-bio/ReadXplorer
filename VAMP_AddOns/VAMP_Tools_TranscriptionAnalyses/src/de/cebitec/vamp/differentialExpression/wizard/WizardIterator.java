@@ -5,6 +5,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.AnalysisHandler;
 import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeSeqResultViewerTopComponent;
 import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
 import de.cebitec.vamp.differentialExpression.Group;
 import java.awt.Component;
@@ -74,6 +75,10 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
 
             if (tool == AnalysisHandler.Tool.DeSeq) {
                 handler = new DeSeqAnalysisHandler(selectedTraks, design, genomeID, workingWithoutReplicates, saveFile);
+                DeSeqResultViewerTopComponent resultViewerTC = new DeSeqResultViewerTopComponent(handler);
+                resultViewerTC.open();
+                resultViewerTC.requestActive();
+                handler.registerObserver(resultViewerTC);
             }
 
             handler.start();
