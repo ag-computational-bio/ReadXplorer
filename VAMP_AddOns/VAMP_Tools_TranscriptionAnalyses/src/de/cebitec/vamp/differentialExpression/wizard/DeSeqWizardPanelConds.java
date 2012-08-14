@@ -1,28 +1,29 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel1b implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class DeSeqWizardPanelConds implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private diffExpVisualPanel1b component;
+    private DeSeqVisualPanelConds component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public diffExpVisualPanel1b getComponent() {
+    public DeSeqVisualPanelConds getComponent() {
         if (component == null) {
-            component = new diffExpVisualPanel1b();
+            component = new DeSeqVisualPanelConds();
         }
         return component;
     }
@@ -55,21 +56,24 @@ public class diffExpWizardPanel1b implements WizardDescriptor.ValidatingPanel<Wi
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state
-        List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
-        getComponent().updateTrackList(selectedTraks);
+        List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        getComponent().updateTrackList(selectedTracks);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        // use wiz.putProperty to remember current panel state
-        wiz.putProperty("replicateStructure", getComponent().getCreatedReplicates());
+        if (getComponent().conditionsComplete()) {
+            List<String[]> conds = new ArrayList<>();
+            conds.add(getComponent().getConditions());
+            wiz.putProperty("design", conds);
+            wiz.putProperty("workingWithoutReplicates", getComponent().workingWithoutReplicates());
+        }
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (getComponent().noReplicatesCreated()) {
-            throw new WizardValidationException(null, "You must define the replicate structure.", null);
+        if (!getComponent().conditionsComplete()) {
+            throw  new WizardValidationException(null, "Please assigne every track to a condition.", null);
         }
     }
 }

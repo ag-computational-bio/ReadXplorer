@@ -1,6 +1,7 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.Group;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +11,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public final class diffExpVisualPanel2 extends JPanel implements ListSelectionListener {
+public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionListener {
 
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<>();
@@ -21,9 +22,9 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
     private int selectedIndex = -1;
 
     /**
-     * Creates new form diffExpVisualPanel2
+     * Creates new form BaySeqVisualPanel3
      */
-    public diffExpVisualPanel2() {
+    public BaySeqVisualPanel3() {
         initComponents();
     }
 
@@ -78,14 +79,14 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
         removeGroupButton = new javax.swing.JButton();
         infoText = new javax.swing.JLabel();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.jLabel1.text")); // NOI18N
 
         jScrollPane1.setViewportView(trackList);
 
         groupCreationField.setEditable(false);
-        groupCreationField.setText(org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.groupCreationField.text")); // NOI18N
+        groupCreationField.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.groupCreationField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.addButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.addButton.text")); // NOI18N
         addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addButtonActionPerformed(evt);
@@ -96,9 +97,9 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
         createdGroupsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(createdGroupsList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.jLabel2.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(addGroupButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.addGroupButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addGroupButton, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.addGroupButton.text")); // NOI18N
         addGroupButton.setEnabled(false);
         addGroupButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -106,7 +107,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeGroupButton, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.removeGroupButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeGroupButton, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.removeGroupButton.text")); // NOI18N
         removeGroupButton.setEnabled(false);
         removeGroupButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,7 +115,7 @@ public final class diffExpVisualPanel2 extends JPanel implements ListSelectionLi
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(infoText, org.openide.util.NbBundle.getMessage(diffExpVisualPanel2.class, "diffExpVisualPanel2.infoText.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(infoText, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.infoText.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

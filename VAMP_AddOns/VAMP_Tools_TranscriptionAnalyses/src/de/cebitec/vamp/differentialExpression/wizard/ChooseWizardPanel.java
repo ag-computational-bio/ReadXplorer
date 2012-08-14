@@ -1,27 +1,26 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.wizard;
 
-import java.io.File;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class diffExpWizardPanel3 implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class ChooseWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private diffExpVisualPanel3 component;
+    private ChooseVisualPanel component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public diffExpVisualPanel3 getComponent() {
+    public ChooseVisualPanel getComponent() {
         if (component == null) {
-            component = new diffExpVisualPanel3(this);
+            component = new ChooseVisualPanel();
         }
         return component;
     }
@@ -59,12 +58,7 @@ public class diffExpWizardPanel3 implements WizardDescriptor.ValidatingPanel<Wiz
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        if (getComponent().isCheckBoxchecked()) {
-            //TODO: Input validation
-            String path = getComponent().getSavePath();
-            File file = new File(path);
-            wiz.putProperty("saveFile", file);
-        }
+        wiz.putProperty("tool", getComponent().getSelectedTool());
     }
 
     @Override

@@ -92,4 +92,7 @@ public class Properties {
     /** r = Supported extension of read 2. */
     public static final char EXT_B2 = 'r';
     
+    /** The CRAN Mirror used by Gnu R to load missing packages */
+    public static final String CRAN_MIRROR = "CRAN_MIRROR";
+    
 }
