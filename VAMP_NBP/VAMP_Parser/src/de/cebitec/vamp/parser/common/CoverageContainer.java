@@ -49,8 +49,8 @@ public class CoverageContainer {
      * Creates a new and empty CoverageContainer.
      */
     public CoverageContainer() {
-        this.coverage = new HashMap<Integer, Integer[]>();
-        this.positionTable = new HashMap<String, Integer[]>();
+        this.coverage = new HashMap<>();
+        this.positionTable = new HashMap<>();
         this.coverageArrayLength = CoverageContainer.NUM_OF_CASES * CoverageContainer.FIELDS_PER_CASE;
         this.coveredPerfectPositions = 0;
         this.coveredBestMatchPositions = 0;
@@ -418,8 +418,8 @@ public class CoverageContainer {
      * @param clearPos the position up to which the coverage container should be cleared.
      */
     public void clearCoverageContainerUpTo(int clearPos) {
-        HashMap<Integer, Integer[]> newCoverage = new HashMap<Integer, Integer[]>();
-        HashMap<String, Integer[]> newPositionTable = new HashMap<String, Integer[]>();
+        HashMap<Integer, Integer[]> newCoverage = new HashMap<>();
+        HashMap<String, Integer[]> newPositionTable = new HashMap<>();
         Iterator<String> posIterator = positionTable.keySet().iterator();
         String posString;
         int pos;

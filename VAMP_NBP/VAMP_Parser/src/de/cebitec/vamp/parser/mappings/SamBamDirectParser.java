@@ -4,7 +4,6 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
-import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observer;
@@ -14,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
@@ -31,7 +31,6 @@ public class SamBamDirectParser implements MappingParserI {
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM/BAM Output";
     
-    private CoverageContainer coverageContainer;
     private SeqPairProcessorI seqPairProcessor;
     private List<Observer> observers;
 
@@ -41,7 +40,6 @@ public class SamBamDirectParser implements MappingParserI {
     public SamBamDirectParser() {
         this.observers = new ArrayList<>();
         this.seqPairProcessor = new SeqPairProcessorDummy();
-        this.coverageContainer = new CoverageContainer();
     }
     
     /**
@@ -105,98 +103,93 @@ public class SamBamDirectParser implements MappingParserI {
         //mapping of read name to number of occurences of the read and the lowest error number
         Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
 
-        ParsedMapping mapping;
         String refSeq;
         int start;
         int stop;
         int differences;
         boolean isRevStrand;
-        byte direction;
         String readSeq;
         String cigar;
         String readName;
         Pair<Integer, Integer> classificationPair;
         DiffAndGapResult diffGapResult;
 
-        SAMFileReader sam = new SAMFileReader(trackJob.getFile());
-        SAMRecordIterator samItor = sam.iterator();
+        try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
+            SAMRecordIterator samItor = sam.iterator();
 
-        SAMRecord record;
-        while (samItor.hasNext()) {
-            ++lineno;
-            try {
+            SAMRecord record;
+            while (samItor.hasNext()) {
+                try {
+                    ++lineno;
 
-                record = samItor.next();
-                if (!record.getReadUnmappedFlag()) {
+                    record = samItor.next();
+                    if (!record.getReadUnmappedFlag()) {
 
-                    cigar = record.getCigarString();
-                    readSeq = record.getReadString();
-                    start = record.getAlignmentStart();
-                    stop = record.getAlignmentEnd();
-                    refSeq = refSeqWhole.substring(start - 1, stop);
-                    
-                    if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
-                        continue; //continue, and ignore read, if it contains inconsistent information
+                        cigar = record.getCigarString();
+                        readSeq = record.getReadString();
+                        start = record.getAlignmentStart();
+                        stop = record.getAlignmentEnd();
+                        refSeq = refSeqWhole.substring(start - 1, stop);
+
+                        if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                            continue; //continue, and ignore read, if it contains inconsistent information
+                        }
+
+                        /*
+                         * The cigar values are as follows: 0 (M) = alignment match
+                         * (both, match or mismatch), 1 (I) = insertion, 2 (D) =
+                         * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) =
+                         * hard clipped, 6 (P) = padding, 7 (=) = sequene match, 8
+                         * (X) = sequence mismatch. H not needed, because these
+                         * bases are not present in the read sequence!
+                         */
+                        //count differences to reference
+                        isRevStrand = record.getReadNegativeStrandFlag();
+                        diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+                        differences = diffGapResult.getDifferences();
+
+                        // add data to map
+                        readName = record.getReadName();
+                        if (!classificationMap.containsKey(readName)) {
+                            classificationMap.put(readName, new Pair<>(0, Integer.MAX_VALUE));
+                        }
+                        classificationPair = classificationMap.get(readName);
+                        classificationPair.setFirst(classificationPair.getFirst() + 1);
+                        if (classificationPair.getSecond() > differences) {
+                            classificationPair.setSecond(differences);
+                        }
+
+                        // increase seqId for new read sequence and reset other fields
+                        if (!lastReadSeq.equals(readSeq)) {
+                            ++seqId;
+                        }
+                        lastReadSeq = readSeq;
+
+                        this.seqPairProcessor.processReadname(seqId, readName);
+
+                        //saruman starts genome at 0 other algorithms like bwa start genome at 1
+
+                    } else {
+                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
                     }
-
-                    /*
-                     * The cigar values are as follows: 0 (M) = alignment match
-                     * (both, match or mismatch), 1 (I) = insertion, 2 (D) =
-                     * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) =
-                     * hard clipped, 6 (P) = padding, 7 (=) = sequene match, 8
-                     * (X) = sequence mismatch. H not needed, because these
-                     * bases are not present in the read sequence!
-                     */
-                    //count differences to reference
-                    isRevStrand = record.getReadNegativeStrandFlag();
-                    diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
-                    differences = diffGapResult.getDifferences();
-                    
-                    // add data to map
-                    readName = record.getReadName();
-                    if (!classificationMap.containsKey(readName)) {
-                        classificationMap.put(readName, new Pair<>(0, Integer.MAX_VALUE));
-                    }
-                    classificationPair = classificationMap.get(readName);
-                    classificationPair.setFirst(classificationPair.getFirst() + 1);
-                    if (classificationPair.getSecond() > differences) {
-                        classificationPair.setSecond(differences);
-                    }
-                    
-                    // increase seqId for new read sequence and reset other fields
-                    if (!lastReadSeq.equals(readSeq)) {
-                        ++seqId;
-                    }
-                    lastReadSeq = readSeq;
-                    
-                    this.seqPairProcessor.processReadname(seqId, readName);
-                    
-                    //store data for position table
-                    direction = isRevStrand ? (byte) -1 : 1;
-                    mapping = new ParsedMapping(start, stop, direction, diffGapResult.getDiffs(), diffGapResult.getGaps(), differences);
-                    this.coverageContainer.addMapping(mapping);
-                    this.coverageContainer.savePositions(mapping);
-
-                    //saruman starts genome at 0 other algorithms like bwa start genome at 1
-
-                } else {
+                } catch (SAMFormatException e) {
                     this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                            "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                            "Parser.Parsing.CorruptData", lineno, e.toString()));
                 }
-            } catch (RuntimeEOFException e) {
-                continue; //skip current incomplete read
+
             }
+
+            samItor.close();
+        } catch (RuntimeEOFException e) {
+            this.notifyObservers("Last read in the file is incomplete, ignoring it.");
         }
-
-
-        samItor.close();
-        sam.close();
 
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully", fileName);
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
 
-        return new DirectAccessDataContainer(this.coverageContainer, classificationMap);
+        return new DirectAccessDataContainer(new CoverageContainer(), classificationMap);
     }
 
     @Override

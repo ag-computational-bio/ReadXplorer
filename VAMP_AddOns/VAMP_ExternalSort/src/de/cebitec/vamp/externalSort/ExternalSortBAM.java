@@ -32,7 +32,7 @@ public abstract class ExternalSortBAM {
     private File sortedFile;
     private String chunkName;
     private InputOutput io;
-    private final int chunkSize = 500000;
+    private final int chunkSize = 250000;
     private int workunits;
     private ProgressHandle ph;
 
@@ -71,23 +71,23 @@ public abstract class ExternalSortBAM {
      * @param file the file whose record number needs to be known
      */
     private void countLines(File file) {
-        SAMFileReader samReader = new SAMFileReader(file);
-        samHeader = samReader.getFileHeader();
-        SAMRecordIterator itLine = samReader.iterator();
-        int lines = 0;
-        while (itLine.hasNext()) {
-            try {
-                itLine.next();
-                lines++;
-            } catch (SAMFormatException e) {
-                ++lines;
-                io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.SamFormatException", lines));
+        try (SAMFileReader samReader = new SAMFileReader(file)) {
+            samHeader = samReader.getFileHeader();
+            SAMRecordIterator itLine = samReader.iterator();
+            int lines = 0;
+            while (itLine.hasNext()) {
+                try {
+                    itLine.next();
+                    lines++;
+                } catch (SAMFormatException e) {
+                    ++lines;
+                    io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.SamFormatException", lines));
+                }
             }
+            workunits = lines *2;
+            ph.start(workunits);
+            itLine.close();
         }
-        workunits = lines *2;
-        ph.start(workunits);
-        itLine.close();
-        samReader.close();
     }
 
     /**
@@ -98,22 +98,22 @@ public abstract class ExternalSortBAM {
         this.countLines(inputFile);
 
         SAMFileReader samReader = new SAMFileReader(inputFile);
-        SAMRecordIterator it = samReader.iterator();
+        SAMRecordIterator samIt = samReader.iterator();
 
-        ArrayList<SAMRecord> chunkSizeRows = new ArrayList<SAMRecord>();
+        ArrayList<SAMRecord> chunkSizeRows = new ArrayList<>();
 
         int numFiles = 0;
         workunits = 0;
         File f;
         BAMFileWriter bfw;
-        while (it.hasNext()) {
+        while (samIt.hasNext()) {
 
             try {
 
 // get chunkSize rows
                 for (int i = 0; i < chunkSize; i++) {
-                    if (it.hasNext()) {
-                        chunkSizeRows.add(it.next());
+                    if (samIt.hasNext()) {
+                        chunkSizeRows.add(samIt.next());
                     } else {
                         break;
                     }
@@ -127,6 +127,7 @@ public abstract class ExternalSortBAM {
                 f = new File(chunkName + numFiles);
                 bfw = new BAMFileWriter(f);
                 bfw.setSortOrder(SAMFileHeader.SortOrder.unsorted, true);
+                samHeader.setSortOrder(SAMFileHeader.SortOrder.unsorted);
                 bfw.setHeader(samHeader);
                 for (int i = 0; i < chunkSizeRows.size(); i++) {
                     bfw.addAlignment(chunkSizeRows.get(i));
@@ -143,7 +144,7 @@ public abstract class ExternalSortBAM {
                 io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.SamFormatException2"));
             }
         }
-        it.close();
+        samIt.close();
         samReader.close();
         io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.sort.chunks.created", numFiles));
         io.getOut().println(NbBundle.getMessage(ExternalSortBAM.class, "ExternalSort.sort.chunks.merge"));
@@ -161,10 +162,10 @@ public abstract class ExternalSortBAM {
     private void mergeFiles(File baseFile, int numFiles) {
         try {
 
-            List<File> files = new ArrayList<File>();
-            List<SAMRecordIterator> mergeIt = new ArrayList<SAMRecordIterator>();
-            List<SAMFileReader> readerList = new ArrayList<SAMFileReader>();
-            List<SAMRecord> filerows = new ArrayList<SAMRecord>();
+            List<File> files = new ArrayList<>();
+            List<SAMRecordIterator> mergeIt = new ArrayList<>();
+            List<SAMFileReader> readerList = new ArrayList<>();
+            List<SAMRecord> filerows = new ArrayList<>();
             String[] s = baseFile.getName().split("\\.");
             String name = baseFile.getParent() + "/" + s[0] + ".sort_" + CRITERION + ".bam";
             File mergedFile = new File(name);
@@ -299,8 +300,8 @@ public abstract class ExternalSortBAM {
      * @param records the records to merge sort
      */
     private ArrayList<SAMRecord> mergeSort(ArrayList<SAMRecord> records) {
-        ArrayList<SAMRecord> left = new ArrayList<SAMRecord>();
-        ArrayList<SAMRecord> right = new ArrayList<SAMRecord>();
+        ArrayList<SAMRecord> left = new ArrayList<>();
+        ArrayList<SAMRecord> right = new ArrayList<>();
         if (records.size() <= 1) {
             return records;
         } else {
@@ -319,7 +320,7 @@ public abstract class ExternalSortBAM {
      * Merges the results of the mergeSort back together.
      */
     private ArrayList<SAMRecord> merge(ArrayList<SAMRecord> left, ArrayList<SAMRecord> right) {
-        ArrayList<SAMRecord> result = new ArrayList<SAMRecord>();
+        ArrayList<SAMRecord> result = new ArrayList<>();
         int sortValue;
         while (left.size() > 0 && right.size() > 0) {
             sortValue = this.compareTwoEntries(left.get(0), right.get(0));

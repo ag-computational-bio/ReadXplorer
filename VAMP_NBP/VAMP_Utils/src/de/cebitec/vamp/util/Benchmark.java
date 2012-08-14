@@ -27,11 +27,11 @@ public class Benchmark {
         int hours = 0;
         int minutes = 0;
         int seconds = 0;
-        int millis = 0;
+        int millis;
         
         if (diff > 3600000) { //milliseconds per hour
             hours = (int) (diff / 3600000);
-            diff -= (minutes * 3600000);
+            diff -= (hours * 3600000);
         }
 
         if (diff > 60000) { // milliseconds per minute

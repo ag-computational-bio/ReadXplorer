@@ -1,5 +1,7 @@
 package de.cebitec.vamp.parser.common;
 
+import de.cebitec.vamp.parser.TrackJob;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
 
@@ -11,39 +13,40 @@ import java.util.HashMap;
  */
 public class ParsedTrack {
 
-    private HashMap<String, Integer> readNameToSeqIDMap;
+    private TrackJob trackJob;
+    private HashMap<String, Integer> readNameToSeqIDMap1;
+    private HashMap<String, Integer> readNameToSeqIDMap2;
     private ParsedMappingContainer mappings;
     private CoverageContainer coverageContainer;
-    private String description;
-    private Timestamp timestamp;
-    private int trackId;
-    private boolean isStepwise;
     private boolean isFirstTrack;
-    private int refId;
 
     /**
      * Contains all data (description, mappings and coverageContainer) belonging
      * to a track, which can be stored into a database now.
-     * @param trackId corect id of the track has to be set on object creation
-     * @param description description of the track
+     * @param trackJob the track job for which the track is created
      * @param mappings mappings of the track
      * @param coverageContainer coverage container of the track
-     * @param refId reference genome id 
      */
-    public ParsedTrack(int trackId, String description, ParsedMappingContainer mappings, CoverageContainer coverageContainer, int refId){
-        this.readNameToSeqIDMap = new HashMap<String, Integer>();
-        this.description = description;
+    public ParsedTrack(TrackJob trackJob, ParsedMappingContainer mappings, CoverageContainer coverageContainer){
+        this.trackJob = trackJob;
+        this.readNameToSeqIDMap1 = new HashMap<>();
+        this.readNameToSeqIDMap2 = new HashMap<>();
         this.mappings = mappings;
         this.coverageContainer = coverageContainer;
-        this.trackId = trackId;
-        this.refId = refId;
+    }
+
+    /**
+     * @return true, if this track is stored in the db completely, false otherwise
+     */
+    public boolean isDbUsed() {
+        return trackJob.isDbUsed();
     }
 
     /**
      * @return the coverage container of this track with all coverage information
      */
     public CoverageContainer getCoverageContainer(){
-        return coverageContainer;
+        return this.coverageContainer;
     }
 
     /**
@@ -51,56 +54,42 @@ public class ParsedTrack {
      * if not, the container is just empty)
      */
     public ParsedMappingContainer getParsedMappingContainer() {
-        return mappings;
+        return this.mappings;
     }
 
     /**
      * @return the description of the track
      */
     public String getDescription(){
-        return description;
-    }
-
-    /**
-     * @param timestamp the timestamp of the creation time of this track
-     */
-    public void setTimestamp(Timestamp timestamp){
-        this.timestamp = timestamp;
+        return trackJob.getDescription();
     }
 
     /**
      * @return the timestamp of the creation time of this track
      */
     public Timestamp getTimestamp() {
-        return timestamp;
+        return trackJob.getTimestamp();
     }
 
     /**
      * @return the track id of this track
      */
     public int getID() {
-        return trackId;
+        return trackJob.getID();
     }
 
     /**
      * @return the id of the reference genome in the db
      */
     public int getRefId() {
-        return refId;
+        return trackJob.getRefGen().getID();
     }
     
     /**
      * @return true, if this is a stepwise import into the db, false otherwise.
      */
     public boolean isStepwise() {
-        return isStepwise;
-    }
-
-    /**
-     * @param isStepwise true, if this is a stepwise import into the db, false otherwise.
-     */
-    public void setIsStepwise(boolean isStepwise) {
-        this.isStepwise = isStepwise;
+        return trackJob.isStepwise();
     }
 
     /**
@@ -108,7 +97,7 @@ public class ParsedTrack {
      * then consists of many tracks. One for each chunk of data).
      */
     public boolean isFirstTrack() {
-        return isFirstTrack;
+        return this.isFirstTrack;
     }
 
     /**
@@ -118,20 +107,35 @@ public class ParsedTrack {
     public void setIsFirstTrack(boolean isFirstTrack) {
         this.isFirstTrack = isFirstTrack;
     }
+    
     /**
-     * @return the readname to sequence id map
+     * @return the readname to sequence id map for read 1 of the pair
      */
-    public HashMap<String, Integer> getReadnameToSeqIdMap(){
-        return this.readNameToSeqIDMap;
+    public HashMap<String, Integer> getReadnameToSeqIdMap1(){
+        return this.readNameToSeqIDMap1;
     }
 
+    /**
+     * @return the readname to sequence id map for read 2 of the pair
+     */
+    public HashMap<String, Integer> getReadnameToSeqIdMap2() {
+        return this.readNameToSeqIDMap2;
+    }
     
     /**
      * Needed additional information from sequence pair parsers.
-     * @param seqToIdMap mapping of readname to sequence id
+     * @param seqToIdMap mapping of readname to sequence id for read 1 of the pair
      */
-    public void setReadnameToSeqIdMap(HashMap<String, Integer> seqToIdMap){
-        this.readNameToSeqIDMap = seqToIdMap;
+    public void setReadnameToSeqIdMap1(HashMap<String, Integer> seqToIdMap){
+        this.readNameToSeqIDMap1 = seqToIdMap;
+    }
+    
+    /**
+     * Needed additional information from sequence pair parsers.
+     * @param seqToIdMap mapping of readname to sequence id for read 2 of the pair
+     */
+    public void setReadnameToSeqIdMap2(HashMap<String, Integer> seqToIdMap) {
+        this.readNameToSeqIDMap2 = seqToIdMap;
     }
     
     /**
@@ -140,8 +144,15 @@ public class ParsedTrack {
      */
     public void clear(){
         this.mappings.clear();
-        this.readNameToSeqIDMap.clear();
-        coverageContainer.clearCoverageContainer();
+        this.readNameToSeqIDMap1.clear();
+        this.coverageContainer.clearCoverageContainer();
+    }
+
+    /**
+     * @return the file from which this track was created.
+     */
+    public File getFile() {
+        return this.trackJob.getFile();
     }
 
 }

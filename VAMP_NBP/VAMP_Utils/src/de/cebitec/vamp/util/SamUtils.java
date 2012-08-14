@@ -40,7 +40,7 @@ public class SamUtils implements Observable {
     private List<Observer> observers;
 
     public SamUtils() {
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
     }
     
     
@@ -114,23 +114,26 @@ public class SamUtils implements Observable {
      *      writing as the first element and the new file as the second element
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter(File oldFile, SAMFileHeader header, boolean presorted, String newEnding) {
-        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
+
+// commented out part: we currently don't allow to write sam files, only bam! (more efficient)
+        
+//        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
         String newFileName = oldFile.getAbsolutePath();
-        String extension;
-        try {
-            newFileName = nameParts[0];
-            extension = nameParts[nameParts.length - 1];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            extension = "bam";
-        }
+//        String extension;
+//        try {
+//            newFileName = nameParts[0];
+//            extension = nameParts[nameParts.length - 1];
+//        } catch (ArrayIndexOutOfBoundsException e) {
+//            extension = "bam";
+//        }
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         File outputFile;
-        if (extension.toLowerCase().contains("sam")) {
-            outputFile = new File(newFileName + newEnding + ".sam");
-            return new Pair<SAMFileWriter, File>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
-        } else {
+//        if (extension.toLowerCase().contains("sam")) {
+//            outputFile = new File(newFileName + newEnding + ".sam");
+//            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
+//        } else {
             outputFile = new File(newFileName + newEnding + ".bam");
-            return new Pair<SAMFileWriter, File>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
-        }
+            return new Pair<>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
+//        }
     }
 }

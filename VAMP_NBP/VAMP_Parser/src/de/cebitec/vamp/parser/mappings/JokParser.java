@@ -237,7 +237,6 @@ public class JokParser implements MappingParserI {
         }
 
         this.seqToIDMap = null; //release resources        
-        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Successfully"));
 
         return mappingContainer;
     }

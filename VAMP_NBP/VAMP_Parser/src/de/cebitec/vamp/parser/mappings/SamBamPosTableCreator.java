@@ -8,9 +8,11 @@ import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
@@ -19,7 +21,8 @@ import org.openide.util.NbBundle;
 
 /**
  * Creates and stores the position table for a sam or bam file, which needs
- * to be sorted by position.
+ * to be sorted by position. The data to store is directly forwarded to the 
+ * observer, which should then further process it (store it in the db).
  *
  * @author -Rolf Hilker-
  */
@@ -30,7 +33,8 @@ public class SamBamPosTableCreator implements Observable {
     
     /**
      * Creates and stores the position table for a sam or bam file, which needs
-     * to be sorted by position.
+     * to be sorted by position. The data to store is directly forwarded to the 
+     * observer, which should then further process it (store it in the db).
      */
     public SamBamPosTableCreator() {
         this.observers = new ArrayList<>();
@@ -38,7 +42,9 @@ public class SamBamPosTableCreator implements Observable {
     }
     
     /**
-     * Creates the position table for the given track job.
+     * Creates the position table for the given track job. The data to store is
+     * directly forwarded to the observer, which should then further process it
+     * (store it in the db).
      * @param trackJob track job whose position table needs to be created
      * @param refSeqWhole reference genome sequence 
      */
@@ -65,81 +71,97 @@ public class SamBamPosTableCreator implements Observable {
         String readSeq;
         String cigar;
         DiffAndGapResult diffGapResult;
+        List<Pair<Integer, Integer>> coveredIntervals = new ArrayList<>();
+        coveredIntervals.add(new Pair<>(0, 0));
+        int lastIndex;
 
-        SAMFileReader sam = new SAMFileReader(trackJob.getFile());
-        SAMRecordIterator samItor = sam.iterator();
+        try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
+            SAMRecordIterator samItor = sam.iterator();
 
-        SAMRecord record;
-        while (samItor.hasNext()) {
-            ++lineno;
-            try {
+            SAMRecord record;
+            while (samItor.hasNext()) {
+                try {
+                    ++lineno;
 
-                record = samItor.next();
-                if (!record.getReadUnmappedFlag()) {
+                    record = samItor.next();
+                    if (!record.getReadUnmappedFlag()) {
 
-                    cigar = record.getCigarString();
-                    start = record.getAlignmentStart();
-                    stop = record.getAlignmentEnd();
-                    readSeq = record.getReadString();
-                    refSeq = refSeqWhole.substring(start - 1, stop);
+                        cigar = record.getCigarString();
+                        start = record.getAlignmentStart();
+                        stop = record.getAlignmentEnd();
+                        readSeq = record.getReadString();
+                        refSeq = refSeqWhole.substring(start - 1, stop);
 
-                    if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
-                        continue; //continue, and ignore read, if it contains inconsistent information
+                        if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                            continue; //continue, and ignore read, if it contains inconsistent information
+                        }
+
+                        //store coverage statistic
+                        lastIndex = coveredIntervals.size() - 1;
+                        if (coveredIntervals.get(lastIndex).getSecond() < start) { //add new pair
+                            coveredIntervals.add(new Pair<>(start, stop));
+                        } else { //increase length of first pair (start remains, stop is enlarged)
+                            coveredIntervals.get(lastIndex).setSecond(stop);
+                        }
+
+                        /*
+                         * The cigar values are as follows: 0 (M) = alignment match
+                         * (both, match or mismatch), 1 (I) = insertion, 2 (D) =
+                         * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) =
+                         * hard clipped, 6 (P) = padding, 7 (=) = sequene match, 8
+                         * (X) = sequence mismatch. H not needed, because these
+                         * bases are not present in the read sequence!
+                         */
+                        //count differences to reference
+                        isRevStrand = record.getReadNegativeStrandFlag();
+                        diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+                        differences = diffGapResult.getDifferences();
+
+                        //store data for position table
+                        direction = isRevStrand ? (byte) -1 : 1;
+                        mapping = new ParsedMapping(start, stop, direction, diffGapResult.getDiffs(), diffGapResult.getGaps(), differences);
+                        mapping.setIsBestMapping(true); //so all mappings of a sam/bam file are taken into consideration for the pos table!
+                        this.coverageContainer.addMapping(mapping); //this is not the case for ordinary database import!
+                        this.coverageContainer.savePositions(mapping);
+
+                        //store position table for each 300.000 positions in db
+                        //at first store mappings which overlap next batch position separately
+                        if (stop > nextBatch) {
+                            batchOverlappingMappings.add(mapping);
+                        }
+                        if (start > nextBatch) { //e.g. 300.001
+                            track = new ParsedTrack(trackJob, null, coverageContainer);
+                            this.notifyObservers(track);
+                            this.coverageContainer.clearCoverageContainer();
+                            this.refillCoverageContainer(batchOverlappingMappings, nextBatch);
+                            nextBatch += batchSize;
+                            batchOverlappingMappings.clear();
+                        }
+
+                        //saruman starts genome at 0 other algorithms like bwa start genome at 1
+
+                    } else {
+                        this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
+                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
                     }
-
-                    /*
-                     * The cigar values are as follows: 0 (M) = alignment match
-                     * (both, match or mismatch), 1 (I) = insertion, 2 (D) =
-                     * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) =
-                     * hard clipped, 6 (P) = padding, 7 (=) = sequene match, 8
-                     * (X) = sequence mismatch. H not needed, because these
-                     * bases are not present in the read sequence!
-                     */
-                    //count differences to reference
-                    isRevStrand = record.getReadNegativeStrandFlag();
-                    diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
-                    differences = diffGapResult.getDifferences();
-                    
-                    //store data for position table
-                    direction = isRevStrand ? (byte) -1 : 1;
-                    mapping = new ParsedMapping(start, stop, direction, diffGapResult.getDiffs(), diffGapResult.getGaps(), differences);
-                    mapping.setIsBestMapping(true); //so all mappings of a sam/bam file are taken into consideration for the pos table!
-                    this.coverageContainer.addMapping(mapping); //this is not the case for ordinary database import!
-                    this.coverageContainer.savePositions(mapping);
-                    
-                    //store position table for each 300.000 positions in db
-                    //at first store mappings which overlap next batch position separately
-                    if (stop > nextBatch) {
-                        batchOverlappingMappings.add(mapping);
-                    }
-                    if (start > nextBatch) { //e.g. 300.001
-                        track = new ParsedTrack(trackJob.getID(), "", null, coverageContainer, trackJob.getRefGen().getID());
-                        this.notifyObservers(track);
-                        this.coverageContainer.clearCoverageContainer();
-                        this.refillCoverageContainer(batchOverlappingMappings, nextBatch);
-                        nextBatch += batchSize;
-                        batchOverlappingMappings.clear();
-                    }
-
-                    //saruman starts genome at 0 other algorithms like bwa start genome at 1
-
-                } else {
-                    this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
-                            "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                } catch (SAMFormatException e) {
+                    this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                            "Parser.Parsing.CorruptData", lineno, e.toString()));
                 }
-            } catch (RuntimeEOFException e) {
-                continue; //skip current incomplete read
-            } catch (Exception e) {
-                Exceptions.printStackTrace(e); //TODO: correct error handling or remove
             }
+            samItor.close();
+
+        } catch (RuntimeEOFException e) {
+            this.notifyObservers("Last read in file is incomplete, ignoring it!");
+        } catch (Exception e) {
+            Exceptions.printStackTrace(e); //TODO: correct error handling or remove
         }
-
-
-        samItor.close();
-        sam.close();
         
-        track = new ParsedTrack(trackJob.getID(), "", null, coverageContainer, trackJob.getRefGen().getID());
+        coverageContainer.setCoveredCommonMatchPositions(this.getCoveredBases(coveredIntervals));
+
+        track = new ParsedTrack(trackJob, null, coverageContainer);
         this.notifyObservers(track);
+        this.coverageContainer.clearCoverageContainer();
 
         
         long finish = System.currentTimeMillis();
@@ -178,6 +200,19 @@ public class SamBamPosTableCreator implements Observable {
             //the db (which are all pos < start
             this.coverageContainer.clearCoverageContainerUpTo(clearPos);
         }
+    }
+    
+    /**
+     * Counts all  bases, which are covered by reads in this data set
+     * @param coveredIntervals the covered intervals of the data set
+     * @return the number of bases covered in the data set
+     */
+    private int getCoveredBases(List<Pair<Integer, Integer>> coveredIntervals) {
+        int coveredBases = 0;
+        for(Pair interval : coveredIntervals) {
+            coveredBases += (int) interval.getSecond() - (int) interval.getFirst();
+        }
+        return coveredBases;
     }
     
 }

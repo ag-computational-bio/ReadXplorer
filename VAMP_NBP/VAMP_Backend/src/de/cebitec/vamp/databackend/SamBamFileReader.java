@@ -11,13 +11,14 @@ import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeIOException;
+import org.openide.util.Exceptions;
 
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
  * 
  * @author -Rolf Hilker-
  */
-public class SamBamFileReader {
+public class SamBamFileReader { //TODO: add observer
     
     public static final String cigarRegex = "[MIDNSPX=]+";
     private final File dataFile;
@@ -26,7 +27,7 @@ public class SamBamFileReader {
     private SAMFileReader samFileReader;
     private String header;
     private boolean hasIndex;
-    private List<de.cebitec.vamp.util.Observer> observers;
+    private List<de.cebitec.vamp.util.Observer> observer;
     
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam file.
@@ -35,6 +36,7 @@ public class SamBamFileReader {
      * @throws RuntimeIOException  
      */
     public SamBamFileReader(File dataFile, int trackId) throws RuntimeIOException {
+        this.observer = new ArrayList<>();
         this.dataFile = dataFile;
         this.trackId = trackId;
         
@@ -55,20 +57,28 @@ public class SamBamFileReader {
      */
     public Collection<PersistantMapping> getMappingsFromBam(PersistantReference refGenome, int from, int to) {
         
-        List<PersistantMapping> mappings = new ArrayList<PersistantMapping>();
+        List<PersistantMapping> mappings = new ArrayList<>();
         SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
         String refSeq = refGenome.getSequence();
         String refSubSeq;
         int id = 0;
         String cigar;
+        SAMRecord record;
+        int start;
+        int stop;
+        boolean isFwdStrand;
+        Integer classification;
+        Integer count;
+        boolean classify;
+        PersistantMapping mapping; 
         
         while (samRecordIterator.hasNext()) {
-            SAMRecord record = samRecordIterator.next();
-            int start = record.getUnclippedStart();
-            int stop = record.getUnclippedEnd();
-            boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-            Integer classification = (Integer) record.getAttribute("Yc");
-            Integer count = (Integer) record.getAttribute("Yt");            
+            record = samRecordIterator.next();
+            start = record.getUnclippedStart();
+            stop = record.getUnclippedEnd();
+            isFwdStrand = !record.getReadNegativeStrandFlag();
+            classification = (Integer) record.getAttribute("Yc");
+            count = (Integer) record.getAttribute("Yt");            
             
             //find check alignment via cigar string and add diffs to mapping
             cigar = record.getCigarString();
@@ -77,10 +87,9 @@ public class SamBamFileReader {
             } else {
                 refSubSeq = null;
             }
-            
-            PersistantMapping mapping;            
+                       
             if (classification != null && count != null) { //since both data fields are always written together
-                boolean classify = classification == (int) Properties.PERFECT_COVERAGE || 
+                classify = classification == (int) Properties.PERFECT_COVERAGE || 
                                   (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
                 mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify); 
             } else {
@@ -143,8 +152,9 @@ public class SamBamFileReader {
         }
 
         PersistantCoverage coverage = new PersistantCoverage(from, to);
-        List<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
-        List<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
+        List<PersistantDiff> diffs = new ArrayList<>();
+        List<PersistantReferenceGap> gaps = new ArrayList<>();
+        PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
         if (diffsAndGapsNeeded) {
             refSeq = refGenome.getSequence();
@@ -225,7 +235,7 @@ public class SamBamFileReader {
                 }
                 
                 if (diffsAndGapsNeeded) {
-                    PersistantDiffAndGapResult diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(), 
+                    diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(), 
                             record.getUnclippedStart(), isFwdStrand, 1, record.getReadString(), 
                             refSeq.substring(record.getUnclippedStart(), record.getUnclippedEnd()), null);
                     diffs.addAll(diffsAndGaps.getDiffs());
@@ -264,12 +274,8 @@ public class SamBamFileReader {
                 coverage.setCommonRevMultTrack2(commonCoverageRevTrack2);
             }
             
-        } catch (NullPointerException e) {
-            System.err.println(e);
-        } catch (IllegalArgumentException e) {
-            System.err.println(e);
-        } catch (SAMFormatException e) {
-            System.err.println(e);
+        } catch (NullPointerException | IllegalArgumentException | SAMFormatException e) {
+            Exceptions.printStackTrace(e); //TODO: replace by notify observer
         }
         return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
     }
@@ -291,9 +297,9 @@ public class SamBamFileReader {
     private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, boolean isFwdStrand, int nbReplicates, 
                     String readSeq, String refSeq, PersistantMapping mapping) throws NumberFormatException {
         
-        Map<Integer, Integer> gapOrderIndex = new HashMap<Integer, Integer>();
-        List<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
-        List<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
+        Map<Integer, Integer> gapOrderIndex = new HashMap<>();
+        List<PersistantDiff> diffs = new ArrayList<>();
+        List<PersistantReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
         
         String[] num = cigar.split(cigarRegex);
