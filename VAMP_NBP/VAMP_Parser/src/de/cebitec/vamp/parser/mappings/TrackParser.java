@@ -25,9 +25,9 @@ public class TrackParser implements TrackParserI {
         
         // parse mapping files and store them in appropriate source objects
         ParsedTrack track = null;
-        MappingParserI mappingp = trackJob.getParser();
-        mappingp.registerObserver(observer);
-        Object parsedData = mappingp.parseInput(trackJob, sequenceString);
+        MappingParserI mappingParser = trackJob.getParser();
+        mappingParser.registerObserver(observer);
+        Object parsedData = mappingParser.parseInput(trackJob, sequenceString);
         if (parsedData instanceof ParsedMappingContainer) {
             ParsedMappingContainer mappings = (ParsedMappingContainer) parsedData;
 
@@ -39,13 +39,13 @@ public class TrackParser implements TrackParserI {
             }
             this.coverageContainer.computeCoverage(mappings);
 
-            track = new ParsedTrack(trackJob.getID(), trackJob.getDescription(), mappings, coverageContainer, trackJob.getRefGen().getID());
-            track.setIsStepwise(trackJob.isStepwise());
-            track.setTimestamp(trackJob.getTimestamp());
+            track = new ParsedTrack(trackJob, mappings, coverageContainer);
+            track.setReadnameToSeqIdMap1(mappingParser.getSeqPairProcessor().getReadNameToSeqIDMap1());
+            track.setReadnameToSeqIdMap2(mappingParser.getSeqPairProcessor().getReadNameToSeqIDMap2());
 
             mappings = null;
         }
-        mappingp = null;
+        mappingParser = null;
         System.gc();
         
         long finish = System.currentTimeMillis();

@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -94,101 +96,105 @@ public class SamBamStepParser implements MappingParserI {
         end += shift;
 
         while (lineno < end) {
-            lineno++;
+            try {
+                lineno++;
 
-
-            nextRecord = (record == null) ? (itorAll.hasNext() ? itorAll.next() : null) : record;
-            //no more mappings
-            if (nextRecord == null) {
-                mappingContainer.setLastMappingContainer(true);
-                break;
-            }
-            record = null;
-
-            if (!nextRecord.getReadUnmappedFlag()) {
-
-                readname = nextRecord.getReadName();
-                start = nextRecord.getAlignmentStart();
-                cigar = nextRecord.getCigarString();
-                readSeqWithoutGaps = nextRecord.getReadString();
-
-                if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
-                    stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqWithoutGaps.length());
-                    refSeqWithoutGaps = refSeqWhole.substring(start - 1, stop);
-                    refAndRead = ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqWithoutGaps, readSeqWithoutGaps);
-                    refSeq = refAndRead[0];
-                    readSeq = refAndRead[1];
-                } else {
-                    stop = start + readSeqWithoutGaps.length() - 1;
-                    refSeqWithoutGaps = refSeqWhole.substring(start - 1, stop);
-                    refSeq = refSeqWithoutGaps;
-                    readSeq = readSeqWithoutGaps;
+                nextRecord = (record == null) ? (itorAll.hasNext() ? itorAll.next() : null) : record;
+                //no more mappings
+                if (nextRecord == null) {
+                    mappingContainer.setLastMappingContainer(true);
+                    break;
                 }
-                
-                isRevStrand = record.getReadNegativeStrandFlag();
+                record = null;
 
-                //check parameters
-                if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filename, lineno)) {
-                    continue; //continue, and ignore read, if it contains inconsistent information
-                }
-                
-                //saruman starts genome at 0 other algorithms like bwa start genome at 1
-                result = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
-                diffs = result.getDiffs();
-                gaps = result.getGaps();
-                differences = result.getDifferences();
+                if (!nextRecord.getReadUnmappedFlag()) {
 
-                if (differences < 0 || differences > readSeq.length()) {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.checkMapping.ErrorRead", differences, filename, lineno));
-                    continue;
-                }
-                
-                //saruman starts genome at 0 other algorithms like bwa start genome at 1
-                direction = isRevStrand ? (byte) -1 : 1;
-                ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
+                    readname = nextRecord.getReadName();
+                    start = nextRecord.getAlignmentStart();
+                    cigar = nextRecord.getCigarString();
+                    readSeqWithoutGaps = nextRecord.getReadString();
 
-                if (nextRecord.getReadNegativeStrandFlag()) {
-                    readSeqWithoutGaps = SequenceUtils.getReverseComplement(readSeqWithoutGaps);
-                }
-                
-                if (this.seqToIDMap.containsKey(readSeqWithoutGaps)) {
-                    seqID = this.seqToIDMap.get(readSeqWithoutGaps);
-                } else {
-                    seqID = ++noUniqueSeq;
-                    this.seqToIDMap.put(readSeqWithoutGaps, seqID);
-                } //int seqID = readnameToSequenceID.get(readname);
-
-                mappingContainer.addParsedMapping(mapping, seqID);
-                sumReadLength += (stop - start);
-                this.seqPairProcessor.processReadname(seqID, readname);
-
-                if (lineno == end) {
-                    
-                    mappingContainer.setSumReadLength(mappingContainer.getSumReadLength() + sumReadLength);
-                    
-                    ++shift;
-                    record = itorAll.hasNext() ? itorAll.next() : null;
-                    if (record != null) {
-
-                        String read = record.getReadString();
-                        if (record.getReadNegativeStrandFlag()) { 
-                            read = SequenceUtils.getReverseComplement(read); 
-                        }
-                        
-                        if (this.seqToIDMap.containsKey(read)) {
-                            end += 1;
-                        }
-
+                    if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
+                        stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqWithoutGaps.length());
+                        refSeqWithoutGaps = refSeqWhole.substring(start - 1, stop);
+                        refAndRead = ParserCommonMethods.createMappingOfRefAndRead(cigar, refSeqWithoutGaps, readSeqWithoutGaps);
+                        refSeq = refAndRead[0];
+                        readSeq = refAndRead[1];
                     } else {
-                        mappingContainer.setLastMappingContainer(true);
-                        break;
+                        stop = start + readSeqWithoutGaps.length() - 1;
+                        refSeqWithoutGaps = refSeqWhole.substring(start - 1, stop);
+                        refSeq = refSeqWithoutGaps;
+                        readSeq = readSeqWithoutGaps;
                     }
-                }
 
-            } else {
-                this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                        "Parser.Parsing.CorruptData", lineno, nextRecord.getReadName()));
+                    isRevStrand = nextRecord.getReadNegativeStrandFlag();
+
+                    //check parameters
+                    if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filename, lineno)) {
+                        continue; //continue, and ignore read, if it contains inconsistent information
+                    }
+
+                    //saruman starts genome at 0 other algorithms like bwa start genome at 1
+                    result = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+                    diffs = result.getDiffs();
+                    gaps = result.getGaps();
+                    differences = result.getDifferences();
+
+                    if (differences < 0 || differences > readSeq.length()) {
+                        this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
+                                "Parser.checkMapping.ErrorRead", differences, filename, lineno));
+                        continue;
+                    }
+
+                    //saruman starts genome at 0 other algorithms like bwa start genome at 1
+                    direction = isRevStrand ? (byte) -1 : 1;
+                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
+
+                    if (nextRecord.getReadNegativeStrandFlag()) {
+                        readSeqWithoutGaps = SequenceUtils.getReverseComplement(readSeqWithoutGaps);
+                    }
+
+                    if (this.seqToIDMap.containsKey(readSeqWithoutGaps)) {
+                        seqID = this.seqToIDMap.get(readSeqWithoutGaps);
+                    } else {
+                        seqID = ++noUniqueSeq;
+                        this.seqToIDMap.put(readSeqWithoutGaps, seqID);
+                    } //int seqID = readnameToSequenceID.get(readname);
+
+                    mappingContainer.addParsedMapping(mapping, seqID);
+                    sumReadLength += (stop - start);
+                    this.seqPairProcessor.processReadname(seqID, readname);
+
+                    if (lineno == end) {
+
+                        mappingContainer.setSumReadLength(mappingContainer.getSumReadLength() + sumReadLength);
+
+                        ++shift;
+                        record = itorAll.hasNext() ? itorAll.next() : null;
+                        if (record != null) {
+
+                            String read = record.getReadString();
+                            if (record.getReadNegativeStrandFlag()) {
+                                read = SequenceUtils.getReverseComplement(read);
+                            }
+
+                            if (this.seqToIDMap.containsKey(read)) {
+                                end += 1;
+                            }
+
+                        } else {
+                            mappingContainer.setLastMappingContainer(true);
+                            break;
+                        }
+                    }
+
+                } else {
+                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
+                            "Parser.Parsing.CorruptData", lineno, nextRecord.getReadName()));
+                }
+            } catch (SAMFormatException e) {
+                this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                        "Parser.Parsing.CorruptData", lineno, e.toString()));
             }
 
         }

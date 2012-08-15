@@ -30,7 +30,6 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     private int minDist;
     private int maxDist;
     private short orienation; //orientation of the reads: 0 = fr, 1 = rf, 2 = ff/rr
-    private String errorMsg;
     private SAMFileWriter samBamFileWriter;
     private Map<String,Pair<Integer,Integer>> classificationMap; 
     private final String refSeq;
@@ -503,8 +502,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     @Override
     public void update(Object args) {
         if (args instanceof String) {
-            this.errorMsg = (String) args;
-            this.notifyObservers(null);
+            this.notifyObservers((String) args);
         }
     }
 

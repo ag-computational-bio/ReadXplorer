@@ -50,7 +50,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
      */
     public SeqPairClassifier() {
         //set data later
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
     }
 
     /**
@@ -66,7 +66,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
     public SeqPairClassifier(ParsedTrack track1, ParsedTrack track2, int dist,
             int deviation, short orientation) throws ParsingException, IOException {
         
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
         this.track1 = track1;
         this.track2 = track2;
         this.dist = dist;
@@ -113,8 +113,10 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
         this.seqPairContainer = new ParsedSeqPairContainer();
         this.seqPairContainer.setTrackId1(this.track1.getID());
         this.seqPairContainer.setTrackId2(this.track2.getID());
-        HashMap<String, Integer> idToNameMap1 = this.track1.getReadnameToSeqIdMap();
-        HashMap<String, Integer> idToNameMap2 = this.track2.getReadnameToSeqIdMap();
+        HashMap<String, Integer> idToNameMap1 = this.track1.getReadnameToSeqIdMap1();
+        HashMap<String, Integer> idToNameMap2 = this.track1.getReadnameToSeqIdMap2();
+        idToNameMap1.putAll(track2.getReadnameToSeqIdMap1());
+        idToNameMap2.putAll(track2.getReadnameToSeqIdMap2());
         Iterator<String> it1 = idToNameMap1.keySet().iterator();
         Iterator<String> it2 = idToNameMap2.keySet().iterator();
         ParsedMappingContainer mappings1 = this.track1.getParsedMappingContainer();
@@ -145,15 +147,15 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
         int dir = this.orienation == 2 ? 1 : -1;
         boolean case1;
         
-        List<ParsedSeqPairMapping> potPairList = new ArrayList<ParsedSeqPairMapping>(); //also perfect
-        List<ParsedSeqPairMapping> potSmallPairList = new ArrayList<ParsedSeqPairMapping>();        
-        List<ParsedSeqPairMapping> potPotSmallPairList = new ArrayList<ParsedSeqPairMapping>();        
-        List<ParsedSeqPairMapping> unorPairList = new ArrayList<ParsedSeqPairMapping>();
-        List<ParsedSeqPairMapping> potUnorPairList = new ArrayList<ParsedSeqPairMapping>();
-        List<ParsedSeqPairMapping> unorSmallPairList = new ArrayList<ParsedSeqPairMapping>();
-        List<ParsedSeqPairMapping> potUnorSmallPairList = new ArrayList<ParsedSeqPairMapping>();
+        List<ParsedSeqPairMapping> potPairList = new ArrayList<>(); //also perfect
+        List<ParsedSeqPairMapping> potSmallPairList = new ArrayList<>();        
+        List<ParsedSeqPairMapping> potPotSmallPairList = new ArrayList<>();        
+        List<ParsedSeqPairMapping> unorPairList = new ArrayList<>();
+        List<ParsedSeqPairMapping> potUnorPairList = new ArrayList<>();
+        List<ParsedSeqPairMapping> unorSmallPairList = new ArrayList<>();
+        List<ParsedSeqPairMapping> potUnorSmallPairList = new ArrayList<>();
         
-        List<Long> omitIdList = new ArrayList<Long>(); //(enthält alle und werden step by step rausgelöscht)
+        List<Long> omitIdList = new ArrayList<>(); //(enthält alle und werden step by step rausgelöscht)
 
         /*
          * 0 = fr -r1(1)-> <-r2(-1)- (stop1<start2) oder -r2(1)-> <-r1(-1)-
@@ -336,13 +338,13 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                     long id;
                     for (ParsedMapping mapping : mappingGroup1) {
                         if (!omitIdList.contains(id = mapping.getID())) {
-                            this.seqPairContainer.addMappingToPairId(new Pair<Long, Long>(id, interimSeqPairId));
+                            this.seqPairContainer.addMappingToPairId(new Pair<>(id, interimSeqPairId));
                         }
                     }
                     
                     for (ParsedMapping mapping : mappingGroup2) {
                         if (!omitIdList.contains(id = mapping.getID())) {
-                            this.seqPairContainer.addMappingToPairId(new Pair<Long, Long>(id, interimSeqPairId));
+                            this.seqPairContainer.addMappingToPairId(new Pair<>(id, interimSeqPairId));
                         }
                     }
 
@@ -359,7 +361,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                 
             } else { //only one side of the sequence pair could be mapped
                 for (ParsedMapping parsedMapping : mappingGroup1) { //pos and direction can deviate
-                    this.seqPairContainer.addMappingToPairId(new Pair<Long, Long>(parsedMapping.getID(), interimSeqPairId));
+                    this.seqPairContainer.addMappingToPairId(new Pair<>(parsedMapping.getID(), interimSeqPairId));
                 }
             }
             ++interimSeqPairId;
@@ -375,7 +377,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
             if (!idToNameMap1.containsKey(currReadname)) { //only scnd side of the sequence pair could be mapped
 
                 for (ParsedMapping parsedMapping : mappingGroup2) { //pos and direction can deviate
-                    this.seqPairContainer.addMappingToPairId(new Pair<Long, Long>(parsedMapping.getID(), interimSeqPairId));
+                    this.seqPairContainer.addMappingToPairId(new Pair<>(parsedMapping.getID(), interimSeqPairId));
                 }
                 ++interimSeqPairId;
             }
@@ -385,6 +387,12 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
         this.seqPairContainer.setAverage_Seq_Pair_length(average_Seq_Pair_Length);
         
         this.notifyObservers(NbBundle.getMessage(SeqPairClassifier.class, "Classifier.Classification.Finish"));
+        
+//        //TODO: trying to clean up
+//        mappings1 = null;
+//        mappings2 = null;
+//        mappingGroup1 = null;
+//        mappingGroup2 = null;
         
         return seqPairContainer;
         
@@ -409,7 +417,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
     private void addPairedMapping(long mappingId1, long mappingId2, long seqPairId, byte type) {
         
         ParsedSeqPairMapping newSeqPair = new ParsedSeqPairMapping(mappingId1, mappingId2, seqPairId, type);
-        Pair<Long, Long> mappingIDs = new Pair<Long, Long>(mappingId1, mappingId2);
+        Pair<Long, Long> mappingIDs = new Pair<>(mappingId1, mappingId2);
         this.seqPairContainer.addParsedSeqPair(mappingIDs, newSeqPair);
     }
     
@@ -417,7 +425,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
         long id1 = pairMapping.getMappingId1();
         long id2 = pairMapping.getMappingId2();
         if (!(omitIdList.contains(id1) || omitIdList.contains(id2))) {
-            this.seqPairContainer.addParsedSeqPair(new Pair<Long, Long>(id1, id2), pairMapping);
+            this.seqPairContainer.addParsedSeqPair(new Pair<>(id1, id2), pairMapping);
             omitIdList.add(id1);
             omitIdList.add(id2);
         }

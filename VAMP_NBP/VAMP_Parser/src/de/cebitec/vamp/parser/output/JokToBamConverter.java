@@ -90,7 +90,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
             //read the input file
             String[] tokens;
             int lineno = 0;
-            String line = null;
+            String line;
             byte direction;
             String readSeq;
             String refSeq;
@@ -109,8 +109,6 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                 if (tokens.length == 7) { // if the length is not correct the read is not parsed
                     // cast tokens
                     readName = tokens[0];
-                    start = -2;
-                    stop = -1;
                     try {
                         start = Integer.parseInt(tokens[1]);
                         stop = Integer.parseInt(tokens[2]);
@@ -178,12 +176,12 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                                 outFileName, lineno, refSeq));
                         continue;
                     }
-//                if (readSeq.length() != refSeq.length()) {
-//                    this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-//                            "Parser.checkMapping.ErrorReadLength",
-//                            fileName, lineno, readSeq, refSeq));
-//                    continue;
-//                }
+                    if (readSeq.length() != refSeq.length()) {
+                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                "Parser.checkMapping.ErrorReadLength",
+                                fileName, lineno, readSeq, refSeq));
+                        continue;
+                    }
                     if (errors < 0 || errors > readSeq.length()) {
                         this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
                                 "Parser.checkMapping.ErrorRead",
@@ -252,7 +250,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
             samFileReader.close();
 
             long finish = System.currentTimeMillis();
-            String msg = NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Finished", outFileName);
+            msg = NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Finished", outFileName);
             this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
 
         } catch (IOException ex) {
@@ -272,7 +270,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
 
         int counter = 0;
         byte lastBase = 0;
-        byte currentBase = 0; 
+        byte currentBase; 
+        char base;
         
        /* 0 (M) = alignment match (both, match or mismatch), 1 (I) = insertion, 
         * 2 (D) = deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard clipped, 
@@ -282,7 +281,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                 currentBase = 7;
             } else {
                 if (refSeq.charAt(i) != '_') { //a base in the genome, most frequent case
-                    char base = readSeq.charAt(i);
+                    base = readSeq.charAt(i);
                     if (base != '_') { //ACGT or N in the read as well
                         currentBase = 8;
                     } else {//a gap in the read

@@ -36,8 +36,11 @@
                 <package>javax.wsdl.extensions.soap</package>
                 <package>javax.wsdl.factory</package>
                 <package>javax.wsdl.xml</package>
+                <package>javax.xml</package>
+                <package>javax.xml.datatype</package>
                 <package>javax.xml.messaging</package>
                 <package>javax.xml.namespace</package>
+                <package>javax.xml.parsers</package>
                 <package>javax.xml.rpc</package>
                 <package>javax.xml.rpc.encoding</package>
                 <package>javax.xml.rpc.handler</package>
@@ -45,6 +48,12 @@
                 <package>javax.xml.rpc.holders</package>
                 <package>javax.xml.rpc.server</package>
                 <package>javax.xml.rpc.soap</package>
+                <package>javax.xml.transform</package>
+                <package>javax.xml.transform.dom</package>
+                <package>javax.xml.transform.sax</package>
+                <package>javax.xml.transform.stream</package>
+                <package>javax.xml.validation</package>
+                <package>javax.xml.xpath</package>
                 <package>jxl</package>
                 <package>jxl.biff</package>
                 <package>jxl.biff.drawing</package>
@@ -56,16 +65,10 @@
                 <package>jxl.read.biff</package>
                 <package>jxl.write</package>
                 <package>jxl.write.biff</package>
-                <package>net.sf.picard</package>
-                <package>net.sf.picard.cmdline</package>
-                <package>net.sf.picard.io</package>
-                <package>net.sf.picard.metrics</package>
-                <package>net.sf.picard.sam</package>
-                <package>net.sf.picard.util</package>
-                <package>net.sf.samtools</package>
-                <package>net.sf.samtools.apps</package>
-                <package>net.sf.samtools.example</package>
-                <package>net.sf.samtools.util</package>
+                <package>org.apache.avalon.framework</package>
+                <package>org.apache.avalon.framework.activity</package>
+                <package>org.apache.avalon.framework.configuration</package>
+                <package>org.apache.avalon.framework.container</package>
                 <package>org.apache.axis</package>
                 <package>org.apache.axis.attachments</package>
                 <package>org.apache.axis.client</package>
@@ -121,9 +124,65 @@
                 <package>org.apache.axis.wsdl.gen</package>
                 <package>org.apache.axis.wsdl.symbolTable</package>
                 <package>org.apache.axis.wsdl.toJava</package>
+                <package>org.apache.batik</package>
+                <package>org.apache.batik.anim</package>
+                <package>org.apache.batik.anim.timing</package>
+                <package>org.apache.batik.anim.values</package>
+                <package>org.apache.batik.bridge</package>
+                <package>org.apache.batik.bridge.svg12</package>
+                <package>org.apache.batik.css.dom</package>
+                <package>org.apache.batik.css.engine</package>
+                <package>org.apache.batik.css.engine.sac</package>
+                <package>org.apache.batik.css.engine.value</package>
+                <package>org.apache.batik.css.engine.value.css2</package>
+                <package>org.apache.batik.css.engine.value.svg</package>
+                <package>org.apache.batik.css.engine.value.svg12</package>
+                <package>org.apache.batik.css.parser</package>
+                <package>org.apache.batik.dom</package>
+                <package>org.apache.batik.dom.anim</package>
+                <package>org.apache.batik.dom.events</package>
+                <package>org.apache.batik.dom.svg</package>
+                <package>org.apache.batik.dom.svg12</package>
+                <package>org.apache.batik.dom.traversal</package>
+                <package>org.apache.batik.dom.util</package>
+                <package>org.apache.batik.dom.xbl</package>
+                <package>org.apache.batik.ext.awt</package>
+                <package>org.apache.batik.ext.awt.color</package>
+                <package>org.apache.batik.ext.awt.font</package>
+                <package>org.apache.batik.ext.awt.g2d</package>
+                <package>org.apache.batik.ext.awt.geom</package>
+                <package>org.apache.batik.ext.awt.image</package>
+                <package>org.apache.batik.ext.awt.image.codec.imageio</package>
+                <package>org.apache.batik.ext.awt.image.codec.jpeg</package>
+                <package>org.apache.batik.ext.awt.image.codec.png</package>
+                <package>org.apache.batik.ext.awt.image.codec.tiff</package>
+                <package>org.apache.batik.ext.awt.image.codec.util</package>
+                <package>org.apache.batik.ext.awt.image.renderable</package>
+                <package>org.apache.batik.ext.awt.image.rendered</package>
+                <package>org.apache.batik.ext.awt.image.spi</package>
+                <package>org.apache.batik.ext.swing</package>
+                <package>org.apache.batik.extension</package>
+                <package>org.apache.batik.extension.svg</package>
+                <package>org.apache.batik.gvt</package>
+                <package>org.apache.batik.gvt.event</package>
+                <package>org.apache.batik.gvt.filter</package>
+                <package>org.apache.batik.gvt.flow</package>
+                <package>org.apache.batik.gvt.font</package>
+                <package>org.apache.batik.gvt.renderer</package>
+                <package>org.apache.batik.gvt.svg12</package>
+                <package>org.apache.batik.gvt.text</package>
+                <package>org.apache.batik.i18n</package>
+                <package>org.apache.batik.parser</package>
+                <package>org.apache.batik.script</package>
+                <package>org.apache.batik.script.rhino</package>
+                <package>org.apache.batik.script.rhino.svg12</package>
+                <package>org.apache.batik.svggen</package>
+                <package>org.apache.batik.svggen.font</package>
+                <package>org.apache.batik.svggen.font.table</package>
                 <package>org.apache.batik.swing</package>
                 <package>org.apache.batik.swing.gvt</package>
                 <package>org.apache.batik.swing.svg</package>
+                <package>org.apache.batik.transcoder</package>
                 <package>org.apache.commons.discovery</package>
                 <package>org.apache.commons.discovery.ant</package>
                 <package>org.apache.commons.discovery.jdk</package>
@@ -134,7 +193,6 @@
                 <package>org.apache.commons.discovery.tools</package>
                 <package>org.apache.commons.logging</package>
                 <package>org.apache.commons.logging.impl</package>
-                <package>org.apache.tools.bzip2</package>
                 <package>org.biojava.bibliography</package>
                 <package>org.biojava.bio</package>
                 <package>org.biojava.bio.alignment</package>
@@ -268,7 +326,6 @@
                 <package>org.rosuda.JRI</package>
                 <package>org.rosuda.REngine</package>
                 <package>org.rosuda.REngine.JRI</package>
-                <package>org.xerial.snappy</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-transcoder.jar</runtime-relative-path>
@@ -333,10 +390,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/BuildBamIndex.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/BuildBamIndex.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
@@ -421,10 +474,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/batik-awt-util.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-awt-util.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/sam-1.69.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/sam-1.69.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-svg-dom.jar</runtime-relative-path>

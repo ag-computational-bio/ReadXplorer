@@ -1,5 +1,6 @@
 package de.cebitec.vamp.seqPairClassifier;
 
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Pair;
 import java.util.ArrayList;
@@ -20,8 +21,8 @@ public class SeqPairClassifierTest {
      * Test your own pairs by adding just adding them to the test.
      */
     
-    private List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
-    private List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
+    private List<ParsedDiff> diffs = new ArrayList<>();
+    private List<ParsedReferenceGap> gaps = new ArrayList<>();
     byte one = 1;
     byte mone = -1;    
     
@@ -101,12 +102,12 @@ public class SeqPairClassifierTest {
     private ParsedMappingContainer mappings2 = new ParsedMappingContainer();
     private CoverageContainer coverageContainer = new CoverageContainer();
     private CoverageContainer coverageContainer2 = new CoverageContainer();
-    private ParsedTrack fwdTrack = new ParsedTrack(1, "fwd track", mappings, coverageContainer, 1);
-    private ParsedTrack revTrack = new ParsedTrack(2, "rev track", mappings2, coverageContainer2, 1);
+    private ParsedTrack fwdTrack = new ParsedTrack(new TrackJob(1, true, null, "fwd track", null, null, true, null), mappings, coverageContainer);
+    private ParsedTrack revTrack = new ParsedTrack(new TrackJob(2, true, null, "rev track", null, null, true, null), mappings, coverageContainer);
     
-    private List<HashMap<String,Integer>> readnameToSeqIDMap = new ArrayList<HashMap<String,Integer>>();
-    HashMap<String,Integer> map1 = new HashMap<String,Integer>();
-    HashMap<String,Integer> map2 = new HashMap<String,Integer>();
+    private List<HashMap<String,Integer>> readnameToSeqIDMap = new ArrayList<>();
+    HashMap<String,Integer> map1 = new HashMap<>();
+    HashMap<String,Integer> map2 = new HashMap<>();
     
     public SeqPairClassifierTest() {
         
@@ -250,8 +251,8 @@ public class SeqPairClassifierTest {
         readnameToSeqIDMap.add(map1);
         readnameToSeqIDMap.add(map2);
         
-        fwdTrack.setReadnameToSeqIdMap(map1);
-        revTrack.setReadnameToSeqIdMap(map2);
+        fwdTrack.setReadnameToSeqIdMap1(map1);
+        revTrack.setReadnameToSeqIdMap1(map2);
         
         coverageContainer.computeCoverage(mappings);
         coverageContainer2.computeCoverage(mappings2);
@@ -288,25 +289,25 @@ public class SeqPairClassifierTest {
         List<Pair<Long,Long>> list = result.getMappingToPairIdList();
         
         //perfect pair
-        ParsedSeqPairMapping pair1 = pairs.get(new Pair<Long, Long>(Long.valueOf("1"), Long.valueOf("2")));
+        ParsedSeqPairMapping pair1 = pairs.get(new Pair<>(Long.valueOf("1"), Long.valueOf("2")));
         Assert.assertTrue(pair1.getMappingId1() == 1 && pair1.getMappingId2() == 2 && pair1.getType() == 0
                             && pair1.getReplicates() == 1);
         
         //tripled perfect pair
-        pair1 = pairs.get(new Pair<Long, Long>(Long.valueOf("3"), Long.valueOf("4")));
+        pair1 = pairs.get(new Pair<>(Long.valueOf("3"), Long.valueOf("4")));
         Assert.assertTrue(pair1.getMappingId1() == 3 && pair1.getMappingId2() == 4 && pair1.getType() == 0
                             && pair1.getReplicates() == 2);
-        pair1 = pairs.get(new Pair<Long, Long>(Long.valueOf("19"), Long.valueOf("20")));
+        pair1 = pairs.get(new Pair<>(Long.valueOf("19"), Long.valueOf("20")));
         Assert.assertTrue(pair1.getMappingId1() == 19 && pair1.getMappingId2() == 20 && pair1.getType() == 0
                             && pair1.getReplicates() == 2);
         
         //dist too small pair
-        pair1 = pairs.get(new Pair<Long, Long>(Long.valueOf("5"), Long.valueOf("6")));
+        pair1 = pairs.get(new Pair<>(Long.valueOf("5"), Long.valueOf("6")));
         Assert.assertTrue(pair1.getMappingId1() == 5 && pair1.getMappingId2() == 6 && pair1.getType() == 2
                             && pair1.getReplicates() == 1);
         
         //dist too large pair
-        pair1 = pairs.get(new Pair<Long, Long>(Long.valueOf("7"), Long.valueOf("8")));
+        pair1 = pairs.get(new Pair<>(Long.valueOf("7"), Long.valueOf("8")));
         Assert.assertTrue(pair1.getMappingId1() == 7 && pair1.getMappingId2() == 8 && pair1.getType() == 1
                             && pair1.getReplicates() == 1);
         

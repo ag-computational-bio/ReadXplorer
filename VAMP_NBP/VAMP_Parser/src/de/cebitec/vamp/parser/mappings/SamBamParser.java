@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.MissingResourceException;
 import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
@@ -87,8 +88,8 @@ public class SamBamParser implements MappingParserI {
         } catch (RuntimeException e) {
             throw new ParsingException(e.getMessage() + ". !! Track will be empty, thus not be stored !!");
         }
-        try {
-            while (itor.hasNext()) {
+        while (itor.hasNext()) {
+            try {
                 record = itor.next();
                 start = record.getAlignmentStart();
                 if (!record.getReadUnmappedFlag()) {
@@ -111,13 +112,13 @@ public class SamBamParser implements MappingParserI {
                         refSeq = refSeqwithoutgaps;
                         readSeq = readSeqwithoutGaps;
                     }
-                    
+
                     //check parameters
                     if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filepath, lineno)) {
                         continue;
                     }
-                    
-                    
+
+
 //                if (!readnameToSequenceID.containsKey(readname)) {
 //                    throw new ParsingException("Could not find sequence id mapping for read  " + readname + ""
 //                            + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
@@ -130,7 +131,7 @@ public class SamBamParser implements MappingParserI {
                     diffs = result.getDiffs();
                     gaps = result.getGaps();
                     errors = result.getDifferences();
-                    
+
                     if (errors < 0 || errors > readSeq.length()) {
                         this.sendMsg(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.checkMapping.ErrorRead",
@@ -151,16 +152,19 @@ public class SamBamParser implements MappingParserI {
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
                     this.seqPairProcessor.processReadname(seqID, readname);
-                    
+
                     if (!itor.hasNext()) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Iterator.noMoreData", filepath));
+                        this.sendMsg(NbBundle.getMessage(JokParser.class, "Parser.Iterator.noMoreData", filepath));
                     }
                 } else {
                     ++counterUnmapped;
                 }
+            } catch (MissingResourceException | ParsingException e) {
+                this.sendMsg(e.getMessage());
+            } catch (SAMFormatException e) {
+                this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                        "Parser.Parsing.CorruptData", lineno, e.toString()));
             }
-        } catch (MissingResourceException | ParsingException e) {
-            this.sendMsg(e.getMessage());
         }
 
 //        int numberMappings = mappingContainer.getMappingInformations().get(1);

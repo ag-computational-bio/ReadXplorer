@@ -710,17 +710,18 @@ public class ProjectConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
         try {
             if (track.isFirstTrack() || !track.isStepwise()) {
-                PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
-
-                // store track in table
-                insertTrack.setLong(1, track.getID());
-                insertTrack.setLong(2, track.getRefId());
-                insertTrack.setString(3, track.getDescription());
-                insertTrack.setTimestamp(4, track.getTimestamp());
-                insertTrack.setString(5, ""); //since the path is not stored - not a direct access track
-                insertTrack.execute();
-
-                insertTrack.close();
+                try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
+                    insertTrack.setLong(1, track.getID());
+                    insertTrack.setLong(2, track.getRefId());
+                    insertTrack.setString(3, track.getDescription());
+                    insertTrack.setTimestamp(4, track.getTimestamp());
+                    if (!track.isDbUsed()) {
+                        insertTrack.setString(5, track.getFile().getAbsolutePath());
+                    } else {
+                        insertTrack.setString(5, "");
+                    }
+                    insertTrack.execute();
+                }
             }
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
@@ -1008,7 +1009,7 @@ public class ProjectConnector {
     }
 
     /**
-     * Adds a all track data to the database.
+     * Adds all track data to the database which should be stored.
      * @param track track to add
      * @param seqPairs true, if this is a sequence pair track, false otherwise
      * @param onlyPosTable true, if only the position table is to be stored, false in the ordinary "import track" scenario
@@ -1026,12 +1027,16 @@ public class ProjectConnector {
         isLastTrack = track.getParsedMappingContainer().isLastMappingContainer();
         if (!onlyPosTable) {
             this.storeTrack(track);
-            this.storeCoverage(track);
-            this.storeMappings(track);
-            this.storeDiffs(track);
+            if (track.isDbUsed()) {
+                this.storeCoverage(track);
+                this.storeMappings(track);
+                this.storeDiffs(track);
+            }
             this.storeTrackStatistics(track); //needs to be called after storeCoverage
         }
-        this.storePositionTable(track);
+        if (track.isDbUsed()) {
+            this.storePositionTable(track);
+        }
 
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.enableTrackDomainIndices();
@@ -1515,18 +1520,15 @@ public class ProjectConnector {
                     seqPairId = 1;
                 }
             }
+            try (PreparedStatement setSeqPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID)) {
+                setSeqPairIds.setInt(1, seqPairId);
+                setSeqPairIds.setLong(2, track1Id);
+                setSeqPairIds.execute();
 
-            PreparedStatement setSeqPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID);
-
-            setSeqPairIds.setInt(1, seqPairId);
-            setSeqPairIds.setLong(2, track1Id);
-            setSeqPairIds.execute();
-
-            setSeqPairIds.setInt(1, seqPairId);
-            setSeqPairIds.setLong(2, track2Id);
-            setSeqPairIds.execute();
-
-            setSeqPairIds.close();
+                setSeqPairIds.setInt(1, seqPairId);
+                setSeqPairIds.setLong(2, track2Id);
+                setSeqPairIds.execute();
+            }
 
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
