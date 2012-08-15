@@ -23,7 +23,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
 
     public static enum Plot {
 
-        Priors, MACD, Posteriors
+        Priors, MACD, Posteriors;
     }
 
     public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure, File saveFile) {

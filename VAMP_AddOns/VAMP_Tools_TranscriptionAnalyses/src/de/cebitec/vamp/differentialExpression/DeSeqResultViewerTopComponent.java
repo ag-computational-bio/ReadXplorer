@@ -39,7 +39,7 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 preferredID = "DeSeqResultViewerTopComponent")
 @Messages({
     "CTL_DeSeqResultViewerAction=DeSeqResultViewer",
-    "CTL_DeSeqResultViewerTopComponent=DeSeqResultViewer Window",
+    "CTL_DeSeqResultViewerTopComponent=Differential expression analysis - results",
     "HINT_DeSeqResultViewerTopComponent=This is a DeSeqResultViewer window"
 })
 public final class DeSeqResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
@@ -48,13 +48,14 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
     private TableModel tm;
     private ComboBoxModel cbm;
     private ArrayList<TableModel> tableModels = new ArrayList<>();
-    private DeSeqAnalysisHandler DeySeqAnalysisHandler;
+    private DeSeqAnalysisHandler deySeqAnalysisHandler;
+    private DeSeqGraficsTopComponent deSeqGraficsTopComponent;
 
     public DeSeqResultViewerTopComponent() {
     }
 
     public DeSeqResultViewerTopComponent(AnalysisHandler handler) {
-        this.DeySeqAnalysisHandler = (DeSeqAnalysisHandler) handler;
+        this.deySeqAnalysisHandler = (DeSeqAnalysisHandler) handler;
         tm = new DefaultTableModel();
         cbm = new DefaultComboBoxModel(new String[]{"Significantly differentially expressed genes", "Most strongly down regulated genes", "Most strongly up regulated genes"});
 
@@ -66,7 +67,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
     }
 
     private void addResults() {
-        List<Object[][]> results = DeySeqAnalysisHandler.getResults();
+        List<Object[][]> results = deySeqAnalysisHandler.getResults();
         columnNames = new String[8];
 
         columnNames[0] = "locus";
@@ -89,6 +90,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
         resultsComboBox.setEnabled(true);
         resultsTable.setEnabled(true);
         saveTableButton.setEnabled(true);
+        createGraficsButton.setEnabled(true);
         jLabel1.setEnabled(true);
         jLabel2.setEnabled(false);
         jProgressBar1.setIndeterminate(false);
@@ -116,6 +118,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
         jScrollPane1 = new javax.swing.JScrollPane();
         resultsTable = new javax.swing.JTable();
         saveTableButton = new javax.swing.JButton();
+        createGraficsButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqResultViewerTopComponent.class, "DeSeqResultViewerTopComponent.jLabel1.text")); // NOI18N
         jLabel1.setEnabled(false);
@@ -138,6 +141,14 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(createGraficsButton, org.openide.util.NbBundle.getMessage(DeSeqResultViewerTopComponent.class, "DeSeqResultViewerTopComponent.createGraficsButton.text")); // NOI18N
+        createGraficsButton.setEnabled(false);
+        createGraficsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createGraficsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -150,8 +161,10 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(resultsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 304, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 187, Short.MAX_VALUE)
                         .addComponent(saveTableButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(createGraficsButton)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -168,7 +181,8 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
                         .addComponent(jLabel1)
                         .addComponent(resultsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel2)
-                        .addComponent(saveTableButton)))
+                        .addComponent(saveTableButton)
+                        .addComponent(createGraficsButton)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
                 .addContainerGap())
@@ -179,7 +193,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
         new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"csv"}, "csv") {
             @Override
             public void save(String fileLocation) {
-                DeySeqAnalysisHandler.saveResultsAsCSV(resultsComboBox.getSelectedIndex(), fileLocation);
+                deySeqAnalysisHandler.saveResultsAsCSV(resultsComboBox.getSelectedIndex(), fileLocation);
             }
 
             @Override
@@ -187,7 +201,16 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
             }
         };
     }//GEN-LAST:event_saveTableButtonActionPerformed
+
+    private void createGraficsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraficsButtonActionPerformed
+        deSeqGraficsTopComponent = new DeSeqGraficsTopComponent(deySeqAnalysisHandler);
+        deySeqAnalysisHandler.registerObserver(deSeqGraficsTopComponent);
+        deSeqGraficsTopComponent.open();
+        deSeqGraficsTopComponent.requestActive();
+    }//GEN-LAST:event_createGraficsButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton createGraficsButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JProgressBar jProgressBar1;
@@ -204,7 +227,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
 
     @Override
     public void componentClosed() {
-        DeySeqAnalysisHandler.removeObserver(this);
+        deySeqAnalysisHandler.removeObserver(this);
     }
 
     void writeProperties(java.util.Properties p) {

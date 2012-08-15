@@ -60,6 +60,8 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         cbm = new DefaultComboBoxModel(BaySeqAnalysisHandler.Plot.values());
         initComponents();
+        setName(Bundle.CTL_DiffExpGraficsTopComponent());
+        setToolTipText(Bundle.HINT_DiffExpGraficsTopComponent());
         svgCanvas = new JSVGCanvas();
         jPanel1.add(svgCanvas, BorderLayout.CENTER);
         svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
