@@ -48,9 +48,10 @@ public class ImportOverviewCard extends javax.swing.JPanel {
             overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.seqPairs") + ":\n");
             for(Iterator<SeqPairJobContainer> it = seqPairJobList.iterator(); it.hasNext(); ){
                 SeqPairJobContainer seqPairCont = it.next();
+                String file2Name = seqPairCont.getTrackJob2().getFile() != null ? seqPairCont.getTrackJob2().getFile().getAbsolutePath() : "-";
                 overviewTextArea.append(seqPairCont.getTrackJob1().getFile().getAbsolutePath()+"\n");
                 overviewTextArea.append("\t"+seqPairCont.getTrackJob1().getDescription()+"\n");
-                overviewTextArea.append(seqPairCont.getTrackJob2().getFile().getAbsolutePath()+"\n");
+                overviewTextArea.append(file2Name + "\n");
                 overviewTextArea.append("\t"+seqPairCont.getTrackJob2().getDescription()+"\n");
             }
         }

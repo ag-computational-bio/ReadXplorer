@@ -13,7 +13,6 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -682,18 +681,14 @@ public class ProjectConnector {
     public void storeDirectAccessTrack(TrackJob trackJob) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");       
         
-        try {
-            PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK);
-
-            // store track in table
+        try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
             insertTrack.setLong(1, trackJob.getID());
             insertTrack.setLong(2, trackJob.getRefGen().getID());
             insertTrack.setString(3, trackJob.getDescription());
             insertTrack.setTimestamp(4, trackJob.getTimestamp());
             insertTrack.setString(5, trackJob.getFile().getAbsolutePath());
             insertTrack.execute();
-            insertTrack.close();
-            
+
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
@@ -1309,6 +1304,8 @@ public class ProjectConnector {
             deleteCoverage.setLong(1, trackID);
             PreparedStatement deleteStatistics = con.prepareStatement(SQLStatements.DELETE_STATISTIC_FROM_TRACK);
             deleteStatistics.setLong(1, trackID);
+            PreparedStatement deletePosTable = con.prepareStatement(SQLStatements.DELETE_POS_TABLE_FROM_TRACK);
+            deletePosTable.setLong(1, trackID);
             PreparedStatement deleteTrack = con.prepareStatement(SQLStatements.DELETE_TRACK);
             deleteTrack.setLong(1, trackID);
 
@@ -1320,6 +1317,8 @@ public class ProjectConnector {
             deleteCoverage.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Statistics...");
             deleteStatistics.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Position Table...");
+            deletePosTable.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track...");
             deleteTrack.execute();
 
@@ -1329,6 +1328,7 @@ public class ProjectConnector {
             deleteMappings.close();
             deleteCoverage.close();
             deleteStatistics.close();
+            deletePosTable.close();
             deleteTrack.close();
 
             con.setAutoCommit(true);

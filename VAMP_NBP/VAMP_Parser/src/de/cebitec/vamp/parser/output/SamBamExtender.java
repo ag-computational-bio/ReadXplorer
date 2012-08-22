@@ -194,29 +194,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                             this.notifyObservers("Cannot contain less than the lowest diff rate number of errors!");
                         }
                         record.setAttribute(Properties.TAG_MAP_COUNT, seqMatches);
-
-                        //set sequence pair information in case this is a sequence pair data set
-                        //                    if (seqPairData) {
-                        //                        readNameLength = readName.length() - 1;
-                        //                        lastChar = readName.charAt(readNameLength);
-                        //                        readName = readName.substring(0, readNameLength); //keep in mind that name was changed here
-                        //                        
-                        //                        if (lastChar == SeqPairProcessorI.EXT_A1 || lastChar == SeqPairProcessorI.EXT_B1) {
-                        //                            if (seqIdToReadNameMap1.containsKey(readName)) {
-                        //                                
-                        //                                record.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_ID, seqIdToReadNameMap1.get(readName));
-                        //                                record.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_TYPE, name); //TODO: get type and correct id
-                        //                            }
-                        //                        } else if (lastChar == SeqPairProcessorI.EXT_A2 || lastChar == SeqPairProcessorI.EXT_B2) {
-                        //                            if (seqIdToReadNameMap2.containsKey(readName)) {
-                        //                                
-                        //                                record.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_ID, seqIdToReadNameMap2.get(readName));
-                        //                                record.setAttribute(SeqPairProcessorI.TAG_SEQ_PAIR_TYPE, name); //TODO: get type and correct id
-                        //                            }
-                        //                        }
-                        //                        
-                        //                    }
-
                     }
 
                     samBamFileWriter.addAlignment(record);

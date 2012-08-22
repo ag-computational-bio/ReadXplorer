@@ -64,6 +64,8 @@ public final class ParserCommonMethods {
         String bases; //bases of the read interval under investigation
         int currentDiffs;
         int absPos = start;
+        int numDeletions = 0;
+        int correctPos;
         int diffPos;
         if (!refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
@@ -85,6 +87,7 @@ public final class ParserCommonMethods {
                 currentDiffs = Integer.valueOf(num[i - 1]);
                 differences += currentDiffs;
                 absPos += currentDiffs;
+                numDeletions += currentDiffs;
 
             } else if (op.equals("I")) { // count and add reference gaps for insertions
                 differences += Integer.valueOf(num[i - 1]);
@@ -92,10 +95,11 @@ public final class ParserCommonMethods {
 
             } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
                 currentDiffs = Integer.valueOf(num[i - 1]);
-                bases = readSeq.substring(absPos, absPos + currentDiffs);
+                correctPos = absPos - start - numDeletions;
+                bases = readSeq.substring(correctPos, correctPos + currentDiffs);
                 for (int j = 0; j < bases.length(); ++j) {
                     diffPos = absPos + j;
-                    if (bases.charAt(j) != refSeq.charAt(diffPos)) {
+                    if (bases.charAt(j) != refSeq.charAt(diffPos - start)) {
                         ++differences;
                     }
                 }
@@ -137,6 +141,8 @@ public final class ParserCommonMethods {
         int currentDiffs;
         int absPos = start;
         int diffPos;
+        int numDeletions = 0;
+        int correctPos;
         char base;
         if (!refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
@@ -154,7 +160,7 @@ public final class ParserCommonMethods {
                 differences += currentDiffs;
                 for (int j = 0; j < currentDiffs; ++j) {
                     diffPos = absPos + j;
-                    base = readSeq.charAt(diffPos - start);
+                    base = readSeq.charAt(diffPos - start - numDeletions);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
@@ -165,6 +171,7 @@ public final class ParserCommonMethods {
             } else if (op.equals("D")) { // count and add diff gaps for deletions in read
                 currentDiffs = Integer.valueOf(num[i - 1]);
                 differences += currentDiffs;
+                numDeletions += currentDiffs;
                 for (int j = 0; j < currentDiffs; ++j) {
                     diffs.add(new ParsedDiff(absPos + j, '_'));
                 }
@@ -174,7 +181,7 @@ public final class ParserCommonMethods {
                 differences += currentDiffs;
                 for (int j = 0; j < currentDiffs; ++j) {
                     diffPos = absPos + j;
-                    base = readSeq.charAt(diffPos - start);
+                    base = readSeq.charAt(diffPos - start - numDeletions);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
@@ -184,11 +191,11 @@ public final class ParserCommonMethods {
 
             } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
                 currentDiffs = Integer.valueOf(num[i - 1]);
-                bases = readSeq.substring(absPos, absPos + currentDiffs);
+                bases = readSeq.substring(absPos - start - numDeletions, absPos - start + currentDiffs - numDeletions);
                 for (int j = 0; j < bases.length(); ++j) {
                     diffPos = absPos + j;
                     base = readSeq.charAt(j);
-                    if (base != refSeq.charAt(diffPos)) {
+                    if (base != refSeq.charAt(diffPos - start)) {
                         ++differences;
                         if (isRevStrand) {
                             base = SequenceUtils.getDnaComplement(base);

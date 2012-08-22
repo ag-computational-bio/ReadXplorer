@@ -152,10 +152,6 @@ public class SamBamParser implements MappingParserI {
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
                     this.seqPairProcessor.processReadname(seqID, readname);
-
-                    if (!itor.hasNext()) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class, "Parser.Iterator.noMoreData", filepath));
-                    }
                 } else {
                     ++counterUnmapped;
                 }

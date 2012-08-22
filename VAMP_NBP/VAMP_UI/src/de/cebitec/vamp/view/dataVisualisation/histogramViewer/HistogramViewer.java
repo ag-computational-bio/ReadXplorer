@@ -68,13 +68,13 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         this.setInDrawingMode(false);
         this.lowerBound = super.getBoundsInfo().getLogLeft();
         this.upperBound = super.getBoundsInfo().getLogRight();
-        this.scaleValues = new ArrayList<Integer>();
+        this.scaleValues = new ArrayList<>();
 //        zoomExcuse = new ZoomLevelExcusePanel();
 
         logoData = new LogoDataManager(lowerBound, upperBound);
         gapManager = new GenomeGapManager(lowerBound, upperBound);
-        gaps = new ArrayList<PersistantReferenceGap>();
-        diffs = new ArrayList<PersistantDiff>();
+        gaps = new ArrayList<>();
+        diffs = new ArrayList<>();
         cov = new PersistantCoverage(lowerBound, lowerBound);
         this.showSequenceBar(true, true);
     }
@@ -283,7 +283,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int minMargin = 20;
         int step;
 
-        ArrayList<Integer> test = new ArrayList<Integer>();
+        ArrayList<Integer> test = new ArrayList<>();
         test.add(50000);
         test.add(20000);
         test.add(10000);
@@ -312,7 +312,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     }
 
     private ArrayList<Integer> getValues(int stepsize) {
-        ArrayList<Integer> list = new ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<>();
 
         int tmp = stepsize;
         while (tmp <= maxCoverage) {
@@ -508,7 +508,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     }
 
     private void fillGapManager() {
-        HashMap<Integer, Integer> positionToNum = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> positionToNum = new HashMap<>();
         for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
             PersistantReferenceGap gap = it.next();
             int gapPosition = gap.getPosition();

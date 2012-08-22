@@ -298,7 +298,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 int distance = seqPairJobContainer.getDistance();
                 if (distance > 0) {
                     
-                    int trackId1;
+                    int trackId1 = -1;
                     int trackId2 = -1; //TODO: change import of track 2 for db import
                     
                     ///////////////////////////////////////////////////////////////////////
@@ -335,51 +335,42 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                     //////////// Special treatment of direct access tracks here: //////////
                     ///////////////////////////////////////////////////////////////////////
                     } else {
+                        
+                        /*
+                         * Algorithm:
+                         * start file
+                         * if (track not yet imported) {
+                         *      if (isTwoTracks) { combine them unsorted (NEW FILE) }
+                         *      sort by readseq (NEW FILE) - if isTwoTracks: deleteOldFile
+                         *      parse mappings 
+                         *      sort by read name (NEW FILE) - deleteOldFile
+                         *      seq pair classification, extension & sorting by coordinate - deleteOldFile
+                         * }
+                         * create position table (advantage: is already sorted by coordinate & classification in file)
+                         */
+                        
                         TrackJob trackJob1 = seqPairJobContainer.getTrackJob1();
                         TrackJob trackJob2 = seqPairJobContainer.getTrackJob2();
                         Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
                         String referenceSeq = this.getReference(trackJob1);
                         
-                        boolean isTwoTracks = trackJob2.getFile().exists();
                         File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the classification
-                                              
-                        //only extend, if data is not already stored in it
+
                         if (!trackJob1.isAlreadyImported()) {
                             
-                            //combine both tracks (if there are two) and continue with trackJob1
-                            SamBamCombiner combiner = new SamBamCombiner(trackJob1, trackJob2, false);
-                            combiner.registerObserver(this);
-                            combiner.combineTracks();
-                            if (isTwoTracks) {
+                            boolean isTwoTracks = trackJob2.getFile() != null;
+                            if (isTwoTracks) { //only combine, if data is not already combined
+
+                                //combine both tracks and continue with trackJob1
+                                SamBamCombiner combiner = new SamBamCombiner(trackJob1, trackJob2, false);
+                                combiner.registerObserver(this);
+                                combiner.combineTracks();
                                 lastWorkFile = trackJob1.getFile();
                             }
-                            
-                            //at first file needs to be sorted by coordinate for efficient calculation
-                            boolean hadToSort = false;
-                            try (SAMFileReader samReader = new SAMFileReader(trackJob1.getFile())) {
-                                if (!samReader.getFileHeader().getSortOrder().equals(SAMFileHeader.SortOrder.coordinate)) {
-                                    this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.coordinate, "coordinate");
-                                    hadToSort = true;
-                                }
-                            }
-                            
-                            //deletion of unneeded file
-                            if (isTwoTracks) {
-                                this.deleteOldWorkFile(lastWorkFile);
-                                lastWorkFile = trackJob1.getFile();
-                            }
-                            if (hadToSort) { lastWorkFile = trackJob1.getFile(); }
-                            
-                            //create position table
-                            SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
-                            posTableCreator.registerObserver(this);
-                            posTableCreator.createPosTable(trackJob1, referenceSeq);
-//                            posTableCreator.getStatistics();
-                            
+
                             //sort file by read sequence for efficient classification
                             this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.readseq, "readSequence");
-                            if (isTwoTracks || hadToSort) {
-                                //only if a new file was created before, we want to delete the obsolete one
+                            if (isTwoTracks) { //only if a new file was created before, we want to delete the obsolete one
                                 this.deleteOldWorkFile(lastWorkFile);
                             }
                             lastWorkFile = trackJob1.getFile();
@@ -397,27 +388,25 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 this.showMsg("Error during parsing of direct access track: " + ex.toString());
                                 this.noErrors = false;
                             }
-                        } //else case with already imported, but two tracks (which cannot occur basically)
 
-                        //sort by read name for efficient seq pair classification
-                        this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.queryname, "readName");
-                        if (!trackJob1.isAlreadyImported()) {
-                            //last file only has to be deleted, if we were in if clause and sorted by read seq
+                            //sort by read name for efficient seq pair classification
+                            this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.queryname, "readName");
                             this.deleteOldWorkFile(lastWorkFile);
-                        }
-                        lastWorkFile = trackJob1.getFile();
+                            lastWorkFile = trackJob1.getFile();
 
-                        //extension for both classification and seq pair info
-                        SamBamDirectSeqPairClassifier samBamDirectSeqPairClassifier = new SamBamDirectSeqPairClassifier(
-                                seqPairJobContainer, referenceSeq, classificationMap);
-                        samBamDirectSeqPairClassifier.registerObserver(this);
-                        samBamDirectSeqPairClassifier.classifySeqPairs();
-                        
-                        try { //last file always has to be deleted (is the sorted by read name one
-                            Files.delete(lastWorkFile.toPath());
-                        } catch (IOException ex) {
-                            this.showMsg(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.FileDeletionError", lastWorkFile.getAbsolutePath()));
-                        }
+                            //extension for both classification and seq pair info
+                            SamBamDirectSeqPairClassifier samBamDirectSeqPairClassifier = new SamBamDirectSeqPairClassifier(
+                                    seqPairJobContainer, referenceSeq, classificationMap);
+                            samBamDirectSeqPairClassifier.registerObserver(this);
+                            samBamDirectSeqPairClassifier.classifySeqPairs();
+                            this.deleteOldWorkFile(lastWorkFile);
+                        } //else case with 2 already imported tracks is prohibited
+
+                        //create position table
+                        SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
+                        posTableCreator.registerObserver(this);
+                        posTableCreator.createPosTable(trackJob1, referenceSeq);
+//                            posTableCreator.getStatistics();
 
                         this.storeDirectAccessTrack(trackJob1); // store track entry in db
                         trackId1 = trackJob1.getID();
@@ -554,35 +543,22 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void parseDirectAccessTrack(TrackJob trackJob) {
         
         String referenceSeq = this.getReference(trackJob);
-        boolean hadToSort = false;
         File lastWorkFile = trackJob.getFile();
         
-        //generate position table data from track
-        //at first file needs to be sorted by coordinate for efficient calculation
-        SAMFileReader samReader = new SAMFileReader(trackJob.getFile());
-        boolean sortedByCoordinate;
-        try {
-            sortedByCoordinate = samReader.getFileHeader().getSortOrder().equals(SAMFileHeader.SortOrder.coordinate);
-        } catch (IllegalArgumentException e) { //if "*" or other weird words were used as sort order we assume the file is unsorted
-            sortedByCoordinate = false;
-        }
-        if (!sortedByCoordinate) {
-            this.sortSamBam(trackJob, SAMFileHeader.SortOrder.coordinate, "coordinate");
-            hadToSort = true;
-            lastWorkFile = trackJob.getFile();
-        }
-        
-        SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
-        posTableCreator.registerObserver(this);
-        posTableCreator.createPosTable(trackJob, referenceSeq);
+        /*
+         * Algorithm:
+         * if (track not yet imported) {
+         *      sort by readseq (NEW FILE)
+         *      parse mappings 
+         *      extend bam file (NEW FILE) - deleteOldFile
+         * }
+         * create position table (advantage: is already sorted by coordinate & classification in file)
+         */   
         
         //only extend, if data is not already stored in it
         if (!trackJob.isAlreadyImported()) {
             //sort file by read sequence for efficient classification
             this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, "readSequence");
-            if (hadToSort) {
-                this.deleteOldWorkFile(lastWorkFile);
-            }
             lastWorkFile = trackJob.getFile();
 
             //generate classification data in sorted file
@@ -594,11 +570,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 
                 //write new file with classification information
                 this.extendSamBamFile(classificationMap, trackJob, referenceSeq);
-                try { //only if a new file was created before, we want to delete the obsolete one
-                    Files.delete(lastWorkFile.toPath());
-                } catch (IOException ex) {
-                    this.showMsg(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.FileDeletionError", lastWorkFile.getAbsolutePath()));
-                }
+                this.deleteOldWorkFile(lastWorkFile);
 
             } catch (OutOfMemoryError ex) {
                 this.showMsg("Out of memory error during parsing of direct access track: " + ex.toString());
@@ -607,12 +579,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 Exceptions.printStackTrace(ex); //TODO: remove this error handling
             }
         }
-        try {
-            //store data in db finally
-            this.storeTrack(new ParsedTrack(trackJob, null, null), trackJob, noErrors, noErrors);
-        } catch (StorageException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+
+        //generate position table data from track
+        //file needs to be sorted by coordinate for efficient calculation
+        SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
+        posTableCreator.registerObserver(this);
+        posTableCreator.createPosTable(trackJob, referenceSeq);
+
         this.storeDirectAccessTrack(trackJob);
     }
     
@@ -688,10 +661,10 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     }
 
     /**
-     * If any other message should be printed to the console, this method is used.
+     * If any message should be printed to the console, this method is used.
      * If an error occured during the run of the parser, which does not interrupt
      * the parsing process, this method prints the error to the program console.
-     * @param msg
+     * @param msg the msg to print
      */
     private void showMsg(String msg) {
         this.io.getOut().println("\"" + msg);
@@ -720,11 +693,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             ProjectConnector.getInstance().storeDirectAccessTrack(trackJob);
             io.getOut().println(this.getBundleString("MSG_ImportThread.import.success.trackdirect"));
             
-            
-//        } catch (StorageException e) {
-//            io.getOut().println(this.getBundleString("MSG_ImportThread.import.failure.trackdirect"));
-//        } catch (ParsingException e) {
-//            io.getOut().println(this.getBundleString("MSG_ImportThread.import.failure.trackdirect"));
         } catch(OutOfMemoryError e) {
             io.getOut().println(this.getBundleString("MSG_ImportThread.import.outOfMemory") + "!");
         }
@@ -775,7 +743,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
     private void extendSamBamFile(Map<String, Pair<Integer, Integer>> classificationMap, TrackJob trackJob, String sequenceString) {
         try {
-            io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.extension.Start"));
+            io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.extension", trackJob.getFile().getName()));
             long start = System.currentTimeMillis();
             
             //sort file again by genome coordinate (position) & store classification data
@@ -785,7 +753,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             bamExtender.convert();
             
             long finish = System.currentTimeMillis();
-            String msg = NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.extension.Finish");
+            String msg = NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.finish.extension", trackJob.getFile().getName());
             io.getOut().println(Benchmark.calculateDuration(start, finish, msg));
             
         } catch (ParsingException ex) {
