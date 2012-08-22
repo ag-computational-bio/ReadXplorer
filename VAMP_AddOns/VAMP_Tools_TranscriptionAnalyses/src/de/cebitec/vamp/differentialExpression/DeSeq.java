@@ -2,10 +2,16 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 
@@ -31,14 +37,19 @@ public class DeSeq {
             gnuR.eval("biocLite(\"DESeq\")");
             gnuR.eval("library(DESeq)");
         }
-        //Defining the plot functions:
-        gnuR.eval("plotDispEsts <- function( cds ){plot(rowMeans( "
-                + "counts( cds, normalized=TRUE ) ), fitInfo(cds)$perGeneDispEsts, "
-                + "pch = '.', log=\"xy\" ) xg <- 10^seq( -.5, 5, length.out=300 ) "
-                + "lines( xg, fitInfo(cds)$dispFun( xg ), col=\"red\")}");
-
-        gnuR.eval("plotDE <- function( res ) plot(res$baseMean, res$log2FoldChange, "
-                + "log=\"x\", pch=20, cex=.3, col = ifelse( res$padj < .1, \"red\", \"black\"))");
+        //Load an R image containing the plotting functions
+        try {
+            InputStream jarPath = DeSeq.class.getResourceAsStream("/de/cebitec/vamp/differentialExpression/DeSeqPlot.rdata");
+            File to = File.createTempFile("VAMP_", ".rdata");
+            to.deleteOnExit();
+            Files.copy(jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            String tmpPath = to.getAbsolutePath();
+            tmpPath = tmpPath.replace("\\", "\\\\");
+            gnuR.eval("load(file=\"" + tmpPath + "\")");
+        } catch (IOException ex) {
+            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load plotting functions. You woun't be able to plot your results!", currentTimestamp);
+        }
 
         if (!AnalysisHandler.TESTING_MODE) {
             //Handing over the count data to Gnu R.
@@ -122,23 +133,23 @@ public class DeSeq {
             gnuR.eval("data(testData)");
         }
         List<RVector> results = new ArrayList<>();
-            //Significant results sorted by the most significantly differentially expressed genes
-            gnuR.eval("res0 <- resSig[order(resSig$pval), ]");
-            REXP result = gnuR.eval("res0");
-            RVector rvec = result.asVector();
-            results.add(rvec);
+        //Significant results sorted by the most significantly differentially expressed genes
+        gnuR.eval("res0 <- resSig[order(resSig$pval), ]");
+        REXP result = gnuR.eval("res0");
+        RVector rvec = result.asVector();
+        results.add(rvec);
 
-            //Significant results sorted by the most strongly down regulated genes
-            gnuR.eval("res1 <- resSig[order(resSig$foldChange, -resSig$baseMean), ]");
-            result = gnuR.eval("res1");
-            rvec = result.asVector();
-            results.add(rvec);
+        //Significant results sorted by the most strongly down regulated genes
+        gnuR.eval("res1 <- resSig[order(resSig$foldChange, -resSig$baseMean), ]");
+        result = gnuR.eval("res1");
+        rvec = result.asVector();
+        results.add(rvec);
 
-            //Significant results sorted by the most strongly up regulated genes
-            gnuR.eval("res2 <- resSig[order(-resSig$foldChange, -resSig$baseMean), ]");
-            result = gnuR.eval("res2");
-            rvec = result.asVector();
-            results.add(rvec);
+        //Significant results sorted by the most strongly up regulated genes
+        gnuR.eval("res2 <- resSig[order(-resSig$foldChange, -resSig$baseMean), ]");
+        result = gnuR.eval("res2");
+        rvec = result.asVector();
+        results.add(rvec);
         if (saveFile != null) {
             String path = saveFile.getAbsolutePath();
             path = path.replace("\\", "\\\\");
@@ -158,6 +169,42 @@ public class DeSeq {
     public void saveResultsAsCSV(int index, File saveFile) {
         String path = saveFile.getAbsolutePath();
         path = path.replace("\\", "/");
-        gnuR.eval("write.csv(res"+index+",file=\"" + path + "\")");
+        gnuR.eval("write.csv(res" + index + ",file=\"" + path + "\")");
+    }
+
+    public void plotDispEsts(File file) throws IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
+        gnuR.setUpSvgOutput();
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotDispEsts(cD)");
+        gnuR.eval("dev.off()");
+    }
+
+    public void plotDE(File file) throws IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
+        gnuR.setUpSvgOutput();
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("plotDE(res)");
+        gnuR.eval("dev.off()");
+    }
+
+    public void plotHist(File file) throws IllegalStateException {
+        if (gnuR == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
+        gnuR.setUpSvgOutput();
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        gnuR.eval("devSVG(file=\"" + path + "\")");
+        gnuR.eval("hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")");
+        gnuR.eval("dev.off()");
     }
 }
