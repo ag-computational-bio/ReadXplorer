@@ -285,7 +285,7 @@ public class CoverageContainer {
                 position = String.valueOf(positionInt);
                 base = gap.getBase();
                 order = gap.getOrder();
-                if (mapping.getDirection() == -1) {
+                if (mapping.getDirection() == SequenceUtils.STRAND_REV) {
                     base = SequenceUtils.getDnaComplement(base);
                 }
                 value = 'a';

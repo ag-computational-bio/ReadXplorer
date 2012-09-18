@@ -121,7 +121,6 @@ public class SamBamFileReader { //TODO: add observer
      */
      public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, int from, int to,
             boolean diffsAndGapsNeeded, byte trackNeeded) {
-        int offset = 1000; //takes care that mappings starting before the "from" or ending after the to position throw out of bounds errors - has to be adapted for longer reads!
 
         int[] perfectCoverageFwd = new int[0];
         int[] perfectCoverageRev = new int[0];
@@ -133,22 +132,23 @@ public class SamBamFileReader { //TODO: add observer
         int[] commonCoverageRevTrack1 = new int[0];
         int[] commonCoverageFwdTrack2 = new int[0];
         int[] commonCoverageRevTrack2 = new int[0];
+        int intervalSize = to - from;
 
         if (trackNeeded == 0) {
-            perfectCoverageFwd = new int[to - from + offset * 2];
-            perfectCoverageRev = new int[to - from + offset * 2];
-            bestMatchCoverageFwd = new int[to - from + offset * 2];
-            bestMatchCoverageRev = new int[to - from + offset * 2];
-            commonCoverageFwd = new int[to - from + offset * 2];
-            commonCoverageRev = new int[to - from + offset * 2];
+            perfectCoverageFwd = new int[intervalSize];
+            perfectCoverageRev = new int[intervalSize];
+            bestMatchCoverageFwd = new int[intervalSize];
+            bestMatchCoverageRev = new int[intervalSize];
+            commonCoverageFwd = new int[intervalSize];
+            commonCoverageRev = new int[intervalSize];
 
         } else if (trackNeeded == PersistantCoverage.TRACK1) {
-            commonCoverageFwdTrack1 = new int[to - from + offset * 2];
-            commonCoverageRevTrack1 = new int[to - from + offset * 2];
+            commonCoverageFwdTrack1 = new int[intervalSize];
+            commonCoverageRevTrack1 = new int[intervalSize];
 
         } else if (trackNeeded == PersistantCoverage.TRACK2) {
-            commonCoverageFwdTrack2 = new int[to - from + offset * 2];
-            commonCoverageRevTrack2 = new int[to - from + offset * 2];
+            commonCoverageFwdTrack2 = new int[intervalSize];
+            commonCoverageRevTrack2 = new int[intervalSize];
         }
 
         PersistantCoverage coverage = new PersistantCoverage(from, to);
@@ -162,12 +162,11 @@ public class SamBamFileReader { //TODO: add observer
         try {
             SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
 
-            int insertFrom = from - offset;
-            
             SAMRecord record;
             boolean isFwdStrand;
             Integer classification;
-            int pos;
+            int refPos;
+            int indexPos;
             int start;
             int stop;
             while (samRecordIterator.hasNext()) {
@@ -176,82 +175,77 @@ public class SamBamFileReader { //TODO: add observer
                 classification = (Integer) record.getAttribute("Yc");
                 start = record.getAlignmentStart();
                 stop = record.getAlignmentEnd();
-                for (int i = 0; i <= stop - start; i++) {                        
-                        pos = start + i - insertFrom;
+                for (int i = 0; i <= stop - start; i++) {
+                    refPos = start + i; //example: 1000 = from, 999 = start, i = 0 -> refPos = 999, indexPos = -1;
+                    if (refPos >= from && refPos < to) {
+                        indexPos = refPos - from; 
                         if (trackNeeded == 0) {
                             if (classification != null) {
                                 if (classification == Properties.PERFECT_COVERAGE) {
                                     if (isFwdStrand) {
-                                        ++perfectCoverageFwd[pos];
-                                        ++bestMatchCoverageFwd[pos];
-                                        ++commonCoverageFwd[pos];
+                                        ++perfectCoverageFwd[indexPos];
+                                        ++bestMatchCoverageFwd[indexPos];
+                                        ++commonCoverageFwd[indexPos];
                                     } else {
-                                        ++perfectCoverageRev[pos];
-                                        ++bestMatchCoverageRev[pos];
-                                        ++commonCoverageRev[pos];
+                                        ++perfectCoverageRev[indexPos];
+                                        ++bestMatchCoverageRev[indexPos];
+                                        ++commonCoverageRev[indexPos];
                                     }
 
                                 } else if (classification == Properties.BEST_MATCH_COVERAGE) {
                                     if (isFwdStrand) {
-                                        ++bestMatchCoverageFwd[pos];
-                                        ++commonCoverageFwd[pos];
+                                        ++bestMatchCoverageFwd[indexPos];
+                                        ++commonCoverageFwd[indexPos];
                                     } else {
-                                        ++bestMatchCoverageRev[pos];
-                                        ++commonCoverageRev[pos];
+                                        ++bestMatchCoverageRev[indexPos];
+                                        ++commonCoverageRev[indexPos];
                                     }
 
                                 } else { //meaning: if (classification == Properties.COMPLETE_COVERAGE) {
                                     if (isFwdStrand) {
-                                        ++commonCoverageFwd[pos];
+                                        ++commonCoverageFwd[indexPos];
                                     } else {
-                                        ++commonCoverageRev[pos];
+                                        ++commonCoverageRev[indexPos];
                                     }
                                 }
 
                             } else {
                                 if (isFwdStrand) {
-                                    ++commonCoverageFwd[pos];
+                                    ++commonCoverageFwd[indexPos];
                                 } else {
-                                    ++commonCoverageRev[pos];
+                                    ++commonCoverageRev[indexPos];
                                 }
                             }
 
-                            //part for double track coverage, where we need to store it in map for track 1 or 2
+                        //part for double track coverage, where we need to store it in map for track 1 or 2
                         } else if (trackNeeded == PersistantCoverage.TRACK1) {
                             if (isFwdStrand) {
-                                ++commonCoverageFwdTrack1[pos];
+                                ++commonCoverageFwdTrack1[indexPos];
                             } else {
-                                ++commonCoverageRevTrack1[pos];
+                                ++commonCoverageRevTrack1[indexPos];
                             }
-                        
+
                         } else if (trackNeeded == PersistantCoverage.TRACK2) {
                             if (isFwdStrand) {
-                                ++commonCoverageFwdTrack2[pos];
+                                ++commonCoverageFwdTrack2[indexPos];
                             } else {
-                                ++commonCoverageRevTrack2[pos];
+                                ++commonCoverageRevTrack2[indexPos];
                             }
-//                        }
+                        }
                     }
                 }
                 
                 if (diffsAndGapsNeeded) {
                     diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(), 
                             record.getUnclippedStart(), isFwdStrand, 1, record.getReadString(), 
-                            refSeq.substring(record.getUnclippedStart(), record.getUnclippedEnd()), null);
+                            refSeq.substring(record.getUnclippedStart() - 1, record.getUnclippedEnd()), null);
                     diffs.addAll(diffsAndGaps.getDiffs());
                     gaps.addAll(diffsAndGaps.getGaps());
                 }
             }
             samRecordIterator.close();
          
-            if (trackNeeded == 0) {
-                perfectCoverageFwd = Arrays.copyOfRange(perfectCoverageFwd, offset, perfectCoverageFwd.length - offset + 1);
-                perfectCoverageRev = Arrays.copyOfRange(perfectCoverageRev, offset, perfectCoverageRev.length - offset + 1);
-                bestMatchCoverageFwd = Arrays.copyOfRange(bestMatchCoverageFwd, offset, bestMatchCoverageFwd.length - offset + 1);
-                bestMatchCoverageRev = Arrays.copyOfRange(bestMatchCoverageRev, offset, bestMatchCoverageRev.length - offset + 1);
-                commonCoverageFwd = Arrays.copyOfRange(commonCoverageFwd, offset, commonCoverageFwd.length - offset + 1);
-                commonCoverageRev = Arrays.copyOfRange(commonCoverageRev, offset, commonCoverageRev.length - offset + 1);
-                
+            if (trackNeeded == 0) {                
                 coverage.setPerfectFwdMult(perfectCoverageFwd);
                 coverage.setPerfectRevMult(perfectCoverageRev);
                 coverage.setBestMatchFwdMult(bestMatchCoverageFwd);
@@ -260,22 +254,20 @@ public class SamBamFileReader { //TODO: add observer
                 coverage.setCommonRevMult(commonCoverageRev);
 
             } else if (trackNeeded == PersistantCoverage.TRACK1) {
-                commonCoverageFwdTrack1 = Arrays.copyOfRange(commonCoverageFwdTrack1, offset, commonCoverageFwdTrack1.length - offset + 1);
-                commonCoverageRevTrack1 = Arrays.copyOfRange(commonCoverageRevTrack1, offset, commonCoverageRevTrack1.length - offset + 1);
-
                 coverage.setCommonFwdMultTrack1(commonCoverageFwdTrack1);
                 coverage.setCommonRevMultTrack1(commonCoverageRevTrack1);
                 
             } else if (trackNeeded == PersistantCoverage.TRACK2) {
-                commonCoverageFwdTrack2 = Arrays.copyOfRange(commonCoverageFwdTrack2, offset, commonCoverageFwdTrack2.length - offset + 1);
-                commonCoverageRevTrack2 = Arrays.copyOfRange(commonCoverageRevTrack2, offset, commonCoverageRevTrack2.length - offset + 1);
-            
                 coverage.setCommonFwdMultTrack2(commonCoverageFwdTrack2);
                 coverage.setCommonRevMultTrack2(commonCoverageRevTrack2);
             }
             
         } catch (NullPointerException | IllegalArgumentException | SAMFormatException e) {
             Exceptions.printStackTrace(e); //TODO: replace by notify observer
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("There are reads longer than 1000 bases: The offset has to be increased! Contact the programmers.");
+            Exceptions.printStackTrace(e);
+            e.printStackTrace();
         }
         return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
     }

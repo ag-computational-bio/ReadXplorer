@@ -350,17 +350,24 @@ public class SQLStatements {
     
     public final static String DELETE_TRACK =
             "DELETE FROM "
-            + FieldNames.TABLE_TRACK + " "
-            + "WHERE "
+            + FieldNames.TABLE_TRACK
+            + " WHERE "
             + FieldNames.TRACK_ID + " = ? ";
     
     
     public final static String DELETE_STATISTIC_FROM_TRACK =
             "DELETE FROM "
-            + FieldNames.TABLE_STATISTICS + " "
-            + "WHERE "
+            + FieldNames.TABLE_STATISTICS
+            + " WHERE "
             + FieldNames.STATISTICS_TRACK_ID + " = ? ";
     
+    
+    public static String DELETE_POS_TABLE_FROM_TRACK =
+            "DELETE FROM "
+            + FieldNames.TABLE_POSITIONS 
+            + " WHERE "
+            + FieldNames.POSITIONS_TRACK_ID + " = ? ";
+            
     
     public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete seqpairs
             "DELETE FROM "

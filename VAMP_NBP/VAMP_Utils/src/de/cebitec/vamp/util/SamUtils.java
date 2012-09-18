@@ -117,11 +117,11 @@ public class SamUtils implements Observable {
 
 // commented out part: we currently don't allow to write sam files, only bam! (more efficient)
         
-//        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
+        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
         String newFileName = oldFile.getAbsolutePath();
 //        String extension;
 //        try {
-//            newFileName = nameParts[0];
+            newFileName = nameParts[0];
 //            extension = nameParts[nameParts.length - 1];
 //        } catch (ArrayIndexOutOfBoundsException e) {
 //            extension = "bam";
@@ -135,5 +135,27 @@ public class SamUtils implements Observable {
             outputFile = new File(newFileName + newEnding + ".bam");
             return new Pair<>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
 //        }
+    }
+    
+    /**
+     * Checks the sort order of the fileToCheck against the sortOrderToCheck and
+     * returns true, if the file is sorted according to the sort order handed 
+     * over as sortOrderToCheck
+     * @param fileToCheck the sam/bam file, whose sort order has to be checked
+     * @param sortOrderToCheck the sort order of the file, which is expected/
+     * needed
+     * @return true, if the sort order of the file equals the given 
+     *          sortOrderToCheck
+     */
+    public static boolean isSortedBy(File fileToCheck, SAMFileHeader.SortOrder sortOrderToCheck) {
+        boolean hadToSortCoordinate = false;
+        try (SAMFileReader samReader = new SAMFileReader(fileToCheck)) {
+            try {
+                hadToSortCoordinate = samReader.getFileHeader().getSortOrder().equals(sortOrderToCheck);
+            } catch (IllegalArgumentException e) { //if "*" or other weird words were used as sort order we assume the file is unsorted
+                hadToSortCoordinate = false;
+            }
+        }
+        return hadToSortCoordinate;
     }
 }

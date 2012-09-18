@@ -44,7 +44,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
     private boolean isDbUsed;
 
-    /** Creates new form NewSeqPairTracksDialogPanel */
+    /** Panel allowing for input of two sequence pair mapping files. */
     public NewSeqPairTracksDialogPanel() {
         this.refGenJobs = getRefGenJobs();
         // choose the default parser. first entry is shown in combobox by default
@@ -206,6 +206,11 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         });
 
         alreadyImportedBox.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.alreadyImportedBox.text")); // NOI18N
+        alreadyImportedBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alreadyImportedBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -263,7 +268,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(alreadyImportedBox)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addGap(0, 28, Short.MAX_VALUE))
                             .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
@@ -365,8 +370,24 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         } else {
             this.parserComboBox.addItem(this.samBamParser);
             this.parserComboBox.addItem(this.jokParser);
+            this.chooseButton2.setEnabled(true);
         }
     }//GEN-LAST:event_importTypeComboActionPerformed
+
+    private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
+        if (this.alreadyImportedBox.isSelected()) {
+            this.chooseButton2.setEnabled(false);
+            if (this.mappingFile2 != null) {
+                String title = NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "MSG_NewSeqPairTracksDialogPanel.TrackNumberInfo.Title");
+                String msg = NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "MSG_NewSeqPairTracksDialogPanel.TrackNumberInfo");
+                JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                this.mappingFile2 = null;
+                this.mappingFile2Field.setText("");
+            }
+        } else {
+            this.chooseButton2.setEnabled(true);
+        }
+    }//GEN-LAST:event_alreadyImportedBoxActionPerformed
 
     
     /**
@@ -397,8 +418,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                     mappingFile2Field.setText(mappingFile2.getAbsolutePath());
                 }
                 
+                path = mappingFile1 == null ? mappingFile2.getAbsolutePath() : mappingFile1.getAbsolutePath();
+                
                 Preferences prefs = Preferences.userNodeForPackage(NewSeqPairTracksDialogPanel.class);
-                prefs.put("RefGenome.Filepath", mappingFile1.getAbsolutePath());
+                prefs.put("RefGenome.Filepath", path);
                 try {
                     prefs.flush();
                 } catch (BackingStoreException ex) {
@@ -443,8 +466,12 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
      */
     @Override
     public boolean isRequiredInfoSet() {
-        if (mappingFile1 == null || mappingFile2 == null || refGenBox.getSelectedItem() == null 
-            || descriptionField.getText().isEmpty() || !distanceHasValidInput()  || !deviationHasValidInput()) {
+        if (mappingFile1 == null 
+                || refGenBox.getSelectedItem() == null 
+                || descriptionField.getText().isEmpty() 
+                || !distanceHasValidInput()  
+                || !deviationHasValidInput() 
+                || mappingFile2 != null && this.alreadyImportedBox.isSelected()) {
             return false;
         } else {
             return true;
@@ -531,7 +558,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
      * have to be available for the import of new tracks too.
      */
     public void setReferenceJobs(List<ReferenceJob> jobs) {
-        List<ReferenceJob> list = new ArrayList<ReferenceJob>();
+        List<ReferenceJob> list = new ArrayList<>();
 
         try {
             List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
@@ -560,7 +587,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
      * @return all reference genomes which are stored in the db until now.
      */
     private ReferenceJob[] getRefGenJobs() {
-        List<ReferenceJob> list = new ArrayList<ReferenceJob>();
+        List<ReferenceJob> list = new ArrayList<>();
         
         try {
             List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
@@ -612,14 +639,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
      * "ff/rr".
      */
     private void setOrientation(String orientString) {
-        if (orientString.equals("fr")) {
-            this.orientation = 0;
-        } else 
-        if (orientString.equals("rf")){
-            this.orientation = 1;
-        } else 
-        if (orientString.equals("ff/rr")){
-            this.orientation = 2;
+        switch (orientString) {
+            case "fr":      this.orientation = 0; break;
+            case "rf":      this.orientation = 1; break;
+            case "ff/rr":   this.orientation = 2; break;
         }
     }
     

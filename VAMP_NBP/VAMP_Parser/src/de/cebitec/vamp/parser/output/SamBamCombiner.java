@@ -38,8 +38,8 @@ public class SamBamCombiner implements Observable, Observer {
      *      file name after the merge process
      * @param trackJob2 containing the second file, which is merged with the first
      *      an its file path is reset to an empty string afterwards
-     * @param sortCoordinate true, if the combined file should be sorted and false
-     *      otherwise
+     * @param sortCoordinate true, if the combined file should be sorted by 
+     * coordinate and false otherwise
      */
     public SamBamCombiner(TrackJob trackJob1, TrackJob trackJob2, boolean sortCoordinate) {
         this.trackJob1 = trackJob1;

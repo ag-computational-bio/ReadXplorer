@@ -11,16 +11,18 @@ and open the template in the editor.
     <body>
         <h2>About VAMP's SNP detection</h2>
         <p style="font-size:0.9em">
-            The snp detection allows to detect snps among all opened/selected tracks for
-            a single reference genome. It opens the dialog windows for creating a snp detection
+            The Single Nucleotide Polymorphism (SNP) detection allows to detect SNPs among all opened/selected tracks for
+            a single reference genome. It opens the dialog windows for creating a SNP detection
             request and returns the result in a new tab, showing all details of the SNPs in a table.
             The data can be exported into an excel sheet and also used for phylogenetic analysis
-            via fdnaml.
+            via fdnaml. The SNP detection only relies on mappings of the BEST MATCH class, discarding all mappings in the
+            common match class. This is important, because otherwise SNPs would be created in repeat regions with a few
+            different bases.
             For explanations of the data in the table model see <a href="nbdocs://de.cebitec.vamp.tools.snp/de/cebitec/vamp/tools/snp/docs/snp-table.html">SNP table model</a>.
             <!-- TODO describe your module, add more pages... -->
         </p>
         <p></p>
-        <h2>Features of the snp detection:</h2>
+        <h2>Features of the SNP detection:</h2>
         <ul style="font-size:0.9em">
             <li style="margin-bottom:13">Exon, intron structure is taken into account: If an annotation has subannotations 
                         a SNP is only translated, if it is located in an exon. The translation uses the length of 
