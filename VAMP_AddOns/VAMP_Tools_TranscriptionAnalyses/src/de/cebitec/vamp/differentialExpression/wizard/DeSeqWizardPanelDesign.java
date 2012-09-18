@@ -6,7 +6,9 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -21,7 +23,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
      */
     private DeSeqVisualPanelDesign component;
     private List<PersistantTrack> tracks;
-    private List<String[]> design;
+    private Map<String, String[]> design;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -70,27 +72,34 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         wiz.putProperty("design", design);
+        //TODO: Check this and set boolean appropiatly
+        wiz.putProperty("workingWithoutReplicates", false);
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        design = new ArrayList<>();
+        design = new HashMap<>();
         Vector tableData = getComponent().getTableData();
         for (int j = 0; j < tableData.size(); j++) {
             Vector row = (Vector) tableData.elementAt(j);
-            String[] rowAsString = new String[tracks.size()];
+            String[] rowAsStringArray = new String[tracks.size()];
+            String key = "";
             for (int i = 0; i < tracks.size(); i++) {
                 String currentCell = (String) row.elementAt(i);
                 if (currentCell == null) {
-                    if (j == 0) {
-                        throw new WizardValidationException(null, "At least one design element must be specified.", null);
+                    if (j < 3) {
+                        throw new WizardValidationException(null, "At least three design elements must be specified.", null);
                     } else {
                         throw new WizardValidationException(null, "Please fill out the complete row or remove it.", null);
                     }
                 }
-                rowAsString[i] = currentCell;
+                if (i == 0) {
+                    key = currentCell;
+                } else {
+                    rowAsStringArray[i] = currentCell;
+                }
             }
-            design.add(rowAsString);
+            design.put(key, rowAsStringArray);
         }
     }
 }

@@ -30,10 +30,6 @@ public class Group {
         return integerRepresentation;
     }
 
-    public String getStringRepresentation() {
-        return stringRepresentation;
-    }
-
     @Override
     public String toString() {
         return stringRepresentation;

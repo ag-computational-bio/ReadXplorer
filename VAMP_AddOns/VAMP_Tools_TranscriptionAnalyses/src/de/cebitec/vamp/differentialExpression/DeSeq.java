@@ -46,6 +46,7 @@ public class DeSeq {
             String tmpPath = to.getAbsolutePath();
             tmpPath = tmpPath.replace("\\", "\\\\");
             gnuR.eval("load(file=\"" + tmpPath + "\")");
+            jarPath.close();
         } catch (IOException ex) {
             currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load plotting functions. You woun't be able to plot your results!", currentTimestamp);
@@ -88,8 +89,9 @@ public class DeSeq {
             //First all sub designs are assigned to an individual variable.
             while (analysisData.hasNextSubDesign()) {
                 numberOfSubDesigns++;
-                gnuR.assign("subDesign" + numberOfSubDesigns, analysisData.getNextSubDesign());
-                concatenate.append("subDesign").append(numberOfSubDesigns).append(",");
+                DeSeqAnalysisData.ReturnTupel subDesign = analysisData.getNextSubDesign();
+                gnuR.assign(subDesign.getKey(), subDesign.getValue());
+                concatenate.append(subDesign.getKey()).append(",");
             }
             concatenate.deleteCharAt(concatenate.length() - 1);
 
@@ -101,7 +103,7 @@ public class DeSeq {
                 gnuR.eval("cD <- newCountDataSet(inputData, design)");
             } else {
                 //If this is just a two conditons experiment we only create the conds array
-                gnuR.eval("conds <- factor(subDesign1)");
+                gnuR.eval("conds <- factor(twoConds)");
                 //Now everything is set up and the count data object on which the main
                 //analysis will be performed can be created
                 gnuR.eval("cD <- newCountDataSet(inputData, conds)");
@@ -121,7 +123,30 @@ public class DeSeq {
 
 
             if (numberOfSubDesigns > 1) {
-                //TODO: Test for multi experiments
+                //Handing over the first fitting group to Gnu R...
+                concatenate = new StringBuilder();
+                List<String> fittingGroupOne = analysisData.getFittingGroupOne();
+                for (Iterator<String> it = fittingGroupOne.iterator(); it.hasNext();) {
+                    String current = it.next();
+                    concatenate.append(current).append(" + ");
+                }
+                concatenate.deleteCharAt(concatenate.length() - 1);
+                gnuR.eval("fit1 <- fitNbinomGLMs( cdsFull, count ~ " + concatenate.toString() + " )");
+
+                //..and then the secound one.
+                concatenate = new StringBuilder();
+                List<String> fittingGroupTwo = analysisData.getFittingGroupTwo();
+                for (Iterator<String> it = fittingGroupTwo.iterator(); it.hasNext();) {
+                    String current = it.next();
+                    concatenate.append(current).append(" + ");
+                }
+                concatenate.deleteCharAt(concatenate.length() - 1);
+                gnuR.eval("fit0 <- fitNbinomGLMs( cdsFull, count ~ " + concatenate.toString() + " )");
+                
+                gnuR.eval("pvalsGLM <- nbinomGLMTest( fit1, fit0 )");
+                gnuR.eval("padjGLM <- p.adjust( pvalsGLM, method=\"BH\" )");
+                REXP test = gnuR.eval("padjGLM");
+                
             } else {
                 //Perform the normal test.
                 gnuR.eval("res <- nbinomTest( cD, \"ONE\", \"TWO\" )");

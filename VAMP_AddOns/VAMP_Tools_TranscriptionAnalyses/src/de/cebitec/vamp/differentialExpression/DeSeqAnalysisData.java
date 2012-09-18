@@ -1,6 +1,8 @@
 package de.cebitec.vamp.differentialExpression;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -8,7 +10,10 @@ import java.util.List;
  */
 public class DeSeqAnalysisData extends AnalysisData {
 
-    private List<String[]> design;
+    private Map<String, String[]> design;
+    private Iterator<String> designIterator;
+    private List<String> fittingGroupOne;
+    private List<String> fittingGroupTwo;
     /**
      * Is the analysis performed with or without Replicates. If there are not at
      * least two tracks belonging to the same conditions this variable is true.
@@ -17,23 +22,52 @@ public class DeSeqAnalysisData extends AnalysisData {
      */
     private boolean workingWithoutReplicates;
 
-    public DeSeqAnalysisData(int capacity, List<String[]> design, boolean workingWithoutReplicates) {
+    public DeSeqAnalysisData(int capacity, Map<String, String[]> design, 
+            List<String> fittingGroupOne, List<String> fittingGroupTwo,
+            boolean workingWithoutReplicates) {
         super(capacity);
         this.design = design;
         this.workingWithoutReplicates = workingWithoutReplicates;
+        designIterator = design.keySet().iterator();
     }
 
-    public String[] getNextSubDesign() {
-        String[] ret = design.get(0);
-        design.remove(0);
-        return ret;
+    public ReturnTupel getNextSubDesign() {
+        String key = designIterator.next();
+        return new ReturnTupel(key, design.get(key));
     }
 
     public boolean hasNextSubDesign() {
-        return !design.isEmpty();
+        return designIterator.hasNext();
     }
 
     public boolean isWorkingWithoutReplicates() {
         return workingWithoutReplicates;
+    }
+
+    public List<String> getFittingGroupOne() {
+        return fittingGroupOne;
+    }
+
+    public List<String> getFittingGroupTwo() {
+        return fittingGroupTwo;
+    }
+
+    public static class ReturnTupel {
+
+        private String key;
+        private String[] value;
+
+        public ReturnTupel(String key, String[] value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String[] getValue() {
+            return value;
+        }
     }
 }

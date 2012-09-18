@@ -15,6 +15,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
@@ -61,7 +62,15 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             Integer genomeID = (Integer) wiz.getProperty("genomeID");
             int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
             File saveFile = (File) wiz.getProperty("saveFile");
-            List<String[]> design = (List<String[]>) wiz.getProperty("design");
+            Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
+            //TODO:Nur abrufen wenn auch da
+            boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
+            List<String> fittingGroupOne = null;
+            List<String> fittingGroupTwo = null;
+            if (moreThanTwoConditions) {
+                fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
+                fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
+            }
             boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
             AnalysisHandler handler = null;
 
@@ -74,7 +83,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             }
 
             if (tool == AnalysisHandler.Tool.DeSeq) {
-                handler = new DeSeqAnalysisHandler(selectedTraks, design, genomeID, workingWithoutReplicates, saveFile);
+                handler = new DeSeqAnalysisHandler(selectedTraks, design, fittingGroupOne, fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile);
                 DeSeqResultViewerTopComponent resultViewerTC = new DeSeqResultViewerTopComponent(handler);
                 resultViewerTC.open();
                 resultViewerTC.requestActive();
@@ -94,6 +103,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             allPanels.add(new BaySeqWizardPanel2());
             allPanels.add(new BaySeqWizardPanel3());
             allPanels.add(new DeSeqWizardPanelDesign());
+            allPanels.add(new DeSeqWizardPanelFit());
             allPanels.add(new DeSeqWizardPanelConds());
             allPanels.add(new StartAnalysisWizardPanel());
             String[] steps = new String[allPanels.size()];
@@ -116,8 +126,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             baySeqPanels.add(allPanels.get(2));
             baySeqPanels.add(allPanels.get(3));
             baySeqPanels.add(allPanels.get(4));
-            baySeqPanels.add(allPanels.get(7));
-            baySeqIndex = new String[]{steps[0], steps[2], steps[3], steps[4], steps[7]};
+            baySeqPanels.add(allPanels.get(8));
+            baySeqIndex = new String[]{steps[0], steps[2], steps[3], steps[4], steps[8]};
 
             deSeqIndex = new String[]{steps[0], steps[1], "..."};
 
@@ -125,17 +135,18 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             deSeqTwoCondsPanels.add(allPanels.get(0));
             deSeqTwoCondsPanels.add(allPanels.get(1));
             deSeqTwoCondsPanels.add(allPanels.get(2));
-            deSeqTwoCondsPanels.add(allPanels.get(6));
             deSeqTwoCondsPanels.add(allPanels.get(7));
-            deSeqTwoCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[6], steps[7]};
+            deSeqTwoCondsPanels.add(allPanels.get(8));
+            deSeqTwoCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[7], steps[8]};
 
             deSeqMoreCondsPanels = new ArrayList<>();
             deSeqMoreCondsPanels.add(allPanels.get(0));
             deSeqMoreCondsPanels.add(allPanels.get(1));
             deSeqMoreCondsPanels.add(allPanels.get(2));
             deSeqMoreCondsPanels.add(allPanels.get(5));
-            deSeqMoreCondsPanels.add(allPanels.get(7));
-            deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[7]};
+            deSeqMoreCondsPanels.add(allPanels.get(6));
+            deSeqMoreCondsPanels.add(allPanels.get(8));
+            deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[6], steps[8]};
 
             currentPanels = baySeqPanels;
         }

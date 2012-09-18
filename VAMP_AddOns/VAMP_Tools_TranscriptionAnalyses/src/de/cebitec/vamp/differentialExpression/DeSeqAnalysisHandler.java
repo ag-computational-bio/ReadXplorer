@@ -15,9 +15,11 @@ import org.rosuda.JRI.RVector;
  */
 public class DeSeqAnalysisHandler extends AnalysisHandler {
 
-    private List<String[]> design;
+    private Map<String, String[]> design;
     private DeSeq deSeq = new DeSeq();
     private boolean workingWithoutReplicates;
+    private List<String> fittingGroupOne;
+    private List<String> fittingGroupTwo;
 
     public static enum Plot {
 
@@ -36,10 +38,14 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         }
     }
 
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<String[]> design, Integer refGenomeID, boolean workingWithoutReplicates, File saveFile) {
+    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, 
+            String[]> design, List<String> fittingGroupOne, List<String> fittingGroupTwo, 
+            Integer refGenomeID, boolean workingWithoutReplicates, File saveFile) {
         super(selectedTraks, refGenomeID, saveFile);
         this.design = design;
         this.workingWithoutReplicates = workingWithoutReplicates;
+        this.fittingGroupOne=fittingGroupOne;
+        this.fittingGroupTwo=fittingGroupTwo;
     }
 
     @Override
@@ -47,7 +53,8 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         List<RVector> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            DeSeqAnalysisData deSeqAnalysisData = new DeSeqAnalysisData(getSelectedTraks().size(), this.design, this.workingWithoutReplicates);
+            DeSeqAnalysisData deSeqAnalysisData = new DeSeqAnalysisData(getSelectedTraks().size(), 
+                    this.design, this.fittingGroupOne, this.fittingGroupTwo, this.workingWithoutReplicates);
             prepareAnnotations(deSeqAnalysisData);
             prepareCountData(deSeqAnalysisData, allCountData);
             results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTraks().size(), getSaveFile());

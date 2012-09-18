@@ -1,6 +1,9 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
@@ -8,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 public final class DeSeqVisualPanelDesign extends JPanel {
-    
+
     private DefaultTableModel tm;
     private DefaultComboBoxModel cbm = new DefaultComboBoxModel(new Integer[]{1});
 
@@ -18,7 +21,7 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     public DeSeqVisualPanelDesign() {
         initComponents();
     }
-    
+
     @Override
     public String getName() {
         return "Experimental design";
@@ -49,6 +52,7 @@ public final class DeSeqVisualPanelDesign extends JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jTable2.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(jTable2);
 
@@ -105,11 +109,10 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     }//GEN-LAST:event_addRowButtonActionPerformed
 
     private void removeRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeRowActionPerformed
-        int rowIndex = ((int) cbm.getSelectedItem())-1;
+        int rowIndex = ((int) cbm.getSelectedItem()) - 1;
         tm.removeRow(rowIndex);
-        cbm.removeElementAt(cbm.getSize()-1);
+        cbm.removeElementAt(cbm.getSize() - 1);
     }//GEN-LAST:event_removeRowActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addRowButton;
     private javax.swing.JScrollPane jScrollPane2;
@@ -118,16 +121,18 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     private javax.swing.JComboBox rowNumberSelection;
     // End of variables declaration//GEN-END:variables
 
-    protected void setTracks(List<PersistantTrack> tracks) {
-        String[] columnNames = new String[tracks.size()];
-        for (int i=0; i<tracks.size();i++) {
-            columnNames[i]=tracks.get(i).getDescription();
+    protected void setTracks(List<PersistantTrack> tracks) {     
+        String[] columnNames = new String[tracks.size() + 1];
+        columnNames[0] = "Group name";
+        for (int i = 0; i < tracks.size(); i++) {
+            String description = tracks.get(i).getDescription();
+            columnNames[i + 1] = description;
         }
-        tm = new DefaultTableModel(columnNames,1);
+        tm = new DefaultTableModel(columnNames, 1);
         jTable2.setModel(tm);
     }
-    
-    protected Vector getTableData(){
+
+    protected Vector getTableData() {
         //If a cell is still selected when you click on "next" the input you
         //have done won't be used unless you change the edited cell first.
         //This is done automatically by this command.
