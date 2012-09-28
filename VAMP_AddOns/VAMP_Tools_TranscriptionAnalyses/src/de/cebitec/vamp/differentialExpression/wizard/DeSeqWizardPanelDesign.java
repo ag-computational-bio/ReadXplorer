@@ -5,7 +5,6 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +72,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
     public void storeSettings(WizardDescriptor wiz) {
         wiz.putProperty("design", design);
         //TODO: Check this and set boolean appropiatly
-        wiz.putProperty("workingWithoutReplicates", false);
+        wiz.putProperty("workingWithoutReplicates", true);
     }
 
     @Override
@@ -83,8 +82,8 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
         for (int j = 0; j < tableData.size(); j++) {
             Vector row = (Vector) tableData.elementAt(j);
             String[] rowAsStringArray = new String[tracks.size()];
-            String key = "";
-            for (int i = 0; i < tracks.size(); i++) {
+            String key = (String) row.elementAt(0);
+            for (int i = 1; i < tracks.size() + 1; i++) {
                 String currentCell = (String) row.elementAt(i);
                 if (currentCell == null) {
                     if (j < 3) {
@@ -93,11 +92,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
                         throw new WizardValidationException(null, "Please fill out the complete row or remove it.", null);
                     }
                 }
-                if (i == 0) {
-                    key = currentCell;
-                } else {
-                    rowAsStringArray[i] = currentCell;
-                }
+                rowAsStringArray[i - 1] = currentCell;
             }
             design.put(key, rowAsStringArray);
         }

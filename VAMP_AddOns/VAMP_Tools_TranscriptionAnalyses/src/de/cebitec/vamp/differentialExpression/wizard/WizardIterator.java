@@ -63,15 +63,6 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
             File saveFile = (File) wiz.getProperty("saveFile");
             Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
-            //TODO:Nur abrufen wenn auch da
-            boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
-            List<String> fittingGroupOne = null;
-            List<String> fittingGroupTwo = null;
-            if (moreThanTwoConditions) {
-                fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
-                fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
-            }
-            boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
             AnalysisHandler handler = null;
 
             if (tool == AnalysisHandler.Tool.BaySeq) {
@@ -83,7 +74,16 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             }
 
             if (tool == AnalysisHandler.Tool.DeSeq) {
-                handler = new DeSeqAnalysisHandler(selectedTraks, design, fittingGroupOne, fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile);
+                boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
+                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
+
+                List<String> fittingGroupOne = null;
+                List<String> fittingGroupTwo = null;
+                if (moreThanTwoConditions) {
+                    fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
+                    fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
+                }
+                handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile);
                 DeSeqResultViewerTopComponent resultViewerTC = new DeSeqResultViewerTopComponent(handler);
                 resultViewerTC.open();
                 resultViewerTC.requestActive();

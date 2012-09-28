@@ -4,14 +4,12 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.util.Exceptions;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RVector;
 
@@ -27,7 +25,8 @@ public class DeSeq {
         gnuR = GnuR.getInstance();
     }
 
-    public List<RVector> process(DeSeqAnalysisData analysisData, int numberOfAnnotations, int numberOfTracks, File saveFile) {
+    public List<DeSeqAnalysisHandler.Result> process(DeSeqAnalysisData analysisData, int numberOfAnnotations, int numberOfTracks, File saveFile) {
+        gnuR.clearGnuR();
         int numberOfSubDesigns;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
@@ -95,7 +94,7 @@ public class DeSeq {
             }
             concatenate.deleteCharAt(concatenate.length() - 1);
 
-            if (numberOfSubDesigns > 1) {
+            if (analysisData.moreThanTwoConditions()) {
                 //The individual variables are then used to create the design element
                 gnuR.eval("design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")");
                 //Now everything is set up and the count data object on which the main
@@ -103,7 +102,7 @@ public class DeSeq {
                 gnuR.eval("cD <- newCountDataSet(inputData, design)");
             } else {
                 //If this is just a two conditons experiment we only create the conds array
-                gnuR.eval("conds <- factor(twoConds)");
+                gnuR.eval("conds <- factor(" + concatenate.toString() + ")");
                 //Now everything is set up and the count data object on which the main
                 //analysis will be performed can be created
                 gnuR.eval("cD <- newCountDataSet(inputData, conds)");
@@ -122,59 +121,90 @@ public class DeSeq {
             }
 
 
-            if (numberOfSubDesigns > 1) {
+            if (analysisData.moreThanTwoConditions()) {
                 //Handing over the first fitting group to Gnu R...
                 concatenate = new StringBuilder();
                 List<String> fittingGroupOne = analysisData.getFittingGroupOne();
                 for (Iterator<String> it = fittingGroupOne.iterator(); it.hasNext();) {
                     String current = it.next();
-                    concatenate.append(current).append(" + ");
+                    concatenate.append(current).append("+");
                 }
                 concatenate.deleteCharAt(concatenate.length() - 1);
-                gnuR.eval("fit1 <- fitNbinomGLMs( cdsFull, count ~ " + concatenate.toString() + " )");
+                gnuR.eval("fit1 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )");
 
                 //..and then the secound one.
                 concatenate = new StringBuilder();
                 List<String> fittingGroupTwo = analysisData.getFittingGroupTwo();
                 for (Iterator<String> it = fittingGroupTwo.iterator(); it.hasNext();) {
                     String current = it.next();
-                    concatenate.append(current).append(" + ");
+                    concatenate.append(current).append("+");
                 }
                 concatenate.deleteCharAt(concatenate.length() - 1);
-                gnuR.eval("fit0 <- fitNbinomGLMs( cdsFull, count ~ " + concatenate.toString() + " )");
-                
+                gnuR.eval("fit0 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )");
+
                 gnuR.eval("pvalsGLM <- nbinomGLMTest( fit1, fit0 )");
                 gnuR.eval("padjGLM <- p.adjust( pvalsGLM, method=\"BH\" )");
-                REXP test = gnuR.eval("padjGLM");
-                
+
             } else {
                 //Perform the normal test.
-                gnuR.eval("res <- nbinomTest( cD, \"ONE\", \"TWO\" )");
+                String[] levels = analysisData.getLevels();
+                gnuR.eval("res <- nbinomTest( cD,\"" + levels[0] + "\",\"" + levels[1] + "\")");
                 //Filter for significant genes, given a threshold for the FDR.
                 //TODO: Make threshold user adjustable.
                 gnuR.eval("resSig <- res[res$padj < 0.1, ]");
             }
         } else {
-            gnuR.eval("data(testData)");
+            if (analysisData.moreThanTwoConditions()) {
+                gnuR.eval("data(multTestData)");
+            } else {
+                gnuR.eval("data(singleTestData)");
+            }
         }
-        List<RVector> results = new ArrayList<>();
-        //Significant results sorted by the most significantly differentially expressed genes
-        gnuR.eval("res0 <- resSig[order(resSig$pval), ]");
-        REXP result = gnuR.eval("res0");
-        RVector rvec = result.asVector();
-        results.add(rvec);
+        List<DeSeqAnalysisHandler.Result> results = new ArrayList<>();
+        if (analysisData.moreThanTwoConditions()) {
+            REXP currentResult1 = gnuR.eval("fit1");
+            RVector tableContents1 = currentResult1.asVector();
+            REXP colNames1 = gnuR.eval("colnames(fit1)");
+            REXP rowNames1 = gnuR.eval("rownames(fit1)");
+            results.add(new DeSeqAnalysisHandler.Result(tableContents1, colNames1, rowNames1));
 
-        //Significant results sorted by the most strongly down regulated genes
-        gnuR.eval("res1 <- resSig[order(resSig$foldChange, -resSig$baseMean), ]");
-        result = gnuR.eval("res1");
-        rvec = result.asVector();
-        results.add(rvec);
+            REXP currentResult0 = gnuR.eval("fit0");
+            RVector tableContents0 = currentResult0.asVector();
+            REXP colNames0 = gnuR.eval("colnames(fit0)");
+            REXP rowNames0 = gnuR.eval("rownames(fit0)");
+            results.add(new DeSeqAnalysisHandler.Result(tableContents0, colNames0, rowNames0));
 
-        //Significant results sorted by the most strongly up regulated genes
-        gnuR.eval("res2 <- resSig[order(-resSig$foldChange, -resSig$baseMean), ]");
-        result = gnuR.eval("res2");
-        rvec = result.asVector();
-        results.add(rvec);
+            REXP currentResult2 = gnuR.eval("data.frame(pvalsGLM,padjGLM)");
+            RVector tableContents2 = currentResult2.asVector();
+            REXP colNames2 = gnuR.eval("colnames(data.frame(pvalsGLM,padjGLM))");
+            REXP rowNames2 = gnuR.eval("rownames(data.frame(pvalsGLM,padjGLM))");
+            results.add(new DeSeqAnalysisHandler.Result(tableContents2, colNames2, rowNames2));
+
+        } else {
+            //Significant results sorted by the most significantly differentially expressed genes
+            gnuR.eval("res0 <- resSig[order(resSig$pval), ]");
+            REXP result = gnuR.eval("res0");
+            RVector rvec = result.asVector();
+            REXP colNames = gnuR.eval("colnames(res0)");
+            REXP rowNames = gnuR.eval("rownames(res0)");
+            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames));
+
+            //Significant results sorted by the most strongly down regulated genes
+            gnuR.eval("res1 <- resSig[order(resSig$foldChange, -resSig$baseMean), ]");
+            result = gnuR.eval("res1");
+            rvec = result.asVector();
+            colNames = gnuR.eval("colnames(res1)");
+            rowNames = gnuR.eval("rownames(res1)");
+            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames));
+
+            //Significant results sorted by the most strongly up regulated genes
+            gnuR.eval("res2 <- resSig[order(-resSig$foldChange, -resSig$baseMean), ]");
+            result = gnuR.eval("res2");
+            rvec = result.asVector();
+            colNames = gnuR.eval("colnames(res2)");
+            rowNames = gnuR.eval("rownames(res2)");
+            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames));
+        }
         if (saveFile != null) {
             String path = saveFile.getAbsolutePath();
             path = path.replace("\\", "\\\\");

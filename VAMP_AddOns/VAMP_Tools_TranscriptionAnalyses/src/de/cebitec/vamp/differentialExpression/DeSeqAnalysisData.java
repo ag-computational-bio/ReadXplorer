@@ -1,19 +1,23 @@
 package de.cebitec.vamp.differentialExpression;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author kstaderm
  */
-public class DeSeqAnalysisData extends AnalysisData {
+public class DeSeqAnalysisData extends AnalysisData{
 
     private Map<String, String[]> design;
     private Iterator<String> designIterator;
     private List<String> fittingGroupOne;
     private List<String> fittingGroupTwo;
+    private Set<String> levels;
+    private boolean moreThanTwoConditions;
     /**
      * Is the analysis performed with or without Replicates. If there are not at
      * least two tracks belonging to the same conditions this variable is true.
@@ -23,11 +27,14 @@ public class DeSeqAnalysisData extends AnalysisData {
     private boolean workingWithoutReplicates;
 
     public DeSeqAnalysisData(int capacity, Map<String, String[]> design, 
-            List<String> fittingGroupOne, List<String> fittingGroupTwo,
-            boolean workingWithoutReplicates) {
+            boolean moreThanTwoConditions, List<String> fittingGroupOne, 
+            List<String> fittingGroupTwo, boolean workingWithoutReplicates) {
         super(capacity);
         this.design = design;
+        this.fittingGroupOne=fittingGroupOne;
+        this.fittingGroupTwo=fittingGroupTwo;
         this.workingWithoutReplicates = workingWithoutReplicates;
+        this.moreThanTwoConditions=moreThanTwoConditions;
         designIterator = design.keySet().iterator();
     }
 
@@ -50,6 +57,24 @@ public class DeSeqAnalysisData extends AnalysisData {
 
     public List<String> getFittingGroupTwo() {
         return fittingGroupTwo;
+    }
+    
+    public boolean moreThanTwoConditions(){
+        return moreThanTwoConditions;
+    }
+    
+    public String[] getLevels(){
+        if(levels==null){
+            levels=new HashSet<>();
+            for(Iterator<String> it = design.keySet().iterator();it.hasNext();){
+                String[] current = design.get(it.next());
+                for(int i=1; i<current.length;i++){
+                    levels.add(current[i]);
+                }
+            }
+
+        }
+        return levels.toArray(new String[levels.size()]);
     }
 
     public static class ReturnTupel {

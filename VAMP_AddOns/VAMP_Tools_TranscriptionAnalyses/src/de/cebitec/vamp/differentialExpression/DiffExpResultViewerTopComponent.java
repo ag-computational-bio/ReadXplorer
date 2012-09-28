@@ -47,13 +47,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private int offset;
     private boolean showNormalizedData = false;
     private DiffExpGraficsTopComponent diffExpGraficsTopComponent;
-    private BaySeqAnalysisHandler BaySeqAnalysisHandler;
+    private BaySeqAnalysisHandler analysisHandler;
 
     public DiffExpResultViewerTopComponent() {
     }
 
     public DiffExpResultViewerTopComponent(AnalysisHandler handler) {
-        this.BaySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
+        this.analysisHandler = (BaySeqAnalysisHandler) handler;
 
         tm = new DefaultTableModel();
         cbm = new DefaultComboBoxModel();
@@ -65,24 +65,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void addResults() {
-        List<Object[][]> results= BaySeqAnalysisHandler.getResults();
-        List<Group> groups = BaySeqAnalysisHandler.getGroups();
-        List<PersistantTrack> selectedTracks = BaySeqAnalysisHandler.getSelectedTraks();
+        List<BaySeqAnalysisHandler.Result> results= analysisHandler.getResults();
+        List<Group> groups = analysisHandler.getGroups();
+        List<PersistantTrack> selectedTracks = analysisHandler.getSelectedTraks();
         offset = groups.size();
-        columnNames = new String[(5 + selectedTracks.size())];
-        int i = 0;
-        columnNames[i++] = "locus";
-        columnNames[i++] = "start";
-        columnNames[i++] = "stop";
-        int j = i;
-        for (; j < i + selectedTracks.size(); j++) {
-            columnNames[j] = selectedTracks.get(j - i).getDescription();
-        }
-        columnNames[j++] = "Likelihood";
-        columnNames[j] = "False discovery rate";
-        for (Iterator<Object[][]> it = results.iterator(); it.hasNext();) {
-            Object[][] currentResult = it.next();
-            TableModel tmpTableModel = new DefaultTableModel(currentResult, columnNames);
+        for (Iterator<BaySeqAnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
+            BaySeqAnalysisHandler.Result currentResult = it.next();
+            TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContents(), currentResult.getColnames());
             tableModels.add(tmpTableModel);
         }
 
@@ -215,8 +204,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }//GEN-LAST:event_normalizedCheckBoxActionPerformed
 
     private void createGraphicsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraphicsButtonActionPerformed
-        diffExpGraficsTopComponent = new DiffExpGraficsTopComponent(BaySeqAnalysisHandler);
-        BaySeqAnalysisHandler.registerObserver(diffExpGraficsTopComponent);
+        diffExpGraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
+        analysisHandler.registerObserver(diffExpGraficsTopComponent);
         diffExpGraficsTopComponent.open();
         diffExpGraficsTopComponent.requestActive();
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
@@ -225,7 +214,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"csv"}, "csv") {
             @Override
             public void save(String fileLocation) {              
-                BaySeqAnalysisHandler.saveResultsAsCSV((Group)groupComboBox.getSelectedItem(), fileLocation, showNormalizedData);
+                analysisHandler.saveResultsAsCSV((Group)groupComboBox.getSelectedItem(), fileLocation, showNormalizedData);
             }
 
             @Override
@@ -252,7 +241,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     @Override
     public void componentClosed() {
-        BaySeqAnalysisHandler.removeObserver(this);
+        analysisHandler.removeObserver(this);
     }
 
     void writeProperties(java.util.Properties p) {

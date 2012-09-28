@@ -44,7 +44,7 @@ public class BaySeq {
      * represent the normalised result for group two. So you will first get all
      * not normalised results and then all the normalised ones.
      */
-    public List<RVector> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) throws IllegalStateException {
+    public List<BaySeqAnalysisHandler.Result> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) throws IllegalStateException {
         if (gnuR == null) {
             throw new IllegalStateException("Shutdown was already called!");
         }
@@ -109,16 +109,20 @@ public class BaySeq {
             gnuR.eval("data(testData)");
             numberofGroups = 2;
         }
-        List<RVector> results = new ArrayList<>();
+        List<BaySeqAnalysisHandler.Result> results = new ArrayList<>();
         for (int j = 1; j <= numberofGroups; j++) {
-            REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
+            gnuR.eval("tCounts <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
+            REXP result = gnuR.eval("tCounts");
             RVector rvec = result.asVector();
-            results.add(rvec);
+            REXP colNames = gnuR.eval("colnames(tCounts)");
+            results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, null));
         }
         for (int j = 1; j <= numberofGroups; j++) {
-            REXP result = gnuR.eval("topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
+            gnuR.eval("tCounts <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
+            REXP result = gnuR.eval("tCounts");
             RVector rvec = result.asVector();
-            results.add(rvec);
+            REXP colNames = gnuR.eval("colnames(tCounts)");
+            results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, null));
         }
         if (saveFile != null) {
             gnuR.saveDataToFile(saveFile);

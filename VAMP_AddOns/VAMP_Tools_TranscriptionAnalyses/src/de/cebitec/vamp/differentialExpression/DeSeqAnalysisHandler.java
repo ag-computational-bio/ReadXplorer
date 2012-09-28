@@ -3,11 +3,8 @@ package de.cebitec.vamp.differentialExpression;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.rosuda.JRI.RVector;
 
 /**
  *
@@ -15,11 +12,8 @@ import org.rosuda.JRI.RVector;
  */
 public class DeSeqAnalysisHandler extends AnalysisHandler {
 
-    private Map<String, String[]> design;
     private DeSeq deSeq = new DeSeq();
-    private boolean workingWithoutReplicates;
-    private List<String> fittingGroupOne;
-    private List<String> fittingGroupTwo;
+    private DeSeqAnalysisData deSeqAnalysisData;
 
     public static enum Plot {
 
@@ -38,54 +32,28 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         }
     }
 
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, 
-            String[]> design, List<String> fittingGroupOne, List<String> fittingGroupTwo, 
+    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks,
+            Map<String, String[]> design, boolean moreThanTwoConditions,
+            List<String> fittingGroupOne, List<String> fittingGroupTwo,
             Integer refGenomeID, boolean workingWithoutReplicates, File saveFile) {
         super(selectedTraks, refGenomeID, saveFile);
-        this.design = design;
-        this.workingWithoutReplicates = workingWithoutReplicates;
-        this.fittingGroupOne=fittingGroupOne;
-        this.fittingGroupTwo=fittingGroupTwo;
+        deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
+                design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, workingWithoutReplicates);
     }
 
     @Override
     public void performAnalysis() {
-        List<RVector> results;
+        List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            DeSeqAnalysisData deSeqAnalysisData = new DeSeqAnalysisData(getSelectedTraks().size(), 
-                    this.design, this.fittingGroupOne, this.fittingGroupTwo, this.workingWithoutReplicates);
             prepareAnnotations(deSeqAnalysisData);
             prepareCountData(deSeqAnalysisData, allCountData);
             results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTraks().size(), getSaveFile());
         } else {
-            results = deSeq.process(null, 3232, getSelectedTraks().size(), getSaveFile());
+            results = deSeq.process(deSeqAnalysisData, 3434, getSelectedTraks().size(), getSaveFile());
         }
-
-        setResults(convertRresults(results));
-        notifyObservers(this);
-    }
-
-    private List<Object[][]> convertRresults(List<RVector> results) {
-        List<Object[][]> ret = new ArrayList<>();
-        for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
-            RVector currentRVector = it.next();
-            int i = 0;
-            Object[][] current = new Object[currentRVector.at(1).asDoubleArray().length][currentRVector.size()];
-            String[] currentStringValues = currentRVector.at(i).asStringArray();
-            for (int j = 0; j < currentStringValues.length; j++) {
-                current[j][i] = currentStringValues[j];
-            }
-            i++;
-            for (; i < currentRVector.size(); i++) {
-                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
-                for (int j = 0; j < currentDoubleValues.length; j++) {
-                    current[j][i] = currentDoubleValues[j];
-                }
-            }
-            ret.add(current);
-        }
-        return ret;
+        setResults(results);
+        notifyObservers(deSeqAnalysisData.moreThanTwoConditions());
     }
 
     @Override

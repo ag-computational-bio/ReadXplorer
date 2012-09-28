@@ -4,12 +4,8 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq.SamplesNotValidException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.rosuda.JRI.RFactor;
-import org.rosuda.JRI.RVector;
 
 /**
  *
@@ -34,7 +30,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
 
     @Override
     public void performAnalysis() {
-        List<RVector> results;
+        List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
             BaySeqAnalysisData baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTraks().size(), this.groups, this.replicateStructure);
@@ -45,7 +41,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
             results = baySeq.process(null, 3232, getSelectedTraks().size(), getSaveFile());
         }
 
-        setResults(convertRresults(results));
+        setResults(results);
         notifyObservers(this);
     }
 
@@ -55,33 +51,33 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         baySeq = null;
     }
 
-    private List<Object[][]> convertRresults(List<RVector> results) {
-        List<Object[][]> ret = new ArrayList<>();
-        for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
-            RVector currentRVector = it.next();
-            int i = 0;
-            Object[][] current = new Object[currentRVector.at(1).asIntArray().length][currentRVector.size()];
-            RFactor currentStringValues = currentRVector.at(i).asFactor();
-            for (int j = 0; j < currentStringValues.size(); j++) {
-                current[j][i] = currentStringValues.at(i);
-            }
-            i++;
-            for (; i < 3; i++) {
-                int[] currentIntValues = currentRVector.at(i).asIntArray();
-                for (int j = 0; j < currentIntValues.length; j++) {
-                    current[j][i] = currentIntValues[j];
-                }
-            }
-            for (; i < currentRVector.size(); i++) {
-                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
-                for (int j = 0; j < currentDoubleValues.length; j++) {
-                    current[j][i] = currentDoubleValues[j];
-                }
-            }
-            ret.add(current);
-        }
-        return ret;
-    }
+//    private List<Object[][]> convertRresults(List<RVector> results) {
+//        List<Object[][]> ret = new ArrayList<>();
+//        for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
+//            RVector currentRVector = it.next();
+//            int i = 0;
+//            Object[][] current = new Object[currentRVector.at(1).asIntArray().length][currentRVector.size()];
+//            RFactor currentStringValues = currentRVector.at(i).asFactor();
+//            for (int j = 0; j < currentStringValues.size(); j++) {
+//                current[j][i] = currentStringValues.at(i);
+//            }
+//            i++;
+//            for (; i < 3; i++) {
+//                int[] currentIntValues = currentRVector.at(i).asIntArray();
+//                for (int j = 0; j < currentIntValues.length; j++) {
+//                    current[j][i] = currentIntValues[j];
+//                }
+//            }
+//            for (; i < currentRVector.size(); i++) {
+//                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
+//                for (int j = 0; j < currentDoubleValues.length; j++) {
+//                    current[j][i] = currentDoubleValues[j];
+//                }
+//            }
+//            ret.add(current);
+//        }
+//        return ret;
+//    }
 
     public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");

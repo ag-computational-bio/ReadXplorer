@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.util.Observer;
@@ -57,7 +53,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
     public DeSeqResultViewerTopComponent(AnalysisHandler handler) {
         this.deySeqAnalysisHandler = (DeSeqAnalysisHandler) handler;
         tm = new DefaultTableModel();
-        cbm = new DefaultComboBoxModel(new String[]{"Significantly differentially expressed genes", "Most strongly down regulated genes", "Most strongly up regulated genes"});
+        cbm = new DefaultComboBoxModel(new String[]{"Fitting group one", "Fitting group two", "probability values"});
 
         initComponents();
         setName(Bundle.CTL_DeSeqResultViewerTopComponent());
@@ -66,22 +62,12 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
         jProgressBar1.setIndeterminate(true);
     }
 
-    private void addResults() {
-        List<Object[][]> results = deySeqAnalysisHandler.getResults();
-        columnNames = new String[8];
+    private void addResults(boolean moreThanTwoConditions) {
+        List<DeSeqAnalysisHandler.Result> results = deySeqAnalysisHandler.getResults();
 
-        columnNames[0] = "locus";
-        columnNames[1] = "baseMean";
-        columnNames[2] = "baseMeanA";
-        columnNames[3] = "baseMeanB";
-        columnNames[4] = "foldChange";
-        columnNames[5] = "log2FoldChange";
-        columnNames[6] = "pval";
-        columnNames[7] = "padj";
-
-        for (Iterator<Object[][]> it = results.iterator(); it.hasNext();) {
-            Object[][] currentResult = it.next();
-            TableModel tmpTableModel = new DefaultTableModel(currentResult, columnNames);
+        for (Iterator<DeSeqAnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
+            DeSeqAnalysisHandler.Result currentResult = it.next();
+            TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContents(), currentResult.getColnames());
             tableModels.add(tmpTableModel);
         }
 
@@ -208,7 +194,6 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
         deSeqGraficsTopComponent.open();
         deSeqGraficsTopComponent.requestActive();
     }//GEN-LAST:event_createGraficsButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createGraficsButton;
     private javax.swing.JLabel jLabel1;
@@ -244,7 +229,7 @@ public final class DeSeqResultViewerTopComponent extends TopComponent implements
 
     @Override
     public void update(Object args) {
-        addResults();
+        addResults((boolean) args);
     }
 
     @Override

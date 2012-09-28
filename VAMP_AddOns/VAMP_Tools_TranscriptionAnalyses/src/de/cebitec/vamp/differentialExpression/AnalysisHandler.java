@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.rosuda.JRI.REXP;
+import org.rosuda.JRI.RFactor;
+import org.rosuda.JRI.RVector;
 
 /**
  *
@@ -22,10 +25,10 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     private List<PersistantAnnotation> persAnno;
     private List<PersistantTrack> selectedTraks;
     private Integer refGenomeID;
-    private List<Object[][]> results;
+    private List<Result> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private File saveFile = null;
-    public static final boolean TESTING_MODE = false;
+    public static boolean TESTING_MODE = false;
 
     public static enum Tool {
 
@@ -90,19 +93,19 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     }
 
     /**
-     * All steps necessary for the analysis.
-     * This Method is called when start() is calles on the instance of this class.
+     * All steps necessary for the analysis. This Method is called when start()
+     * is calles on the instance of this class.
      */
     public abstract void performAnalysis();
-    
+
     /**
      * This is the final Method which is called when all windows associated with
-     * the analysis are closed. So you should clean up everything and release the
-     * Gnu R instance at this point.
+     * the analysis are closed. So you should clean up everything and release
+     * the Gnu R instance at this point.
      */
     public abstract void endAnalysis();
 
-    public void setResults(List<Object[][]> results) {
+    public void setResults(List<Result> results) {
         this.results = results;
     }
 
@@ -126,7 +129,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         return selectedTraks;
     }
 
-    public List<Object[][]> getResults() {
+    public List<Result> getResults() {
         return results;
     }
 
@@ -144,7 +147,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     @Override
     public void removeObserver(de.cebitec.vamp.util.Observer observer) {
         this.observer.remove(observer);
-        if(this.observer.isEmpty()){
+        if (this.observer.isEmpty()) {
             endAnalysis();
             this.interrupt();
         }
@@ -155,6 +158,117 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         for (Iterator<de.cebitec.vamp.util.Observer> it = observer.iterator(); it.hasNext();) {
             de.cebitec.vamp.util.Observer currentObserver = it.next();
             currentObserver.update(data);
+        }
+    }
+
+    public static class Result {
+
+        private RVector rawTableContents;
+        private Object[][] tableContents = null;
+        private REXP raqColNames;
+        private Object[] colNames = null;
+        private REXP rawRowNames;
+        private Object[] rowNames = null;
+
+        public Result(RVector tableContents, REXP colnames, REXP rownames) {
+            rawTableContents = tableContents;
+            raqColNames = colnames;
+            rawRowNames = rownames;
+        }
+
+        public Object[][] getTableContents() {
+            if (tableContents == null) {
+                tableContents = convertRresults(rawTableContents);
+            }
+            return tableContents;
+        }
+
+        public Object[] getColnames() {
+            if (colNames == null) {
+                colNames = convertNames(raqColNames);
+            }
+            return colNames;
+        }
+
+        public Object[] getRownames() {
+            if (rowNames == null) {
+                rowNames = convertNames(rawRowNames);
+            }
+            return rowNames;
+        }
+
+        private Object[] convertNames(REXP currentValues) {
+            int currentType = currentValues.getType();
+            Object[] current = null;;
+            switch (currentType) {
+                case REXP.XT_ARRAY_DOUBLE:
+                    double[] currentDoubleValues = currentValues.asDoubleArray();
+                    if (current == null) {
+                        current = new Object[currentDoubleValues.length];
+                    }
+                    for (int j = 0; j < currentDoubleValues.length; j++) {
+                        current[j] = currentDoubleValues[j];
+                    }
+                    break;
+                case REXP.XT_ARRAY_INT:
+                    int[] currentIntValues = currentValues.asIntArray();
+                    if (current == null) {
+                        current = new Object[currentIntValues.length];
+                    }
+                    for (int j = 0; j < currentIntValues.length; j++) {
+                        current[j] = currentIntValues[j];
+                    }
+                    break;
+                case REXP.XT_ARRAY_STR:
+                    String[] currentStringValues = currentValues.asStringArray();
+                    if (current == null) {
+                        current = new Object[currentStringValues.length];
+                    }
+                    for (int j = 0; j < currentStringValues.length; j++) {
+                        current[j] = currentStringValues[j];
+                    }
+                    break;
+                case REXP.XT_ARRAY_BOOL_INT:
+                    int[] currentBoolValues = currentValues.asIntArray();
+                    if (current == null) {
+                        current = new Object[currentBoolValues.length];
+                    }
+                    for (int j = 0; j < currentBoolValues.length; j++) {
+                        if (currentBoolValues[j] == 1) {
+                            current[j] = true;
+                        } else {
+                            current[j] = false;
+                        }
+                    }
+                    break;
+                case REXP.XT_FACTOR:
+                    RFactor factor = currentValues.asFactor();
+                    if (current == null) {
+                        current = new Object[factor.size()];
+                    }
+                    for (int j = 0; j < factor.size(); j++) {
+                        current[j] = factor.at(j);
+                    }
+                    break;
+
+            }
+            return current;
+        }
+
+        private Object[][] convertRresults(RVector currentRVector) {
+            Object[][] current = null;
+            for (int i = 0; i < currentRVector.size(); i++) {
+                REXP currentValues = currentRVector.at(i);
+
+                Object[] converted = convertNames(currentValues);
+                if (current == null) {
+                    current = new Object[converted.length][currentRVector.size()];
+                }
+                for (int j = 0; j < converted.length; j++) {
+                    current[j][i] = converted[j];
+                }
+            }
+            return current;
         }
     }
 }
