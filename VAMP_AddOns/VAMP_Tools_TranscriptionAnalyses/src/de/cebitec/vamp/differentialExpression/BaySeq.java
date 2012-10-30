@@ -110,19 +110,24 @@ public class BaySeq {
             numberofGroups = 2;
         }
         List<BaySeqAnalysisHandler.Result> results = new ArrayList<>();
+        int resultIndex = 0;
         for (int j = 1; j <= numberofGroups; j++) {
-            gnuR.eval("tCounts <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
-            REXP result = gnuR.eval("tCounts");
+            gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
+            REXP result = gnuR.eval("tCounts" + resultIndex);
             RVector rvec = result.asVector();
-            REXP colNames = gnuR.eval("colnames(tCounts)");
-            results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, null));
+            REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
+            REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
+            results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, rowNames, "Result of group " + j));
+            resultIndex++;
         }
         for (int j = 1; j <= numberofGroups; j++) {
-            gnuR.eval("tCounts <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
-            REXP result = gnuR.eval("tCounts");
+            gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
+            REXP result = gnuR.eval("tCounts" + resultIndex);
             RVector rvec = result.asVector();
-            REXP colNames = gnuR.eval("colnames(tCounts)");
-            results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, null));
+            REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
+            REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
+            results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, rowNames, "Normalized result of group " + j));
+            resultIndex++;
         }
         if (saveFile != null) {
             gnuR.saveDataToFile(saveFile);
@@ -224,12 +229,10 @@ public class BaySeq {
         gnuR.eval("dev.off()");
     }
 
-    public void saveResultsAsCSV(Group group, File saveFile, Boolean normalized) {
+    public void saveResultsAsCSV(int index, File saveFile) {
         String path = saveFile.getAbsolutePath();
         path = path.replace("\\", "/");
-        gnuR.eval("write.csv(topCounts(cD, group=" + group.getGnuRID()
-                + ",number = " + numberOfAnnotations + ", normaliseData="
-                + normalized.toString().toUpperCase() + "),file=\"" + path + "\")");
+        gnuR.eval("write.csv(tCounts" + index + ",file=\"" + path + "\")");
     }
 
     /**

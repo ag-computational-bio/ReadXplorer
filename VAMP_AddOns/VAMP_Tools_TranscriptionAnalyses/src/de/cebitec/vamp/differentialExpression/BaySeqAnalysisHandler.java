@@ -19,7 +19,19 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
 
     public static enum Plot {
 
-        Priors, MACD, Posteriors;
+        Priors("Priors"),
+        MACD("\"MA\"-Plot for the count data"), 
+        Posteriors("Posterior likelihoods of differential expression against log-ratio");
+        String representation;
+
+        Plot(String representation) {
+            this.representation = representation;
+        }
+
+        @Override
+        public String toString() {
+            return representation;
+        }
     }
 
     public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure, File saveFile) {
@@ -51,34 +63,6 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         baySeq = null;
     }
 
-//    private List<Object[][]> convertRresults(List<RVector> results) {
-//        List<Object[][]> ret = new ArrayList<>();
-//        for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
-//            RVector currentRVector = it.next();
-//            int i = 0;
-//            Object[][] current = new Object[currentRVector.at(1).asIntArray().length][currentRVector.size()];
-//            RFactor currentStringValues = currentRVector.at(i).asFactor();
-//            for (int j = 0; j < currentStringValues.size(); j++) {
-//                current[j][i] = currentStringValues.at(i);
-//            }
-//            i++;
-//            for (; i < 3; i++) {
-//                int[] currentIntValues = currentRVector.at(i).asIntArray();
-//                for (int j = 0; j < currentIntValues.length; j++) {
-//                    current[j][i] = currentIntValues[j];
-//                }
-//            }
-//            for (; i < currentRVector.size(); i++) {
-//                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
-//                for (int j = 0; j < currentDoubleValues.length; j++) {
-//                    current[j][i] = currentDoubleValues[j];
-//                }
-//            }
-//            ret.add(current);
-//        }
-//        return ret;
-//    }
-
     public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
@@ -94,9 +78,10 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         return file;
     }
 
-    public void saveResultsAsCSV(Group group, String path, boolean normalized) {
+    @Override
+    public void saveResultsAsCSV(int selectedIndex, String path) {
         File saveFile = new File(path);
-        baySeq.saveResultsAsCSV(group, saveFile, normalized);
+        baySeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
     public List<Group> getGroups() {
