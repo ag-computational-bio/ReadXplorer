@@ -15,15 +15,15 @@ import java.util.List;
 public class PersistantSeqPairGroup {
     
     private long seqPairId;
-    private ArrayList<PersistantSequencePair> seqPairs;
-    private ArrayList<PersistantMapping> singleMappings;
+    private List<PersistantSequencePair> seqPairs;
+    private List<PersistantMapping> singleMappings;
 //    private boolean hasNewRead; //set true when new read was added until this variable was send to the observers
 //    private ArrayList<Observer> observers;
 
     public PersistantSeqPairGroup(){
 //        observers = new ArrayList<Observer>();
-        this.seqPairs = new ArrayList<PersistantSequencePair>();
-        this.singleMappings = new ArrayList<PersistantMapping>();
+        this.seqPairs = new ArrayList<>();
+        this.singleMappings = new ArrayList<>();
     }
 
     /**
@@ -37,26 +37,26 @@ public class PersistantSeqPairGroup {
     public void addPersistantMapping(PersistantMapping mapping, byte type, long mapping1Id, long mapping2Id, int replicates){
         
         boolean stored = false;
-        if (type != Properties.TYPE_UNPAIRED_PAIR){ 
-            for (PersistantSequencePair seqPair : this.seqPairs){
-                
-                if (mapping.getId() == seqPair.getVisibleMapping().getId() 
-                 || mapping.getId() == seqPair.getMapping2Id() && seqPair.hasVisibleMapping2()) {
-                    
+        if (type != Properties.TYPE_UNPAIRED_PAIR) {
+            for (PersistantSequencePair seqPair : this.seqPairs) {
+
+                if (mapping.getId() == seqPair.getVisibleMapping().getId()
+                        || mapping.getId() == seqPair.getMapping2Id() && seqPair.hasVisibleMapping2()) {
+
                     //second mapping of this sequence pair = second mappingid will deviate = create a new pair
                     this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping1Id, mapping2Id, type, replicates, mapping));
                     stored = true;
                     break;
-                    
-                } else if (mapping.getId() == seqPair.getMapping2Id()){
-                   
+
+                } else if (mapping.getId() == seqPair.getMapping2Id()) {
+
                     // pair already exists, this is the second mapping of that pair = add it
                     seqPair.setVisiblemapping2(mapping);
                     stored = true;
                     break;
                 }
             }
-            if (!stored){
+            if (!stored) {
                 // this mapping defines a new sequence pair for this pair id
                 this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping1Id, mapping2Id, type, replicates, mapping));
             }
@@ -65,6 +65,49 @@ public class PersistantSeqPairGroup {
             this.singleMappings.add(mapping);
         }
         
+//            this.hasNewRead = true;
+//            this.notifyObservers();
+    }
+    
+    /**
+     * Adds a new direct access mapping to the group and creates a new 
+     * PersistantSequencePair, if necessary.
+     * @param mapping the mapping to add to the group
+     * @param type type of the sequence pair this mapping is belonging to (
+     * @see de.cebitec.vamp.util.Properties)
+     */
+    public void addPersistantDirectAccessMapping(PersistantMapping mapping, byte type, boolean bothVisible) {
+
+        boolean stored = false;
+        if (type != Properties.TYPE_UNPAIRED_PAIR) {
+            int replicates;
+            for (PersistantSequencePair seqPair : this.seqPairs) {
+
+                if (!bothVisible) { //second mapping of this sequence pair = create a new pair
+
+                    replicates = seqPair.getSeqPairReplicates() + 1;
+                    seqPair.setSeqPairReplicates(replicates);
+                    this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping.getId(), -1, type, replicates , mapping));
+                    stored = true;
+                    break;
+
+                } else {
+
+                    // pair already exists, this is the second mapping of that pair = add it
+                    seqPair.setVisiblemapping2(mapping);
+                    stored = true;
+                    break;
+                }
+            }
+            if (!stored) {
+                // this mapping defines a new sequence pair for this pair id
+                this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping.getId(), -1, type, 1, mapping));
+            }
+        } else {
+            //this is a single mapping, just add id to the list
+            this.singleMappings.add(mapping);
+        }
+
 //            this.hasNewRead = true;
 //            this.notifyObservers();
     }

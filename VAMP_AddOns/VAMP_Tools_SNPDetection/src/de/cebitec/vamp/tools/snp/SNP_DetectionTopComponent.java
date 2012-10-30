@@ -74,7 +74,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
     private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, List<Integer> trackIds, final int tabId) {
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
-        SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel();
+        SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel(referenceViewer.getReference().getId());
         final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
         //add reference sequence for amino acid mutation detection
         resultPanel.setReferenceGenome(referenceViewer.getReference());

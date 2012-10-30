@@ -16,7 +16,7 @@ import org.openide.util.NbBundle;
 /**
  * Extends a SAM/BAM file !!sorted by read sequence!! with VAMP classification
  * information (perfect, best and common match classes), adds the number of for
- * occurences of each mapping and sorts the whole file by coordinate again.
+ * occurrences of each mapping and sorts the whole file by coordinate again.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -54,15 +54,34 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     }
 
     /**
-     * @param trackJob Sets the track job including a sam or bam file for
+     * A SamBamExtender needs exactly two arguments:
+     * @param trackJob the track job including a sam or bam file for
      * extension with more data.
      * @param refGenome the reference genome belonging to the trackJob
      */
-    public void setDataToConvert(TrackJob trackJob, String refGenome) {
+    @Override
+    public void setDataToConvert(Object... data) {
         this.observers = new ArrayList<>();
-        this.trackJob = trackJob;
-        this.refGenome = refGenome;
-        this.refSeqLength = this.refGenome.length();
+        boolean works = true;
+        if (data.length >= 2) {
+            if (data[0] instanceof TrackJob) {
+                this.trackJob = (TrackJob) data[0];
+            } else {
+                works = false;
+            }
+            if (data[1] instanceof String) {
+                this.refGenome = (String) data[1];
+                this.refSeqLength = this.refGenome.length();
+            } else {
+                works = false;
+            }
+        } else {
+            works = false;
+        }
+        if (!works) {
+            throw new IllegalArgumentException(NbBundle.getMessage(JokToBamConverter.class, 
+                    "Converter.SetDataError", "Inappropriate arguments passed to the converter!"));
+        }
     }
 
     /**
@@ -75,7 +94,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
         File fileToExtend = trackJob.getFile();
         String fileName = fileToExtend.getName();
         String lastReadSeq = "";
-        int lastStartPos = -1;
         int noReads = 0;
         int noSequences = 0;
         int noUniqueMappings = 0;

@@ -1,10 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -75,7 +75,7 @@ public class SequencePairViewer extends AbstractViewer {
         this.setHorizontalMargin(10);
         this.setupComponents();
         this.setActive(false);
-        this.seqPairs = new ArrayList<PersistantSeqPairGroup>();
+        this.seqPairs = new ArrayList<>();
     }
 
     @Override
@@ -205,7 +205,7 @@ public class SequencePairViewer extends AbstractViewer {
         int countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
         boolean isOneBlockAdded = false;
-        boolean isBlockAdded = false;
+        boolean isBlockAdded;
         while (itRev.hasNext()) {
             LayerI b = itRev.next();
             Iterator<BlockI> blockIt = b.getBlockIterator();
@@ -213,9 +213,7 @@ public class SequencePairViewer extends AbstractViewer {
             while (blockIt.hasNext()) {
                 BlockPair block = (BlockPair) blockIt.next();
                 isBlockAdded = this.createJBlock(block, layerCounter);
-                if (isBlockAdded){
-                    isOneBlockAdded = true;
-                }
+                isOneBlockAdded = isBlockAdded;
             }
             
             if (isOneBlockAdded) {

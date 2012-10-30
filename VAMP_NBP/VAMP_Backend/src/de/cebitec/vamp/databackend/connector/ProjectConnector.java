@@ -1035,6 +1035,8 @@ public class ProjectConnector {
 
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.enableTrackDomainIndices();
+            this.enableReferenceIndices();
+            this.enableSeqPairDomainIndices();
             this.unlockTables();
         }
 
@@ -1385,6 +1387,7 @@ public class ProjectConnector {
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.lockSeqPairDomainTables();
             this.disableSeqPairDomainIndices();
+            this.disableTrackDomainIndices();
         }
 
         this.storeSeqPairTrackStatistics(seqPairData);
@@ -1544,22 +1547,14 @@ public class ProjectConnector {
      */
     public void storePositionTable(ParsedTrack track) {
 
-        if (!track.isStepwise() || isLastTrack) { //NEXT STEP: check where id of track is set wrongly!
+        if (!track.isStepwise() || isLastTrack) {
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
-            try {
-                long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
-                PreparedStatement getRefSeq = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
-                PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION);
+            try (PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION)) {
                 // get latest snpID used
-
+                long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
                 //get reference sequence
-                getRefSeq.setLong(1, track.getRefId());
-                String refSeq = "";
-                ResultSet os = getRefSeq.executeQuery();
-                if (os.next()) {
-                    refSeq = os.getString(FieldNames.REF_GEN_SEQUENCE);
-                }
+                String refSeq = this.getRefGenomeConnector(track.getRefId()).getRefGenome().getSequence();
 
                 int batchCounter = 0;
                 int counterUncoveredDiffs = 0;
@@ -1614,7 +1609,7 @@ public class ProjectConnector {
                             // get consensus base
                             refBase = String.valueOf(refSeq.charAt(position - 1)).toUpperCase();
                             baseInt = this.getBaseInt(refBase);
-                            coverageValues[baseInt] = (int) cov - coverageValues[11];
+                            coverageValues[baseInt] = (int) cov - coverageValues[DIFFS];
                             coverageValues[baseInt] = coverageValues[baseInt] < 0 ? 0 : coverageValues[baseInt]; //check if negative
                             if (maxCount < coverageValues[baseInt]) {
                                 type = SequenceComparison.MATCH.getType();
@@ -1623,7 +1618,7 @@ public class ProjectConnector {
                             } else {
                                 type = this.getType(typeInt);
                                 base = this.getBase(typeInt);
-                                frequency = coverageValues[11] / cov * 100;
+                                frequency = coverageValues[DIFFS] / cov * 100;
                             }
                             if (!refBase.equals("N")) {
                                 frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
@@ -1694,7 +1689,7 @@ public class ProjectConnector {
                         coverage = forwCov1 + revCov1;
                         coverage = coverage == 0 ? 1 : coverage;
 
-                        frequency = coverageValues[11] / coverage * 100;
+                        frequency = coverageValues[DIFFS] / coverage * 100;
                         frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
 
                         insertPosition.setLong(1, snpID);
@@ -1728,6 +1723,10 @@ public class ProjectConnector {
 
                 insertPosition.executeBatch();
                 insertPosition.close();
+                
+                if (adapter.equalsIgnoreCase("mysql")) {
+                    this.unlockTables();
+                }
 
             } catch (SQLException ex) {
                 this.rollbackOnError(this.getClass().getName(), ex);
@@ -1826,13 +1825,14 @@ public class ProjectConnector {
             fetchSNP.setInt(3, absThreshold);
             fetchSNP.setInt(4, absThreshold);
             fetchSNP.setInt(5, absThreshold);
-
+            fetchSNP.setInt(6, absThreshold);
+            
             ResultSet rs = fetchSNP.executeQuery();
             while (rs.next()) {
                 String position = rs.getString(FieldNames.POSITIONS_POSITION);
                 int trackId = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
                 char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
-                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
+                char refBase = rs.getString(FieldNames.POSITIONS_REFERENCE_BASE).charAt(0);
                 int aRate = rs.getInt(FieldNames.POSITIONS_A);
                 int cRate = rs.getInt(FieldNames.POSITIONS_C);
                 int gRate = rs.getInt(FieldNames.POSITIONS_G);
@@ -1845,7 +1845,7 @@ public class ProjectConnector {
                 if (trackIds.contains(trackId)) {
                     snps.add(new Snp(position, trackId, base, refBase, aRate, cRate, gRate,
                             tRate, nRate, gapRate, coverage, frequency, type));
-                    if (coverage == 0){
+                    if (coverage == 0) {
                         System.out.println("Coverage is zero"); //TODO: remove this
                     }
                 }

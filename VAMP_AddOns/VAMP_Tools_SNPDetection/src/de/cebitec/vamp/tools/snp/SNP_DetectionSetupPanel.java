@@ -7,8 +7,9 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,17 +30,20 @@ import org.openide.util.TaskListener;
  */
 public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
+    public static final String PROP_SNPS_LOADED = "snpsLoaded";
+    
     private static final long serialVersionUID = 1L;
     private ProjectConnector proCon;
     private List<Integer> trackIds;
     private SnpData snpData;
+    private int referenceId;
 
-    public static final String PROP_SNPS_LOADED = "snpsLoaded";
 
     /** Creates new form SNP_DetectionSetupPanel */
-    public SNP_DetectionSetupPanel() {
+    public SNP_DetectionSetupPanel(int referenceId) {
         initComponents();
-        snpData = new SnpData(new ArrayList<SnpI>(), new HashMap<Integer, String>());
+        this.referenceId = referenceId;
+        this.snpData = new SnpData(new ArrayList<SnpI>(), new HashMap<Integer, String>());
         this.proCon = ProjectConnector.getInstance();
     }
     
@@ -61,7 +65,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
 
             ph.start();
             List<SnpI> snps = proCon.findSNPs(percent, num, trackIds);
-            snpData = new SnpData(snps, proCon.getOpenedTrackNames());
+            snpData = new SnpData(snps, proCon.getRefGenomeConnector(referenceId).getAssociatedTrackNames());
             return snpData;
         }
 

@@ -218,7 +218,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         String referenceSeq = null;
         try {
             int id = trackJob.getRefGen().getID();
-            referenceSeq = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGen().getSequence();
+            referenceSeq = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGenome().getSequence();
         } catch (Exception ex) {
             Logger.getLogger(ImportThread.class.getName()).log(Level.WARNING, "Could not get the ref genome\"{0}\"{1}", new Object[]{trackJob.getFile().getName(), ex});
         }
@@ -543,7 +543,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void parseDirectAccessTrack(TrackJob trackJob) {
         
         String referenceSeq = this.getReference(trackJob);
-        File lastWorkFile = trackJob.getFile();
         
         /*
          * Algorithm:
@@ -559,7 +558,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         if (!trackJob.isAlreadyImported()) {
             //sort file by read sequence for efficient classification
             this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, "readSequence");
-            lastWorkFile = trackJob.getFile();
+            File lastWorkFile = trackJob.getFile();
 
             //generate classification data in sorted file
             SamBamDirectParser samBamDirectParser = (SamBamDirectParser) trackJob.getParser();

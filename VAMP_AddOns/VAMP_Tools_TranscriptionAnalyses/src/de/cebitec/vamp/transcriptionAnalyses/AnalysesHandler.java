@@ -83,7 +83,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        this.genomeSize = refConnector.getRefGen().getRefLength();
+        this.genomeSize = refConnector.getRefGenome().getRefLength();
 
         if (this.coverageNeeded) {
             List<Integer> trackIds = new ArrayList<>();

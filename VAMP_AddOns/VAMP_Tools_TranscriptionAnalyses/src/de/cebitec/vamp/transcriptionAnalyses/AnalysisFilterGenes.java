@@ -68,7 +68,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
         List<Integer> trackIds = new ArrayList<>();
         trackIds.add(trackCon.getTrackID());
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getRefLength();
+        this.genomeSize = refConnector.getRefGenome().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         
         for (PersistantAnnotation annotation : this.genomeAnnotations) {

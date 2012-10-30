@@ -27,7 +27,7 @@ public class MySQLStatements {
             + FieldNames.POSITIONS_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_POSITION + " VARCHAR(200) NOT NULL, "
             + FieldNames.POSITIONS_BASE + " VARCHAR(1) NOT NULL, "
-            + FieldNames.POSITIONS_REF_BASE + " VARCHAR(1) NOT NULL, "
+            + FieldNames.POSITIONS_REFERENCE_BASE + " VARCHAR(1) NOT NULL, "
             + FieldNames.POSITIONS_A + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_C + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_G + " MEDIUMINT UNSIGNED NOT NULL, "
@@ -49,7 +49,7 @@ public class MySQLStatements {
             FieldNames.DIFF_BASE+ " VARCHAR (1) NOT NULL, "+
             FieldNames.DIFF_POSITION+" BIGINT UNSIGNED NOT NULL, "+
             FieldNames.DIFF_TYPE+" TINYINT UNSIGNED NOT NULL, " +
-            FieldNames.DIFF_ORDER+" BIGINT UNSIGNED , " +
+            FieldNames.DIFF_GAP_ORDER+" BIGINT UNSIGNED , " +
             "INDEX ("+FieldNames.DIFF_POSITION+"), " +
             "INDEX ("+FieldNames.DIFF_MAPPING_ID+") " +
             ") ";
@@ -322,7 +322,7 @@ public class MySQLStatements {
                 "M."+FieldNames.MAPPING_STOP+", "+
                 "M."+FieldNames.MAPPING_TRACK+", "+
                 "D."+FieldNames.DIFF_BASE+", "+
-                "D."+FieldNames.DIFF_ORDER+", "+
+                "D."+FieldNames.DIFF_GAP_ORDER+", "+
                 "D."+FieldNames.DIFF_POSITION+", "+
                 "D."+FieldNames.DIFF_TYPE+" "+
             "FROM " +
