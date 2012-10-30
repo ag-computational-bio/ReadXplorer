@@ -30,6 +30,14 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         public String toString() {
             return representation;
         }
+
+        public static Plot[] getValues(boolean moreThanTwoConditions) {
+            if (moreThanTwoConditions) {
+                return new Plot[]{DispEsts};
+            } else {
+                return new Plot[]{DispEsts,DE,HIST};
+            }
+        }
     }
 
     public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks,
@@ -62,12 +70,13 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         deSeq = null;
     }
 
-    void saveResultsAsCSV(int selectedIndex, String path) {
+    @Override
+    public void saveResultsAsCSV(int selectedIndex, String path) {
         File saveFile = new File(path);
         deSeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
-    File plot(Plot plot) throws IOException {
+    public File plot(Plot plot) throws IOException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.DE) {

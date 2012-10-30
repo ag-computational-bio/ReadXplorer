@@ -69,6 +69,8 @@ public class DeSeqWizardPanelConds implements WizardDescriptor.ValidatingPanel<W
             conds.put("twoConds",getComponent().getConditions());
             wiz.putProperty("design", conds);
             wiz.putProperty("workingWithoutReplicates", getComponent().workingWithoutReplicates());
+            wiz.putProperty("groupA", getComponent().getGroupA());
+            wiz.putProperty("groupB", getComponent().getGroupB());
         }
     }
 

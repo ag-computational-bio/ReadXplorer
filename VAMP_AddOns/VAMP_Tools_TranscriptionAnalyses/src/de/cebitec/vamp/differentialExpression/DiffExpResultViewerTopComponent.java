@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.event.ItemEvent;
@@ -8,6 +7,7 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
@@ -40,20 +40,20 @@ preferredID = "DiffExpResultViewerTopComponent")
 })
 public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
 
-    private String[] columnNames;
     private TableModel tm;
     private ComboBoxModel cbm;
     private ArrayList<TableModel> tableModels = new ArrayList<>();
-    private int offset;
-    private boolean showNormalizedData = false;
-    private DiffExpGraficsTopComponent diffExpGraficsTopComponent;
-    private BaySeqAnalysisHandler analysisHandler;
+    private TopComponent GraficsTopComponent;
+    private AnalysisHandler analysisHandler;
+    private AnalysisHandler.Tool usedTool;
+    private boolean moreThanTwoCondsForDeSeq = false;
 
     public DiffExpResultViewerTopComponent() {
     }
 
-    public DiffExpResultViewerTopComponent(AnalysisHandler handler) {
-        this.analysisHandler = (BaySeqAnalysisHandler) handler;
+    public DiffExpResultViewerTopComponent(AnalysisHandler handler, AnalysisHandler.Tool usedTool) {
+        this.analysisHandler = handler;
+        this.usedTool = usedTool;
 
         tm = new DefaultTableModel();
         cbm = new DefaultComboBoxModel();
@@ -65,38 +65,30 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void addResults() {
-        List<BaySeqAnalysisHandler.Result> results= analysisHandler.getResults();
-        List<Group> groups = analysisHandler.getGroups();
-        List<PersistantTrack> selectedTracks = analysisHandler.getSelectedTraks();
-        offset = groups.size();
-        for (Iterator<BaySeqAnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
-            BaySeqAnalysisHandler.Result currentResult = it.next();
-            TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContents(), currentResult.getColnames());
+        List<AnalysisHandler.Result> results = analysisHandler.getResults();
+        List<String> descriptions = new ArrayList<>();
+        for (Iterator<AnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
+            AnalysisHandler.Result currentResult = it.next();
+            Vector colNames = currentResult.getColnames();
+            colNames.add(0, " ");
+            TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
+            descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
         }
 
-        groupComboBox.setModel(new DefaultComboBoxModel(groups.toArray()));
+        resultComboBox.setModel(new DefaultComboBoxModel(descriptions.toArray()));
         topCountsTable.setModel(tableModels.get(0));
 
         createGraphicsButton.setEnabled(true);
         saveTableButton.setEnabled(true);
-        groupComboBox.setEnabled(true);
+        resultComboBox.setEnabled(true);
         topCountsTable.setEnabled(true);
-        normalizedCheckBox.setEnabled(true);
         jLabel1.setEnabled(true);
         jLabel2.setEnabled(false);
         jProgressBar1.setIndeterminate(false);
         jProgressBar1.setValue(100);
         jProgressBar1.setEnabled(false);
 
-    }
-
-    private void changeShownTable(int element) {
-        if (showNormalizedData) {
-            topCountsTable.setModel(tableModels.get(element + offset));
-        } else {
-            topCountsTable.setModel(tableModels.get(element));
-        }
     }
 
     /**
@@ -108,21 +100,20 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        groupComboBox = new javax.swing.JComboBox();
+        resultComboBox = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         topCountsTable = new javax.swing.JTable();
         jProgressBar1 = new javax.swing.JProgressBar();
         jLabel2 = new javax.swing.JLabel();
-        normalizedCheckBox = new javax.swing.JCheckBox();
         createGraphicsButton = new javax.swing.JButton();
         saveTableButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.jLabel1.text")); // NOI18N
         jLabel1.setEnabled(false);
 
-        groupComboBox.setModel(cbm);
-        groupComboBox.setEnabled(false);
-        groupComboBox.addItemListener(this);
+        resultComboBox.setModel(cbm);
+        resultComboBox.setEnabled(false);
+        resultComboBox.addItemListener(this);
 
         topCountsTable.setAutoCreateRowSorter(true);
         topCountsTable.setModel(tm);
@@ -130,14 +121,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         jScrollPane1.setViewportView(topCountsTable);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.jLabel2.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(normalizedCheckBox, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.normalizedCheckBox.text")); // NOI18N
-        normalizedCheckBox.setEnabled(false);
-        normalizedCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                normalizedCheckBoxActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(createGraphicsButton, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.createGraphicsButton.text")); // NOI18N
         createGraphicsButton.setEnabled(false);
@@ -165,10 +148,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(groupComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(normalizedCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(resultComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(saveTableButton)
                         .addGap(18, 18, 18)
                         .addComponent(createGraphicsButton)
@@ -187,9 +168,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel1)
-                        .addComponent(groupComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(resultComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel2)
-                        .addComponent(normalizedCheckBox)
                         .addComponent(createGraphicsButton)
                         .addComponent(saveTableButton)))
                 .addGap(18, 18, 18)
@@ -198,23 +178,25 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void normalizedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalizedCheckBoxActionPerformed
-        showNormalizedData = (!showNormalizedData);
-        changeShownTable(groupComboBox.getSelectedIndex());
-    }//GEN-LAST:event_normalizedCheckBoxActionPerformed
-
     private void createGraphicsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraphicsButtonActionPerformed
-        diffExpGraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
-        analysisHandler.registerObserver(diffExpGraficsTopComponent);
-        diffExpGraficsTopComponent.open();
-        diffExpGraficsTopComponent.requestActive();
+        if (usedTool == AnalysisHandler.Tool.DeSeq || usedTool == AnalysisHandler.Tool.SimpleTest) {
+            GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, moreThanTwoCondsForDeSeq, usedTool);
+            GraficsTopComponent.open();
+            GraficsTopComponent.requestActive();
+        }
+        if (usedTool == AnalysisHandler.Tool.BaySeq) {
+            GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
+            analysisHandler.registerObserver((DiffExpGraficsTopComponent) GraficsTopComponent);
+            GraficsTopComponent.open();
+            GraficsTopComponent.requestActive();
+        }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
         new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"csv"}, "csv") {
             @Override
-            public void save(String fileLocation) {              
-                analysisHandler.saveResultsAsCSV((Group)groupComboBox.getSelectedItem(), fileLocation, showNormalizedData);
+            public void save(String fileLocation) {
+                analysisHandler.saveResultsAsCSV(resultComboBox.getSelectedIndex(), fileLocation);
             }
 
             @Override
@@ -224,12 +206,11 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }//GEN-LAST:event_saveTableButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createGraphicsButton;
-    private javax.swing.JComboBox groupComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JCheckBox normalizedCheckBox;
+    private javax.swing.JComboBox resultComboBox;
     private javax.swing.JButton saveTableButton;
     private javax.swing.JTable topCountsTable;
     // End of variables declaration//GEN-END:variables
@@ -258,15 +239,17 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     @Override
     public void update(Object args) {
+        if (usedTool == AnalysisHandler.Tool.DeSeq) {
+            moreThanTwoCondsForDeSeq = (boolean) args;
+        }
         addResults();
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        Group item = (Group) e.getItem();
         int state = e.getStateChange();
         if (state == ItemEvent.SELECTED) {
-            changeShownTable(item.getId());
+            topCountsTable.setModel(tableModels.get(resultComboBox.getSelectedIndex()));
         }
     }
 }

@@ -162,23 +162,19 @@ public class DeSeq {
         }
         List<DeSeqAnalysisHandler.Result> results = new ArrayList<>();
         if (analysisData.moreThanTwoConditions()) {
-            REXP currentResult1 = gnuR.eval("fit1");
+            gnuR.eval("res0 <- data.frame(fit1,pvalsGLM,padjGLM)");
+            REXP currentResult1 = gnuR.eval("res0");
             RVector tableContents1 = currentResult1.asVector();
-            REXP colNames1 = gnuR.eval("colnames(fit1)");
-            REXP rowNames1 = gnuR.eval("rownames(fit1)");
-            results.add(new DeSeqAnalysisHandler.Result(tableContents1, colNames1, rowNames1));
+            REXP colNames1 = gnuR.eval("colnames(res0)");
+            REXP rowNames1 = gnuR.eval("rownames(res0)");
+            results.add(new DeSeqAnalysisHandler.Result(tableContents1, colNames1, rowNames1, "Fitting Group One"));
 
-            REXP currentResult0 = gnuR.eval("fit0");
+            gnuR.eval("res1 <- data.frame(fit0,pvalsGLM,padjGLM)");
+            REXP currentResult0 = gnuR.eval("res1");
             RVector tableContents0 = currentResult0.asVector();
-            REXP colNames0 = gnuR.eval("colnames(fit0)");
-            REXP rowNames0 = gnuR.eval("rownames(fit0)");
-            results.add(new DeSeqAnalysisHandler.Result(tableContents0, colNames0, rowNames0));
-
-            REXP currentResult2 = gnuR.eval("data.frame(pvalsGLM,padjGLM)");
-            RVector tableContents2 = currentResult2.asVector();
-            REXP colNames2 = gnuR.eval("colnames(data.frame(pvalsGLM,padjGLM))");
-            REXP rowNames2 = gnuR.eval("rownames(data.frame(pvalsGLM,padjGLM))");
-            results.add(new DeSeqAnalysisHandler.Result(tableContents2, colNames2, rowNames2));
+            REXP colNames0 = gnuR.eval("colnames(res1)");
+            REXP rowNames0 = gnuR.eval("rownames(res1)");
+            results.add(new DeSeqAnalysisHandler.Result(tableContents0, colNames0, rowNames0, "Fitting Group Two"));
 
         } else {
             //Significant results sorted by the most significantly differentially expressed genes
@@ -187,7 +183,8 @@ public class DeSeq {
             RVector rvec = result.asVector();
             REXP colNames = gnuR.eval("colnames(res0)");
             REXP rowNames = gnuR.eval("rownames(res0)");
-            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames));
+            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames, 
+                    "Significant results sorted by the most significantly differentially expressed genes"));
 
             //Significant results sorted by the most strongly down regulated genes
             gnuR.eval("res1 <- resSig[order(resSig$foldChange, -resSig$baseMean), ]");
@@ -195,7 +192,8 @@ public class DeSeq {
             rvec = result.asVector();
             colNames = gnuR.eval("colnames(res1)");
             rowNames = gnuR.eval("rownames(res1)");
-            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames));
+            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames, 
+                    "Significant results sorted by the most strongly down regulated genes"));
 
             //Significant results sorted by the most strongly up regulated genes
             gnuR.eval("res2 <- resSig[order(-resSig$foldChange, -resSig$baseMean), ]");
@@ -203,7 +201,8 @@ public class DeSeq {
             rvec = result.asVector();
             colNames = gnuR.eval("colnames(res2)");
             rowNames = gnuR.eval("rownames(res2)");
-            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames));
+            results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames, 
+                    "Significant results sorted by the most strongly up regulated genes"));
         }
         if (saveFile != null) {
             String path = saveFile.getAbsolutePath();
