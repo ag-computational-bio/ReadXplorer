@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -237,7 +236,7 @@ public final class ParserCommonMethods {
             if (readSeq.charAt(i) != refSeq.charAt(i)) {
                 ++errors;
                 base = readSeq.charAt(i);
-                if (direction == -1) {
+                if (direction == SequenceUtils.STRAND_REV) {
                     base = SequenceUtils.getDnaComplement(base);
                 }
                 if (refSeq.charAt(i) == '_') {
@@ -305,13 +304,13 @@ public final class ParserCommonMethods {
         
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
-        String c;
+        String op;
         String numOfBases;
         for (int i = 1; i < charCigar.length; i++) {
-            c = charCigar[i];
+            op = charCigar[i];
             numOfBases = num[i - 1];
 
-            if (c.equals("D") || c.equals("N") || c.equals("P")) {
+            if (op.equals("D") || op.equals("N") || op.equals("P")) {
                 //deletion of the read
                 numberofDeletion = Integer.parseInt(numOfBases);
 
@@ -329,7 +328,7 @@ public final class ParserCommonMethods {
                     //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
                 }
 
-            } else if (c.equals("I")) {
+            } else if (op.equals("I")) {
                 //insertion of the  read
                 numberOfInsertions = Integer.parseInt(numOfBases);
 
@@ -348,14 +347,14 @@ public final class ParserCommonMethods {
                     //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                 }
                 
-            } else if (c.equals("M") || c.equals("=") || c.equals("X")) {
+            } else if (op.equals("M") || op.equals("=") || op.equals("X")) {
                 //for match/mismatch thr positions just move forward
                 readPos += Integer.parseInt(numOfBases);
                 refpos += Integer.parseInt(numOfBases);
                 newRefSeqwithGaps = refSeq;
                 newreadSeq = readSeq;
                 
-            } else if (c.equals("S")) {
+            } else if (op.equals("S")) {
                 if (i > 1) {
                     //soft clipping of the last bases
                     newreadSeq = newreadSeq.substring(0, readSeq.length() - Integer.parseInt(numOfBases));
@@ -365,7 +364,7 @@ public final class ParserCommonMethods {
                     softclipped = Integer.parseInt(numOfBases);
                 }
             } else {
-                Logger.getLogger(ParserCommonMethods.class.getName()).log(Level.WARNING, NbBundle.getMessage(ParserCommonMethods.class, "CommonMethod.CIGAR ", c));
+                Logger.getLogger(ParserCommonMethods.class.getName()).log(Level.WARNING, NbBundle.getMessage(ParserCommonMethods.class, "CommonMethod.CIGAR ", op));
             }
         }
         newreadSeq = newreadSeq.substring(softclipped, newreadSeq.length());
@@ -438,22 +437,25 @@ public final class ParserCommonMethods {
         int stopPosition;
         int numberofDeletion = 0;
         int numberofInsertion = 0;
-        int numberofSoftclipped = 0;  
-               String[] num=  cigar.split(cigarRegex);
+        int numberofSoftclipped = 0;
+        String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
-        for (int i=1;i<charCigar.length;i++) {
-            String c = charCigar[i];
-            String numOfBases = num[i-1];
-
-                if (c.contains("D") || c.contains("N") || c.contains("P")) {
-                    numberofDeletion += Integer.parseInt(numOfBases);
-                } if(c.contains("I")) {
-                    numberofInsertion += Integer.parseInt(numOfBases);
-                }if(c.contains("S")){
-                    numberofSoftclipped += Integer.parseInt(numOfBases);
-                }
+        String op;
+        String numOfBases;
+        for (int i = 1; i < charCigar.length; i++) {
+            op = charCigar[i];
+            numOfBases = num[i - 1];
+            if (op.contains("D") || op.contains("N") || op.contains("P")) {
+                numberofDeletion += Integer.parseInt(numOfBases);
+            }
+            if (op.contains("I")) {
+                numberofInsertion += Integer.parseInt(numOfBases);
+            }
+            if (op.contains("S")) {
+                numberofSoftclipped += Integer.parseInt(numOfBases);
+            }
         }
-        stopPosition = startPosition + readLength-1 + numberofDeletion - numberofInsertion-numberofSoftclipped;
+        stopPosition = startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
         return stopPosition;
     }
 

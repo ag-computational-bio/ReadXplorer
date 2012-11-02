@@ -206,7 +206,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         //get all annotations from the reference to determine amino acid 
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
         List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, reference.getRefLength());
-        Map<Integer, PersistantAnnotation> annotationMap = new HashMap<Integer, PersistantAnnotation>();
+        Map<Integer, PersistantAnnotation> annotationMap = new HashMap<>();
         for (PersistantAnnotation annotation : annotationsSorted){
             annotationMap.put(annotation.getId(), annotation); //ids are unique
         }
@@ -301,7 +301,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             model.addRow(rowData);
         }
 
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
         this.snpTable.setRowSorter(sorter);
         sorter.setModel(model);
         sorter.setComparator(0, new Comparator<String>() {
@@ -347,6 +347,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
      */
     private void setFdnamlPath() {
         VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, new String[1], "") {
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void save(String fileLocation) {

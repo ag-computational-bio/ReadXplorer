@@ -50,7 +50,7 @@ public class SamBamFileReader { //TODO: add observer
     /**
      * Retrieves the mappings from the given interval from the sam or bam file set 
      * for this data reader and the reference sequence with the given name.
-     * @param refGenome referebce genome used in the bam file
+     * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
      * @return the coverage for the given interval
@@ -104,6 +104,91 @@ public class SamBamFileReader { //TODO: add observer
         }
         samRecordIterator.close();
         return mappings;
+    }
+    
+    /**
+     * Retrieves the sequence pair mappings from the given interval from the sam
+     * or bam file set for this data reader and the reference sequence with the
+     * given name.
+     * @param refGenome reference genome used in the bam file
+     * @param from start of the interval
+     * @param to end of the interval
+     * @return the coverage for the given interval
+     */
+    public Collection<PersistantSeqPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome, 
+            int from, int to, boolean diffsAndGapsNeeded) {
+        HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
+        
+        SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+        String refSeq = refGenome.getSequence();
+        String refSubSeq;
+        int id = 0;
+        String cigar;
+        SAMRecord record;
+        int start;
+        int stop;
+        boolean isFwdStrand;
+        Integer classification;
+        Integer count;
+        Integer pairId;
+        Integer pairType;
+        long seqPairId;
+        byte seqPairType;
+        int mateStart;
+        boolean bothVisible;
+        boolean isBestMapping;
+        PersistantMapping mapping;
+
+        while (samRecordIterator.hasNext()) {
+            record = samRecordIterator.next();
+            start = record.getUnclippedStart();
+            stop = record.getUnclippedEnd();
+            isFwdStrand = !record.getReadNegativeStrandFlag();
+            classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+            count = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+            pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
+            pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
+            mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
+            bothVisible = mateStart > from && mateStart < to ? true : false;
+            
+
+            //check alignment via cigar string and add diffs to mapping
+            cigar = record.getCigarString();
+            if (cigar.contains("M")) {
+                refSubSeq = refSeq.substring(start, stop);
+            } else {
+                refSubSeq = null;
+            }
+
+            if (classification != null && count != null) { //since both data fields are always written together
+                isBestMapping = classification == (int) Properties.PERFECT_COVERAGE
+                        || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
+                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, isBestMapping);
+            } else {
+                count = 1;
+                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, false);
+            }
+            if (pairId != null && pairType != null) { //since both data fields are always written together
+//                // add new seqPair if not exists
+                seqPairId = (long) pairId;
+                seqPairType = Byte.valueOf(pairType.toString());
+                if (!seqPairs.containsKey(seqPairId)) {
+                    PersistantSeqPairGroup newGroup = new PersistantSeqPairGroup();
+                    newGroup.setSeqPairId(pairId);
+                    seqPairs.put(seqPairId, newGroup);
+                } //TODO: check where ids are needed
+                seqPairs.get(seqPairId).addPersistantMapping(mapping, seqPairType, Long.valueOf(id), -1, 1);
+            }
+
+            if (diffsAndGapsNeeded) {
+                this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
+                    record.getReadString(), refSubSeq, mapping);
+            }
+            
+        }
+        samRecordIterator.close();
+        
+        return seqPairs.values();
     }
     
     /**
@@ -262,12 +347,8 @@ public class SamBamFileReader { //TODO: add observer
                 coverage.setCommonRevMultTrack2(commonCoverageRevTrack2);
             }
             
-        } catch (NullPointerException | IllegalArgumentException | SAMFormatException e) {
+        } catch (NullPointerException | IllegalArgumentException | SAMFormatException | ArrayIndexOutOfBoundsException e) {
             Exceptions.printStackTrace(e); //TODO: replace by notify observer
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("There are reads longer than 1000 bases: The offset has to be increased! Contact the programmers.");
-            Exceptions.printStackTrace(e);
-            e.printStackTrace();
         }
         return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
     }
@@ -275,15 +356,17 @@ public class SamBamFileReader { //TODO: add observer
     /**
      * Counts and returns each difference to the reference sequence for a cigar string and
      * the belonging read sequence. If the operation "M" is not used in the cigar,
-     * then the reference sequence can be null (it is not used in this case).
+     * then the reference sequence can be null (it is not used in this case). If the 
+     * mapping is also handed over to the method, the diffs and gaps are stored
+     * directly in the mapping.
      * @param cigar the cigar string containing the alignment operations
      * @param start the start position of the alignment on the chromosome
      * @param readSeq the read sequence belonging to the cigar and without gaps
      * @param refSeq the reference sequence belonging to the cigar and without gaps
      * @param mapping if a mapping is handed over to the method it adds the diffs and
      *      gaps directly to the mapping and updates it's number of differences to the
-     *      reference. If null is passed, the PersistantDiffAndGapResult contains all
-     *      the diff and gap data.
+     *      reference. If null is passed, only the PersistantDiffAndGapResult contains 
+     *      all the diff and gap data.
      * @return PersistantDiffAndGapResult containing all the diffs and gaps
      */
     private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, boolean isFwdStrand, int nbReplicates, 
@@ -342,8 +425,10 @@ public class SamBamFileReader { //TODO: add observer
                     } else if (op.equals("I")) { //insertions
                         for (int j = 0; j < count; ++j) {
                             pos = baseNo + j;
+                            base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
+                            base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base);
                             PersistantReferenceGap gap = new PersistantReferenceGap(start + pos + dels, 
-                                    readSeq.charAt(pos), ParserCommonMethods.getOrderForGap(pos, gapOrderIndex), 
+                                    base, ParserCommonMethods.getOrderForGap(pos, gapOrderIndex), 
                                     isFwdStrand, nbReplicates);
                             if (mapping != null) {
                                 mapping.addGenomeGap(gap);

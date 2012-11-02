@@ -74,7 +74,7 @@ public class SQLStatements {
             + FieldNames.POSITIONS_TRACK_ID + ", "
             + FieldNames.POSITIONS_POSITION + ", "
             + FieldNames.POSITIONS_BASE + ", "
-            + FieldNames.POSITIONS_REF_BASE + ", "
+            + FieldNames.POSITIONS_REFERENCE_BASE + ", "
             + FieldNames.POSITIONS_A + ", "
             + FieldNames.POSITIONS_C + ", "
             + FieldNames.POSITIONS_G + ", "
@@ -181,7 +181,7 @@ public class SQLStatements {
             + FieldNames.DIFF_BASE + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + " "
+            + FieldNames.DIFF_GAP_ORDER + " "
             + ") "
             + "VALUES (?,?,?,?,?, null)";
     
@@ -194,7 +194,7 @@ public class SQLStatements {
             + FieldNames.DIFF_BASE + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + " "
+            + FieldNames.DIFF_GAP_ORDER + " "
             + ") "
             + "VALUES (?,?,?,?,?,?)";
     
@@ -645,7 +645,7 @@ public class SQLStatements {
             + "A." + FieldNames.DIFF_BASE + ", "
             + "A." + FieldNames.MAPPING_DIRECTION + ", "
             + "A." + FieldNames.DIFF_TYPE + ", "
-            + "A." + FieldNames.DIFF_ORDER + ", "
+            + "A." + FieldNames.DIFF_GAP_ORDER + ", "
             + "A.mult_count, "
             + "C." + FieldNames.COVERAGE_BM_FW_MULT + ", "
             + "C." + FieldNames.COVERAGE_BM_RV_MULT + " "
@@ -654,7 +654,7 @@ public class SQLStatements {
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_BASE + ", "
             + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_ORDER + ", "
+            + FieldNames.DIFF_GAP_ORDER + ", "
             + FieldNames.MAPPING_DIRECTION + ", "
             + "SUM(" + FieldNames.MAPPING_NUM_OF_REPLICATES + ") as mult_count  "
             + "FROM "
@@ -666,7 +666,7 @@ public class SQLStatements {
             + FieldNames.MAPPING_START + " BETWEEN ? AND ? and D." + FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "
             + "GROUP BY "
             + "D." + FieldNames.DIFF_POSITION + ", "
-            + "D." + FieldNames.DIFF_ORDER + ", "
+            + "D." + FieldNames.DIFF_GAP_ORDER + ", "
             + "D." + FieldNames.DIFF_BASE + ", "
             + "M." + FieldNames.MAPPING_DIRECTION + " ,"
             + "D." + FieldNames.DIFF_TYPE + ""
@@ -696,7 +696,7 @@ public class SQLStatements {
             + "M." + FieldNames.MAPPING_STOP + ", "
             + "M." + FieldNames.MAPPING_TRACK + ", "
             + "D." + FieldNames.DIFF_BASE + ", "
-            + "D." + FieldNames.DIFF_ORDER + ", "
+            + "D." + FieldNames.DIFF_GAP_ORDER + ", "
             + "D." + FieldNames.DIFF_POSITION + ", "
             + "D." + FieldNames.DIFF_TYPE + " "
             + "FROM ("
@@ -733,7 +733,7 @@ public class SQLStatements {
             + "LEFT JOIN ("
             + "SELECT "
             + FieldNames.DIFF_BASE + ", "
-            + FieldNames.DIFF_ORDER + ", "
+            + FieldNames.DIFF_GAP_ORDER + ", "
             + FieldNames.DIFF_POSITION + ", "
             + FieldNames.DIFF_TYPE + ", "
             + FieldNames.DIFF_MAPPING_ID + " "
@@ -744,8 +744,8 @@ public class SQLStatements {
             + ") AS D "
             + "on "
             + "M." + FieldNames.MAPPING_ID + " = D." + FieldNames.DIFF_MAPPING_ID;
-    
-    
+
+            
     public final static String FETCH_MAPPINGS_WITHOUT_DIFFS =
             "SELECT "
             + FieldNames.MAPPING_ID + ", "
@@ -816,7 +816,7 @@ public class SQLStatements {
             "SELECT "
             + "D." + FieldNames.DIFF_POSITION + ", "
             + "D." + FieldNames.DIFF_BASE + ", "
-            + "D." + FieldNames.DIFF_ORDER + ", "
+            + "D." + FieldNames.DIFF_GAP_ORDER + ", "
             + "D." + FieldNames.DIFF_TYPE + ", "
             + "M." + FieldNames.MAPPING_DIRECTION + ", "
             + "M." + FieldNames.MAPPING_NUM_OF_REPLICATES + " "
@@ -1442,7 +1442,7 @@ public class SQLStatements {
             + FieldNames.DIFF_BASE + ","
             + FieldNames.DIFF_POSITION + ","
             + FieldNames.DIFF_TYPE + ","
-            + FieldNames.DIFF_ORDER + " "
+            + FieldNames.DIFF_GAP_ORDER + " "
             + "FROM "
             + FieldNames.TABLE_DIFF + " "
             + "WHERE "
@@ -1458,22 +1458,32 @@ public class SQLStatements {
             + FieldNames.POSITIONS_TYPE + " != 'M' AND "
             + FieldNames.POSITIONS_FREQUENCY + " >= ? AND "
             + "SELECT CASE WHEN "
-            + FieldNames.POSITIONS_REF_BASE + " = 'A' "
+            + FieldNames.POSITIONS_REFERENCE_BASE + " = 'A' "
             + "THEN GREATEST("
-            + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T
+            + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + "," 
+            + FieldNames.POSITIONS_N + "," + FieldNames.POSITIONS_GAP
             + ") >= ? "
             + "WHEN "
-            + FieldNames.POSITIONS_REF_BASE + " = 'C' "
+            + FieldNames.POSITIONS_REFERENCE_BASE + " = 'C' "
             + "THEN GREATEST("
-            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_G + "," + FieldNames.POSITIONS_T + "," 
+            + FieldNames.POSITIONS_N + "," + FieldNames.POSITIONS_GAP
             + ") >= ? "
             + "WHEN "
-            + FieldNames.POSITIONS_REF_BASE + " = 'G' "
+            + FieldNames.POSITIONS_REFERENCE_BASE + " = 'G' "
             + "THEN GREATEST("
-            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_T
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_T + "," 
+            + FieldNames.POSITIONS_N + "," + FieldNames.POSITIONS_GAP
+            + ") >= ? "
+            + "WHEN "
+            + FieldNames.POSITIONS_REFERENCE_BASE + " = 'T' "
+            + "THEN GREATEST("
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," 
+            + FieldNames.POSITIONS_N + "," + FieldNames.POSITIONS_GAP
             + ") >= ? "
             + "ELSE GREATEST("
-            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G
+            + FieldNames.POSITIONS_A + "," + FieldNames.POSITIONS_C + "," + FieldNames.POSITIONS_G + "," 
+            + FieldNames.POSITIONS_T + "," + FieldNames.POSITIONS_N + "," + FieldNames.POSITIONS_GAP
             + ") >= ? END) "
             + "ORDER BY " + FieldNames.POSITIONS_POSITION;
     

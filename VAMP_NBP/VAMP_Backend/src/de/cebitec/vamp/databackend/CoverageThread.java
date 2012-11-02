@@ -145,7 +145,7 @@ public class CoverageThread extends Thread implements RequestThreadI {
         File file = new File(track.getFilePath());
         if (this.referenceGenome == null) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
-            this.referenceGenome = refConnector.getRefGen();
+            this.referenceGenome = refConnector.getRefGenome();
         }
         SamBamFileReader externalDataReader;
         externalDataReader = new SamBamFileReader(file, track.getId());

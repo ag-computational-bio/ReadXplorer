@@ -36,7 +36,7 @@ public class TrackConnector {
      * @param adapter the database adapter type (mysql or h2)
      */
     protected TrackConnector(PersistantTrack track, String adapter) {
-        this.associatedTracks = new ArrayList<PersistantTrack>();
+        this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
         this.trackID = track.getId();
         this.adapter = adapter;
@@ -44,7 +44,7 @@ public class TrackConnector {
         
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
-        this.refGenome = refConnector.getRefGen();
+        this.refGenome = refConnector.getRefGenome();
         this.genomeSize = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
@@ -72,7 +72,7 @@ public class TrackConnector {
         this.con = ProjectConnector.getInstance().getConnection();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
-        this.refGenome = refConnector.getRefGen();
+        this.refGenome = refConnector.getRefGenome();
         this.genomeSize = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
@@ -141,7 +141,7 @@ public class TrackConnector {
      * @return the collection of mappings for the given interval
      */
     public Collection<PersistantMapping> getMappings(int from, int to) {
-        HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
+        HashMap<Long, PersistantMapping> mappings = new HashMap<>();
         if (from < to && from > 0 && to > 0) {
             if (this.associatedTracks.get(0).isDbUsed()) { //mappings are always only querried for one track
                 try {
@@ -197,7 +197,7 @@ public class TrackConnector {
                         String baseString = rs.getString(FieldNames.DIFF_BASE);
                         int position = rs.getInt(FieldNames.DIFF_POSITION);
                         int type = rs.getInt(FieldNames.DIFF_TYPE);
-                        int gapOrder = rs.getInt(FieldNames.DIFF_ORDER);
+                        int gapOrder = rs.getInt(FieldNames.DIFF_GAP_ORDER);
 
                         // diff data may be null, if mapping has no diffs
                         if (baseString != null) {
@@ -220,11 +220,10 @@ public class TrackConnector {
                 }
             } else { //handle retrieving of data from other source than a DB
 
-                Collection<PersistantMapping> mappingList = externalDataReader.getMappingsFromBam(
-                        this.refGenome, from, to);
-                Iterator it = mappingList.iterator();
+                Collection<PersistantMapping> mappingList = externalDataReader.getMappingsFromBam(this.refGenome, from, to);
+                Iterator<PersistantMapping> it = mappingList.iterator();
                 while (it.hasNext()) {
-                    PersistantMapping next = (PersistantMapping) it.next();
+                    PersistantMapping next = it.next();
                     mappings.put(next.getId(), next);
                 }
             }
@@ -261,7 +260,7 @@ public class TrackConnector {
                     if (type == 1) { //1 = diffs
                         diffs.add(new PersistantDiff(position, base, isForwardStrand, count));
                     } else { //0 = gaps
-                        int order = rs.getInt(FieldNames.DIFF_ORDER);
+                        int order = rs.getInt(FieldNames.DIFF_GAP_ORDER);
                         gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count));
                     }
                 }
@@ -626,7 +625,7 @@ public class TrackConnector {
      */
     public Collection<PersistantSeqPairGroup> getSeqPairMappings(int from, int to, int trackID2, byte typeFlag) {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
-        if (from < to) {
+        if (from < 0 && from > 0 && to > 0) {
 
             if (this.associatedTracks.get(0).isDbUsed()) {
                 try {
@@ -789,6 +788,8 @@ public class TrackConnector {
                 } catch (SQLException ex) {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, from, to, false);
             }
         }
 

@@ -140,7 +140,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         //get reference sequence for promotor regions
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        String sequence = refConnector.getRefGen().getSequence();
+        String sequence = refConnector.getRefGenome().getSequence();
         String promotor;
         
         //get the promotor region for each TSS

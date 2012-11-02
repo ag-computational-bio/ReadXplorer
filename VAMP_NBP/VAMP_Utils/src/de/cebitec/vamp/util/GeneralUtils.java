@@ -35,6 +35,7 @@ public class GeneralUtils {
     }
 
     /**
+     * @param parent the parent component
      * @return Any text found in the clipboard. If none is found, an empty
      * String is returned.
      */
@@ -57,7 +58,7 @@ public class GeneralUtils {
     }
     
     /**
-     * Cecks if the input string is a valid number.
+     * Checks if the input string is a valid number.
      * @param input input string to check
      * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
      */

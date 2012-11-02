@@ -4,7 +4,6 @@ import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +28,6 @@ public class SnpData implements ExcelExportDataI {
         this.snpList = snpList;
         this.trackNames = trackNames;
     }
-
-    public SnpData(List<Snp454> snps, HashMap<Integer, String> hashMap) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
     
     public List<SnpI> getSnpList() {
         return snpList;
@@ -50,10 +44,10 @@ public class SnpData implements ExcelExportDataI {
     
     @Override
     public List<List<Object>> dataToExcelExportList() {
-        List<List<Object>> snpExportData = new ArrayList<List<Object>>();
+        List<List<Object>> snpExportData = new ArrayList<>();
         
         for (SnpI snpi : this.snpList) {
-            List<Object> snpExport = new ArrayList<Object>();
+            List<Object> snpExport = new ArrayList<>();
             Snp snp = (Snp) snpi; 
             
             snpExport.add(snp.getPosition());

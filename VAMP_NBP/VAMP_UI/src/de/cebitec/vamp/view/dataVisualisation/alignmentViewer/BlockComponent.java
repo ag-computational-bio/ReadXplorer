@@ -1,10 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -288,7 +288,7 @@ public class BlockComponent extends JComponent {
      * @return the character string representing the base of this brick
      */
     private String determineBrickLabel(Brick brick) {
-        String label = " ";
+        String label;
         int type = brick.getType();
         switch (type) {
             case Brick.MATCH : label = ""; break;
@@ -323,7 +323,7 @@ public class BlockComponent extends JComponent {
      * @return the color of the non-matching block
      */
     private Color determineBrickColor(Brick block) {
-        Color c = Color.black;
+        Color c;
         int type = block.getType();
         switch (type) {
             case Brick.BASE_A : c = ColorProperties.ALIGNMENT_A; break;

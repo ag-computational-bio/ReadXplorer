@@ -68,7 +68,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         averageReadLength = trackCon.getAverageReadLength();
         averageSeqPairLength = trackCon.getAverageSeqPairLength();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getRefLength();
+        this.genomeSize = refConnector.getRefGenome().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         
         ////////////////////////////////////////////////////////////////////////////
