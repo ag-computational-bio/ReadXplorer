@@ -85,14 +85,30 @@ public class SimpleTest {
         gnuR.assign("groupB", analysisData.getGroupB());
         gnuR.eval("groupB <- c(groupB)");
 
-        //First we build the means for each row coresponding to the given groups
-        gnuR.eval("means <- createMeansTable(inputData,groupA,groupB)");
-        //Now we remove all rows with both values < 30
+        //We need to distinguish between an experiment with no replicates and an
+        //experiement with such. In der first case results will be unreliable.
+        if (analysisData.isWorkingWithoutReplicates()) {
+            //For just to replicates no means can be computed. So this step
+            //is just a rewriting the table to a fitting format for the
+            //following function. The Means notet are just the absolute value
+            //from each condition and the variance is just set to the string "-".
+            gnuR.eval("means <- createMeansTableTwoConds(inputData)");
+        } else {
+            //First we build the means for each row coresponding to the given groups
+            gnuR.eval("means <- createMeansTable(inputData,groupA,groupB)");
+        }
+        //Now we remove all rows with both values < cutof. This cut of value can
+        //be specified as the secound argument of the function. If left unspecified
+        //it will be set to 30.
         gnuR.eval("filtered <- filterLowValues(means)");
         //The ratios A/B and B/A are calculated
         gnuR.eval("ratios <- calculateRatios(filtered)");
-        //Finally the confidence values are beeing computed
-        gnuR.eval("res <- calculateConfidence(ratios)");
+        if (analysisData.isWorkingWithoutReplicates()) {
+            gnuR.eval("res <- calculateConfidenceTwoConds(ratios)");
+        } else {
+            //Finally the confidence values are beeing computed
+            gnuR.eval("res <- calculateConfidence(ratios)");
+        }
 
         if (saveFile != null) {
             gnuR.saveDataToFile(saveFile);

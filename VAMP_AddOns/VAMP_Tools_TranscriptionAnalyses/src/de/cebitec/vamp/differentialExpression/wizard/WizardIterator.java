@@ -87,6 +87,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
 
             if (tool == AnalysisHandler.Tool.SimpleTest) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
+                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
                 int[] groupA = new int[groupAList.size()];
                 for (int i = 0; i < groupA.length; i++) {
                     groupA[i] = groupAList.get(i);
@@ -98,7 +99,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     groupB[i] = groupBList.get(i);
                 }
 
-                handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, saveFile);
+                handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, workingWithoutReplicates, saveFile);
             }
 
             DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);

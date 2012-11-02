@@ -32,9 +32,10 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
     }
 
     public SimpleTestAnalysisHandler(List<PersistantTrack> selectedTraks,
-            int[] groupA, int[] groupB, Integer refGenomeID, File saveFile) {
+            int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,File saveFile) {
         super(selectedTraks, refGenomeID, saveFile);
-        simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(), groupA, groupB);
+        simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(), 
+                                        groupA, groupB, workingWithoutReplicates);
         simpleTestAnalysisData.setSelectedTraks(selectedTraks);
     }
 
