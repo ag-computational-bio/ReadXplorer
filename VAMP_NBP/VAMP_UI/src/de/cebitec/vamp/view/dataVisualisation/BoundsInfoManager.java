@@ -20,8 +20,8 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     public BoundsInfoManager(PersistantReference refGen) {
         this.currentRefGen = refGen;
-        this.boundListeners = new ArrayList<LogicalBoundsListener>();
-        this.syncedNavigators = new ArrayList<SynchronousNavigator>();
+        this.boundListeners = new ArrayList<>();
+        this.syncedNavigators = new ArrayList<>();
         this.zoomfactor = 1;
         this.currentHorizontalPosition = 1;
     }

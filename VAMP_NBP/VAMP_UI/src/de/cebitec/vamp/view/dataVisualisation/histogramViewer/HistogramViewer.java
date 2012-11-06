@@ -5,6 +5,7 @@ import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -192,7 +193,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private void requestData() {
         if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
             this.coverageLoaded = true;
-            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
+            //we need to load the diffs seperately for tracks completely stored in the db
+            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this, Properties.DIFFS));
             if (this.diffsLoaded) {
                 this.setupData();
             }
@@ -201,7 +203,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             this.coverageLoaded = false;
             this.diffsLoaded = false;
             trackConnector.addCoverageRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
-            trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
+            trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this, Properties.DIFFS));
         }
     }
 
@@ -225,8 +227,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                         diffsLoaded = true;
                     }
                     if (coverageLoaded && diffsLoaded) {
-                        setupData();
-                        repaint();
+                            setupData();
+                            repaint();
                     }
                 }
             });

@@ -24,7 +24,7 @@ public class DirectAccessDataContainer {
      */
     public DirectAccessDataContainer() {
         this.coverageContainer = new CoverageContainer();
-        this.classificationMap = new HashMap<String, Pair<Integer, Integer>>();
+        this.classificationMap = new HashMap<>();
     }
 
     /**

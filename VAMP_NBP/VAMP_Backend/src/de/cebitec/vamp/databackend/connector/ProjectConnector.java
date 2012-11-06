@@ -676,17 +676,17 @@ public class ProjectConnector {
      * Adds a track to the database with its file path. This means, it is stored
      * as a track for direct file access and adds the persistant track id to the 
      * track job.
-     * @param trackJob the track job containing the track information to store
+     * @param track the track job containing the track information to store
      */
-    public void storeDirectAccessTrack(TrackJob trackJob) {
+    public void storeDirectAccessTrack(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");       
         
         try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
-            insertTrack.setLong(1, trackJob.getID());
-            insertTrack.setLong(2, trackJob.getRefGen().getID());
-            insertTrack.setString(3, trackJob.getDescription());
-            insertTrack.setTimestamp(4, trackJob.getTimestamp());
-            insertTrack.setString(5, trackJob.getFile().getAbsolutePath());
+            insertTrack.setLong(1, track.getID());
+            insertTrack.setLong(2, track.getRefId());
+            insertTrack.setString(3, track.getDescription());
+            insertTrack.setTimestamp(4, track.getTimestamp());
+            insertTrack.setString(5, track.getFile().getAbsolutePath());
             insertTrack.execute();
 
         } catch (SQLException ex) {
@@ -726,7 +726,11 @@ public class ProjectConnector {
     }
 
 
-    private void storeTrackStatistics(ParsedTrack track) {
+    /**
+     * Stores the statistics for a track in the db.
+     * @param track the track to store containing a coverage container
+     */
+    public void storeTrackStatistics(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics data...");
 
         int coveragePerf;
@@ -734,7 +738,7 @@ public class ProjectConnector {
         int coverageComplete;
         long trackID = track.getID();
         try {
-            HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
+            Map<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInfos();
             numMappings += mappingInfos.get(1);
             numPerfectMappings += mappingInfos.get(2);
             numBmMappings += mappingInfos.get(3);
@@ -774,23 +778,21 @@ public class ProjectConnector {
                 
                 //calculate average read length
                 int averageReadLength = this.numMappings != 0 ? this.sumReadLength / this.numMappings : 0;
-                
-                PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
-                // store track in table
-                insertStatistics.setLong(1, id);
-                insertStatistics.setLong(2, trackID);
-                insertStatistics.setInt(3, this.numMappings);
-                insertStatistics.setInt(4, this.numPerfectMappings);
-                insertStatistics.setInt(5, this.numBmMappings);
-                insertStatistics.setInt(6, this.noUniqueMappings);
-                insertStatistics.setInt(7, coveragePerf);
-                insertStatistics.setInt(8, coverageBM);
-                insertStatistics.setInt(9, coverageComplete);
-                insertStatistics.setInt(10, this.noUniqueSeq);
-                insertStatistics.setInt(11, this.numReads);
-                insertStatistics.setInt(12, averageReadLength);
-                insertStatistics.execute();
-                insertStatistics.close();
+                try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
+                    insertStatistics.setLong(1, id);
+                    insertStatistics.setLong(2, trackID);
+                    insertStatistics.setInt(3, this.numMappings);
+                    insertStatistics.setInt(4, this.numPerfectMappings);
+                    insertStatistics.setInt(5, this.numBmMappings);
+                    insertStatistics.setInt(6, this.noUniqueMappings);
+                    insertStatistics.setInt(7, coveragePerf);
+                    insertStatistics.setInt(8, coverageBM);
+                    insertStatistics.setInt(9, coverageComplete);
+                    insertStatistics.setInt(10, this.noUniqueSeq);
+                    insertStatistics.setInt(11, this.numReads);
+                    insertStatistics.setInt(12, averageReadLength);
+                    insertStatistics.execute();
+                }
                 this.numMappings = 0;
                 this.numPerfectMappings = 0;
                 this.numBmMappings = 0;
@@ -1029,9 +1031,7 @@ public class ProjectConnector {
             }
             this.storeTrackStatistics(track); //needs to be called after storeCoverage
         }
-        if (track.isDbUsed()) {
-            this.storePositionTable(track);
-        }
+        this.storePositionTable(track);
 
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.enableTrackDomainIndices();

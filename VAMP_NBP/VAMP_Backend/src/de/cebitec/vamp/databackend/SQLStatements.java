@@ -770,7 +770,7 @@ public class SQLStatements {
      * Fetches mappins without diffs where the mapping id is between 2 given values.
      * The result is sorted by mapping start.
      */
-    public final static String FETCH_MAPPINGS_WITHOUT_DIFFS2 =
+    public final static String FETCH_MAPPINGS_BY_ID_WITHOUT_DIFFS =
             "SELECT "
             + FieldNames.MAPPING_ID + ", "
             + FieldNames.MAPPING_IS_BEST_MAPPING + ", "

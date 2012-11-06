@@ -122,7 +122,7 @@ public class TrackJob implements Job {
     }
 
     /**
-     * @return the description of this track job.
+     * @return the name of this track job.
      */
     @Override
     public String getName() {

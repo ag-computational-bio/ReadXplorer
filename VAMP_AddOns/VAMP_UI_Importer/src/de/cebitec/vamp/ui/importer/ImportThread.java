@@ -98,7 +98,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
     
     private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0}trackjobID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
+        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0} with track job ID {1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
         
         String sequenceString = this.getReference(trackJob);
         TrackParser parser = new TrackParser();
@@ -298,7 +298,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 int distance = seqPairJobContainer.getDistance();
                 if (distance > 0) {
                     
-                    int trackId1 = -1;
+                    int trackId1;
                     int trackId2 = -1; //TODO: change import of track 2 for db import
                     
                     ///////////////////////////////////////////////////////////////////////
@@ -405,10 +405,10 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         //create position table
                         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
                         posTableCreator.registerObserver(this);
-                        posTableCreator.createPosTable(trackJob1, referenceSeq);
+                        ParsedTrack track = posTableCreator.createPosTable(trackJob1, referenceSeq);
 //                            posTableCreator.getStatistics();
 
-                        this.storeDirectAccessTrack(trackJob1); // store track entry in db
+                        this.storeDirectAccessTrack(track); // store track entry in db
                         trackId1 = trackJob1.getID();
                     }
 
@@ -583,9 +583,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         //file needs to be sorted by coordinate for efficient calculation
         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
         posTableCreator.registerObserver(this);
-        posTableCreator.createPosTable(trackJob, referenceSeq);
+        ParsedTrack track = posTableCreator.createPosTable(trackJob, referenceSeq);
 
-        this.storeDirectAccessTrack(trackJob);
+        this.storeDirectAccessTrack(track);
     }
     
     /**
@@ -649,9 +649,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         } else if (data instanceof ParsedTrack) {
             //if we have a coverage container, it means that we want to store data in the position table
             ParsedTrack track = (ParsedTrack) data;
-            ProjectConnector.getInstance().storePositionTable(track);
-            if (track.getCoverageContainer().getCoveredCommonMatchPositions() > 0) {
-                //TODO: store them somewhere, store statistics?
+            if (track.getCoverageContainer() != null) {
+                ProjectConnector.getInstance().storePositionTable(track);
             }
         } else {
             this.showMsg(data.toString());
@@ -686,10 +685,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * Stores a direct access track in the database and gives appropriate status messages.
      * @param trackJob the information about the track to store
      */
-    private void storeDirectAccessTrack(TrackJob trackJob) {
+    private void storeDirectAccessTrack(ParsedTrack track) {
         try {
-            io.getOut().println(trackJob.getName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
-            ProjectConnector.getInstance().storeDirectAccessTrack(trackJob);
+            io.getOut().println(track.getTrackName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
+            ProjectConnector.getInstance().storeDirectAccessTrack(track);
+            ProjectConnector.getInstance().storeTrackStatistics(track);
             io.getOut().println(this.getBundleString("MSG_ImportThread.import.success.trackdirect"));
             
         } catch(OutOfMemoryError e) {

@@ -1,19 +1,19 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.*;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.MouseEvent;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
@@ -74,7 +74,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
-        this.excludedFeatureTypes = new ArrayList<FeatureType>();
+        this.excludedFeatureTypes = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
         this.boundsManager = boundsManager;

@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
  * corresponding result tables on the right side.
  */
 public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements DataVisualisationI {
+    private static final long serialVersionUID = 1L;
 
     private TrackViewer trackViewer;
     private AnalysisTranscriptionStart analysisTSS;
@@ -37,6 +38,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
      * Creates a new transcription analyses panel, which contains the menu for
      * different transcription anlyses on the left side and a tabbed pane for
      * the corresponding result tables on the right side.
+     * @param trackViewer track  viewer
      */
     public TranscriptionAnalysesPanel(TrackViewer trackViewer) {
         this.initComponents();
@@ -574,7 +576,7 @@ public class TranscriptionAnalysesPanel extends javax.swing.JPanel implements Da
 
     /**
      * Visualizes the data handed over to this method as defined by the implementation.
-     * @param data the data object to visualize.
+     * @param dataTypeObject the data object to visualize.
      */
     @Override
     public void showData(Object dataTypeObject) {

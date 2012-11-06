@@ -1,9 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.JobI;
-import de.cebitec.vamp.databackend.CoverageThreadAnalyses;
 import de.cebitec.vamp.databackend.IntervalRequest;
-import de.cebitec.vamp.databackend.MappingThreadAnalyses;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
@@ -79,16 +77,12 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.nbRequests = 0;
         this.progressHandle.start();
         TrackConnector trackCon = this.trackViewer.getTrackCon();
-        int trackId = trackCon.getTrackID();
         
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
         this.genomeSize = refConnector.getRefGenome().getRefLength();
 
         if (this.coverageNeeded) {
-            List<Integer> trackIds = new ArrayList<>();
-            trackIds.add(trackId);
-            CoverageThreadAnalyses coverageThread = new CoverageThreadAnalyses(trackIds);
 
             //decide upon stepSize of a single request and analyse coverage of whole genome
             int stepSize = 200000;
@@ -100,59 +94,74 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             this.progressHandle.switchToDeterminate(this.nbRequests);
             this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
-            coverageThread.start();
             while (to < this.genomeSize) {
                 IntervalRequest coverageRequest = new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
-                coverageThread.addRequest(coverageRequest);
-
+                trackCon.addCoverageAnalysisRequest(coverageRequest);
+                
                 from = to + 1;
                 to += stepSize;
             }
 
             //calc last interval until genomeSize
             to = this.genomeSize;
-            IntervalRequest coverageRequest = new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
-            coverageThread.addRequest(coverageRequest);
+            trackCon.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE));
         } else
         
         if (this.mappingsNeeded) {
             
-            //calculate which mappings are needed from the db
-            int numUnneededMappings = 0;
-            List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
-            for (PersistantTrack track : tracksAll) {
-                TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
+            int stepSize = 50000;
+            
+            if (trackCon.isDbUsed()) {
+                //calculate which mappings are needed from the db
+                int numUnneededMappings = 0;
+                List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
+                for (PersistantTrack track : tracksAll) {
+                    TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
                     if (track.getId() < trackCon.getTrackID()) {
                         numUnneededMappings += connector.getNumOfUniqueMappings();
                     }
                 }
-            int numInterestingMappings = numUnneededMappings + trackCon.getNumOfUniqueMappings();
-            int stepSize = 50000;
-            int from = numUnneededMappings;
-            int to = numInterestingMappings - numUnneededMappings > stepSize ? 
-                        numUnneededMappings + stepSize : numInterestingMappings;
-            
-            int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
-            this.nbMappingRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest;
-            this.nbRequests += this.nbMappingRequests;
-            this.progressHandle.switchToDeterminate(this.nbRequests);
-            this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+                int numInterestingMappings = numUnneededMappings + trackCon.getNumOfUniqueMappings();
+                int from = numUnneededMappings;
+                int to = numInterestingMappings - numUnneededMappings > stepSize
+                        ? numUnneededMappings + stepSize : numInterestingMappings;
 
-            MappingThreadAnalyses mappingThread = new MappingThreadAnalyses(trackId, this.nbRequests);
-            mappingThread.start();
+                int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
+                this.nbMappingRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest;
 
-            while (to < numInterestingMappings) {
+                this.nbRequests += this.nbMappingRequests;
+                this.progressHandle.switchToDeterminate(this.nbRequests);
+                this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+
+                while (to < numInterestingMappings) {
+                    trackCon.addMappingAnalysisRequest(new IntervalRequest(from, to, this));
+
+                    from = to + 1;
+                    to += stepSize;
+                }
+
+                //calc last interval until genomeSize
+                to = numInterestingMappings;
                 IntervalRequest mappingRequest = new IntervalRequest(from, to, this);
-                mappingThread.addRequest(mappingRequest);
+                trackCon.addMappingAnalysisRequest(mappingRequest);
 
-                from = to + 1;
-                to += stepSize;
+            } else {
+                this.nbRequests = this.genomeSize / stepSize + 1;
+                this.progressHandle.switchToDeterminate(this.nbRequests);
+                this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+                int from = 0;
+                int to = stepSize;
+                while (to < this.genomeSize) {
+                    trackCon.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
+
+                    from = to + 1;
+                    to += stepSize;
+                }
+                
+                //calc last interval until genomeSize
+                to = this.genomeSize;
+                trackCon.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
             }
-
-            //calc last interval until genomeSize
-            to = numInterestingMappings;
-            IntervalRequest mappingRequest = new IntervalRequest(from, to, this);
-            mappingThread.addRequest(mappingRequest);
         } else {
             this.progressHandle.finish();
         }

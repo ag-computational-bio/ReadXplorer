@@ -8,12 +8,12 @@ import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.util.logging.Logger;
+import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.openide.util.ImageUtilities;
-import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.util.Utilities;
 
 /**
  * @author ddopmmeier, rhilker
@@ -183,6 +183,7 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
+     * @return default instance
      */
     public static synchronized DetailedViewerTopComponent getDefault() {
         if (instance == null) {
@@ -193,6 +194,7 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
 
     /**
      * Obtain the DetailedViewerTopComponent instance. Never call {@link #getDefault} directly!
+     * @return the DetailedViewerTopComponent instance
      */
     public static synchronized DetailedViewerTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);

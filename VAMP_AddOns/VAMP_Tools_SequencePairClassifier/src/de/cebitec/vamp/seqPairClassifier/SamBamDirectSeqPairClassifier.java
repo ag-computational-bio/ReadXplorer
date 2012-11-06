@@ -265,8 +265,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                 recordA.getCigarString(),
                                 recordA.getReadString(),
                                 this.refSeq.substring(start1 - 1, stop1),
-                                recordA.getReadNegativeStrandFlag(),
-                                start1);
+                                recordA.getReadNegativeStrandFlag());
 
                         for (SAMRecord recordB : currentRecords2) {
 
@@ -282,8 +281,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                             recordB.getCigarString(),
                                             recordB.getReadString(),
                                             this.refSeq.substring(start2 - 1, stop2),
-                                            recordB.getReadNegativeStrandFlag(),
-                                            start2);
+                                            recordB.getReadNegativeStrandFlag());
 
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
@@ -573,8 +571,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 record.getCigarString(), 
                 record.getReadString(), 
                 this.refSeq.substring(record.getAlignmentStart() - 1, record.getAlignmentEnd()),
-                record.getReadNegativeStrandFlag(),
-                record.getAlignmentStart());
+                record.getReadNegativeStrandFlag());
         this.addClassificationData(record, differences);
     }
 

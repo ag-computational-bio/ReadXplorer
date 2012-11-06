@@ -42,29 +42,25 @@ public final class ParserCommonMethods {
      * cigar, then the read and reference sequence can be null (it is not used
      * in this case). Read and reference sequence are treated case
      * insensitively, so there is no need to transform the case beforehand.
-     *
      * @param cigar the cigar string containing the alignment operations
      * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence belonging to the cigar and without
-     * gaps
+     * @param refSeq the reference sequence area belonging to the cigar and
+     * without gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
      * false if the read is on the fwd strand.
-     * @param start start of the alignment of read and reference in the
-     * reference
      * @return diff and gap result for the read and reference seq pair
      * @throws NumberFormatException
      */
-    public static int countDiffsAndGaps(String cigar, String readSeq, String refSeq, boolean isRevStrand, int start) throws NumberFormatException {
+    public static int countDiffsAndGaps(String cigar, String readSeq, String refSeq, boolean isRevStrand) throws NumberFormatException {
 
         int differences = 0;
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
-        int currentDiffs;
-        int absPos = start;
-        int numDeletions = 0;
-        int correctPos;
+        int currentCount = 0;
+        int refPos = 0;
+        int readPos = 0;
         int diffPos;
         if (!refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
@@ -74,37 +70,43 @@ public final class ParserCommonMethods {
         for (int i = 0; i < charCigar.length; ++i) {
             op = charCigar[i];
 
-            if (op.equals("=")) { //only increase position for matches
-                absPos += Integer.valueOf(num[i - 1]);
+            if (op.equals("=")) { //increase position for matches, skipped regions (N) and padded regions (P)
+                currentCount = Integer.valueOf(num[i - 1]);
+                refPos += currentCount;
+                readPos += currentCount;
 
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += Integer.valueOf(num[i - 1]);
+                
             } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                absPos += currentDiffs;
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                refPos += currentCount;
+                readPos += currentCount;
 
             } else if (op.equals("D")) { // count and add diff gaps for deletions in read
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                absPos += currentDiffs;
-                numDeletions += currentDiffs;
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                refPos += currentCount;
 
             } else if (op.equals("I")) { // count and add reference gaps for insertions
                 differences += Integer.valueOf(num[i - 1]);
-                //abs pos remains the same
+                readPos += currentCount;
+                // refPos remains the same
 
             } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                correctPos = absPos - start - numDeletions;
-                bases = readSeq.substring(correctPos, correctPos + currentDiffs);
+                currentCount = Integer.valueOf(num[i - 1]);
+                bases = readSeq.substring(readPos, readPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = absPos + j;
-                    if (bases.charAt(j) != refSeq.charAt(diffPos - start)) {
+                    diffPos = refPos + j;
+                    if (bases.charAt(j) != refSeq.charAt(diffPos)) {
                         ++differences;
                     }
                 }
-                absPos += currentDiffs;
+                refPos += currentCount;
+                readPos += currentCount;
 
-            } //P and H = padding and hard clipping do not contribute to differences
+            } //H = hard clipped bases are not present in the read string and pos in record, so don't inc. absPos
         }
 
         return differences;
@@ -119,8 +121,8 @@ public final class ParserCommonMethods {
      * cigar operations need to be uppercase!
      * @param cigar the cigar string containing the alignment operations
      * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence belonging to the cigar and without
-     * gaps
+     * @param refSeq the reference sequence area belonging to the cigar and
+     * without gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
      * false if the read is on the fwd strand.
      * @param start start of the alignment of read and reference in the reference
@@ -137,11 +139,10 @@ public final class ParserCommonMethods {
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
-        int currentDiffs;
-        int absPos = start;
+        int currentCount;
+        int refPos = 0;
+        int readPos = 0;
         int diffPos;
-        int numDeletions = 0;
-        int correctPos;
         char base;
         if (!refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
@@ -152,57 +153,65 @@ public final class ParserCommonMethods {
             op = charCigar[i];
             
             if (op.equals("=")) { //only increase position for matches
-                absPos += Integer.valueOf(num[i - 1]);
-                
+                currentCount = Integer.valueOf(num[i - 1]);
+                refPos += currentCount;
+                readPos += currentCount;
+               
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += Integer.valueOf(num[i - 1]);
+
             } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                for (int j = 0; j < currentDiffs; ++j) {
-                    diffPos = absPos + j;
-                    base = readSeq.charAt(diffPos - start - numDeletions);
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    diffPos = readPos + j;
+                    base = readSeq.charAt(diffPos);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    diffs.add(new ParsedDiff(diffPos, base));
+                    diffs.add(new ParsedDiff(diffPos + start, base));
                 }
-                absPos += currentDiffs;
+                refPos += currentCount;
+                readPos += currentCount;
 
             } else if (op.equals("D")) { // count and add diff gaps for deletions in read
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                numDeletions += currentDiffs;
-                for (int j = 0; j < currentDiffs; ++j) {
-                    diffs.add(new ParsedDiff(absPos + j, '_'));
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    diffs.add(new ParsedDiff(refPos + j + start, '_'));
                 }
+                refPos += currentCount;
+                // readPos remains the same
             
             } else if (op.equals("I")) { // count and add reference gaps for insertions
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                for (int j = 0; j < currentDiffs; ++j) {
-                    diffPos = absPos + j;
-                    base = readSeq.charAt(diffPos - start - numDeletions);
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    base = readSeq.charAt(readPos + j);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    gaps.add(new ParsedReferenceGap(diffPos, base, getOrderForGap(diffPos, gapOrderIndex)));
+                    gaps.add(new ParsedReferenceGap(refPos + start, base, getOrderForGap(refPos + start, gapOrderIndex)));
                 }
-                //abs pos remains the same
+                //refPos remains the same
+                readPos += currentCount;
 
             } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                bases = readSeq.substring(absPos - start - numDeletions, absPos - start + currentDiffs - numDeletions);
+                currentCount = Integer.valueOf(num[i - 1]);
+                bases = readSeq.substring(readPos, readPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = absPos + j;
-                    base = readSeq.charAt(j);
-                    if (base != refSeq.charAt(diffPos - start)) {
+                    diffPos = refPos + j;
+                    base = bases.charAt(j);
+                    if (base != refSeq.charAt(diffPos)) {
                         ++differences;
                         if (isRevStrand) {
                             base = SequenceUtils.getDnaComplement(base);
                         }
-                        diffs.add(new ParsedDiff(diffPos, base));
+                        diffs.add(new ParsedDiff(diffPos + start, base));
                     }
                 }
-                absPos += currentDiffs;
+                refPos += currentCount;
+                readPos += currentCount;
 
             } //P and H = padding and hard clipping do not contribute to differences
         }

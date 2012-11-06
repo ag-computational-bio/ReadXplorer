@@ -4,6 +4,7 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedMapping;
+import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
@@ -12,7 +13,9 @@ import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -32,6 +35,7 @@ public class SamBamPosTableCreator implements Observable {
 
     private List<Observer> observers;
     private CoverageContainer coverageContainer;
+    private Map<Integer, Integer> mappingInfos;
     
     /**
      * Creates and stores the position table for a sam or bam file, which needs
@@ -41,6 +45,7 @@ public class SamBamPosTableCreator implements Observable {
     public SamBamPosTableCreator() {
         this.observers = new ArrayList<>();
         this.coverageContainer = new CoverageContainer();
+        this.mappingInfos = new HashMap<>();
     }
     
     /**
@@ -48,9 +53,10 @@ public class SamBamPosTableCreator implements Observable {
      * sorted by position. The data to store is directly forwarded to the
      * observer, which should then further process it (store it in the db).
      * @param trackJob track job whose position table needs to be created
-     * @param refSeqWhole reference genome sequence 
+     * @param refSeqWhole reference genome sequence
+     * @return  
      */
-    public void createPosTable(TrackJob trackJob, String refSeqWhole) {
+    public ParsedTrack createPosTable(TrackJob trackJob, String refSeqWhole) {
         
         long startTime = System.currentTimeMillis();
         String fileName = trackJob.getFile().getName();
@@ -62,6 +68,15 @@ public class SamBamPosTableCreator implements Observable {
         final int batchSize = 300000;
         int nextBatch = batchSize;
         int lineno = 0;
+        
+        String lastReadSeq = "";
+        String readName = "";
+        int noReads = 0;
+        int noUniqueMappings = 0;
+        int noBestMatch = 0;
+        int noPerfect = 0;
+        List<String> readNamesSameSeq = new ArrayList<>();
+        List<Integer> readsDifferentPos = new ArrayList<>();
 
         ParsedMapping mapping;
         String refSeq;
@@ -72,9 +87,14 @@ public class SamBamPosTableCreator implements Observable {
         byte direction;
         String readSeq;
         String cigar;
+        byte readClass;
         DiffAndGapResult diffGapResult;
-        List<Pair<Integer, Integer>> coveredIntervals = new ArrayList<>();
-        coveredIntervals.add(new Pair<>(0, 0));
+        List<Pair<Integer, Integer>> coveredCommonIntervals = new ArrayList<>();
+        List<Pair<Integer, Integer>> coveredBestMatchIntervals = new ArrayList<>();
+        List<Pair<Integer, Integer>> coveredPerfectIntervals = new ArrayList<>();
+        coveredCommonIntervals.add(new Pair<>(0, 0));
+        coveredBestMatchIntervals.add(new Pair<>(0, 0));
+        coveredPerfectIntervals.add(new Pair<>(0, 0));
         int lastIndex;
         Integer classification;
 
@@ -100,18 +120,42 @@ public class SamBamPosTableCreator implements Observable {
                             stop = record.getAlignmentEnd();
                             readSeq = record.getReadString();
                             refSeq = refSeqWhole.substring(start - 1, stop);
+                            int rClass = (int) record.getAttribute(Properties.TAG_READ_CLASS);
+                            readClass = (byte) rClass;
 
                             if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
                                 continue; //continue, and ignore read, if it contains inconsistent information
                             }
-
-                            //store coverage statistic
-                            lastIndex = coveredIntervals.size() - 1;
-                            if (coveredIntervals.get(lastIndex).getSecond() < start) { //add new pair
-                                coveredIntervals.add(new Pair<>(start, stop));
-                            } else { //increase length of first pair (start remains, stop is enlarged)
-                                coveredIntervals.get(lastIndex).setSecond(stop);
+                            
+                            //statistics claculations: count no reads and distinct sequences ////////////
+                            if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when mapping to diff. pos
+                                noReads += readNamesSameSeq.size();
+                                if (readsDifferentPos.size() == 1) {
+                                    ++noUniqueMappings;
+                                }
+                                readNamesSameSeq.clear();
+                                readsDifferentPos.clear();
                             }
+                            if (!readNamesSameSeq.contains(readName)) {
+                                readNamesSameSeq.add(readName);
+                            }
+                            if (!readsDifferentPos.contains(start)) {
+                                readsDifferentPos.add(start);
+                            }
+                            lastReadSeq = readSeq;
+                            
+                            this.updateIntervals(coveredCommonIntervals, start, stop);
+                            if (readClass == Properties.PERFECT_COVERAGE) {
+                                this.updateIntervals(coveredPerfectIntervals, start, stop);
+                                this.updateIntervals(coveredBestMatchIntervals, start, stop);
+                                ++noPerfect;
+                                ++noBestMatch;
+                            } else if (readClass == Properties.BEST_MATCH_COVERAGE) {
+                                this.updateIntervals(coveredBestMatchIntervals, start, stop);
+                                ++noBestMatch;
+                            }
+                            
+                            ///////////////////////////////////////////////////////////////////////////
 
                             /*
                              * The cigar values are as follows: 0 (M) = alignment match
@@ -129,7 +173,7 @@ public class SamBamPosTableCreator implements Observable {
                             //store data for position table
                             direction = isRevStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
                             mapping = new ParsedMapping(start, stop, direction, diffGapResult.getDiffs(), diffGapResult.getGaps(), differences);
-                            mapping.setIsBestMapping(true);
+                            mapping.setIsBestMapping(readClass == Properties.PERFECT_COVERAGE || readClass == Properties.BEST_MATCH_COVERAGE);
                             this.coverageContainer.addMapping(mapping); //this is not the case for ordinary database import!
                             this.coverageContainer.savePositions(mapping);
 
@@ -166,16 +210,28 @@ public class SamBamPosTableCreator implements Observable {
             Exceptions.printStackTrace(e); //TODO: correct error handling or remove
         }
         
-        coverageContainer.setCoveredCommonMatchPositions(this.getCoveredBases(coveredIntervals));
+        //finish statistics and return the track with the statistics data in the end
+        coverageContainer.setCoveredCommonMatchPositions(this.getCoveredBases(coveredCommonIntervals));
+        coverageContainer.setCoveredBestMatchPositions(this.getCoveredBases(coveredBestMatchIntervals));
+        coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
+        
+        mappingInfos.put(1, -1); //no of mappings not existent, since we work on existing reads
+        mappingInfos.put(2, noPerfect);
+        mappingInfos.put(3, noBestMatch);
+        mappingInfos.put(4, noUniqueMappings);
+        mappingInfos.put(6, noReads);
 
-        track = new ParsedTrack(trackJob, null, coverageContainer);
+        ParsedMappingContainer statsContainer = new ParsedMappingContainer();
+        statsContainer.setMappingInfos(this.mappingInfos);
+        track = new ParsedTrack(trackJob, statsContainer, coverageContainer);
         this.notifyObservers(track);
         this.coverageContainer.clearCoverageContainer();
-
         
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamDirectParser.class, "PosTableCreator.Finished", fileName);
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
+        
+        return track;
     }
 
     @Override
@@ -218,10 +274,36 @@ public class SamBamPosTableCreator implements Observable {
      */
     private int getCoveredBases(List<Pair<Integer, Integer>> coveredIntervals) {
         int coveredBases = 0;
-        for(Pair interval : coveredIntervals) {
+        for (Pair<Integer, Integer> interval : coveredIntervals) {
             coveredBases += (int) interval.getSecond() - (int) interval.getFirst();
         }
         return coveredBases;
+    }
+
+    /**
+     * @return the mapping infos for this dataset after extension, empty before
+     * extension.
+     */
+    public Map<Integer, Integer> getMappingInfos() {
+        return this.mappingInfos;
+    }
+
+    /**
+     * Update the last interval of the given list or create a new interval in 
+     * the given list, if the new boundaries are beyond the boundaries of the 
+     * last interval in the list.
+     * @param coveredIntervals list of covered intervals
+     * @param start start pos of new interval to add
+     * @param stop stop pos of new interval to add
+     */
+    private void updateIntervals(List<Pair<Integer, Integer>> coveredIntervals, int start, int stop) {
+        //store coverage statistic
+        int lastIndex = coveredIntervals.size() - 1;
+        if (coveredIntervals.get(lastIndex).getSecond() < start) { //add new pair
+            coveredIntervals.add(new Pair<>(start, stop));
+        } else { //increase length of first pair (start remains, stop is enlarged)
+            coveredIntervals.get(lastIndex).setSecond(stop);
+        }
     }
     
 }

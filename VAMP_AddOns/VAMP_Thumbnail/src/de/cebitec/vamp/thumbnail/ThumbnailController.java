@@ -1,8 +1,9 @@
 package de.cebitec.vamp.thumbnail;
 
-import de.cebitec.vamp.databackend.connector.MultiTrackConnector;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.databackend.IntervalRequest;
+import de.cebitec.vamp.databackend.connector.MultiTrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
@@ -14,7 +15,6 @@ import de.cebitec.vamp.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceAnnotationTopComp;
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
@@ -93,11 +93,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     private boolean autoSlider = true;
 
     public ThumbnailController() {
-        this.refThumbTopComponents = new HashMap<ReferenceViewer, ThumbNailViewTopComponent>();
-        this.selectedAnnotations = new HashMap<ReferenceViewer, List<PersistantAnnotation>>();
-        this.annotationToTrackpanelList = new HashMap<PersistantAnnotation, List<BasePanel>>();
-        this.trackPanelToTrack = new HashMap<BasePanel, PersistantTrack>();
-        this.annotationToLayoutWidget = new HashMap<PersistantAnnotation, Widget>();
+        this.refThumbTopComponents = new HashMap<>();
+        this.selectedAnnotations = new HashMap<>();
+        this.annotationToTrackpanelList = new HashMap<>();
+        this.trackPanelToTrack = new HashMap<>();
+        this.annotationToLayoutWidget = new HashMap<>();
 
         content = new InstanceContent();
         controllerLookup = new ThumbControllerLookup(content);
@@ -288,7 +288,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         //Set initial Slider-value based on Coverage if autoSlider is true
         if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(currentAnnotation.getStart(), currentAnnotation.getStop());
+            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(new IntervalRequest(currentAnnotation.getStart(), currentAnnotation.getStop(), null));
             int max = 0;
             int cnt = 0;
             int avg = 0;
@@ -406,7 +406,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     @Override
     public void addAnnotationToList(PersistantAnnotation annotation, final ReferenceViewer refViewer) {
         if (!selectedAnnotations.containsKey(refViewer)) {
-            ArrayList<PersistantAnnotation> list = new ArrayList<PersistantAnnotation>();
+            ArrayList<PersistantAnnotation> list = new ArrayList<>();
             list.add(annotation);
             selectedAnnotations.put(refViewer, list);
         } else {
@@ -660,7 +660,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         annotationToLayoutWidget.put(annotation, layoutWidg);
 
         //Save all BasePanels for annotation in List to put into HashMap
-        List<BasePanel> bps = new ArrayList<BasePanel>();
+        List<BasePanel> bps = new ArrayList<>();
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
         for (PersistantTrack track : refCon.getAssociatedTracks()) {
             BasePanel trackPanel = createTrackPanel(track, controller, cbListener);
@@ -706,7 +706,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         void startCompare(ActionEvent e) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
-                ArrayList<PersistantTrack> trackList = new ArrayList<PersistantTrack>();
+                ArrayList<PersistantTrack> trackList = new ArrayList<>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
                 compareTwoTracks(trackList, currentAnnotation);

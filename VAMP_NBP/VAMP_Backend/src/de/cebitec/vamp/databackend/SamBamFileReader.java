@@ -53,9 +53,10 @@ public class SamBamFileReader { //TODO: add observer
      * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
-     * @return the coverage for the given interval
+     * @param needDiffs true, if the diffs need to be fetched from the file as well
+     * @return the mappings for the given interval
      */
-    public Collection<PersistantMapping> getMappingsFromBam(PersistantReference refGenome, int from, int to) {
+    public Collection<PersistantMapping> getMappingsFromBam(PersistantReference refGenome, int from, int to, boolean needDiffs) {
         
         List<PersistantMapping> mappings = new ArrayList<>();
         SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
@@ -113,6 +114,8 @@ public class SamBamFileReader { //TODO: add observer
      * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
+     * @param diffsAndGapsNeeded true, if the diffs and gaps have to be fetched
+     *      from the file as well
      * @return the coverage for the given interval
      */
     public Collection<PersistantSeqPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome, 
