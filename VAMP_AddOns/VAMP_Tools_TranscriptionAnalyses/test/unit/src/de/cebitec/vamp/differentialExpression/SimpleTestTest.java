@@ -131,7 +131,7 @@ public class SimpleTestTest {
     @Test
     public void testProcess() {
         System.out.println("process");
-        SimpleTestAnalysisData analysisData = new SimpleTestAnalysisData(7, groupA, groupB);
+        SimpleTestAnalysisData analysisData = new SimpleTestAnalysisData(7, groupA, groupB, false);
         for (Iterator<List<Integer>> it = allCountData.iterator(); it.hasNext();) {
             List<Integer> current = it.next();
             analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));

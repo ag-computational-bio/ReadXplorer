@@ -8,11 +8,13 @@ public class SimpleTestAnalysisData extends AnalysisData {
 
     private int[] groupA;
     private int[] groupB;
+    private boolean workingWithoutReplicates;
 
-    public SimpleTestAnalysisData(int capacity, int[] groupA, int[] groupB) {
+    public SimpleTestAnalysisData(int capacity, int[] groupA, int[] groupB, boolean workingWithoutReplicates) {
         super(capacity);
         this.groupA = groupA;
         this.groupB = groupB;
+        this.workingWithoutReplicates = workingWithoutReplicates;
     }
 
     public int[] getGroupA() {
@@ -21,5 +23,9 @@ public class SimpleTestAnalysisData extends AnalysisData {
 
     public int[] getGroupB() {
         return groupB;
+    }
+
+    public boolean isWorkingWithoutReplicates() {
+        return workingWithoutReplicates;
     }
 }
