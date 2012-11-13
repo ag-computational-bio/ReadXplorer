@@ -97,7 +97,9 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
     public void storeSettings(WizardDescriptor settings) {
         // store converter parameters
         ConverterI converter = converterPanel.getSelectedConverter();
-        converter.setDataToConvert(converterPanel.getFilePath(), converterPanel.getReferenceName(), converterPanel.getReferenceLength());
+        if (isFinishPanel()) {
+            converter.setDataToConvert(converterPanel.getFilePath(), converterPanel.getReferenceName(), converterPanel.getReferenceLength());
+        }
         settings.putProperty(ConverterAction.PROP_CONVERTER_TYPE, converter);
     }
     

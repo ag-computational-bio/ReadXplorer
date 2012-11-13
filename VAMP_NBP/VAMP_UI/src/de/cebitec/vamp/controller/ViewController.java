@@ -31,25 +31,25 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     private PersistantReference currentRefGen;
     private BasePanel genomeViewer;
     private Map<PersistantTrack, BasePanel> trackToPanel;
-    private List<BasePanel> currentTracks= new ArrayList<BasePanel>();
+    private List<BasePanel> currentTracks= new ArrayList<>();
     
     private ApplicationFrameI app;
 
     public ViewController(ApplicationFrameI app){
         this.app = app;
 
-        mousePosListener = new ArrayList<MousePositionListener>();
+        mousePosListener = new ArrayList<>();
 
-        trackToPanel = new HashMap<PersistantTrack, BasePanel>();
+        trackToPanel = new HashMap<>();
     }
 
-    public void openRefGen(){
+    public void openRefGen() {
         OpenRefGenPanel orgp = new OpenRefGenPanel();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(orgp, "Open Reference");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
-        if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && orgp.getSelectedReference() != null){
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && orgp.getSelectedReference() != null) {
             currentRefGen = orgp.getSelectedReference();
             boundsManager = new BoundsInfoManager(currentRefGen);
             basePanelFac = new BasePanelFactory(boundsManager, this);
@@ -61,7 +61,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
     public void closeRefGen() {
         // remove all tracks that are still open
-        List<PersistantTrack> tracks = new ArrayList<PersistantTrack>();
+        List<PersistantTrack> tracks = new ArrayList<>();
         for(PersistantTrack t : trackToPanel.keySet()){
             tracks.add(t);
         }

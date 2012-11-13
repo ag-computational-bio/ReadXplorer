@@ -81,7 +81,11 @@ public class BasePanelFactory {
             tc = connector.getTrackConnector(track);
         } catch (RuntimeIOException e) {
             PersistantTrack newTrack = this.openResetFilePathDialog(track, connector, basePanel);
-            tc = connector.getTrackConnector(newTrack);
+            if (newTrack != null) {
+                tc = connector.getTrackConnector(newTrack);
+            } else {
+                return null;
+            }
         }
         TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
         trackV.setName(track.getDescription());

@@ -7,6 +7,7 @@ import de.cebitec.vamp.util.fileChooser.VampFileChooser;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ResetTrackFilePanel extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     private String newFileLocation;
   
@@ -68,6 +69,7 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, new String[1], "") {
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void save(String fileLocation) {
