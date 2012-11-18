@@ -1542,7 +1542,9 @@ public class ProjectConnector {
                 
     /**
      * Since Coverage container only stores the data, here we have to calculate which base is the
-     * one with the most occurrences at a certain position.
+     * one with the most occurrences at a certain position. Afterwards the positions
+     * are stored in the db, if they are not larger than the batchStop position 
+     * of the given track (This prevents storing positions twice). 
      * @param track 
      */
     public void storePositionTable(ParsedTrack track) {
@@ -1581,6 +1583,11 @@ public class ProjectConnector {
                 String refBase;
                 int baseInt;
                 
+                double forwCov1;
+                double revCov1;
+                double forwCov2;
+                double revCov2;
+                
                 while (positionIterator.hasNext()) {
 
                     posString = positionIterator.next();
@@ -1600,7 +1607,7 @@ public class ProjectConnector {
 
                         position = PositionUtils.convertPosition(posString);
                         // get coverage
-                        if (coverageContainer.positionCovered(position)) {
+                        if (position <= track.getBatchPos() && coverageContainer.positionCovered(position)) {
                             forwCov = coverageContainer.getBestMappingForwardCoverage(position);
                             revCov = coverageContainer.getBestMappingReverseCoverage(position);
                             cov = forwCov + revCov;
@@ -1665,52 +1672,55 @@ public class ProjectConnector {
 
                         String absPosition = posString.substring(0, posString.length() - 2);
                         position = Integer.parseInt(absPosition);
+                        
+                        if (position <= track.getBatchPos())  {
 
-                        // get coverage from adjacent positions
-                        double forwCov1 = 0;
-                        double revCov1 = 0;
-                        double forwCov2 = 0;
-                        double revCov2 = 0;
-                        if (coverageContainer.positionCovered(position)) {
-                            forwCov1 = coverageContainer.getBestMappingForwardCoverage(position);
-                            revCov1 = coverageContainer.getBestMappingReverseCoverage(position);
-                        } else {
-                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredGaps + " uncovered position in gaps: {0}", position);
+                            // get coverage from adjacent positions
+                            forwCov1 = 0;
+                            revCov1 = 0;
+                            forwCov2 = 0;
+                            revCov2 = 0;
+                            if (coverageContainer.positionCovered(position)) {
+                                forwCov1 = coverageContainer.getBestMappingForwardCoverage(position);
+                                revCov1 = coverageContainer.getBestMappingReverseCoverage(position);
+                            } else {
+                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredGaps + " uncovered position in gaps: {0}", position);
+                            }
+
+                            if (coverageContainer.positionCovered(position + 1)) {
+                                forwCov2 = coverageContainer.getBestMappingForwardCoverage(position + 1);
+                                revCov2 = coverageContainer.getBestMappingReverseCoverage(position + 1);
+                            }
+
+                            forwCov = (forwCov1 + forwCov2) / 2;
+                            revCov = (revCov1 + revCov2) / 2;
+                            cov = forwCov + revCov;
+                            coverage = forwCov1 + revCov1;
+                            coverage = coverage == 0 ? 1 : coverage;
+
+                            frequency = coverageValues[DIFFS] / coverage * 100;
+                            frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
+
+                            insertPosition.setLong(1, snpID);
+                            insertPosition.setLong(2, track.getID());
+                            insertPosition.setString(3, posString);
+                            insertPosition.setString(4, String.valueOf(getBase(typeInt)));
+                            insertPosition.setString(5, String.valueOf('_'));
+                            insertPosition.setInt(6, coverageValues[GAP_A]);
+                            insertPosition.setInt(7, coverageValues[GAP_C]);
+                            insertPosition.setInt(8, coverageValues[GAP_G]);
+                            insertPosition.setInt(9, coverageValues[GAP_T]);
+                            insertPosition.setInt(10, coverageValues[GAP_N]);
+                            insertPosition.setInt(11, 0);
+                            insertPosition.setInt(12, (int) cov);
+                            insertPosition.setInt(13, (int) frequency);
+                            insertPosition.setString(14, String.valueOf(SequenceComparison.INSERTION.getType()));
+
+                            insertPosition.addBatch();
+
+                            batchCounter++;
+                            snpID++;
                         }
-
-                        if (coverageContainer.positionCovered(position + 1)) {
-                            forwCov2 = coverageContainer.getBestMappingForwardCoverage(position + 1);
-                            revCov2 = coverageContainer.getBestMappingReverseCoverage(position + 1);
-                        }
-
-                        forwCov = (forwCov1 + forwCov2) / 2;
-                        revCov = (revCov1 + revCov2) / 2;
-                        cov = forwCov + revCov;
-                        coverage = forwCov1 + revCov1;
-                        coverage = coverage == 0 ? 1 : coverage;
-
-                        frequency = coverageValues[DIFFS] / coverage * 100;
-                        frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
-
-                        insertPosition.setLong(1, snpID);
-                        insertPosition.setLong(2, track.getID());
-                        insertPosition.setString(3, posString);
-                        insertPosition.setString(4, String.valueOf(getBase(typeInt)));
-                        insertPosition.setString(5, String.valueOf('_'));
-                        insertPosition.setInt(6, coverageValues[GAP_A]);
-                        insertPosition.setInt(7, coverageValues[GAP_C]);
-                        insertPosition.setInt(8, coverageValues[GAP_G]);
-                        insertPosition.setInt(9, coverageValues[GAP_T]);
-                        insertPosition.setInt(10, coverageValues[GAP_N]);
-                        insertPosition.setInt(11, 0);
-                        insertPosition.setInt(12, (int) cov);
-                        insertPosition.setInt(13, (int) frequency);
-                        insertPosition.setString(14, String.valueOf(SequenceComparison.INSERTION.getType()));
-
-                        insertPosition.addBatch();
-
-                        batchCounter++;
-                        snpID++;
                     }
 
 
@@ -1820,6 +1830,7 @@ public class ProjectConnector {
         // currently opened tracks
         try {
             PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
+//            fetchSNP.setInt(1, trackIds.get(0));
             fetchSNP.setInt(1, percentageThreshold);
             fetchSNP.setInt(2, absThreshold);
             fetchSNP.setInt(3, absThreshold);

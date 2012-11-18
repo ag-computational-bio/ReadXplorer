@@ -43,6 +43,7 @@ public class CoverageContainer {
     private int coveredPerfectPositions;
     private int coveredBestMatchPositions;
     private int coveredCommonMatchPositions;
+    private Integer[] newCov;
 
     /**
      * Creates a new and empty CoverageContainer.
@@ -53,6 +54,7 @@ public class CoverageContainer {
         this.coveredPerfectPositions = 0;
         this.coveredBestMatchPositions = 0;
         this.coveredCommonMatchPositions = 0;
+        this.initCovArray();
     }
     
 
@@ -110,7 +112,7 @@ public class CoverageContainer {
         for (int i = mapping.getStart(); i <= mapping.getStop(); i++) {
             // init coverage array if not done yet
             if (!coverage.containsKey(i)) {
-                coverage.put(i, CoverageContainer.getInitializedCovArray());            
+                coverage.put(i, this.getInitializedCovArray());            
             }
             // increase the values in coverage array
             Integer[] cov = coverage.get(i);
@@ -221,6 +223,7 @@ public class CoverageContainer {
             long positionInt;
             String position;
             char base;
+            Integer[] bases;
 
             // saves diffs
             for (int i = 0; i < mapping.getNumOfDiffs(); i++) {
@@ -232,12 +235,8 @@ public class CoverageContainer {
                     base = SequenceUtils.getDnaComplement(base);
                 }
                 // init positionTable if not done yet 
-                Integer[] bases;
                 if (!positionTable.containsKey(position)) {
-                    bases = new Integer[12];
-                    for (int j = 0; j < bases.length; ++j) {
-                        bases[j] = 0;
-                    }
+                    bases = this.getInitializedCovArray();
                     positionTable.put(position, bases);
                 }
                 
@@ -268,7 +267,6 @@ public class CoverageContainer {
             //save gaps
             int order;
             char value;
-            Integer[] bases;
             for (int i = 0; i < gaps.size(); i++) {
                 gap = gaps.get(i);
                 positionInt = gap.getAbsPos();
@@ -289,10 +287,7 @@ public class CoverageContainer {
 
                 // init positionTable if not done yet 
                 if (!positionTable.containsKey(position)) {
-                    bases = new Integer[12];
-                    for (int j = 0; j < bases.length; ++j) {
-                        bases[j] = 0;
-                    }
+                    bases = this.getInitializedCovArray();
                     positionTable.put(position, bases);
                 }
 
@@ -419,7 +414,7 @@ public class CoverageContainer {
             if (pos >= clearPos) {
                 cov = this.coverage.get(pos);
                 if (cov == null) { // can occur if current read ends, but there is a larger pos in the posTable from originating from another read
-                    cov = CoverageContainer.getInitializedCovArray();
+                    cov = this.getInitializedCovArray();
                 }  
                 newCoverage.put(pos, cov);
                 newPositionTable.put(posString, positionTable.get(posString));
@@ -431,16 +426,19 @@ public class CoverageContainer {
         this.positionTable = newPositionTable;
     }
     
+    private void initCovArray() {
+        newCov = new Integer[COV_ARRAY_LENGTH];
+        for (int j = 0; j < newCov.length; j++) {
+            newCov[j] = 0;
+        }
+    }
+    
     /**
      * @return Creates and returns a new array of length "coverageArrayLength"
      * filled with zeros.
      */
-    private static Integer[] getInitializedCovArray() {
-        Integer[] newCov = new Integer[COV_ARRAY_LENGTH];
-        for (int j = 0; j < newCov.length; j++) {
-            newCov[j] = 0;
-        }
-        return newCov;
+    private Integer[] getInitializedCovArray() {
+        return newCov.clone();
     }
     
 }

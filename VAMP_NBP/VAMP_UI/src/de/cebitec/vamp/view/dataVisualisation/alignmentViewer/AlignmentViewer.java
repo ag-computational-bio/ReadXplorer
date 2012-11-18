@@ -45,6 +45,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private float percentSandBPerCovUnit;
     private int oldLogLeft;
     private int oldLogRight;
+    boolean needRepaint = false;
     MappingResultPersistant mappingResult;
     HashMap<Integer, Integer> completeCoverage;
 
@@ -157,6 +158,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     public void receiveData(Object data) {
         if (data.getClass().equals(mappingResult.getClass())) {
             this.mappingResult = ((MappingResultPersistant) data);
+            this.needRepaint = true;
             this.showData();
         }
     }
@@ -166,29 +168,35 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      */
     private void showData() {
         
-        findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
-        findMaxCoverage(completeCoverage);
-        
-        this.removeAll();
-        
-        if (this.hasLegend()) {
-            this.add(this.getLegendLabel());
-            this.add(this.getLegendPanel());
+        if (this.needRepaint) {
+
+            this.findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
+            this.findMaxCoverage(completeCoverage);
+            this.setViewerHeight();
+            this.layout = new Layout(mappingResult.getLowerBound(), mappingResult.getUpperBound(), mappingResult.getMappings(), getExcludedFeatureTypes());
+
+            this.removeAll();
+            this.addBlocks(layout);
+
+            if (this.hasLegend()) {
+                this.add(this.getLegendLabel());
+                this.add(this.getLegendPanel());
+            }
+            if (this.hasOptions()) {
+                this.add(this.getOptionsLabel());
+                this.add(this.getOptionsPanel());
+            }
+            // if a sequence viewer was set for this panel, add/show it
+            if (this.hasSequenceBar()) {
+                this.add(this.getSequenceBar());
+            }
+
+            getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            
+            this.needRepaint = false;
+            this.repaint();
         }
-        if (this.hasOptions()) {
-            this.add(this.getOptionsLabel());
-            this.add(this.getOptionsPanel());
-        }
-        // if a sequence viewer was set for this panel, add/show it
-        if (this.hasSequenceBar()) {
-            this.add(this.getSequenceBar());
-        }
-        
-        setViewerHeight();
-        layout = new Layout(mappingResult.getLowerBound(), mappingResult.getUpperBound(), mappingResult.getMappings(), getExcludedFeatureTypes());
-        addBlocks(layout);
-        getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     /**

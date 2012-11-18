@@ -215,6 +215,7 @@ public class ReferenceConnector {
      */
     public List<PersistantTrack> getAssociatedTracks() {  
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME)) {
+            this.associatedTracks.clear();
             fetch.setLong(1, refGenID);
 
             ResultSet rs = fetch.executeQuery();

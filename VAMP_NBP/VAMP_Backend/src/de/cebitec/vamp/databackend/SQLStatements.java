@@ -1455,6 +1455,7 @@ public class SQLStatements {
             + "FROM "
             + FieldNames.TABLE_POSITIONS
             + " WHERE ("
+//            + FieldNames.POSITIONS_TRACK_ID + " = ? AND "
             + FieldNames.POSITIONS_TYPE + " != 'M' AND "
             + FieldNames.POSITIONS_FREQUENCY + " >= ? AND "
             + "SELECT CASE WHEN "
