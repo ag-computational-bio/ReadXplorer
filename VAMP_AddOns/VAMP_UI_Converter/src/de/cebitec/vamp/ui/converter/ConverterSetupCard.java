@@ -185,19 +185,19 @@ public class ConverterSetupCard extends javax.swing.JPanel {
 
     private void referenceLengthFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_referenceLengthFieldKeyTyped
         String input = String.valueOf(evt.getKeyChar());
-        String wholeInput = this.referenceLengthField.getText().concat(input);
-        if (input.equals("\b") || evt.getKeyChar() == ' ') {
-            if (GeneralUtils.isValidNumberInput(wholeInput)) {
-                this.referenceLength = Integer.valueOf(wholeInput);
-            } else if (input.isEmpty()) {
-                this.referenceLength = -1;
+        String value = this.referenceLengthField.getText();
+        String wholeInput = value.concat(input);
+        if (input.equals("\b")) {
+            if (GeneralUtils.isValidNumberInput(value)) {
+                this.referenceLength = Integer.valueOf(value);
             } else {
-                //just ignore it...
+                this.referenceLength = -1;
             }
         } else if (GeneralUtils.isValidNumberInput(wholeInput)) {
             this.referenceLength = Integer.valueOf(wholeInput);
         } else {
             JOptionPane.showMessageDialog(this, "Please enter a numerical reference length larger than 0!", "Invalid Length", JOptionPane.ERROR_MESSAGE);
+            this.referenceLength = -1;
         }
         this.isRequiredInfoSet();
 

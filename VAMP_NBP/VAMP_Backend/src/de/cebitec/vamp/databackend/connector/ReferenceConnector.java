@@ -213,33 +213,32 @@ public class ReferenceConnector {
     /**
      * @return the tracks associated to this reference connector.
      */
-    public List<PersistantTrack> getAssociatedTracks() {    
-        if (associatedTracks.isEmpty()) {
-            try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME)){                
-                fetch.setLong(1, refGenID);
+    public List<PersistantTrack> getAssociatedTracks() {  
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME)) {
+            this.associatedTracks.clear();
+            fetch.setLong(1, refGenID);
 
-                ResultSet rs = fetch.executeQuery();
-                while (rs.next()) {
-                    int id = rs.getInt(FieldNames.TRACK_ID);
-                    String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
-                    Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
-                    int refGenomeID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
-                    String filePath = rs.getString(FieldNames.TRACK_PATH);
-                    int seqPairId = rs.getInt(FieldNames.TRACK_SEQUENCE_PAIR_ID);
-                    associatedTracks.add(new PersistantTrack(id, filePath, description, date, refGenomeID, seqPairId));
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
+            ResultSet rs = fetch.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt(FieldNames.TRACK_ID);
+                String description = rs.getString(FieldNames.TRACK_DESCRIPTION);
+                Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
+                int refGenomeID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
+                String filePath = rs.getString(FieldNames.TRACK_PATH);
+                int seqPairId = rs.getInt(FieldNames.TRACK_SEQUENCE_PAIR_ID);
+                associatedTracks.add(new PersistantTrack(id, filePath, description, date, refGenomeID, seqPairId));
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return associatedTracks;
     }
     
     /**
-     * Calculates and returns the names of all tracks in the given list hashed
-     * to their track id.
-     * @return the names of all currently opened tracks hashed to their track
+     * Calculates and returns the names of all tracks belonging to this
+     * reference hashed to their track id.
+     * @return the names of all tracks of this reference hashed to their track
      * id.
      */
     public HashMap<Integer, String> getAssociatedTrackNames() {

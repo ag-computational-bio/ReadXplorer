@@ -3,27 +3,27 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.view.dataVisualisation.TranscriptionAnalysesFrameI;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.JList;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import org.openide.awt.ActionRegistration;
+import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
-import org.openide.awt.ActionID;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * @author rhilker
- * 
- * Action for opening a new transcription analyses frame. It opens a track list containing all
- * tracks of the selected reference and creates a new transcription analyses frame
- * when a track was chosen.
+ * Action for opening a new transcription analyses frame. It opens a track list
+ * containing all tracks of the selected reference and creates a new
+ * transcription analyses frame when a track was chosen.
+ *
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 
 @ActionID(category = "Tools",
@@ -45,14 +45,15 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        TrackViewer currentTrackViewer = null;
+        TrackViewer currentTrackViewer;
         if (this.context.size() > 1){
-            JList trackList = new JList(this.context.toArray());
+            @SuppressWarnings("unchecked")
+            JList<TrackViewer> trackList = new JList(this.context.toArray());
             DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "TTL_OpenTranscriptionAnalysesViewer"));
             dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
             DialogDisplayer.getDefault().notify(dd);
             if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()){
-                currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
+                currentTrackViewer = trackList.getSelectedValue();
             } else {
                 return;
             }

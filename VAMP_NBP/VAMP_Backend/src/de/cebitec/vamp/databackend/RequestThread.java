@@ -40,7 +40,6 @@ public abstract class RequestThread extends Thread {
      * then the results of the current request are discarded, as they are not 
      * needed anymore).
      * @param request the currently handled request
-     * @param latestRequest the latest request (e.g. latest request added to the request queue)
      * @return true, if the request bounds are identical, false otherwise
      */
     protected boolean matchesLatestRequestBounds(IntervalRequest request) {

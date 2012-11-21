@@ -87,7 +87,7 @@ public class SamBamPosTableCreator implements Observable {
         byte direction;
         String readSeq;
         String cigar;
-        byte readClass;
+        int readClass;
         DiffAndGapResult diffGapResult;
         List<Pair<Integer, Integer>> coveredCommonIntervals = new ArrayList<>();
         List<Pair<Integer, Integer>> coveredBestMatchIntervals = new ArrayList<>();
@@ -120,8 +120,12 @@ public class SamBamPosTableCreator implements Observable {
                             stop = record.getAlignmentEnd();
                             readSeq = record.getReadString();
                             refSeq = refSeqWhole.substring(start - 1, stop);
-                            int rClass = (int) record.getAttribute(Properties.TAG_READ_CLASS);
-                            readClass = (byte) rClass;
+                            Integer rClass = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                            if (rClass != null) {
+                                readClass = (int) rClass;
+                            } else {
+                                readClass = Properties.COMPLETE_COVERAGE;
+                            }
 
                             if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
                                 continue; //continue, and ignore read, if it contains inconsistent information
@@ -184,6 +188,7 @@ public class SamBamPosTableCreator implements Observable {
                             }
                             if (start > nextBatch) { //e.g. 300.001
                                 track = new ParsedTrack(trackJob, null, coverageContainer);
+                                track.setBatchPos(stop);
                                 this.notifyObservers(track);
                                 this.coverageContainer.clearCoverageContainer();
                                 this.refillCoverageContainer(batchOverlappingMappings, nextBatch);
