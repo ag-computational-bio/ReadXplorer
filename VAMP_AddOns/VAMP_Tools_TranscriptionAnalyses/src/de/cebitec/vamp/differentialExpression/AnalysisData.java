@@ -1,8 +1,10 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
@@ -123,7 +125,14 @@ public class AnalysisData {
     }
 
     public void setLoci(String[] loci) {
-        this.loci = loci;
+        Set<String> tmpSet = new LinkedHashSet<>();
+        int counter = 1;
+        for (int i = 0; i < loci.length; i++) {
+            if(!tmpSet.add(loci[i])){
+                tmpSet.add(loci[i]+"_"+counter++);
+            }
+        }
+        this.loci = tmpSet.toArray(new String[tmpSet.size()]);
     }
 
     public void setSelectedTraks(List<PersistantTrack> selectedTraks) {

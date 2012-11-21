@@ -107,6 +107,12 @@ public class DeSeq {
                 //analysis will be performed can be created
                 gnuR.eval("cD <- newCountDataSet(inputData, conds)");
             }
+            
+                    if (saveFile != null) {
+            String path = saveFile.getAbsolutePath();
+            path = path.replace("\\", "\\\\");
+            gnuR.eval("save.image(\"" + path + "\")");
+        }
 
             //We estimate the size factor
             gnuR.eval("cD <- estimateSizeFactors(cD)");
