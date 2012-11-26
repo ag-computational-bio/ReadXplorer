@@ -19,6 +19,12 @@ public class BaySeq {
 
     private GnuR gnuR;
     private int numberOfAnnotations;
+    /*
+     * The maximum number baySeq will use. This should prevent the programm
+     * from using insanely mutch cores on big machines in the CeBiTec Grid
+     * infrastructure.
+     */
+    private static final int MAX_PROCESSORS = 8;
 
     public BaySeq() {
         gnuR = GnuR.getInstance();
@@ -63,10 +69,13 @@ public class BaySeq {
             gnuR.eval("install.packages(\"snow\")");
             gnuR.eval("library(snow)");
         }
-        //Gnu R is configured to use all your processor cores aside from one. So the
-        //computation will speed up a little bit but still leave you one core
+        //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
+        //computation will speed up a little bit but still leave you at least one core
         //for your other work.
         int processors = Runtime.getRuntime().availableProcessors();
+        if (processors > MAX_PROCESSORS) {
+            processors = MAX_PROCESSORS;
+        }
         if (processors > 1) {
             processors--;
         }

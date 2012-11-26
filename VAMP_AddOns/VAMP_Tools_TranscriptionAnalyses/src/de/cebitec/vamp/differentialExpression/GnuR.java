@@ -49,7 +49,7 @@ public class GnuR extends Rengine {
     public static synchronized GnuR getInstance() throws IllegalStateException{
         if (sem.tryAcquire()) {
             if (instance == null) {
-                String[] args = new String[0];
+                String[] args = new String[]{"--no-save"};
                 instance = new GnuR(args);
             }
             return instance;
