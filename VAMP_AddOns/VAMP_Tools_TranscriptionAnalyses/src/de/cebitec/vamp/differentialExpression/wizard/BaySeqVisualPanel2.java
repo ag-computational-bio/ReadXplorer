@@ -32,7 +32,12 @@ public final class BaySeqVisualPanel2 extends JPanel {
     public void updateTrackList(List<PersistantTrack> selectedTraks) {
         if (this.selectedTraks == null) {
             this.selectedTraks = selectedTraks;
+            resetTrackList();
         }
+
+    }
+    
+    private void resetTrackList() {
         trackListModel.clear();
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack persistantTrack = it.next();
@@ -120,7 +125,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addAsReplicatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAsReplicatesActionPerformed
-        if (replicateStructure.length<2) {
+        if (replicateStructure.length < 2) {
             replicateStructure = new int[selectedTraks.size()];
         }
         if (!trackList.isSelectionEmpty()) {
@@ -150,7 +155,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
         removeReplicates.setEnabled(false);
         replicateStructureField.setText("");
         replicateStructure = new int[1];
-        updateTrackList(selectedTraks);
+        resetTrackList();
         addAsReplicates.setEnabled(true);
     }//GEN-LAST:event_removeReplicatesActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

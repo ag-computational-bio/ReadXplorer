@@ -30,12 +30,14 @@ public final class DeSeqVisualPanelConds extends JPanel {
     }
 
     public void updateTrackList(List<PersistantTrack> selectedTraks) {
-        this.selectedTraks = selectedTraks;
-        conds = new String[selectedTraks.size()];
-        trackListModel.clear();
-        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.addElement(persistantTrack);
+        if (this.selectedTraks == null) {
+            this.selectedTraks = selectedTraks;
+            conds = new String[selectedTraks.size()];
+            trackListModel.clear();
+            for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+                PersistantTrack persistantTrack = it.next();
+                trackListModel.addElement(persistantTrack);
+            }
         }
     }
 
@@ -200,7 +202,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.add(((Integer) selectedTraks.indexOf(persistantTrack)) + 1);
+            groupA.add((Integer) (selectedTraks.indexOf(persistantTrack) + 1));
         }
     }//GEN-LAST:event_addToConditionOneActionPerformed
 
@@ -214,7 +216,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.add(((Integer) selectedTraks.indexOf(persistantTrack)) + 1);
+            groupB.add((Integer) (selectedTraks.indexOf(persistantTrack) + 1));
         }
     }//GEN-LAST:event_addToConditionTwoActionPerformed
 
@@ -228,7 +230,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.remove(((Integer) selectedTraks.indexOf(persistantTrack)) + 1);
+            groupA.remove((Integer) (selectedTraks.indexOf(persistantTrack) + 1));
         }
     }//GEN-LAST:event_removeFromConditionOneActionPerformed
 
@@ -242,7 +244,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.remove(((Integer) selectedTraks.indexOf(persistantTrack)) + 1);
+            groupB.remove((Integer) (selectedTraks.indexOf(persistantTrack) + 1));
         }
     }//GEN-LAST:event_removeFromConditionTwoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
