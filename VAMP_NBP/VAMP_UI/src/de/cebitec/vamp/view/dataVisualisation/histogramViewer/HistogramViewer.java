@@ -61,6 +61,15 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private enum Bases {
         m, a, c, t, g, n, _,
     }
+    
+    /**
+     * The histogram viewer. Showing the match an deviating coverage for each
+     * position in a reference genome as a histogram.
+     * @param boundsInfoManager
+     * @param basePanel the panel this viewer is placed on
+     * @param refGen the reference sequence object
+     * @param trackConnector the track connector
+     */
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
@@ -363,14 +372,15 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if (seqBar != null) {
             seqBar.removeAll();
         }
+        int relPos;
+        int x;
         for (int i = lowerBound; i <= upperBound; i++) {
             // compute relative position in layout
-            int relPos = i + gapManager.getNumOfGapsSmaller(i);
-            relPos += gapManager.getNumOfGapsAt(i);
+            relPos = i + gapManager.getNumOfGapsSmaller(i) + gapManager.getNumOfGapsAt(i);
 
             // get physical x coordinate
-            int x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound();
-            x += getPhysBoundariesForLogPos(i).getPhysWidth() * gapManager.getNumOfGapsAt(i);
+            x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound() + 
+                    (int) getPhysBoundariesForLogPos(i).getPhysWidth() * gapManager.getNumOfGapsAt(i);
 
             this.cycleBases(i, relPos, x, pxPerCoverageUnit, true, isColored);
             this.cycleBases(i, relPos, x, pxPerCoverageUnit, false, isColored);
@@ -383,8 +393,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                     relPos = i + gapManager.getNumOfGapsSmaller(i);
                     relPos += j;
 
-                    x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound();
-                    x += getPhysBoundariesForLogPos(i).getPhysWidth() * j;
+                    x = (int) getPhysBoundariesForLogPos(i).getLeftPhysBound() + 
+                            (int) getPhysBoundariesForLogPos(i).getPhysWidth() * j;
 
                     this.cycleBases(i, relPos, x, pxPerCoverageUnit, true, isColored);
                     this.cycleBases(i, relPos, x, pxPerCoverageUnit, false, isColored);
@@ -400,7 +410,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * @param x
      * @param heightPerCoverageUnit
      * @param isForwardStrand true, if bars for fwd strand should be painted
-     * @param isColored true, if the histogram should be colored
+     * @param setIsColored true, if the histogram should be colored
      */
     @SuppressWarnings("fallthrough")
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean isColored) {
@@ -408,8 +418,10 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int featureHeight;
         Color c;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-        char base= refGen.getSequence().charAt(absPos-1);
-
+        char base = refGen.getSequence().charAt(absPos-1);
+        PhysicalBaseBounds bounds;
+        BarComponent block;
+        
         for (Bases type : Bases.values()) {
                 switch (type) {
                     case m:
@@ -475,14 +487,14 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
             featureHeight = (int) (value * heightPerCoverageUnit);
 
-            PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
-            BarComponent block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), c);
+            bounds = getPhysBoundariesForLogPos(absPos);
+            block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), c);
             if (isForwardStrand) {
-                    y -= featureHeight;
+                y -= featureHeight;
                 block.setBounds(x, y, (int) bounds.getPhysWidth(), featureHeight);
             } else {
                 block.setBounds(x, y + 1, (int) bounds.getPhysWidth(), featureHeight);
-                   y += featureHeight;
+                y += featureHeight;
             }
             this.add(block);
         }
@@ -511,24 +523,29 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     private void fillGapManager() {
         HashMap<Integer, Integer> positionToNum = new HashMap<>();
+        PersistantReferenceGap gap;
+        int gapPosition;
+        int gapOrder;
+        int oldValue;
         for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
-            PersistantReferenceGap gap = it.next();
-            int gapPosition = gap.getPosition();
-            int gapOrder = gap.getOrder();
-            gapOrder++;
+            gap = it.next();
+            gapPosition = gap.getPosition();
+            gapOrder = gap.getOrder() + 1;
 
             if (!positionToNum.containsKey(gapPosition)) {
                 positionToNum.put(gapPosition, 0);
             }
-            int oldValue = positionToNum.get(gapPosition);
+            oldValue = positionToNum.get(gapPosition);
             if (gapOrder > oldValue) {
                 positionToNum.put(gapPosition, gapOrder);
             }
         }
 
+        int position;
+        int numOfGaps;
         for (Iterator<Integer> it = positionToNum.keySet().iterator(); it.hasNext();) {
-            int position = it.next();
-            int numOfGaps = positionToNum.get(position);
+            position = it.next();
+            numOfGaps = positionToNum.get(position);
             gapManager.addNumOfGapsAtPosition(position, numOfGaps);
         }
     }
@@ -537,18 +554,20 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         logoData = new LogoDataManager(lowerBound, width);
 
         // store coverage information in logo data
+        int relPos;
         for (int i = lowerBound; i <= upperBound; i++) {
-            int relPos = i + gapManager.getNumOfGapsAt(i);
-            relPos += gapManager.getNumOfGapsSmaller(i);
+            relPos = i + gapManager.getNumOfGapsAt(i) + gapManager.getNumOfGapsSmaller(i);
             logoData.setCoverageAt(relPos, cov.getCommonFwdMult(i), true);
             logoData.setCoverageAt(relPos, cov.getCommonRevMult(i), false);
 
         }
 
         // store diff information from the reference genome in logo data
+        PersistantDiff d;
+        int position;
         for (Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext();) {
-            PersistantDiff d = it.next();
-            int position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
+            d = it.next();
+            position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
             if (position > lowerBound && position < upperBound) {
                 logoData.addExtendedPersistantDiff(d, position);
             } else if (position > upperBound) {
@@ -636,9 +655,12 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         return tmp;
     }
 
-    public boolean isColored(boolean setColored){
-    isColored = setColored;
-    return isColored;
+    /**
+     * Set value for a colored histogram.
+     * @param setColored true for a colored histogram, false for green beams.
+     */
+    public void setIsColored(boolean setColored) {
+        isColored = setColored;
     }
 
 }

@@ -157,7 +157,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
 
     private void colorHistogramBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorHistogramBoxActionPerformed
         HistogramViewer histViewer = (HistogramViewer) histogramBasePanel.getViewer();
-        histViewer.isColored(colorHistogramBox.isSelected());
+        histViewer.setIsColored(colorHistogramBox.isSelected());
         histViewer.boundsChangedHook();
         histViewer.repaint();
 }//GEN-LAST:event_colorHistogramBoxActionPerformed

@@ -26,16 +26,16 @@ import javax.swing.JTextField;
 import org.openide.util.NbBundle;
 
 /**
- * @author Rolf Hilker
- * 
  * A BlockComponent represents one sequence pair and displays all mappings of the 
  * pair in the currently shown interval of the genome.
  * TODO: think about overlaps in pairs: enlarge layer height!
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class BlockComponentPair extends JComponent implements ActionListener {
 
     private static final long serialVersionUID = 1324672345;
-    private static final float satAndBrightSubtrahend = 0.2f;
+    private static final float satAndBrightSubtrahend = 0.3f;
     
     /*
      * In order to be efficient this class holds its main information in 4 arraylists.
@@ -45,20 +45,16 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * all three arrays. The line list is a bit independent, since it is always grey.
      */
     
-    private ArrayList<Rectangle> rectList = new ArrayList<Rectangle>();
-    private ArrayList<Color> colorList = new ArrayList<Color>();
-    private ArrayList<String> mappingTypeList = new ArrayList<String>();
-    private ArrayList<Line2D> lineList = new ArrayList<Line2D>();
-    
-    private ArrayList<Color> pairColors = new ArrayList<Color>();
+    private ArrayList<Rectangle> rectList = new ArrayList<>();
+    private ArrayList<Color> colorList = new ArrayList<>();
+    private ArrayList<Line2D> lineList = new ArrayList<>();
+    private ArrayList<Color> pairColors = new ArrayList<>();
     
     private BlockPair block;
     private int length;
     private int height;
     private String pairType;
     private AbstractViewer parentViewer;
-    private int absLogBlockStart;
-    private int absLogBlockStop;
     private int phyLeft;
     private int phyRight;
     private float minSatAndBright;
@@ -70,14 +66,12 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
-        this.absLogBlockStart = block.getAbsStart();
-        this.absLogBlockStop = block.getAbsStop();
         this.minSatAndBright = minSaturationAndBrightness;
         this.pairType = this.determineSeqPairType(this.block);
         // component boundaries //
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(absLogBlockStart);
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(block.getAbsStart());
         this.phyLeft = (int) bounds.getLeftPhysBound();
-        this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos(absLogBlockStop).getRightPhysBound();
+        this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos(block.getAbsStop()).getRightPhysBound();
         this.length = phyRight - phyLeft;
         this.length = this.length < 3 ? 3 : this.length;
         
@@ -166,10 +160,10 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * @param addLine true if this is the second mapping of a pair and a connecting line is desired, false otherwise
      */
     private void addRectAndItsColor(Color pairColor, PersistantMapping mapping, boolean addLine) {
-        this.colorList.add(this.adjustBlockColorAndStoreMappingType(pairColor, mapping));
+        this.colorList.add(this.adjustBlockColor(pairColor, mapping));
         int absStartMapping = (int) parentViewer.getPhysBoundariesForLogPos(mapping.getStart()).getLeftPhysBound();
         int absStopMapping = this.phyRight;
-        if (mapping.getStop() < this.absLogBlockStop) {
+        if (mapping.getStop() < this.block.getAbsStop()) {
             absStopMapping = (int) parentViewer.getPhysBoundariesForLogPos(mapping.getStop()).getRightPhysBound();
         }
         int absLength = absStopMapping - absStartMapping;
@@ -190,24 +184,20 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     }
 
     /**
-     * Adjusts the color of a mapping according to its mapping type and adds the
-     * mapping type string to the mappingTypeList
+     * Adjusts the color of a mapping according to its mapping type.
      * @param blockColor old color of the block for the mapping
      * @param mapping mapping whose color needs to be adjusted
      * @return new color of the block for the mapping
      */
-    private Color adjustBlockColorAndStoreMappingType(Color blockColor, PersistantMapping mapping) {
+    private Color adjustBlockColor(Color blockColor, PersistantMapping mapping) {
         // order of addition to blockList and mappingTypeList has to be correct always!
         float hue = Color.RGBtoHSB(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue(), null)[0];
         if (mapping.getDifferences() == 0) {
             blockColor = Color.getHSBColor(hue, minSatAndBright, minSatAndBright);
-            this.mappingTypeList.add("Perfect Match");
         } else if (mapping.isBestMatch()) {
             blockColor = Color.getHSBColor(hue, minSatAndBright - satAndBrightSubtrahend, minSatAndBright - satAndBrightSubtrahend);
-            this.mappingTypeList.add("Best Match");
         } else {
             blockColor = Color.getHSBColor(hue, minSatAndBright - satAndBrightSubtrahend * 2, minSatAndBright - satAndBrightSubtrahend * 2);
-            this.mappingTypeList.add("Common Match");
         }
         return blockColor;
     }
@@ -320,7 +310,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      */
     private String determineSeqPairType(BlockPair block) {
         String type = "Not a sequence pair object";
-        if (block.getPersistantObject() instanceof PersistantSequencePair){
+        if (block.getPersistantObject() instanceof PersistantSequencePair) {
             type = PersistantSequencePair.determineType(((PersistantSequencePair) block.getPersistantObject()).getSeqPairType());
         }
         return type;

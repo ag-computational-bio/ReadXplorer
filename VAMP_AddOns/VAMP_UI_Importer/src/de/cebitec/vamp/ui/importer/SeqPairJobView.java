@@ -6,6 +6,7 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.SeqPairJobContainer;
+import de.cebitec.vamp.parser.TrackJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
@@ -47,19 +48,21 @@ public class SeqPairJobView extends javax.swing.JPanel implements ListSelectionL
         DefaultTableModel model = (DefaultTableModel) seqPairJobTable.getModel();
         
         String orientation = "fr";
+        TrackJob trackJob = seqPairJobContainer.getTrackJob1();
         if (     seqPairJobContainer.getOrientation() == 1){ orientation = "rf"; }
         else if (seqPairJobContainer.getOrientation() == 2){ orientation = "ff/rr"; }
         String file2Name = seqPairJobContainer.getTrackJob2().getFile() != null 
                 ? seqPairJobContainer.getTrackJob2().getFile().getName() : "-";
        
-        model.addRow(new Object[]{
-                seqPairJobContainer.getTrackJob1().getFile().getName(),
+        model.addRow(new Object[] {
+                trackJob.getFile().getName(),
                 file2Name,
-                seqPairJobContainer.getTrackJob1().getDescription(),
-                seqPairJobContainer.getTrackJob1().getRefGen().getDescription(), 
+                trackJob.getDescription(),
+                trackJob.getRefGen().getDescription(), 
                 seqPairJobContainer.getDistance(),
                 seqPairJobContainer.getDeviation(), 
-                orientation});
+                orientation,
+                trackJob.isAlreadyImported()});
         
         this.seqPairJobContainerList.add(seqPairJobContainer);
 
@@ -127,14 +130,14 @@ public class SeqPairJobView extends javax.swing.JPanel implements ListSelectionL
 
             },
             new String [] {
-                "File 1", "File 2", "Description", "Reference", "Distance", "% Deviation", "Orientation"
+                "File 1", "File 2", "Description", "Reference", "Distance", "% Deviation", "Orientation", "Already imported"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -154,6 +157,7 @@ public class SeqPairJobView extends javax.swing.JPanel implements ListSelectionL
         seqPairJobTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SeqPairJobView.class, "SeqPairJobView.trackTable.columnModel.title3")); // NOI18N
         seqPairJobTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(SeqPairJobView.class, "SeqPairJobView.trackTable.columnModel.title4")); // NOI18N
         seqPairJobTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(SeqPairJobView.class, "SeqPairJobView.trackTable.columnModel.title5")); // NOI18N
+        seqPairJobTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(SeqPairJobView.class, "SeqPairJobView.seqPairJobTable.columnModel.title7")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

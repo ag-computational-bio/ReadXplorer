@@ -3,6 +3,7 @@ package de.cebitec.vamp.view.dialogMenus;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 
 /**
+ * Panel for resetting the file path of a direct access mapping file (track).
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -10,12 +11,17 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private String newFileLocation;
+    private String filePath;
   
     /**
-     * Creates new form ResetTrackFilePanel
+     * Panel for resetting the file path of a direct access mapping file
+     * (track).
+     * @param filePath the old path of the track, which is not valid anymore
      */
-    public ResetTrackFilePanel() {
+    public ResetTrackFilePanel(String filePath) {
+        this.filePath = filePath;
         initComponents();
+        this.resetPane.setText(org.openide.util.NbBundle.getMessage(ResetTrackFilePanel.class, "ResetTrackFilePanel.resetPane.text", this.filePath));
     }
 
     /**
@@ -27,11 +33,10 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        resetLabel = new javax.swing.JLabel();
         resetField = new javax.swing.JTextField();
         resetButton = new javax.swing.JButton();
-
-        resetLabel.setText(org.openide.util.NbBundle.getMessage(ResetTrackFilePanel.class, "ResetTrackFilePanel.resetLabel.text")); // NOI18N
+        jScrollPane1 = new javax.swing.JScrollPane();
+        resetPane = new javax.swing.JTextPane();
 
         resetField.setText(org.openide.util.NbBundle.getMessage(ResetTrackFilePanel.class, "ResetTrackFilePanel.resetField.text")); // NOI18N
 
@@ -42,24 +47,32 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
             }
         });
 
+        jScrollPane1.setBorder(null);
+
+        resetPane.setEditable(false);
+        resetPane.setBackground(new java.awt.Color(240, 240, 240));
+        resetPane.setBorder(null);
+        jScrollPane1.setViewportView(resetPane);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(resetField, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(resetField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(resetButton))
-                    .addComponent(resetLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(resetLabel)
+                .addGap(5, 5, 5)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(resetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -85,9 +98,10 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_resetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton resetButton;
     private javax.swing.JTextField resetField;
-    private javax.swing.JLabel resetLabel;
+    private javax.swing.JTextPane resetPane;
     // End of variables declaration//GEN-END:variables
 
     public String getNewFileLocation() {

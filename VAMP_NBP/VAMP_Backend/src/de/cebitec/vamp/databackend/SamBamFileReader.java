@@ -141,6 +141,7 @@ public class SamBamFileReader { //TODO: add observer
         boolean bothVisible;
         boolean isBestMapping;
         PersistantMapping mapping;
+        PersistantSeqPairGroup newGroup;
 
         while (samRecordIterator.hasNext()) {
             record = samRecordIterator.next();
@@ -152,7 +153,7 @@ public class SamBamFileReader { //TODO: add observer
             pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
             pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
             mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
-            bothVisible = mateStart > from && mateStart < to ? true : false;
+            bothVisible = mateStart > from && mateStart < to;
             
 
             //check alignment via cigar string and add diffs to mapping
@@ -176,7 +177,7 @@ public class SamBamFileReader { //TODO: add observer
                 seqPairId = (long) pairId;
                 seqPairType = Byte.valueOf(pairType.toString());
                 if (!seqPairs.containsKey(seqPairId)) {
-                    PersistantSeqPairGroup newGroup = new PersistantSeqPairGroup();
+                    newGroup = new PersistantSeqPairGroup();
                     newGroup.setSeqPairId(pairId);
                     seqPairs.put(seqPairId, newGroup);
                 } //TODO: check where ids are needed

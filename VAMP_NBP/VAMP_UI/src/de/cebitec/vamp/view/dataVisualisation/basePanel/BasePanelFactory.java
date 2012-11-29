@@ -344,7 +344,7 @@ public class BasePanelFactory {
      */
     private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector, BasePanel b) {
         PersistantTrack newTrack = null;
-        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel();
+        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel(track.getFilePath());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
         Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         resetFileDialog.setVisible(true);

@@ -8,7 +8,6 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import java.util.ArrayList;
@@ -66,6 +65,7 @@ public class SNP_DetectionSetupPanel extends javax.swing.JPanel {
             ph.start();
             List<SnpI> snps = proCon.findSNPs(percent, num, trackIds);
             snpData = new SnpData(snps, proCon.getRefGenomeConnector(referenceId).getAssociatedTrackNames());
+            snpData.setSearchParameters(percent, num);
             return snpData;
         }
 

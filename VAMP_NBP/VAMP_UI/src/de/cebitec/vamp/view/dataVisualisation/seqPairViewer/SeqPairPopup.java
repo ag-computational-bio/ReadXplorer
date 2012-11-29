@@ -24,6 +24,8 @@ import org.openide.util.NbBundle;
  */
 public class SeqPairPopup extends JPopupMenu {
     
+    private static final long serialVersionUID = 1L;
+    
     private final AbstractViewer parentViewer;
     private final String pairType;
     private final long seqPairId;
@@ -99,12 +101,12 @@ public class SeqPairPopup extends JPopupMenu {
             }
 
             //create JList with content for all paired mappings of the pair
-            final JList contentList = new javax.swing.JList();
+            final JList<Object> contentList = new javax.swing.JList<>();
             seqPairMappingInfoPanel.add(contentList);
             contentList.setModel(new MappingListModel());
             contentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
-            ArrayList<String> mappingList = new ArrayList<String>();
+            ArrayList<String> mappingList = new ArrayList<>();
             mappingList.add(mapping1Description);
             if (mapping2Description != null) {
                 mappingList.add(mapping2Description);
@@ -130,7 +132,7 @@ public class SeqPairPopup extends JPopupMenu {
 
         }
 
-        ArrayList<String> singleMappingList = new ArrayList<String>();
+        ArrayList<String> singleMappingList = new ArrayList<>();
         for (int i = 0; i < singleMappings.size(); ++i) {
             mapping = singleMappings.get(i);
             singleMappingList.add(this.getSingleMappingString("SingleMapping", i+1, mapping));
@@ -149,7 +151,7 @@ public class SeqPairPopup extends JPopupMenu {
             mappingInfoPanel.setLayout(new BoxLayout(mappingInfoPanel, BoxLayout.Y_AXIS));
             mappingInfoPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));//createLoweredBevelBorder());
             contentPanel.add(mappingInfoPanel);
-            final JList contentList = new javax.swing.JList();
+            final JList<Object> contentList = new javax.swing.JList<>();
             mappingInfoPanel.add(contentList);
             contentList.setModel(new MappingListModel());
             ((MappingListModel) contentList.getModel()).setContent(singleMappingList);
@@ -197,7 +199,7 @@ public class SeqPairPopup extends JPopupMenu {
     
     /**
      * @return all information about this components sequence pair from the DB
-     * to show in the popup. If the parten viewer ist not a SequencePairViewer
+     * to show in the popup. If the parent viewer ist not a SequencePairViewer
      * <code>null</code> is returned.
      */
     private PersistantSeqPairGroup getSeqPairInfoFromDB() {
@@ -267,7 +269,8 @@ public class SeqPairPopup extends JPopupMenu {
      * Adds a setContent method to the functionality of the AbstractListModel,
      * which is the displayable content of the ListModel.
      */
-    private class MappingListModel extends AbstractListModel {
+    private class MappingListModel extends AbstractListModel<Object> {
+        private static final long serialVersionUID = 1L;
 
         String content[] = new String[1];
         
