@@ -4,12 +4,14 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.util.Observable;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RFactor;
 import org.rosuda.JRI.RVector;
@@ -31,6 +33,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     public static boolean TESTING_MODE = false;
 
     public static enum Tool {
+
         DeSeq, BaySeq, SimpleTest;
     }
 
@@ -95,7 +98,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
      * All steps necessary for the analysis. This Method is called when start()
      * is calles on the instance of this class.
      */
-    public abstract void performAnalysis();
+    public abstract void performAnalysis() throws GnuR.PackageNotLoadableException;
 
     /**
      * This is the final Method which is called when all windows associated with
@@ -103,7 +106,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
      * the Gnu R instance at this point.
      */
     public abstract void endAnalysis();
-    
+
     public abstract void saveResultsAsCSV(int selectedIndex, String path);
 
     public void setResults(List<Result> results) {
@@ -136,8 +139,13 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
     @Override
     public void run() {
-        super.run();
-        performAnalysis();
+        try {
+            performAnalysis();
+        } catch (PackageNotLoadableException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: "+ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     @Override
@@ -178,10 +186,10 @@ public abstract class AnalysisHandler extends Thread implements Observable {
             rawRowNames = rownames;
             this.description = description;
         }
-        
+
         public Vector<Vector> getTableContentsContainingRowNames() {
             Vector rnames = getRownames();
-            Vector<Vector   > data = getTableContents();
+            Vector<Vector> data = getTableContents();
             for (int i = 0; i < rnames.size(); i++) {
                 data.get(i).add(0, rnames.get(i));
             }

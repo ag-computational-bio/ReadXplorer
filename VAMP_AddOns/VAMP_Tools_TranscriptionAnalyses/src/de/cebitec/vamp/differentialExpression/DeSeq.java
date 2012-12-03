@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,17 +26,12 @@ public class DeSeq {
         gnuR = GnuR.getInstance();
     }
 
-    public List<DeSeqAnalysisHandler.Result> process(DeSeqAnalysisData analysisData, int numberOfAnnotations, int numberOfTracks, File saveFile) {
+    public List<DeSeqAnalysisHandler.Result> process(DeSeqAnalysisData analysisData, int numberOfAnnotations, int numberOfTracks, File saveFile) throws PackageNotLoadableException {
         gnuR.clearGnuR();
         int numberOfSubDesigns;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
-        REXP deseq = gnuR.eval("library(DESeq)");
-        if (deseq == null) {
-            gnuR.eval("source(\"http://bioconductor.org/biocLite.R\")");
-            gnuR.eval("biocLite(\"DESeq\")");
-            gnuR.eval("library(DESeq)");
-        }
+        gnuR.loadPackage("DESeq");
         //Load an R image containing the plotting functions
         try {
             InputStream jarPath = DeSeq.class.getResourceAsStream("/de/cebitec/vamp/differentialExpression/DeSeqPlot.rdata");

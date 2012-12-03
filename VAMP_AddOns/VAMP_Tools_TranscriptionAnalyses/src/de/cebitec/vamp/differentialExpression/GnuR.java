@@ -46,14 +46,14 @@ public class GnuR extends Rengine {
         setDefaultCranMirror();
     }
 
-    public static synchronized GnuR getInstance() throws IllegalStateException{
+    public static synchronized GnuR getInstance() throws IllegalStateException {
         if (sem.tryAcquire()) {
             if (instance == null) {
-                String[] args = new String[]{"--no-save"};
+                String[] args = new String[]{"--vanilla", "--quite", "--slave"};
                 instance = new GnuR(args);
             }
             return instance;
-        } else{
+        } else {
             throw new IllegalStateException("The instance of Gnu R is currently used");
         }
     }
@@ -99,6 +99,30 @@ public class GnuR extends Rengine {
     private void setDefaultCranMirror() {
         cranMirror = NbPreferences.forModule(Object.class).get(Properties.CRAN_MIRROR, "http://cran.mirrors.hoobly.com/");
         this.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
+    }
+
+    /**
+     * Loads the specified Gnu R package. If not installed the method will try
+     * to download and install the package.
+     *
+     * @param packageName
+     */
+    public void loadPackage(String packageName) throws PackageNotLoadableException{
+        REXP result = this.eval("library("+packageName+")");
+        if (result == null) {
+            this.eval("source(\"http://bioconductor.org/biocLite.R\")");
+            this.eval("biocLite(pkgs=\""+packageName+"\",ask=\"graphics\")");
+            result = this.eval("library("+packageName+")");
+            if (result == null) {
+                throw new PackageNotLoadableException(packageName);
+            }
+        }
+    }
+    
+    public static class PackageNotLoadableException extends Exception {
+        public PackageNotLoadableException(String packageName) {
+            super("The Gnu R package "+packageName+" can't be loaded automatically. Please install it manually!");
+        }
     }
 
     private static class Callback implements RMainLoopCallbacks {

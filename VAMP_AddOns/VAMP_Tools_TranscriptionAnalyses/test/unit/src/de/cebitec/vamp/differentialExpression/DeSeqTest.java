@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -154,7 +155,12 @@ public class DeSeqTest {
             analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));            
         }
         
-        List result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, saveFile);
+        List result=new ArrayList();
+        try {
+            result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, saveFile);
+        } catch (PackageNotLoadableException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         assertEquals(expResult, result.size());
         
         expResult = 3;
@@ -184,7 +190,11 @@ public class DeSeqTest {
         selectedTraksTwoFactor.add(new PersistantTrack(6, "", tracks.get(6), currentTimestamp, 0, 0));
         
         analysisData.setSelectedTraks(selectedTraksTwoFactor);
-        result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, null);
+        try {
+            result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, null);
+        } catch (PackageNotLoadableException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         assertEquals(expResult, result.size());
     }
 }

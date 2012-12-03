@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -50,7 +51,7 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
     }
 
     @Override
-    public void performAnalysis() {
+    public void performAnalysis() throws PackageNotLoadableException {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();

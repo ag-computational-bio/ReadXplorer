@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class BaySeq {
      * represent the normalised result for group two. So you will first get all
      * not normalised results and then all the normalised ones.
      */
-    public List<BaySeqAnalysisHandler.Result> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) throws IllegalStateException {
+    public List<BaySeqAnalysisHandler.Result> process(BaySeqAnalysisData bseqData, int numberOfAnnotations, int numberOfTracks, File saveFile) throws IllegalStateException, PackageNotLoadableException {
         if (gnuR == null) {
             throw new IllegalStateException("Shutdown was already called!");
         }
@@ -58,17 +59,8 @@ public class BaySeq {
         int numberofGroups;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
-        REXP baySeq = gnuR.eval("library(baySeq)");
-        if (baySeq == null) {
-            gnuR.eval("source(\"http://bioconductor.org/biocLite.R\")");
-            gnuR.eval("biocLite(\"baySeq\")");
-            gnuR.eval("library(baySeq)");
-        }
-        REXP snow = gnuR.eval("library(snow)");
-        if (snow == null) {
-            gnuR.eval("install.packages(\"snow\")");
-            gnuR.eval("library(snow)");
-        }
+        gnuR.loadPackage("baySeq");
+        gnuR.loadPackage("snow");
         //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
         //computation will speed up a little bit but still leave you at least one core
         //for your other work.
