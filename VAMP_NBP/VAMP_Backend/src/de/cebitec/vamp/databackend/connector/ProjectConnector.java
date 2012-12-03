@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
-import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
@@ -1587,6 +1586,7 @@ public class ProjectConnector {
                 double revCov1;
                 double forwCov2;
                 double revCov2;
+                String absPosition;
                 
                 while (positionIterator.hasNext()) {
 
@@ -1670,7 +1670,7 @@ public class ProjectConnector {
 
                     if (maxCount != 0) {
 
-                        String absPosition = posString.substring(0, posString.length() - 2);
+                        absPosition = posString.substring(0, posString.length() - 2);
                         position = Integer.parseInt(absPosition);
                         
                         if (position <= track.getBatchPos())  {

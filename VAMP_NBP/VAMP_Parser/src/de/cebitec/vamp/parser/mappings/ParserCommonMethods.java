@@ -78,7 +78,7 @@ public final class ParserCommonMethods {
             } else if (op.equals("N") || op.equals("P")) {
                 refPos += Integer.valueOf(num[i - 1]);
                 
-            } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
+            } else if (op.equals("X")) { //count and create diffs for mismatches
                 currentCount = Integer.valueOf(num[i - 1]);
                 differences += currentCount;
                 refPos += currentCount;
@@ -90,7 +90,8 @@ public final class ParserCommonMethods {
                 refPos += currentCount;
 
             } else if (op.equals("I")) { // count and add reference gaps for insertions
-                differences += Integer.valueOf(num[i - 1]);
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
                 readPos += currentCount;
                 // refPos remains the same
 
@@ -106,7 +107,7 @@ public final class ParserCommonMethods {
                 refPos += currentCount;
                 readPos += currentCount;
 
-            } //H = hard clipped bases are not present in the read string and pos in record, so don't inc. absPos
+            } //H and S = hard and soft clipped bases are not present in the read string and pos in record, so don't inc. absPos
         }
 
         return differences;
@@ -160,7 +161,7 @@ public final class ParserCommonMethods {
             } else if (op.equals("N") || op.equals("P")) {
                 refPos += Integer.valueOf(num[i - 1]);
 
-            } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
+            } else if (op.equals("X")) { //count and create diffs for mismatches
                 currentCount = Integer.valueOf(num[i - 1]);
                 differences += currentCount;
                 for (int j = 0; j < currentCount; ++j) {
@@ -213,7 +214,7 @@ public final class ParserCommonMethods {
                 refPos += currentCount;
                 readPos += currentCount;
 
-            } //P and H = padding and hard clipping do not contribute to differences
+            } //P, S and H = padding, soft and hard clipping do not contribute to differences
         }
 
         return new DiffAndGapResult(diffs, gaps, differences);

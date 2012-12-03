@@ -353,6 +353,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         TrackJob trackJob2 = seqPairJobContainer.getTrackJob2();
                         Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
                         String referenceSeq = this.getReference(trackJob1);
+                        File inputFile1 = trackJob1.getFile();
+                        File inputFile2 = trackJob2.getFile();
+                        inputFile1.setReadOnly(); //prevents changes or deletion of original file!
                         
                         File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the classification
 
@@ -360,12 +363,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             
                             boolean isTwoTracks = trackJob2.getFile() != null;
                             if (isTwoTracks) { //only combine, if data is not already combined
+                                inputFile2.setReadOnly();
 
                                 //combine both tracks and continue with trackJob1
                                 SamBamCombiner combiner = new SamBamCombiner(trackJob1, trackJob2, false);
                                 combiner.registerObserver(this);
                                 combiner.combineTracks();
                                 lastWorkFile = trackJob1.getFile();
+                                inputFile2.setWritable(true);
                             }
 
                             //sort file by read sequence for efficient classification
@@ -410,6 +415,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                         this.storeDirectAccessTrack(track); // store track entry in db
                         trackId1 = trackJob1.getID();
+                        inputFile1.setWritable(true);
                     }
 
                     //seq pair ids have to be set in track entry
@@ -556,6 +562,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         
         //only extend, if data is not already stored in it
         if (!trackJob.isAlreadyImported()) {
+            File inputFile = trackJob.getFile();
+            inputFile.setReadOnly(); //prevents changes or deletion of original file!
             //sort file by read sequence for efficient classification
             this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, "readSequence");
             File lastWorkFile = trackJob.getFile();
@@ -577,6 +585,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 this.showMsg("Error during parsing of direct access track: " + ex.toString());
                 Exceptions.printStackTrace(ex); //TODO: remove this error handling
             }
+            inputFile.setWritable(true);
         }
 
         //generate position table data from track
@@ -725,6 +734,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             trackJob.setFile(writerAndFile.getSecond());
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
+            trackJob.setFile(new File(trackJob.getFile() + ".sort_" + sortOrderMsg));
         }
 
         long finish = System.currentTimeMillis();

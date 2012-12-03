@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * Shows a table containing the current track jobs to import.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class TrackJobView extends javax.swing.JPanel implements ListSelectionListener {
 
@@ -21,43 +21,58 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
 
     /** Creates new form TaskViewerTemplate */
     public TrackJobView() {
-        tracks = new ArrayList<TrackJob>();
+        tracks = new ArrayList<>();
         initComponents();
     }
 
+    /**
+     * @return the selected track job in the track job table
+     */
     public TrackJob getSelectedItem() {
         return tracks.get(trackTable.getSelectedRow());
     }
 
+    /**
+     * Adds a track job to this view
+     * @param trackJob the track job to add
+     */
     public void add(TrackJob trackJob){
         DefaultTableModel model = (DefaultTableModel) trackTable.getModel();
         model.addRow(new Object[]{
             trackJob.getFile().getName(),
             trackJob.getDescription(),
-            trackJob.getRefGen().getDescription()});
-        tracks.add(trackJob);
-
-        if (!hasJobs){
-            hasJobs = true;
-            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
+            trackJob.getRefGen().getDescription(),
+            trackJob.isAlreadyImported()});
+        
+        this.tracks.add(trackJob);
+        if (!this.hasJobs){
+            this.hasJobs = true;
+            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, this.hasJobs);
         }
     }
 
+    /**
+     * Removes the given track job from the list of track jobs
+     * @param trackJob the track job to remove
+     */
     public void remove(TrackJob trackJob){
-        int index = tracks.indexOf(trackJob);
-        tracks.remove(trackJob);
+        int index = this.tracks.indexOf(trackJob);
+        this.tracks.remove(trackJob);
 
         DefaultTableModel model = (DefaultTableModel) trackTable.getModel();
         model.removeRow(index);
 
-        if (tracks.isEmpty()){
-            hasJobs = false;
+        if (this.tracks.isEmpty()){
+            this.hasJobs = false;
             firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
         }
     }
 
+    /**
+     * @return the list of all track jobs added to this track job view
+     */
     public List<TrackJob> getJobs(){
-        return tracks;
+        return this.tracks;
     }
 
     /** This method is called from within the constructor to
@@ -80,14 +95,14 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
 
             },
             new String [] {
-                "File", "Description", "Reference"
+                "File", "Description", "Reference", "Already imported"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -125,13 +140,16 @@ public class TrackJobView extends javax.swing.JPanel implements ListSelectionLis
     @Override
     public void valueChanged(ListSelectionEvent e) {
         ListSelectionModel model = (ListSelectionModel) e.getSource();
-        if(model.isSelectionEmpty()){
+        if (model.isSelectionEmpty()) {
             firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.FALSE);
         } else {
             firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.TRUE);
         }
     }
 
+    /**
+     * @return true, if at least one row is selected, false otherwise
+     */
     public boolean IsRowSelected(){
         ListSelectionModel model = trackTable.getSelectionModel();
         return !model.isSelectionEmpty();

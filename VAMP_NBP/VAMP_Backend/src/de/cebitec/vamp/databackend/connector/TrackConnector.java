@@ -693,7 +693,7 @@ public class TrackConnector {
      */
     public Collection<PersistantSeqPairGroup> getSeqPairMappings(int from, int to, int trackID2, byte typeFlag) {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
-        if (from < 0 && from > 0 && to > 0) {
+        if (from > 0 && to > 0 && from < to) {
 
             if (this.associatedTracks.get(0).isDbUsed()) {
                 try {
@@ -857,7 +857,7 @@ public class TrackConnector {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, from, to, false);
+                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, from, to, true);
             }
         }
 
