@@ -1,6 +1,8 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -139,7 +141,12 @@ public class SimpleTestTest {
         analysisData.setLoci(loci.toArray(new String[loci.size()]));
         analysisData.setSelectedTraks(new ArrayList<>(selectedTraks));
         List expResult = null;
-        List result = instance.process(analysisData, numberOfAnnotations, saveFile);
+        List result = null;
+        try {
+            result = instance.process(analysisData, numberOfAnnotations, saveFile);
+        } catch (JRILibraryNotInPathException | IllegalStateException | UnknownGnuRException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

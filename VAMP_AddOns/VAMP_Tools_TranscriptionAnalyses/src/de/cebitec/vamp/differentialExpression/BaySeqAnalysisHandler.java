@@ -2,7 +2,9 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq.SamplesNotValidException;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +44,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
     }
 
     @Override
-    public void performAnalysis() throws PackageNotLoadableException {
+    public void performAnalysis() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
@@ -55,7 +57,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         }
 
         setResults(results);
-        notifyObservers(this);
+        notifyObservers(AnalysisStatus.FINISHED);
     }
 
     @Override
@@ -64,7 +66,8 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         baySeq = null;
     }
 
-    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException {
+    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException, 
+                                                                        IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {

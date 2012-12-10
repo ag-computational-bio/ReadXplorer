@@ -6,19 +6,25 @@ import de.cebitec.vamp.differentialExpression.AnalysisHandler;
 import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
+import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.Group;
 import de.cebitec.vamp.differentialExpression.SimpleTestAnalysisHandler;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeListener;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -53,60 +59,67 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        initializePanels();
-        wiz = new WizardDescriptor(this);
-        // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-        // {1} will be replaced by WizardDescriptor.Iterator.name()
-        wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-        wiz.setTitle("Differential expression analysis");
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
-            List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
-            Integer genomeID = (Integer) wiz.getProperty("genomeID");
-            int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
-            File saveFile = (File) wiz.getProperty("saveFile");
-            Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
-            AnalysisHandler handler = null;
+        if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
+            initializePanels();
+            wiz = new WizardDescriptor(this);
+            // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
+            // {1} will be replaced by WizardDescriptor.Iterator.name()
+            wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
+            wiz.setTitle("Differential expression analysis");
+            if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+                List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
+                List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
+                Integer genomeID = (Integer) wiz.getProperty("genomeID");
+                int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
+                File saveFile = (File) wiz.getProperty("saveFile");
+                Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
+                AnalysisHandler handler = null;
 
-            if (tool == AnalysisHandler.Tool.BaySeq) {
-                handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID, replicateStructure, saveFile);
-            }
-
-            if (tool == AnalysisHandler.Tool.DeSeq) {
-                boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
-                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
-
-                List<String> fittingGroupOne = null;
-                List<String> fittingGroupTwo = null;
-                if (moreThanTwoConditions) {
-                    fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
-                    fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
-                }
-                handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile);
-            }
-
-            if (tool == AnalysisHandler.Tool.SimpleTest) {
-                List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
-                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
-                int[] groupA = new int[groupAList.size()];
-                for (int i = 0; i < groupA.length; i++) {
-                    groupA[i] = groupAList.get(i);
+                if (tool == AnalysisHandler.Tool.BaySeq) {
+                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID, replicateStructure, saveFile);
                 }
 
-                List<Integer> groupBList = (List<Integer>) wiz.getProperty("groupB");
-                int[] groupB = new int[groupBList.size()];
-                for (int i = 0; i < groupB.length; i++) {
-                    groupB[i] = groupBList.get(i);
+                if (tool == AnalysisHandler.Tool.DeSeq) {
+                    boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
+                    boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
+
+                    List<String> fittingGroupOne = null;
+                    List<String> fittingGroupTwo = null;
+                    if (moreThanTwoConditions) {
+                        fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
+                        fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
+                    }
+                    handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile);
                 }
 
-                handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, workingWithoutReplicates, saveFile);
-            }
+                if (tool == AnalysisHandler.Tool.SimpleTest) {
+                    List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
+                    boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
+                    int[] groupA = new int[groupAList.size()];
+                    for (int i = 0; i < groupA.length; i++) {
+                        groupA[i] = groupAList.get(i);
+                    }
 
-            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
-            diffExpResultViewerTopComponent.open();
-            diffExpResultViewerTopComponent.requestActive();
-            handler.registerObserver(diffExpResultViewerTopComponent);
-            handler.start();
+                    List<Integer> groupBList = (List<Integer>) wiz.getProperty("groupB");
+                    int[] groupB = new int[groupBList.size()];
+                    for (int i = 0; i < groupB.length; i++) {
+                        groupB[i] = groupBList.get(i);
+                    }
+
+                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, workingWithoutReplicates, saveFile);
+                }
+
+                DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
+                diffExpResultViewerTopComponent.open();
+                diffExpResultViewerTopComponent.requestActive();
+                handler.registerObserver(diffExpResultViewerTopComponent);
+                handler.start();
+            }
+        } else {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: JRI native library can't be found in the PATH. Please add it to the PATH and try again.", currentTimestamp);
+            JOptionPane.showMessageDialog(null, "JRI native library can't be found in the PATH. Please add it to the PATH and try again.",
+                    "Gnu R Error", JOptionPane.WARNING_MESSAGE);
         }
     }
 

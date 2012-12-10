@@ -1,9 +1,6 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;

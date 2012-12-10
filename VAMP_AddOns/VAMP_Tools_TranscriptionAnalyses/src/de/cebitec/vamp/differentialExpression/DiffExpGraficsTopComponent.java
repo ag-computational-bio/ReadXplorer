@@ -12,11 +12,17 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
@@ -242,15 +248,21 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
             svgCanvas.setVisible(true);
             svgCanvas.repaint();
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE);
         } catch (BaySeq.SamplesNotValidException ex) {
             messages.setText("Samples A and B must not be the same!");
             plotButton.setEnabled(true);
+        } catch (GnuR.PackageNotLoadableException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_plotButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"svg"},"svg") {
+        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"svg"}, "svg") {
             @Override
             public void save(String fileLocation) {
                 Path from = currentlyDisplayed.toPath();

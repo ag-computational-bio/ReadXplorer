@@ -4,7 +4,9 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import de.cebitec.vamp.util.Observable;
 import java.io.File;
 import java.sql.Timestamp;
@@ -35,6 +37,10 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     public static enum Tool {
 
         DeSeq, BaySeq, SimpleTest;
+    }
+    
+    public static enum AnalysisStatus {
+        RUNNING, FINISHED, ERROR;
     }
 
     public AnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID, File saveFile) {
@@ -98,7 +104,8 @@ public abstract class AnalysisHandler extends Thread implements Observable {
      * All steps necessary for the analysis. This Method is called when start()
      * is calles on the instance of this class.
      */
-    public abstract void performAnalysis() throws GnuR.PackageNotLoadableException;
+    public abstract void performAnalysis() throws PackageNotLoadableException,
+            JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
 
     /**
      * This is the final Method which is called when all windows associated with
@@ -139,11 +146,22 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
     @Override
     public void run() {
+        notifyObservers(AnalysisStatus.RUNNING);
         try {
             performAnalysis();
-        } catch (PackageNotLoadableException ex) {
+        } catch (PackageNotLoadableException | UnknownGnuRException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: "+ex.getMessage(), currentTimestamp);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            notifyObservers(AnalysisStatus.ERROR);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+            this.interrupt();
+        } catch (IllegalStateException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+        } catch (JRILibraryNotInPathException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -164,7 +182,8 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
     @Override
     public void notifyObservers(Object data) {
-        for (Iterator<de.cebitec.vamp.util.Observer> it = observer.iterator(); it.hasNext();) {
+        List<de.cebitec.vamp.util.Observer> tmpObserver = new ArrayList<>(observer);
+        for (Iterator<de.cebitec.vamp.util.Observer> it = tmpObserver.iterator(); it.hasNext();) {
             de.cebitec.vamp.util.Observer currentObserver = it.next();
             currentObserver.update(data);
         }

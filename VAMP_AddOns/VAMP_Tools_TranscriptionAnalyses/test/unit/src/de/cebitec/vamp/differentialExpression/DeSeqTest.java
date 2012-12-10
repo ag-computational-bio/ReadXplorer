@@ -1,7 +1,9 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -158,7 +160,7 @@ public class DeSeqTest {
         List result=new ArrayList();
         try {
             result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, saveFile);
-        } catch (PackageNotLoadableException ex) {
+        } catch (PackageNotLoadableException | JRILibraryNotInPathException | UnknownGnuRException ex) {
             Exceptions.printStackTrace(ex);
         }
         assertEquals(expResult, result.size());
@@ -192,7 +194,7 @@ public class DeSeqTest {
         analysisData.setSelectedTraks(selectedTraksTwoFactor);
         try {
             result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, null);
-        } catch (PackageNotLoadableException ex) {
+        } catch (PackageNotLoadableException | JRILibraryNotInPathException | UnknownGnuRException ex) {
             Exceptions.printStackTrace(ex);
         }
         assertEquals(expResult, result.size());

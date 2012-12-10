@@ -79,22 +79,32 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
     public void validate() throws WizardValidationException {
         design = new HashMap<>();
         Vector tableData = getComponent().getTableData();
+        if (tableData.size() < 3) {
+            throw new WizardValidationException(null, "At least three design elements must be specified.", null);
+        }
         for (int j = 0; j < tableData.size(); j++) {
             Vector row = (Vector) tableData.elementAt(j);
             String[] rowAsStringArray = new String[tracks.size()];
             String key = (String) row.elementAt(0);
+            boolean differentCondsUsed = false;
+            String stringBefore = "";
             for (int i = 1; i < tracks.size() + 1; i++) {
                 String currentCell = (String) row.elementAt(i);
                 if (currentCell == null) {
-                    if (j < 3) {
-                        throw new WizardValidationException(null, "At least three design elements must be specified.", null);
-                    } else {
-                        throw new WizardValidationException(null, "Please fill out the complete row or remove it.", null);
-                    }
+                    throw new WizardValidationException(null, "Please fill out the complete row or remove it.", null);
+                }
+                if (!currentCell.equals(stringBefore)) {
+                    differentCondsUsed = true;
                 }
                 rowAsStringArray[i - 1] = currentCell;
+                stringBefore = currentCell;
             }
-            design.put(key, rowAsStringArray);
+            if (differentCondsUsed) {
+                design.put(key, rowAsStringArray);
+            } else {
+                throw new WizardValidationException(null, "Each row must have at lead two different identifier in it.", null);
+            }
+
         }
     }
 }

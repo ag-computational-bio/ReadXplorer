@@ -1,6 +1,9 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -40,7 +43,7 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
     }
 
     @Override
-    public void performAnalysis() {
+    public void performAnalysis() throws JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
@@ -51,7 +54,7 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
             results = simpleTest.process(simpleTestAnalysisData, 3434, getSaveFile());
         }
         setResults(results);
-        notifyObservers(this);
+        notifyObservers(AnalysisStatus.FINISHED);
     }
 
     @Override
@@ -65,7 +68,8 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
         simpleTest.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
-    public File plot(SimpleTestAnalysisHandler.Plot plot) throws IOException {
+    public File plot(SimpleTestAnalysisHandler.Plot plot) throws IOException, 
+                            IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == SimpleTestAnalysisHandler.Plot.ABvsConf) {

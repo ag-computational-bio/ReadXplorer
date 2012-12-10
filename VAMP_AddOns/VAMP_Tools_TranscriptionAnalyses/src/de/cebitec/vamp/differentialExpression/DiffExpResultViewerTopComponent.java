@@ -1,20 +1,24 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.differentialExpression.AnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
@@ -61,7 +65,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         initComponents();
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
-        jProgressBar1.setIndeterminate(true);
     }
 
     private void addResults() {
@@ -179,8 +182,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }// </editor-fold>//GEN-END:initComponents
 
     private void createGraphicsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraphicsButtonActionPerformed
-        if (usedTool == AnalysisHandler.Tool.DeSeq || usedTool == AnalysisHandler.Tool.SimpleTest) {
-            GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, moreThanTwoCondsForDeSeq, usedTool);
+        if (usedTool == AnalysisHandler.Tool.DeSeq) {
+            GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
+                    ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq(), usedTool);
+            GraficsTopComponent.open();
+            GraficsTopComponent.requestActive();
+        }
+        if (usedTool == AnalysisHandler.Tool.SimpleTest) {
+            GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,usedTool);
             GraficsTopComponent.open();
             GraficsTopComponent.requestActive();
         }
@@ -239,10 +248,29 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     @Override
     public void update(Object args) {
-        if (usedTool == AnalysisHandler.Tool.DeSeq) {
-            moreThanTwoCondsForDeSeq = (boolean) args;
+        try {
+            final AnalysisStatus status = (AnalysisStatus) args;
+            final DiffExpResultViewerTopComponent cmp = this;
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    switch (status) {
+                        case RUNNING:
+                            jProgressBar1.setIndeterminate(true);
+                            break;
+                        case FINISHED:
+                            addResults();
+                            break;
+                        case ERROR:
+                            cmp.close();
+                            break;
+                    }
+                }
+            });
+        } catch (InterruptedException | InvocationTargetException ex) {
+            //Exception will occure when the TopComponent Window is closed but
+            //this is not a problem.
         }
-        addResults();
     }
 
     @Override

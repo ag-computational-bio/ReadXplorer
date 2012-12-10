@@ -8,8 +8,14 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
@@ -51,45 +57,21 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
 
     public DeSeqGraficsTopComponent() {
     }
+    
+    public DeSeqGraficsTopComponent(AnalysisHandler handler, AnalysisHandler.Tool tool) {
+        analysisHandler = handler;
+        this.tool = tool;
+        cbm = new DefaultComboBoxModel(SimpleTestAnalysisHandler.Plot.values());
+        initComponents();
+        setupGrafics();
+    }
 
     public DeSeqGraficsTopComponent(AnalysisHandler handler, boolean moreThanTwoConditions, AnalysisHandler.Tool tool) {
         analysisHandler = handler;
         this.tool = tool;
-        if (tool == AnalysisHandler.Tool.DeSeq) {
-            cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
-        } else {
-
-            cbm = new DefaultComboBoxModel(SimpleTestAnalysisHandler.Plot.values());
-        }
-
+        cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
         initComponents();
-        setName(Bundle.CTL_DeSeqGraficsTopComponent());
-        setToolTipText(Bundle.HINT_DeSeqGraficsTopComponent());
-        svgCanvas = new JSVGCanvas();
-        jPanel1.add(svgCanvas, BorderLayout.CENTER);
-        svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
-            @Override
-            public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
-                progressBar.setIndeterminate(true);
-            }
-
-            @Override
-            public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(100);
-                saveButton.setEnabled(true);
-                plotButton.setEnabled(true);
-            }
-
-            @Override
-            public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
-            }
-
-            @Override
-            public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
-                messages.setText("Could not load SVG file. Please try again.");
-            }
-        });
+        setupGrafics();
     }
 
     /**
@@ -188,7 +170,13 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
             svgCanvas.setVisible(true);
             svgCanvas.repaint();
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+        } catch (GnuR.PackageNotLoadableException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_plotButtonActionPerformed
 
@@ -241,5 +229,35 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
+    }
+
+    private void setupGrafics() {
+        setName(Bundle.CTL_DeSeqGraficsTopComponent());
+        setToolTipText(Bundle.HINT_DeSeqGraficsTopComponent());
+        svgCanvas = new JSVGCanvas();
+        jPanel1.add(svgCanvas, BorderLayout.CENTER);
+        svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
+            @Override
+            public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
+                progressBar.setIndeterminate(true);
+            }
+
+            @Override
+            public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(100);
+                saveButton.setEnabled(true);
+                plotButton.setEnabled(true);
+            }
+
+            @Override
+            public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
+            }
+
+            @Override
+            public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
+                messages.setText("Could not load SVG file. Please try again.");
+            }
+        });
     }
 }

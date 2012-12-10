@@ -46,7 +46,7 @@ public class GnuR extends Rengine {
         setDefaultCranMirror();
     }
 
-    public static synchronized GnuR getInstance() throws IllegalStateException {
+    private static synchronized GnuR getInstance() throws IllegalStateException {
         if (sem.tryAcquire()) {
             if (instance == null) {
                 String[] args = new String[]{"--vanilla", "--quite", "--slave"};
@@ -107,21 +107,36 @@ public class GnuR extends Rengine {
      *
      * @param packageName
      */
-    public void loadPackage(String packageName) throws PackageNotLoadableException{
-        REXP result = this.eval("library("+packageName+")");
+    public void loadPackage(String packageName) throws PackageNotLoadableException {
+        REXP result = this.eval("library(" + packageName + ")");
         if (result == null) {
             this.eval("source(\"http://bioconductor.org/biocLite.R\")");
-            this.eval("biocLite(pkgs=\""+packageName+"\",ask=\"graphics\")");
-            result = this.eval("library("+packageName+")");
+            this.eval("biocLite(pkgs=\"" + packageName + "\",ask=\"graphics\")");
+            result = this.eval("library(" + packageName + ")");
             if (result == null) {
                 throw new PackageNotLoadableException(packageName);
             }
         }
     }
-    
+
     public static class PackageNotLoadableException extends Exception {
+
         public PackageNotLoadableException(String packageName) {
-            super("The Gnu R package "+packageName+" can't be loaded automatically. Please install it manually!");
+            super("The Gnu R package " + packageName + " can't be loaded automatically. Please install it manually!");
+        }
+    }
+
+    public static class JRILibraryNotInPathException extends Exception {
+
+        public JRILibraryNotInPathException() {
+            super("JRI native library can't be found in the PATH. Please add it to the PATH and try again.");
+        }
+    }
+    
+    public static class UnknownGnuRException extends Exception {
+        public UnknownGnuRException(Exception e){
+            super("An unknown exception occurred in GNU R while processing your data. "
+                    + "This caused an "+e.getClass().getName()+" on the Java side of the programm.", e);
         }
     }
 
@@ -160,6 +175,22 @@ public class GnuR extends Rengine {
 
         @Override
         public void rLoadHistory(Rengine rngn, String string) {
+        }
+    }
+
+    public static class SecureGnuRInitiliser {
+
+        public static GnuR getGnuRinstance() throws JRILibraryNotInPathException, IllegalStateException {
+            if (!isGnuRSetUpCorrect()) {
+                throw new JRILibraryNotInPathException();
+            }
+            GnuR ret = getInstance();
+            return ret;
+        }
+
+        public static boolean isGnuRSetUpCorrect() {
+            String libraryPath = System.getProperty("java.library.path");
+            return libraryPath.contains("jri");
         }
     }
 }
