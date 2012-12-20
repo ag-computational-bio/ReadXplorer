@@ -21,7 +21,6 @@ import org.rosuda.JRI.RVector;
 public class BaySeq {
 
     private GnuR gnuR;
-    private int numberOfAnnotations;
     /*
      * The maximum number baySeq will use. This should prevent the programm
      * from using insanely mutch cores on big machines in the CeBiTec Grid
@@ -57,7 +56,6 @@ public class BaySeq {
             throws JRILibraryNotInPathException, PackageNotLoadableException,
             IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
-        this.numberOfAnnotations = numberOfAnnotations;
         int numberofGroups;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);

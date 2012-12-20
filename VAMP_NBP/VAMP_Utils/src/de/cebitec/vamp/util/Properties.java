@@ -64,6 +64,8 @@ public class Properties {
     public static final byte MAPPINGS_W_DIFFS = 6;
     /** Value for mappings without diffs (7). */
     public static final byte MAPPINGS_WO_DIFFS = 7;
+    /**kasterm: Value for all reduced mappings*/
+    public static final byte REDUCED_MAPPINGS  = 8;
     
     public static final byte COVERAGE_INCREASE_DISTRIBUTION = 1;
     public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 2;

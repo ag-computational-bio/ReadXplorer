@@ -28,15 +28,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This mapping thread should be used for analyses, but not for visualizing data.
- * The thread carries out the database querries to receive the mappings for a certain interval.
- * 
+ * This mapping thread should be used for analyses, but not for visualizing
+ * data. The thread carries out the database querries to receive the mappings
+ * for a certain interval.
+ *
  * @author -Rolf Hilker-
  */
 public class MappingThread extends RequestThread {
 
     public static int FIXED_INTERVAL_LENGTH = 1000;
-    
     private int trackId;
     private Connection con;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
@@ -46,8 +46,9 @@ public class MappingThread extends RequestThread {
     private SamBamFileReader externalDataReader;
 
     /**
-     * Creates a new mapping thread for carrying out mapping request either to
-     * a database or a file.
+     * Creates a new mapping thread for carrying out mapping request either to a
+     * database or a file.
+     *
      * @param track the track for which this mapping thread is created
      */
     public MappingThread(PersistantTrack track) {
@@ -71,16 +72,18 @@ public class MappingThread extends RequestThread {
     }
 
     /**
-     * Loads all mappings (without diffs) from the DB with start positions within 
-     * the given interval of the reference genome.
-     * @param request the genome request containing the requested genome interval
+     * Loads all mappings (without diffs) from the DB with start positions
+     * within the given interval of the reference genome.
+     *
+     * @param request the genome request containing the requested genome
+     * interval
      * @return the list of mappings belonging to the given interval
      */
     List<PersistantMapping> loadMappingsWithoutDiffs(IntervalRequest request) {
-        
+
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
-        
+
         List<PersistantMapping> mappings = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
@@ -130,20 +133,22 @@ public class MappingThread extends RequestThread {
 
         return mappings;
     }
-    
+
     /**
      * Collects all mappings of the associated track for the interval described
      * by the request parameters. Mappings can only be obtained for one track
      * currently.
-     * @param request the genome request containing the requested genome interval
+     *
+     * @param request the genome request containing the requested genome
+     * interval
      * @return the collection of mappings for the given interval
      */
-    List<PersistantMapping> loadMappingsWithDiffs(IntervalRequest request) {        
+    List<PersistantMapping> loadMappingsWithDiffs(IntervalRequest request) {
         HashMap<Long, PersistantMapping> mappings = new HashMap<>();
-       
+
         int from = request.getFrom();
         int to = request.getTo();
-        
+
         if (from < to && from > 0 && to > 0) {
             if (this.isDbUsed) {
                 try {
@@ -232,18 +237,21 @@ public class MappingThread extends RequestThread {
         }
         return new ArrayList<>(mappings.values());
     }
-    
+
     /**
-     * Loads all mappings (without diffs) from the DB with ids within 
-     * the given interval of the reference genome.
-     * @param request the genome request containing the requested mapping id interval
-     * @return the list of mappings belonging to the given mapping id interval sorted by mapping start
+     * Loads all mappings (without diffs) from the DB with ids within the given
+     * interval of the reference genome.
+     *
+     * @param request the genome request containing the requested mapping id
+     * interval
+     * @return the list of mappings belonging to the given mapping id interval
+     * sorted by mapping start
      */
     List<PersistantMapping> loadMappingsById(IntervalRequest request) {
-        
+
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
-        
+
         List<PersistantMapping> mappings = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
@@ -282,17 +290,60 @@ public class MappingThread extends RequestThread {
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
-        
+
         return mappings;
     }
 
-    
+    /**
+     * Receives all the mappings belonging to the given trackID. In order to
+     * save space only Start, Stop and Direction are received by this method. 
+     *
+     * @param trackID the ID of the track the received mappings should be from
+     * @return list of mappings
+     */
+    public List<PersistantMapping> loadAllReducedMappings() {
+
+        Connection connection = ProjectConnector.getInstance().getConnection();
+        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
+
+        List<PersistantMapping> mappings = new ArrayList<>();
+        if (this.isDbUsed) {
+            try {
+                PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_MAPPINGS_BY_TRACK_ID);
+                fetch.setLong(1, trackId);
+
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+                    int start = rs.getInt(FieldNames.MAPPING_START);
+                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                    boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
+
+
+                    PersistantMapping mapping = new PersistantMapping(start, stop, isFwdStrand);
+                    mappings.add(mapping);
+                }
+                rs.close();
+                fetch.close();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+        } else { //handle retrieving of data from other source than a DB
+            mappings = new ArrayList<>(externalDataReader.getAllReducedMappingsFromBam(this.refGenome));
+        }
+        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
+
+        return mappings;
+    }
+
     @Override
     public void run() {
-        
+
         while (!interrupted()) {
 
             IntervalRequest request = requestQueue.poll();
@@ -307,7 +358,7 @@ public class MappingThread extends RequestThread {
                     }
                     request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
                 }
-                
+
             } else {
                 try {
                     Thread.sleep(10);
@@ -318,5 +369,8 @@ public class MappingThread extends RequestThread {
 
         }
     }
-    
+
+    public int getTrackId() {
+        return trackId;
+    }
 }

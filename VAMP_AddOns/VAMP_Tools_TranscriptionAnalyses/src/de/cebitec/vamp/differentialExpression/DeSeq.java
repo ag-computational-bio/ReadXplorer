@@ -84,7 +84,10 @@ public class DeSeq {
                 gnuR.assign("rowNames", analysisData.getLoci());
                 //...and then assign them to the count data matrix.
                 gnuR.eval("rownames(inputData) <- rowNames");
-
+                //Remove all the sides that don't appear under any condition because
+                //those rows produce "NA" rows in the results table.
+                gnuR.eval("inputData <- inputData[rowSums(inputData) > 0,]");
+                
                 //Now we need to hand over the experimental design behind the data.
                 concatenate = new StringBuilder();
                 numberOfSubDesigns = 0;

@@ -15,49 +15,53 @@ import org.openide.util.Exceptions;
 
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
- * 
+ *
  * @author -Rolf Hilker-
  */
 public class SamBamFileReader { //TODO: add observer
-    
+
     public static final String cigarRegex = "[MIDNSPX=]+";
     private final File dataFile;
     private final int trackId;
-    
     private SAMFileReader samFileReader;
     private String header;
     private boolean hasIndex;
     private List<de.cebitec.vamp.util.Observer> observer;
-    
+
     /**
-     * A SamBamFileReader has different methods to read data from a bam or sam file.
+     * A SamBamFileReader has different methods to read data from a bam or sam
+     * file.
+     *
      * @param dataFile the file to read from
-     * @param trackId the track id of the track whose data is stored in the given file
-     * @throws RuntimeIOException  
+     * @param trackId the track id of the track whose data is stored in the
+     * given file
+     * @throws RuntimeIOException
      */
     public SamBamFileReader(File dataFile, int trackId) throws RuntimeIOException {
         this.observer = new ArrayList<>();
         this.dataFile = dataFile;
         this.trackId = trackId;
-        
+
         samFileReader = new SAMFileReader(this.dataFile);
         samFileReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
         header = samFileReader.getFileHeader().getTextHeader();
         hasIndex = samFileReader.hasIndex();
-        
+
     }
-    
+
     /**
-     * Retrieves the mappings from the given interval from the sam or bam file set 
-     * for this data reader and the reference sequence with the given name.
+     * Retrieves the mappings from the given interval from the sam or bam file
+     * set for this data reader and the reference sequence with the given name.
+     *
      * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
-     * @param needDiffs true, if the diffs need to be fetched from the file as well
+     * @param needDiffs true, if the diffs need to be fetched from the file as
+     * well
      * @return the mappings for the given interval
      */
     public Collection<PersistantMapping> getMappingsFromBam(PersistantReference refGenome, int from, int to, boolean needDiffs) {
-        
+
         List<PersistantMapping> mappings = new ArrayList<>();
         SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
         String refSeq = refGenome.getSequence();
@@ -71,16 +75,16 @@ public class SamBamFileReader { //TODO: add observer
         Integer classification;
         Integer count;
         boolean classify;
-        PersistantMapping mapping; 
-        
+        PersistantMapping mapping;
+
         while (samRecordIterator.hasNext()) {
             record = samRecordIterator.next();
             start = record.getUnclippedStart();
             stop = record.getUnclippedEnd();
             isFwdStrand = !record.getReadNegativeStrandFlag();
             classification = (Integer) record.getAttribute("Yc");
-            count = (Integer) record.getAttribute("Yt");            
-            
+            count = (Integer) record.getAttribute("Yt");
+
             //find check alignment via cigar string and add diffs to mapping
             cigar = record.getCigarString();
             if (cigar.contains("M")) {
@@ -88,40 +92,70 @@ public class SamBamFileReader { //TODO: add observer
             } else {
                 refSubSeq = null;
             }
-                       
+
             if (classification != null && count != null) { //since both data fields are always written together
-                classify = classification == (int) Properties.PERFECT_COVERAGE || 
-                                  (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify); 
+                classify = classification == (int) Properties.PERFECT_COVERAGE
+                        || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
+                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify);
             } else {
                 count = 1;
                 mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, true);
             }
-            
-            this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count, 
+
+            this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
                     record.getReadString(), refSubSeq, mapping);
-            
+
             mappings.add(mapping);
         }
         samRecordIterator.close();
         return mappings;
     }
-    
+
+    /**
+     * Retrieves the reduced mappings from the given interval from the sam or
+     * bam file set for this data reader and the reference sequence with the
+     * given name.
+     *
+     * @param refGenome reference genome used in the bam file
+     * @return the reduced mappings for the given interval
+     */
+    public Collection<PersistantMapping> getAllReducedMappingsFromBam(PersistantReference refGenome) {
+        List<PersistantMapping> mappings = new ArrayList<>();
+        SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), 0, 0, false);
+        SAMRecord record;
+        int start;
+        int stop;
+        boolean isFwdStrand;
+        PersistantMapping mapping;
+
+        while (samRecordIterator.hasNext()) {
+            record = samRecordIterator.next();
+            start = record.getUnclippedStart();
+            stop = record.getUnclippedEnd();
+            isFwdStrand = !record.getReadNegativeStrandFlag();
+            mapping = new PersistantMapping(start, stop, isFwdStrand);
+            mappings.add(mapping);
+        }
+        samRecordIterator.close();
+        return mappings;
+    }
+
     /**
      * Retrieves the sequence pair mappings from the given interval from the sam
      * or bam file set for this data reader and the reference sequence with the
      * given name.
+     *
      * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
      * @param diffsAndGapsNeeded true, if the diffs and gaps have to be fetched
-     *      from the file as well
+     * from the file as well
      * @return the coverage for the given interval
      */
-    public Collection<PersistantSeqPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome, 
+    public Collection<PersistantSeqPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome,
             int from, int to, boolean diffsAndGapsNeeded) {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
-        
+
         SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
         String refSeq = refGenome.getSequence();
         String refSubSeq;
@@ -154,7 +188,7 @@ public class SamBamFileReader { //TODO: add observer
             pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
             mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
             bothVisible = mateStart > from && mateStart < to;
-            
+
 
             //check alignment via cigar string and add diffs to mapping
             cigar = record.getCigarString();
@@ -186,29 +220,31 @@ public class SamBamFileReader { //TODO: add observer
 
             if (diffsAndGapsNeeded) {
                 this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
-                    record.getReadString(), refSubSeq, mapping);
+                        record.getReadString(), refSubSeq, mapping);
             }
-            
+
         }
         samRecordIterator.close();
-        
+
         return seqPairs.values();
     }
-    
+
     /**
-     * Retrieves the coverage for the given interval from the bam file set for 
-     * this data reader and the reference sequence with the given name.
-     * If reads become longer than 1000bp the offset in this method has to be enlarged!
+     * Retrieves the coverage for the given interval from the bam file set for
+     * this data reader and the reference sequence with the given name. If reads
+     * become longer than 1000bp the offset in this method has to be enlarged!
+     *
      * @param refGenome the reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
-     * @param diffsAndGapsNeeded true, if the diffs and gaps are needed, false otherwise
-     * @param trackNeeded value among 0, if it is an ordinary request, 
-     *          PersistantCoverage.TRACK1 and PersistantCoverage.TRACK2 if it is a
-     *          part of a double track request
+     * @param diffsAndGapsNeeded true, if the diffs and gaps are needed, false
+     * otherwise
+     * @param trackNeeded value among 0, if it is an ordinary request,
+     * PersistantCoverage.TRACK1 and PersistantCoverage.TRACK2 if it is a part
+     * of a double track request
      * @return the coverage for the given interval
      */
-     public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, int from, int to,
+    public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, int from, int to,
             boolean diffsAndGapsNeeded, byte trackNeeded) {
 
         int[] perfectCoverageFwd = new int[0];
@@ -267,7 +303,7 @@ public class SamBamFileReader { //TODO: add observer
                 for (int i = 0; i <= stop - start; i++) {
                     refPos = start + i; //example: 1000 = from, 999 = start, i = 0 -> refPos = 999, indexPos = -1;
                     if (refPos >= from && refPos < to) {
-                        indexPos = refPos - from; 
+                        indexPos = refPos - from;
                         if (trackNeeded == 0) {
                             if (classification != null) {
                                 if (classification == Properties.PERFECT_COVERAGE) {
@@ -306,7 +342,7 @@ public class SamBamFileReader { //TODO: add observer
                                 }
                             }
 
-                        //part for double track coverage, where we need to store it in map for track 1 or 2
+                            //part for double track coverage, where we need to store it in map for track 1 or 2
                         } else if (trackNeeded == PersistantCoverage.TRACK1) {
                             if (isFwdStrand) {
                                 ++commonCoverageFwdTrack1[indexPos];
@@ -323,18 +359,18 @@ public class SamBamFileReader { //TODO: add observer
                         }
                     }
                 }
-                
+
                 if (diffsAndGapsNeeded) {
-                    diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(), 
-                            record.getUnclippedStart(), isFwdStrand, 1, record.getReadString(), 
+                    diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
+                            record.getUnclippedStart(), isFwdStrand, 1, record.getReadString(),
                             refSeq.substring(record.getUnclippedStart() - 1, record.getUnclippedEnd()), null);
                     diffs.addAll(diffsAndGaps.getDiffs());
                     gaps.addAll(diffsAndGaps.getGaps());
                 }
             }
             samRecordIterator.close();
-         
-            if (trackNeeded == 0) {                
+
+            if (trackNeeded == 0) {
                 coverage.setPerfectFwdMult(perfectCoverageFwd);
                 coverage.setPerfectRevMult(perfectCoverageRev);
                 coverage.setBestMatchFwdMult(bestMatchCoverageFwd);
@@ -345,42 +381,44 @@ public class SamBamFileReader { //TODO: add observer
             } else if (trackNeeded == PersistantCoverage.TRACK1) {
                 coverage.setCommonFwdMultTrack1(commonCoverageFwdTrack1);
                 coverage.setCommonRevMultTrack1(commonCoverageRevTrack1);
-                
+
             } else if (trackNeeded == PersistantCoverage.TRACK2) {
                 coverage.setCommonFwdMultTrack2(commonCoverageFwdTrack2);
                 coverage.setCommonRevMultTrack2(commonCoverageRevTrack2);
             }
-            
+
         } catch (NullPointerException | IllegalArgumentException | SAMFormatException | ArrayIndexOutOfBoundsException e) {
             Exceptions.printStackTrace(e); //TODO: replace by notify observer
         }
         return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
     }
-     
+
     /**
-     * Counts and returns each difference to the reference sequence for a cigar string and
-     * the belonging read sequence. If the operation "M" is not used in the cigar,
-     * then the reference sequence can be null (it is not used in this case). If the 
-     * mapping is also handed over to the method, the diffs and gaps are stored
-     * directly in the mapping.
+     * Counts and returns each difference to the reference sequence for a cigar
+     * string and the belonging read sequence. If the operation "M" is not used
+     * in the cigar, then the reference sequence can be null (it is not used in
+     * this case). If the mapping is also handed over to the method, the diffs
+     * and gaps are stored directly in the mapping.
+     *
      * @param cigar the cigar string containing the alignment operations
      * @param start the start position of the alignment on the chromosome
      * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence belonging to the cigar and without gaps
-     * @param mapping if a mapping is handed over to the method it adds the diffs and
-     *      gaps directly to the mapping and updates it's number of differences to the
-     *      reference. If null is passed, only the PersistantDiffAndGapResult contains 
-     *      all the diff and gap data.
+     * @param refSeq the reference sequence belonging to the cigar and without
+     * gaps
+     * @param mapping if a mapping is handed over to the method it adds the
+     * diffs and gaps directly to the mapping and updates it's number of
+     * differences to the reference. If null is passed, only the
+     * PersistantDiffAndGapResult contains all the diff and gap data.
      * @return PersistantDiffAndGapResult containing all the diffs and gaps
      */
-    private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, boolean isFwdStrand, int nbReplicates, 
-                    String readSeq, String refSeq, PersistantMapping mapping) throws NumberFormatException {
-        
+    private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, boolean isFwdStrand, int nbReplicates,
+            String readSeq, String refSeq, PersistantMapping mapping) throws NumberFormatException {
+
         Map<Integer, Integer> gapOrderIndex = new HashMap<>();
         List<PersistantDiff> diffs = new ArrayList<>();
         List<PersistantReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
-        
+
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
         String op; //operation
@@ -395,16 +433,16 @@ public class SamBamFileReader { //TODO: add observer
             if (op.matches(cigarRegex)) {
                 try {
                     count = Integer.valueOf(num[i - 1]);
-                    
+
                     if (op.equals("=")) { //match, the most common case
                         baseNo += count;
-                        
+
                     } else if (op.equals("X") || op.equals("S")) { //mismatch or soft clipped, both treated as mismatch
                         for (int j = 0; j < count; ++j) {
                             pos = baseNo + j;
                             base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
                             base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base);
-                            PersistantDiff d = new PersistantDiff(start + pos + dels, base, isFwdStrand , nbReplicates);
+                            PersistantDiff d = new PersistantDiff(start + pos + dels, base, isFwdStrand, nbReplicates);
                             if (mapping != null) {
                                 mapping.addDiff(d);
                             } else {
@@ -413,7 +451,7 @@ public class SamBamFileReader { //TODO: add observer
                         }
                         differences += count;
                         baseNo += count;
-                        
+
                     } else if (op.equals("D")) { //deletions             
                         for (int j = 0; j < count; ++j) {
                             PersistantDiff d = new PersistantDiff(start + dels + baseNo + j, '_', isFwdStrand, nbReplicates);
@@ -425,14 +463,14 @@ public class SamBamFileReader { //TODO: add observer
                         }
                         differences += count;
                         dels += count;
-                        
+
                     } else if (op.equals("I")) { //insertions
                         for (int j = 0; j < count; ++j) {
                             pos = baseNo + j;
                             base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
                             base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base);
-                            PersistantReferenceGap gap = new PersistantReferenceGap(start + pos + dels, 
-                                    base, ParserCommonMethods.getOrderForGap(pos, gapOrderIndex), 
+                            PersistantReferenceGap gap = new PersistantReferenceGap(start + pos + dels,
+                                    base, ParserCommonMethods.getOrderForGap(pos, gapOrderIndex),
                                     isFwdStrand, nbReplicates);
                             if (mapping != null) {
                                 mapping.addGenomeGap(gap);
@@ -443,7 +481,7 @@ public class SamBamFileReader { //TODO: add observer
                         differences += count;
 //                        baseNo += count;
 //                        ins += count;
-                        
+
                     } else if (op.equals("N")) { //skipped bases of ref
                         for (int j = 0; j < count; ++j) {
                             PersistantDiff d = new PersistantDiff(start + dels + baseNo + j, '.', isFwdStrand, nbReplicates);
@@ -453,7 +491,7 @@ public class SamBamFileReader { //TODO: add observer
                                 diffs.add(d);
                             }
                         }
-                    
+
                     } else if (op.equals("M")) { //mismatch or match, we don't know yet
                         for (int j = 0; j < count; ++j) {
                             pos = baseNo + j;
@@ -467,7 +505,7 @@ public class SamBamFileReader { //TODO: add observer
                                 ++differences;
                             }
                         }
-                        baseNo += count; 
+                        baseNo += count;
                     } //P and H = padding and hard clipping do not contribute to differences
                 } catch (NumberFormatException e) {
                     //error in the cigar, we currently skip this entry and treat it as match...
@@ -477,13 +515,11 @@ public class SamBamFileReader { //TODO: add observer
                 //do nothing, we pretend, this is a match
             }
         }
-        
+
         if (mapping != null) {
             mapping.setDifferences(differences);
         }
-        
+
         return new PersistantDiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
     }
-
-
 }

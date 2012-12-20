@@ -58,7 +58,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         persAnno = referenceConnector.getAnnotationsForRegion(1, genomeSize);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
-            CollectCoverageData collCovData = new CollectCoverageData(currentTrack.getId(), this);
+            CollectCoverageData collCovData = new CollectCoverageData(currentTrack, this);
             allCountData.put(currentTrack.getId(), collCovData.startCollecting());
         }
         return allCountData;

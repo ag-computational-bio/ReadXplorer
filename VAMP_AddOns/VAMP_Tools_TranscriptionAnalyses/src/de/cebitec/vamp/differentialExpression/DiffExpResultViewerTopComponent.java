@@ -1,24 +1,31 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.differentialExpression.AnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
@@ -56,6 +63,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     public DiffExpResultViewerTopComponent(AnalysisHandler handler, AnalysisHandler.Tool usedTool) {
+//        BoundsInfoManager man = getLookup().lookupAll(ViewController.class).iterator().next().getBoundsManager();
+        Lookup look = getLookup();
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
@@ -65,6 +74,41 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         initComponents();
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
+        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
+        model.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                showPosition();
+            }
+        });
+    }
+
+    private void showPosition() {
+//        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
+//        int selectedView = model.getLeadSelectionIndex();
+//        int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
+//        int pos = 0;
+//        //TODO
+//        switch (usedTool) {
+//            case DeSeq:
+////                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
+//                break;
+//            case BaySeq:
+//                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
+//                break;
+//            case SimpleTest:
+////                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
+//                String locus = (String) topCountsTable.getModel().getValueAt(selectedModel, 0);
+//                break;
+//        }
+//
+//        Collection<ViewController> viewControllers;
+//        viewControllers = (Collection<ViewController>) getLookup().lookupAll(ViewController.class);
+//        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
+//            ViewController tmpVCon = it.next();
+//            tmpVCon.getBoundsManager().navigatorBarUpdated(pos);
+//
+//        }
     }
 
     private void addResults() {
@@ -182,22 +226,24 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }// </editor-fold>//GEN-END:initComponents
 
     private void createGraphicsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraphicsButtonActionPerformed
-        if (usedTool == AnalysisHandler.Tool.DeSeq) {
-            GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
-                    ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq(), usedTool);
-            GraficsTopComponent.open();
-            GraficsTopComponent.requestActive();
-        }
-        if (usedTool == AnalysisHandler.Tool.SimpleTest) {
-            GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,usedTool);
-            GraficsTopComponent.open();
-            GraficsTopComponent.requestActive();
-        }
-        if (usedTool == AnalysisHandler.Tool.BaySeq) {
-            GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
-            analysisHandler.registerObserver((DiffExpGraficsTopComponent) GraficsTopComponent);
-            GraficsTopComponent.open();
-            GraficsTopComponent.requestActive();
+        switch (usedTool) {
+            case DeSeq:
+                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
+                        ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq(), usedTool);
+                GraficsTopComponent.open();
+                GraficsTopComponent.requestActive();
+                break;
+            case BaySeq:
+                GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
+                analysisHandler.registerObserver((DiffExpGraficsTopComponent) GraficsTopComponent);
+                GraficsTopComponent.open();
+                GraficsTopComponent.requestActive();
+                break;
+            case SimpleTest:
+                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
+                GraficsTopComponent.open();
+                GraficsTopComponent.requestActive();
+                break;
         }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 

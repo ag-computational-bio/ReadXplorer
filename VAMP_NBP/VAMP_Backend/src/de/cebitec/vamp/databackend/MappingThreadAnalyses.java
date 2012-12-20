@@ -18,12 +18,13 @@ public class MappingThreadAnalyses extends MappingThread {
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * database or a file.
+     *
      * @param track the track for which this mapping thread is created
      */
     public MappingThreadAnalyses(PersistantTrack track) {
         super(track);
     }
-    
+
     @Override
     public void run() {
 
@@ -36,7 +37,11 @@ public class MappingThreadAnalyses extends MappingThread {
                 } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
                     this.currentMappings = this.loadMappingsWithoutDiffs(request);
                 } else {
-                    this.currentMappings = this.loadMappingsById(request);
+                    if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
+                        this.currentMappings = this.loadAllReducedMappings();
+                    } else {
+                        this.currentMappings = this.loadMappingsById(request);
+                    }
                 }
                 request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
 
@@ -50,5 +55,4 @@ public class MappingThreadAnalyses extends MappingThread {
 
         }
     }
-    
 }

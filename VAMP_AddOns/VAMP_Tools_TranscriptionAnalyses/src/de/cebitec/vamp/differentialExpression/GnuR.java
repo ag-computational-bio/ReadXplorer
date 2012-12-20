@@ -75,17 +75,6 @@ public class GnuR extends Rengine {
     }
 
     /**
-     * Used by all the plotting methods to set up Gnu R to create SVGs.
-     */
-    public void setUpSvgOutput() {
-        REXP svg = this.eval("library(RSvgDevice)");
-        if (svg == null) {
-            this.eval("install.packages(\"RSvgDevice\")");
-            this.eval("library(RSvgDevice)");
-        }
-    }
-
-    /**
      * Saves the memory of the current R instance to the given file.
      *
      * @param saveFile File the memory image should be saved to
@@ -110,8 +99,7 @@ public class GnuR extends Rengine {
     public void loadPackage(String packageName) throws PackageNotLoadableException {
         REXP result = this.eval("library(" + packageName + ")");
         if (result == null) {
-            this.eval("source(\"http://bioconductor.org/biocLite.R\")");
-            this.eval("biocLite(pkgs=\"" + packageName + "\",ask=\"graphics\")");
+            this.eval("install.packages(\""+packageName+"\")");
             result = this.eval("library(" + packageName + ")");
             if (result == null) {
                 throw new PackageNotLoadableException(packageName);
