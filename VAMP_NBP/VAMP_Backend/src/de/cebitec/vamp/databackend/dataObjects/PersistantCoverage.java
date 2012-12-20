@@ -1,5 +1,7 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import java.io.Serializable;
+
 /**
  * Container for all different coverage types for a given interval. If you want
  * to set each coverage position separately you have to call
@@ -7,7 +9,7 @@ package de.cebitec.vamp.databackend.dataObjects;
  *
  * @author ddoppmeier, rhilker
  */
-public class PersistantCoverage {
+public class PersistantCoverage implements Serializable {
     
     //2 for fwd (mult = all & num = without duplicates), and 2 rev
     

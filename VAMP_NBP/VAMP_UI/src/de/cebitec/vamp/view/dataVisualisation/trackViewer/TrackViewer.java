@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.controller.TrackCacher;
 import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -109,6 +110,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             }
         });
         this.setViewerSize();
+        
+        //if (trackCon.)
+        TrackCacher tc = new TrackCacher(trackCon, refGen.getRefLength());
+                    //tc.cache();
     }
 
     private void setColors(Preferences pref) {
@@ -935,6 +940,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void setAutomaticScaling(boolean automaticScaling) {
         this.automaticScaling = automaticScaling;
         this.computeAutomaticScaling();
+    }
+
+    @Override
+    public void notifySkipped() {
+        //do nothing
     }
 
 }

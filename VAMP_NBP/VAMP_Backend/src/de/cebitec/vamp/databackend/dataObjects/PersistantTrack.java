@@ -76,5 +76,38 @@ public class PersistantTrack {
     public String toString(){
         return description;
     }
+    
+    /* 
+     * need this to use PersistantReference class as key for HashMap 
+     * @see http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+     * (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+       return id;
+   }
+    
+    
+    /**
+     * check if the given track is equal to this one 
+     */
+    @Override
+    public boolean equals(Object o) {
+        
+        if (o instanceof PersistantTrack) {
+            PersistantTrack otrack = (PersistantTrack) o;
+            return ( 
+               otrack.description.equals(this.description)
+                && otrack.date.equals(this.date)
+                && (otrack.id==this.id)
+                && (otrack.path.equals(this.path))
+                && (otrack.refGenID==this.refGenID)
+                && (otrack.seqPairId==this.seqPairId)
+               );
+                    
+        }
+        else return super.equals(o);
+    }
 
 }

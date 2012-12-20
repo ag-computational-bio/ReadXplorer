@@ -1,6 +1,7 @@
 package de.cebitec.vamp.ui.visualisation.actions;
 
 import de.cebitec.vamp.api.cookies.LoginCookie;
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,9 @@ public final class OpenRefGenViewerAction implements ActionListener {
     public void actionPerformed(ActionEvent ev) {
         AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
         appPanelTopComponent.open();
+        ViewController vc = appPanelTopComponent.getLookup().lookup(ViewController.class);
+        vc.openRefGen();
+        appPanelTopComponent.setName(vc.getDisplayName());
         appPanelTopComponent.requestActive();
     }
 }

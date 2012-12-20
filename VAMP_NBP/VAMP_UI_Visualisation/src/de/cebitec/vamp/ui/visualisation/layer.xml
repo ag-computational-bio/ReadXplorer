@@ -68,6 +68,7 @@
     <folder name="Menu">
         <folder name="Visualisation">
             <attr name="position" intvalue="250"/>
+            
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseRegGenAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="300"/>
@@ -76,6 +77,12 @@
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-CloseRefGenAction.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
+            
+            <file name="de-cebitec-vamp-ui-visualisation-actions-MyCancelableAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-vamp-ui-visualisation-actions-MyCancelableAction.instance"/>
+                <attr name="position" intvalue="200"/>
+            </file>
+            
             <file name="de-cebitec-vamp-ui-visualisation-actions-CloseTrackAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="600"/>

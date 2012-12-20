@@ -12,6 +12,15 @@ public class SQLStatements {
      * For retrieving "NUM" result from result set of a db request.
      */
     public static final String GET_NUM = "NUM";
+    
+    public static String DELETE_OBJECTFROMCACHE = "DELETE FROM "
+    + FieldNames.TABLE_OBJECTCACHE + " WHERE "
+    + FieldNames.OBJECTCACHE_FAMILY+"=? AND " + FieldNames.OBJECTCACHE_KEY
+    + "=?";
+    
+    public static String DELETE_OBJECTFAMILYFROMCACHE = "DELETE FROM "
+    + FieldNames.TABLE_OBJECTCACHE + " WHERE "
+    + FieldNames.OBJECTCACHE_FAMILY+"=?";
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -50,6 +59,17 @@ public class SQLStatements {
             + FieldNames.STATISTICS_AVERAGE_READ_LENGTH + " INT UNSIGNED "
             + ") ";
     
+    /**
+     *
+     */
+    public final static String SETUP_OBJECTCACHE = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_OBJECTCACHE + " "
+            + "( "
+            + FieldNames.OBJECTCACHE_FAMILY + " VARCHAR(255), "
+            + FieldNames.OBJECTCACHE_KEY + " VARCHAR(255), "
+            + FieldNames.OBJECTCACHE_DATA + " BLOB "
+            + ") ";
+    
     
    /**
     * Only needed as long as older databases are floating around and did not
@@ -66,7 +86,17 @@ public class SQLStatements {
 //            + FieldNames.PROJECT_FOLDER_PATH
 //            + ") "
 //            + " VALUES (?); ";
-        
+    
+    
+    static String INSERT_OBJECTINTOCACHE = "INSERT INTO " + FieldNames.TABLE_OBJECTCACHE + " "
+            + "("
+            + FieldNames.OBJECTCACHE_FAMILY + ", "
+            + FieldNames.OBJECTCACHE_KEY + ", "
+            + FieldNames.OBJECTCACHE_DATA
+            + ") "
+            + "VALUES (?,?,?)"
+            ;
+    
     public final static String INSERT_POSITION =
             "INSERT INTO " + FieldNames.TABLE_POSITIONS + " "
             + "("
@@ -565,9 +595,10 @@ public class SQLStatements {
             + FieldNames.COVERAGE_ZERO_RV_NUM + " "
             + "FROM "
             + FieldNames.TABLE_COVERAGE + " "
-            + "WHERE "
-            + FieldNames.COVERAGE_POSITION + " between ? and ? and "
-            + FieldNames.COVERAGE_TRACK + " = ? ";
+            + "WHERE ("
+            + FieldNames.COVERAGE_TRACK + " = ?) and ("
+            + FieldNames.COVERAGE_POSITION + " between ? and ?) "
+            ;
     
     
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK_PART1 =
@@ -683,6 +714,13 @@ public class SQLStatements {
             + "FROM "
             + FieldNames.TABLE_STATISTICS;
     
+    
+    public final static String FETCH_OBJECTFROMCACHE = 
+            "SELECT " + FieldNames.OBJECTCACHE_DATA 
+            + " FROM " + FieldNames.TABLE_OBJECTCACHE
+            + " WHERE " + FieldNames.OBJECTCACHE_FAMILY + " = ? "
+            + " AND " + FieldNames.OBJECTCACHE_KEY + " = ? "
+            ;
     
     public final static String FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK =
             "SELECT "

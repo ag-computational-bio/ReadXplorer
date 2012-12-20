@@ -57,6 +57,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private List<Integer> scaleValues;
     private double pxPerCoverageUnit;
 
+    @Override
+    public void notifySkipped() {
+        //do nothing
+    }
+
     private enum Bases {
         m, a, c, t, g, n, _,
     }

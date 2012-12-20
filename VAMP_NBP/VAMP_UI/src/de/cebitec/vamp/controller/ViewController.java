@@ -42,7 +42,16 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
         trackToPanel = new HashMap<PersistantTrack, BasePanel>();
     }
+    
+    public void openGenome(PersistantReference genome) {
+        currentRefGen = genome;
+        boundsManager = new BoundsInfoManager(currentRefGen);
+        basePanelFac = new BasePanelFactory(boundsManager, this);
+        genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
 
+        getApp().showRefGenPanel(genomeViewer);
+    }
+    
     public void openRefGen(){
         OpenRefGenPanel orgp = new OpenRefGenPanel();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(orgp, "Open Reference");
@@ -50,12 +59,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         openRefGenDialog.setVisible(true);
 
         if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && orgp.getSelectedReference() != null){
-            currentRefGen = orgp.getSelectedReference();
-            boundsManager = new BoundsInfoManager(currentRefGen);
-            basePanelFac = new BasePanelFactory(boundsManager, this);
-            genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
-
-            getApp().showRefGenPanel(genomeViewer);
+            this.openGenome(orgp.getSelectedReference());
         }
     }
 
@@ -80,7 +84,25 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         boundsManager = null;
 
     }
+    
+    /**
+     * opens the given track on the current genome
+     * @param track 
+     */
+    public void openTracksOnCurrentGenome(Collection<PersistantTrack> tracks) {
+        for (PersistantTrack track : tracks) {
+            // create basepanel
+            BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
+            if (trackPanel != null) {
+                currentTracks.add(trackPanel);
+                trackToPanel.put(track, trackPanel);
 
+                // show the panel and the track
+                getApp().showTrackPanel(trackPanel);
+            }
+        }
+    }
+    
     /**
      * Opens a dialog with all available tracks for the current reference genome.
      * After selecting a track, the associated track viewer is opened.
@@ -92,19 +114,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         openTrackDialog.setVisible(true);
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-           
-            for (PersistantTrack track : otp.getSelectedTracks()) {
-                // create basepanel
-                BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
-                if (trackPanel != null) {
-                    currentTracks.add(trackPanel);
-                    trackToPanel.put(track, trackPanel);
-
-                    // show the panel and the track
-                    getApp().showTrackPanel(trackPanel);
-                }
-                
-            }
+           this.openTracksOnCurrentGenome(otp.getSelectedTracks());
         } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
             String msg = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfo",
                     "No track selected. To open a track, at least one track has to be selected.");

@@ -1,10 +1,12 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import java.io.Serializable;
+
 /**
  *
  * @author ddoppmeier
  */
-public class PersistantReferenceGap implements Comparable<PersistantReferenceGap>{
+public class PersistantReferenceGap implements Comparable<PersistantReferenceGap>, Serializable {
 
     private int position;
     private Character base;

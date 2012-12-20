@@ -52,6 +52,12 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private ReferenceViewer referenceViewer;
     private ArrayList<TrackViewer> trackViewerList;
 
+    
+    
+    public InstanceContent getContent() {
+        return this.content;
+    }
+    
     public AppPanelTopComponent() {
         initComponents();
         this.jSplitPane1.setDividerLocation(2000);
@@ -62,7 +68,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         associateLookup(localLookup);
         this.trackViewerList = new ArrayList<TrackViewer>();
     }
-
+    
     private void clearLookup() {
         Collection<? extends Object> allCookies = getLookup().lookupAll(Object.class);
 
@@ -150,13 +156,15 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     @Override
     public void componentOpened() {
         ViewController vc = new ViewController(this);
-        vc.openRefGen();
+        //vc.openRefGen();
+        content.add(vc);
+                
         if (vc.hasRefGen()) {
             setName(vc.getDisplayName());
-            content.add(vc);
-        } else {
-            this.close();
-        }
+        } 
+        //else {
+        //    this.close();
+        //}
     }
 
     @Override
@@ -408,6 +416,10 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             }
         }
         return result;
+    }
+
+    public ReferenceViewer getReferenceViewer() {
+        return this.referenceViewer;
     }
 
     private static final class ShowAction extends AbstractAction {

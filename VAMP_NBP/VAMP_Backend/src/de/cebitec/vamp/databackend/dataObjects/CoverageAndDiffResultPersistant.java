@@ -1,5 +1,6 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoverageAndDiffResultPersistant {
+public class CoverageAndDiffResultPersistant implements Serializable {
     
     private PersistantCoverage coverage;
     private List<PersistantDiff> diffs;

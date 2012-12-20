@@ -709,7 +709,7 @@ public class TrackConnector {
                         fetch.setLong(6, trackID2);
 
 
-                        ResultSet rs = fetch.executeQuery();
+                        ResultSet rs = fetch.executeQuery();                       
                         while (rs.next()) {
 
                             // mapping data

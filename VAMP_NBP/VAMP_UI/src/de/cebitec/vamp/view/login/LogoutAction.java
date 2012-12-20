@@ -28,14 +28,20 @@ public final class LogoutAction implements ActionListener {
             DialogDisplayer.getDefault().notify(nd);
         
         } else {
+            
+            //do not close the dashboard window, if opened!
+            TopComponent dashboard = WindowManager.getDefault().findTopComponent("DashboardWindowTopComponent");
             for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
-                tc.close();
+                if (tc!=dashboard) tc.close();
 //                TopComponent tc1 = WindowManager.getDefault().findTopComponent("RNAFolderTopComponent");
 //                if (tc1 != null){ //useful if rna viewer should be openend after closing DB connection
 //                    tc.close();
 //                }
                 //ViewController viewCon - listener auf schließen des zugehörigen top components
             }
+            //sometimes the window remains in the same state -> needs a repaint
+            //dashboard.repaint();
+            
 
             if (ProjectConnector.getInstance().isConnected()){
                 ProjectConnector.getInstance().disconnect();
