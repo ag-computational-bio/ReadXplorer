@@ -30,4 +30,10 @@ class ThumbnailCoverageListener implements ThreadListener{
        }
     }
 
+    @Override
+    public void notifySkipped() {
+        //do nothing 
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
