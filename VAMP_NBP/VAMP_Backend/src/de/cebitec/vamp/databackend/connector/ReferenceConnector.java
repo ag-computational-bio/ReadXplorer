@@ -10,11 +10,14 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * The reference genome connector is responsible for the connection to a 
+ * reference genome.
  *
  * @author ddoppmeier
  */
@@ -27,21 +30,29 @@ public class ReferenceConnector {
 //    private String projectFolder;
 //    private boolean isFolderSet = false;
     private PersistantReference reference;
+    private List<PersistantTrack> associatedTracks;
     
 
+    /**
+     * The reference genome connector is responsible for the connection to a 
+     * reference genome.
+     * @param refGenID id of the associated reference genome
+     */
     ReferenceConnector(int refGenID){
         this.refGenID = refGenID;
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         this.con = projectConnector.getConnection();
+        this.associatedTracks = new ArrayList<>();
 //        this.projectFolder = projectConnector.getProjectFolder();
 //        this.isFolderSet = !this.projectFolder.isEmpty();
     }
 
     /**
      * @return fetches the reference genome of the reference associated with this
-     * connector.
+     * connector. If it was called once, it is kept in memory and does not need
+     * to be fetched from the DB again.
      */
-    public PersistantReference getRefGen() {
+    public PersistantReference getRefGenome() {
         if (this.reference == null) {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
             try {
@@ -66,8 +77,15 @@ public class ReferenceConnector {
         return this.reference;
     }
 
+    /**
+     * Fetches all annotations which at least partly overlap a given region 
+     * of the reference.
+     * @param from start position of the region of interest
+     * @param to end position of the region of interest
+     * @return the list of all annotations found in the interval of interest
+     */
     public List<PersistantAnnotation> getAnnotationsForRegion(int from, int to){
-        List<PersistantAnnotation> annotations = new ArrayList<PersistantAnnotation>();
+        List<PersistantAnnotation> annotations = new ArrayList<>();
         try {
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_ANNOTATIONS_FOR_GENOME_INTERVAL);
             fetch.setLong(1, refGenID);
@@ -96,8 +114,15 @@ public class ReferenceConnector {
         return annotations;
     }
     
+    /**
+     * Fetches all annotations which are completely located within a given 
+     * region of the reference.
+     * @param left start position of the region of interest
+     * @param right end position of the region of interest
+     * @return the list of all annotations found in the interval of interest
+     */
     public List<PersistantAnnotation> getAnnotationsForClosedInterval(int left, int right){
-        List<PersistantAnnotation> annotations = new ArrayList<PersistantAnnotation>();
+        List<PersistantAnnotation> annotations = new ArrayList<>();
         try {
             
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_ANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL);
@@ -109,7 +134,7 @@ public class ReferenceConnector {
             fetch.setInt(5, right);
 
             ResultSet rs = fetch.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 int id = rs.getInt(FieldNames.ANNOTATION_ID);
                 String ecnum = rs.getString(FieldNames.ANNOTATION_EC_NUM);
                 String locus = rs.getString(FieldNames.ANNOTATION_LOCUS_TAG);
@@ -132,7 +157,7 @@ public class ReferenceConnector {
         
     
     public List<PersistantSubAnnotation> getSubAnnotationsForRegion(int from, int to){
-        List<PersistantSubAnnotation> subAnnotations = new ArrayList<PersistantSubAnnotation>();
+        List<PersistantSubAnnotation> subAnnotations = new ArrayList<>();
         try {
             PreparedStatement fetchSubAnnotations = con.prepareStatement(SQLStatements.FETCH_SUBANNOTATIONS_FOR_GENOME_INTERVAL);
             fetchSubAnnotations.setInt(1, refGenID);
@@ -157,7 +182,7 @@ public class ReferenceConnector {
     }
     
     public List<PersistantSubAnnotation> getSubAnnotationsForClosedInterval(int left, int right){
-        List<PersistantSubAnnotation> subAnnotations = new ArrayList<PersistantSubAnnotation>();
+        List<PersistantSubAnnotation> subAnnotations = new ArrayList<>();
         try {
             
             PreparedStatement fetchExons = con.prepareStatement(SQLStatements.FETCH_SUBANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL);
@@ -188,12 +213,9 @@ public class ReferenceConnector {
     /**
      * @return the tracks associated to this reference connector.
      */
-    public List<PersistantTrack> getAssociatedTracks() {
-        List<PersistantTrack> list = new ArrayList<PersistantTrack>();
-        
-        //fetch tracks from db
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME);
+    public List<PersistantTrack> getAssociatedTracks() {  
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME)) {
+            this.associatedTracks.clear();
             fetch.setLong(1, refGenID);
 
             ResultSet rs = fetch.executeQuery();
@@ -204,13 +226,29 @@ public class ReferenceConnector {
                 int refGenomeID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
                 String filePath = rs.getString(FieldNames.TRACK_PATH);
                 int seqPairId = rs.getInt(FieldNames.TRACK_SEQUENCE_PAIR_ID);
-                list.add(new PersistantTrack(id, filePath, description, date, refGenomeID, seqPairId));
+                associatedTracks.add(new PersistantTrack(id, filePath, description, date, refGenomeID, seqPairId));
             }
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return list;
+        return associatedTracks;
+    }
+    
+    /**
+     * Calculates and returns the names of all tracks belonging to this
+     * reference hashed to their track id.
+     * @return the names of all tracks of this reference hashed to their track
+     * id.
+     */
+    public HashMap<Integer, String> getAssociatedTrackNames() {
+        this.getAssociatedTracks(); //ensures the tracks are already in the list
+
+        HashMap<Integer, String> namesList = new HashMap<>();
+        for (PersistantTrack track : associatedTracks) {
+            namesList.put(track.getId(), track.getDescription());
+        }
+        return namesList;
     }
 
 }

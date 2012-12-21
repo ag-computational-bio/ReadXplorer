@@ -40,8 +40,8 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
         this.count = count;
         this.trackId = trackId;
         this.isFwdStrand = isFwdStrand;
-        this.diffs = new HashMap<Integer, PersistantDiff>();
-        this.gaps = new TreeMap<Integer, TreeSet<PersistantReferenceGap>>();
+        this.diffs = new HashMap<>();
+        this.gaps = new TreeMap<>();
         this.differences = errors;
         this.sequenceID = sequenceID;
         this.isBestMatch = isBestMapping;

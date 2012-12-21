@@ -1,10 +1,11 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.databackend.MappingThreadAnalyses;
+import de.cebitec.vamp.databackend.MappingThread;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
@@ -30,7 +31,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
     private List<FilteredGene> filteredGenes;
     private List<PersistantMapping> mappingsAll;
     
-    MappingThreadAnalyses mappingThread;
+    MappingThread mappingThread;
     
     private int lastMappingIdx;
     private int currentCount;
@@ -68,7 +69,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
         List<Integer> trackIds = new ArrayList<>();
         trackIds.add(trackCon.getTrackID());
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getRefLength();
+        this.genomeSize = refConnector.getRefGenome().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         
         for (PersistantAnnotation annotation : this.genomeAnnotations) {
@@ -91,10 +92,10 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      */
     @Override
     public void update(Object data) {
-        List<PersistantMapping> mappings = new ArrayList<>();
+        MappingResultPersistant mappingResult = new MappingResultPersistant(null, 0, 0);
         
-        if (data.getClass() == mappings.getClass()) {
-            mappings = (List<PersistantMapping>) data;
+        if (data.getClass() == mappingResult.getClass()) {
+            List<PersistantMapping> mappings = ((MappingResultPersistant) data).getMappings();
             this.updateReadCountForAnnotations(mappings);
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished

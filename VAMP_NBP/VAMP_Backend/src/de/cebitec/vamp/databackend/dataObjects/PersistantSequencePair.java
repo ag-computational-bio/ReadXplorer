@@ -5,11 +5,11 @@ import de.cebitec.vamp.util.Properties;
 import java.awt.Color;
 
 /**
- * @author Rolf Hilker
- * 
  * Creates a new persistant sequence pair. If both mappings of the pair are
  * visible the second mapping has to be added separately.
  * TODO: persistant objects vereinheitlichen, wo möglich
+ * 
+ * @author Rolf Hilker
  */
 public class PersistantSequencePair implements PersistantObject {
 
@@ -138,20 +138,25 @@ public class PersistantSequencePair implements PersistantObject {
      * @return the type string of the sequence pair
      */
     public static String determineType(int type) {
-
-        String typeString = "Not in an ordinary Pair";
-        if (type == Properties.TYPE_PERFECT_PAIR) {
-            typeString = "Perfect Pair";
-        } else if (type == Properties.TYPE_DIST_SMALL_PAIR) {
-            typeString = "Smaller pair";
-        } else if (type == Properties.TYPE_DIST_LARGE_PAIR) {
-            typeString = "Enlarged Pair";
-        } else if (type == Properties.TYPE_ORIENT_WRONG_PAIR) {
-            typeString = "Wrong Orientation Pair";
-        } else if (type == Properties.TYPE_OR_DIST_SMALL_PAIR) {
-            typeString = "Smaller Wrong Orientation Pair";
-        } else if (type == Properties.TYPE_OR_DIST_LARGE_PAIR) {
-            typeString = "Larger Wrong Orientation Pair";
+        
+        String typeString;
+        switch (type) {
+            case Properties.TYPE_PERFECT_PAIR:
+                typeString = "Perfect Pair"; break;
+            case Properties.TYPE_DIST_SMALL_PAIR:
+                typeString = "Smaller pair"; break;
+            case Properties.TYPE_DIST_LARGE_PAIR:
+                typeString = "Enlarged Pair"; break;
+            case Properties.TYPE_ORIENT_WRONG_PAIR:
+                typeString = "Wrong Orientation Pair"; break;
+            case Properties.TYPE_OR_DIST_SMALL_PAIR:
+                typeString = "Smaller Wrong Orientation Pair"; break;
+            case Properties.TYPE_OR_DIST_LARGE_PAIR:
+                typeString = "Larger Wrong Orientation Pair"; break;
+            case Properties.TYPE_UNPAIRED_PAIR:
+                typeString = "Single Mapping"; break;
+            default:
+                typeString = "Not in an ordinary Pair";
         }
         return typeString;
     }

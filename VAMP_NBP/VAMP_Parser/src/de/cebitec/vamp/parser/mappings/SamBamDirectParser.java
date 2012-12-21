@@ -33,6 +33,7 @@ public class SamBamDirectParser implements MappingParserI {
     
     private SeqPairProcessorI seqPairProcessor;
     private List<Observer> observers;
+    private int nbUniqueSeq;
 
     /**
      * Parser for parsing sam and bam data files for direct access in vamp.
@@ -181,6 +182,7 @@ public class SamBamDirectParser implements MappingParserI {
             }
 
             samItor.close();
+            this.nbUniqueSeq = seqId + 1;
         } catch (RuntimeEOFException e) {
             this.notifyObservers("Last read in the file is incomplete, ignoring it.");
         }
@@ -216,4 +218,12 @@ public class SamBamDirectParser implements MappingParserI {
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
     }
+
+    /**
+     * @return the number of unique sequences in the dataset
+     */
+    public int getNbUniqueSeq() {
+        return this.nbUniqueSeq;
+    }
+    
 }

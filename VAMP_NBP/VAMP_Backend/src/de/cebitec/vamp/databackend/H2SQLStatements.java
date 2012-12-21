@@ -23,7 +23,7 @@ public class H2SQLStatements {
             + FieldNames.POSITIONS_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_POSITION + " VARCHAR(200) NOT NULL, "
             + FieldNames.POSITIONS_BASE + " VARCHAR(1) NOT NULL, "
-            + FieldNames.POSITIONS_REF_BASE + " VARCHAR(1) NOT NULL, "
+            + FieldNames.POSITIONS_REFERENCE_BASE + " VARCHAR(1) NOT NULL, "
             + FieldNames.POSITIONS_A + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_C + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_G + " MEDIUMINT UNSIGNED NOT NULL, "
@@ -59,7 +59,7 @@ public class H2SQLStatements {
             + FieldNames.DIFF_BASE + " VARCHAR (1) NOT NULL, "
             + FieldNames.DIFF_POSITION + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.DIFF_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.DIFF_ORDER + " BIGINT UNSIGNED "
+            + FieldNames.DIFF_GAP_ORDER + " BIGINT UNSIGNED "
             + ") ";
     
     

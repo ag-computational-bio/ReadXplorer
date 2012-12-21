@@ -3,11 +3,11 @@
  * and open the template in the editor.
  */
 package de.cebitec.vamp.dashboard;
- 
+  
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference; 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import java.awt.BorderLayout;
@@ -336,7 +336,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             
             //ReferenceConnector rc = new ReferenceConnector( genome_id.intValue() );
             ReferenceConnector rc = ProjectConnector.getInstance().getRefGenomeConnector(genome_id.intValue());
-            PersistantReference genome = rc.getRefGen();
+            PersistantReference genome = rc.getRefGenome();
             //ProjectConnector.getInstance().getGenomes()
             
             //open reference genome now

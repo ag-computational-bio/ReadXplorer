@@ -10,14 +10,12 @@ import java.util.List;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoverageAndDiffResultPersistant implements Serializable {
+public class CoverageAndDiffResultPersistant extends PersistantResult implements Serializable {
     
     private PersistantCoverage coverage;
     private List<PersistantDiff> diffs;
     private List<PersistantReferenceGap> gaps;
     private boolean diffsAndGapsUsed;
-    private int lowerBound;
-    private int upperBound;
 
     /**
      * Data storage for coverage, diffs and gaps.
@@ -27,15 +25,17 @@ public class CoverageAndDiffResultPersistant implements Serializable {
      *      or an empty list.
      * @param gaps the list of gaps to store, if they are not use, you can add null
      *      or an empty list
+     * @param diffsAndGapsUsed true, if this is a result from querying also diffs and gaps
+     * @param lowerBound the lower bound of the requested interval
+     * @param upperBound the upper bound of the requested interval
      */
     public CoverageAndDiffResultPersistant(PersistantCoverage coverage, List<PersistantDiff> diffs, List<PersistantReferenceGap> gaps, 
             boolean diffsAndGapsUsed, int lowerBound, int upperBound) {
+        super(lowerBound, upperBound);
         this.coverage = coverage;
         this.diffs = diffs;
         this.gaps = gaps;
         this.diffsAndGapsUsed = diffsAndGapsUsed;
-        this.lowerBound = lowerBound;
-        this.upperBound = upperBound;
     }
     
     /**
@@ -46,7 +46,7 @@ public class CoverageAndDiffResultPersistant implements Serializable {
         if (this.diffs != null) {
             return this.diffs;
         } else {
-            return new ArrayList<PersistantDiff>();
+            return new ArrayList<>();
         }
     }
 
@@ -58,7 +58,7 @@ public class CoverageAndDiffResultPersistant implements Serializable {
         if (this.gaps != null) {
             return this.gaps;
         } else {
-            return new ArrayList<PersistantReferenceGap>();
+            return new ArrayList<>();
         }
     }
 
@@ -79,22 +79,5 @@ public class CoverageAndDiffResultPersistant implements Serializable {
      */
     public boolean isDiffsAndGapsUsed() {
         return this.diffsAndGapsUsed;
-    }    
-    
-    /**
-     * @return the lower bound of the interval of this request
-     */
-    public int getLowerBound() {
-        return this.lowerBound;
-    }
-
-    /**
-     * @return the upper bound of the interval of this request
-     */
-    public int getUpperBound() {
-        return this.upperBound;
-    }
-    
-    
-    
+    }       
 }

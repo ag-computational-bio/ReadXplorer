@@ -96,7 +96,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             int seqPairId = 1;
             while (samItor.hasNext()) {
                 ++lineno;
-
+                if (lineno == 371) {
+                System.out.println(lineno);
+                }
                 //separate all mappings of same pair by seq pair tag and hand it over to classification then
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag()) {
@@ -112,13 +114,17 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                         ++seqPairId;
                         
                     }
-                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1) {
+                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getFirstOfPairFlag()) { //TODO: remove pairTag
                         currentRecords1.add(record);
-                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2) {
+                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2 || record.getSecondOfPairFlag()) {
                         currentRecords2.add(record);
                     }
                     lastReadName = readName;
                 }
+            }
+            
+            if (!currentRecords1.isEmpty() || !currentRecords2.isEmpty()) {
+                this.performClassification(currentRecords1, currentRecords2, seqPairId);
             }
             
             samItor.close();
@@ -135,8 +141,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             String msg = NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Finish");
             this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
             
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.toString()));
+            e.printStackTrace();
         }
         
         return new ParsedSeqPairContainer();
@@ -265,8 +272,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                 recordA.getCigarString(),
                                 recordA.getReadString(),
                                 this.refSeq.substring(start1 - 1, stop1),
-                                recordA.getReadNegativeStrandFlag(),
-                                start1);
+                                recordA.getReadNegativeStrandFlag());
 
                         for (SAMRecord recordB : currentRecords2) {
 
@@ -282,8 +288,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                             recordB.getCigarString(),
                                             recordB.getReadString(),
                                             this.refSeq.substring(start2 - 1, stop2),
-                                            recordB.getReadNegativeStrandFlag(),
-                                            start2);
+                                            recordB.getReadNegativeStrandFlag());
 
 
                                     //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
@@ -573,8 +578,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 record.getCigarString(), 
                 record.getReadString(), 
                 this.refSeq.substring(record.getAlignmentStart() - 1, record.getAlignmentEnd()),
-                record.getReadNegativeStrandFlag(),
-                record.getAlignmentStart());
+                record.getReadNegativeStrandFlag());
         this.addClassificationData(record, differences);
     }
 

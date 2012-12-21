@@ -5,6 +5,7 @@ import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
@@ -114,7 +115,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         TrackConnector trackCon = this.trackViewer.getTrackCon();
         int refId = this.trackViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        this.genomeSize = refConnector.getRefGen().getRefLength();
+        this.genomeSize = refConnector.getRefGenome().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, this.genomeSize);   
         
         this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
@@ -143,8 +144,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     @Override
     public void update(Object data) {
-        if (data instanceof PersistantCoverage) {
-            PersistantCoverage coverage = (PersistantCoverage) data;
+        if (data instanceof CoverageAndDiffResultPersistant) {
+            PersistantCoverage coverage = ((CoverageAndDiffResultPersistant) data).getCoverage();
             this.detectTSSs(coverage);
 
             //TODO: annotation finden/ändern

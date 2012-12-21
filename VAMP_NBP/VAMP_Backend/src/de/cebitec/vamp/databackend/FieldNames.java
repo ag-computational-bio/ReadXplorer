@@ -40,7 +40,7 @@ public class FieldNames {
     public final static String POSITIONS_TRACK_ID = "TRACK_ID";
     public final static String POSITIONS_POSITION = "POSITION";
     public final static String POSITIONS_BASE = "BASE";
-    public final static String POSITIONS_REF_BASE = "REFERENCE_BASE";
+    public final static String POSITIONS_REFERENCE_BASE = "REFERENCE_BASE";
     public final static String POSITIONS_A = "A";
     public final static String POSITIONS_C = "C";
     public final static String POSITIONS_G = "G";
@@ -64,7 +64,7 @@ public class FieldNames {
     public final static String DIFF_POSITION = "POSITION";
     public final static String DIFF_BASE = "BASE";
     public final static String DIFF_TYPE = "TYPE";
-    public final static String DIFF_ORDER = "GAP_ORDER";
+    public final static String DIFF_GAP_ORDER = "GAP_ORDER";
     public final static String DIFF_SNP_ID = "SNP_ID";
 
     

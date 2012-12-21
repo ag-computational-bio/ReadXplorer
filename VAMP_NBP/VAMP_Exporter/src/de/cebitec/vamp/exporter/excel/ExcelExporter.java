@@ -18,14 +18,15 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.NbBundle;
 
 
 /**
- * @author -Rolf Hilker-
- * 
  * General excel exporter.
+ *
+ * @author -Rolf Hilker-
  */
 public class ExcelExporter {
     
@@ -34,6 +35,7 @@ public class ExcelExporter {
     private String sheetName;
     private List<String> headers; //contains all headers
     private List<List<Object>> exportData; //each object contains the data of one row
+    private int rowNumberGlobal;
     
     /**
      * 
@@ -44,6 +46,7 @@ public class ExcelExporter {
     public ExcelExporter(String sheetName, ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
         this.sheetName = sheetName;
+        this.rowNumberGlobal = 0;
     }
 
     
@@ -87,7 +90,9 @@ public class ExcelExporter {
      * @param file the file in which to write the data.
      * @return the file in which the data was written.
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
+     * @throws WriteException
+     * @throws OutOfMemoryError  
      */
     public File writeFile(File file) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
@@ -95,16 +100,22 @@ public class ExcelExporter {
  
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale(new Locale("en", "EN"));
-        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
 
+        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
         WritableSheet sheet = null;
         int currentPage = 0;
-        if (!exportData.isEmpty()) {
-            sheet = workbook.createSheet(this.sheetName, currentPage++);
-        }
-        
-        if (sheet != null) {
-            this.fillSheet(sheet);
+        boolean dataLeft = true;
+        while (dataLeft) { //only 65536 rows allowed per sheet in xls format
+            if (!exportData.isEmpty()) {
+                if (currentPage > 0) {
+                    this.sheetName += "I";
+                }
+                sheet = workbook.createSheet(this.sheetName, currentPage++);
+            }
+
+            if (sheet != null) {
+                dataLeft = this.fillSheet(sheet);
+            }
         }
         workbook.write();
         workbook.close();
@@ -121,17 +132,21 @@ public class ExcelExporter {
      * This method actually fills the given excel sheet with the data handed over to
      * this ExcelExporter.
      * @param sheet the sheet to write the data to
+     * @return dataLeft: false, if the sheet could store all data, true, if there is too
+     * much data for one sheet
      * @throws WriteException 
      */
-    public void fillSheet(WritableSheet sheet) throws OutOfMemoryError, WriteException {
+    public boolean fillSheet(WritableSheet sheet) throws OutOfMemoryError, WriteException {
 
+        boolean dataLeft = false;
         int row = 0;
         int column = 0;
 
         for (String header : headers) {
             this.addColumn(sheet, "LABEL", header, column++, row);
         }
-        this.progressHandle.progress("Storing line", row++);
+        ++row;
+        this.progressHandle.progress("Storing line", this.rowNumberGlobal++);
 
         String objectType;
         for (List<Object> exportRow : exportData) {
@@ -139,12 +154,27 @@ public class ExcelExporter {
             column = 0;
             for (Object entry : exportRow) {
                 objectType = this.getObjectType(entry);
-                this.addColumn(sheet, objectType, entry, column++, row);
+                try {
+                    this.addColumn(sheet, objectType, entry, column++, row);
+                } catch (RowsExceededException e) {
+                    dataLeft = true;
+                    break;
+                }
             }
-            if (row++ % 10 == 0) {
-                this.progressHandle.progress("Storing line", row);
+            if (dataLeft) { break; }
+            if (this.rowNumberGlobal++ % 10 == 0) {
+                this.progressHandle.progress("Storing line", this.rowNumberGlobal);
+            }
+            ++row;
+        }
+        
+        if (dataLeft) {
+            for (int i = 0; i < row; ++i) {
+                exportData.remove(0);
             }
         }
+        
+        return dataLeft;
     }
 
     /**

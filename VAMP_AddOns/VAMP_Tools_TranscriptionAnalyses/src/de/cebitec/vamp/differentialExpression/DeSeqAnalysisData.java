@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -68,9 +69,7 @@ public class DeSeqAnalysisData extends AnalysisData{
             levels=new HashSet<>();
             for(Iterator<String> it = design.keySet().iterator();it.hasNext();){
                 String[] current = design.get(it.next());
-                for(int i=1; i<current.length;i++){
-                    levels.add(current[i]);
-                }
+                levels.addAll(Arrays.asList(current));
             }
 
         }

@@ -81,7 +81,11 @@ public class BasePanelFactory {
             tc = connector.getTrackConnector(track);
         } catch (RuntimeIOException e) {
             PersistantTrack newTrack = this.openResetFilePathDialog(track, connector, basePanel);
-            tc = connector.getTrackConnector(newTrack);
+            if (newTrack != null) {
+                tc = connector.getTrackConnector(newTrack);
+            } else {
+                return null;
+            }
         }
         TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
         trackV.setName(track.getDescription());
@@ -340,7 +344,7 @@ public class BasePanelFactory {
      */
     private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector, BasePanel b) {
         PersistantTrack newTrack = null;
-        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel();
+        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel(track.getFilePath());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
         Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         resetFileDialog.setVisible(true);

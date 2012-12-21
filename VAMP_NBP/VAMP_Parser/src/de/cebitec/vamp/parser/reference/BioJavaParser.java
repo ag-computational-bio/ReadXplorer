@@ -1,12 +1,12 @@
 package de.cebitec.vamp.parser.reference;
 
+import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParsedAnnotation;
 import de.cebitec.vamp.parser.common.ParsedReference;
+import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
-import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.BufferedReader;
@@ -58,7 +58,7 @@ public class BioJavaParser implements ReferenceParserI {
     
     private final RichSequenceFormat seqFormat;
     
-    private ArrayList<Observer> observers = new ArrayList<Observer>();
+    private ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
     /**
@@ -89,7 +89,7 @@ public class BioJavaParser implements ReferenceParserI {
         ParsedReference refGenome = new ParsedReference();
         refGenome.setAnnotationFilter(filter);
         //at first store all eonxs in one data structure and add them to the ref genome at the end
-        List<ParsedAnnotation> exons = new ArrayList<ParsedAnnotation>();
+        List<ParsedAnnotation> exons = new ArrayList<>();
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
         try {
@@ -100,10 +100,32 @@ public class BioJavaParser implements ReferenceParserI {
             RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
 
             RichStreamReader seqIter = new RichStreamReader(in, seqFormat, dna, factory, ns);
+            RichSequence seq;
+            Iterator<Feature> featIt;
+            RichFeature annotation;
+            String parsedType = null;
+            String locusTag = "unknown locus tag";
+            String product = null;
+            int start;
+            int stop;
+            int strand;
+            String ecNumber = null;
+            String geneName = null;
+            List<ParsedSubAnnotation> subAnnotations;
+            Location location;
+            Iterator<Note> noteIter;
+            Note note;
+            String name;
+            String value;
+            Iterator<Location> subAnnotationIter;
+            int subStart;
+            int subStop;
+            String pos;
+            String[] posArray;
+            ParsedAnnotation currentAnnotation;
 
             // take only the first sequence from file, if exists
             while (seqIter.hasNext()) {
-                RichSequence seq = null;
                 try {
                     seq = seqIter.nextRichSequence();
 //                    this.sendErrorMsg("rich seq set");
@@ -114,21 +136,13 @@ public class BioJavaParser implements ReferenceParserI {
                     refGenome.setSequence(seq.seqString());
 
                     // iterate through all annotations
-                    Iterator<Feature> featIt = seq.getFeatureSet().iterator();
+                    featIt = seq.getFeatureSet().iterator();
                     while (featIt.hasNext()) {
-                        RichFeature annotation = (RichFeature) featIt.next();
+                        annotation = (RichFeature) featIt.next();
 
                         // attributes of annotation that should be stored
-                        String parsedType = null;
-                        String locusTag = "unknown locus tag";
-                        String product = null;
-                        int start = 0;
-                        int stop = 0;
-                        int strand = 0;
-                        String ecNumber = null;
-                        String geneName = null;
-                        List<ParsedSubAnnotation> subAnnotations = new ArrayList<ParsedSubAnnotation>();
-                        Location location = annotation.getLocation();
+                        subAnnotations = new ArrayList<>();
+                        location = annotation.getLocation();
 
                         parsedType = annotation.getType();
                         start = location.getMin();
@@ -146,11 +160,11 @@ public class BioJavaParser implements ReferenceParserI {
                         }
 
                         //Determine annotation tags
-                        Iterator<Note> noteIter = annotation.getRichAnnotation().getNoteSet().iterator();
+                        noteIter = annotation.getRichAnnotation().getNoteSet().iterator();
                         while (noteIter.hasNext()) {
-                            Note note = noteIter.next();
-                            String name = note.getTerm().getName();
-                            String value = note.getValue();
+                            note = noteIter.next();
+                            name = note.getTerm().getName();
+                            value = note.getValue();
 
                             if (name.equals("locus_tag")) {
                                 locusTag = value;
@@ -213,14 +227,12 @@ public class BioJavaParser implements ReferenceParserI {
                          */
                         //check annotation for subannotations
                         if (location.toString().contains("join")) {
-                            Iterator<Location> subAnnotationIter = location.blockIterator();
-                            int subStart = -1;
-                            int subStop = -1;
+                            subAnnotationIter = location.blockIterator();
                             while (subAnnotationIter.hasNext()) {
 
-                                String pos = subAnnotationIter.next().toString();
+                               pos = subAnnotationIter.next().toString();
                                 //array always contains at least 2 entries
-                                String[] posArray = pos.split("\\..");
+                                posArray = pos.split("\\..");
                                 subStart = Integer.parseInt(posArray[0]);
                                 subStop = Integer.parseInt(posArray[1]);
                                 subAnnotations.add(new ParsedSubAnnotation(subStart, subStop, type));
@@ -228,7 +240,7 @@ public class BioJavaParser implements ReferenceParserI {
                         }
 
                         //TODO: filter unknown annotations, if a known annotation exists with same locus! best to do not here
-                        ParsedAnnotation currentAnnotation = new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, subAnnotations);
+                        currentAnnotation = new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, subAnnotations);
                         refGenome.addAnnotation(currentAnnotation);
 //                        if (currentAnnotation.getType() == FeatureType.GENE){
 //                            lastGenes.add(currentAnnotation);

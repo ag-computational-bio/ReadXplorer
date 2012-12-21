@@ -149,7 +149,7 @@ public final class TrackCacher {
                 }
             });
 
-            theTask.schedule(5*1000); //start the task with a delay of 5 seconds
+            //if (tc.isDbUsed()) theTask.schedule(5*1000); //start the task with a delay of 5 seconds
                                       //to let the first track position load 
         }
 

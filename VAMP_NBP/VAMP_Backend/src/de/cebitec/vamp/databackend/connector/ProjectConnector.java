@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
-import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
@@ -731,17 +730,17 @@ public class ProjectConnector extends Observable {
      * Adds a track to the database with its file path. This means, it is stored
      * as a track for direct file access and adds the persistant track id to the 
      * track job.
-     * @param trackJob the track job containing the track information to store
+     * @param track the track job containing the track information to store
      */
-    public void storeDirectAccessTrack(TrackJob trackJob) {
+    public void storeDirectAccessTrack(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");       
         
         try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
-            insertTrack.setLong(1, trackJob.getID());
-            insertTrack.setLong(2, trackJob.getRefGen().getID());
-            insertTrack.setString(3, trackJob.getDescription());
-            insertTrack.setTimestamp(4, trackJob.getTimestamp());
-            insertTrack.setString(5, trackJob.getFile().getAbsolutePath());
+            insertTrack.setLong(1, track.getID());
+            insertTrack.setLong(2, track.getRefId());
+            insertTrack.setString(3, track.getDescription());
+            insertTrack.setTimestamp(4, track.getTimestamp());
+            insertTrack.setString(5, track.getFile().getAbsolutePath());
             insertTrack.execute();
 
         } catch (SQLException ex) {
@@ -781,7 +780,11 @@ public class ProjectConnector extends Observable {
     }
 
 
-    private void storeTrackStatistics(ParsedTrack track) {
+    /**
+     * Stores the statistics for a track in the db.
+     * @param track the track to store containing a coverage container
+     */
+    public void storeTrackStatistics(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics data...");
 
         int coveragePerf;
@@ -789,7 +792,7 @@ public class ProjectConnector extends Observable {
         int coverageComplete;
         long trackID = track.getID();
         try {
-            HashMap<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInformations();
+            Map<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInfos();
             numMappings += mappingInfos.get(1);
             numPerfectMappings += mappingInfos.get(2);
             numBmMappings += mappingInfos.get(3);
@@ -829,23 +832,21 @@ public class ProjectConnector extends Observable {
                 
                 //calculate average read length
                 int averageReadLength = this.numMappings != 0 ? this.sumReadLength / this.numMappings : 0;
-                
-                PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
-                // store track in table
-                insertStatistics.setLong(1, id);
-                insertStatistics.setLong(2, trackID);
-                insertStatistics.setInt(3, this.numMappings);
-                insertStatistics.setInt(4, this.numPerfectMappings);
-                insertStatistics.setInt(5, this.numBmMappings);
-                insertStatistics.setInt(6, this.noUniqueMappings);
-                insertStatistics.setInt(7, coveragePerf);
-                insertStatistics.setInt(8, coverageBM);
-                insertStatistics.setInt(9, coverageComplete);
-                insertStatistics.setInt(10, this.noUniqueSeq);
-                insertStatistics.setInt(11, this.numReads);
-                insertStatistics.setInt(12, averageReadLength);
-                insertStatistics.execute();
-                insertStatistics.close();
+                try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
+                    insertStatistics.setLong(1, id);
+                    insertStatistics.setLong(2, trackID);
+                    insertStatistics.setInt(3, this.numMappings);
+                    insertStatistics.setInt(4, this.numPerfectMappings);
+                    insertStatistics.setInt(5, this.numBmMappings);
+                    insertStatistics.setInt(6, this.noUniqueMappings);
+                    insertStatistics.setInt(7, coveragePerf);
+                    insertStatistics.setInt(8, coverageBM);
+                    insertStatistics.setInt(9, coverageComplete);
+                    insertStatistics.setInt(10, this.noUniqueSeq);
+                    insertStatistics.setInt(11, this.numReads);
+                    insertStatistics.setInt(12, averageReadLength);
+                    insertStatistics.execute();
+                }
                 this.numMappings = 0;
                 this.numPerfectMappings = 0;
                 this.numBmMappings = 0;
@@ -1084,12 +1085,12 @@ public class ProjectConnector extends Observable {
             }
             this.storeTrackStatistics(track); //needs to be called after storeCoverage
         }
-        if (track.isDbUsed()) {
-            this.storePositionTable(track);
-        }
+        this.storePositionTable(track);
 
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.enableTrackDomainIndices();
+            this.enableReferenceIndices();
+            this.enableSeqPairDomainIndices();
             this.unlockTables();
         }
 
@@ -1453,6 +1454,7 @@ public class ProjectConnector extends Observable {
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.lockSeqPairDomainTables();
             this.disableSeqPairDomainIndices();
+            this.disableTrackDomainIndices();
         }
 
         this.storeSeqPairTrackStatistics(seqPairData);
@@ -1612,27 +1614,21 @@ public class ProjectConnector extends Observable {
                 
     /**
      * Since Coverage container only stores the data, here we have to calculate which base is the
-     * one with the most occurrences at a certain position.
+     * one with the most occurrences at a certain position. Afterwards the positions
+     * are stored in the db, if they are not larger than the batchStop position 
+     * of the given track (This prevents storing positions twice). 
      * @param track 
      */
     public void storePositionTable(ParsedTrack track) {
 
-        if (!track.isStepwise() || isLastTrack) { //NEXT STEP: check where id of track is set wrongly!
+        if (!track.isStepwise() || isLastTrack) {
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
-            try {
-                long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
-                PreparedStatement getRefSeq = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME);
-                PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION);
+            try (PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION)) {
                 // get latest snpID used
-
+                long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
                 //get reference sequence
-                getRefSeq.setLong(1, track.getRefId());
-                String refSeq = "";
-                ResultSet os = getRefSeq.executeQuery();
-                if (os.next()) {
-                    refSeq = os.getString(FieldNames.REF_GEN_SEQUENCE);
-                }
+                String refSeq = this.getRefGenomeConnector(track.getRefId()).getRefGenome().getSequence();
 
                 int batchCounter = 0;
                 int counterUncoveredDiffs = 0;
@@ -1659,6 +1655,12 @@ public class ProjectConnector extends Observable {
                 String refBase;
                 int baseInt;
                 
+                double forwCov1;
+                double revCov1;
+                double forwCov2;
+                double revCov2;
+                String absPosition;
+                
                 while (positionIterator.hasNext()) {
 
                     posString = positionIterator.next();
@@ -1678,7 +1680,7 @@ public class ProjectConnector extends Observable {
 
                         position = PositionUtils.convertPosition(posString);
                         // get coverage
-                        if (coverageContainer.positionCovered(position)) {
+                        if (position <= track.getBatchPos() && coverageContainer.positionCovered(position)) {
                             forwCov = coverageContainer.getBestMappingForwardCoverage(position);
                             revCov = coverageContainer.getBestMappingReverseCoverage(position);
                             cov = forwCov + revCov;
@@ -1687,7 +1689,7 @@ public class ProjectConnector extends Observable {
                             // get consensus base
                             refBase = String.valueOf(refSeq.charAt(position - 1)).toUpperCase();
                             baseInt = this.getBaseInt(refBase);
-                            coverageValues[baseInt] = (int) cov - coverageValues[11];
+                            coverageValues[baseInt] = (int) cov - coverageValues[DIFFS];
                             coverageValues[baseInt] = coverageValues[baseInt] < 0 ? 0 : coverageValues[baseInt]; //check if negative
                             if (maxCount < coverageValues[baseInt]) {
                                 type = SequenceComparison.MATCH.getType();
@@ -1696,7 +1698,7 @@ public class ProjectConnector extends Observable {
                             } else {
                                 type = this.getType(typeInt);
                                 base = this.getBase(typeInt);
-                                frequency = coverageValues[11] / cov * 100;
+                                frequency = coverageValues[DIFFS] / cov * 100;
                             }
                             if (!refBase.equals("N")) {
                                 frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
@@ -1741,54 +1743,57 @@ public class ProjectConnector extends Observable {
 
                     if (maxCount != 0) {
 
-                        String absPosition = posString.substring(0, posString.length() - 2);
+                        absPosition = posString.substring(0, posString.length() - 2);
                         position = Integer.parseInt(absPosition);
+                        
+                        if (position <= track.getBatchPos())  {
 
-                        // get coverage from adjacent positions
-                        double forwCov1 = 0;
-                        double revCov1 = 0;
-                        double forwCov2 = 0;
-                        double revCov2 = 0;
-                        if (coverageContainer.positionCovered(position)) {
-                            forwCov1 = coverageContainer.getBestMappingForwardCoverage(position);
-                            revCov1 = coverageContainer.getBestMappingReverseCoverage(position);
-                        } else {
-                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredGaps + " uncovered position in gaps: {0}", position);
+                            // get coverage from adjacent positions
+                            forwCov1 = 0;
+                            revCov1 = 0;
+                            forwCov2 = 0;
+                            revCov2 = 0;
+                            if (coverageContainer.positionCovered(position)) {
+                                forwCov1 = coverageContainer.getBestMappingForwardCoverage(position);
+                                revCov1 = coverageContainer.getBestMappingReverseCoverage(position);
+                            } else {
+                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredGaps + " uncovered position in gaps: {0}", position);
+                            }
+
+                            if (coverageContainer.positionCovered(position + 1)) {
+                                forwCov2 = coverageContainer.getBestMappingForwardCoverage(position + 1);
+                                revCov2 = coverageContainer.getBestMappingReverseCoverage(position + 1);
+                            }
+
+                            forwCov = (forwCov1 + forwCov2) / 2;
+                            revCov = (revCov1 + revCov2) / 2;
+                            cov = forwCov + revCov;
+                            coverage = forwCov1 + revCov1;
+                            coverage = coverage == 0 ? 1 : coverage;
+
+                            frequency = coverageValues[DIFFS] / coverage * 100;
+                            frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
+
+                            insertPosition.setLong(1, snpID);
+                            insertPosition.setLong(2, track.getID());
+                            insertPosition.setString(3, posString);
+                            insertPosition.setString(4, String.valueOf(getBase(typeInt)));
+                            insertPosition.setString(5, String.valueOf('_'));
+                            insertPosition.setInt(6, coverageValues[GAP_A]);
+                            insertPosition.setInt(7, coverageValues[GAP_C]);
+                            insertPosition.setInt(8, coverageValues[GAP_G]);
+                            insertPosition.setInt(9, coverageValues[GAP_T]);
+                            insertPosition.setInt(10, coverageValues[GAP_N]);
+                            insertPosition.setInt(11, 0);
+                            insertPosition.setInt(12, (int) cov);
+                            insertPosition.setInt(13, (int) frequency);
+                            insertPosition.setString(14, String.valueOf(SequenceComparison.INSERTION.getType()));
+
+                            insertPosition.addBatch();
+
+                            batchCounter++;
+                            snpID++;
                         }
-
-                        if (coverageContainer.positionCovered(position + 1)) {
-                            forwCov2 = coverageContainer.getBestMappingForwardCoverage(position + 1);
-                            revCov2 = coverageContainer.getBestMappingReverseCoverage(position + 1);
-                        }
-
-                        forwCov = (forwCov1 + forwCov2) / 2;
-                        revCov = (revCov1 + revCov2) / 2;
-                        cov = forwCov + revCov;
-                        coverage = forwCov1 + revCov1;
-                        coverage = coverage == 0 ? 1 : coverage;
-
-                        frequency = coverageValues[11] / coverage * 100;
-                        frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
-
-                        insertPosition.setLong(1, snpID);
-                        insertPosition.setLong(2, track.getID());
-                        insertPosition.setString(3, posString);
-                        insertPosition.setString(4, String.valueOf(getBase(typeInt)));
-                        insertPosition.setString(5, String.valueOf('_'));
-                        insertPosition.setInt(6, coverageValues[GAP_A]);
-                        insertPosition.setInt(7, coverageValues[GAP_C]);
-                        insertPosition.setInt(8, coverageValues[GAP_G]);
-                        insertPosition.setInt(9, coverageValues[GAP_T]);
-                        insertPosition.setInt(10, coverageValues[GAP_N]);
-                        insertPosition.setInt(11, 0);
-                        insertPosition.setInt(12, (int) cov);
-                        insertPosition.setInt(13, (int) frequency);
-                        insertPosition.setString(14, String.valueOf(SequenceComparison.INSERTION.getType()));
-
-                        insertPosition.addBatch();
-
-                        batchCounter++;
-                        snpID++;
                     }
 
 
@@ -1801,6 +1806,10 @@ public class ProjectConnector extends Observable {
 
                 insertPosition.executeBatch();
                 insertPosition.close();
+                
+                if (adapter.equalsIgnoreCase("mysql")) {
+                    this.unlockTables();
+                }
 
             } catch (SQLException ex) {
                 this.rollbackOnError(this.getClass().getName(), ex);
@@ -1898,18 +1907,20 @@ public class ProjectConnector extends Observable {
         // currently opened tracks
         try {
             PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
+//            fetchSNP.setInt(1, trackIds.get(0));
             fetchSNP.setInt(1, percentageThreshold);
             fetchSNP.setInt(2, absThreshold);
             fetchSNP.setInt(3, absThreshold);
             fetchSNP.setInt(4, absThreshold);
             fetchSNP.setInt(5, absThreshold);
-
+            fetchSNP.setInt(6, absThreshold);
+            
             ResultSet rs = fetchSNP.executeQuery();
             while (rs.next()) {
                 String position = rs.getString(FieldNames.POSITIONS_POSITION);
                 int trackId = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
                 char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
-                char refBase = rs.getString(FieldNames.POSITIONS_REF_BASE).charAt(0);
+                char refBase = rs.getString(FieldNames.POSITIONS_REFERENCE_BASE).charAt(0);
                 int aRate = rs.getInt(FieldNames.POSITIONS_A);
                 int cRate = rs.getInt(FieldNames.POSITIONS_C);
                 int gRate = rs.getInt(FieldNames.POSITIONS_G);
@@ -1922,7 +1933,7 @@ public class ProjectConnector extends Observable {
                 if (trackIds.contains(trackId)) {
                     snps.add(new Snp(position, trackId, base, refBase, aRate, cRate, gRate,
                             tRate, nRate, gapRate, coverage, frequency, type));
-                    if (coverage == 0){
+                    if (coverage == 0) {
                         System.out.println("Coverage is zero"); //TODO: remove this
                     }
                 }

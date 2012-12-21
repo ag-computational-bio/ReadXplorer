@@ -32,8 +32,6 @@ public class SamBamParser implements MappingParserI {
     private ArrayList<Observer> observers;
 
     public SamBamParser() {
-        this.seqToIDMap = new HashMap<>();
-        this.readnames = new ArrayList<>();
         this.observers = new ArrayList<>();
         this.seqPairProcessor = new SeqPairProcessorDummy();
     }
@@ -53,6 +51,8 @@ public class SamBamParser implements MappingParserI {
     @Override
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
+        this.seqToIDMap = new HashMap<>();
+        this.readnames = new ArrayList<>();
         int lineno = 0;
         String filepath = trackJob.getFile().getAbsolutePath();
         String readname;

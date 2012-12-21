@@ -98,7 +98,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
     
     private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
-        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0}trackjobID{1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
+        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0} with track job ID {1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
         
         String sequenceString = this.getReference(trackJob);
         TrackParser parser = new TrackParser();
@@ -218,7 +218,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         String referenceSeq = null;
         try {
             int id = trackJob.getRefGen().getID();
-            referenceSeq = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGen().getSequence();
+            referenceSeq = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGenome().getSequence();
         } catch (Exception ex) {
             Logger.getLogger(ImportThread.class.getName()).log(Level.WARNING, "Could not get the ref genome\"{0}\"{1}", new Object[]{trackJob.getFile().getName(), ex});
         }
@@ -298,7 +298,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 int distance = seqPairJobContainer.getDistance();
                 if (distance > 0) {
                     
-                    int trackId1 = -1;
+                    int trackId1;
                     int trackId2 = -1; //TODO: change import of track 2 for db import
                     
                     ///////////////////////////////////////////////////////////////////////
@@ -353,6 +353,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         TrackJob trackJob2 = seqPairJobContainer.getTrackJob2();
                         Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
                         String referenceSeq = this.getReference(trackJob1);
+                        File inputFile1 = trackJob1.getFile();
+                        File inputFile2 = trackJob2.getFile();
+                        inputFile1.setReadOnly(); //prevents changes or deletion of original file!
                         
                         File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the classification
 
@@ -360,12 +363,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             
                             boolean isTwoTracks = trackJob2.getFile() != null;
                             if (isTwoTracks) { //only combine, if data is not already combined
+                                inputFile2.setReadOnly();
 
                                 //combine both tracks and continue with trackJob1
                                 SamBamCombiner combiner = new SamBamCombiner(trackJob1, trackJob2, false);
                                 combiner.registerObserver(this);
                                 combiner.combineTracks();
                                 lastWorkFile = trackJob1.getFile();
+                                inputFile2.setWritable(true);
                             }
 
                             //sort file by read sequence for efficient classification
@@ -405,11 +410,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         //create position table
                         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
                         posTableCreator.registerObserver(this);
-                        posTableCreator.createPosTable(trackJob1, referenceSeq);
+                        ParsedTrack track = posTableCreator.createPosTable(trackJob1, referenceSeq);
 //                            posTableCreator.getStatistics();
 
-                        this.storeDirectAccessTrack(trackJob1); // store track entry in db
+                        this.storeDirectAccessTrack(track); // store track entry in db
                         trackId1 = trackJob1.getID();
+                        inputFile1.setWritable(true);
                     }
 
                     //seq pair ids have to be set in track entry
@@ -543,7 +549,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void parseDirectAccessTrack(TrackJob trackJob) {
         
         String referenceSeq = this.getReference(trackJob);
-        File lastWorkFile = trackJob.getFile();
         
         /*
          * Algorithm:
@@ -557,9 +562,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         
         //only extend, if data is not already stored in it
         if (!trackJob.isAlreadyImported()) {
+            File inputFile = trackJob.getFile();
+            inputFile.setReadOnly(); //prevents changes or deletion of original file!
             //sort file by read sequence for efficient classification
             this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, "readSequence");
-            lastWorkFile = trackJob.getFile();
+            File lastWorkFile = trackJob.getFile();
 
             //generate classification data in sorted file
             SamBamDirectParser samBamDirectParser = (SamBamDirectParser) trackJob.getParser();
@@ -578,15 +585,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 this.showMsg("Error during parsing of direct access track: " + ex.toString());
                 Exceptions.printStackTrace(ex); //TODO: remove this error handling
             }
+            inputFile.setWritable(true);
         }
 
         //generate position table data from track
         //file needs to be sorted by coordinate for efficient calculation
         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
         posTableCreator.registerObserver(this);
-        posTableCreator.createPosTable(trackJob, referenceSeq);
+        ParsedTrack track = posTableCreator.createPosTable(trackJob, referenceSeq);
 
-        this.storeDirectAccessTrack(trackJob);
+        this.storeDirectAccessTrack(track);
     }
     
     /**
@@ -650,9 +658,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         } else if (data instanceof ParsedTrack) {
             //if we have a coverage container, it means that we want to store data in the position table
             ParsedTrack track = (ParsedTrack) data;
-            ProjectConnector.getInstance().storePositionTable(track);
-            if (track.getCoverageContainer().getCoveredCommonMatchPositions() > 0) {
-                //TODO: store them somewhere, store statistics?
+            if (track.getCoverageContainer() != null) {
+                ProjectConnector.getInstance().storePositionTable(track);
             }
         } else {
             this.showMsg(data.toString());
@@ -687,10 +694,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * Stores a direct access track in the database and gives appropriate status messages.
      * @param trackJob the information about the track to store
      */
-    private void storeDirectAccessTrack(TrackJob trackJob) {
+    private void storeDirectAccessTrack(ParsedTrack track) {
         try {
-            io.getOut().println(trackJob.getName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
-            ProjectConnector.getInstance().storeDirectAccessTrack(trackJob);
+            io.getOut().println(track.getTrackName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
+            ProjectConnector.getInstance().storeDirectAccessTrack(track);
+            ProjectConnector.getInstance().storeTrackStatistics(track);
             io.getOut().println(this.getBundleString("MSG_ImportThread.import.success.trackdirect"));
             
         } catch(OutOfMemoryError e) {
@@ -726,6 +734,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             trackJob.setFile(writerAndFile.getSecond());
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
+            trackJob.setFile(new File(trackJob.getFile() + ".sort_" + sortOrderMsg));
         }
 
         long finish = System.currentTimeMillis();

@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.converter;
 
+import de.cebitec.vamp.parser.output.ConverterI;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -20,7 +21,7 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
 
     private ConverterSetupCard converterPanel;
     private boolean canConvert;
-    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>(1); // or can use ChangeSupport in NB 6.0, but how?!?
+    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0, but how?!?
     
     public ConverterWizardPanel() {
     }
@@ -68,7 +69,7 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
         synchronized (listeners) {
-            it = new HashSet<ChangeListener>(listeners).iterator();
+            it = new HashSet<>(listeners).iterator();
         }
         ChangeEvent ev = new ChangeEvent(this);
         while (it.hasNext()) {
@@ -95,10 +96,11 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
     @Override
     public void storeSettings(WizardDescriptor settings) {
         // store converter parameters
-        settings.putProperty(ConverterAction.PROP_FILEPATH, converterPanel.getFilePath());
-        settings.putProperty(ConverterAction.PROP_CONVERTER_TYPE, converterPanel.getSelectedConverter());
-        settings.putProperty(ConverterAction.PROP_REFERENCE_NAME, converterPanel.getReferenceName());
-        settings.putProperty(ConverterAction.PROP_REFERENCE_LENGTH, converterPanel.getReferenceLength());
+        ConverterI converter = converterPanel.getSelectedConverter();
+        if (isFinishPanel()) {
+            converter.setDataToConvert(converterPanel.getFilePath(), converterPanel.getReferenceName(), converterPanel.getReferenceLength());
+        }
+        settings.putProperty(ConverterAction.PROP_CONVERTER_TYPE, converter);
     }
     
 }

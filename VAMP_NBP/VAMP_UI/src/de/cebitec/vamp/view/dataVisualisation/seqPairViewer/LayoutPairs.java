@@ -14,10 +14,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author rhilker
- * 
  * A LayoutPairs holds all information to display for sequence pair alignments 
  * in different, non-overlapping layers.
+ * 
+ * @author rhilker
  */
 public class LayoutPairs implements LayoutI {
 
@@ -29,7 +29,7 @@ public class LayoutPairs implements LayoutI {
     public LayoutPairs(int absStart, int absStop, Collection<PersistantSeqPairGroup> seqPairs) {
         this.absStart = absStart;
         this.absStop = absStop;
-        this.reverseLayers = new ArrayList<LayerI>();
+        this.reverseLayers = new ArrayList<>();
         this.reverseBlockContainer = new BlockContainer();
 
         this.createBlocks(seqPairs);
@@ -38,10 +38,10 @@ public class LayoutPairs implements LayoutI {
 
     /**
      * Each seq pair group gets one block.
-     * @param seqPair mappings in current interval
+     * @param seqPairList seq pairs in current interval
      */
-    private void createBlocks(Collection<PersistantSeqPairGroup> seqPair) {
-        Iterator<PersistantSeqPairGroup> groupIt = seqPair.iterator();
+    private void createBlocks(Collection<PersistantSeqPairGroup> seqPairList) {
+        Iterator<PersistantSeqPairGroup> groupIt = seqPairList.iterator();
         while (groupIt.hasNext()) {
             PersistantSeqPairGroup group = groupIt.next();
             List<PersistantSequencePair> seqPairs = group.getSequencePairs();

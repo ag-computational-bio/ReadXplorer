@@ -46,14 +46,14 @@ public class GnuR extends Rengine {
         setDefaultCranMirror();
     }
 
-    public static synchronized GnuR getInstance() throws IllegalStateException{
+    private static synchronized GnuR getInstance() throws IllegalStateException {
         if (sem.tryAcquire()) {
             if (instance == null) {
-                String[] args = new String[0];
+                String[] args = new String[]{"--vanilla", "--quite", "--slave"};
                 instance = new GnuR(args);
             }
             return instance;
-        } else{
+        } else {
             throw new IllegalStateException("The instance of Gnu R is currently used");
         }
     }
@@ -75,17 +75,6 @@ public class GnuR extends Rengine {
     }
 
     /**
-     * Used by all the plotting methods to set up Gnu R to create SVGs.
-     */
-    public void setUpSvgOutput() {
-        REXP svg = this.eval("library(RSvgDevice)");
-        if (svg == null) {
-            this.eval("install.packages(\"RSvgDevice\")");
-            this.eval("library(RSvgDevice)");
-        }
-    }
-
-    /**
      * Saves the memory of the current R instance to the given file.
      *
      * @param saveFile File the memory image should be saved to
@@ -99,6 +88,44 @@ public class GnuR extends Rengine {
     private void setDefaultCranMirror() {
         cranMirror = NbPreferences.forModule(Object.class).get(Properties.CRAN_MIRROR, "http://cran.mirrors.hoobly.com/");
         this.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
+    }
+
+    /**
+     * Loads the specified Gnu R package. If not installed the method will try
+     * to download and install the package.
+     *
+     * @param packageName
+     */
+    public void loadPackage(String packageName) throws PackageNotLoadableException {
+        REXP result = this.eval("library(" + packageName + ")");
+        if (result == null) {
+            this.eval("install.packages(\""+packageName+"\")");
+            result = this.eval("library(" + packageName + ")");
+            if (result == null) {
+                throw new PackageNotLoadableException(packageName);
+            }
+        }
+    }
+
+    public static class PackageNotLoadableException extends Exception {
+
+        public PackageNotLoadableException(String packageName) {
+            super("The Gnu R package " + packageName + " can't be loaded automatically. Please install it manually!");
+        }
+    }
+
+    public static class JRILibraryNotInPathException extends Exception {
+
+        public JRILibraryNotInPathException() {
+            super("JRI native library can't be found in the PATH. Please add it to the PATH and try again.");
+        }
+    }
+    
+    public static class UnknownGnuRException extends Exception {
+        public UnknownGnuRException(Exception e){
+            super("An unknown exception occurred in GNU R while processing your data. "
+                    + "This caused an "+e.getClass().getName()+" on the Java side of the programm.", e);
+        }
     }
 
     private static class Callback implements RMainLoopCallbacks {
@@ -136,6 +163,22 @@ public class GnuR extends Rengine {
 
         @Override
         public void rLoadHistory(Rengine rngn, String string) {
+        }
+    }
+
+    public static class SecureGnuRInitiliser {
+
+        public static GnuR getGnuRinstance() throws JRILibraryNotInPathException, IllegalStateException {
+            if (!isGnuRSetUpCorrect()) {
+                throw new JRILibraryNotInPathException();
+            }
+            GnuR ret = getInstance();
+            return ret;
+        }
+
+        public static boolean isGnuRSetUpCorrect() {
+            String libraryPath = System.getProperty("java.library.path");
+            return libraryPath.contains("jri");
         }
     }
 }

@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.converter;
 
+import de.cebitec.vamp.parser.output.ConverterI;
 import de.cebitec.vamp.util.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -55,14 +56,10 @@ public final class ConverterAction implements ActionListener {
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) { //could test can import property, if more than one pages are included...
+            
             // start conversion
-            
-            String filePath = (String) wizardDescriptor.getProperty(ConverterAction.PROP_FILEPATH);
-            String converterType = (String) wizardDescriptor.getProperty(ConverterAction.PROP_CONVERTER_TYPE);
-            String referenceName = (String) wizardDescriptor.getProperty(ConverterAction.PROP_REFERENCE_NAME);
-            int referenceLength = (Integer) wizardDescriptor.getProperty(ConverterAction.PROP_REFERENCE_LENGTH);
-            
-            ConvertThread convertThread = new ConvertThread(filePath, converterType, referenceName, referenceLength);
+            ConverterI converter = (ConverterI) wizardDescriptor.getProperty(ConverterAction.PROP_CONVERTER_TYPE);
+            ConvertThread convertThread = new ConvertThread(converter);
             convertThread.start();
         }
     }

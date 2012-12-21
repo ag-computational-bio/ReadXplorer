@@ -172,10 +172,10 @@ public class LogoDataManager {
         position -= absStart;
 
         // increase counts for current base
-        counts[position][row] = counts[position][row] + count;
+        counts[position][row] += count;
 
         // decrease match coverage
-        counts[position][column] = counts[position][column] - count;
+        counts[position][column] -= count;
     }
 
     @Override
@@ -230,7 +230,7 @@ public class LogoDataManager {
                     row += NO_BASE_TYPES;
                 }
 
-                counts[shiftedPos][row] = counts[shiftedPos][row] + count;
+                counts[shiftedPos][row] += count;
             
             } else if (origPos > this.stop) {
                 break;

@@ -4,20 +4,22 @@ import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author rhilker
+ * Contains all data belonging to a SNP analysis data set. Also has the
+ * capabilities of transforming the SNP data into the format readable by
+ * ExcelExporters.
  * 
- * Contains all data belonging to a SNP analysis data set. Also has the 
- * capabilities of transforming the SNP data into the format readable by ExcelExporters.
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SnpData implements ExcelExportDataI {
     
     private List<SnpI> snpList;
     private Map<Integer, String> trackNames;
+    private int num;
+    private int percent;
 
     
     /**
@@ -29,11 +31,6 @@ public class SnpData implements ExcelExportDataI {
         this.snpList = snpList;
         this.trackNames = trackNames;
     }
-
-    public SnpData(List<Snp454> snps, HashMap<Integer, String> hashMap) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
     
     public List<SnpI> getSnpList() {
         return snpList;
@@ -50,10 +47,10 @@ public class SnpData implements ExcelExportDataI {
     
     @Override
     public List<List<Object>> dataToExcelExportList() {
-        List<List<Object>> snpExportData = new ArrayList<List<Object>>();
+        List<List<Object>> snpExportData = new ArrayList<>();
         
         for (SnpI snpi : this.snpList) {
-            List<Object> snpExport = new ArrayList<Object>();
+            List<Object> snpExport = new ArrayList<>();
             Snp snp = (Snp) snpi; 
             
             snpExport.add(snp.getPosition());
@@ -136,7 +133,7 @@ public class SnpData implements ExcelExportDataI {
 
     @Override
     public List<String> dataColumnDescriptions() {
-        List<String> dataColumnDescriptions = new ArrayList();
+        List<String> dataColumnDescriptions = new ArrayList<>();
         
         dataColumnDescriptions.add("Position");
         dataColumnDescriptions.add("Track");
@@ -158,5 +155,36 @@ public class SnpData implements ExcelExportDataI {
         
         return dataColumnDescriptions;
     }
+
+    /**
+     * Sets the SNP dection parameters to have them connected with the search
+     * results.
+     * @param percent minimum deviation in percent at a position used for this
+     * snp detection
+     * @param num minimum number of deviating coverage at a position used for
+     * this snp detection
+     */
+    public void setSearchParameters(int percent, int num) {
+        this.percent = percent;
+        this.num = num;
+    }
+
+    /**
+     * @return get minimum number of deviating coverage at a position used for
+     * this snp detection
+     */
+    public int getMinNoDeviatingCoverage() {
+        return this.num;
+    }
+
+    /**
+     * @return get the minimum deviation in percent at a position used for this
+     * snp detection
+     */
+    public int getMinPercentDeviation() {
+        return this.percent;
+    }
+    
+    
     
 }

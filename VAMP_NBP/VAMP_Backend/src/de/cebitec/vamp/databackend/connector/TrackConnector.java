@@ -25,6 +25,10 @@ public class TrackConnector {
     private int genomeSize;
     private String adapter;
     private CoverageThread coverageThread;
+    private CoverageThread diffThread;
+    private MappingThread mappingThread;
+    private CoverageThreadAnalyses coverageThreadAnalyses;
+    private MappingThreadAnalyses mappingThreadAnalyses; 
     private Connection con;
     public static int FIXED_INTERVAL_LENGTH = 1000;
     private final PersistantReference refGenome;
@@ -36,7 +40,7 @@ public class TrackConnector {
      * @param adapter the database adapter type (mysql or h2)
      */
     protected TrackConnector(PersistantTrack track, String adapter) {
-        this.associatedTracks = new ArrayList<PersistantTrack>();
+        this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
         this.trackID = track.getId();
         this.adapter = adapter;
@@ -44,14 +48,14 @@ public class TrackConnector {
         
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
-        this.refGenome = refConnector.getRefGen();
+        this.refGenome = refConnector.getRefGenome();
         this.genomeSize = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
             this.externalDataReader = new SamBamFileReader(file, this.trackID);
         }
 
-        this.startCoverageThread(false);
+        this.startDataThreads(false);
     }
 
     /**
@@ -72,14 +76,14 @@ public class TrackConnector {
         this.con = ProjectConnector.getInstance().getConnection();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
-        this.refGenome = refConnector.getRefGen();
+        this.refGenome = refConnector.getRefGenome();
         this.genomeSize = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
             this.externalDataReader = new SamBamFileReader(file, this.trackID);
         }
         
-        this.startCoverageThread(combineTracks);
+        this.startDataThreads(combineTracks);
     }
 
     /**
@@ -87,9 +91,17 @@ public class TrackConnector {
      * @param tracks the tracks whose coverage can be querried from the thread
      * @param combineTracks true, if the coverage of both tracks should be combined
      */
-    private void startCoverageThread(boolean combineTracks) {
+    private void startDataThreads(boolean combineTracks) {
         this.coverageThread = new CoverageThread(this.associatedTracks, combineTracks);
+        this.diffThread = new CoverageThread(this.associatedTracks, combineTracks);
+        this.coverageThreadAnalyses = new CoverageThreadAnalyses(this.associatedTracks, combineTracks);
+        this.mappingThread = new MappingThread(this.associatedTracks.get(0));
+        this.mappingThreadAnalyses = new MappingThreadAnalyses(this.associatedTracks.get(0));
         this.coverageThread.start();
+        this.diffThread.start();
+        this.coverageThreadAnalyses.start();
+        this.mappingThread.start();
+        this.mappingThreadAnalyses.start();
     }
 
     /**
@@ -97,6 +109,10 @@ public class TrackConnector {
      * of the request (the object that wants to receive the coverage) is handed
      * over to the CoverageThread, who will carry out the request as soon as
      * possible. Afterwards the coverage result is handed over to the receiver.
+     * (CAUTION: Only the latest request is carried out completely by the
+     * thread. This means when scrolling while a request is in progress the
+     * current data is depleted and only data for the new request for the
+     * currently visible interval is carried out)
      * @param request the coverage request including the receiving object
      */
     public void addCoverageRequest(IntervalRequest request) {
@@ -105,43 +121,84 @@ public class TrackConnector {
     }
     
     /**
+     * Handles a coverage request. This means the request containig the sender
+     * of the request (the object that wants to receive the coverage) is handed
+     * over to the CoverageThread, who will carry out the request as soon as
+     * possible. Afterwards the coverage result is handed over to the receiver.
+     * @param request the coverage request including the receiving object
+     */
+    public void addCoverageAnalysisRequest(IntervalRequest request) {
+        coverageThreadAnalyses.addRequest(request);
+        //Currently we can only catch the diffs for one track, but not, if this is a multiple track connector
+    }
+    
+    /**
      * Handles a diff request. This means the request is carried out by the TrackConnector
-     * and afterwards the diff result is handed over to the receiver.
+     * if the track is stored in the db and afterwards the diff result is handed 
+     * over to the receiver.
      * @param request the diff request including the receiving object
-     * @return request unneeded: true, if this is not a direct access track, false, if the request had to be carried out
+     * @return request unneeded: true, if this is a direct access track, false, if the request had to be carried out
      */
     public boolean addDiffRequest(IntervalRequest request) {
         if (request instanceof CoverageAndDiffRequest && this.associatedTracks.get(0).isDbUsed()) {
-            CoverageAndDiffResultPersistant result = this.getDiffsAndGapsForInterval(request.getFrom(), request.getTo());
-            request.getSender().receiveData(result);
+            this.diffThread.addRequest(request);
             return false;
         }
         return true;
     }
     
     /**
-     * Handles a coverage and diff request. This means the request containig the sender
-     * of the request (the object that wants to receive the coverage) is handed
-     * over to the CoverageThread, who will carry out the request as soon as
-     * possible. Afterwards the result is handed over to the receiver.
-     * For database tracks the diffs are fetched from the db in a second statement.
-     *
+     * Handles a coverage and diff request. This means the request containig the
+     * sender of the request (the object that wants to receive the coverage) is
+     * handed over to the CoverageThread, who will carry out the request as soon
+     * as possible. Afterwards the result is handed over to the receiver. For
+     * database tracks the diffs are fetched from the db in a second statement.
      * @param request the coverage and diff request including the receiving object
      */
     public void addCoverageAndDiffRequest(IntervalRequest request) {
-        coverageThread.addRequest(request);
+        this.coverageThread.addRequest(request);
 
     }
-
+    
     /**
-     * Collects all mappings of the associated track for the interval described 
-     * by from and to parameters. Mappings can only be obtained for one track currently.
+     * Handles a mapping request. This means the request containig the sender of
+     * the request (the object that wants to receive the mappings) is handed
+     * over to the MappingThread, who will carry out the request as soon as
+     * possible. Afterwards the mapping result is handed over to the receiver.
+     * (CAUTION: Only the latest request is carried out completely by the
+     * thread. This means when scrolling while a request is in progress the
+     * current data is depleted and only data for the new request for the
+     * currently visible interval is carried out)
+     *
+     * @param request the mapping request including the receiving object
+     */
+    public void addMappingRequest(IntervalRequest request) {
+        this.mappingThread.addRequest(request);
+    } 
+    
+    /**
+     * Handles a mapping request for analysis functions. This means the request
+     * containig the sender of the request (the object that wants to receive the
+     * mappings) is handed over to the MappingThreadanalyses, who will carry out
+     * the request as soon as possible. Afterwards the mapping result is handed
+     * over to the receiver.
+     * @param request the mapping request including the receiving object
+     */
+    public void addMappingAnalysisRequest(IntervalRequest request) {
+        this.mappingThreadAnalyses.addRequest(request);
+    }
+    
+    /**
+     * Collects all mappings of the associated track for the interval described
+     * by from and to parameters. Mappings can only be obtained for one track
+     * currently.
+     *
      * @param from start of the interval whose mappings are needed
      * @param to stop of the interval whose mappings are needed
      * @return the collection of mappings for the given interval
      */
-    public Collection<PersistantMapping> getMappings(int from, int to) {
-        HashMap<Long, PersistantMapping> mappings = new HashMap<Long, PersistantMapping>();
+    public MappingResultPersistant getMappings(int from, int to) {
+        HashMap<Long, PersistantMapping> mappings = new HashMap<>();
         if (from < to && from > 0 && to > 0) {
             if (this.associatedTracks.get(0).isDbUsed()) { //mappings are always only querried for one track
                 try {
@@ -197,7 +254,7 @@ public class TrackConnector {
                         String baseString = rs.getString(FieldNames.DIFF_BASE);
                         int position = rs.getInt(FieldNames.DIFF_POSITION);
                         int type = rs.getInt(FieldNames.DIFF_TYPE);
-                        int gapOrder = rs.getInt(FieldNames.DIFF_ORDER);
+                        int gapOrder = rs.getInt(FieldNames.DIFF_GAP_ORDER);
 
                         // diff data may be null, if mapping has no diffs
                         if (baseString != null) {
@@ -220,28 +277,29 @@ public class TrackConnector {
                 }
             } else { //handle retrieving of data from other source than a DB
 
-                Collection<PersistantMapping> mappingList = externalDataReader.getMappingsFromBam(
-                        this.refGenome, from, to);
-                Iterator it = mappingList.iterator();
+                Collection<PersistantMapping> mappingList = externalDataReader.getMappingsFromBam(this.refGenome, from, to, true);
+                Iterator<PersistantMapping> it = mappingList.iterator();
                 while (it.hasNext()) {
-                    PersistantMapping next = (PersistantMapping) it.next();
+                    PersistantMapping next = it.next();
                     mappings.put(next.getId(), next);
                 }
             }
         }
-        return mappings.values();
+        return new MappingResultPersistant(new ArrayList<>(mappings.values()), from, to);
     }
 
     /**
-     * Returns the diffs for a given interval in the current track from the database.
+     * Returns the diffs for a given interval in the current track from the
+     * database.
+     *
      * @param from left bound of the interval
      * @param to right bound of the interval
      * @return the collection of diffs for this interval
      */
     public CoverageAndDiffResultPersistant getDiffsAndGapsForInterval(int from, int to) {
 
-        List<PersistantDiff> diffs = new ArrayList<PersistantDiff>();
-        List<PersistantReferenceGap> gaps = new ArrayList<PersistantReferenceGap>();
+        List<PersistantDiff> diffs = new ArrayList<>();
+        List<PersistantReferenceGap> gaps = new ArrayList<>();
         if (from < to) {
             try {
                 PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_AND_GAPS_FOR_INTERVAL);
@@ -261,7 +319,7 @@ public class TrackConnector {
                     if (type == 1) { //1 = diffs
                         diffs.add(new PersistantDiff(position, base, isForwardStrand, count));
                     } else { //0 = gaps
-                        int order = rs.getInt(FieldNames.DIFF_ORDER);
+                        int order = rs.getInt(FieldNames.DIFF_GAP_ORDER);
                         gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count));
                     }
                 }
@@ -274,7 +332,6 @@ public class TrackConnector {
 
         return new CoverageAndDiffResultPersistant(null, diffs, gaps, true, from, to);
     }
-    
 
     public int getNumOfReads() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
@@ -392,11 +449,18 @@ public class TrackConnector {
         return absValue / genomeSize * 100;
     }
 
-    public HashMap<Integer, Integer> getCoverageInfosOfTrack(int from, int to) {
+    /**
+     * Fetches the common coverage information from the db for a given interval.
+     * @param request request containing the needed interval
+     * @return a map of the position to the common coverage value at that position
+     */
+    public HashMap<Integer, Integer> getCoverageInfosOfTrack(IntervalRequest request) {
         PreparedStatement fetch;
-        HashMap<Integer, Integer> positionMap = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> positionMap = new HashMap<>();
         int coverage;
         int position;
+        int from = request.getFrom();
+        int to = request.getTo();
         if (from < to && from > 0 && to > 0) {
             try {
 
@@ -540,7 +604,7 @@ public class TrackConnector {
     }
 
     public List<Integer> getTrackIds() {
-        List<Integer> trackIds = new ArrayList<Integer>();
+        List<Integer> trackIds = new ArrayList<>();
         for (PersistantTrack track : this.associatedTracks) {
             trackIds.add(track.getId());
         }
@@ -584,6 +648,9 @@ public class TrackConnector {
         return isContinous;
     }
 
+    /**
+     * @return TODO: remove this method for encapsulation: hand data from here to thread
+     */
     public CoverageThread getCoverageThread() {
         return this.coverageThread;
     }
@@ -626,7 +693,7 @@ public class TrackConnector {
      */
     public Collection<PersistantSeqPairGroup> getSeqPairMappings(int from, int to, int trackID2, byte typeFlag) {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
-        if (from < to) {
+        if (from > 0 && to > 0 && from < to) {
 
             if (this.associatedTracks.get(0).isDbUsed()) {
                 try {
@@ -789,6 +856,8 @@ public class TrackConnector {
                 } catch (SQLException ex) {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
                 }
+            } else {
+                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, from, to, true);
             }
         }
 
@@ -987,5 +1056,13 @@ public class TrackConnector {
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * @return true, if this track's data is completely stored in the db, false
+     * if this is a direct access track
+     */
+    public boolean isDbUsed() {
+        return this.associatedTracks.get(0).isDbUsed();
     }
 }

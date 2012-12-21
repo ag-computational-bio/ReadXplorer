@@ -1,10 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -14,14 +14,18 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayerI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayoutI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 
 /**
  * Viewer for sequence pairs.
@@ -51,6 +55,7 @@ public class SequencePairViewer extends AbstractViewer {
     private int oldLogRight;
     private Collection<PersistantSeqPairGroup> seqPairs;
     private byte lastInclTypeFlag;
+//    private JPanel paintPanel;
 
     /**
      * Creates a new viewer for displaying sequence pair information between two
@@ -63,6 +68,7 @@ public class SequencePairViewer extends AbstractViewer {
     public SequencePairViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
 //        this.createFocusListener();
+//        this.paintPanel = new JPanel();
         this.refGen = refGen;
         this.trackConnector = trackConnector;
         int id = this.trackConnector.getSeqPairToTrackID();
@@ -75,7 +81,7 @@ public class SequencePairViewer extends AbstractViewer {
         this.setHorizontalMargin(10);
         this.setupComponents();
         this.setActive(false);
-        this.seqPairs = new ArrayList<PersistantSeqPairGroup>();
+        this.seqPairs = new ArrayList<>();
     }
 
     @Override
@@ -124,6 +130,7 @@ public class SequencePairViewer extends AbstractViewer {
      * @param to right (larger) border of interval
      */
     private void createAndShowNewLayout(int from, int to) {
+//        this.paintPanel.removeAll();
         
         //check for annotation types in the exclusion list and adapt database query for performance
         List<FeatureType> excludedAnnotationTypes = this.getExcludedFeatureTypes();
@@ -153,7 +160,9 @@ public class SequencePairViewer extends AbstractViewer {
 //        this.findMinAndMaxCount(seqPairs); //for currently shown mappings
 //        this.findMaxCoverage(coverage); //TODO: update counts here? at the moment not needed
         layout = new LayoutPairs(from, to, seqPairs);
+        this.setVisible(false);
         this.addBlocks(layout);
+        this.setVisible(true);
         this.setViewerHeight();
 
     }
@@ -199,23 +208,24 @@ public class SequencePairViewer extends AbstractViewer {
 //    }
 
     private void addBlocks(LayoutI layout) {
-
-        // only reverse layer
+        
+        // only show reverse layer
         int layerCounter = -1;
         int countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
         boolean isOneBlockAdded = false;
-        boolean isBlockAdded = false;
+        boolean isBlockAdded;
+        LayerI b;
+        Iterator<BlockI> blockIt;
+        BlockPair block;
         while (itRev.hasNext()) {
-            LayerI b = itRev.next();
-            Iterator<BlockI> blockIt = b.getBlockIterator();
+            b = itRev.next();
+            blockIt = b.getBlockIterator();
             
             while (blockIt.hasNext()) {
-                BlockPair block = (BlockPair) blockIt.next();
+                block = (BlockPair) blockIt.next();
                 isBlockAdded = this.createJBlock(block, layerCounter);
-                if (isBlockAdded){
-                    isOneBlockAdded = true;
-                }
+                isOneBlockAdded = isBlockAdded;
             }
             
             if (isOneBlockAdded) {

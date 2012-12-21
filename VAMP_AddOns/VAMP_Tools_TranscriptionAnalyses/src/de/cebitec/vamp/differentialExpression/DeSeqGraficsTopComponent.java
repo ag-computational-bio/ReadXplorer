@@ -1,24 +1,21 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
@@ -50,48 +47,31 @@ preferredID = "DeSeqGraficsTopComponent")
     "CTL_DeSeqGraficsTopComponent=Create graphics",
     "HINT_DeSeqGraficsTopComponent=This is a DeSeqGrafics window"
 })
-public final class DeSeqGraficsTopComponent extends TopComponent implements Observer, ItemListener {
+public final class DeSeqGraficsTopComponent extends TopComponent {
 
-    private DeSeqAnalysisHandler deSeqAnalysisHandler;
+    private AnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
-    private ComboBoxModel cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.values());
-    private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<>();
+    private ComboBoxModel cbm;
     private File currentlyDisplayed;
+    private AnalysisHandler.Tool tool;
 
     public DeSeqGraficsTopComponent() {
     }
-
-    public DeSeqGraficsTopComponent(AnalysisHandler handler) {
-        deSeqAnalysisHandler = (DeSeqAnalysisHandler) handler;
+    
+    public DeSeqGraficsTopComponent(AnalysisHandler handler, AnalysisHandler.Tool tool) {
+        analysisHandler = handler;
+        this.tool = tool;
+        cbm = new DefaultComboBoxModel(SimpleTestAnalysisHandler.Plot.values());
         initComponents();
-        setName(Bundle.CTL_DeSeqGraficsTopComponent());
-        setToolTipText(Bundle.HINT_DeSeqGraficsTopComponent());
-        svgCanvas = new JSVGCanvas();
-        jPanel1.add(svgCanvas, BorderLayout.CENTER);
-        svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
-            @Override
-            public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
-                progressBar.setIndeterminate(true);
-            }
+        setupGrafics();
+    }
 
-            @Override
-            public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(100);
-                saveButton.setEnabled(true);
-                plotButton.setEnabled(true);
-            }
-
-            @Override
-            public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
-            }
-
-            @Override
-            public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
-                messages.setText("Could not load SVG file. Please try again.");
-            }
-        });
+    public DeSeqGraficsTopComponent(AnalysisHandler handler, boolean moreThanTwoConditions, AnalysisHandler.Tool tool) {
+        analysisHandler = handler;
+        this.tool = tool;
+        cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
+        initComponents();
+        setupGrafics();
     }
 
     /**
@@ -175,17 +155,28 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
     }// </editor-fold>//GEN-END:initComponents
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
-        DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
         try {
             messages.setText("");
             plotButton.setEnabled(false);
             saveButton.setEnabled(false);
-            currentlyDisplayed = deSeqAnalysisHandler.plot(selectedPlot);
+            if (tool == AnalysisHandler.Tool.DeSeq) {
+                DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
+                currentlyDisplayed = ((DeSeqAnalysisHandler) analysisHandler).plot(selectedPlot);
+            } else {
+                SimpleTestAnalysisHandler.Plot selectedPlot = (SimpleTestAnalysisHandler.Plot) plotType.getSelectedItem();
+                currentlyDisplayed = ((SimpleTestAnalysisHandler) analysisHandler).plot(selectedPlot);
+            }
             svgCanvas.setURI(currentlyDisplayed.toURI().toString());
             svgCanvas.setVisible(true);
             svgCanvas.repaint();
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+        } catch (GnuR.PackageNotLoadableException ex) {
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_plotButtonActionPerformed
 
@@ -240,13 +231,33 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         // TODO read your settings according to their version
     }
 
-    @Override
-    public void update(Object args) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    private void setupGrafics() {
+        setName(Bundle.CTL_DeSeqGraficsTopComponent());
+        setToolTipText(Bundle.HINT_DeSeqGraficsTopComponent());
+        svgCanvas = new JSVGCanvas();
+        jPanel1.add(svgCanvas, BorderLayout.CENTER);
+        svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
+            @Override
+            public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
+                progressBar.setIndeterminate(true);
+            }
 
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+            @Override
+            public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(100);
+                saveButton.setEnabled(true);
+                plotButton.setEnabled(true);
+            }
+
+            @Override
+            public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
+            }
+
+            @Override
+            public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
+                messages.setText("Could not load SVG file. Please try again.");
+            }
+        });
     }
 }

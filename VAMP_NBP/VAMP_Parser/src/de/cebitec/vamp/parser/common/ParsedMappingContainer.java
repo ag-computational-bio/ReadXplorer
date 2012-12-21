@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Container for all mappings belonging to one track. Contains statistics as well
@@ -24,12 +25,14 @@ public class ParsedMappingContainer {
     private boolean firstMappingContainer = false;
     private int sumReadLength;
     private boolean mappingInfosCalculated = false;
+    private Map<Integer, Integer> mappingInfos;
     
     /**
      * Creates an empty mapping container.
      */
     public ParsedMappingContainer(){
-        this.mappings = new HashMap<Integer, ParsedMappingGroup>();
+        this.mappings = new HashMap<>();
+        this.mappingInfos = new HashMap<>();
         this.sumReadLength = 0;
     }
 
@@ -55,19 +58,39 @@ public class ParsedMappingContainer {
     }
 
     /**
-     * @return Hashmap with following entries:
+     * Set the mapping informations, if calculated somewhere else already.
+     * @param mappingInfos the mapping infos to set:
      * <br>(1, numberOfMappings);
-     * <br>(2, numberOfPerfect);
-     * <br>(3, numberOfBM);
-     * <br>(4, numUniqueMappings);
-     * <br>(5, numUniqueSeq);
-     * <br>(6, numReads);
+     * <br>(2, numberOfPerfect); 
+     * <br>(3, numberOfBM); 
+     * <br>(4, numUniqueMappings); 
+     * <br>(5, numUniqueSeq); 
+     * <br>(6, numReads); 
      * <br>(7, sumReadLength);
      */
-    public HashMap<Integer, Integer> getMappingInformations() {
-        HashMap<Integer, Integer> mappingInfos = new HashMap<Integer, Integer>();
-        
+    public void setMappingInfos(Map<Integer, Integer> mappingInfos) {
+        this.mappingInfos = mappingInfos;
+        this.mappingInfosCalculated = true;
+    }
+
+    /**
+     * @return Hashmap with following entries: <br>(1, numberOfMappings);
+     * <br>(2, numberOfPerfect); <br>(3, numberOfBM); <br>(4,
+     * numUniqueMappings); <br>(5, numUniqueSeq); <br>(6, numReads); <br>(7,
+     * sumReadLength);
+     */
+    public Map<Integer, Integer> getMappingInfos() {
         if (!mappingInfosCalculated) {
+            this.calcMappingInformations();
+        }
+        return this.mappingInfos;
+    }    
+
+    /**
+     * Calculates the mapping informations by analyzing the mapping container 
+     * data.
+     */
+    private void calcMappingInformations() {
 
             Collection<ParsedMappingGroup> groups = mappings.values();
             Iterator<ParsedMappingGroup> groupsIt = groups.iterator();
@@ -93,7 +116,6 @@ public class ParsedMappingContainer {
                 }
                 this.numReads += mappingList.get(0).getNumReplicates();
             }
-        }
         
 //        int averageReadLength = 0;
 //        averageReadLength = this.numOfMappings != 0 ? this.sumReadLength / this.numOfMappings : 0;
@@ -105,8 +127,8 @@ public class ParsedMappingContainer {
         mappingInfos.put(5, this.numUniqueSeq);
         mappingInfos.put(6, this.numReads);
         mappingInfos.put(7, this.sumReadLength);
-
-        return mappingInfos;
+        
+        this.mappingInfosCalculated = true;
     }
 
     public void clear(){

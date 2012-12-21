@@ -1,6 +1,9 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -30,6 +33,14 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         public String toString() {
             return representation;
         }
+
+        public static Plot[] getValues(boolean moreThanTwoConditions) {
+            if (moreThanTwoConditions) {
+                return new Plot[]{DispEsts};
+            } else {
+                return new Plot[]{DispEsts,DE,HIST};
+            }
+        }
     }
 
     public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks,
@@ -42,7 +53,7 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
     }
 
     @Override
-    public void performAnalysis() {
+    public void performAnalysis() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
@@ -53,7 +64,11 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
             results = deSeq.process(deSeqAnalysisData, 3434, getSelectedTraks().size(), getSaveFile());
         }
         setResults(results);
-        notifyObservers(deSeqAnalysisData.moreThanTwoConditions());
+        notifyObservers(AnalysisStatus.FINISHED);
+    }
+    
+    public boolean moreThanTwoCondsForDeSeq(){
+        return deSeqAnalysisData.moreThanTwoConditions();
     }
 
     @Override
@@ -62,12 +77,13 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         deSeq = null;
     }
 
-    void saveResultsAsCSV(int selectedIndex, String path) {
+    @Override
+    public void saveResultsAsCSV(int selectedIndex, String path) {
         File saveFile = new File(path);
         deSeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
-    File plot(Plot plot) throws IOException {
+    public File plot(Plot plot) throws IOException, IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.DE) {

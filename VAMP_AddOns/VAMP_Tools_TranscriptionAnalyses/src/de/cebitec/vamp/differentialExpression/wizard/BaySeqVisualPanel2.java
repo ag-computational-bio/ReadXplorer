@@ -32,7 +32,12 @@ public final class BaySeqVisualPanel2 extends JPanel {
     public void updateTrackList(List<PersistantTrack> selectedTraks) {
         if (this.selectedTraks == null) {
             this.selectedTraks = selectedTraks;
+            resetTrackList();
         }
+
+    }
+    
+    private void resetTrackList() {
         trackListModel.clear();
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack persistantTrack = it.next();
@@ -52,18 +57,16 @@ public final class BaySeqVisualPanel2 extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         trackList = new javax.swing.JList(trackListModel);
         jLabel2 = new javax.swing.JLabel();
-        replicateStructureField = new javax.swing.JTextField();
         addAsReplicates = new javax.swing.JButton();
         removeReplicates = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        replicateStructureField = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel1.text")); // NOI18N
 
         jScrollPane1.setViewportView(trackList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel2.text")); // NOI18N
-
-        replicateStructureField.setEditable(false);
-        replicateStructureField.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.replicateStructureField.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(addAsReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.addAsReplicates.text")); // NOI18N
         addAsReplicates.addActionListener(new java.awt.event.ActionListener() {
@@ -80,6 +83,11 @@ public final class BaySeqVisualPanel2 extends JPanel {
             }
         });
 
+        replicateStructureField.setEditable(false);
+        replicateStructureField.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.replicateStructureField.text")); // NOI18N
+        replicateStructureField.setBorder(null);
+        jScrollPane2.setViewportView(replicateStructureField);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -87,17 +95,17 @@ public final class BaySeqVisualPanel2 extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
-                    .addComponent(replicateStructureField)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(addAsReplicates)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(removeReplicates))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel2))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(addAsReplicates)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(removeReplicates)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -106,7 +114,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
                 .addGap(6, 6, 6)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addAsReplicates)
@@ -114,13 +122,13 @@ public final class BaySeqVisualPanel2 extends JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(replicateStructureField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(21, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void addAsReplicatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAsReplicatesActionPerformed
-        if (replicateStructure.length<2) {
+        if (replicateStructure.length < 2) {
             replicateStructure = new int[selectedTraks.size()];
         }
         if (!trackList.isSelectionEmpty()) {
@@ -150,7 +158,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
         removeReplicates.setEnabled(false);
         replicateStructureField.setText("");
         replicateStructure = new int[1];
-        updateTrackList(selectedTraks);
+        resetTrackList();
         addAsReplicates.setEnabled(true);
     }//GEN-LAST:event_removeReplicatesActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -158,6 +166,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton removeReplicates;
     private javax.swing.JTextField replicateStructureField;
     private javax.swing.JList trackList;

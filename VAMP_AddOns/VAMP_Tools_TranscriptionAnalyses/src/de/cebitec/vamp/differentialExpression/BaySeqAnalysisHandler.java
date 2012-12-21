@@ -2,6 +2,9 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq.SamplesNotValidException;
+import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
+import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
+import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -19,7 +22,19 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
 
     public static enum Plot {
 
-        Priors, MACD, Posteriors;
+        Priors("Priors"),
+        MACD("\"MA\"-Plot for the count data"), 
+        Posteriors("Posterior likelihoods of differential expression against log-ratio");
+        String representation;
+
+        Plot(String representation) {
+            this.representation = representation;
+        }
+
+        @Override
+        public String toString() {
+            return representation;
+        }
     }
 
     public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure, File saveFile) {
@@ -29,7 +44,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
     }
 
     @Override
-    public void performAnalysis() {
+    public void performAnalysis() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
@@ -42,7 +57,7 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         }
 
         setResults(results);
-        notifyObservers(this);
+        notifyObservers(AnalysisStatus.FINISHED);
     }
 
     @Override
@@ -51,35 +66,8 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         baySeq = null;
     }
 
-//    private List<Object[][]> convertRresults(List<RVector> results) {
-//        List<Object[][]> ret = new ArrayList<>();
-//        for (Iterator<RVector> it = results.iterator(); it.hasNext();) {
-//            RVector currentRVector = it.next();
-//            int i = 0;
-//            Object[][] current = new Object[currentRVector.at(1).asIntArray().length][currentRVector.size()];
-//            RFactor currentStringValues = currentRVector.at(i).asFactor();
-//            for (int j = 0; j < currentStringValues.size(); j++) {
-//                current[j][i] = currentStringValues.at(i);
-//            }
-//            i++;
-//            for (; i < 3; i++) {
-//                int[] currentIntValues = currentRVector.at(i).asIntArray();
-//                for (int j = 0; j < currentIntValues.length; j++) {
-//                    current[j][i] = currentIntValues[j];
-//                }
-//            }
-//            for (; i < currentRVector.size(); i++) {
-//                double[] currentDoubleValues = currentRVector.at(i).asDoubleArray();
-//                for (int j = 0; j < currentDoubleValues.length; j++) {
-//                    current[j][i] = currentDoubleValues[j];
-//                }
-//            }
-//            ret.add(current);
-//        }
-//        return ret;
-//    }
-
-    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException {
+    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException, 
+                                                                        IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {
@@ -94,9 +82,10 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         return file;
     }
 
-    public void saveResultsAsCSV(Group group, String path, boolean normalized) {
+    @Override
+    public void saveResultsAsCSV(int selectedIndex, String path) {
         File saveFile = new File(path);
-        baySeq.saveResultsAsCSV(group, saveFile, normalized);
+        baySeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
     public List<Group> getGroups() {

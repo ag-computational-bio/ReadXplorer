@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -44,11 +45,13 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private SnpData snpData;
     private PersistantReference reference;
+    private SnpResultStatistics snpMetrics;
 
     /** Creates new form SNP_DetectionResultPanel */
     public SNP_DetectionResultPanel() {
         initComponents();
         
+        this.snpMetrics = new SnpResultStatistics();
         //ensures number of lines will adapt to number of translations (annotations) for each snp
         LineWrapCellRenderer cellRenderer = new LineWrapCellRenderer();
         this.snpTable.getColumnModel().getColumn(13).setCellRenderer(cellRenderer);
@@ -80,6 +83,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         exportButton = new javax.swing.JButton();
         alignmentButton = new javax.swing.JButton();
         alignmentButton1 = new javax.swing.JButton();
+        parametersLabel = new javax.swing.JLabel();
+        metricsButton = new javax.swing.JButton();
 
         snpTable.setAutoCreateRowSorter(true);
         snpTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -148,19 +153,31 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             }
         });
 
+        parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.parametersLabel.text")); // NOI18N
+
+        metricsButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.metricsButton.text")); // NOI18N
+        metricsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                metricsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(412, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 335, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(metricsButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton)
                 .addContainerGap())
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 789, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,7 +187,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exportButton)
                     .addComponent(alignmentButton)
-                    .addComponent(alignmentButton1))
+                    .addComponent(alignmentButton1)
+                    .addComponent(parametersLabel)
+                    .addComponent(metricsButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -187,16 +206,37 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         this.setFdnamlPath();
     }//GEN-LAST:event_alignmentButton1ActionPerformed
 
+    private void metricsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metricsButtonActionPerformed
+        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpMetrics), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_metricsButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton alignmentButton;
     private javax.swing.JButton alignmentButton1;
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton metricsButton;
+    private javax.swing.JLabel parametersLabel;
     private javax.swing.JTable snpTable;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Adds the SNPs to show to this panel. Amino acids are calculated and the
+     * SNP result table is generated
+     * @param snpData the snps to show
+     */
     public void addSNPs(SnpData snpData) {
+        
+        //snp metrics
+        int noIntergenicSnps = 0;
+        int noSynonymousSnps = 0;
+        int noMissenseSnps = 0;
+        int noChemicallyNeutralSnps = 0;
+        int noInsertions = 0;
+        int noDeletions = 0;
+        
+
         final int snpDataSize = 17;
         this.snpData = snpData;
         List<SnpI> snps = this.snpData.getSnpList();
@@ -206,7 +246,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         //get all annotations from the reference to determine amino acid 
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
         List<PersistantAnnotation> annotationsSorted = refGenCon.getAnnotationsForClosedInterval(0, reference.getRefLength());
-        Map<Integer, PersistantAnnotation> annotationMap = new HashMap<Integer, PersistantAnnotation>();
+        Map<Integer, PersistantAnnotation> annotationMap = new HashMap<>();
         for (PersistantAnnotation annotation : annotationsSorted){
             annotationMap.put(annotation.getId(), annotation); //ids are unique
         }
@@ -216,11 +256,22 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         
         SnpTranslator snpTranslator = new SnpTranslator(annotationsSorted, reference);
         
+        Snp snp;
+        Object[] rowData;
+        String aminosSnp;
+        String aminosRef;
+        String effect;
+        String ids;
+        char aminoAcid;
+        List<PersistantAnnotation> annotationsFound;
+        SequenceComparison type;
+        
         for (SnpI snpi : snps) {
             
-            Snp snp = (Snp) snpi;
             
-            Object[] rowData = new Object[snpDataSize];
+            snp = (Snp) snpi;
+            
+            rowData = new Object[snpDataSize];
             rowData[0] = snp.getPosition();
             rowData[1] = trackNames.get(snp.getTrackId());
             rowData[2] = snp.getBase().toUpperCase();
@@ -238,11 +289,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             //determine amino acid substitutions among snp substitutions
             if (snp.getType() == SequenceComparison.SUBSTITUTION) {
                        
-                String aminosSnp = "";
-                String aminosRef = "";
-                String effect = "";
-                String ids = "";
-                char aminoAcid;
+                aminosSnp = "";
+                aminosRef = "";
+                effect = "";
+                ids = "";
                 
                 snpTranslator.checkForAnnotation(snp);
                 List<CodonSnp> codons = snp.getCodons();
@@ -260,48 +310,58 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 if (codons.isEmpty()) {
                     aminosRef = aminosRef.isEmpty() ? "No gene" : aminosRef;
                     aminosSnp = aminosSnp.isEmpty() ? "No gene" : aminosSnp;
+                    ++noIntergenicSnps;
 
+                } else if (effect.contains("E")) {
+                    ++noMissenseSnps;
+                } else if (effect.contains("N")) {
+                    ++noChemicallyNeutralSnps;
+                } else if (effect.contains("M")) {
+                    ++noSynonymousSnps;
                 }
+                
                 rowData[13] = aminosSnp;
                 rowData[14] = aminosRef;
                 rowData[15] = effect;
                 rowData[16] = ids;
 
             } else {
-                List<PersistantAnnotation> annotationsFound = snpTranslator.checkCoveredByAnnotation(snp.getPosition());
-                String ids = "";
-                if (!annotationsFound.isEmpty()) {
-                    SequenceComparison type = SequenceComparison.UNKNOWN;
+                annotationsFound = snpTranslator.checkCoveredByAnnotation(snp.getPosition());
+                ids = "";
+                if (!annotationsFound.isEmpty()) { // insertion or deletion
+                    type = SequenceComparison.UNKNOWN;
                     if (snp.getType().equals(SequenceComparison.INSERTION)) {
                         type = SequenceComparison.INSERTION;
+                        ++noInsertions;
                         
                     } else if (snp.getType().equals(SequenceComparison.DELETION)) {
                         type = SequenceComparison.DELETION;
+                        ++noDeletions;
                         
-                    } else if (snp.getType().equals(SequenceComparison.MATCH)) {
-                        type = SequenceComparison.MATCH;
                     }
                     
                     for (PersistantAnnotation annotation : annotationsFound){
                         ids += (annotation.hasGeneName() ? annotation.getGeneName() : annotation.getLocus()) + "\n";
                         snp.addCodon(new CodonSnp("", "", ' ', ' ', type, ids));
                     }
-                    rowData[15] = String.valueOf(type.getType());
-                    rowData[16] = ids;
                     rowData[13] = "-";
                     rowData[14] = "-";
-                } else {
+                    rowData[15] = String.valueOf(type.getType());
+                    rowData[16] = ids;
+                    
+                } else { //intergenic
                     rowData[13] = "No gene";
                     rowData[14] = "No gene";
                     rowData[15] = "";
                     rowData[16] = "";
+                    ++noIntergenicSnps;
                 }
             }
             
             model.addRow(rowData);
         }
 
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
         this.snpTable.setRowSorter(sorter);
         sorter.setModel(model);
         sorter.setComparator(0, new Comparator<String>() {
@@ -319,6 +379,18 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 return intA.compareTo(intB);
             }
         });
+        
+        this.snpMetrics.setTotalNoSnps(this.snpData.getSnpList().size());
+        this.snpMetrics.setNoIntergenicSnps(noIntergenicSnps);
+        this.snpMetrics.setNoSynonymousSnps(noSynonymousSnps);
+        this.snpMetrics.setNoChemicallyNeutralSnps(noChemicallyNeutralSnps);
+        this.snpMetrics.setNoMissenseSnps(noMissenseSnps);
+        this.snpMetrics.setNoInsertions(noInsertions);
+        this.snpMetrics.setNoDeletions(noDeletions);
+        
+        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, 
+                "SNP_DetectionResultPanel.parametersLabel.text", snpData.getMinPercentDeviation(), snpData.getMinNoDeviatingCoverage()));
+        
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
@@ -347,6 +419,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
      */
     private void setFdnamlPath() {
         VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, new String[1], "") {
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void save(String fileLocation) {

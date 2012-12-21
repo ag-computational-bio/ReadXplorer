@@ -5,6 +5,7 @@ import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
@@ -68,7 +69,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         averageReadLength = trackCon.getAverageReadLength();
         averageSeqPairLength = trackCon.getAverageSeqPairLength();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGen().getRefLength();
+        this.genomeSize = refConnector.getRefGenome().getRefLength();
         this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
         
         ////////////////////////////////////////////////////////////////////////////
@@ -114,10 +115,10 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     @Override
     public void update(Object data) {
         //the mappings are sorted by their start position!
-        List<PersistantMapping> mappings = new ArrayList<>();
-        if (data.getClass() == mappings.getClass()) {
+        MappingResultPersistant mappingResult = new MappingResultPersistant(null, 0, 0);
+        if (data.getClass() == mappingResult.getClass()) {
 
-            mappings = (List<PersistantMapping>) data;
+        List<PersistantMapping> mappings = ((MappingResultPersistant) data).getMappings();
             this.sumReadCounts(mappings);
         }
         if (data instanceof Byte && ((Byte) data) == 2) {

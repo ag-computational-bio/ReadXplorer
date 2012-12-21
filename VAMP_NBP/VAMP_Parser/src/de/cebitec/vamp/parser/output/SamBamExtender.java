@@ -7,6 +7,7 @@ import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
 import de.cebitec.vamp.util.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.*;
@@ -16,7 +17,7 @@ import org.openide.util.NbBundle;
 /**
  * Extends a SAM/BAM file !!sorted by read sequence!! with VAMP classification
  * information (perfect, best and common match classes), adds the number of for
- * occurences of each mapping and sorts the whole file by coordinate again.
+ * occurrences of each mapping and sorts the whole file by coordinate again.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -30,6 +31,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private List<Observer> observers;
     private String refGenome;
     private int refSeqLength;
+    private Map<Integer, Integer> mappingInfos;
 
     /**
      * Extends a SAM/BAM file !!sorted by read sequence!! with VAMP
@@ -40,6 +42,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      */
     public SamBamExtender(Map<String, Pair<Integer, Integer>> classificationMap) {
         this.classificationMap = classificationMap;
+        this.mappingInfos = new HashMap<>();
     }
 
     /**
@@ -54,15 +57,34 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     }
 
     /**
-     * @param trackJob Sets the track job including a sam or bam file for
+     * A SamBamExtender needs exactly two arguments:
+     * @param trackJob the track job including a sam or bam file for
      * extension with more data.
      * @param refGenome the reference genome belonging to the trackJob
      */
-    public void setDataToConvert(TrackJob trackJob, String refGenome) {
+    @Override
+    public void setDataToConvert(Object... data) {
         this.observers = new ArrayList<>();
-        this.trackJob = trackJob;
-        this.refGenome = refGenome;
-        this.refSeqLength = this.refGenome.length();
+        boolean works = true;
+        if (data.length >= 2) {
+            if (data[0] instanceof TrackJob) {
+                this.trackJob = (TrackJob) data[0];
+            } else {
+                works = false;
+            }
+            if (data[1] instanceof String) {
+                this.refGenome = (String) data[1];
+                this.refSeqLength = this.refGenome.length();
+            } else {
+                works = false;
+            }
+        } else {
+            works = false;
+        }
+        if (!works) {
+            throw new IllegalArgumentException(NbBundle.getMessage(JokToBamConverter.class, 
+                    "Converter.SetDataError", "Inappropriate arguments passed to the converter!"));
+        }
     }
 
     /**
@@ -74,13 +96,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
         File fileToExtend = trackJob.getFile();
         String fileName = fileToExtend.getName();
-        String lastReadSeq = "";
-        int lastStartPos = -1;
-        int noReads = 0;
-        int noSequences = 0;
-        int noUniqueMappings = 0;
-        int noBestMatch = 0;
-        int noPerfect = 0;
 
         this.notifyObservers(NbBundle.getMessage(SamBamExtender.class, "Converter.Convert.Start", fileName));
         File outputFile;
@@ -127,8 +142,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             int differences;
             String readName;
             Pair<Integer, Integer> data;
-            List<String> readNamesSameSeq = new ArrayList<>();
-            List<Integer> readsDifferentPos = new ArrayList<>();
 
             while (samBamItor.hasNext()) {
                 ++lineno;
@@ -147,27 +160,8 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         
-                        //statistics claculations: count no reads and distinct sequences
-                        if (!lastReadSeq.equals(readSeq)) {
-                            ++noSequences;
-                            noReads += readNamesSameSeq.size();
-                            if (readsDifferentPos.size() == 1) {
-                                ++noUniqueMappings;
-                            }
-                            readNamesSameSeq.clear();
-                            readsDifferentPos.clear();
-                        }
-                        if (!readNamesSameSeq.contains(readName)) {
-                            readNamesSameSeq.add(readName);
-                        }
-                        if (!readsDifferentPos.contains(start)) {
-                            readsDifferentPos.add(start);
-                        }
-                        lastReadSeq = readSeq;
-                        /////////////////////////////////////////////////////////////////
-
                         //count differences to reference
-                        differences = ParserCommonMethods.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag(), start);
+                        differences = ParserCommonMethods.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
 
                         data = this.classificationMap.get(readName);
                         if (data != null) {
@@ -180,12 +174,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
                         if (differences == 0) { //perfect mapping
                             record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
-                            ++noPerfect;
-                            ++noBestMatch;
 
                         } else if (differences == lowestDiffRate) { //best match mapping
                             record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
-                            ++noBestMatch;
 
                         } else if (differences > lowestDiffRate) { //common mapping
                             record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);

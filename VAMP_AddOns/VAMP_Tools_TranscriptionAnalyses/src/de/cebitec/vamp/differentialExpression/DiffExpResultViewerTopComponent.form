@@ -22,10 +22,8 @@
                   <Group type="102" attributes="0">
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="groupComboBox" min="-2" pref="263" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="normalizedCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="resultComboBox" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="saveTableButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="createGraphicsButton" min="-2" max="-2" attributes="0"/>
@@ -48,9 +46,8 @@
                   <Component id="jProgressBar1" alignment="1" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="groupComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="resultComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="normalizedCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="createGraphicsButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="saveTableButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -71,7 +68,7 @@
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JComboBox" name="groupComboBox">
+    <Component class="javax.swing.JComboBox" name="resultComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="cbm" type="code"/>
@@ -81,7 +78,7 @@
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="groupComboBox.addItemListener(this);"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="resultComboBox.addItemListener(this);"/>
       </AuxValues>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
@@ -113,17 +110,6 @@
           <ResourceString bundle="de/cebitec/vamp/differentialExpression/Bundle.properties" key="DiffExpResultViewerTopComponent.jLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="normalizedCheckBox">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/differentialExpression/Bundle.properties" key="DiffExpResultViewerTopComponent.normalizedCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="enabled" type="boolean" value="false"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="normalizedCheckBoxActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="createGraphicsButton">
       <Properties>

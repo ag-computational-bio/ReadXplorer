@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -43,29 +42,25 @@ public final class ParserCommonMethods {
      * cigar, then the read and reference sequence can be null (it is not used
      * in this case). Read and reference sequence are treated case
      * insensitively, so there is no need to transform the case beforehand.
-     *
      * @param cigar the cigar string containing the alignment operations
      * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence belonging to the cigar and without
-     * gaps
+     * @param refSeq the reference sequence area belonging to the cigar and
+     * without gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
      * false if the read is on the fwd strand.
-     * @param start start of the alignment of read and reference in the
-     * reference
      * @return diff and gap result for the read and reference seq pair
      * @throws NumberFormatException
      */
-    public static int countDiffsAndGaps(String cigar, String readSeq, String refSeq, boolean isRevStrand, int start) throws NumberFormatException {
+    public static int countDiffsAndGaps(String cigar, String readSeq, String refSeq, boolean isRevStrand) throws NumberFormatException {
 
         int differences = 0;
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
-        int currentDiffs;
-        int absPos = start;
-        int numDeletions = 0;
-        int correctPos;
+        int currentCount = 0;
+        int refPos = 0;
+        int readPos = 0;
         int diffPos;
         if (!refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
@@ -75,37 +70,44 @@ public final class ParserCommonMethods {
         for (int i = 0; i < charCigar.length; ++i) {
             op = charCigar[i];
 
-            if (op.equals("=")) { //only increase position for matches
-                absPos += Integer.valueOf(num[i - 1]);
+            if (op.equals("=")) { //increase position for matches, skipped regions (N) and padded regions (P)
+                currentCount = Integer.valueOf(num[i - 1]);
+                refPos += currentCount;
+                readPos += currentCount;
 
-            } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                absPos += currentDiffs;
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += Integer.valueOf(num[i - 1]);
+                
+            } else if (op.equals("X")) { //count and create diffs for mismatches
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                refPos += currentCount;
+                readPos += currentCount;
 
             } else if (op.equals("D")) { // count and add diff gaps for deletions in read
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                absPos += currentDiffs;
-                numDeletions += currentDiffs;
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                refPos += currentCount;
 
             } else if (op.equals("I")) { // count and add reference gaps for insertions
-                differences += Integer.valueOf(num[i - 1]);
-                //abs pos remains the same
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                readPos += currentCount;
+                // refPos remains the same
 
             } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                correctPos = absPos - start - numDeletions;
-                bases = readSeq.substring(correctPos, correctPos + currentDiffs);
+                currentCount = Integer.valueOf(num[i - 1]);
+                bases = readSeq.substring(readPos, readPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = absPos + j;
-                    if (bases.charAt(j) != refSeq.charAt(diffPos - start)) {
+                    diffPos = refPos + j;
+                    if (bases.charAt(j) != refSeq.charAt(diffPos)) {
                         ++differences;
                     }
                 }
-                absPos += currentDiffs;
+                refPos += currentCount;
+                readPos += currentCount;
 
-            } //P and H = padding and hard clipping do not contribute to differences
+            } //H and S = hard and soft clipped bases are not present in the read string and pos in record, so don't inc. absPos
         }
 
         return differences;
@@ -120,8 +122,8 @@ public final class ParserCommonMethods {
      * cigar operations need to be uppercase!
      * @param cigar the cigar string containing the alignment operations
      * @param readSeq the read sequence belonging to the cigar and without gaps
-     * @param refSeq the reference sequence belonging to the cigar and without
-     * gaps
+     * @param refSeq the reference sequence area belonging to the cigar and
+     * without gaps
      * @param isRevStrand true, if the ref seq has to be reverse complemented,
      * false if the read is on the fwd strand.
      * @param start start of the alignment of read and reference in the reference
@@ -138,11 +140,10 @@ public final class ParserCommonMethods {
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
-        int currentDiffs;
-        int absPos = start;
+        int currentCount;
+        int refPos = 0;
+        int readPos = 0;
         int diffPos;
-        int numDeletions = 0;
-        int correctPos;
         char base;
         if (!refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
@@ -153,59 +154,67 @@ public final class ParserCommonMethods {
             op = charCigar[i];
             
             if (op.equals("=")) { //only increase position for matches
-                absPos += Integer.valueOf(num[i - 1]);
-                
-            } else if (op.equals("X") || op.equals("S")) { //count and create diffs for mismatches
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                for (int j = 0; j < currentDiffs; ++j) {
-                    diffPos = absPos + j;
-                    base = readSeq.charAt(diffPos - start - numDeletions);
+                currentCount = Integer.valueOf(num[i - 1]);
+                refPos += currentCount;
+                readPos += currentCount;
+               
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += Integer.valueOf(num[i - 1]);
+
+            } else if (op.equals("X")) { //count and create diffs for mismatches
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    diffPos = readPos + j;
+                    base = readSeq.charAt(diffPos);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    diffs.add(new ParsedDiff(diffPos, base));
+                    diffs.add(new ParsedDiff(diffPos + start, base));
                 }
-                absPos += currentDiffs;
+                refPos += currentCount;
+                readPos += currentCount;
 
             } else if (op.equals("D")) { // count and add diff gaps for deletions in read
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                numDeletions += currentDiffs;
-                for (int j = 0; j < currentDiffs; ++j) {
-                    diffs.add(new ParsedDiff(absPos + j, '_'));
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    diffs.add(new ParsedDiff(refPos + j + start, '_'));
                 }
+                refPos += currentCount;
+                // readPos remains the same
             
             } else if (op.equals("I")) { // count and add reference gaps for insertions
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                differences += currentDiffs;
-                for (int j = 0; j < currentDiffs; ++j) {
-                    diffPos = absPos + j;
-                    base = readSeq.charAt(diffPos - start - numDeletions);
+                currentCount = Integer.valueOf(num[i - 1]);
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    base = readSeq.charAt(readPos + j);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    gaps.add(new ParsedReferenceGap(diffPos, base, getOrderForGap(diffPos, gapOrderIndex)));
+                    gaps.add(new ParsedReferenceGap(refPos + start, base, getOrderForGap(refPos + start, gapOrderIndex)));
                 }
-                //abs pos remains the same
+                //refPos remains the same
+                readPos += currentCount;
 
             } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                currentDiffs = Integer.valueOf(num[i - 1]);
-                bases = readSeq.substring(absPos - start - numDeletions, absPos - start + currentDiffs - numDeletions);
+                currentCount = Integer.valueOf(num[i - 1]);
+                bases = readSeq.substring(readPos, readPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = absPos + j;
-                    base = readSeq.charAt(j);
-                    if (base != refSeq.charAt(diffPos - start)) {
+                    diffPos = refPos + j;
+                    base = bases.charAt(j);
+                    if (base != refSeq.charAt(diffPos)) {
                         ++differences;
                         if (isRevStrand) {
                             base = SequenceUtils.getDnaComplement(base);
                         }
-                        diffs.add(new ParsedDiff(diffPos, base));
+                        diffs.add(new ParsedDiff(diffPos + start, base));
                     }
                 }
-                absPos += currentDiffs;
+                refPos += currentCount;
+                readPos += currentCount;
 
-            } //P and H = padding and hard clipping do not contribute to differences
+            } //P, S and H = padding, soft and hard clipping do not contribute to differences
         }
 
         return new DiffAndGapResult(diffs, gaps, differences);
@@ -237,7 +246,7 @@ public final class ParserCommonMethods {
             if (readSeq.charAt(i) != refSeq.charAt(i)) {
                 ++errors;
                 base = readSeq.charAt(i);
-                if (direction == -1) {
+                if (direction == SequenceUtils.STRAND_REV) {
                     base = SequenceUtils.getDnaComplement(base);
                 }
                 if (refSeq.charAt(i) == '_') {
@@ -305,13 +314,13 @@ public final class ParserCommonMethods {
         
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
-        String c;
+        String op;
         String numOfBases;
         for (int i = 1; i < charCigar.length; i++) {
-            c = charCigar[i];
+            op = charCigar[i];
             numOfBases = num[i - 1];
 
-            if (c.equals("D") || c.equals("N") || c.equals("P")) {
+            if (op.equals("D") || op.equals("N") || op.equals("P")) {
                 //deletion of the read
                 numberofDeletion = Integer.parseInt(numOfBases);
 
@@ -329,7 +338,7 @@ public final class ParserCommonMethods {
                     //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
                 }
 
-            } else if (c.equals("I")) {
+            } else if (op.equals("I")) {
                 //insertion of the  read
                 numberOfInsertions = Integer.parseInt(numOfBases);
 
@@ -348,14 +357,14 @@ public final class ParserCommonMethods {
                     //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                 }
                 
-            } else if (c.equals("M") || c.equals("=") || c.equals("X")) {
+            } else if (op.equals("M") || op.equals("=") || op.equals("X")) {
                 //for match/mismatch thr positions just move forward
                 readPos += Integer.parseInt(numOfBases);
                 refpos += Integer.parseInt(numOfBases);
                 newRefSeqwithGaps = refSeq;
                 newreadSeq = readSeq;
                 
-            } else if (c.equals("S")) {
+            } else if (op.equals("S")) {
                 if (i > 1) {
                     //soft clipping of the last bases
                     newreadSeq = newreadSeq.substring(0, readSeq.length() - Integer.parseInt(numOfBases));
@@ -365,7 +374,7 @@ public final class ParserCommonMethods {
                     softclipped = Integer.parseInt(numOfBases);
                 }
             } else {
-                Logger.getLogger(ParserCommonMethods.class.getName()).log(Level.WARNING, NbBundle.getMessage(ParserCommonMethods.class, "CommonMethod.CIGAR ", c));
+                Logger.getLogger(ParserCommonMethods.class.getName()).log(Level.WARNING, NbBundle.getMessage(ParserCommonMethods.class, "CommonMethod.CIGAR ", op));
             }
         }
         newreadSeq = newreadSeq.substring(softclipped, newreadSeq.length());
@@ -438,22 +447,25 @@ public final class ParserCommonMethods {
         int stopPosition;
         int numberofDeletion = 0;
         int numberofInsertion = 0;
-        int numberofSoftclipped = 0;  
-               String[] num=  cigar.split(cigarRegex);
+        int numberofSoftclipped = 0;
+        String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
-        for (int i=1;i<charCigar.length;i++) {
-            String c = charCigar[i];
-            String numOfBases = num[i-1];
-
-                if (c.contains("D") || c.contains("N") || c.contains("P")) {
-                    numberofDeletion += Integer.parseInt(numOfBases);
-                } if(c.contains("I")) {
-                    numberofInsertion += Integer.parseInt(numOfBases);
-                }if(c.contains("S")){
-                    numberofSoftclipped += Integer.parseInt(numOfBases);
-                }
+        String op;
+        String numOfBases;
+        for (int i = 1; i < charCigar.length; i++) {
+            op = charCigar[i];
+            numOfBases = num[i - 1];
+            if (op.contains("D") || op.contains("N") || op.contains("P")) {
+                numberofDeletion += Integer.parseInt(numOfBases);
+            }
+            if (op.contains("I")) {
+                numberofInsertion += Integer.parseInt(numOfBases);
+            }
+            if (op.contains("S")) {
+                numberofSoftclipped += Integer.parseInt(numOfBases);
+            }
         }
-        stopPosition = startPosition + readLength-1 + numberofDeletion - numberofInsertion-numberofSoftclipped;
+        stopPosition = startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
         return stopPosition;
     }
 

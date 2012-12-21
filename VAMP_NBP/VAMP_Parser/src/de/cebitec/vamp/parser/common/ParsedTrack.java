@@ -19,6 +19,7 @@ public class ParsedTrack {
     private ParsedMappingContainer mappings;
     private CoverageContainer coverageContainer;
     private boolean isFirstTrack;
+    private int batchPos; /** Stop position of the current batch in the ref. genome. */
 
     /**
      * Contains all data (description, mappings and coverageContainer) belonging
@@ -83,6 +84,13 @@ public class ParsedTrack {
      */
     public int getRefId() {
         return trackJob.getRefGen().getID();
+    }
+    
+    /**
+     * @return the track name
+     */
+    public String getTrackName() {
+        return trackJob.getName();
     }
     
     /**
@@ -153,6 +161,20 @@ public class ParsedTrack {
      */
     public File getFile() {
         return this.trackJob.getFile();
+    }
+
+    /**
+     * @return Stop position of the current batch in the ref. genome.
+     */
+    public int getBatchPos() {
+        return batchPos;
+    }
+
+    /**
+     * @param batchPos Stop position of the current batch in the ref. genome.
+     */
+    public void setBatchPos(int batchPos) {
+        this.batchPos = batchPos;
     }
 
 }

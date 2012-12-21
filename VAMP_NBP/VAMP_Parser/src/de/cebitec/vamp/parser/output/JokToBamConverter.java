@@ -41,14 +41,37 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
     }
 
     /**
-     * @param jokFile Sets the jok file to convert into BAM format.
+     * A JokToBamConverter needs exactly the following three parameters:
+     * @param jokFile the jok file to convert into BAM format.
      * @param refSeqName name of the reference sequence
      * @param refSeqLength length of the reference sequence 
      */
-    public void setDataToConvert(File jokFile, String refSeqName, int refSeqLength) {
-        this.jokFile = jokFile;
-        this.refSeqName = refSeqName;
-        this.refSeqLength = refSeqLength;
+    @Override
+    public void setDataToConvert(Object... data) throws IllegalArgumentException {
+        boolean works = true;
+        if (data.length >= 3) {
+            if (data[0] instanceof String) {
+                this.jokFile = new File((String) data[0]);
+            } else {
+                works = false;
+            }
+            if (data[1] instanceof String) {
+                this.refSeqName = (String) data[1];
+            } else {
+                works = false;
+            }
+            if (data[2] instanceof Integer) {
+                this.refSeqLength = (Integer) data[2];
+            } else {
+                works = false;
+            }
+        } else {
+            works = false;
+        }
+        if (!works) {
+            throw new IllegalArgumentException(NbBundle.getMessage(JokToBamConverter.class, 
+                    "Converter.SetDataError", "Inappropriate arguments passed to the converter!"));
+        }
     }
 
     @Override
