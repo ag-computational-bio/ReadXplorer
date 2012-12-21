@@ -9,3 +9,4 @@
 \.conflict\~$
 syntax: glob
 VAMP_NBP/testData.RData
+.DS_Store
