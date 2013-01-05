@@ -77,13 +77,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
         this.removeAll();
         this.repaint();
         
-        //Set the layout so that we can easily add the OutlineView: 
-        //setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); //Create children, using the factory class we created: 
-        //setLayout(new BorderLayout());
-        //setLayout(new FlowLayout());
-        
         if (!ProjectConnector.getInstance().isConnected()) {
-            
             /*
              * Quickstart:
              * 1. Open a database
@@ -101,59 +95,13 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
         }
         else {
             jButton1.setVisible(true);
-            /*GridBagLayout gbl = new GridBagLayout();
-            setLayout(gbl);
-            GridBagConstraints constraints = new GridBagConstraints();
-            constraints.gridwidth = GridBagConstraints.REMAINDER;
-            constraints.gridheight = 1;
-            constraints.weightx = 0.9;
-            constraints.fill = GridBagConstraints.HORIZONTAL;
-            constraints.anchor = GridBagConstraints.CENTER;*/
-            GroupLayout layout = new GroupLayout(this);
-            
-            setLayout(layout);
-            layout.setAutoCreateGaps(true);
-            layout.setAutoCreateContainerGaps(true);
-            
             final List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            /*HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
-            List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
-            List<TrackJobs> trackJobs = new ArrayList<TrackJobs>();
-
-            for(PersistantReference dbGen : dbGens) {
-                // File and parser parameter meaningles in this context
-                ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
-                indexedGens.put(r.getID(), r);
-                refJobs.add(r);
-            }*/
 
             List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
             
             final Map<PersistantReference,List<PersistantTrack>> genomesandtracks = 
                     ProjectConnector.getInstance().getGenomesAndTracks();
-            
-            
-            
-            /*for(PersistantTrack dbTrack : dbTracks){
-                // File and parser, refgenjob, runjob parameters meaningles in this context
-                TrackJobs t = new TrackJobs(dbTrack.getId(), null, dbTrack.getDescription(),
-                        indexedGens.get(dbTrack.getRefGenID()),
-                        null, dbTrack.getTimestamp());
 
-                // register dependent tracks at genome and run
-                ReferenceJob gen = indexedGens.get(dbTrack.getRefGenID());
-                gen.registerTrackWithoutRunJob(t);
-                trackJobs.add(t);
-            }*/
-
-
-            /*Category[] categories = {
-                new Category("Reference Genome", dbGens), 
-                //new Category("Tracks", dbTracks)
-            };*/
-
-            //Children kids = Children.create(new CustomerChildFactory(), true); //Create a root node: 
-            //Node rootNode = new AbstractNode(new CategoryChildren(categories)); //Create the OutlineView: 
             Node rootNode = new AbstractNode(new Children.Keys() {
 
                 @Override
@@ -191,65 +139,34 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             ov.getOutline().setRootVisible(false); //Add the OutlineView to the TopComponent: 
             ov.getOutline().setDefaultRenderer(Node.Property.class,
                                             new CustomOutlineCellRenderer());
-            //ov.getOutline().setDefaultRenderer(ov.getOutline().getColumnClass(1), null);
-            /*ov.getOutline().setDefaultRenderer(ov.getOutline().getColumnClass(0),
-                                            new CustomOutlineCellRenderer());
-            ov.getOutline().setDefaultRenderer(ov.getOutline().getColumnClass(1),
-                                            new CustomOutlineCellRenderer());
-            */
-            //ov.getOutline().setDefaultRenderer(
-            //ov.get .getColumnModel().getColumns()
             
-            //ov.set
-            //add(ov, BorderLayout.CENTER); //Set the root of the ExplorerManager: 
-            //add(jPanel1, BorderLayout.SOUTH);
-            //add(jPanel1);
-            //ov.setSize(ov.getSize().width, 100);
-            //ov.setPreferredSize(new Dimension(ov.getSize().width, 100));
-            //ov.getOutline().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            //ov.setMinimumSize();
-            //ov.setPreferredSize(new Dimension(400, 200));
-            
+            //use GroupLayout to show the "open selected" button directly under the outlineview
+            GroupLayout layout = new GroupLayout(this);
+            setLayout(layout);
+            layout.setAutoCreateGaps(true);
+            layout.setAutoCreateContainerGaps(true);
             layout.setHorizontalGroup(
                  layout.createParallelGroup(GroupLayout.Alignment.CENTER)
                     .addComponent(ov)
                     .addComponent(jButton1));
-            
-            //int prefHeight = 
-            
+
             layout.setVerticalGroup(
                 layout.createSequentialGroup()
                 .addComponent(ov, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                // important: add a gap under the button to get the users 
+                // attention to it, i.e. it is not to far away from the outline view
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
                      GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     );
-            //add(ov, constraints); //Set the root of the ExplorerManager: 
-            //add(Box.createRigidArea(new Dimension(0, 30)));
-            //jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.LINE_AXIS));
-            //jPanel1.add(jButton1);
-            //add(jPanel1, constraints);
-            //jPanel1.removeAll();
-            //jPanel1.add(jButton1);
-            //constraints.weightx = 0;
-            //add(jPanel1, constraints);
-            
-            //jPanel1.setLayout(new BorderLayout());
-            
             em.setRootContext(rootNode); //Put the Nodes into the Lookup of the TopComponent, 
-            //so that the Properties window will be synchronized: 
             
-            
-            //associateLookup(ExplorerUtils.createLookup(em, getActionMap())); 
-            //ov.getOutline().expandPath(new TreePath());
-
             //expand all nodes
             for(Node n : em.getRootContext().getChildren().getNodes()) {
                 ov.expandNode(n);
             }
+            //or like this for one special node: 
             //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
-            //ov.expandNode(em.getRootContext().getChildren().getNodeAt(1));
         }
         this.repaint();
     }
@@ -350,20 +267,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         List<Node> selectedNodes = getAllMarkedNodes(Arrays.asList(em.getRootContext().getChildren().getNodes()));
-                
-        /*for(Node n : ) {
-            ItemNode node = (ItemNode) n;
-            Item item = node.getData();
-            //ov.getOutline().getSelectedRows() rowat()
-            if (item.getMark()) {
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-                "Node "+item.getTitle()+" is selected!");
-                selectedNodes.add(n);
-            }
-            n.getChildren().getNodes()
-        }*/
-        
-        //int[] selectedRows = ov.getOutline().getSelectedRows();
+            
         //scan all selected nodes and save them to a map of the form:
         // GenomeID -> List<ReferenceID>
         selectedNodes.addAll(Arrays.asList(em.getSelectedNodes()));
@@ -405,14 +309,6 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             appPanelTopComponent.setName(appPanelTopComponent.getLookup().lookup(ViewController.class).getDisplayName());
             appPanelTopComponent.requestActive();
              
-            //ViewController vc;
-            //vc = new ViewController(appPanelTopComponent);
-            //vc.openRefGen();
-            //appPanelTopComponent.getContent().add(vc);
-            //vc.openGenome(genome);
-            
-            //appPanelTopComponent.getcont
-            
             
             //open tracks for this genome now
             List<PersistantTrack> all_tracks_for_this_genome = genomesAndTracks.get(genome);
