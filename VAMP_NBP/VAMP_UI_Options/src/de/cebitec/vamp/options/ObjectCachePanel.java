@@ -6,12 +6,12 @@ import java.awt.event.KeyListener;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
-final class GnuRPanel extends javax.swing.JPanel {
+final class ObjectCachePanel extends javax.swing.JPanel {
     
-    private final GnuROptionsPanelController controller;
+    private final ObjectCachePanelController controller;
     private Preferences pref;
     
-    GnuRPanel(GnuROptionsPanelController controller) {
+    ObjectCachePanel(ObjectCachePanelController controller) {
         this.controller = controller;
         initComponents();
         this.pref = NbPreferences.forModule(Object.class);
@@ -19,7 +19,7 @@ final class GnuRPanel extends javax.swing.JPanel {
     }
     
     private void setUpListener() {
-        cranMirror.addKeyListener(new KeyListener() {
+        cacheCheckBox.addKeyListener(new KeyListener() {
             
             @Override
             public void keyTyped(KeyEvent e) {
@@ -45,12 +45,16 @@ final class GnuRPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        cranMirror = new javax.swing.JTextField();
+        cacheCheckBox = new javax.swing.JCheckBox();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ObjectCachePanel.class, "ObjectCachePanel.jLabel1.text")); // NOI18N
 
-        cranMirror.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.text")); // NOI18N
-        cranMirror.setToolTipText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(cacheCheckBox, org.openide.util.NbBundle.getMessage(ObjectCachePanel.class, "ObjectCachePanel.cacheCheckBox.text")); // NOI18N
+        cacheCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cacheCheckBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -59,36 +63,38 @@ final class GnuRPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cranMirror)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 119, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 843, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cacheCheckBox))
+                .addContainerGap(435, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cranMirror, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(cacheCheckBox)
+                .addContainerGap(193, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cacheCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cacheCheckBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cacheCheckBoxActionPerformed
+
     void load() {
-        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, "http://cran.mirrors.hoobly.com/"));
+        cacheCheckBox.setSelected(pref.getBoolean(Properties.OBJECTCACHE_AUTOSTART, true));
     }
     
     void store() {
-        pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
+        pref.putBoolean(Properties.OBJECTCACHE_AUTOSTART, cacheCheckBox.isSelected());
     }
     
     boolean valid() {
         return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField cranMirror;
+    private javax.swing.JCheckBox cacheCheckBox;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

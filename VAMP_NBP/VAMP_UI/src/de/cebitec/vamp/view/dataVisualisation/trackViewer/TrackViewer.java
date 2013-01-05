@@ -10,6 +10,7 @@ import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -112,8 +113,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         this.setViewerSize();
         
         //if (trackCon.)
+        
         TrackCacher tc = new TrackCacher(trackCon, refGen.getRefLength());
-                    //tc.cache();
+        //tc.cache();
+        
+                    
     }
 
     private void setColors(Preferences pref) {

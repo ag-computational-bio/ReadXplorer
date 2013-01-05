@@ -10,11 +10,14 @@ import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.ObjectCache;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.vamp.util.Properties;
 import java.util.logging.Logger;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
@@ -67,7 +70,7 @@ public final class TrackCacher {
                     LOG.info("Requesting track cache for position=" + currentPosition);
                     
                     try {                    
-                        Thread.sleep(1000);
+                        Thread.sleep(50);
                     } catch (InterruptedException ex) {
                         Exceptions.printStackTrace(ex);
                     }
@@ -132,7 +135,9 @@ public final class TrackCacher {
         //check a boolean key to test, if the cache has allready been created 
         //for this track
         final String cacheFamily = "TrackCacher."+CACHEVERSION+"."
-                + SCANFACTOR +"." + "run";
+                + SCANFACTOR + "." 
+                + CoverageAndDiffResultPersistant.serialVersionUID 
+                + "." + "run";
         
         final String cacheKey = "Track." + tc.getTrackID();
         
@@ -148,9 +153,12 @@ public final class TrackCacher {
                     ObjectCache.getInstance().set(cacheFamily, cacheKey, true);
                 }
             });
-
-            //if (tc.isDbUsed()) theTask.schedule(5*1000); //start the task with a delay of 5 seconds
+            
+            //start pre caching only, if the user accepted it in his prefererences
+            if (NbPreferences.forModule(Object.class).getBoolean(Properties.OBJECTCACHE_AUTOSTART, true)) {
+                if (tc.isDbUsed()) theTask.schedule(5*1000); //start the task with a delay of 5 seconds
                                       //to let the first track position load 
+            }
         }
 
     }

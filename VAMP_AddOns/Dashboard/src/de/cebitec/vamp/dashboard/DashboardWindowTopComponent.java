@@ -22,6 +22,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
 import javax.swing.border.Border;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -73,9 +75,12 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
     
     public void refreshData() {
         this.removeAll();
+        this.repaint();
         
         //Set the layout so that we can easily add the OutlineView: 
-        setLayout(new BorderLayout()); //Create children, using the factory class we created: 
+        //setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); //Create children, using the factory class we created: 
+        //setLayout(new BorderLayout());
+        //setLayout(new FlowLayout());
         
         if (!ProjectConnector.getInstance().isConnected()) {
             
@@ -89,11 +94,27 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             
             Border paddingBorder = BorderFactory.createEmptyBorder(100,100,100,100);
             jLabel1.setBorder(BorderFactory.createCompoundBorder(paddingBorder,paddingBorder));
-            
+               
             add(jLabel1, BorderLayout.CENTER);
-            this.repaint();
+            this.remove(jPanel1);
+            jButton1.setVisible(false);
         }
         else {
+            jButton1.setVisible(true);
+            /*GridBagLayout gbl = new GridBagLayout();
+            setLayout(gbl);
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.gridheight = 1;
+            constraints.weightx = 0.9;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.CENTER;*/
+            GroupLayout layout = new GroupLayout(this);
+            
+            setLayout(layout);
+            layout.setAutoCreateGaps(true);
+            layout.setAutoCreateContainerGaps(true);
+            
             final List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
             /*HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
             List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
@@ -180,8 +201,40 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             //ov.get .getColumnModel().getColumns()
             
             //ov.set
-            add(ov, BorderLayout.CENTER); //Set the root of the ExplorerManager: 
-            add(jPanel1, BorderLayout.SOUTH);
+            //add(ov, BorderLayout.CENTER); //Set the root of the ExplorerManager: 
+            //add(jPanel1, BorderLayout.SOUTH);
+            //add(jPanel1);
+            //ov.setSize(ov.getSize().width, 100);
+            //ov.setPreferredSize(new Dimension(ov.getSize().width, 100));
+            //ov.getOutline().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            //ov.setMinimumSize();
+            //ov.setPreferredSize(new Dimension(400, 200));
+            
+            layout.setHorizontalGroup(
+                 layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                    .addComponent(ov)
+                    .addComponent(jButton1));
+            
+            //int prefHeight = 
+            
+            layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                .addComponent(ov, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                     GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    );
+            //add(ov, constraints); //Set the root of the ExplorerManager: 
+            //add(Box.createRigidArea(new Dimension(0, 30)));
+            //jPanel1.setLayout(new BoxLayout(jPanel1, BoxLayout.LINE_AXIS));
+            //jPanel1.add(jButton1);
+            //add(jPanel1, constraints);
+            //jPanel1.removeAll();
+            //jPanel1.add(jButton1);
+            //constraints.weightx = 0;
+            //add(jPanel1, constraints);
+            
             //jPanel1.setLayout(new BorderLayout());
             
             em.setRootContext(rootNode); //Put the Nodes into the Lookup of the TopComponent, 
@@ -198,6 +251,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
             //ov.expandNode(em.getRootContext().getChildren().getNodeAt(1));
         }
+        this.repaint();
     }
 
     
@@ -241,6 +295,10 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.jButton1.text")); // NOI18N
+        jButton1.setBounds(new java.awt.Rectangle(0, 0, 400, 29));
+        jButton1.setMargin(new java.awt.Insets(15, 50, 15, 50));
+        jButton1.setMaximumSize(new java.awt.Dimension(400, 29));
+        jButton1.setMinimumSize(new java.awt.Dimension(400, 29));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -254,9 +312,9 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 312, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -264,9 +322,9 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addGap(47, 47, 47)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 207, Short.MAX_VALUE))
+                .addGap(0, 248, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

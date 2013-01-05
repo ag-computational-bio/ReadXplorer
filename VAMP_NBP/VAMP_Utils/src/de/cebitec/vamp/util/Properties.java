@@ -104,4 +104,6 @@ public class Properties {
     /** The CRAN Mirror used by Gnu R to load missing packages */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
     
+    /* cache every track automatically when opened? */
+    public static final String OBJECTCACHE_AUTOSTART = "OBJECTCACHE_AUTOSTART";
 }
