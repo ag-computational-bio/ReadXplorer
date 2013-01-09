@@ -7,5 +7,6 @@ package de.cebitec.vamp.databackend;
 public interface ThreadListener {
 
     public void receiveData(Object data);
-
+    
+    public void notifySkipped();
 }

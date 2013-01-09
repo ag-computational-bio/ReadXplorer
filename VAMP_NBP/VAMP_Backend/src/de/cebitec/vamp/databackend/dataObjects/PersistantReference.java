@@ -80,5 +80,41 @@ public class PersistantReference {
     public String toString(){
         return name+" "+description;
     }
+    
+    /* 
+     * need this to use PersistantReference class as key for HashMap 
+     * @see http://stackoverflow.com/questions/27581/overriding-equals-and-hashcode-in-java
+     * (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+    */
+   @Override
+   public int hashCode() {
+       return id;
+   }
+    
+    /**
+     * check if the given reference genome is equal to this one 
+     */
+    @Override
+    public boolean equals(Object o) {
+        
+        if (o instanceof PersistantReference) {
+            PersistantReference ogenome = (PersistantReference) o;
+            return ( 
+               ogenome.description.equals(this.description)
+                && ogenome.name.equals(this.name)
+                && (ogenome.id==this.id)
+                && (ogenome.refLength==this.refLength)
+                && ogenome.timestamp.equals(this.timestamp)
+                
+                //for current purposes we do not need to compare the sequence, 
+                //in most cases the id should be enoght
+                //&& (ogenome.sequence...) 
+                    
+               );
+                    
+        }
+        else return super.equals(o);
+    }
 
 }

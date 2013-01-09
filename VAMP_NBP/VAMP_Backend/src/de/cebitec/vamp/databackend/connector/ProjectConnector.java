@@ -12,6 +12,7 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.sql.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -24,7 +25,7 @@ import org.openide.util.NbBundle;
  *
  * @author ddoppmeier, rhilker
  */
-public class ProjectConnector {
+public class ProjectConnector extends Observable {
 
     private static ProjectConnector dbConnector;
     private Connection con;
@@ -87,6 +88,7 @@ public class ProjectConnector {
         }
         return dbConnector;
     }
+    
 
     /**
      * @return All tracks stored in the database with all their information.
@@ -115,6 +117,33 @@ public class ProjectConnector {
 
         return tracks;
     }
+    
+    public Map<PersistantReference,List<PersistantTrack>> getGenomesAndTracks() {
+       List<PersistantReference> genomes = this.getGenomes();
+       List<PersistantTrack> tracks = this.getTracks();
+       HashMap<Integer, List<PersistantTrack>> tracks_by_reference_id = new HashMap<Integer, List<PersistantTrack>>();
+       for(PersistantTrack t : tracks) {
+           List<PersistantTrack> list = tracks_by_reference_id.get(t.getRefGenID());
+           if (list==null) {
+               list = new ArrayList<PersistantTrack>();
+               tracks_by_reference_id.put(t.getRefGenID(), list);
+           }
+           list.add(t);
+       }
+       
+       HashMap<PersistantReference, List<PersistantTrack>> tracks_by_reference
+               = new HashMap<PersistantReference, List<PersistantTrack>>();
+       for(PersistantReference reference : genomes) {
+           List<PersistantTrack> current_track_list = tracks_by_reference_id.get(reference.getId());
+           //if the current reference genome does not have any tracks, 
+           //just create an empty list
+           if (current_track_list==null) current_track_list = new ArrayList<PersistantTrack>();
+           tracks_by_reference.put(reference, current_track_list);
+       }
+    
+        
+       return tracks_by_reference;
+    }
 
     public boolean isConnected() {
         if (con != null) {
@@ -137,6 +166,10 @@ public class ProjectConnector {
         } finally {
             con = null;
             this.cleanUp();
+            
+            // notify observers about the change of the database
+            this.setChanged();
+            this.notifyObservers( "disconnect" );
         }
     }
 
@@ -160,7 +193,8 @@ public class ProjectConnector {
             this.connect(url, user, password);
             this.setupMySQLDatabase();
         } else if (adapter.equalsIgnoreCase(Properties.ADAPTER_H2)) {
-            this.url = "jdbc:" + adapter + ":" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
+            //CACHE_SIZE is measured in KB
+            this.url = "jdbc:" + adapter + ":" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
             //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
 
             this.connectH2DataBase(url);
@@ -168,6 +202,9 @@ public class ProjectConnector {
 //        } else { //means: if (adapter.equalsIgnoreCase(Properties.ADAPTER_DIRECT_ACCESS)) {
 //            this.connectToProject(projectLocation);
         }
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "connect" );
     }
 
     
@@ -213,6 +250,9 @@ public class ProjectConnector {
             con.prepareStatement(H2SQLStatements.SETUP_COVERAGE).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_COVERAGE).executeUpdate();
             
+            //create reversed coverage index (speedup by factor of 3 with many tracks in one database)
+            con.prepareStatement(H2SQLStatements.INDEX_COVERAGE_RV).executeUpdate();
+            
             con.prepareStatement(H2SQLStatements.SETUP_ANNOTATIONS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_ANNOTATIONS).executeUpdate();
             
@@ -246,6 +286,9 @@ public class ProjectConnector {
             
             con.prepareStatement(H2SQLStatements.SETUP_COVERAGE_DISTRIBUTION).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_COVERAGE_DIST).executeUpdate();
+            
+            con.prepareStatement(SQLStatements.SETUP_OBJECTCACHE).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_OBJECTCACHE).executeUpdate();
 
             this.checkDBStructure();
 
@@ -475,7 +518,7 @@ public class ProjectConnector {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting project folder"); 
 //        return true;        
 //    }
-
+    
     private void storeGenome(ParsedReference reference) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing reference sequence data...");
         try {
@@ -569,7 +612,9 @@ public class ProjectConnector {
     private void lockReferenceDomainTables() {
         this.lockDomainTables(MySQLStatements.LOCK_TABLE_REFERENCE_DOMAIN, "reference");
     }
-
+    
+   
+    
     public int addRefGenome(ParsedReference reference) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName());
 
@@ -595,6 +640,11 @@ public class ProjectConnector {
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName());
+        
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "addRefGenome" );
+        
         return reference.getID();
     }
 
@@ -667,6 +717,11 @@ public class ProjectConnector {
             } catch (SQLException ex) {
                 this.rollbackOnError(this.getClass().getName(), ex);
             }
+            
+            // notify observers about the change of the database
+            this.setChanged();
+            this.notifyObservers( "storeCoverage" );
+            
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
         }
     }
@@ -691,7 +746,7 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
-
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");        
     }
     
@@ -720,7 +775,7 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
-
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
 
@@ -1043,7 +1098,11 @@ public class ProjectConnector {
             track.clear();
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
-
+        
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "addTrack" );
+        
         return track.getID();
     }
 
@@ -1337,7 +1396,11 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             throw new StorageException(ex);
         }
-
+        
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "deleteTrack" );
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"{0}\"", trackID);
     }
 
@@ -1372,6 +1435,11 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             throw new StorageException(ex);
         }
+        
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "deleteGenomes" );
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
 
@@ -1501,6 +1569,11 @@ public class ProjectConnector {
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
+        
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "storeSeqPairData" );
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair data");
     }
 
@@ -1741,6 +1814,10 @@ public class ProjectConnector {
             } catch (SQLException ex) {
                 this.rollbackOnError(this.getClass().getName(), ex);
             }
+            
+            // notify observers about the change of the database
+            this.setChanged();
+            this.notifyObservers( "storePositionTable" );
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
         }

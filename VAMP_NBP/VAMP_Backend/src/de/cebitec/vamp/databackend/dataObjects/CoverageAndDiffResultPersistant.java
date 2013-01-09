@@ -1,5 +1,6 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,11 @@ import java.util.List;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoverageAndDiffResultPersistant extends PersistantResult {
+public class CoverageAndDiffResultPersistant extends PersistantResult implements Serializable {
+    
+    /** important: this id is used, when saving a CoverageAndDiffResultPersistant in the objectcache
+     * raise this number, if any change to the class structure will be made in the future */
+    public static final long serialVersionUID = 42L;
     
     private PersistantCoverage coverage;
     private List<PersistantDiff> diffs;

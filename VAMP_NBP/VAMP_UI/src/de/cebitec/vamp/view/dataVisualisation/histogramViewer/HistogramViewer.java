@@ -5,7 +5,7 @@ import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.Properties; 
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -57,6 +57,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private int maxCoverage;
     private List<Integer> scaleValues;
     private double pxPerCoverageUnit;
+
+    @Override
+    public void notifySkipped() {
+        //do nothing
+    }
 
     private enum Bases {
         m, a, c, t, g, n, _,

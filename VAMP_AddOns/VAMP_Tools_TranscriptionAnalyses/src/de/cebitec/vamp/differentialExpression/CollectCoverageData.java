@@ -130,4 +130,9 @@ public class CollectCoverageData implements ThreadListener {
         MappingResultPersistant results = (MappingResultPersistant) data;
         mappings = results.getMappings();
     }
+
+    @Override
+    public void notifySkipped() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

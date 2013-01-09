@@ -20,7 +20,7 @@ import org.openide.util.NbBundle;
 
 /**
  * @author -Rolf Hilker
- * 
+ *  
  * Class for handling the data threads for one of the currently started analyses.
  * CAUTION: You cannot query coverage and mapping tables with the same AnalysisHandler at
  * the same time.
@@ -231,5 +231,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 observer.update(mappingQuerriesFinished);
             }
         }
+    }
+
+    @Override
+    public void notifySkipped() {
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -1,12 +1,14 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import java.io.Serializable;
+
 /**
  * Depicts a difference in a mapping to the reference genome. Therefore, it contains
  * base, position, number of replicates and strand information.
  * 
  * @author ddoppmei
  */
-public class PersistantDiff implements Comparable<PersistantDiff> {
+public class PersistantDiff implements Comparable<PersistantDiff>, Serializable {
 
     private char base;
     private int position;

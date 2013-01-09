@@ -9,4 +9,5 @@
 \.conflict\~$
 syntax: glob
 VAMP_NBP/testData.RData
+.DS_Store
 VAMP_NBP/VAMP_Libraries/nbproject/findbugs.settings

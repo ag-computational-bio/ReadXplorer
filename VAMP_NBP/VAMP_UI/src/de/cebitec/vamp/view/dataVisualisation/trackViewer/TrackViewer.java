@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.controller.TrackCacher;
 import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -16,6 +17,9 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +28,9 @@ import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
+import javax.imageio.ImageIO;
 import javax.swing.JSlider;
+import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 /**
@@ -67,6 +73,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
  //   public static final String PROP_TRACK_CLICKED = "track clicked";
   //  public static final String PROP_TRACK_ENTERED = "track entered";
     private boolean combineTracks;
+    private BufferedImage loadingIndicator;
 
     /**
      * Create a new panel to show coverage information
@@ -80,6 +87,16 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
             TrackConnector trackCon, boolean combineTracks){
         super(boundsManager, basePanel, refGen);
+        
+        //read loadingIndicator icon from package resources
+        try { 
+            InputStream stream = TrackViewer.class
+            .getResourceAsStream( "loading.png" );
+            this.loadingIndicator = ImageIO.read( stream ); 
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
         this.trackCon = trackCon;
         this.twoTracks = this.trackCon.getAssociatedTrackNames().size() > 1; 
         this.combineTracks = combineTracks;
@@ -109,6 +126,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             }
         });
         this.setViewerSize();
+        
+        //if (trackCon.)
+        
+        TrackCacher tc = new TrackCacher(trackCon, refGen.getRefLength());
+        //tc.cache();
+        
+                    
     }
 
     private void setColors(Preferences pref) {
@@ -149,7 +173,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
         if (this.covLoaded || this.colorChanges) {
             if (!this.twoTracks || this.twoTracks && this.combineTracks) {
-
+                               
                 // fill and draw all coverage pathes
 
                 // n error mappings
@@ -203,7 +227,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             }
 
         } else {
-            g.fillRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
+            Color fillcolor = ColorProperties.TITLE_BACKGROUND;
+            g.setColor(fillcolor);
+            if (this.loadingIndicator!=null)
+            g.drawImage(this.loadingIndicator, this.getWidth()-60-loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            //g.fillRect(0, 0, this.getHeight()/4, this.getHeight()/4); //this.getWidth(), this.getHeight()/3);
         }
 
         // draw scales
@@ -935,6 +963,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void setAutomaticScaling(boolean automaticScaling) {
         this.automaticScaling = automaticScaling;
         this.computeAutomaticScaling();
+    }
+
+    @Override
+    public void notifySkipped() {
+        //do nothing
     }
 
 }

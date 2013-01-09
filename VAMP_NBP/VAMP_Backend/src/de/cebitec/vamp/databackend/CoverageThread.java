@@ -44,8 +44,19 @@ public class CoverageThread extends RequestThread {
     private ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResultPersistant currentCov;
     private int coveredWidth;
+    private IntervalRequest latestRequest;
+    private double requestCounter;
+    private double skippedCounter;
     private boolean isDbUsed = false;
     private PersistantReference referenceGenome;
+    
+    /** 
+     * Defines the minimum interval length to be loaded. 
+     * If the requested interval is less than this value, it will be extended
+     * to this width.
+     * This is used for preloading available data to make rendering faster.
+     */
+    public static final int MINIMUMINTERVALLENGTH = 90000; 
 
     /**
      * Thread for retrieving the coverage for a list of tracks either from the
@@ -58,7 +69,9 @@ public class CoverageThread extends RequestThread {
         super();
         this.requestQueue = new ConcurrentLinkedQueue<>();
         con = ProjectConnector.getInstance().getConnection();
-        coveredWidth = 25000;
+        coveredWidth = MINIMUMINTERVALLENGTH;
+        requestCounter = 0;
+        skippedCounter = 0;
 
         // do id specific stuff
         this.tracks = tracks;
@@ -104,22 +117,52 @@ public class CoverageThread extends RequestThread {
 
     public void setCoveredWidth(int coveredWidth) {
         this.coveredWidth = coveredWidth;
+        //TODO: check what does this function do?
     }
-
+    
+    public static int getMinimumSubIntervalLength() {
+        return MINIMUMINTERVALLENGTH/3;
+    }
+    
+    
+    
+    /**
+     * calculate the left boundary of the area to be loaded by the request
+     * the area will be changed to cover more width than requested (preload more data)
+     * @param request
+     * @return 
+     */
     private int calcCenterLeft(IntervalRequest request) {
         int centerMiddle = this.calcCenterMiddle(request);
         int interval = request.getTo() - request.getFrom();
-        coveredWidth = interval > coveredWidth * 2 ? interval / 2 : coveredWidth;
-        int result = centerMiddle - coveredWidth;
+        //coveredWidth = interval > coveredWidth * 2 ? interval / 2 : coveredWidth;
+        //int result = centerMiddle - coveredWidth;
+        
+        // round down to multiple of sub interval length 
+        int result = centerMiddle / getMinimumSubIntervalLength() * getMinimumSubIntervalLength();
+        // and extend with one extra subinterval 
+        result = result - getMinimumSubIntervalLength();
+        
         return result < 0 ? 0 : result;
     }
-
+    
+    /**
+     * calculate the left boundary of the area to be loaded by the request
+     * the area will be changed to cover more width than requested (preload more data)
+     * @param request
+     * @return 
+     */
     private int calcCenterRight(IntervalRequest request) {
-        int centerMiddle = this.calcCenterMiddle(request);
+        /*int centerMiddle = calcCenterMiddle(request);
         int interval = request.getTo() - request.getFrom();
         coveredWidth = interval > coveredWidth * 2 ? interval / 2 : coveredWidth;
-        int result = centerMiddle + coveredWidth;
-        return result;
+        int result = centerMiddle + coveredWidth;*/
+        
+        int result = this.calcCenterLeft(request) + MINIMUMINTERVALLENGTH;
+        
+        //take care of intervals bigger than the minimum length
+        if (result<request.getTo()) return ((request.getTo() / getMinimumSubIntervalLength())+1) * getMinimumSubIntervalLength();
+        else return result;
     }
     
     /**
@@ -154,24 +197,53 @@ public class CoverageThread extends RequestThread {
      * @throws SQLException 
      */
     private CoverageAndDiffResultPersistant loadCoverage(IntervalRequest request) throws SQLException {
+        StopWatch stopwatch = new StopWatch();
+        
         int from = calcCenterLeft(request);
         int to = calcCenterRight(request);
         
         CoverageAndDiffResultPersistant result;
         PersistantCoverage cov = new PersistantCoverage(from, to);
         cov.incArraysToIntervalSize();
-
+        
+        
+        
         if (this.isDbUsed) {
+            
+            String cacheFamily = "loadCoverage."+trackID;
+            String cacheKey = from + "." + to;
+            Object cachedResult = ObjectCache.getInstance().get(cacheFamily, cacheKey);
+            if (cachedResult!=null) {
+                result = (CoverageAndDiffResultPersistant) cachedResult;
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
+                "Needed "+(stopwatch.getElapsedTimeAsString())+" to load Coverage data from cache");
+                return result;
+            }
+            
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
-            fetch.setInt(1, from);
-            fetch.setInt(2, to);
-            fetch.setLong(3, trackID);
+            fetch.setLong(1, trackID);
+            fetch.setInt(2, from);
+            fetch.setInt(3, to);
+            
 
             ResultSet rs = fetch.executeQuery();
+            
+        
+           
+                                    
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
+                                "sql:"+fetch.toString());
+            
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
+             "Needed "+(stopwatch.getElapsedTimeAsString())+" to execute fetch coverage query");
+            stopwatch.reset();
+                        
+                        
+            int counter = 0;
 //            int tmpHighestCov = 0;
             while (rs.next()) {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-//                counter++;
+                counter++;
                 //perfect cov
                 cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
                 cov.setPerfectFwdNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
@@ -200,10 +272,17 @@ public class CoverageThread extends RequestThread {
             rs.close();
             result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
             
+            
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
+                "Needed "+(stopwatch.getElapsedTimeAsString())+" to calculate Coverage ("+counter+" items)");
+            
+            ObjectCache.getInstance().set(cacheFamily, cacheKey, result);
+            
+
         } else {
             result = this.getCoverageAndDiffsFromFile(request, from, to, tracks.get(0));
         }
-
+            
         return result;
     }
 
@@ -583,11 +662,17 @@ public class CoverageThread extends RequestThread {
                             } else if (this.tracks != null && !this.tracks.isEmpty()) {
                                 currentCov = this.loadCoverageMultiple(request);
                             }
+                        } else {
+                            skippedCounter++;
+                            request.getSender().notifySkipped();
                         }
                     }
                     
                     if (this.matchesLatestRequestBounds(request)) {
                         request.getSender().receiveData(currentCov);
+                    }
+                    else {
+                       request.getSender().notifySkipped(); 
                     }
                 } else {
                     try {

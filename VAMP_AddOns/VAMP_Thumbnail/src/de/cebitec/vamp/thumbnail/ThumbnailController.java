@@ -337,7 +337,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         int annotationWidth = (annotation.getStop() - annotation.getStart()) / 2;
         trackV.getTrackCon().getCoverageThread().setCoveredWidth(annotationWidth);
-
+ 
         //eigener ComponentListener für TrackV
         trackV.addComponentListener(new TrackViewerCompListener(annotation, trackV));
 

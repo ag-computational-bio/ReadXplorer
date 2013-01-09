@@ -91,6 +91,13 @@ public class H2SQLStatements {
 
     public final static String INDEX_COVERAGE =
             "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_POSITION + ", " + FieldNames.COVERAGE_TRACK + ") ";
+    
+    public final static String INDEX_COVERAGE_RV =
+            "CREATE INDEX IF NOT EXISTS INDEXCOVERAGE_RV ON " + FieldNames.TABLE_COVERAGE + "(" + FieldNames.COVERAGE_TRACK + ", " + FieldNames.COVERAGE_POSITION + ") ";
+    
+    
+    public final static String INDEX_OBJECTCACHE =
+            "CREATE INDEX IF NOT EXISTS INDEXOBJECTCACHE ON " + FieldNames.TABLE_OBJECTCACHE + "(" + FieldNames.OBJECTCACHE_FAMILY + ", " + FieldNames.OBJECTCACHE_KEY + ") ";
    
     
     public final static String SETUP_ANNOTATIONS =

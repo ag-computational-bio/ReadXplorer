@@ -3,13 +3,7 @@ package de.cebitec.vamp.options;
 import de.cebitec.vamp.util.Properties;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.prefs.Preferences;
-import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 final class GnuRPanel extends javax.swing.JPanel {

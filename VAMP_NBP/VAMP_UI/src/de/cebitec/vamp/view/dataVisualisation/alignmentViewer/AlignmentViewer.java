@@ -377,4 +377,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         this.revalidate();
     }
 
+    @Override
+    public void notifySkipped() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

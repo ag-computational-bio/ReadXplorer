@@ -27,7 +27,7 @@ public class FieldNames {
     public final static String TABLE_POSITIONS = "POSITIONS";
     public final static String TABLE_STATISTICS = "STATISTICS";  
     public final static String TABLE_COVERAGE_DISTRIBUTION = "COVERAGE_DISTRIBUTION";
-   
+    public final static String TABLE_OBJECTCACHE = "OBJECT_CACHE"; 
     
     
     ////////////////////////  tables fields  //////////////////////////////// 
@@ -67,6 +67,12 @@ public class FieldNames {
     public final static String DIFF_GAP_ORDER = "GAP_ORDER";
     public final static String DIFF_SNP_ID = "SNP_ID";
 
+    
+    // objectcache table fields
+    public final static String OBJECTCACHE_ID = "ID";
+    public final static String OBJECTCACHE_FAMILY = "FAMILY";
+    public final static String OBJECTCACHE_KEY = "KEY";
+    public final static String OBJECTCACHE_DATA = "DATA";
     
     // coverage table fields
     public final static String COVERAGE_ID = "ID";

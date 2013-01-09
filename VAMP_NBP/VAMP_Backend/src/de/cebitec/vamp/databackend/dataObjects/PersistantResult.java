@@ -1,11 +1,13 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import java.io.Serializable;
+
 /**
  * Contains the basic functionality of a persistant result.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class PersistantResult {
+public class PersistantResult implements Serializable {
     
     private int lowerBound;
     private int upperBound;
@@ -18,6 +20,13 @@ public class PersistantResult {
     public PersistantResult(int lowerBound, int upperBound) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
+    }
+    
+    /** a parameterless constructor is needed to enable deserialization 
+     *  of child classed */
+    public PersistantResult() {
+        this.lowerBound = 0;
+        this.upperBound = 0;
     }
     
     /**
