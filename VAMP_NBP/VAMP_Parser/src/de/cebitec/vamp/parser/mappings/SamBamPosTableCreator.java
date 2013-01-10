@@ -202,7 +202,7 @@ public class SamBamPosTableCreator implements Observable {
                         this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
                                 "Parser.Parsing.CorruptData", lineno, record.getReadName()));
                     }
-                } catch (SAMFormatException e) {
+                } catch (Exception e) {
                     this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                             "Parser.Parsing.CorruptData", lineno, e.toString()));
                 }

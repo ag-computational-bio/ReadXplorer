@@ -776,6 +776,10 @@ public class ProjectConnector extends Observable {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
         
+        // notify observers about the change of the database
+        this.setChanged();
+        this.notifyObservers( "storeTrack" );
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
 
