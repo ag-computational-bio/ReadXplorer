@@ -88,7 +88,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             
             Border paddingBorder = BorderFactory.createEmptyBorder(100,100,100,100);
             jLabel1.setBorder(BorderFactory.createCompoundBorder(paddingBorder,paddingBorder));
-               
+            this.setLayout(new BorderLayout());
             add(jLabel1, BorderLayout.CENTER);
             this.remove(jPanel1);
             jButton1.setVisible(false);
