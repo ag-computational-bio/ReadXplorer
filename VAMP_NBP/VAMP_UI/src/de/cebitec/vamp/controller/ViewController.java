@@ -43,15 +43,19 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         trackToPanel = new HashMap<>();
     }
     
-    /**
-     * Handles the opening of a reference genome viewer. First the list of
-     * reference sequences is shown, and after a selection was made, the 
-     * corresponding reference viewer is opened.
-     */
-
+    public void openGenome(PersistantReference genome) {
+        currentRefGen = genome;
+        boundsManager = new BoundsInfoManager(currentRefGen);
+        basePanelFac = new BasePanelFactory(boundsManager, this);
+        genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
         getApp().showRefGenPanel(genomeViewer);
     }
     
+    /**
+     * Handles the opening of a reference genome viewer. First the list of
+     * reference sequences is shown, and after a selection was made, the
+     * corresponding reference viewer is opened.
+     */
     public void openRefGen(){
         OpenRefGenPanel orgp = new OpenRefGenPanel();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(orgp, "Open Reference");
@@ -82,7 +86,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     
     /**
      * opens the given track on the current genome
-     * @param track 
+     * @param tracks the tracks belonging to the current reference genome
      */
     public void openTracksOnCurrentGenome(Collection<PersistantTrack> tracks) {
         for (PersistantTrack track : tracks) {

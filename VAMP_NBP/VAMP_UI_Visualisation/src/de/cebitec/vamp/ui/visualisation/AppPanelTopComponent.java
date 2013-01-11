@@ -54,8 +54,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
      * Top component which displays the main work area of VAMP, which contains
      * the reference and track viewers.
      */
-    }
-    
     public AppPanelTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
