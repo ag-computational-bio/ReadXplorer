@@ -5,6 +5,7 @@
  */
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
@@ -31,9 +32,9 @@ import javax.swing.text.NumberFormatter;
 import org.openide.util.NbBundle;
 
 /**
- * @author rhilker
- * 
  * The dialog panel for importing only position tables for an existing track.
+ *
+ * @author rhilker
  */
 public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
 
@@ -49,7 +50,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
     private static final int defaultVal = 300000;
 
     
-    /** Creates new form NewPositionTableDialog */
+    /** The dialog panel for importing only position tables for an existing track. */
     public NewPositionTableDialog() {
         this.getRefGenJobs();
         this.initComponents();
@@ -106,7 +107,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
     
     private ReferenceJob[] getRefGenJobs() {
         if (this.refGenJobs == null) {
-            List<ReferenceJob> list = new ArrayList<ReferenceJob>();
+            List<ReferenceJob> list = new ArrayList<>();
 
             try {
                 List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
@@ -287,12 +288,10 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
                 fc.setCurrentDirectory(new File(path));
             }
             int result = fc.showOpenDialog(this);
-
-            File file = null;
-
+            
             if (result == 0) {
                 // file chosen
-                file = fc.getSelectedFile();
+                File file = fc.getSelectedFile();
 
                 if (file.canRead()) {
                     mappingFile = file;

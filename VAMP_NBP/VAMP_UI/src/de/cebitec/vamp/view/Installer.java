@@ -23,7 +23,7 @@ import org.openide.windows.WindowManager;
  */
 public class Installer extends ModuleInstall {
     
-    public static final String VAMP_VERSION = "1.7";
+    public static final String VAMP_VERSION = "1.7.1";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 

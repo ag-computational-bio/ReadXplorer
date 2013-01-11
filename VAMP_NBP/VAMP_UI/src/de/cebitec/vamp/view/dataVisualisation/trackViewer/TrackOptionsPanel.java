@@ -9,24 +9,25 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
-
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 /**
- * @author jstraube, rhilker
- * 
  * Panel containing the display options for a track viewer like
  * automatic sclaing and normalizing the coverage.
+ * 
+ * @author jstraube, rhilker
  */
 public class TrackOptionsPanel extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     private TrackViewer trackViewer;
 
     /**
      * Creates a new Panel containing the display options for a track viewer like
      * automatic sclaing and normalizing the coverage.
+     * @param parentTrackViewer parent track viewer
      */
     public TrackOptionsPanel(TrackViewer parentTrackViewer) {
         this.trackViewer = parentTrackViewer;
@@ -79,7 +80,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         generalPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
         final JCheckBox scaleBox = new JCheckBox("Automatic scaling enabled");
         scaleBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        scaleBox.setSelected(true);
+        scaleBox.setSelected(false);
         
         //automatic scaling enabled event
         scaleBox.addActionListener(new ActionListener() {

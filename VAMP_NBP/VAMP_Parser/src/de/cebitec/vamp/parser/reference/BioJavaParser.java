@@ -84,6 +84,7 @@ public class BioJavaParser implements ReferenceParserI {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public ParsedReference parseReference(ReferenceJob refGenJob, AnnotationFilter filter) throws ParsingException {
 
         ParsedReference refGenome = new ParsedReference();
@@ -103,7 +104,7 @@ public class BioJavaParser implements ReferenceParserI {
             RichSequence seq;
             Iterator<Feature> featIt;
             RichFeature annotation;
-            String parsedType = null;
+            String parsedType;
             String locusTag = "unknown locus tag";
             String product = null;
             int start;
@@ -256,7 +257,7 @@ public class BioJavaParser implements ReferenceParserI {
             }
 
         } catch (Exception ex) {
-            this.sendErrorMsg(ex.getMessage());
+            throw new ParsingException(ex);
         }
         refGenome.addSubAnnotations(exons);
         return refGenome;

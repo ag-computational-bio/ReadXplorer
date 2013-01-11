@@ -5,6 +5,7 @@
  */
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;

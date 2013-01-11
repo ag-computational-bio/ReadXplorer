@@ -1,20 +1,19 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JAnnotation;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
-import org.openide.util.LookupEvent;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
+import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
@@ -117,8 +116,12 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
         org.openide.awt.Mnemonics.setLocalizedText(startLabel, org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startLabel.text")); // NOI18N
         startLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceAnnotationTopComp.class, "ReferenceAnnotationTopComp.startLabel.toolTipText")); // NOI18N
 
+        productText.setEditable(false);
         productText.setColumns(20);
+        productText.setLineWrap(true);
         productText.setRows(5);
+        productText.setWrapStyleWord(true);
+        productText.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jScrollPane1.setViewportView(productText);
 
         geneField.setEditable(false);
@@ -135,7 +138,7 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(strandLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE)
+                    .addComponent(strandLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(productLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(geneLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(stopLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -221,6 +224,7 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
+     * @return the ReferenceAnnotationTopComp
      */
     public static synchronized ReferenceAnnotationTopComp getDefault() {
         if (instance == null) {
@@ -231,6 +235,7 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
 
     /**
      * Obtain the ReferenceAnnotationTopComp instance. Never call {@link #getDefault} directly!
+     * @return the ReferenceAnnotationTopComp
      */
     public static synchronized ReferenceAnnotationTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
@@ -307,21 +312,36 @@ public final class ReferenceAnnotationTopComp extends TopComponent implements Lo
         return PREFERRED_ID;
     }
 
-    public void showAnnotationDetails(PersistantAnnotation f) {
-        this.ecNumField.setText(f != null ? f.getEcNumber() : "");
-        this.startField.setText(f != null ? String.valueOf(f.getStart()) : "");
-        this.stopField.setText(f != null ? String.valueOf(f.getStop()) : "");
-        this.productText.setText(f != null ? f.getProduct() : "");
-        this.productText.setToolTipText(f != null ? f.getProduct() : "");
-        this.locusField.setText(f != null ? f.getLocus() : "");
-        this.geneField.setText(f != null ? f.getGeneName() : "");
-        this.typeText.setText(f != null ? f.getType().getTypeString() : "");
-
+    /**
+     * Displays the annotation details in their belonging visual components.
+     * @param anno the annotation whose details should be shown
+     */
+    public void showAnnotationDetails(PersistantAnnotation anno) {
+        
         String strand = "";
-        if (f != null){
-            strand = f.isFwdStrand() ? "forward" : "reverse";
+        if (anno != null) {
+            this.ecNumField.setText(anno.getEcNumber());
+            this.startField.setText(String.valueOf(anno.getStart()));
+            this.stopField.setText(String.valueOf(anno.getStop()));
+            this.productText.setText(anno.getProduct());
+            this.productText.setToolTipText(anno.getProduct());
+            this.locusField.setText(anno.getLocus());
+            this.geneField.setText(anno.getGeneName());
+            this.typeText.setText(anno.getType().getTypeString());
+
+            strand = anno.isFwdStrand() ? "forward" : "reverse";
+        } else {
+            this.ecNumField.setText("");
+            this.startField.setText("");
+            this.stopField.setText("");
+            this.productText.setText("");
+            this.productText.setToolTipText("");
+            this.locusField.setText("");
+            this.geneField.setText("");
+            this.typeText.setText("");
         }
         this.strandText.setText(strand);
+        this.productText.setCaretPosition(0);
     }
 
 }

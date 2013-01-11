@@ -22,7 +22,7 @@ public class TrackConnector {
 
     private List<PersistantTrack> associatedTracks;
     private int trackID;
-    private int genomeSize;
+    private int refSeqLength;
     private String adapter;
     private CoverageThread coverageThread;
     private CoverageThread diffThread;
@@ -49,7 +49,7 @@ public class TrackConnector {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGenome();
-        this.genomeSize = this.refGenome.getRefLength();
+        this.refSeqLength = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
             this.externalDataReader = new SamBamFileReader(file, this.trackID);
@@ -70,6 +70,7 @@ public class TrackConnector {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
         }
+        //TODO: create MultipleTrackConnector with some special methods, but extending the track connector
         this.trackID = id; //TODO: trackabhängig gucken ob db benutzt oder nicht (double/multitrack)
         this.associatedTracks = tracks;
         this.adapter = adapter;
@@ -77,7 +78,7 @@ public class TrackConnector {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGenome();
-        this.genomeSize = this.refGenome.getRefLength();
+        this.refSeqLength = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
             File file = new File(this.associatedTracks.get(0).getFilePath());
             this.externalDataReader = new SamBamFileReader(file, this.trackID);
@@ -187,151 +188,6 @@ public class TrackConnector {
     public void addMappingAnalysisRequest(IntervalRequest request) {
         this.mappingThreadAnalyses.addRequest(request);
     }
-    
-    /**
-     * Collects all mappings of the associated track for the interval described
-     * by from and to parameters. Mappings can only be obtained for one track
-     * currently.
-     *
-     * @param from start of the interval whose mappings are needed
-     * @param to stop of the interval whose mappings are needed
-     * @return the collection of mappings for the given interval
-     */
-    public MappingResultPersistant getMappings(int from, int to) {
-        HashMap<Long, PersistantMapping> mappings = new HashMap<>();
-        if (from < to && from > 0 && to > 0) {
-            if (this.associatedTracks.get(0).isDbUsed()) { //mappings are always only querried for one track
-                try {
-
-                    //determine readlength
-                    //TODO: ensure this is only calculated when track id or db changed!
-//                    PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
-//                    fetchReadlength.setLong(1, trackID);
-//                    ResultSet rsReadlength = fetchReadlength.executeQuery();
-//
-//                    int readlength = 1000;
-//                    final int spacer = 10;
-//                    if (rsReadlength.next()) {
-//                        int start = rsReadlength.getInt(FieldNames.MAPPING_START);
-//                        int stop = rsReadlength.getInt(FieldNames.MAPPING_STOP);
-//                        readlength = stop - start + spacer;
-//                    }
-//                    fetchReadlength.close();
-
-
-                    //mapping processing
-                    PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
-                    fetch.setLong(1, from - FIXED_INTERVAL_LENGTH);
-                    fetch.setLong(2, to);
-                    fetch.setLong(3, from);
-                    fetch.setLong(4, to + FIXED_INTERVAL_LENGTH);
-                    fetch.setLong(5, trackID);
-                    fetch.setLong(6, from);
-                    fetch.setLong(7, to);
-
-                    ResultSet rs = fetch.executeQuery();
-                    while (rs.next()) {
-                        // mapping data
-                        int mappingID = rs.getInt(FieldNames.MAPPING_ID);
-                        int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
-                        int mappingTrack = rs.getInt(FieldNames.MAPPING_TRACK);
-                        int start = rs.getInt(FieldNames.MAPPING_START);
-                        int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                        byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                        boolean isForwardStrand = (direction == 1 ? true : false);
-                        int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-                        int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                        int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                        boolean isBestMapping = (bestMapping == 1 ? true : false);
-                        PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, isForwardStrand, count, errors, sequenceID, isBestMapping);
-
-                        // add new mapping if not exists
-                        if (!mappings.containsKey(m.getId())) {
-                            mappings.put(m.getId(), m);
-                        }
-
-                        // diff data
-                        String baseString = rs.getString(FieldNames.DIFF_BASE);
-                        int position = rs.getInt(FieldNames.DIFF_POSITION);
-                        int type = rs.getInt(FieldNames.DIFF_TYPE);
-                        int gapOrder = rs.getInt(FieldNames.DIFF_GAP_ORDER);
-
-                        // diff data may be null, if mapping has no diffs
-                        if (baseString != null) {
-                            char base = baseString.charAt(0);
-                            if (type == 1) {
-                                PersistantDiff d = new PersistantDiff(position, base, isForwardStrand, count);
-                                mappings.get(m.getId()).addDiff(d);
-                            } else if (type == 0) {
-                                PersistantReferenceGap g = new PersistantReferenceGap(position, base, gapOrder, isForwardStrand, count);
-                                mappings.get(m.getId()).addGenomeGap(g);
-                            } else {
-                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown type for diff in database {0}", type);
-                            }
-                        }
-                    }
-
-                    fetch.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex.getStackTrace());
-                }
-            } else { //handle retrieving of data from other source than a DB
-
-                Collection<PersistantMapping> mappingList = externalDataReader.getMappingsFromBam(this.refGenome, from, to, true);
-                Iterator<PersistantMapping> it = mappingList.iterator();
-                while (it.hasNext()) {
-                    PersistantMapping next = it.next();
-                    mappings.put(next.getId(), next);
-                }
-            }
-        }
-        return new MappingResultPersistant(new ArrayList<>(mappings.values()), from, to);
-    }
-
-    /**
-     * Returns the diffs for a given interval in the current track from the
-     * database.
-     *
-     * @param from left bound of the interval
-     * @param to right bound of the interval
-     * @return the collection of diffs for this interval
-     */
-    public CoverageAndDiffResultPersistant getDiffsAndGapsForInterval(int from, int to) {
-
-        List<PersistantDiff> diffs = new ArrayList<>();
-        List<PersistantReferenceGap> gaps = new ArrayList<>();
-        if (from < to) {
-            try {
-                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_DIFFS_AND_GAPS_FOR_INTERVAL);
-                fetch.setInt(1, from);
-                fetch.setInt(2, to);
-                fetch.setLong(3, trackID);
-
-                ResultSet rs = fetch.executeQuery();
-                while (rs.next()) {
-                    int position = rs.getInt(FieldNames.DIFF_POSITION);
-                    char base = rs.getString(FieldNames.DIFF_BASE).charAt(0);
-                    int type = rs.getInt(FieldNames.DIFF_TYPE);
-                    byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                    boolean isForwardStrand = (direction == SequenceUtils.STRAND_FWD ? true : false);
-                    int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-
-                    if (type == 1) { //1 = diffs
-                        diffs.add(new PersistantDiff(position, base, isForwardStrand, count));
-                    } else { //0 = gaps
-                        int order = rs.getInt(FieldNames.DIFF_GAP_ORDER);
-                        gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count));
-                    }
-                }
-
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, ex.getMessage());
-                Logger.getLogger(TrackConnector.class.getName()).log(Level.INFO, null, ex);
-            }
-        }
-
-        return new CoverageAndDiffResultPersistant(null, diffs, gaps, true, from, to);
-    }
 
     public int getNumOfReads() {
         return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
@@ -414,12 +270,12 @@ public class TrackConnector {
     }
 
     public double getPercentRefGenPerfectCovered() {
-        return (double) this.getCoveredPerfectPos() / genomeSize * 100;
+        return (double) this.getCoveredPerfectPos() / refSeqLength * 100;
     }
 
     public double getPercentRefGenPerfectCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
-        return absValue / genomeSize * 100;
+        return absValue / refSeqLength * 100;
 
     }
 
@@ -428,12 +284,12 @@ public class TrackConnector {
     }
 
     public double getPercentRefGenBmCovered() {
-        return  (double) this.getCoveredBestMatchPos() / genomeSize * 100;
+        return  (double) this.getCoveredBestMatchPos() / refSeqLength * 100;
     }
 
     public double getPercentRefGenBmCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-        return absValue / genomeSize * 100;
+        return absValue / refSeqLength * 100;
     }
 
     public int getCoveredCommonMatchPos() {
@@ -441,12 +297,12 @@ public class TrackConnector {
     }
 
     public double getPercentRefGenNErrorCovered() {
-        return (double) this.getCoveredCommonMatchPos() / genomeSize * 100;
+        return (double) this.getCoveredCommonMatchPos() / refSeqLength * 100;
     }
 
     public double getPercentRefGenNErrorCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_NUM, con, trackID);
-        return absValue / genomeSize * 100;
+        return absValue / refSeqLength * 100;
     }
 
     /**
@@ -494,9 +350,9 @@ public class TrackConnector {
 
                 int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
                 id++;
-                int covPerf = (int) (coveragePerf / 100 * genomeSize);
-                int covBM = (int) (coverageBM / 100 * genomeSize);
-                int covComplete = (int) (coverageComplete / 100 * genomeSize);
+                int covPerf = (int) (coveragePerf / 100 * refSeqLength);
+                int covBM = (int) (coverageBM / 100 * refSeqLength);
+                int covComplete = (int) (coverageComplete / 100 * refSeqLength);
                 
                 //calculate average read length
                 int averageReadLength = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_READ_LENGTH, SQLStatements.GET_NUM, con, trackID);
@@ -520,9 +376,9 @@ public class TrackConnector {
                 PreparedStatement updateStatistics = con.prepareStatement(SQLStatements.UPDATE_STATISTICS);
                 int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
                 id++;
-                int covPerf = (int) (coveragePerf / 100 * genomeSize);
-                int covBM = (int) (coverageBM / 100 * genomeSize);
-                int covComplete = (int) (coverageComplete / 100 * genomeSize);
+                int covPerf = (int) (coveragePerf / 100 * refSeqLength);
+                int covBM = (int) (coverageBM / 100 * refSeqLength);
+                int covComplete = (int) (coverageComplete / 100 * refSeqLength);
                 // store track in table
                 updateStatistics.setInt(1, numMappings);
                 updateStatistics.setInt(2, numPerfectMappings);
@@ -596,7 +452,7 @@ public class TrackConnector {
     }
 
     public List<String> getAssociatedTrackNames() {
-        List<String> trackNames = new ArrayList<String>();
+        List<String> trackNames = new ArrayList<>();
         for (PersistantTrack track : this.associatedTracks) {
             trackNames.add(track.getDescription());
         }
@@ -622,7 +478,7 @@ public class TrackConnector {
         try {
             //Die Coverage der naechsten 5 Basen links und rechts des SNPs wird verglichen
             int fromPos = ((position - 5) < 0) ? 0 : (position - 5);
-            int toPos = ((position + 5) > this.genomeSize) ? this.genomeSize : (position + 5);
+            int toPos = ((position + 5) > this.refSeqLength) ? this.refSeqLength : (position + 5);
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
             fetch.setLong(3, trackID);
             fetch.setLong(1, fromPos);
@@ -1039,9 +895,7 @@ public class TrackConnector {
     public void insertCoverageDistribution(DiscreteCountingDistribution distribution) {
 
         int[] covDistribution = distribution.getDiscreteCountingDistribution();
-        try {
-            PreparedStatement insert = con.prepareStatement(SQLStatements.INSERT_COVERAGE_DISTRIBUTION);
-
+        try (PreparedStatement insert = con.prepareStatement(SQLStatements.INSERT_COVERAGE_DISTRIBUTION)) {
             for (int i = 0; i < covDistribution.length; ++i) {
                 insert.setInt(1, this.trackID);
                 insert.setByte(2, distribution.getType());
@@ -1051,7 +905,6 @@ public class TrackConnector {
             }
 
             insert.executeBatch();
-            insert.close();
 
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1064,5 +917,31 @@ public class TrackConnector {
      */
     public boolean isDbUsed() {
         return this.associatedTracks.get(0).isDbUsed();
+    }
+
+    /**
+     * @return the reference genome associated to this connector
+     */
+    public PersistantReference getRefGenome() {
+        return this.refGenome;
+    }
+
+    /**
+     * @return the length of the reference sequence belonging to this track
+     * connector
+     */
+    public int getRefSequenceLength() {
+        return this.refSeqLength;
+    }    
+    
+    /**
+     * Creates an analysis handler for this track connector, which can handle
+     * coverage and mapping requests for analysis functions.
+     * @param visualizer the DataVisualizationI implementation to treat the 
+     * analysis results
+     * @return the configurable analysis handler
+     */
+    public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer) {
+        return new AnalysesHandler(this, visualizer);
     }
 }

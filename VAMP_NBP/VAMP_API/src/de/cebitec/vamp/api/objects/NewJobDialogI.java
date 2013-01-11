@@ -1,4 +1,4 @@
-package de.cebitec.vamp.ui.importer;
+package de.cebitec.vamp.api.objects;
 
 /**
  * Interface for all dialogs that create new jobs and need some required info set

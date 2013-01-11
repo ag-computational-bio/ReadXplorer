@@ -1,9 +1,9 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 
 /**
  * Starts the TSS analysis including the detection of unannotated transcripts.
@@ -26,10 +26,10 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
     
     private int minCoverage;
 
-    public AnalysisUnannotatedTransStart(TrackViewer trackViewer, int increaseReadCount, int increaseReadPercent, 
+    public AnalysisUnannotatedTransStart(TrackConnector trackConnector, int increaseReadCount, int increaseReadPercent, 
             int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic, int minCoverage) {
            
-        super(trackViewer, increaseReadCount, increaseReadPercent, maxInitialReadCount, increaseReadCount2, tssAutomatic);
+        super(trackConnector, increaseReadCount, increaseReadPercent, maxInitialReadCount, increaseReadCount2, tssAutomatic);
         this.minCoverage = minCoverage;
     }
     

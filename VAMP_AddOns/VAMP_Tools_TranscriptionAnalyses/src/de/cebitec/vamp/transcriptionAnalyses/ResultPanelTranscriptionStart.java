@@ -13,7 +13,7 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
@@ -24,19 +24,30 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
+ * This panel is capable of showing a table with transcription start sites and
+ * contains an export button, which exports the data into an excel file.
  *
  * @author -Rolf Hilker-
  */
 public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
+    
+    private static final long serialVersionUID = 1L;
 
     private BoundsInfoManager boundsInfoManager;
     private List<TranscriptionStart> tSSs;
     private List<String> promotorRegions;
-    private TrackViewer trackViewer;
+    private ReferenceViewer referenceViewer;
+    private final ParameterSetTSS tssParameters;
     
-    /** Creates new form ResultPanelTranscriptionStart */
-    public ResultPanelTranscriptionStart() {
+    /**
+     * This panel is capable of showing a table with transcription start sites
+     * and contains an export button, which exports the data into an excel file.
+     * @param tssParameters parameter set used for this transcription start site detection
+     */
+    public ResultPanelTranscriptionStart(ParameterSetTSS tssParameters) {
         initComponents();
+        this.tssParameters = tssParameters;
+        this.tSSs = new ArrayList<>();
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -73,6 +84,8 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tSSTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
+        parametersLabel = new javax.swing.JLabel();
+        statisticsButton = new javax.swing.JButton();
 
         tSSTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -115,21 +128,31 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
             }
         });
 
+        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.parametersLabel.text")); // NOI18N
+
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.statisticsButton.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 484, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(statisticsButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exportButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(exportButton)
+                    .addComponent(parametersLabel)
+                    .addComponent(statisticsButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -138,7 +161,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         this.promotorRegions = new ArrayList<>();
         
         //get reference sequence for promotor regions
-        int refId = this.trackViewer.getReference().getId();
+        int refId = this.referenceViewer.getReference().getId();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
         String sequence = refConnector.getRefGenome().getSequence();
         String promotor;
@@ -154,12 +177,14 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         }
         
         TranscriptionStartColumns tSSColumns = new TranscriptionStartColumns(this.tSSs, this.promotorRegions); 
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", tSSColumns, "Transcription Start Site Table"); 
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", tSSColumns); 
     }//GEN-LAST:event_exportButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel parametersLabel;
+    private javax.swing.JButton statisticsButton;
     private javax.swing.JTable tSSTable;
     // End of variables declaration//GEN-END:variables
 
@@ -170,14 +195,14 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
     public void addTSSs(List<TranscriptionStart> tSSs) {
         final int nbColumns = 11;
         
-        this.tSSs = tSSs;
+        this.tSSs.addAll(tSSs);
         DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();  
         String strand;
         DetectedAnnotations detAnnotations;
         PersistantAnnotation annotation;
         TransStartUnannotated tSSU;
 
-        for (TranscriptionStart tSS : this.tSSs) {
+        for (TranscriptionStart tSS : tSSs) {
             
             strand = tSS.isFwdStrand() ? "Fwd" : "Rev";
             
@@ -210,18 +235,33 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
             }
 
             model.addRow(rowData);
-            
-            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-            this.tSSTable.setRowSorter(sorter);
-            sorter.setModel(model);
         }
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+        this.tSSTable.setRowSorter(sorter);
+        sorter.setModel(model);
+        
+        String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
+        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
+                "ResultPanelTranscriptionStart.parametersLabel.text", tssParameters.getMinTotalIncrease(), tssParameters.getMinPercentIncrease(),
+                tssParameters.getMaxLowCovInitCount(), tssParameters.getMinLowCovIncrease(), unannotatedTranscriptDet, 
+                tssParameters.getMinTranscriptExtensionCov()));
     }
     
-    public void setTrackViewer(TrackViewer trackViewer) {
-        this.boundsInfoManager = trackViewer.getBoundsInformationManager();
-        this.trackViewer = trackViewer;
+    /**
+     * Set the reference viewer needed for updating the currently shown position
+     * and extracting the reference sequence.
+     * @param referenceViewer the reference viewer belonging to this analysis 
+     * result
+     */
+    public void setReferenceViewer(ReferenceViewer referenceViewer) {
+        this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
+        this.referenceViewer = referenceViewer;
     }
 
+    /**
+     * @return The number of detected TSS
+     */
     public int getResultSize() {
         return this.tSSs.size();
     }

@@ -3,7 +3,6 @@
  *
  * Created on 24-Feb-2011, 09:51:49
  */
-
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.common.sequencetools.AminoAcidProperties;
@@ -16,6 +15,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
+import de.cebitec.vamp.databackend.dataObjects.SnpResultStatistics;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.util.PositionUtils;
@@ -36,7 +36,8 @@ import javax.swing.table.TableRowSorter;
 import org.openide.util.NbPreferences;
 
 /**
- *
+ * Panel showing a SNP detection result.
+ * 
  * @author joern, rhilker
  */
 public class SNP_DetectionResultPanel extends javax.swing.JPanel {
@@ -45,13 +46,12 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private SnpData snpData;
     private PersistantReference reference;
-    private SnpResultStatistics snpMetrics;
+    
 
     /** Creates new form SNP_DetectionResultPanel */
     public SNP_DetectionResultPanel() {
         initComponents();
         
-        this.snpMetrics = new SnpResultStatistics();
         //ensures number of lines will adapt to number of translations (annotations) for each snp
         LineWrapCellRenderer cellRenderer = new LineWrapCellRenderer();
         this.snpTable.getColumnModel().getColumn(13).setCellRenderer(cellRenderer);
@@ -195,7 +195,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", snpData, "SNP Table");
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", snpData);
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
@@ -207,7 +207,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_alignmentButton1ActionPerformed
 
     private void metricsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metricsButtonActionPerformed
-        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpMetrics), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpData.getSnpStatistics()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_metricsButtonActionPerformed
 
 
@@ -228,11 +228,16 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
      */
     public void addSNPs(SnpData snpData) {
         
-        //snp metrics
+        //snp effect statistics
         int noIntergenicSnps = 0;
         int noSynonymousSnps = 0;
         int noMissenseSnps = 0;
         int noChemicallyNeutralSnps = 0;
+        int noAAInsertions = 0;
+        int noAADeletions = 0;
+        
+        //snp type statistics
+        int noSubstitutions = 0;
         int noInsertions = 0;
         int noDeletions = 0;
         
@@ -270,6 +275,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             
             
             snp = (Snp) snpi;
+            type = snp.getType();
             
             rowData = new Object[snpDataSize];
             rowData[0] = snp.getPosition();
@@ -284,10 +290,11 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             rowData[9] = snp.getGapRate();
             rowData[10] = snp.getCoverage();
             rowData[11] = snp.getFrequency();
-            rowData[12] = String.valueOf(snp.getType().getType());
+            rowData[12] = type.toString();
 
             //determine amino acid substitutions among snp substitutions
-            if (snp.getType() == SequenceComparison.SUBSTITUTION) {
+            if (type.equals(SequenceComparison.SUBSTITUTION)) {
+                ++noSubstitutions;
                        
                 aminosSnp = "";
                 aminosRef = "";
@@ -329,15 +336,16 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 annotationsFound = snpTranslator.checkCoveredByAnnotation(snp.getPosition());
                 ids = "";
                 if (!annotationsFound.isEmpty()) { // insertion or deletion
-                    type = SequenceComparison.UNKNOWN;
-                    if (snp.getType().equals(SequenceComparison.INSERTION)) {
-                        type = SequenceComparison.INSERTION;
+                    if (type.equals(SequenceComparison.INSERTION)) {
+                        ++noAAInsertions;
                         ++noInsertions;
                         
-                    } else if (snp.getType().equals(SequenceComparison.DELETION)) {
-                        type = SequenceComparison.DELETION;
+                    } else if (type.equals(SequenceComparison.DELETION)) {
+                        ++noAADeletions;
                         ++noDeletions;
                         
+                    } else {
+                        type = SequenceComparison.UNKNOWN;
                     }
                     
                     for (PersistantAnnotation annotation : annotationsFound){
@@ -355,6 +363,11 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                     rowData[15] = "";
                     rowData[16] = "";
                     ++noIntergenicSnps;
+                    if (type.equals(SequenceComparison.INSERTION)) {
+                        ++noInsertions;
+                    } else if (type == SequenceComparison.DELETION) {
+                        ++noDeletions;
+                    }
                 }
             }
             
@@ -379,14 +392,18 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 return intA.compareTo(intB);
             }
         });
-        
-        this.snpMetrics.setTotalNoSnps(this.snpData.getSnpList().size());
-        this.snpMetrics.setNoIntergenicSnps(noIntergenicSnps);
-        this.snpMetrics.setNoSynonymousSnps(noSynonymousSnps);
-        this.snpMetrics.setNoChemicallyNeutralSnps(noChemicallyNeutralSnps);
-        this.snpMetrics.setNoMissenseSnps(noMissenseSnps);
-        this.snpMetrics.setNoInsertions(noInsertions);
-        this.snpMetrics.setNoDeletions(noDeletions);
+        SnpResultStatistics snpStatistics = new SnpResultStatistics();
+        snpStatistics.setTotalNoSnps(this.snpData.getSnpList().size());
+        snpStatistics.setNoIntergenicSnps(noIntergenicSnps);
+        snpStatistics.setNoSynonymousSnps(noSynonymousSnps);
+        snpStatistics.setNoChemicallyNeutralSnps(noChemicallyNeutralSnps);
+        snpStatistics.setNoMissenseSnps(noMissenseSnps);
+        snpStatistics.setNoAAInsertions(noAAInsertions);
+        snpStatistics.setNoAADeletions(noAADeletions);
+        snpStatistics.setNoSubstitutions(noSubstitutions);
+        snpStatistics.setNoInsertions(noInsertions);
+        snpStatistics.setNoDeletions(noDeletions);
+        this.snpData.setSnpStatistics(snpStatistics);
         
         this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, 
                 "SNP_DetectionResultPanel.parametersLabel.text", snpData.getMinPercentDeviation(), snpData.getMinNoDeviatingCoverage()));

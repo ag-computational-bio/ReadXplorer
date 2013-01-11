@@ -43,11 +43,11 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         trackToPanel = new HashMap<>();
     }
     
-    public void openGenome(PersistantReference genome) {
-        currentRefGen = genome;
-        boundsManager = new BoundsInfoManager(currentRefGen);
-        basePanelFac = new BasePanelFactory(boundsManager, this);
-        genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
+    /**
+     * Handles the opening of a reference genome viewer. First the list of
+     * reference sequences is shown, and after a selection was made, the 
+     * corresponding reference viewer is opened.
+     */
 
         getApp().showRefGenPanel(genomeViewer);
     }
@@ -63,16 +63,11 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         }
     }
 
+    /**
+     * Closes all tracks, which are currently open for the reference viewer of
+     * this top component.
+     */
     public void closeRefGen() {
-        // remove all tracks that are still open
-        List<PersistantTrack> tracks = new ArrayList<>();
-        for(PersistantTrack t : trackToPanel.keySet()){
-            tracks.add(t);
-        }
-        for(Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext(); ){
-            PersistantTrack t = it.next();
-            closeTrack(t);
-        }
 
         // unregister from listeners and remove
         genomeViewer.close();
@@ -148,17 +143,6 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         currentTracks.add(tp);
     }
 
-    @Deprecated
-    public void closeTrack(PersistantTrack track) {
-        BasePanel trackPanel = trackToPanel.get(track);
-
-        getApp().closeTrackPanel(trackPanel);
-        trackPanel.close();
-        mousePosListener.remove(trackPanel);
-
-        trackToPanel.remove(track);
-    }
-
     @Override
     public void setCurrentMousePosition(int logPos) {
         for(MousePositionListener c : mousePosListener){
@@ -182,7 +166,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public boolean hasRefGen(){
-        return currentRefGen != null ? Boolean.TRUE : Boolean.FALSE;
+        return currentRefGen != null;
     }
 
     public String getDisplayName(){
