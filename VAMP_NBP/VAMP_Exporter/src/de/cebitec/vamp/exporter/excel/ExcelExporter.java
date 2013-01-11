@@ -24,7 +24,7 @@ import org.openide.util.NbBundle;
 
 
 /**
- * General excel exporter.
+ * General excel exporter. It supports even multiple sheets in one document.
  *
  * @author -Rolf Hilker-
  */
@@ -32,57 +32,46 @@ public class ExcelExporter {
     
 
     private ProgressHandle progressHandle;
-    private String sheetName;
-    private List<String> headers; //contains all headers
-    private List<List<Object>> exportData; //each object contains the data of one row
+    private List<String> sheetNames; //contains all sheet names
+    private List<List<String>> headers; //contains all headers
+    /** Inner list contains data of one row, middle list contains all rows, 
+     * outer list is the list of sheets. */
+    private List<List<List<Object>>> exportData; 
     private int rowNumberGlobal;
     
     /**
-     * 
-     * @param sheetName the name of the sheet to export to excel.
+     * General excel exporter. It supports even multiple sheets in one document.
+     * All 3 data fields have to be set in order to start a successful export.
      * @param progressHandle the progress handle which should display the progress
      *      of the ExcelExporter
      */
-    public ExcelExporter(String sheetName, ProgressHandle progressHandle) {
+    public ExcelExporter(ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
-        this.sheetName = sheetName;
         this.rowNumberGlobal = 0;
-    }
-
+    } 
     
-    public void setSheetName(String sheetName) {
-        this.sheetName = sheetName;
-    }  
+    /**
+     * @param dataSheetNames the sheet name list the sheets which should be 
+     * exported to the excel file. Must be set!
+     */
+    public void setSheetNames(List<String> dataSheetNames) {
+        this.sheetNames = dataSheetNames;
+    } 
 
     /**
-     * @param headers the header list for the table which should be exported to excel.
+     * @param headers the header list for the tables which should be exported to
+     * the excel file. Must be set!
      */
-    public void setHeaders(List<String> headers) {
+    public void setHeaders(List<List<String>> headers) {
         this.headers = headers;
     }
 
     /**
      * @param exportData The list of data which should be exported to excel.
+     * Must be set!
      */
-    public void setExportData(List<List<Object>> exportData) {
+    public void setExportData(List<List<List<Object>>> exportData) {
         this.exportData = exportData;
-    }
-
-    
-    public String getSheetName() {
-        return this.sheetName;
-    }
-    
-    /**
-     * @return the header list for the table which should be exported to excel.
-     */
-    public List<String> getHeaders() {
-        return this.headers;
-    }  
-    
-    
-    public List<List<Object>> getExportData() {
-        return this.exportData;
     }
     
     /**
@@ -104,23 +93,36 @@ public class ExcelExporter {
         WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
         WritableSheet sheet = null;
         int currentPage = 0;
-        boolean dataLeft = true;
-        while (dataLeft) { //only 65536 rows allowed per sheet in xls format
-            if (!exportData.isEmpty()) {
-                if (currentPage > 0) {
-                    this.sheetName += "I";
+        int totalPage = 0;
+        boolean dataLeft;
+        String sheetName;
+        List<List<Object>> sheetData;
+        List<String> headerRow;
+        
+        for (int i = 0; i < exportData.size(); ++i) {
+            sheetName = sheetNames.get(i);
+            sheetData = exportData.get(i);
+            headerRow = headers.get(i);
+            dataLeft = true;
+            currentPage = 0;
+            while (dataLeft) { //only 65536 rows allowed per sheet in xls format
+                if (!sheetData.isEmpty()) {
+                    if (currentPage++ > 0) {
+                        sheetName += "I";
+                    }
+                    sheet = workbook.createSheet(sheetName, totalPage++);
                 }
-                sheet = workbook.createSheet(this.sheetName, currentPage++);
-            }
 
-            if (sheet != null) {
-                dataLeft = this.fillSheet(sheet);
+                if (sheet != null) {
+                    dataLeft = this.fillSheet(sheet, sheetData, headerRow);
+                }
             }
         }
         workbook.write();
         workbook.close();
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.SuccessMsg") + this.sheetName,
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(
+                ExcelExporter.class, "ExcelExporter.SuccessMsg") + sheetNames.get(0),
                 NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.SuccessHeader"), JOptionPane.INFORMATION_MESSAGE);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
@@ -132,24 +134,27 @@ public class ExcelExporter {
      * This method actually fills the given excel sheet with the data handed over to
      * this ExcelExporter.
      * @param sheet the sheet to write the data to
+     * @param sheetData the data to write in this sheet
+     * @param headerRow the header to use for this sheet
      * @return dataLeft: false, if the sheet could store all data, true, if there is too
      * much data for one sheet
+     * @throws OutOfMemoryError 
      * @throws WriteException 
      */
-    public boolean fillSheet(WritableSheet sheet) throws OutOfMemoryError, WriteException {
+    public boolean fillSheet(WritableSheet sheet, List<List<Object>> sheetData, List<String> headerRow) throws OutOfMemoryError, WriteException {
 
         boolean dataLeft = false;
         int row = 0;
         int column = 0;
 
-        for (String header : headers) {
+        for (String header : headerRow) {
             this.addColumn(sheet, "LABEL", header, column++, row);
         }
         ++row;
         this.progressHandle.progress("Storing line", this.rowNumberGlobal++);
 
         String objectType;
-        for (List<Object> exportRow : exportData) {
+        for (List<Object> exportRow : sheetData) {
 
             column = 0;
             for (Object entry : exportRow) {
@@ -238,7 +243,8 @@ public class ExcelExporter {
      *      {@link writeFile()}.
      */
     public boolean readyToExport() {
-        return !(this.exportData == null) && !this.exportData.isEmpty() 
-                && !(this.headers == null) && !this.headers.isEmpty();
+        return this.exportData != null && !this.exportData.isEmpty() 
+                && this.headers != null && !this.headers.isEmpty()
+                && this.sheetNames != null && !this.sheetNames.isEmpty();
     }
 }

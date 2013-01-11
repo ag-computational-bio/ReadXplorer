@@ -96,7 +96,7 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
      * @return The tracks selected in the selection list.
      */
     public List<PersistantTrack> getSelectedTracks() {
-        List<PersistantTrack> selectedTracks = new ArrayList<PersistantTrack>();
+        List<PersistantTrack> selectedTracks = new ArrayList<>();
 
         List<Object> trackArray = this.checkList.getModel().getCheckeds();
         for (Object track : trackArray) {

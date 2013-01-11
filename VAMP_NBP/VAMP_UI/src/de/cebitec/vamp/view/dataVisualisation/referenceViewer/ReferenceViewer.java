@@ -1,13 +1,13 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Viewer for genome sequences / chromosomes.
  *
  * @author ddoppmeier, rhilker
  */
@@ -50,10 +51,10 @@ public class ReferenceViewer extends AbstractViewer {
      */
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome){
         super(boundsInfoManager, basePanel, refGenome);
-        this.annotations = new ArrayList<JAnnotation>();
-        this.subAnnotations = new ArrayList<JAnnotation>();
+        this.annotations = new ArrayList<>();
+        this.subAnnotations = new ArrayList<>();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
-        this.annotationStats = new EnumMap<FeatureType, Integer>(FeatureType.class);
+        this.annotationStats = new EnumMap<>(FeatureType.class);
         this.getExcludedFeatureTypes().add(FeatureType.UNDEFINED);
         this.showSequenceBar(true, true);
         this.labelMargin = 3;
@@ -245,10 +246,10 @@ public class ReferenceViewer extends AbstractViewer {
     }
 
     private int determineYFromFrame(int frame){
-        int result = 0;
+        int result;
         int offset = Math.abs(frame) * FRAMEHEIGHT;
 
-        if(frame < 0){
+        if (frame < 0) {
             result = this.getPaintingAreaInfo().getReverseLow();
             result += offset;
         } else {
@@ -263,7 +264,7 @@ public class ReferenceViewer extends AbstractViewer {
      * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the annotation
      */
     public int determineFrame(PersistantAnnotation annotation) {
-        int frame = 0;
+        int frame;
 
         if (annotation.isFwdStrand()) {
             // forward strand
@@ -347,7 +348,7 @@ public class ReferenceViewer extends AbstractViewer {
      */
     private void setViewerSize() {
         
-        this.setPreferredSize(new Dimension(1, 300));
+        this.setPreferredSize(new Dimension(1, 230));
         this.revalidate();
     }
 

@@ -1,8 +1,8 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
-import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +19,9 @@ public class OperonColumns implements ExcelExportDataI {
     }
 
     @Override
-    public List<String> dataColumnDescriptions() {
-        List<String> dataColumnDescriptions = new ArrayList();
+    public List<List<String>> dataColumnDescriptions() {
+        List<List<String>> allSheetDescriptions = new ArrayList<>();
+        List<String> dataColumnDescriptions = new ArrayList<>();
 
         dataColumnDescriptions.add("Annotation 1");
         dataColumnDescriptions.add("Annotation 2");
@@ -31,13 +32,16 @@ public class OperonColumns implements ExcelExportDataI {
         dataColumnDescriptions.add("Reads Overlap Start 2");
         dataColumnDescriptions.add("Internal Reads");
         dataColumnDescriptions.add("Spanning Reads");
+        
+        allSheetDescriptions.add(dataColumnDescriptions);
 
-        return dataColumnDescriptions;
+        return allSheetDescriptions;
     }
 
     @Override
-    public List<List<Object>> dataToExcelExportList() {
-        List<List<Object>> operonExport = new ArrayList<List<Object>>();
+    public List<List<List<Object>>> dataToExcelExportList() {
+        List<List<List<Object>>> exportData = new ArrayList<>();
+        List<List<Object>> operonResults = new ArrayList<>();
 
         for (Operon operon : operonDetection) {
             String annoName1 = "";
@@ -61,7 +65,7 @@ public class OperonColumns implements ExcelExportDataI {
                 spanningReads += opAdj.getSpanningReads() + "\n";
 
             }
-            List<Object> operonsRow = new ArrayList<Object>();
+            List<Object> operonsRow = new ArrayList<>();
             operonsRow.add(annoName1);
             operonsRow.add(annoName2);
             operonsRow.add(strand);
@@ -72,8 +76,19 @@ public class OperonColumns implements ExcelExportDataI {
             operonsRow.add(internalReads);
             operonsRow.add(spanningReads);
 
-            operonExport.add(operonsRow);
+            operonResults.add(operonsRow);
         }
-        return operonExport;
+        
+        exportData.add(operonResults);
+        
+        return exportData;
+    }
+
+    @Override
+    public List<String> dataSheetNames() {
+        List<String> sheetNames = new ArrayList<>();
+        sheetNames.add("Operon Detection Table");
+        sheetNames.add("Operon Detection Parameters/Stats");
+        return sheetNames;
     }
 }

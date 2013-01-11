@@ -1,9 +1,9 @@
-package de.cebitec.vamp.view.dataVisualisation;
+package de.cebitec.vamp.databackend.dataObjects;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Interface for methods commonly used for data visualization.
+ * 
+ * @author -Rolf Hilker-
  */
 public interface DataVisualisationI {
     

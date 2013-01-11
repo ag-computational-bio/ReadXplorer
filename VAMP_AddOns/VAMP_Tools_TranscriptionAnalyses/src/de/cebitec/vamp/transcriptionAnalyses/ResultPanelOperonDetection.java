@@ -5,11 +5,12 @@ package de.cebitec.vamp.transcriptionAnalyses;
  *
  * Created on 27.01.2012, 14:31:03
  */
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
-import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
@@ -20,19 +21,28 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
+ * This panel is capable of showing a table with detected operons and
+ * contains an export button, which exports the data into an excel file.
  *
  * @author -Rolf Hilker-
  */
 public class ResultPanelOperonDetection extends javax.swing.JPanel {
+    
+    private static final long serialVersionUID = 1L;
 
     private BoundsInfoManager bim;
     private List<Operon> operonDetection;
+    private final ParameterSetOperonDet operonDetParameters;
 
     /**
-     * Creates new form GeneStartsResultPanel
+     * This panel is capable of showing a table with detected operons and
+     * contains an export button, which exports the data into an excel file.
+     * @param operonDetParameters parameters used for this operon detection
      */
-    public ResultPanelOperonDetection() {
+    public ResultPanelOperonDetection(ParameterSetOperonDet operonDetParameters) {
         initComponents();
+        this.operonDetParameters = operonDetParameters;
+        this.operonDetection = new ArrayList<>();
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -56,6 +66,8 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         operonDetectionTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
+        parametersLabel = new javax.swing.JLabel();
+        statisticsButton = new javax.swing.JButton();
 
         operonDetectionTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -98,37 +110,50 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
             }
         });
 
+        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.parametersLabel.text")); // NOI18N
+
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.statisticsButton.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(452, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(parametersLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(statisticsButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton))
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 601, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exportButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(parametersLabel)
+                        .addComponent(statisticsButton))
+                    .addComponent(exportButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         OperonColumns operonColumns = new OperonColumns(operonDetection);
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", operonColumns, "Operon Detection Table");
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", operonColumns);
     }//GEN-LAST:event_exportButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable operonDetectionTable;
+    private javax.swing.JLabel parametersLabel;
+    private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
     public void addDetectedOperons(List<Operon> operonDetection) {
         final int nbColumns = 9;
-        this.operonDetection = operonDetection;
+        this.operonDetection.addAll(operonDetection);
         DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();
         LineWrapCellRenderer lineWrapCellRenderer = new LineWrapCellRenderer();
         operonDetectionTable.getColumnModel().getColumn(0).setCellRenderer(lineWrapCellRenderer);
@@ -177,12 +202,15 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
             }
         }
         
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>();
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
         this.operonDetectionTable.setRowSorter(sorter);
         sorter.setModel(model);
         for (int i = 3; i < 8; ++i) {
             sorter.setComparator(i, this.getStringComparator());
         }
+        
+        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
+                "ResultPanelOperonDetection.parametersLabel.text", operonDetParameters.getMinSpanningReads()));
     }
     
     /**
@@ -216,6 +244,10 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         return stringComparator;
     }
 
+    /**
+     * Updates the position of the viewers to the currently selected operon 
+     * start position in the table.
+     */
     private void showOperonDetectionPosition() {
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
@@ -229,10 +261,19 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
        
     }
 
+    /**
+     * Set the bounds info manager needed for updating the currently shown 
+     * position.
+     * @param boundsInformationManager the bounds info manager belonging to this analysis
+     * result
+     */
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;
     }
     
+    /**
+     * @return The number of detected operons
+     */
     public int getResultSize() {
         return this.operonDetection.size();
     }

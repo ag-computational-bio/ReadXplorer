@@ -1,22 +1,20 @@
 package de.cebitec.vamp.tools.snp;
 
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 import de.cebitec.vamp.databackend.dataObjects.SnpData;
+import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import java.awt.CardLayout;
+import java.awt.BorderLayout;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import org.netbeans.api.settings.ConvertAsProperties;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
  * Top component which displays SNP detection tabs.
@@ -37,7 +35,6 @@ public final class SNP_DetectionTopComponent extends TopComponent {
 
     private static final long serialVersionUID = 1L;
     private static SNP_DetectionTopComponent instance;
-    /** path to the icon used by the component and its open action */
     private static final String PREFERRED_ID = "SNP_DetectionTopComponent";
     
 
@@ -59,53 +56,6 @@ public final class SNP_DetectionTopComponent extends TopComponent {
                 }
             }
         });
-    }
-
-    /**
-     * Creates a complete snp detection panel, that is used in the JTabbedPane.
-     * The <code>TrackViewer</code> instance is used to set up the setup and
-     * result panels.
-     *
-     * @param referenceViewer the reference viewer for which the snp detection should be carried out.
-     * @param trackIds the list of track ids for which the snp detection should be carried out. They 
-     * all have to belong to the reference genome set in the reference viewer
-     * @return complete snp detection panel
-     */
-    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, List<Integer> trackIds, final int tabId) {
-        // initialise components
-        final JPanel snpDetectionPanel = new JPanel();
-        SNP_DetectionSetupPanel setupPanel = new SNP_DetectionSetupPanel(referenceViewer.getReference().getId());
-        final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
-        //add reference sequence for amino acid mutation detection
-        resultPanel.setReferenceGenome(referenceViewer.getReference());
-
-        // assign the track Ids
-        setupPanel.setTrackIds(trackIds);
-        resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
-
-        // listen on changes of the search
-        setupPanel.addPropertyChangeListener(SNP_DetectionSetupPanel.PROP_SNPS_LOADED, new PropertyChangeListener() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public void propertyChange(PropertyChangeEvent evt) {
-                SnpData snpData = (SnpData) evt.getNewValue();
-                resultPanel.addSNPs(snpData);
-                ((CardLayout) snpDetectionPanel.getLayout()).show(snpDetectionPanel, "results");
-                if (snpData.getSnpList().size() > 0) {
-                    String title = "SNP Detection for selected tracks ("
-                            + snpData.getSnpList().size() + " hits)";
-                    snpTabs.setTitleAt(tabId, title);
-                }
-            }
-        });
-
-        // setup the layout
-        snpDetectionPanel.setLayout(new java.awt.CardLayout());
-        snpDetectionPanel.add(setupPanel, "setup");
-        snpDetectionPanel.add(resultPanel, "results");
-
-        return snpDetectionPanel;
     }
 
     /** This method is called from within the constructor to
@@ -201,10 +151,48 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * @param trackIds the list of track ids (associated to the reference viewer) for which the snp 
      *          detection should be carried out.
      */
-    public void openDetectionTab(ReferenceViewer referenceViewer, List<Integer> trackIds) {
+    public void openDetectionTab(ReferenceViewer referenceViewer, SnpData snpData) {
         String title = "SNP Detection for selected tracks";
-        JPanel snpDetectionPanel = this.getSnpDetectionPanel(referenceViewer, trackIds, snpTabs.getTabCount());
+        JPanel snpDetectionPanel = this.getSnpDetectionPanel(referenceViewer, snpData);
         snpTabs.addTab(title, snpDetectionPanel);
         snpTabs.setTabComponentAt(snpTabs.getTabCount() - 1, new TabWithCloseX(snpTabs));
+        
+        if (snpData.getSnpList().size() > 0) {
+            String tracksString = GeneralUtils.generateConcatenatedString(snpData.getTrackNames());
+            title = "SNP Detection for " + tracksString + " ("
+                    + snpData.getSnpList().size() + " hits)";
+            snpTabs.setTitleAt(snpTabs.getTabCount() - 1, title);
+            snpTabs.repaint();
+        }
+    }
+    
+    
+
+    /**
+     * Creates a complete snp detection panel, that is used in the JTabbedPane.
+     * The <code>TrackViewer</code> instance is used to set up the setup and
+     * result panels.
+     *
+     * @param referenceViewer the reference viewer for which the snp detection should be carried out.
+     * @param trackIds the list of track ids for which the snp detection should be carried out. They 
+     * all have to belong to the reference genome set in the reference viewer
+     * @return complete snp detection panel
+     */
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, SnpData snpData) {
+        // initialise components
+        final JPanel snpDetectionPanel = new JPanel();
+        final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();
+        //add reference sequence for amino acid mutation detection
+        resultPanel.setReferenceGenome(referenceViewer.getReference());
+        resultPanel.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
+
+        // display the snp result
+        resultPanel.addSNPs(snpData);
+
+        // setup the layout
+        snpDetectionPanel.setLayout(new BorderLayout());
+        snpDetectionPanel.add(resultPanel, BorderLayout.CENTER);
+
+        return snpDetectionPanel;
     }
 }

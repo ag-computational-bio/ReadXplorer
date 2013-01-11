@@ -198,7 +198,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 //                    if (r.hasRegisteredTrackswithoutrRunJob()) {
 //                        setValidTracksRun(r.getDependentTrackswithoutRunjob(), false);
 //                    }
-                    Logger.getLogger(ImportThread.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, null, ex);
                 } catch (OutOfMemoryError ex) {
                     io.getOut().println("\"" + r.getName() + "\" " + NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.outOfMemory") + "!");
                 }

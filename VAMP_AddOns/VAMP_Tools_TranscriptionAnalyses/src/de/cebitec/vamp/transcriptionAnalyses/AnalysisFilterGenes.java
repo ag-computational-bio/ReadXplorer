@@ -1,37 +1,33 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.databackend.MappingThread;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredGene;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredAnnotation;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Carries out the logic behind the filtered genes analysis.
+ * 
+ * @author -Rolf Hilker-
  */
-public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGene>> {
+public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredAnnotation>> {
 
-    private TrackViewer trackViewer;
+    private TrackConnector trackConnector;
     private int minNumberReads;
     private int maxNumberReads;
-    private int genomeSize;
+    private int refSeqLength;
     private List<PersistantAnnotation> genomeAnnotations;
-    private HashMap<Integer, FilteredGene> annotationReadCount; //annotation id to count of mappings for annotation
-    private List<FilteredGene> filteredGenes;
+    private HashMap<Integer, FilteredAnnotation> annotationReadCount; //annotation id to count of mappings for annotation
+    private List<FilteredAnnotation> filteredGenes;
     private List<PersistantMapping> mappingsAll;
-    
-    MappingThread mappingThread;
     
     private int lastMappingIdx;
     private int currentCount;
@@ -41,14 +37,14 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      * When executing the filtered genes analysis the minNumberReads always has
      * to be set, in order to find genes with at least that number of reads.
      * 
-     * @param trackViewer the track viewer for which the analyses should be carried out
+     * @param trackConnector the track viewer for which the analyses should be carried out
      * @param minNumberReads minimum number of reads which have to be found within
      *      a gene in order to classify it as an filtered gene
      * @param maxNumberReads  maximum number of reads which are allowed to be 
      *      found within a gene in order to classify it as an filtered gene
      */
-    public AnalysisFilterGenes(TrackViewer trackViewer, int minNumberReads, int maxNumberReads) {
-        this.trackViewer = trackViewer;
+    public AnalysisFilterGenes(TrackConnector trackConnector, int minNumberReads, int maxNumberReads) {
+        this.trackConnector = trackConnector;
         this.minNumberReads = minNumberReads;
         this.maxNumberReads = maxNumberReads;
         
@@ -65,15 +61,12 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
      * Initializes the initial data structures needed for filtering annotations by read count.
      */
     private void initDatastructures() {
-        TrackConnector trackCon = trackViewer.getTrackCon();
-        List<Integer> trackIds = new ArrayList<>();
-        trackIds.add(trackCon.getTrackID());
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGenome().getRefLength();
-        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
+        this.refSeqLength = this.trackConnector.getRefSequenceLength();
+        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, refSeqLength);
         
         for (PersistantAnnotation annotation : this.genomeAnnotations) {
-            this.annotationReadCount.put(annotation.getId(), new FilteredGene(annotation));
+            this.annotationReadCount.put(annotation.getId(), new FilteredAnnotation(annotation));
         }
         
         //        int coveredPerfectPos = trackCon.getCoveredPerfectPos();
@@ -163,7 +156,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
     }
     
     @Override
-    public List<FilteredGene> getResults() {
+    public List<FilteredAnnotation> getResults() {
         return this.filteredGenes;
     }
 
@@ -184,7 +177,7 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredGen
         }
         
         this.mappingsAll.clear();
-        for (int i = 0; i < this.genomeSize; ++i) {
+        for (int i = 0; i < this.refSeqLength; ++i) {
             List<PersistantMapping> mappingsAtPos = mappingsToPos.get(i);
             if (mappingsAtPos != null) {
                 this.mappingsAll.addAll(mappingsAtPos);

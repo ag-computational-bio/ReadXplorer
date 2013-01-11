@@ -3,21 +3,21 @@ package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Data structure for storing a annotation (gene), which is detected as expressed
  * and its corresponding data.
+ * 
+ * @author -Rolf Hilker-
  */
-public class FilteredGene {
+public class FilteredAnnotation {
 
     private PersistantAnnotation expressedAnnotation;
     private int readCount;
     
     /**
-     * Creates a new FilteredGene.
+     * Creates a new FilteredAnnotation.
      * @param expressedAnnotation the annotation (gene) which is detected as expressed.
      */
-    public FilteredGene(PersistantAnnotation expressedAnnotation) {
+    public FilteredAnnotation(PersistantAnnotation expressedAnnotation) {
         this.expressedAnnotation = expressedAnnotation;
     }
 
@@ -41,7 +41,4 @@ public class FilteredGene {
     public int getReadCount() {
         return this.readCount;
     }
-    
-    
-    
 }

@@ -5,6 +5,7 @@
  */
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
@@ -153,7 +154,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
      *      have to be available for the import of new tracks too.
      */
     public void setReferenceJobs(List<ReferenceJob> jobs) {
-        List<ReferenceJob> list = new ArrayList<ReferenceJob>();
+        List<ReferenceJob> list = new ArrayList<>();
 
         try {
             List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
@@ -182,7 +183,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
      * @return all reference genomes which are stored in the db until now.
      */
     private ReferenceJob[] getRefGenJobs() {
-        List<ReferenceJob> list = new ArrayList<ReferenceJob>();
+        List<ReferenceJob> list = new ArrayList<>();
         
         try {
             List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();

@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.SeqPairJobContainer;
@@ -20,6 +21,8 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 /**
+ * Allows to create new jobs to import and displays the summary of all currently
+ * created jobs.
  *
  * @author ddoppmeier, rhilker
  */
@@ -31,7 +34,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
     public static final String PROP_JOB_SELECTED = "jobSelected";
     private int trackID = 0;
 
-    /** Creates new form SetupImportCard */
+    /**
+     * Allows to create new jobs to import and displays the summary of all
+     * currently created jobs.
+     */
     public ImportSetupCard() {
         initComponents();
         refJobView.addPropertyChangeListener(this.getJobPropListener());

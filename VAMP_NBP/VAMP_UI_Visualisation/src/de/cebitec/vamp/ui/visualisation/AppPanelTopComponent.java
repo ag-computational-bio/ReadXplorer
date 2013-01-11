@@ -1,11 +1,10 @@
 package de.cebitec.vamp.ui.visualisation;
 
-import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.api.cookies.CloseRefGenCookie;
 import de.cebitec.vamp.api.cookies.CloseTrackCookie;
 import de.cebitec.vamp.api.cookies.OpenTrackCookie;
-import de.cebitec.vamp.view.dataVisualisation.TranscriptionAnalysesFrameI;
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
@@ -22,25 +21,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
-import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays something.
+ * Top component which displays the main work area of VAMP, which contains the
+ * reference and track viewers.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.view//AppPanel//EN", autostore = false)
-public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI, TranscriptionAnalysesFrameI {
+public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI {
 
     private static AppPanelTopComponent instance;
     /** path to the icon used by the component and its open action */
@@ -52,17 +50,23 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private ReferenceViewer referenceViewer;
     private ArrayList<TrackViewer> trackViewerList;
 
+    /**
+     * Top component which displays the main work area of VAMP, which contains
+     * the reference and track viewers.
+     */
     public AppPanelTopComponent() {
         initComponents();
-        this.jSplitPane1.setDividerLocation(2000);
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
         setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         localLookup = new AbstractLookup(content);
         associateLookup(localLookup);
-        this.trackViewerList = new ArrayList<TrackViewer>();
+        this.trackViewerList = new ArrayList<>();
     }
 
+    /**
+     * Removes all cookies which are contained in TopComponent.getLookup().
+     */
     private void clearLookup() {
         Collection<? extends Object> allCookies = getLookup().lookupAll(Object.class);
 
@@ -79,74 +83,37 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSplitPane1 = new javax.swing.JSplitPane();
         viewerPane = new javax.swing.JScrollPane();
         visualPanel = new javax.swing.JPanel();
-        transcriptionAnalysesPane = new javax.swing.JScrollPane();
-
-        jSplitPane1.setDividerLocation(600);
-        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         visualPanel.setLayout(new javax.swing.BoxLayout(visualPanel, javax.swing.BoxLayout.PAGE_AXIS));
         viewerPane.setViewportView(visualPanel);
-
-        jSplitPane1.setTopComponent(viewerPane);
-        jSplitPane1.setRightComponent(transcriptionAnalysesPane);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
+            .addComponent(viewerPane, javax.swing.GroupLayout.DEFAULT_SIZE, 629, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
+            .addComponent(viewerPane, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JScrollPane transcriptionAnalysesPane;
     private javax.swing.JScrollPane viewerPane;
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
-
-    /**
-     * @return default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
-     * To obtain the singleton instance, use {@link #findInstance}.
-     */
-    public static synchronized AppPanelTopComponent getDefault() {
-        if (instance == null) {
-            instance = new AppPanelTopComponent();
-        }
-        return instance;
-    }
-
-    /**
-     * @return Obtain the AppPanelTopComponent instance. Never call {@link #getDefault} directly!
-     */
-    public static synchronized AppPanelTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(AppPanelTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
-            return getDefault();
-        }
-        if (win instanceof AppPanelTopComponent) {
-            return (AppPanelTopComponent) win;
-        }
-        Logger.getLogger(AppPanelTopComponent.class.getName()).warning(
-                "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
-        return getDefault();
-    }
 
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
     }
 
+    /**
+     * Sets the view controller for this top component, which will display
+     * the list of references and open the reference viewer afterwards.
+     */
     @Override
     public void componentOpened() {
         ViewController vc = new ViewController(this);
@@ -319,32 +286,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         }
     }
     
-    @Override
-    public void showTranscriptionAnalysesTopPanel(final JPanel transAnalysesPanel) {
-        // add the transcription analyses panel
-        this.transcriptionAnalysesPane.setViewportView(transAnalysesPanel);
-        this.jSplitPane1.setDividerLocation(530);
-        this.transcriptionAnalysesPane.updateUI();
-
-    }
-    
-    @Override
-    public void closeTranscriptionAnalysesTopPanel(final JPanel transAnalysesPanel) {
-        this.transcriptionAnalysesPane.remove(transAnalysesPanel);
-        this.jSplitPane1.setDividerLocation(this.getHeight());
-        this.transcriptionAnalysesPane.updateUI();
-    }
-    
-    @Override
-    public boolean hasTranscriptionAnalysesTopPanel() {
-        return this.getJPanel(this.transcriptionAnalysesPane.getComponents()) != null;
-    }
-
-    @Override
-    public JPanel getTranscriptionAnalysesTopPanel() {
-        return (JPanel) this.getJPanel(this.transcriptionAnalysesPane.getComponents());
-    }
-    
     /**
      * Checks all components recursively for a JPanel and returns the first one found.
      * If there is no JPanel among the components, null is returned.
@@ -397,14 +338,14 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private List<Reference<JPanel>> all = Collections.synchronizedList(new ArrayList<Reference<JPanel>>());
 
     public List<Action> allTrackCloseActions() {
-        List<Action> result = new ArrayList<Action>();
+        List<Action> result = new ArrayList<>();
         for (Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext();) {
             Reference<JPanel> cookieRef = it.next();
             JPanel cookie = cookieRef.get();
             if (cookie == null) {
                 it.remove();
             } else {
-                result.add(new ShowAction(cookie.getName(), cookieRef, new WeakReference<ViewController>(getLookup().lookup(ViewController.class))));
+                result.add(new ShowAction(cookie.getName(), cookieRef, new WeakReference<>(getLookup().lookup(ViewController.class))));
             }
         }
         return result;
@@ -447,9 +388,6 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     public void paint(Graphics g) {
         try {
             super.paint(g);
-            if (this.transcriptionAnalysesPane.getComponentCount() <= 0) {
-                this.jSplitPane1.setDividerLocation(this.getPreferredSize().height);
-            }
         } catch (OutOfMemoryError e) {
             String msg = NbBundle.getMessage(AppPanelTopComponent.class, "OOM_Message",
                     "An out of memory error occured during fetching the references. Please restart the software with more memory.");

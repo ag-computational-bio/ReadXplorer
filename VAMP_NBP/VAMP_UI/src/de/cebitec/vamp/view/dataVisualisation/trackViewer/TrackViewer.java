@@ -44,7 +44,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private int id2 ;
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
-    private boolean automaticScaling = true;
+    private boolean automaticScaling = false;
     
     private JSlider verticalSlider = null;
  
@@ -143,7 +143,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         Graphics2D g = (Graphics2D) graphics;
 
         // set rendering hints
-        Map<Object, Object> hints = new HashMap<Object, Object>();
+        Map<Object, Object> hints = new HashMap<>();
         hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHints(hints);
 
@@ -408,6 +408,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             }
             
             this.computeAutomaticScaling();
+            this.computeScaleStep();
             this.covLoaded = true;
             this.repaint();
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -430,7 +431,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             } else {
                 this.createCoveragePaths();
             }
-            this.computeScaleStep();
             this.computeAutomaticScaling();
             this.covLoaded = true;
         }
@@ -446,7 +446,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         }
     }
     
-
+    /**
+     * Creates the coverage paths, which are later painted in the viewer.
+     */
     private void createCoveragePaths() {
         this.cov.setHighestCoverage(0);
         
@@ -616,7 +618,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     private String toolTipDouble(Double[] data, boolean hasNormFac) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("<html>");
         sb.append("<b>Position</b>: ").append(data[0]);
         sb.append("<br>");
@@ -644,7 +646,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     private String toolTipSingle(Double[] data, boolean hasNormFac) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("<html>");
         sb.append("<b>Position</b>: ").append(data[0]);
         sb.append("<br>");
@@ -732,7 +734,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         return (Math.log(num) / Math.log(2));
     }
 
-
+    /**
+     * Computes the scale line step value, which should be used for the current
+     * coverage values.
+     */
     private void computeScaleStep() {
         int visibleCoverage = (int) (this.getPaintingAreaInfo().getAvailableForwardHeight() * this.scaleFactor);
 
@@ -864,7 +869,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Sets the initial size of the track viewer.
      */
     private void setViewerSize() {
-        this.setPreferredSize(new Dimension(1, 300));
+        this.setPreferredSize(new Dimension(1, 230));
         this.revalidate();
     }
 

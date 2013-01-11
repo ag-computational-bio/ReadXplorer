@@ -14,7 +14,6 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,8 +40,8 @@ import java.util.List;
  */
 public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<TranscriptionStart>> {
 
-    private TrackViewer trackViewer;
-    private int genomeSize;
+    private TrackConnector trackConnector;
+    private int refSeqLength;
     private int increaseReadCount;
     private int increaseReadPercent;
     private int maxInitialReadCount;
@@ -76,7 +75,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * with an initial read count of 0-10 are detected as transcription start sites, but for all positions
      * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
      * 
-     * @param trackViewer the track viewer for which the analyses should be carried out
+     * @param trackConnector the track viewer for which the analyses should be carried out
      * @param increaseReadCount minimum increase of read counts for two neighboring
      *          positions. Only when the increase is bigger, a transcription start site is predicted
      * @param increaseReadPercent minimum increase of read counts for two neighboring
@@ -89,9 +88,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      *          positions. Only when the increase is bigger, a transcription start site is predicted
      * @param tssAutomatic  true, if the parameters should be estimated automatically, false otherwise
      */
-    public AnalysisTranscriptionStart(TrackViewer trackViewer, int increaseReadCount, int increaseReadPercent, 
+    public AnalysisTranscriptionStart(TrackConnector trackConnector, int increaseReadCount, int increaseReadPercent, 
             int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic) {
-        this.trackViewer = trackViewer;
+        this.trackConnector = trackConnector;
         this.increaseReadCount = increaseReadCount;
         this.increaseReadPercent = increaseReadPercent;
         this.maxInitialReadCount = maxInitialReadCount;
@@ -112,14 +111,12 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void initDatastructures() {
         
-        TrackConnector trackCon = this.trackViewer.getTrackCon();
-        int refId = this.trackViewer.getReference().getId();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        this.genomeSize = refConnector.getRefGenome().getRefLength();
-        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, this.genomeSize);   
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
+        this.refSeqLength = trackConnector.getRefSequenceLength();
+        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, this.refSeqLength);   
         
-        this.covIncreaseDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
-        this.covIncPercentDistribution = trackCon.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
+        this.covIncreaseDistribution = trackConnector.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
+        this.covIncPercentDistribution = trackConnector.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
         this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
         
         if (this.tssAutomatic) {
@@ -309,7 +306,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private DetectedAnnotations findNextAnnotation(int tssPos, boolean isFwdStrand) {
         final int maxDeviation = 1000;
         int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
-        int maxStartPos = tssPos + maxDeviation > this.genomeSize ? genomeSize : tssPos + maxDeviation;
+        int maxStartPos = tssPos + maxDeviation > this.refSeqLength ? refSeqLength : tssPos + maxDeviation;
         PersistantAnnotation annotation;
         DetectedAnnotations detectedAnnotations = new DetectedAnnotations();
         int start;
@@ -522,7 +519,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private int estimateCutoff(DiscreteCountingDistribution distribution, int thresholdEnlarger) {
         //genomeSize = total number of positions contributing to the increase distribution
-        int maxEstimatedNbOfActiveGenes = (int) (this.genomeSize * 0.0025) + thresholdEnlarger; // 0,25% = 2,5 Genes per 1KB Genome size. This allows for variability.
+        int maxEstimatedNbOfActiveGenes = (int) (this.refSeqLength * 0.0025) + thresholdEnlarger; // 0,25% = 2,5 Genes per 1KB Genome size. This allows for variability.
         int[] distributionValues = distribution.getDiscreteCountingDistribution();
         
         int nbTSSs = 0;
@@ -569,8 +566,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void storeDistributions() {
         if (this.calcCoverageDistributions) { //if it was calculated, also store it
-            this.trackViewer.getTrackCon().insertCoverageDistribution(covIncreaseDistribution);
-            this.trackViewer.getTrackCon().insertCoverageDistribution(covIncPercentDistribution);
+            this.trackConnector.insertCoverageDistribution(covIncreaseDistribution);
+            this.trackConnector.insertCoverageDistribution(covIncPercentDistribution);
             if (this.tssAutomatic) {
                 this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0);//(int) (this.genomeSize * 0.0005));
                 this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);//(int) (this.genomeSize * 0.0005));
@@ -635,7 +632,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @return 
      */
     private int getNewThreshold(HashMap<Integer, Integer> distribution, int thresholdEnlarger) {
-        int maxValue = (int) (this.genomeSize * 0.0025 + thresholdEnlarger); // = 0,25% + thresholdEnlarger
+        int maxValue = (int) (this.refSeqLength * 0.0025 + thresholdEnlarger); // = 0,25% + thresholdEnlarger
         int nbValues = 0;
         List<Integer> keyList = new ArrayList<>(distribution.keySet());
         Collections.sort(keyList);

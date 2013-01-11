@@ -96,7 +96,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     }
 
     private void setupComponents() {
-//        this.removeAll();
 
 
         if (!this.isInMaxZoomLevel()) {
@@ -135,8 +134,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     }
     
     /**
-     * Calls the sql requests direct, we have to check if from and to are out of bounds 
-     * and skip out of bounds requests.
+     * Requests new mapping data for the current bounds or shows the mapping 
+     * data, if it is already available.
      */
     private void requestData(int from, int to) {
         
@@ -153,6 +152,12 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         }
     }
     
+    /**
+     * Method called, when data is available. If the avialable data is a 
+     * MappingResultPersistant, then the viewer is updated with the new
+     * mapping data.
+     * @param data the new mapping data to show
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void receiveData(Object data) {

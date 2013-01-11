@@ -4,12 +4,9 @@ import de.cebitec.vamp.parser.output.ConverterI;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
+import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
 /**
@@ -21,9 +18,10 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
 
     private ConverterSetupCard converterPanel;
     private boolean canConvert;
-    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0, but how?!?
+    private ChangeSupport changeSupport;
     
     public ConverterWizardPanel() {
+        this.changeSupport = new ChangeSupport(this);
     }
 
     @Override
@@ -54,27 +52,12 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
 
     @Override
     public final void addChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.add(l);
-        }
+        changeSupport.addChangeListener(l);
     }
 
     @Override
     public final void removeChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.remove(l);
-        }
-    }
-
-    protected final void fireChangeEvent() {
-        Iterator<ChangeListener> it;
-        synchronized (listeners) {
-            it = new HashSet<>(listeners).iterator();
-        }
-        ChangeEvent ev = new ChangeEvent(this);
-        while (it.hasNext()) {
-            it.next().stateChanged(ev);
-        }
+        changeSupport.removeChangeListener(l);
     }
 
     // You can use a settings object to keep track of state. Normally the
@@ -88,7 +71,7 @@ class ConverterWizardPanel implements WizardDescriptor.FinishablePanel<WizardDes
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 canConvert = (Boolean) evt.getNewValue();
-                fireChangeEvent();
+                changeSupport.fireChange();
             }
         });
     }

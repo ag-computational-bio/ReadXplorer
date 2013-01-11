@@ -4,6 +4,7 @@ import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.JOptionPane;
 import jxl.write.WriteException;
 import org.netbeans.api.progress.ProgressHandle;
@@ -11,25 +12,24 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 
 /**
- * @author rhilker
- *  
  * A file chooser for storing any kind of ExcelExportDataI data in an excel sheet.
+ * 
+ * @author rhilker
  */
 public class ExcelExportFileChooser extends VampFileChooser {
     
+    private static final long serialVersionUID = 1L;
+    
     private ProgressHandle progressHandle;
-    private String tableName;
     
     /**
      * Creates a new file chooser for saving ExcelExportDataI data into an excel file.
      * @param fileExtensions the file extension of the excel file (typically xls)
+     * @param fileDescription description of the file extension
      * @param exportData the data object to be exported (needs to implement {@link ExcelExportDataI}).
-     * @param tableName the name of the table to write
      */
-    public ExcelExportFileChooser(final String[] fileExtensions, String fileDescription, ExcelExportDataI exportData, String tableName) {
+    public ExcelExportFileChooser(final String[] fileExtensions, String fileDescription, ExcelExportDataI exportData) {
         super(VampFileChooser.SAVE_DIALOG, fileExtensions, fileDescription, exportData);
-        
-        this.tableName = tableName;
     }
 
     @Override
@@ -42,16 +42,21 @@ public class ExcelExportFileChooser extends VampFileChooser {
         if (this.data instanceof ExcelExportDataI) {
 
             final ExcelExportDataI exportData = (ExcelExportDataI) this.data;
+            int size = 0;
+            for (List<List<Object>> dataList : exportData.dataToExcelExportList()) {
+                size += dataList.size();
+            }
             this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.progress.name"));
-            progressHandle.start(exportData.dataToExcelExportList().size() + 1);
+            this.progressHandle.start(size + 1);
 
             Thread exportThread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    ExcelExporter exporter = new ExcelExporter(tableName, progressHandle);
+                    ExcelExporter exporter = new ExcelExporter(progressHandle);
                     exporter.setHeaders(exportData.dataColumnDescriptions());
                     exporter.setExportData(exportData.dataToExcelExportList());
+                    exporter.setSheetNames(exportData.dataSheetNames());
                     if (exporter.readyToExport()) {
                         try {
 

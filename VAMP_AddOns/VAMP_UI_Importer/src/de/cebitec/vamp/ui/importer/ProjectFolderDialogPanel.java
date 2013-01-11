@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.util.Properties;
 import java.io.File;
 import javax.swing.JFileChooser;
@@ -13,6 +14,8 @@ import org.openide.util.NbPreferences;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ProjectFolderDialogPanel extends javax.swing.JPanel implements NewJobDialogI {
+    
+    private static final long serialVersionUID = 1L;
     
     private String projectFolder;
     

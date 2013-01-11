@@ -1,17 +1,14 @@
-package de.cebitec.vamp.transcriptionAnalyses;
+package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.api.objects.JobI;
-import de.cebitec.vamp.databackend.IntervalRequest;
-import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.view.dataVisualisation.DataVisualisationI;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
@@ -19,11 +16,9 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 
 /**
- * @author -Rolf Hilker
- * 
  * Class for handling the data threads for one of the currently started analyses.
  * CAUTION: You cannot query coverage and mapping tables with the same AnalysisHandler at
- * the same time.
+ * the same time. You have to use two separate handlers.
  */
 public class AnalysesHandler implements ThreadListener, Observable, JobI {
     
@@ -32,10 +27,9 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     
     private final ProgressHandle progressHandle;
     private DataVisualisationI parent;
-    private TrackViewer trackViewer;
-    private int genomeSize;
+    private TrackConnector trackConnector;
+    private int refSeqLength;
     
-    //varibles for transcription start site detection
     private int nbCovRequests;
     private int nbMappingRequests;
     private int nbRequests;
@@ -47,16 +41,18 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private boolean mappingsNeeded;
     
     /**
+     * Creates a new analysis handler, ready for extracting mapping and 
+     * coverage information for the given track.
      * CAUTION: You cannot query coverage and mapping tables with the same AnalysisHandler at
-     * the same time.
-     * @param trackViewer the track viewer for which the analysis is carried out
+     * the same time. You have to use two separate handlers.
+     * @param trackConnector the track connector for which the analyses are carried out
      * @param parent the parent for visualization of the results
      */
-    public AnalysesHandler (TrackViewer trackViewer, DataVisualisationI parent) {
-        this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysisTranscriptionStart.class, "MSG_AnalysesWorker.progress.name"));
+    public AnalysesHandler (TrackConnector trackConnector, DataVisualisationI parent) {
+        this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysesHandler.class, "MSG_AnalysesWorker.progress.name"));
         this.observers = new ArrayList<>();
         this.parent = parent;
-        this.trackViewer = trackViewer;
+        this.trackConnector = trackConnector;
         this.coverageNeeded = false;
         this.mappingsNeeded = false;
         this.nbCovRequests = 0;
@@ -68,60 +64,57 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * Needs to be called in order to start the transcription analyses. Creates the
      * needed database requests and carries them out. The parent has to be a
      * ThreadListener in order to receive the coverage or mapping data.
-     * Afterwards the results can be received by calling {@link getResults()} on the
-     * observers of this analyses handler.
+     * Afterwards the results are returned to the observers of this analyses 
+     * handler by the {@link receiveData()} method.
      */
     public void startAnalysis() {
 
         this.queryType = this.coverageNeeded ? DATA_TYPE_COVERAGE : DATA_TYPE_MAPPINGS;
         this.nbRequests = 0;
         this.progressHandle.start();
-        TrackConnector trackCon = this.trackViewer.getTrackCon();
         
-        int refId = this.trackViewer.getReference().getId();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
-        this.genomeSize = refConnector.getRefGenome().getRefLength();
+        this.refSeqLength = trackConnector.getRefSequenceLength();
 
         if (this.coverageNeeded) {
 
             //decide upon stepSize of a single request and analyse coverage of whole genome
-            int stepSize = 200000;
+            final int stepSize = 200000;
             int from = 1;
-            int to = this.genomeSize > stepSize ? stepSize : this.genomeSize;
-            int additionalRequest = this.genomeSize % stepSize == 0 ? 0 : 1;
-            this.nbCovRequests = this.genomeSize / stepSize + additionalRequest;
+            int to = this.refSeqLength > stepSize ? stepSize : this.refSeqLength;
+            int additionalRequest = this.refSeqLength % stepSize == 0 ? 0 : 1;
+            this.nbCovRequests = this.refSeqLength / stepSize + additionalRequest;
             this.nbRequests += this.nbCovRequests;
             this.progressHandle.switchToDeterminate(this.nbRequests);
             this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
-            while (to < this.genomeSize) {
+            while (to < this.refSeqLength) {
                 IntervalRequest coverageRequest = new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
-                trackCon.addCoverageAnalysisRequest(coverageRequest);
+                trackConnector.addCoverageAnalysisRequest(coverageRequest);
                 
                 from = to + 1;
                 to += stepSize;
             }
 
             //calc last interval until genomeSize
-            to = this.genomeSize;
-            trackCon.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE));
-        } else
+            to = this.refSeqLength;
+            trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE));
         
-        if (this.mappingsNeeded) {
+            
+        } else if (this.mappingsNeeded) {
             
             int stepSize = 50000;
             
-            if (trackCon.isDbUsed()) {
+            if (trackConnector.isDbUsed()) {
                 //calculate which mappings are needed from the db
                 int numUnneededMappings = 0;
                 List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
                 for (PersistantTrack track : tracksAll) {
                     TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
-                    if (track.getId() < trackCon.getTrackID()) {
+                    if (track.getId() < trackConnector.getTrackID()) {
                         numUnneededMappings += connector.getNumOfUniqueMappings();
                     }
                 }
-                int numInterestingMappings = numUnneededMappings + trackCon.getNumOfUniqueMappings();
+                int numInterestingMappings = numUnneededMappings + trackConnector.getNumOfUniqueMappings();
                 int from = numUnneededMappings;
                 int to = numInterestingMappings - numUnneededMappings > stepSize
                         ? numUnneededMappings + stepSize : numInterestingMappings;
@@ -134,7 +127,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
                 while (to < numInterestingMappings) {
-                    trackCon.addMappingAnalysisRequest(new IntervalRequest(from, to, this));
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this));
 
                     from = to + 1;
                     to += stepSize;
@@ -143,24 +136,24 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 //calc last interval until genomeSize
                 to = numInterestingMappings;
                 IntervalRequest mappingRequest = new IntervalRequest(from, to, this);
-                trackCon.addMappingAnalysisRequest(mappingRequest);
+                trackConnector.addMappingAnalysisRequest(mappingRequest);
 
             } else {
-                this.nbRequests = this.genomeSize / stepSize + 1;
+                this.nbRequests = this.refSeqLength / stepSize + 1;
                 this.progressHandle.switchToDeterminate(this.nbRequests);
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
                 int from = 0;
                 int to = stepSize;
-                while (to < this.genomeSize) {
-                    trackCon.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
+                while (to < this.refSeqLength) {
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
 
                     from = to + 1;
                     to += stepSize;
                 }
                 
                 //calc last interval until genomeSize
-                to = this.genomeSize;
-                trackCon.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
+                to = this.refSeqLength;
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
             }
         } else {
             this.progressHandle.finish();
@@ -176,24 +169,42 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         //when the last request is finished signalize the parent to collect the data
         if (this.nbCarriedOutRequests >= this.nbRequests) {
             String dataType = this.coverageNeeded ? DATA_TYPE_COVERAGE : DATA_TYPE_MAPPINGS;
-            this.parent.showData(dataType);
+            this.parent.showData(new Pair<>(trackConnector.getTrackID(), dataType));
             this.nbCarriedOutRequests = 0;
             this.progressHandle.finish();
         }
     }
 
+    /**
+     * @return True, if the analysis works with coverage, false otherwise.
+     */
     public boolean isCoverageNeeded() {
         return this.coverageNeeded;
     }
 
+    /**
+     * Set before an anylsis is is started. True, if the analysis works with
+     * coverage, false otherwise. By default it is false.
+     * @param coverageNeeded True, if the analysis works with
+     * coverage, false otherwise.
+     */
     public void setCoverageNeeded(boolean coverageNeeded) {
         this.coverageNeeded = coverageNeeded;
     }
-
+    
+    /**
+     * @return True, if the analysis works with mappings, false otherwise.
+     */
     public boolean isMappingsNeeded() {
         return this.mappingsNeeded;
     }
 
+    /**
+     * Set before an anylsis is is started. True, if the analysis works with
+     * mappings, false otherwise. By default it is false.
+     * @param mappingsNeeded True, if the analysis works with
+     * mappings, false otherwise.
+     */
     public void setMappingsNeeded(boolean mappingsNeeded) {
         this.mappingsNeeded = mappingsNeeded;
     }
@@ -231,5 +242,5 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 observer.update(mappingQuerriesFinished);
             }
         }
-    }
+    }    
 }

@@ -6,10 +6,11 @@
 
 package de.cebitec.vamp.ui.importer;
 
+import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.parser.common.ParserI;
-import de.cebitec.vamp.parser.reference.ReferenceParserI;
-import de.cebitec.vamp.parser.reference.FastaReferenceParser;
 import de.cebitec.vamp.parser.reference.BioJavaParser;
+import de.cebitec.vamp.parser.reference.FastaReferenceParser;
+import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import java.awt.Component;
 import java.io.File;
 import java.util.logging.Level;
@@ -207,11 +208,9 @@ public class NewReferenceDialogPanel extends javax.swing.JPanel implements NewJo
         }
         int result = fc.showOpenDialog(this);
 
-        File file = null;
-
         if (result == 0) {
             // file chosen
-            file = fc.getSelectedFile();
+            File file = fc.getSelectedFile();
 
             if (file.canRead()) {
                 refGenFile = file;

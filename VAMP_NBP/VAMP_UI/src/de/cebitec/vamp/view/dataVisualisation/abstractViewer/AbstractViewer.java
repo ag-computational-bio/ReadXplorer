@@ -200,16 +200,18 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * @return true, if this viewer has a sequence bar, false otherwise
+     */
     public boolean hasSequenceBar() {
-        if (seqBar != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.seqBar != null;
     }
 
+    /**
+     * @return returns the sequence bar of this viewer
+     */
     public SequenceBar getSequenceBar() {
-        return seqBar;
+        return this.seqBar;
     }
 
     protected abstract int getMaximalHeight();
@@ -632,10 +634,19 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return this.reference;
     }
 
+    /**
+     * @return true, if this viewer is currently active (in the foreground)
+     * and false, if it is inactive
+     */
     public boolean isActive() {
         return this.isActive;
     }
 
+    /**
+     * Set true, if this viewer should be active (in the foreground or it needs
+     * to update its data) and false, if it should be inactive.
+     * @param isActive true, if this viewer should be active and false, if not
+     */
     public void setActive(boolean isActive) {
         this.isActive = isActive;
         if (isActive) {

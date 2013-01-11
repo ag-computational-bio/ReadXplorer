@@ -35,8 +35,9 @@ public class TranscriptionStartColumns implements ExcelExportDataI {
      * for the columns of the table.
      */
     @Override
-    public List<String> dataColumnDescriptions() {
-        List<String> dataColumnDescriptions = new ArrayList();
+    public List<List<String>> dataColumnDescriptions() {
+        List<List<String>> allSheetDescriptions = new ArrayList<>();
+        List<String> dataColumnDescriptions = new ArrayList<>();
         
         dataColumnDescriptions.add("Position");
         dataColumnDescriptions.add("Strand");
@@ -57,7 +58,9 @@ public class TranscriptionStartColumns implements ExcelExportDataI {
         dataColumnDescriptions.add("Transcript Stop");
         dataColumnDescriptions.add("70bp Upstream of Start");
         
-        return dataColumnDescriptions;
+        allSheetDescriptions.add(dataColumnDescriptions);
+        
+        return allSheetDescriptions;
     }
 
     /**
@@ -65,12 +68,13 @@ public class TranscriptionStartColumns implements ExcelExportDataI {
      * to the transcription start site table.
      */
     @Override
-    public List<List<Object>> dataToExcelExportList() {
-        List<List<Object>> tSSExport = new ArrayList<List<Object>>();
+    public List<List<List<Object>>> dataToExcelExportList() {
+        List<List<List<Object>>> tSSExport = new ArrayList<>();
+        List<List<Object>> tSSResults = new ArrayList<>();
         
         for (int i = 0; i < this.tSS.size(); ++i) {      
             TranscriptionStart geneStart = this.tSS.get(i);
-            List<Object> geneStartRow = new ArrayList<Object>();
+            List<Object> geneStartRow = new ArrayList<>();
             
             int percentageIncrease;
             if (geneStart.getInitialCoverage() > 0) {
@@ -113,9 +117,19 @@ public class TranscriptionStartColumns implements ExcelExportDataI {
            
             geneStartRow.add(this.promotorRegions.get(i));
             
-            tSSExport.add(geneStartRow);
+            tSSResults.add(geneStartRow);
         }
         
+        tSSExport.add(tSSResults);
+        
         return tSSExport;
+    }
+
+    @Override
+    public List<String> dataSheetNames() {
+        List<String> sheetNames = new ArrayList<>();
+        sheetNames.add("Transcription Analysis Table");
+        sheetNames.add("Trans Analysis Parameters/Stats");
+        return sheetNames;
     }
 }
