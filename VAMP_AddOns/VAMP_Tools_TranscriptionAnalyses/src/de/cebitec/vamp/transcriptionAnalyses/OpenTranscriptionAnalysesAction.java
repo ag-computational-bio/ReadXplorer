@@ -55,7 +55,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private int finishedCovAnalyses = 0;
     private int finishedMappingAnalyses = 0;
     private ParameterSetTSS parametersTss;
-    private ParameterSetFilterAnnos parametersFilterAnnos;
+    private ParameterSetFilteredAnnos parametersFilterAnnos;
     private ParameterSetOperonDet parametersOperonDet;
     
     private Map<Integer, AnalysisContainer> trackToAnalysisMap;
@@ -171,7 +171,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet, 
                 minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov);
-        parametersFilterAnnos = new ParameterSetFilterAnnos(performFilterAnalysis, minNumberReads, maxNumberReads);
+        parametersFilterAnnos = new ParameterSetFilteredAnnos(performFilterAnalysis, minNumberReads, maxNumberReads);
         parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation);
 
         

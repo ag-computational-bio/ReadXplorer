@@ -27,8 +27,12 @@ public final class OpenRefGenViewerAction implements ActionListener {
         AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
         appPanelTopComponent.open();
         ViewController vc = appPanelTopComponent.getLookup().lookup(ViewController.class);
-        vc.openRefGen();
-        appPanelTopComponent.setName(vc.getDisplayName());
-        appPanelTopComponent.requestActive();
+        boolean isRefSelected = vc.openRefGen();
+        if (isRefSelected) {
+            appPanelTopComponent.setName(vc.getDisplayName());
+            appPanelTopComponent.requestActive();
+        } else {
+            appPanelTopComponent.close();
+        }
     }
 }

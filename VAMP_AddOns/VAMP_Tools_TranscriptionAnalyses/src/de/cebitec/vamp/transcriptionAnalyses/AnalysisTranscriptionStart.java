@@ -421,12 +421,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     } else if (start > tssPos && annotation.getStart() < tssPos) {
                         //store next upstream annotation, translation start is further in gene
                         
-                        /* 
-                         * Also check, if gene and CDS annotation are available for current SNP.
-                         * Handle this case by not storing the current annotation, if it is 
-                         * a CDS annotation completely covered by a gene annotation. In all other
-                         * cases the annotation can be stored.
-                         */
                         if (    annotation.getType() == FeatureType.CDS && 
                                 this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE &&
                                 this.genomeAnnotations.get(i+1).getStart() <= annotation.getStart()) {

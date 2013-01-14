@@ -24,6 +24,8 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     
     public static final String DATA_TYPE_COVERAGE = "Coverage";
     public static final String DATA_TYPE_MAPPINGS = "Mappings";
+    public static final byte COVERAGE_QUERRIES_FINISHED = 1;
+    public static final byte MAPPING_QUERRIES_FINISHED = 2;
     
     private final ProgressHandle progressHandle;
     private DataVisualisationI parent;
@@ -234,12 +236,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         for (Observer observer : this.observers) {
             observer.update(data);
             if (this.nbCarriedOutRequests == this.nbCovRequests) {
-                byte coverageQuerriesFinished = 1;
-                observer.update(coverageQuerriesFinished);
+                observer.update(COVERAGE_QUERRIES_FINISHED);
             } else 
             if (this.nbCarriedOutRequests == this.nbRequests) {
-                byte mappingQuerriesFinished = 2;
-                observer.update(mappingQuerriesFinished);
+                observer.update(MAPPING_QUERRIES_FINISHED);
             }
         }
     }

@@ -89,7 +89,7 @@ public class CoverageThreadAnalyses extends RequestThread {
         }
         SamBamFileReader externalDataReader;
         externalDataReader = new SamBamFileReader(file, track.getId());
-        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
+        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, Byte.valueOf("0"));
 
     }
 

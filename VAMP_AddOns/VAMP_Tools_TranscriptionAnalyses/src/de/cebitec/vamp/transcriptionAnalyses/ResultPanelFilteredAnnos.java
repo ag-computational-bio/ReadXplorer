@@ -30,14 +30,14 @@ public class ResultPanelFilteredAnnos extends javax.swing.JPanel {
 
     private BoundsInfoManager bim;
     private List<FilteredAnnotation> filteredAnnos;
-    private final ParameterSetFilterAnnos filterAnnosParameters;
+    private final ParameterSetFilteredAnnos filterAnnosParameters;
     
     /**
      * Panel showing a result of an analysis filtering for annotations with a
      * min and max certain readcount.
      * @param filterAnnosParameters parameter set used for this annotation filtering
      */
-    public ResultPanelFilteredAnnos(ParameterSetFilterAnnos filterAnnosParameters) {
+    public ResultPanelFilteredAnnos(ParameterSetFilteredAnnos filterAnnosParameters) {
         initComponents();
         this.filterAnnosParameters = filterAnnosParameters;
         this.filteredAnnos = new ArrayList<>();
