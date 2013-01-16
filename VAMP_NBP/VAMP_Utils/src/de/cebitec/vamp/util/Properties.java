@@ -106,4 +106,5 @@ public class Properties {
     
     /* cache every track automatically when opened? */
     public static final String OBJECTCACHE_AUTOSTART = "OBJECTCACHE_AUTOSTART";
+    public static String OBJECTCACHE_ACTIVE = "OBJECTCACHE_ACTIVE";;
 }

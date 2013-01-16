@@ -12,7 +12,6 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.sql.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -168,8 +167,7 @@ public class ProjectConnector extends Observable {
             this.cleanUp();
             
             // notify observers about the change of the database
-            this.setChanged();
-            this.notifyObservers( "disconnect" );
+            this.notifyObserversAbout("disconnect");
         }
     }
 
@@ -203,8 +201,7 @@ public class ProjectConnector extends Observable {
 //            this.connectToProject(projectLocation);
         }
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "connect" );
+        this.notifyObserversAbout("connect");
     }
 
     
@@ -642,8 +639,7 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName());
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "addRefGenome" );
+        this.notifyObserversAbout("addRefGenome");
         
         return reference.getID();
     }
@@ -719,8 +715,7 @@ public class ProjectConnector extends Observable {
             }
             
             // notify observers about the change of the database
-            this.setChanged();
-            this.notifyObservers( "storeCoverage" );
+            this.notifyObserversAbout("storeCoverage");
             
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
         }
@@ -777,8 +772,7 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "storeTrack" );
+        this.notifyObserversAbout("storeTrack");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
@@ -1104,8 +1098,11 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "addTrack" );
+        this.notifyObserversAbout("addTrack");
+        
+        //ensure, that there is no cache for this track
+        ObjectCache.getInstance().deleteFamily("loadCoverage."+track.getID());
+        ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track."+track.getID());
         
         return track.getID();
     }
@@ -1402,10 +1399,14 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "deleteTrack" );
+        this.notifyObserversAbout("deleteTrack");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"{0}\"", trackID);
+    }
+    
+    private void notifyObserversAbout(final String message) {
+        this.setChanged();
+        this.notifyObservers(message);        
     }
 
     
@@ -1441,8 +1442,7 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "deleteGenomes" );
+        this.notifyObserversAbout("deleteGenomes");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
@@ -1575,8 +1575,7 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "storeSeqPairData" );
+         this.notifyObserversAbout("storeSeqPairData");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair data");
     }
@@ -1820,8 +1819,7 @@ public class ProjectConnector extends Observable {
             }
             
             // notify observers about the change of the database
-            this.setChanged();
-            this.notifyObservers( "storePositionTable" );
+            this.notifyObserversAbout("storeSeqPairData");
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
         }

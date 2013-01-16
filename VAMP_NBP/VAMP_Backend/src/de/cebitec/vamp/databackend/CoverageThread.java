@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /*
  * TODO: finish coverage thread for direct bam support. already done: loadCoverage

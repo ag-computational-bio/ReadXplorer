@@ -31,8 +31,7 @@ import org.openide.util.TaskListener;
 
 public final class TrackCacher {
     
-    //change the cache version if the object structure of cached responses changes
-    private final static int CACHEVERSION = 3;
+    
     private final static int SCANFACTOR = 10;
     
     private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
@@ -79,7 +78,11 @@ public final class TrackCacher {
 
                     
                     currentStep++;
-                    ph.progress(currentStep);
+                    //make sure, that we do not show too many steps
+                    if (currentStep>steps) ph.finish();// ph.progress(steps);
+                        //currentStep = steps;
+                    else ph.progress(currentStep);
+                    
                     
                     
                     
@@ -134,11 +137,7 @@ public final class TrackCacher {
         
         //check a boolean key to test, if the cache has allready been created 
         //for this track
-        final String cacheFamily = "TrackCacher."+CACHEVERSION+"."
-                + SCANFACTOR + "." 
-                + CoverageAndDiffResultPersistant.serialVersionUID 
-                + "." + "run";
-        
+        final String cacheFamily = ObjectCache.getTrackCacherFieldFamily();
         final String cacheKey = "Track." + tc.getTrackID();
         
         Object cachedResult = ObjectCache.getInstance().get(cacheFamily, cacheKey);
@@ -155,7 +154,10 @@ public final class TrackCacher {
             });
             
             //start pre caching only, if the user accepted it in his prefererences
-            if (NbPreferences.forModule(Object.class).getBoolean(Properties.OBJECTCACHE_AUTOSTART, true)) {
+            if (NbPreferences.forModule(Object.class).getBoolean(Properties.OBJECTCACHE_AUTOSTART, true)
+                &&
+                NbPreferences.forModule(Object.class).getBoolean(Properties.OBJECTCACHE_ACTIVE, true)
+                ) {
                 if (tc.isDbUsed()) theTask.schedule(5*1000); //start the task with a delay of 5 seconds
                                       //to let the first track position load 
             }

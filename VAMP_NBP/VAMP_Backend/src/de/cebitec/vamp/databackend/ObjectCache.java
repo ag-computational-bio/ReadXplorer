@@ -5,6 +5,8 @@
 package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.vamp.util.Properties;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
 
 /**
  * Object cache provides the possibility to save any serializable 
@@ -35,6 +38,9 @@ import org.openide.util.Exceptions;
 public class ObjectCache {
     private static ObjectCache instance;
     
+    //change the cache version if the object structure of cached responses changes
+    public final static int CACHEVERSION = 3;
+    
     /** provides singleton pattern */
     public static synchronized ObjectCache getInstance() {
         if (instance == null) {
@@ -44,36 +50,39 @@ public class ObjectCache {
     }
     
     public Object get(String family, String key) {
-        PreparedStatement fetch;
-        try {
-            fetch = ProjectConnector.getInstance()
-            .getConnection().prepareStatement(SQLStatements.FETCH_OBJECTFROMCACHE);
-            fetch.setString(1, family);
-            fetch.setString(2, key);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                Object id = rs.getBytes(FieldNames.OBJECTCACHE_DATA);
-                ByteArrayInputStream bais;
-                GZIPInputStream gz;
-                ObjectInputStream ins;
-                bais = new ByteArrayInputStream(rs.getBytes(FieldNames.OBJECTCACHE_DATA));
-                try {
-                    gz = new GZIPInputStream(bais);
-                    ins = new ObjectInputStream(gz);
-                    Object data = ins.readObject();
-                    return data;
-                } catch (Exception e) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
-                    "Failed to load object " + family + "." + " from cache: "+ e.getMessage());
-                }                 
-            }
-        } catch (SQLException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
-            "Failed to load object " + family + "." + " from cache: "+ e.getMessage());
-            return null;
-        }
         
+        if (NbPreferences.forModule(Object.class).getBoolean(Properties.OBJECTCACHE_ACTIVE, true)) {
+            PreparedStatement fetch;
+            try {
+                fetch = ProjectConnector.getInstance()
+                .getConnection().prepareStatement(SQLStatements.FETCH_OBJECTFROMCACHE);
+                fetch.setString(1, family);
+                fetch.setString(2, key);
+
+                ResultSet rs = fetch.executeQuery();
+                if (rs.next()) {
+                    Object id = rs.getBytes(FieldNames.OBJECTCACHE_DATA);
+                    ByteArrayInputStream bais;
+                    GZIPInputStream gz;
+                    ObjectInputStream ins;
+                    bais = new ByteArrayInputStream(rs.getBytes(FieldNames.OBJECTCACHE_DATA));
+                    try {
+                        gz = new GZIPInputStream(bais);
+                        ins = new ObjectInputStream(gz);
+                        Object data = ins.readObject();
+                        return data;
+                    } catch (Exception e) {
+                        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
+                        "Failed to load object " + family + "." + " from cache: "+ e.getMessage());
+                    }                 
+                }
+            } catch (SQLException e) {
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
+                "Failed to load object " + family + "." + " from cache: "+ e.getMessage());
+                return null;
+            }
+        }
+           
         
         return null;
         
@@ -81,43 +90,45 @@ public class ObjectCache {
     
     public void set(String family, String key, Serializable data) {
         
-        StopWatch watch = new StopWatch();
-        
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
-        GZIPOutputStream gz;
-        ObjectOutputStream    oos; 
-        try {
-            gz = new GZIPOutputStream(baos);
-            oos = new ObjectOutputStream( gz );
-            oos.writeObject( data ); 
-            oos.close(); 
-            byte[] array = baos.toByteArray();
-            
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-            "Needed " + watch.getElapsedTimeAsString() + " to create byte representation ("+array.length+" bytes)");
-            
-            this.delete(family, key);
-            
+        if (NbPreferences.forModule(Object.class).getBoolean(Properties.OBJECTCACHE_ACTIVE, true)) {
+            StopWatch watch = new StopWatch();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+            GZIPOutputStream gz;
+            ObjectOutputStream    oos; 
             try {
-                PreparedStatement insert = ProjectConnector.getInstance()
-                .getConnection().prepareStatement(SQLStatements.INSERT_OBJECTINTOCACHE);
-                insert.setString(1, family);
-                insert.setString(2, key);
-                insert.setObject(3, array);
-                insert.executeUpdate();
-                insert.close();
-                
-            } catch (SQLException ex) {
+                gz = new GZIPOutputStream(baos);
+                oos = new ObjectOutputStream( gz );
+                oos.writeObject( data ); 
+                oos.close(); 
+                byte[] array = baos.toByteArray();
+
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
+                "Needed " + watch.getElapsedTimeAsString() + " to create byte representation ("+array.length+" bytes)");
+
+                this.delete(family, key);
+
+                try {
+                    PreparedStatement insert = ProjectConnector.getInstance()
+                    .getConnection().prepareStatement(SQLStatements.INSERT_OBJECTINTOCACHE);
+                    insert.setString(1, family);
+                    insert.setString(2, key);
+                    insert.setObject(3, array);
+                    insert.executeUpdate();
+                    insert.close();
+
+                } catch (SQLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+                catch (NullPointerException ex) { 
+                    Exceptions.printStackTrace(ex);
+                }
+
+
+
+            } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
-            catch (NullPointerException ex) { 
-                Exceptions.printStackTrace(ex);
-            }
-            
-            
-            
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
         }
     }
     
@@ -154,6 +165,17 @@ public class ObjectCache {
             Exceptions.printStackTrace(ex);
         }
         return false;       
+    }
+    
+    /**
+     * returns the name of the cache family, that is to be used 
+     * to determine that a certain track has been allready cached
+     * @return cache family name
+     */
+    public static String getTrackCacherFieldFamily() {
+        return "TrackCacher."+ObjectCache.CACHEVERSION+"."
+                + CoverageAndDiffResultPersistant.serialVersionUID 
+                + "." + "run";
     }
       
 }
