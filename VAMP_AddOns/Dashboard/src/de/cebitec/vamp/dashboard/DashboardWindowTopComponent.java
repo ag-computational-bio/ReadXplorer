@@ -11,6 +11,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle;
@@ -131,7 +134,11 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
                 }
                 
             });
-            ov = new OutlineView(); //Set the columns of the outline view, 
+            ov = new OutlineView(); //Set the columns of the outline view,
+            
+            //do not show the default property window
+            //this outlineview is meant to be a readonly list
+            ov.setDefaultActionAllowed(false);
             //using the name of the property 
             //followed by the text to be displayed in the column header: 
             ov.setPropertyColumns( "description", "Description", "timestamp", "Date", "mark", "Mark for action"); 
@@ -187,7 +194,19 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
 
             @Override 
             public void update(Observable o, Object arg) {
-                refreshData();
+                try {
+                    //run gui updates separately in the AWT Thread
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshData();
+                        }
+                    });
+                }
+                catch(Exception e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
+                    e.getMessage());
+                }
             }
         
         }); 
