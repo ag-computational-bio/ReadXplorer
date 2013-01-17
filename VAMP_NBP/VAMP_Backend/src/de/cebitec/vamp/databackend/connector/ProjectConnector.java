@@ -1382,6 +1382,10 @@ public class ProjectConnector extends Observable {
             deletePosTable.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track...");
             deleteTrack.execute();
+            
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track Cache...");
+            ObjectCache.getInstance().deleteFamily("loadCoverage."+trackID);
+            ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track."+trackID);
 
             con.commit();
 

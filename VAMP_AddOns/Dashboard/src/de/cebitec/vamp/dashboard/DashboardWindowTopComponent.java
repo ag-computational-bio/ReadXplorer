@@ -86,7 +86,9 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
              * 1. Open a database
              * 2. Import data
             */
-            String  sText  = "<html><h2>Quick Start</h2> 1. Open a database <br/> 2. Import data </html>";
+            String  sText  = "<html><img src=\""+DashboardWindowTopComponent.class.getResource("splash.png")+"\" /><h2>Visualization and Analysis of MapPed sequences: Quick Start</h2> <p>1. Open a database <br/> "
+                    +"2. Import a reference genome <br /> 3. Import a track <br /> 4. Explore your reference genome and tracks <br />"
+                    + "5. Run an analysis on your data </p></html>";
             jLabel1.setText (sText);
             
             Border paddingBorder = BorderFactory.createEmptyBorder(100,100,100,100);
