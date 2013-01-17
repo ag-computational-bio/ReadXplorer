@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.NbBundle;
 
 /**
  * Class for handling the data threads for one of the currently started analyses.
@@ -24,6 +23,8 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     
     public static final String DATA_TYPE_COVERAGE = "Coverage";
     public static final String DATA_TYPE_MAPPINGS = "Mappings";
+    public static final byte COVERAGE_QUERRIES_FINISHED = 1;
+    public static final byte MAPPING_QUERRIES_FINISHED = 2;
     
     private final ProgressHandle progressHandle;
     private DataVisualisationI parent;
@@ -47,9 +48,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * the same time. You have to use two separate handlers.
      * @param trackConnector the track connector for which the analyses are carried out
      * @param parent the parent for visualization of the results
+     * @param handlerTitle title of the analysis handler 
      */
-    public AnalysesHandler (TrackConnector trackConnector, DataVisualisationI parent) {
-        this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysesHandler.class, "MSG_AnalysesWorker.progress.name"));
+    public AnalysesHandler (TrackConnector trackConnector, DataVisualisationI parent, String handlerTitle) {
+        this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
         this.observers = new ArrayList<>();
         this.parent = parent;
         this.trackConnector = trackConnector;
@@ -234,12 +236,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         for (Observer observer : this.observers) {
             observer.update(data);
             if (this.nbCarriedOutRequests == this.nbCovRequests) {
-                byte coverageQuerriesFinished = 1;
-                observer.update(coverageQuerriesFinished);
+                observer.update(COVERAGE_QUERRIES_FINISHED);
             } else 
             if (this.nbCarriedOutRequests == this.nbRequests) {
-                byte mappingQuerriesFinished = 2;
-                observer.update(mappingQuerriesFinished);
+                observer.update(MAPPING_QUERRIES_FINISHED);
             }
         }
     }

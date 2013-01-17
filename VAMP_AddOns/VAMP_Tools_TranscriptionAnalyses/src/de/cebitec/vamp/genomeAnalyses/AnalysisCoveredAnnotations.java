@@ -1,6 +1,7 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
+import de.cebitec.vamp.databackend.AnalysesHandler;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -26,6 +27,7 @@ public class AnalysisCoveredAnnotations implements Observer, AnalysisI<List<Cove
     private List<PersistantAnnotation> genomeAnnotations;
     private HashMap<Integer, CoveredAnnotation> coveredAnnoCount; //annotation id to count of covered positions for annotation
     private List<CoveredAnnotation> coveredAnnos;
+    private CoveredAnnotationResult coveredAnnosResult;
     
     private int lastAnnotationIdx;
 
@@ -76,7 +78,7 @@ public class AnalysisCoveredAnnotations implements Observer, AnalysisI<List<Cove
             coverageAndDiffResult = (CoverageAndDiffResultPersistant) data;
             this.updateCoverageCountForAnnotations(coverageAndDiffResult);
         } else
-        if (data instanceof Byte && ((Byte) data) == 2) { //2 means coverage analysis is finished
+        if (data instanceof Byte && ((Byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED) { //1 means coverage analysis is finished
             this.findCoveredAnnotations();
         }
     }
@@ -90,23 +92,15 @@ public class AnalysisCoveredAnnotations implements Observer, AnalysisI<List<Cove
         PersistantCoverage coverage = coverageAndDiffResult.getCoverage();
         int rightBound = coverage.getRightBound();
 
-        /*
-         * algorithm:
-         * get bunch of data
-         * extract for each position the total coverage value
-         * (unneeded, because SNPs are exprected - extract for each position the total diff count)
-         * (substract coverage - diff for each position)
-         * after done for all positions of genome: count for each anno the number of covered bases
-         */
-
         PersistantAnnotation annotation;
-        int noCoveredBases = 0;
+        int noCoveredBases;
         int annoStart;
         int annoStop;
         int coveredBases;
 
           //coverage identified within an annotation
         for (int i = this.lastAnnotationIdx; i < this.genomeAnnotations.size() - 1; ++i) {
+            noCoveredBases = 0;
             annotation = this.genomeAnnotations.get(i);
             annoStart = annotation.getStart();
             annoStop = annotation.getStop();
@@ -156,5 +150,9 @@ public class AnalysisCoveredAnnotations implements Observer, AnalysisI<List<Cove
     @Override
     public List<CoveredAnnotation> getResults() {
         return this.coveredAnnos;
+    }
+    
+    public int getGenomeAnnotationSize() {
+        return this.genomeAnnotations.size();
     }
 }

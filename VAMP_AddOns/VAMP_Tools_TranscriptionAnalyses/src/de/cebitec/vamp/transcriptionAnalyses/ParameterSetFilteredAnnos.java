@@ -5,7 +5,7 @@ package de.cebitec.vamp.transcriptionAnalyses;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetFilterAnnos {
+public class ParameterSetFilteredAnnos {
     
     private boolean performFilterAnalysis;
     private int minNumberReads;
@@ -18,7 +18,7 @@ public class ParameterSetFilterAnnos {
      * @param maxNumberReads  the maximum number of reads an annotation has to contain
      * 
      */
-    public ParameterSetFilterAnnos(boolean performFilterAnalysis, int minNumberReads, int maxNumberReads) {
+    public ParameterSetFilteredAnnos(boolean performFilterAnalysis, int minNumberReads, int maxNumberReads) {
         this.performFilterAnalysis = performFilterAnalysis;
         this.minNumberReads = minNumberReads;
         this.maxNumberReads = maxNumberReads;
