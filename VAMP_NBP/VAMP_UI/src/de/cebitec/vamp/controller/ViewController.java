@@ -55,7 +55,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
      * Handles the opening of a reference genome viewer. First the list of
      * reference sequences is shown, and after a selection was made, the
      * corresponding reference viewer is opened.
-     * @return true, if a reference genome is selected, false otherwise
+     * @return true, if a reference genome is selected and OK was clicked in the dialog, false otherwise
      */
     public boolean openRefGen(){
         OpenRefGenPanel orgp = new OpenRefGenPanel();
@@ -63,12 +63,12 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
-        boolean isRefSelected = orgp.getSelectedReference() != null;
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && isRefSelected) {
+        boolean canOpenRefViewer = orgp.getSelectedReference() != null && dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION);
+        if (canOpenRefViewer) {
             this.openGenome(orgp.getSelectedReference());
         }
         
-        return isRefSelected;
+        return canOpenRefViewer;
     }
 
     /**

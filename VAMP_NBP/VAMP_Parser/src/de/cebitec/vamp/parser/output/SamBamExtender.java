@@ -107,27 +107,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
 
-            
-//commented out because: we currently don't allow to write sam files, only bam! (more efficient)
-            
-            //determine writer type (sam or bam):
-//            String[] nameParts = fileName.split(".");
-//            String extension;
-//            try {
-//                extension = nameParts[nameParts.length - 1];
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                extension = "bam";
-//            }
-
-            SAMFileWriterFactory factory = new SAMFileWriterFactory();
-//            if (extension.toLowerCase().contains("sam")) {
-//                outputFile = new File(fileToExtend.getAbsolutePath() + "_extended.sam");
-//                samBamFileWriter = factory.makeSAMWriter(header, false, outputFile);
-//            } else {
-                outputFile = new File(fileToExtend.getAbsolutePath() + "_extended.bam");
-                samBamFileWriter = factory.makeBAMWriter(header, false, outputFile);
-//            }
-
+            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(fileToExtend, header, false, "_extended.bam");
+            samBamFileWriter = writerAndFile.getFirst();
+            outputFile = writerAndFile.getSecond();
             trackJob.setFile(outputFile);
 
             int lineno = 0;

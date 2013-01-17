@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.NbBundle;
 
 /**
  * Class for handling the data threads for one of the currently started analyses.
@@ -49,9 +48,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * the same time. You have to use two separate handlers.
      * @param trackConnector the track connector for which the analyses are carried out
      * @param parent the parent for visualization of the results
+     * @param handlerTitle title of the analysis handler 
      */
-    public AnalysesHandler (TrackConnector trackConnector, DataVisualisationI parent) {
-        this.progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(AnalysesHandler.class, "MSG_AnalysesWorker.progress.name"));
+    public AnalysesHandler (TrackConnector trackConnector, DataVisualisationI parent, String handlerTitle) {
+        this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
         this.observers = new ArrayList<>();
         this.parent = parent;
         this.trackConnector = trackConnector;

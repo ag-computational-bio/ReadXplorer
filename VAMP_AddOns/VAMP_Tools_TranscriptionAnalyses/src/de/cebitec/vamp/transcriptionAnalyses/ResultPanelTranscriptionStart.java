@@ -8,10 +8,13 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
+import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * This panel is capable of showing a table with transcription start sites and
@@ -161,17 +165,23 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         this.promotorRegions = new ArrayList<>();
         
         //get reference sequence for promotor regions
-        int refId = this.referenceViewer.getReference().getId();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refId);
+        PersistantReference ref = this.referenceViewer.getReference();
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
         String sequence = refConnector.getRefGenome().getSequence();
         String promotor;
         
         //get the promotor region for each TSS
+        int promotorStart;
+        int refSeqLength = ref.getSequence().length();
         for (TranscriptionStart tSS : this.tSSs) {
             if (tSS.isFwdStrand()) {
-                promotor = sequence.substring(tSS.getPos() - 70, tSS.getPos());
+                promotorStart = tSS.getPos() - 70;
+                promotorStart = promotorStart < 0 ? 0 : promotorStart;
+                promotor = sequence.substring(promotorStart, tSS.getPos());
             } else {
-                promotor = sequence.substring(tSS.getPos(), tSS.getPos() + 70);
+                promotorStart = tSS.getPos() + 70;
+                promotorStart = promotorStart > refSeqLength ? refSeqLength : promotorStart;
+                promotor = SequenceUtils.getReverseComplement(sequence.substring(tSS.getPos(), promotorStart));
             }
             this.promotorRegions.add(promotor);
         }

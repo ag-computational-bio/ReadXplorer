@@ -64,7 +64,7 @@ public class SamBamFileReader { //TODO: add observer
 
         List<PersistantMapping> mappings = new ArrayList<>();
         SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
-        String refSeq = refGenome.getSequence();
+        String refSeq = refGenome.getSequence().toUpperCase();
         String refSubSeq;
         int id = 0;
         String cigar;
@@ -79,8 +79,10 @@ public class SamBamFileReader { //TODO: add observer
 
         while (samRecordIterator.hasNext()) {
             record = samRecordIterator.next();
-            start = record.getUnclippedStart();
-            stop = record.getUnclippedEnd();
+            start = record.getAlignmentStart();
+            stop = record.getAlignmentEnd();
+//            start = start < 0 ? 0 : start;
+//            stop = stop >= refSeq.length() ? refSeq.length() : stop;
             isFwdStrand = !record.getReadNegativeStrandFlag();
             classification = (Integer) record.getAttribute("Yc");
             count = (Integer) record.getAttribute("Yt");
@@ -88,7 +90,7 @@ public class SamBamFileReader { //TODO: add observer
             //find check alignment via cigar string and add diffs to mapping
             cigar = record.getCigarString();
             if (cigar.contains("M")) {
-                refSubSeq = refSeq.substring(start, stop);
+                refSubSeq = refSeq.substring(start - 1, stop);
             } else {
                 refSubSeq = null;
             }
@@ -130,8 +132,9 @@ public class SamBamFileReader { //TODO: add observer
 
         while (samRecordIterator.hasNext()) {
             record = samRecordIterator.next();
-            start = record.getUnclippedStart();
-            stop = record.getUnclippedEnd();
+            start = record.getAlignmentStart();
+            stop = record.getAlignmentEnd();
+//            start = start < 0 ? 0 : start;
             isFwdStrand = !record.getReadNegativeStrandFlag();
             mapping = new PersistantMapping(start, stop, isFwdStrand);
             mappings.add(mapping);
@@ -157,12 +160,12 @@ public class SamBamFileReader { //TODO: add observer
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
 
         SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
-        String refSeq = refGenome.getSequence();
+        String refSeq = refGenome.getSequence().toUpperCase();
         String refSubSeq;
         int id = 0;
         String cigar;
         SAMRecord record;
-        int start;
+        int startPos; //in the genome, to get the index: -1
         int stop;
         boolean isFwdStrand;
         Integer classification;
@@ -179,8 +182,10 @@ public class SamBamFileReader { //TODO: add observer
 
         while (samRecordIterator.hasNext()) {
             record = samRecordIterator.next();
-            start = record.getUnclippedStart();
-            stop = record.getUnclippedEnd();
+            startPos = record.getAlignmentStart();
+            stop = record.getAlignmentEnd();
+//            start = start < 0 ? 0 : start;
+//            stop = stop >= refSeq.length() ? refSeq.length() : stop;
             isFwdStrand = !record.getReadNegativeStrandFlag();
             classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
             count = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
@@ -193,7 +198,7 @@ public class SamBamFileReader { //TODO: add observer
             //check alignment via cigar string and add diffs to mapping
             cigar = record.getCigarString();
             if (cigar.contains("M")) {
-                refSubSeq = refSeq.substring(start, stop);
+                refSubSeq = refSeq.substring(startPos - 1, stop);
             } else {
                 refSubSeq = null;
             }
@@ -201,10 +206,10 @@ public class SamBamFileReader { //TODO: add observer
             if (classification != null && count != null) { //since both data fields are always written together
                 isBestMapping = classification == (int) Properties.PERFECT_COVERAGE
                         || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, isBestMapping);
+                mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, isBestMapping);
             } else {
                 count = 1;
-                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, false);
+                mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, false);
             }
             if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new seqPair if not exists
@@ -219,7 +224,7 @@ public class SamBamFileReader { //TODO: add observer
             }
 
             if (diffsAndGapsNeeded) {
-                this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
+                this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, count,
                         record.getReadString(), refSubSeq, mapping);
             }
 
@@ -282,7 +287,7 @@ public class SamBamFileReader { //TODO: add observer
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
         if (diffsAndGapsNeeded) {
-            refSeq = refGenome.getSequence();
+            refSeq = refGenome.getSequence().toUpperCase();
         }
         try {
             SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
@@ -292,16 +297,18 @@ public class SamBamFileReader { //TODO: add observer
             Integer classification;
             int refPos;
             int indexPos;
-            int start;
+            int startPos; //in the genome, to get the index: -1
             int stop;
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
                 isFwdStrand = !record.getReadNegativeStrandFlag();
                 classification = (Integer) record.getAttribute("Yc");
-                start = record.getAlignmentStart();
+                startPos = record.getAlignmentStart();
                 stop = record.getAlignmentEnd();
-                for (int i = 0; i <= stop - start; i++) {
-                    refPos = start + i; //example: 1000 = from, 999 = start, i = 0 -> refPos = 999, indexPos = -1;
+//                start = start < 0 ? 0 : start;
+//                stop = stop >= refSeq.length() ? refSeq.length() : stop;
+                for (int i = 0; i <= stop - startPos; i++) {
+                    refPos = startPos + i; //example: 1000 = from, 999 = start, i = 0 -> refPos = 999, indexPos = -1;
                     if (refPos >= from && refPos < to) {
                         indexPos = refPos - from;
                         if (trackNeeded == 0) {
@@ -362,8 +369,8 @@ public class SamBamFileReader { //TODO: add observer
 
                 if (diffsAndGapsNeeded) {
                     diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
-                            record.getUnclippedStart(), isFwdStrand, 1, record.getReadString(),
-                            refSeq.substring(record.getUnclippedStart() - 1, record.getUnclippedEnd()), null);
+                            startPos, isFwdStrand, 1, record.getReadString(),
+                            refSeq.substring(startPos - 1, stop), null);
                     diffs.addAll(diffsAndGaps.getDiffs());
                     gaps.addAll(diffsAndGaps.getGaps());
                 }
@@ -404,7 +411,7 @@ public class SamBamFileReader { //TODO: add observer
      * @param start the start position of the alignment on the chromosome
      * @param readSeq the read sequence belonging to the cigar and without gaps
      * @param refSeq the reference sequence belonging to the cigar and without
-     * gaps
+     * gaps in upper case characters
      * @param mapping if a mapping is handed over to the method it adds the
      * diffs and gaps directly to the mapping and updates it's number of
      * differences to the reference. If null is passed, only the
@@ -418,102 +425,106 @@ public class SamBamFileReader { //TODO: add observer
         List<PersistantDiff> diffs = new ArrayList<>();
         List<PersistantReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
-
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
-        String op; //operation
+        String op;//operation
         char base; //currently visited base
-        int baseNo = 0; //number of first base of consecutive operation types
-        int count; //number of consecutive bases with same operation type
-        int pos; //baseNo + current position in list of consecutive bases
-        int dels = 0; //number of deletions in read until current base
-//        int ins = 0; //number of insertions in read until current base
-        for (int i = 0; i < charCigar.length; ++i) {
+        String bases; //bases of the read interval under investigation
+        int currentCount;
+        int refPos = 0;
+        int readPos = 0;
+        int diffPos;
+        if (!refSeq.isEmpty()) {
+            readSeq = readSeq.toUpperCase();
+            refSeq = refSeq.toUpperCase();
+        }
+        
+        for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
-            if (op.matches(cigarRegex)) {
-                try {
-                    count = Integer.valueOf(num[i - 1]);
-
-                    if (op.equals("=")) { //match, the most common case
-                        baseNo += count;
-
-                    } else if (op.equals("X") || op.equals("S")) { //mismatch or soft clipped, both treated as mismatch
-                        for (int j = 0; j < count; ++j) {
-                            pos = baseNo + j;
-                            base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
-                            base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base);
-                            PersistantDiff d = new PersistantDiff(start + pos + dels, base, isFwdStrand, nbReplicates);
-                            if (mapping != null) {
-                                mapping.addDiff(d);
-                            } else {
-                                diffs.add(d);
-                            }
-                        }
-                        differences += count;
-                        baseNo += count;
-
-                    } else if (op.equals("D")) { //deletions             
-                        for (int j = 0; j < count; ++j) {
-                            PersistantDiff d = new PersistantDiff(start + dels + baseNo + j, '_', isFwdStrand, nbReplicates);
-                            if (mapping != null) {
-                                mapping.addDiff(d);
-                            } else {
-                                diffs.add(d);
-                            }
-                        }
-                        differences += count;
-                        dels += count;
-
-                    } else if (op.equals("I")) { //insertions
-                        for (int j = 0; j < count; ++j) {
-                            pos = baseNo + j;
-                            base = readSeq.charAt(pos); //55 means we get base 56, because of 0 shift
-                            base = isFwdStrand ? base : SequenceUtils.getDnaComplement(base);
-                            PersistantReferenceGap gap = new PersistantReferenceGap(start + pos + dels,
-                                    base, ParserCommonMethods.getOrderForGap(pos, gapOrderIndex),
-                                    isFwdStrand, nbReplicates);
-                            if (mapping != null) {
-                                mapping.addGenomeGap(gap);
-                            } else {
-                                gaps.add(gap);
-                            }
-                        }
-                        differences += count;
-//                        baseNo += count;
-//                        ins += count;
-
-                    } else if (op.equals("N")) { //skipped bases of ref
-                        for (int j = 0; j < count; ++j) {
-                            PersistantDiff d = new PersistantDiff(start + dels + baseNo + j, '.', isFwdStrand, nbReplicates);
-                            if (mapping != null) {
-                                mapping.addDiff(d);
-                            } else {
-                                diffs.add(d);
-                            }
-                        }
-
-                    } else if (op.equals("M")) { //mismatch or match, we don't know yet
-                        for (int j = 0; j < count; ++j) {
-                            pos = baseNo + j;
-                            if (readSeq.charAt(pos) != refSeq.charAt(pos)) {
-                                PersistantDiff d = new PersistantDiff(start + pos + dels, readSeq.charAt(pos), isFwdStrand, nbReplicates);
-                                if (mapping != null) {
-                                    mapping.addDiff(d);
-                                } else {
-                                    diffs.add(d);
-                                }
-                                ++differences;
-                            }
-                        }
-                        baseNo += count;
-                    } //P and H = padding and hard clipping do not contribute to differences
-                } catch (NumberFormatException e) {
-                    //error in the cigar, we currently skip this entry and treat it as match...
-                    //TODO: return msg to user about cigar error
-                }
-            } else {
-                //do nothing, we pretend, this is a match
+            currentCount = Integer.valueOf(num[i - 1]);
+            if (start <= 104908 && currentCount + start >= 104908) {
+                System.out.println("break");
             }
+            
+            if (op.equals("=")) { //only increase position for matches
+                refPos += currentCount;
+                readPos += currentCount;
+               
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += Integer.valueOf(num[i - 1]);
+
+            } else if (op.equals("X")) { //count and create diffs for mismatches
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    diffPos = readPos + j;
+                    base = readSeq.charAt(diffPos);
+                    if (!isFwdStrand) {
+                        base = SequenceUtils.getDnaComplement(base);
+                    }
+                    PersistantDiff d = new PersistantDiff(diffPos + start, base, isFwdStrand, nbReplicates);
+                    if (mapping != null) {
+                        mapping.addDiff(d);
+                    } else {
+                        diffs.add(d);
+                    }
+                    
+                }
+                refPos += currentCount;
+                readPos += currentCount;
+
+            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    PersistantDiff d = new PersistantDiff(refPos + j + start, '_', isFwdStrand, nbReplicates);
+                    if (mapping != null) {
+                        mapping.addDiff(d);
+                    } else {
+                        diffs.add(d);
+                    }
+                }
+                refPos += currentCount;
+                // readPos remains the same
+            
+            } else if (op.equals("I")) { // count and add reference gaps for insertions
+                differences += currentCount;
+                for (int j = 0; j < currentCount; ++j) {
+                    base = readSeq.charAt(readPos + j);
+                    if (!isFwdStrand) {
+                        base = SequenceUtils.getDnaComplement(base);
+                    }
+                    gaps.add(new PersistantReferenceGap(refPos + start, base, ParserCommonMethods.getOrderForGap(
+                            refPos + start, gapOrderIndex), isFwdStrand, nbReplicates));
+                }
+                //refPos remains the same
+                readPos += currentCount;
+
+            } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
+                bases = readSeq.substring(readPos, readPos + currentCount);
+                for (int j = 0; j < bases.length(); ++j) {
+                    diffPos = refPos + j;
+                    base = bases.charAt(j);
+                    if (base != refSeq.charAt(diffPos)) {
+                        ++differences;
+                        if (!isFwdStrand) {
+                            base = SequenceUtils.getDnaComplement(base);
+                        }
+                        PersistantDiff d = new PersistantDiff(diffPos + start, base, isFwdStrand, nbReplicates);
+                        if (mapping != null) {
+                            mapping.addDiff(d);
+                        } else {
+                            diffs.add(d);
+                        }
+                    }
+                }
+                refPos += currentCount;
+                readPos += currentCount;
+
+            } else if (op.equals("S")) {
+                //refPos remains the same
+                readPos += currentCount;
+            }
+            
+            //P, S and H = padding, soft and hard clipping do not contribute to differences
         }
 
         if (mapping != null) {

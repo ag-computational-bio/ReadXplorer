@@ -939,9 +939,10 @@ public class TrackConnector {
      * coverage and mapping requests for analysis functions.
      * @param visualizer the DataVisualizationI implementation to treat the 
      * analysis results
+     * @param handlerTitle title of the analysis handler
      * @return the configurable analysis handler
      */
-    public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer) {
-        return new AnalysesHandler(this, visualizer);
+    public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer, String handlerTitle) {
+        return new AnalysesHandler(this, visualizer, handlerTitle);
     }
 }

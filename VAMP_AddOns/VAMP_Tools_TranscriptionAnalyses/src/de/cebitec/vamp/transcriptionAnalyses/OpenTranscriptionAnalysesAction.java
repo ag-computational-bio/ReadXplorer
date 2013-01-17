@@ -5,6 +5,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.genomeAnalyses.OpenCoveredAnnotationsAction;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredAnnotation;
 import de.cebitec.vamp.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator;
 import de.cebitec.vamp.util.Pair;
@@ -182,8 +183,10 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             AnalysisOperon analysisOperon = null;
             
             connector = ProjectConnector.getInstance().getTrackConnector(track);
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this); //every track has its own analysis handlers
-            AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this);
+            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
+            AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
+                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"));
 
             if (parametersTss.isPerformTSSAnalysis()) {
 

@@ -123,7 +123,8 @@ public final class OpenCoveredAnnotationsAction implements ActionListener, DataV
         for (PersistantTrack track : this.tracks) {
 
             connector = ProjectConnector.getInstance().getTrackConnector(track);
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this); //every track has its own analysis handlers
+            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this, 
+                    NbBundle.getMessage(OpenCoveredAnnotationsAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
             AnalysisCoveredAnnotations analysisCoveredAnnos = new AnalysisCoveredAnnotations(connector, minCoveredPercent, minCoverageCount);
             covAnalysisHandler.registerObserver(analysisCoveredAnnos);
             covAnalysisHandler.setCoverageNeeded(true);
