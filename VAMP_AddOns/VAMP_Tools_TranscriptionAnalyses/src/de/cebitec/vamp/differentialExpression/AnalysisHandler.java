@@ -2,7 +2,7 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
@@ -26,7 +26,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
     private ReferenceConnector referenceConnector;
     private int genomeSize;
-    private List<PersistantAnnotation> persAnno;
+    private List<PersistantFeature> persAnno;
     private List<PersistantTrack> selectedTraks;
     private Integer refGenomeID;
     private List<Result> results;
@@ -55,7 +55,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
-        persAnno = referenceConnector.getAnnotationsForRegion(1, genomeSize);
+        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             CollectCoverageData collCovData = new CollectCoverageData(currentTrack, this);
@@ -64,20 +64,20 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         return allCountData;
     }
 
-    protected void prepareAnnotations(AnalysisData analysisData) {
-        int[] annotationsStart = new int[getPersAnno().size()];
-        int[] annotationsStop = new int[getPersAnno().size()];
+    protected void prepareFeatures(AnalysisData analysisData) {
+        int[] featuresStart = new int[getPersAnno().size()];
+        int[] featuresStop = new int[getPersAnno().size()];
         String[] loci = new String[getPersAnno().size()];
         int i = 0;
-        for (Iterator<PersistantAnnotation> it = getPersAnno().iterator(); it.hasNext(); i++) {
-            PersistantAnnotation persistantAnnotation = it.next();
-            annotationsStart[i] = persistantAnnotation.getStart();
-            annotationsStop[i] = persistantAnnotation.getStop();
-            loci[i] = persistantAnnotation.getLocus();
+        for (Iterator<PersistantFeature> it = getPersAnno().iterator(); it.hasNext(); i++) {
+            PersistantFeature persistantFeature = it.next();
+            featuresStart[i] = persistantFeature.getStart();
+            featuresStop[i] = persistantFeature.getStop();
+            loci[i] = persistantFeature.getLocus();
         }
 
-        analysisData.setStart(annotationsStart);
-        analysisData.setStop(annotationsStop);
+        analysisData.setStart(featuresStart);
+        analysisData.setStop(featuresStop);
         analysisData.setLoci(loci);
         analysisData.setSelectedTraks(selectedTraks);
     }
@@ -88,9 +88,9 @@ public abstract class AnalysisHandler extends Thread implements Observable {
             Integer[] data = new Integer[getPersAnno().size()];
             Map<Integer, Integer> currentTrack = allCountData.get(key);
             int j = 0;
-            for (Iterator<PersistantAnnotation> it1 = getPersAnno().iterator(); it1.hasNext(); j++) {
-                PersistantAnnotation persistantAnnotation = it1.next();
-                data[j] = currentTrack.get(persistantAnnotation.getId());
+            for (Iterator<PersistantFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++) {
+                PersistantFeature persistantFeature = it1.next();
+                data[j] = currentTrack.get(persistantFeature.getId());
             }
             analysisData.addCountDataForTrack(data);
         }
@@ -132,7 +132,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         return saveFile;
     }
 
-    public List<PersistantAnnotation> getPersAnno() {
+    public List<PersistantFeature> getPersAnno() {
         return persAnno;
     }
 

@@ -5,8 +5,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.genomeAnalyses.OpenCoveredAnnotationsAction;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredAnnotation;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
 import de.cebitec.vamp.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -56,12 +55,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private int finishedCovAnalyses = 0;
     private int finishedMappingAnalyses = 0;
     private ParameterSetTSS parametersTss;
-    private ParameterSetFilteredAnnos parametersFilterAnnos;
+    private ParameterSetFilteredFeatures parametersFilterFeatures;
     private ParameterSetOperonDet parametersOperonDet;
     
     private Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
-    private ResultPanelFilteredAnnos filteredGenesResultPanel;
+    private ResultPanelFilteredFeatures filteredGenesResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
     
     boolean performTSSAnalysis;
@@ -109,8 +108,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             this.tracks = otp.getSelectedTracks();
             
-            this.runWizardAndTranscriptionAnalysis();
             this.transcAnalysesTopComp.open();
+            this.runWizardAndTranscriptionAnalysis();
             
         } else {
             String msg = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
@@ -138,6 +137,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
             this.startTransciptionAnalyses(wiz);
+        } else {
+            this.transcAnalysesTopComp.close();
         }
     }
 
@@ -172,7 +173,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet, 
                 minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov);
-        parametersFilterAnnos = new ParameterSetFilteredAnnos(performFilterAnalysis, minNumberReads, maxNumberReads);
+        parametersFilterFeatures = new ParameterSetFilteredFeatures(performFilterAnalysis, minNumberReads, maxNumberReads);
         parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation);
 
         
@@ -202,8 +203,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 covAnalysisHandler.registerObserver(analysisTSS);
                 covAnalysisHandler.setCoverageNeeded(true);
             }
-            if (parametersFilterAnnos.isPerformFilterAnalysis()) {
-                analysisFilteredGenes = new AnalysisFilterGenes(connector, parametersFilterAnnos.getMinNumberReads(), parametersFilterAnnos.getMaxNumberReads());
+            if (parametersFilterFeatures.isPerformFilterAnalysis()) {
+                analysisFilteredGenes = new AnalysisFilterGenes(connector, parametersFilterFeatures.getMinNumberReads(), parametersFilterFeatures.getMaxNumberReads());
 
                 mappingAnalysisHandler.registerObserver(analysisFilteredGenes);
                 mappingAnalysisHandler.setMappingsNeeded(true);
@@ -274,25 +275,25 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                     System.out.println("Max. initial read count: " + analysisTSS.getMaxInitialReadCount());
                 }
             }
-            if (parametersFilterAnnos.isPerformFilterAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
+            if (parametersFilterFeatures.isPerformFilterAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
                 
                 ++finishedMappingAnalyses;
 
-                List<FilteredAnnotation> filteredGenes = trackToAnalysisMap.get(trackId).getAnalysisFilteredGenes().getResults();
+                List<FilteredFeature> filteredGenes = trackToAnalysisMap.get(trackId).getAnalysisFilteredGenes().getResults();
 
                 if (filteredGenesResultPanel == null) {
-                    filteredGenesResultPanel = new ResultPanelFilteredAnnos(parametersFilterAnnos);
+                    filteredGenesResultPanel = new ResultPanelFilteredFeatures(parametersFilterFeatures);
                     filteredGenesResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
                 }
-                filteredGenesResultPanel.addFilteredAnnos(filteredGenes);
+                filteredGenesResultPanel.addFilteredFeatures(filteredGenes);
                 
                 if (finishedMappingAnalyses >= tracks.size()) {
-                    String panelName = "Filtered annotations for " + trackNames + " (" + filteredGenesResultPanel.getResultSize() + " hits)";
+                    String panelName = "Filtered features for " + trackNames + " (" + filteredGenesResultPanel.getResultSize() + " hits)";
                     this.transcAnalysesTopComp.openAnalysisTab(panelName, filteredGenesResultPanel);
                 }
 
                 //TODO: prozentualer increase
-                //annotation finden/ändern
+                //feature finden/ändern
 
             }
             if (parametersOperonDet.isPerformOperonAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
@@ -340,7 +341,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         }
 
         /**
-         * @return The filter annotations analysis stored in this
+         * @return The filter features analysis stored in this
          * container
          */
         public AnalysisFilterGenes getAnalysisFilteredGenes() {

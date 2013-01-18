@@ -18,7 +18,7 @@ and open the template in the editor.
             (default = 50 reads).<br> B) The <u>minimal coverage increase in percent</u> from one position 
             to the neighboring one (default = 50%). <!-- TODO: add help page with details on models-->
             <br><br>In order to output currently unannotated transcript information along with the detected TSS, you can choose the
-            "<b>Unannotated transcript detection</b>". For detected TSS, which do not have neighboring annotations, it adds the information,
+            "<b>Unannotated transcript detection</b>". For detected TSS, which do not have neighboring features, it adds the information,
             that this is an unannotated transcript and further a transcript stop is inferred by a coverage threshold (<b>Minimal transcript 
             extension coverage</b>, which has to be set, if the unannotated transcript detection checkbox is selected.
             <br><br>Additionally, two more parameters can be set: 
@@ -33,10 +33,10 @@ and open the template in the editor.
             Therefore, it requires 
             <br> A) The <u>minimum number of reads</u> (default = 100 reads)
             <br> B) The <u>maximum number of reads</u> (default = 100000 reads) 
-            <br>mapped within the bounds of an annotation.<br><br>
+            <br>mapped within the bounds of an feature.<br><br>
             3. The <b>Operon detection</b> allows to predict operons for prokaryotic genomes on the basis of:
             <br> A) <u>Minimal number of spanning reads</u> (default = 5 reads) 
-            <br>between two annotated genes on the same strand. Reads are called "spanning", if they overlap both neighboring annotations.
+            <br>between two annotated genes on the same strand. Reads are called "spanning", if they overlap both neighboring features.
             <br>For all these analyses the results are returned in a matrix. Furthermore, they are visualized in the corresponding track
             viewer by different colors. This helps to compare the different analysis results at a glance.
         </p>

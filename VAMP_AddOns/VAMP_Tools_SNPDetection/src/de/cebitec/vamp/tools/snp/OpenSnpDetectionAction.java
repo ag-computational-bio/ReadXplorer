@@ -94,8 +94,8 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
             }
             
             this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
-            this.runWizardAndSnpDetection();
             this.snpDetectionTopComp.open();
+            this.runWizardAndSnpDetection();
 
         } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
             String msg = NbBundle.getMessage(OpenSnpDetectionAction.class, "CTL_OpenSNPDetectionInfo", 
@@ -125,6 +125,8 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
             this.startSNPDetection(wiz);
+        } else {
+            this.snpDetectionTopComp.close();
         }
     }
     

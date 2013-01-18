@@ -47,7 +47,7 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            prepareAnnotations(simpleTestAnalysisData);
+            prepareFeatures(simpleTestAnalysisData);
             prepareCountData(simpleTestAnalysisData, allCountData);
             results = simpleTest.process(simpleTestAnalysisData, getPersAnno().size(), getSaveFile());
         } else {

@@ -17,12 +17,12 @@ public class TransStartUnannotated extends TranscriptionStart {
      * @param isFwdStrand true, if the gene start was detected on the fwd strand, false otherwise.
      * @param initialCoverage The coverage directly before the detected gene start
      * @param startCoverage The coverage at the detected gene start position (getPos()).
-     * @param detAnnotations object containing the annotations associated to this predicted gene start
+     * @param detFeatures object containing the features associated to this predicted gene start
      * @param detectedStop The stop position of the predicted unannotated transcript
      */
     public TransStartUnannotated(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, 
-            DetectedAnnotations detAnnotations, int detectedStop) {
-        super(pos, isFwdStrand, initialCoverage, startCoverage, detAnnotations);
+            DetectedFeatures detFeatures, int detectedStop) {
+        super(pos, isFwdStrand, initialCoverage, startCoverage, detFeatures);
         this.detectedStop = detectedStop;
     }
 

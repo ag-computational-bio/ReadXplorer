@@ -39,7 +39,7 @@ public final class TransAnalysesSelectionVisualPanel extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tssTextArea = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
-        filterAnnosTextArea = new javax.swing.JTextArea();
+        filterFeaturesTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         opeonTextArea = new javax.swing.JTextArea();
 
@@ -74,15 +74,15 @@ public final class TransAnalysesSelectionVisualPanel extends JPanel {
         tssTextArea.setWrapStyleWord(true);
         jScrollPane1.setViewportView(tssTextArea);
 
-        filterAnnosTextArea.setEditable(false);
-        filterAnnosTextArea.setBackground(new java.awt.Color(240, 240, 240));
-        filterAnnosTextArea.setColumns(20);
-        filterAnnosTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        filterAnnosTextArea.setLineWrap(true);
-        filterAnnosTextArea.setRows(1);
-        filterAnnosTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.filterAnnosTextArea.text")); // NOI18N
-        filterAnnosTextArea.setWrapStyleWord(true);
-        jScrollPane2.setViewportView(filterAnnosTextArea);
+        filterFeaturesTextArea.setEditable(false);
+        filterFeaturesTextArea.setBackground(new java.awt.Color(240, 240, 240));
+        filterFeaturesTextArea.setColumns(20);
+        filterFeaturesTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        filterFeaturesTextArea.setLineWrap(true);
+        filterFeaturesTextArea.setRows(1);
+        filterFeaturesTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.filterFeaturesTextArea.text")); // NOI18N
+        filterFeaturesTextArea.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(filterFeaturesTextArea);
 
         opeonTextArea.setEditable(false);
         opeonTextArea.setBackground(new java.awt.Color(240, 240, 240));
@@ -141,7 +141,7 @@ public final class TransAnalysesSelectionVisualPanel extends JPanel {
     }//GEN-LAST:event_operonDetectionBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea filterAnnosTextArea;
+    private javax.swing.JTextArea filterFeaturesTextArea;
     private javax.swing.JCheckBox filteredGenesBox;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

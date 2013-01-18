@@ -2,7 +2,7 @@ package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -77,31 +77,31 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         });        
 
         //Listener for TableSelect-Events
-        annotationTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        featureTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int[] selectedRows = annotationTable.getSelectedRows();
+                int[] selectedRows = featureTable.getSelectedRows();
                 if (selectedRows.length > 0) {
-                    int correctedRow = annotationTable.convertRowIndexToModel(selectedRows[0]);
-                    PersistantAnnotation annotation = (PersistantAnnotation) annotationTable.getModel().getValueAt(correctedRow, 0);
-                    if (annotation.isFwdStrand()) {
-                        boundsManager.navigatorBarUpdated(annotation.getStart());
+                    int correctedRow = featureTable.convertRowIndexToModel(selectedRows[0]);
+                    PersistantFeature feature = (PersistantFeature) featureTable.getModel().getValueAt(correctedRow, 0);
+                    if (feature.isFwdStrand()) {
+                        boundsManager.navigatorBarUpdated(feature.getStart());
                     } else {
-                        boundsManager.navigatorBarUpdated(annotation.getStop());
+                        boundsManager.navigatorBarUpdated(feature.getStop());
                     }
                 }
             }
         });
 
-        annotationTable.addMouseListener(new MouseAdapter() {
+        featureTable.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
                     final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                     if (thumb != null) {
-                        thumb.showTablePopUp(annotationTable, curRefViewer, e);
+                        thumb.showTablePopUp(featureTable, curRefViewer, e);
                     }
                 }
             }
@@ -111,7 +111,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
                     final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
                     if (thumb != null) {
-                        thumb.showTablePopUp(annotationTable, curRefViewer, e);
+                        thumb.showTablePopUp(featureTable, curRefViewer, e);
                     }
                 }
             }
@@ -142,10 +142,10 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         filterForLabel = new javax.swing.JLabel();
         radioProduct = new javax.swing.JRadioButton();
         radioEC = new javax.swing.JRadioButton();
-        radioAnnotationButton = new javax.swing.JRadioButton();
+        radioFeatureButton = new javax.swing.JRadioButton();
         radioGene = new javax.swing.JRadioButton();
         tableScrollPane = new javax.swing.JScrollPane();
-        annotationTable = new javax.swing.JTable();
+        featureTable = new javax.swing.JTable();
         searchPatternField = new JTextFieldPasteable();
         searchPatternButton = new javax.swing.JButton();
 
@@ -198,12 +198,12 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         });
 
-        buttonGroup1.add(radioAnnotationButton);
-        radioAnnotationButton.setSelected(true);
-        radioAnnotationButton.setText("Annotation");
-        radioAnnotationButton.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(radioFeatureButton);
+        radioFeatureButton.setSelected(true);
+        radioFeatureButton.setText("Feature");
+        radioFeatureButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioAnnotationButtonActionPerformed(evt);
+                radioFeatureButtonActionPerformed(evt);
             }
         });
 
@@ -229,7 +229,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addGroup(filterPropertiesLayout.createSequentialGroup()
                         .addComponent(filterForLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(radioAnnotationButton)
+                        .addComponent(radioFeatureButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioGene)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -250,18 +250,18 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                     .addComponent(filterForLabel)
                     .addComponent(radioProduct)
                     .addComponent(radioEC)
-                    .addComponent(radioAnnotationButton)
+                    .addComponent(radioFeatureButton)
                     .addComponent(radioGene))
                 .addContainerGap())
         );
 
-        tableScrollPane.setViewportView(annotationTable);
+        tableScrollPane.setViewportView(featureTable);
 
         javax.swing.GroupLayout featureGroundPanelLayout = new javax.swing.GroupLayout(featureGroundPanel);
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
             .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         featureGroundPanelLayout.setVerticalGroup(
@@ -348,9 +348,9 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         this.clearFilter();
     }//GEN-LAST:event_radioECActionPerformed
 
-    private void radioAnnotationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioAnnotationButtonActionPerformed
+    private void radioFeatureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFeatureButtonActionPerformed
         this.clearFilter();
-    }//GEN-LAST:event_radioAnnotationButtonActionPerformed
+    }//GEN-LAST:event_radioFeatureButtonActionPerformed
 
     private void searchPatternFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternFieldActionPerformed
         this.searchPatternButtonActionPerformed(evt);
@@ -405,17 +405,17 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable annotationTable;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel featureGroundPanel;
+    private javax.swing.JTable featureTable;
     private javax.swing.JLabel filterForLabel;
     private javax.swing.JPanel filterProperties;
     private javax.swing.JTextField filterTextfield;
     private javax.swing.JButton jumpButton;
     private javax.swing.JLabel jumpFilterLabel;
     private javax.swing.JTextField jumpTextfield;
-    private javax.swing.JRadioButton radioAnnotationButton;
     private javax.swing.JRadioButton radioEC;
+    private javax.swing.JRadioButton radioFeatureButton;
     private javax.swing.JRadioButton radioGene;
     private javax.swing.JRadioButton radioProduct;
     private javax.swing.JButton searchPatternButton;
@@ -426,32 +426,32 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     public void setReferenceGenome(PersistantReference refGen) {
         this.refGen = refGen;
         refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
-        this.fillAnnotationList();
+        this.fillFeatureList();
     }
 
-    private void fillAnnotationList() {
-        List<PersistantAnnotation> annotations = refGenCon.getAnnotationsForRegion(0, refGen.getRefLength());
+    private void fillFeatureList() {
+        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGen.getRefLength());
         
-        List<PersistantAnnotation> featList = new ArrayList<PersistantAnnotation>(annotations);
-        Collections.sort(featList, new AnnotationNameSorter());
-        PersistantAnnotation[] annotationData = featList.toArray(new PersistantAnnotation[0]);
+        List<PersistantFeature> featList = new ArrayList<PersistantFeature>(features);
+        Collections.sort(featList, new FeatureNameSorter());
+        PersistantFeature[] featureData = featList.toArray(new PersistantFeature[0]);
 
         //Create new Model for Table
-        annotationTable.setModel(new AnnotationTableModel(annotationData));
-        annotationTable.setRowSorter(new TableRowSorter<TableModel>(annotationTable.getModel()));
-        annotationTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+        featureTable.setModel(new FeatureTableModel(featureData));
+        featureTable.setRowSorter(new TableRowSorter<TableModel>(featureTable.getModel()));
+        featureTable.getColumnModel().getColumn(2).setPreferredWidth(150);
         updateFilter();
 
     }
 
     /*
-     * Uses regular expression to filter all matching entries in Annotation, Product- or EC-Column.
+     * Uses regular expression to filter all matching entries in Feature, Product- or EC-Column.
      */
     private void updateFilter() {
         RowFilter<TableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
-            if (radioAnnotationButton.isSelected()) {
+            if (radioFeatureButton.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 0);
             } else if (radioGene.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 1);
@@ -464,7 +464,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
-        ((TableRowSorter<TableModel>) annotationTable.getRowSorter()).setRowFilter(rf);
+        ((TableRowSorter<TableModel>) featureTable.getRowSorter()).setRowFilter(rf);
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsManager) {
@@ -494,10 +494,10 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         this.filterTextfield.addMouseListener(new StandardMenuEvent());
     }
 
-    private class AnnotationNameSorter implements Comparator<PersistantAnnotation> {
+    private class FeatureNameSorter implements Comparator<PersistantFeature> {
 
         @Override
-        public int compare(PersistantAnnotation o1, PersistantAnnotation o2) {
+        public int compare(PersistantFeature o1, PersistantFeature o2) {
             String name1 = o1.getLocus();
             String name2 = o2.getLocus();
 

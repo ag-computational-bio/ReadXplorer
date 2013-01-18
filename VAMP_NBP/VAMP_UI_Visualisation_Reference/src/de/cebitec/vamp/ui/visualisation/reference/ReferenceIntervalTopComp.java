@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import org.openide.util.LookupEvent;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
+import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
@@ -169,6 +169,7 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
+     * @return the singleton instance of this class
      */
     public static synchronized ReferenceIntervalTopComp getDefault() {
         if (instance == null) {
@@ -179,6 +180,7 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
 
     /**
      * Obtain the ReferenceIntervalTopComp instance. Never call {@link #getDefault} directly!
+     * @return the singleton instance of this class
      */
     public static synchronized ReferenceIntervalTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
@@ -213,23 +215,23 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
         for (ReferenceViewer referenceViewer : result.allInstances()) {
             this.codonSelector.setGenomeViewer(referenceViewer);
             
-            // update visible annotation list
-            Map<FeatureType, Integer> annotationStats = referenceViewer.getAnnotationStats();
-            this.showAnnotationStatsForInterval(annotationStats);
+            // update visible feature list
+            Map<FeatureType, Integer> featureStats = referenceViewer.getFeatureStats();
+            this.showFeatureStatsForInterval(featureStats);
 
             // update intervall
             BoundsInfo boundsInfo = referenceViewer.getBoundsInfo();
             setInterval(boundsInfo.getLogLeft(), boundsInfo.getLogRight());
 
             // register listeners so every change occurs
-            referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_ANNOTATION_STATS_CHANGED, new PropertyChangeListener() {
+            referenceViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_STATS_CHANGED, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    // update visible annotation list
+                    // update visible feature list
                     @SuppressWarnings("unchecked")
-                    Map<FeatureType, Integer> annotationStats = (Map<FeatureType, Integer>) evt.getNewValue();
-                    ReferenceIntervalTopComp.this.showAnnotationStatsForInterval(annotationStats);
+                    Map<FeatureType, Integer> featureStats = (Map<FeatureType, Integer>) evt.getNewValue();
+                    ReferenceIntervalTopComp.this.showFeatureStatsForInterval(featureStats);
 
                     // update intervall
                     BoundsInfo boundsInfo = ((ReferenceViewer) evt.getSource()).getBoundsInfo();
@@ -288,15 +290,15 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
         intervalToField.setText(String.valueOf(to));
     }
 
-    private void showAnnotationStatsForInterval(Map<FeatureType, Integer> annotationStats) {
+    private void showFeatureStatsForInterval(Map<FeatureType, Integer> featureStats) {
         statisticsList.removeAll();
         DefaultListModel model = new DefaultListModel();
 
-        Set<FeatureType> keys = annotationStats.keySet();
+        Set<FeatureType> keys = featureStats.keySet();
         for(Iterator<FeatureType> it = keys.iterator(); it.hasNext(); ){
             FeatureType type = it.next();
             String typeS = type.getTypeString();
-            model.addElement(typeS+": "+annotationStats.get(type));
+            model.addElement(typeS+": "+featureStats.get(type));
         }
         statisticsList.setModel(model);
     }

@@ -77,7 +77,7 @@
                 <Column editable="false" title="Amino SNP" type="java.lang.String"/>
                 <Column editable="false" title="Amino Ref" type="java.lang.String"/>
                 <Column editable="false" title="Effect on AA" type="java.lang.String"/>
-                <Column editable="false" title="Annotation" type="java.lang.String"/>
+                <Column editable="false" title="Feature" type="java.lang.String"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">

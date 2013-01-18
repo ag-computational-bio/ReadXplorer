@@ -1,7 +1,7 @@
 package de.cebitec.vamp.parser.reference.Filter;
 
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.parser.common.ParsedAnnotation;
+import de.cebitec.vamp.parser.common.ParsedFeature;
 
 /**
  *
@@ -10,8 +10,8 @@ import de.cebitec.vamp.parser.common.ParsedAnnotation;
 public class FilterRuleTRNA implements FilterRuleI {
 
     @Override
-    public boolean appliesRule(ParsedAnnotation annotation) {
-        if(annotation.getType() == FeatureType.TRNA){
+    public boolean appliesRule(ParsedFeature feature) {
+        if(feature.getType() == FeatureType.TRNA){
             return true;
         } else {
             return false;

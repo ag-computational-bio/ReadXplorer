@@ -23,10 +23,10 @@
             </file>
         </folder>
         <folder name="RemoveTracks">
-            <file name="de-cebitec-vamp-thumbnail-Actions-RemoveAnnotationAction.instance">
+            <file name="de-cebitec-vamp-thumbnail-Actions-RemoveFeatureAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.thumbnail.Actions.Bundle#CTL_RemoveTracksAction"/>
-                <attr name="injectable" stringvalue="de.cebitec.vamp.thumbnail.Actions.RemoveAnnotationAction"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.thumbnail.Actions.RemoveFeatureAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
@@ -98,7 +98,7 @@
                     <attr name="position" intvalue="600"/>
                 </file>
                 <file name="de-cebitec-vamp-thumbnail-Actions-RemoveTracksAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/RemoveTracks/de-cebitec-vamp-thumbnail-Actions-RemoveAnnotationAction.instance"/>
+                    <attr name="originalFile" stringvalue="Actions/RemoveTracks/de-cebitec-vamp-thumbnail-Actions-RemoveFeatureAction.instance"/>
                     <attr name="position" intvalue="700"/>
                 </file>
             </folder>

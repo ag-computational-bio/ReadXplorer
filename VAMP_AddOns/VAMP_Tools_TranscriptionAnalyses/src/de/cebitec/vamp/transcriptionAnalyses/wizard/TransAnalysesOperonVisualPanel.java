@@ -116,7 +116,7 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
     }
 
     /**
-     * @return the minimum number of spanning reads between two annotations
+     * @return the minimum number of spanning reads between two features
      * to assign them to an operon
      */
     public int getMinSpanningReads() {

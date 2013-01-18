@@ -38,7 +38,7 @@ preferredID = "TranscriptionAnalysesTopComponent")
 public final class TranscriptionAnalysesTopComponent extends TopComponent {
     
     private static final long serialVersionUID = 1L;
-    private static final String PREFERRED_ID = "TranscriptionAnalysesTopComponent";
+    public static final String PREFERRED_ID = "TranscriptionAnalysesTopComponent";
 
     /**
      * TopComponent for displaying all gui elements belonging to the

@@ -7,13 +7,12 @@ package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
-import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -25,7 +24,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import org.biojava.bio.seq.DNATools;
 
 /**
  * This panel is capable of showing a table with transcription start sites and
@@ -96,7 +94,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Position", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Annotation", "Next Upstream Annotation", "Next Downstream Annotation", "Unannotated Transcript", "Transcript Stop"
+                "Position", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Next Downstream Feature", "Unannotated Transcript", "Transcript Stop"
             }
         ) {
             Class[] types = new Class [] {
@@ -124,6 +122,8 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title6")); // NOI18N
         tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title7")); // NOI18N
         tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title8")); // NOI18N
+        tSSTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9")); // NOI18N
+        tSSTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -208,8 +208,8 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         this.tSSs.addAll(tSSs);
         DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();  
         String strand;
-        DetectedAnnotations detAnnotations;
-        PersistantAnnotation annotation;
+        DetectedFeatures detFeatures;
+        PersistantFeature feature;
         TransStartUnannotated tSSU;
 
         for (TranscriptionStart tSS : tSSs) {
@@ -228,13 +228,13 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                 rowData[5] = Integer.MAX_VALUE;
             }
             
-            detAnnotations = tSS.getDetAnnotations();
-            annotation = detAnnotations.getCorrectStartAnnotation();
-            rowData[6] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
-            annotation = detAnnotations.getUpstreamAnnotation();
-            rowData[7] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
-            annotation = detAnnotations.getDownstreamAnnotation();
-            rowData[8] = annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-";
+            detFeatures = tSS.getDetFeatures();
+            feature = detFeatures.getCorrectStartFeature();
+            rowData[6] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
+            feature = detFeatures.getUpstreamFeature();
+            rowData[7] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
+            feature = detFeatures.getDownstreamFeature();
+            rowData[8] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
             
             if (tSS instanceof TransStartUnannotated) {
                 tSSU = (TransStartUnannotated) tSS;

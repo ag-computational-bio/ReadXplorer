@@ -14,7 +14,7 @@ import de.cebitec.vamp.parser.mappings.SeqPairProcessorI;
 import de.cebitec.vamp.parser.mappings.TrackParser;
 import de.cebitec.vamp.parser.output.SamBamCombiner;
 import de.cebitec.vamp.parser.output.SamBamExtender;
-import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
+import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import de.cebitec.vamp.seqPairClassifier.SamBamDirectSeqPairClassifier;
@@ -88,7 +88,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         ReferenceParserI parser = refGenJob.getParser();
         parser.registerObserver(this);
-        AnnotationFilter filter = new AnnotationFilter();
+        FeatureFilter filter = new FeatureFilter();
         filter.addBlacklistRule(new FilterRuleSource());
         ParsedReference refGenome = parser.parseReference(refGenJob, filter);
 

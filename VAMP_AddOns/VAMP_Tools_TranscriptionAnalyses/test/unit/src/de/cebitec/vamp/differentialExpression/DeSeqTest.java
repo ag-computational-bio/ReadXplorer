@@ -32,7 +32,7 @@ public class DeSeqTest {
     public DeSeqTest() {
     }
     private static DeSeq instance = new DeSeq();
-    private static int numberOfAnnotations;
+    private static int numberOfFeatures;
     private static int numberOfTracks;
     private static List<PersistantTrack> selectedTraks;
     private static List<String> loci;
@@ -124,7 +124,7 @@ public class DeSeqTest {
             selectedTraks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
         }
 
-        numberOfAnnotations = loci.size();
+        numberOfFeatures = loci.size();
         numberOfTracks = tracks.size();
 
         System.out.println("Setup ready");
@@ -159,7 +159,7 @@ public class DeSeqTest {
         
         List result=new ArrayList();
         try {
-            result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, saveFile);
+            result = instance.process(analysisData, numberOfFeatures, numberOfTracks, saveFile);
         } catch (PackageNotLoadableException | JRILibraryNotInPathException | UnknownGnuRException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -193,7 +193,7 @@ public class DeSeqTest {
         
         analysisData.setSelectedTraks(selectedTraksTwoFactor);
         try {
-            result = instance.process(analysisData, numberOfAnnotations, numberOfTracks, null);
+            result = instance.process(analysisData, numberOfFeatures, numberOfTracks, null);
         } catch (PackageNotLoadableException | JRILibraryNotInPathException | UnknownGnuRException ex) {
             Exceptions.printStackTrace(ex);
         }

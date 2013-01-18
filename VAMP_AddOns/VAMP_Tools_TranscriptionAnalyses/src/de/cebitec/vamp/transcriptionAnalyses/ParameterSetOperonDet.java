@@ -15,7 +15,7 @@ public class ParameterSetOperonDet {
      * Data storage for all parameters associated with an operon detection.
      * @param performOperonAnalysis true, if the operon analysis should be carries out
      * @param minSpanningReads minimum number of spanning reads between two neighboring
-     * annotations
+     * features
      * @param autoOperonParamEstimation true, if the automatic parameter estimation should
      * be switched on for the operon detection
      * 

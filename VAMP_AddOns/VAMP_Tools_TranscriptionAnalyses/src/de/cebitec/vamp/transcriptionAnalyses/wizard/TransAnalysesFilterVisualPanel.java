@@ -27,7 +27,7 @@ public final class TransAnalysesFilterVisualPanel extends JobPanel {
 
     @Override
     public String getName() {
-        return "Filter Annotation Parameters";
+        return "Filter Feature Parameters";
     }
 
     /**

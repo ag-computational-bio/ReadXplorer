@@ -31,7 +31,10 @@ public final class SequenceUtils {
     }
 
     /**
-     * Complements a sequence String.
+     * Complements a sequence String. Bases not present in the DNA or RNA
+     * alphabet are not replaced and RNA sequences are translated in DNA
+     * sequences. A = T / a = t U = A / u = a G = C / g = c all other characters
+     * are returned as they were.
      * @param sequence the string to complement
      * @return the complemented string
      */
@@ -46,10 +49,12 @@ public final class SequenceUtils {
                 case 'g': complement.append('c'); break;
                 case 't': complement.append('a'); break;
                 case 'a': complement.append('t'); break;
+                case 'u': complement.append('a'); break;
                 case 'C': complement.append('G'); break;
                 case 'G': complement.append('C'); break;
                 case 'T': complement.append('A'); break;
                 case 'A': complement.append('T'); break;
+                case 'U': complement.append('A'); break; 
                 default : complement.append(currChar);
             }
         }
@@ -80,7 +85,6 @@ public final class SequenceUtils {
      * @return the complemented base
      */
     public static char getDnaComplement(char base) {
-        base = Character.toUpperCase(base);
         char comp;
         switch (base) {
                 case 'C': comp = 'G'; break;

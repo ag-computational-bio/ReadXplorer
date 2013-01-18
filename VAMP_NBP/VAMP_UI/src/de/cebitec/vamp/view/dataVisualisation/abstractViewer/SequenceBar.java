@@ -1,11 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
-import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.*;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -46,7 +45,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private int smallBar;
     private HighlightAreaListener highlightListener;
     private RegionManager regionManager;
-    private byte frameCurrAnnotation;
+    private byte frameCurrFeature;
 
     /**
      * A sequence bar is used to display the sequence of a reference genome
@@ -248,7 +247,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             physX += numOfGaps * bounds.getPhysWidth();
         }
         String base = refGen.getSequence().substring(basePosition, basePosition + 1);
-        String revBase = reverseBase(base);
+        String revBase = SequenceUtils.complementDNA(base);
         int offset = metrics.stringWidth(revBase) / 2;
         g.drawString(revBase,
                 (float) physX - offset,
@@ -357,18 +356,19 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Determines the frame of the currently selected annotation. if there is none it
+     * Determines the frame of the currently selected feature. if there is none it
      * is set to 10.
+     * @return the correct reading frame (-3 to 3 excluding 0)
      */
-    public byte determineAnnotationFrame() {
-        this.frameCurrAnnotation = StartCodonFilter.INIT;//if it is 10 later, no selected annotation exists yet!
+    public byte determineFeatureFrame() {
+        this.frameCurrFeature = StartCodonFilter.INIT;//if it is 10 later, no selected feature exists yet!
         if (this.parentViewer instanceof ReferenceViewer) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
-            if (refViewer.getCurrentlySelectedAnnotation() != null) {
-                frameCurrAnnotation = (byte) refViewer.determineFrame(refViewer.getCurrentlySelectedAnnotation().getPersistantAnnotation());
+            if (refViewer.getCurrentlySelectedFeature() != null) {
+                frameCurrFeature = (byte) refViewer.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
             }
         }
-        return frameCurrAnnotation;
+        return frameCurrFeature;
     }
     
     /**
@@ -464,6 +464,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * Detects the occurences of the given pattern in the currently shown
      * interval or the next occurence of the pattern in the genome.
      * @param pattern Pattern to search for
+     * @return the next (closest) occurrence of the pattern
      */
     public int showPattern(String pattern) {
         return this.regionManager.showPattern(pattern);
@@ -479,7 +480,6 @@ public class SequenceBar extends JComponent implements HighlightableI {
     
     /**
      * Identifies the currently in this object stored pattern in the genome sequence.
-     * @return position of the next occurence of the pattern from the current position on.
      */
     public void findPattern() {
         this.regionManager.findPattern();
@@ -495,10 +495,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
     
     /**
-     * @return The frame of the current annotation
+     * @return The frame of the current feature
      */
-    public byte getFrameCurrAnnotation() {
-        return this.frameCurrAnnotation;
+    public byte getFrameCurrFeature() {
+        return this.frameCurrFeature;
     }
 
     /**
@@ -527,31 +527,11 @@ public class SequenceBar extends JComponent implements HighlightableI {
                 BaseBackground b = new BaseBackground(12, 12, base);
                 b.setBounds((int) physX - offset, baseLineY - 18, b.getSize().width, b.getSize().height);
                 this.add(b);
-                BaseBackground brev = new BaseBackground(12, 12, reverseBase(base));
+                BaseBackground brev = new BaseBackground(12, 12, SequenceUtils.complementDNA(base));
                 brev.setBounds((int) physX - offset, baseLineY + 2, b.getSize().width, b.getSize().height);
                 this.add(brev);
             }
         }
-    }
-
-    public String reverseBase(String base) {
-        String revBase;
-        if (base.equals("a")) {
-            revBase = "t";
-        } else if (base.equals("t")) {
-            revBase = "a";
-        } else if (base.equals("g")) {
-            revBase = "c";
-        } else if (base.equals("c")) {
-            revBase = "g";
-        } else if (base.equals("n")) {
-            revBase = "n";
-        } else if (base.equals("-")) {
-            revBase = "-";
-        } else {
-            revBase = base;
-        }
-        return revBase;
     }
 
     /**
@@ -655,7 +635,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @param type the type of components to remove
      */
     protected void removeAll(Byte type) {
-        List<Byte> typeList = new ArrayList<Byte>();
+        List<Byte> typeList = new ArrayList<>();
         typeList.add(type);
         this.removeAll(typeList);
     }

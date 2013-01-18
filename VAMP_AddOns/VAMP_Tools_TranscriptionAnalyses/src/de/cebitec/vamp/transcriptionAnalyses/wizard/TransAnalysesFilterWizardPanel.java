@@ -8,7 +8,7 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
 /**
- * Panel for showing and handling all available options for the annotation
+ * Panel for showing and handling all available options for the feature
  * filter.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
@@ -24,7 +24,7 @@ public class TransAnalysesFilterWizardPanel implements WizardDescriptor.Panel<Wi
     private boolean isValidated = true;
 
     /**
-     * Panel for showing and handling all available options for the annotation
+     * Panel for showing and handling all available options for the feature
      * filter.
      */
     public TransAnalysesFilterWizardPanel() {

@@ -58,9 +58,9 @@
                 <Column editable="false" title="Start Coverage" type="java.lang.Integer"/>
                 <Column editable="false" title="Coverage Increase" type="java.lang.Integer"/>
                 <Column editable="false" title="Coverage Increase %" type="java.lang.Integer"/>
-                <Column editable="false" title="Correct Annotation" type="java.lang.String"/>
-                <Column editable="false" title="Next Upstream Annotation" type="java.lang.String"/>
-                <Column editable="false" title="Next Downstream Annotation" type="java.lang.String"/>
+                <Column editable="false" title="Correct Feature" type="java.lang.String"/>
+                <Column editable="false" title="Next Upstream Feature" type="java.lang.String"/>
+                <Column editable="false" title="Next Downstream Feature" type="java.lang.String"/>
                 <Column editable="false" title="Unannotated Transcript" type="java.lang.Boolean"/>
                 <Column editable="false" title="Transcript Stop" type="java.lang.Integer"/>
               </Table>
@@ -126,6 +126,20 @@
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title8" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title10" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>

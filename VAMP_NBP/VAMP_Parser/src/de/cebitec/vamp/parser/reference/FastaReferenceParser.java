@@ -1,9 +1,9 @@
 package de.cebitec.vamp.parser.reference;
 
+import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParsedReference;
 import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
-import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  * The FastaReferenceParser can parse the reference genome from a fasta file.
- * Attention: there will be no annotations in this file just the sequence
+ * Attention: there will be no features in this file just the sequence
  *
  * @author jstraube, rhilker
  */
@@ -22,7 +22,7 @@ public class FastaReferenceParser implements ReferenceParserI {
     private static String parsername = "Fasta Reference Parser";
     private static String[] fileExtension = new String[]{"fas", "fasta", "fna", "fa"};
     private static String fileDescription = "Fasta File";
-    private ArrayList<Observer> observers = new ArrayList<Observer>();
+    private ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
     /*
@@ -31,7 +31,7 @@ public class FastaReferenceParser implements ReferenceParserI {
      * and the sequence from the reference genome
      */
     @Override
-    public ParsedReference parseReference(ReferenceJob referenceJob, AnnotationFilter filter) throws ParsingException {
+    public ParsedReference parseReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         ParsedReference refGenome = new ParsedReference();
         StringBuilder sBuilder = new StringBuilder();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile());
@@ -41,7 +41,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setDescription(referenceJob.getDescription());
             refGenome.setName(referenceJob.getName());
             refGenome.setTimestamp(referenceJob.getTimestamp());
-            String line = null;
+            String line;
 
             while ((line = in.readLine()) != null) {
                 if (!line.startsWith(">")) {

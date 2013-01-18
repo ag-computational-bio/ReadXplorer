@@ -31,7 +31,7 @@ public class SimpleTest {
     public SimpleTest() {
     }
 
-    public List<AnalysisHandler.Result> process(SimpleTestAnalysisData analysisData, int numberOfAnnotations, File saveFile)
+    public List<AnalysisHandler.Result> process(SimpleTestAnalysisData analysisData, int numberOfFeatures, File saveFile)
             throws JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
         gnuR.clearGnuR();
@@ -68,7 +68,7 @@ public class SimpleTest {
             concatenate.deleteCharAt(concatenate.length() - 1);
             concatenate.append(")");
             //Then the big count data matrix is created out of the single track data handed over.
-            gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfAnnotations + ")");
+            gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
             //The colum names are created...
             concatenate = new StringBuilder("c(");
             List<PersistantTrack> tracks = analysisData.getSelectedTraks();

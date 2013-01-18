@@ -434,7 +434,7 @@ public class SamBamFileReader { //TODO: add observer
         int refPos = 0;
         int readPos = 0;
         int diffPos;
-        if (!refSeq.isEmpty()) {
+        if (refSeq != null && !refSeq.isEmpty()) {
             readSeq = readSeq.toUpperCase();
             refSeq = refSeq.toUpperCase();
         }
@@ -442,9 +442,6 @@ public class SamBamFileReader { //TODO: add observer
         for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
             currentCount = Integer.valueOf(num[i - 1]);
-            if (start <= 104908 && currentCount + start >= 104908) {
-                System.out.println("break");
-            }
             
             if (op.equals("=")) { //only increase position for matches
                 refPos += currentCount;

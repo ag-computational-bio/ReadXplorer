@@ -117,7 +117,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTextArea" name="filterAnnosTextArea">
+        <Component class="javax.swing.JTextArea" name="filterFeaturesTextArea">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -130,7 +130,7 @@
             <Property name="lineWrap" type="boolean" value="true"/>
             <Property name="rows" type="int" value="1"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesSelectionVisualPanel.filterAnnosTextArea.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesSelectionVisualPanel.filterFeaturesTextArea.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="wrapStyleWord" type="boolean" value="true"/>
           </Properties>

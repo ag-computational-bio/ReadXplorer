@@ -74,7 +74,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Annotation 1", "Annotation 2", "Strand", "Start Anno 1", "Start Anno 2", "Reads Overlap Stop 1", "Reads Overlap Start 2", "Internal Reads", "Spanning Reads"
+                "Feature 1", "Feature 2", "Strand", "Start Feature 1", "Start Feature 2", "Reads Overlap Stop 1", "Reads Overlap Start 2", "Internal Reads", "Spanning Reads"
             }
         ) {
             Class[] types = new Class [] {
@@ -169,7 +169,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         for (Operon operon : operonDetection) {
             String annoName1 = "";
             String annoName2 = "";
-            String strand = (operon.getOperonAdjacencies().get(0).getAnnotation1().isFwdStrand() ? "Fwd" : "Rev") + "\n";
+            String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrand() ? "Fwd" : "Rev") + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";
@@ -178,12 +178,12 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
             String spanningReads = "";
             
             for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
-                annoName1 += opAdj.getAnnotation1().getLocus() + "\n";
-                annoName2 += opAdj.getAnnotation2().getLocus() + "\n";
-                startAnno1 += opAdj.getAnnotation1().getStart() + "\n";
-                startAnno2 += opAdj.getAnnotation2().getStart() + "\n";
-                readsAnno1 += opAdj.getReadsAnnotation1() + "\n";
-                readsAnno2 += opAdj.getReadsAnnotation2() + "\n";
+                annoName1 += opAdj.getFeature1().getLocus() + "\n";
+                annoName2 += opAdj.getFeature2().getLocus() + "\n";
+                startAnno1 += opAdj.getFeature1().getStart() + "\n";
+                startAnno2 += opAdj.getFeature2().getStart() + "\n";
+                readsAnno1 += opAdj.getReadsFeature1() + "\n";
+                readsAnno2 += opAdj.getReadsFeature2() + "\n";
                 internalReads += opAdj.getInternalReads() + "\n";
                 spanningReads += opAdj.getSpanningReads() + "\n";
             }

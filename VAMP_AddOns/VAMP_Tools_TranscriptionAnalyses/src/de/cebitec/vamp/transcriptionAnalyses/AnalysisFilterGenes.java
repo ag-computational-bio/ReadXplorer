@@ -5,52 +5,50 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredAnnotation;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
 import de.cebitec.vamp.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * Carries out the logic behind the filtered genes analysis.
+ * Carries out the logic behind the filtered features analysis.
  * 
  * @author -Rolf Hilker-
  */
-public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredAnnotation>> {
+public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredFeature>> {
 
     private TrackConnector trackConnector;
     private int minNumberReads;
     private int maxNumberReads;
     private int refSeqLength;
-    private List<PersistantAnnotation> genomeAnnotations;
-    private HashMap<Integer, FilteredAnnotation> annotationReadCount; //annotation id to count of mappings for annotation
-    private List<FilteredAnnotation> filteredGenes;
+    private List<PersistantFeature> genomeFeatures;
+    private HashMap<Integer, FilteredFeature> featureReadCount; //feature id to count of mappings for feature
+    private List<FilteredFeature> filteredFeatures;
     private List<PersistantMapping> mappingsAll;
     
     private int lastMappingIdx;
     private int currentCount;
 
     /**
-     * Carries out the logic behind the filtered genes analysis.
-     * When executing the filtered genes analysis the minNumberReads always has
-     * to be set, in order to find genes with at least that number of reads.
+     * Carries out the logic behind the filtered features analysis.
      * 
      * @param trackConnector the track viewer for which the analyses should be carried out
      * @param minNumberReads minimum number of reads which have to be found within
-     *      a gene in order to classify it as an filtered gene
+     *      a feature in order to classify it as an filtered feature
      * @param maxNumberReads  maximum number of reads which are allowed to be 
-     *      found within a gene in order to classify it as an filtered gene
+     *      found within a feature in order to classify it as an filtered feature
      */
     public AnalysisFilterGenes(TrackConnector trackConnector, int minNumberReads, int maxNumberReads) {
         this.trackConnector = trackConnector;
         this.minNumberReads = minNumberReads;
         this.maxNumberReads = maxNumberReads;
         
-        this.filteredGenes = new ArrayList<>();
+        this.filteredFeatures = new ArrayList<>();
         this.mappingsAll = new ArrayList<>();
-        this.annotationReadCount = new HashMap<>();
+        this.featureReadCount = new HashMap<>();
         this.lastMappingIdx = 0;
         this.lastMappingIdx = 0;
         
@@ -58,23 +56,23 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredAnn
     }
     
     /**
-     * Initializes the initial data structures needed for filtering annotations by read count.
+     * Initializes the initial data structures needed for filtering features by read count.
      */
     private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         this.refSeqLength = this.trackConnector.getRefSequenceLength();
-        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, refSeqLength);
+        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);
         
-        for (PersistantAnnotation annotation : this.genomeAnnotations) {
-            this.annotationReadCount.put(annotation.getId(), new FilteredAnnotation(annotation));
+        for (PersistantFeature feature : this.genomeFeatures) {
+            this.featureReadCount.put(feature.getId(), new FilteredFeature(feature));
         }
         
         //        int coveredPerfectPos = trackCon.getCoveredPerfectPos();
         //use for RPKM in other analyses
 //        int coveredBestMatchPos = trackCon.getCoveredBestMatchPos();
 //        int totalExonModelLength = 0; //calculate the total length of the transcriptome
-//        for (PersistantAnnotation annotation : this.genomeAnnotations) {
-//            totalExonModelLength += annotation.getStop() - annotation.getStart();
+//        for (PersistantFeature feature : this.genomeFeatures) {
+//            totalExonModelLength += feature.getStop() - feature.getStart();
 //        }
 //        totalExonModelLength /= 1000;
     }
@@ -89,32 +87,32 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredAnn
         
         if (data.getClass() == mappingResult.getClass()) {
             List<PersistantMapping> mappings = ((MappingResultPersistant) data).getMappings();
-            this.updateReadCountForAnnotations(mappings);
+            this.updateReadCountForFeatures(mappings);
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished
-            this.findFilteredGenes();
+            this.findFilteredFeatures();
         }
     }
     
     /**
-     * Updates the read count for the annotations with the given mappings.
+     * Updates the read count for the features with the given mappings.
      * @param mappings the mappings
      */
-    public void updateReadCountForAnnotations(List<PersistantMapping> mappings) {
-            PersistantAnnotation annotation;
+    public void updateReadCountForFeatures(List<PersistantMapping> mappings) {
+            PersistantFeature feature;
             boolean fstFittingMapping;
             
-            for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
-                annotation = this.genomeAnnotations.get(i);
-                int featStart = annotation.getStart();
-                int featStop = annotation.getStop();
+            for (int i = 0; i < this.genomeFeatures.size(); ++i) {
+                feature = this.genomeFeatures.get(i);
+                int featStart = feature.getStart();
+                int featStop = feature.getStop();
                 fstFittingMapping = true;
 
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
                     PersistantMapping mapping = mappings.get(j);
 
-                    //mappings identified within a annotation
-                    if (mapping.getStop() > featStart && annotation.isFwdStrand() == mapping.isFwdStrand()
+                    //mappings identified within a feature
+                    if (mapping.getStop() > featStart && feature.isFwdStrand() == mapping.isFwdStrand()
                             && mapping.getStart() < featStop) {
 
                         if (fstFittingMapping == true) {
@@ -124,40 +122,40 @@ public class AnalysisFilterGenes implements Observer, AnalysisI<List<FilteredAnn
                         this.currentCount += mapping.getNbReplicates();
 
 
-                        //still mappings left, but need next annotation
+                        //still mappings left, but need next feature
                     } else if (mapping.getStart() > featStop) {
                         break;
                     }
                 }
 
-                //store filtered genes
-                this.annotationReadCount.get(annotation.getId()).setReadCount(this.annotationReadCount.get(annotation.getId()).getReadCount() + this.currentCount);
+                //store filtered features
+                this.featureReadCount.get(feature.getId()).setReadCount(this.featureReadCount.get(feature.getId()).getReadCount() + this.currentCount);
                 this.currentCount = 0;
             }
             
             this.lastMappingIdx = 0;
-            //TODO: solution for more than one annotation overlapping mapping request boundaries
+            //TODO: solution for more than one feature overlapping mapping request boundaries
             
     }
 
     /**
-     * Detects all annotations, which satisfy the given minimum number of reads and
-     * do not exceed the maximum number of reads and stores them in the FilteredGenes
+     * Detects all features, which satisfy the given minimum number of reads and
+     * do not exceed the maximum number of reads and stores them in the FilteredFeatures
      * data structure.
      */
-    private void findFilteredGenes() {
+    private void findFilteredFeatures() {
         int readCount;
-        for (Integer id : this.annotationReadCount.keySet()) {
-            readCount = this.annotationReadCount.get(id).getReadCount();
+        for (Integer id : this.featureReadCount.keySet()) {
+            readCount = this.featureReadCount.get(id).getReadCount();
             if (readCount > this.minNumberReads && readCount < this.maxNumberReads) {
-                this.filteredGenes.add(this.annotationReadCount.get(id));
+                this.filteredFeatures.add(this.featureReadCount.get(id));
             }
         }
     }
     
     @Override
-    public List<FilteredAnnotation> getResults() {
-        return this.filteredGenes;
+    public List<FilteredFeature> getResults() {
+        return this.filteredFeatures;
     }
 
     /**

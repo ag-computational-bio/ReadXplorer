@@ -1,8 +1,8 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import java.util.ArrayList;
@@ -45,15 +45,15 @@ public class TranscriptionStartColumns implements ExcelExportDataI {
         dataColumnDescriptions.add("Gene Start Coverage");
         dataColumnDescriptions.add("Coverage Increase");
         dataColumnDescriptions.add("Coverage Increase %");
-        dataColumnDescriptions.add("Correct Start Annotation");
-        dataColumnDescriptions.add("Correct Start Annotation Start");
-        dataColumnDescriptions.add("Correct Start Annotation Stop");
-        dataColumnDescriptions.add("Next Upstream Annotation");
-        dataColumnDescriptions.add("Next Upstream Annotation Start");
-        dataColumnDescriptions.add("Next Upstream Annotation Stop");
-        dataColumnDescriptions.add("Next Downstream Annotation");
-        dataColumnDescriptions.add("Next Downstream Annotation Start");
-        dataColumnDescriptions.add("Next Downstream Annotation Stop");
+        dataColumnDescriptions.add("Correct Start Feature");
+        dataColumnDescriptions.add("Correct Start Feature Start");
+        dataColumnDescriptions.add("Correct Start Feature Stop");
+        dataColumnDescriptions.add("Next Upstream Feature");
+        dataColumnDescriptions.add("Next Upstream Feature Start");
+        dataColumnDescriptions.add("Next Upstream Feature Stop");
+        dataColumnDescriptions.add("Next Downstream Feature");
+        dataColumnDescriptions.add("Next Downstream Feature Start");
+        dataColumnDescriptions.add("Next Downstream Feature Stop");
         dataColumnDescriptions.add("Unannotated Transcript");
         dataColumnDescriptions.add("Transcript Stop");
         dataColumnDescriptions.add("70bp Upstream of Start");
@@ -90,21 +90,21 @@ public class TranscriptionStartColumns implements ExcelExportDataI {
             geneStartRow.add(geneStart.getStartCoverage() - geneStart.getInitialCoverage());
             geneStartRow.add(percentageIncrease);
             
-            DetectedAnnotations detAnnotations = geneStart.getDetAnnotations();
-            PersistantAnnotation annotation = detAnnotations.getCorrectStartAnnotation();
-            geneStartRow.add(annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-");
-            geneStartRow.add(annotation != null ? annotation.getStart() : "-");
-            geneStartRow.add(annotation != null ? annotation.getStop() : "-");
+            DetectedFeatures detFeatures = geneStart.getDetFeatures();
+            PersistantFeature feature = detFeatures.getCorrectStartFeature();
+            geneStartRow.add(feature != null ? PersistantFeature.getFeatureName(feature) : "-");
+            geneStartRow.add(feature != null ? feature.getStart() : "-");
+            geneStartRow.add(feature != null ? feature.getStop() : "-");
             
-            annotation = detAnnotations.getUpstreamAnnotation();
-            geneStartRow.add(annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-");
-            geneStartRow.add(annotation != null ? annotation.getStart() : "-");
-            geneStartRow.add(annotation != null ? annotation.getStop() : "-");
+            feature = detFeatures.getUpstreamFeature();
+            geneStartRow.add(feature != null ? PersistantFeature.getFeatureName(feature) : "-");
+            geneStartRow.add(feature != null ? feature.getStart() : "-");
+            geneStartRow.add(feature != null ? feature.getStop() : "-");
             
-            annotation = detAnnotations.getDownstreamAnnotation();
-            geneStartRow.add(annotation != null ? PersistantAnnotation.getAnnotationName(annotation) : "-");
-            geneStartRow.add(annotation != null ? annotation.getStart() : "-");
-            geneStartRow.add(annotation != null ? annotation.getStop() : "-");
+            feature = detFeatures.getDownstreamFeature();
+            geneStartRow.add(feature != null ? PersistantFeature.getFeatureName(feature) : "-");
+            geneStartRow.add(feature != null ? feature.getStart() : "-");
+            geneStartRow.add(feature != null ? feature.getStop() : "-");
             
             if (geneStart instanceof TransStartUnannotated) {
                 TransStartUnannotated unannoStart = (TransStartUnannotated) geneStart;

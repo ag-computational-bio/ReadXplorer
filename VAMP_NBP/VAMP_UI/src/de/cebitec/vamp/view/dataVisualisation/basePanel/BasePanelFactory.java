@@ -430,7 +430,7 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
         legend.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
         legend.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.UNDEF_ANNOTATION, FeatureType.UNDEFINED, viewer));
+        legend.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
 
         return legend;
     }

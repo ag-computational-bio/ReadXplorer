@@ -57,7 +57,7 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            prepareAnnotations(deSeqAnalysisData);
+            prepareFeatures(deSeqAnalysisData);
             prepareCountData(deSeqAnalysisData, allCountData);
             results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTraks().size(), getSaveFile());
         } else {

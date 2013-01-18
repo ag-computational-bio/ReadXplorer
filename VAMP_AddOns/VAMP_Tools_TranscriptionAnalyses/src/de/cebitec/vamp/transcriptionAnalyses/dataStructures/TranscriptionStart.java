@@ -1,11 +1,11 @@
 package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Data structure for storing a gene start with position, strand, initial coverage
  * (coverage directly before predicted gene start) and start coverage (coverage 
  * at predicted gene start).
+ *
+ * @author -Rolf Hilker-
  */
 public class TranscriptionStart {
     
@@ -13,7 +13,7 @@ public class TranscriptionStart {
     private boolean isFwdStrand;
     private int initialCoverage;
     private int startCoverage;
-    private DetectedAnnotations detAnnotations;
+    private DetectedFeatures detFeatures;
     
     /**
      * Data structure for storing a gene start.
@@ -21,14 +21,14 @@ public class TranscriptionStart {
      * @param isFwdStrand true, if the transcript start was detected on the fwd strand, false otherwise.
      * @param initialCoverage The coverage directly before the detected gene start
      * @param startCoverage The coverage at the detected gene start position (getPos()).
-     * @param detAnnotations object containing the annotations associated to this predicted gene start
+     * @param detFeatures object containing the features associated to this predicted gene start
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, DetectedAnnotations detAnnotations) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, DetectedFeatures detFeatures) {
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
         this.initialCoverage = initialCoverage;
         this.startCoverage = startCoverage;
-        this.detAnnotations = detAnnotations;
+        this.detFeatures = detFeatures;
     }
 
     /**
@@ -60,10 +60,10 @@ public class TranscriptionStart {
     }
 
     /**
-     * @return The object containing the annotations associated to this predicted gene start.
+     * @return The object containing the features associated to this predicted gene start.
      */
-    public DetectedAnnotations getDetAnnotations() {
-        return this.detAnnotations;
+    public DetectedFeatures getDetFeatures() {
+        return this.detFeatures;
     }
     
     

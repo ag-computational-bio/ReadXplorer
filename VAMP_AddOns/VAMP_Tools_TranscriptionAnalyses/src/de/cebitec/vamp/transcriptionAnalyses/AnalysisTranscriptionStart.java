@@ -7,9 +7,9 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
@@ -46,7 +46,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private int increaseReadPercent;
     private int maxInitialReadCount;
     private int increaseReadCount2;
-    private List<PersistantAnnotation> genomeAnnotations;
+    private List<PersistantFeature> genomeFeatures;
     protected List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
     private DiscreteCountingDistribution covIncreaseDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
@@ -56,8 +56,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     //varibles for transcription start site detection
     private int covLastFwdPos;
     private int covLastRevPos;
-    private int lastAnnotationIdxGenStartsFwd;
-    private int lastAnnotationIdxGenStartsRev;
+    private int lastFeatureIdxGenStartsFwd;
+    private int lastFeatureIdxGenStartsRev;
     
     private HashMap<Integer, Integer> exactCovIncreaseDist = new HashMap<>(); //exact coverage increase distribution
     private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
@@ -100,8 +100,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.detectedStarts = new ArrayList<>();
         this.covLastFwdPos = 0;
         this.covLastRevPos = 0;
-        this.lastAnnotationIdxGenStartsFwd = 0;
-        this.lastAnnotationIdxGenStartsRev = 0;
+        this.lastFeatureIdxGenStartsFwd = 0;
+        this.lastFeatureIdxGenStartsRev = 0;
         
         this.initDatastructures();
     }
@@ -113,7 +113,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         this.refSeqLength = trackConnector.getRefSequenceLength();
-        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, this.refSeqLength);   
+        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);   
         
         this.covIncreaseDistribution = trackConnector.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
         this.covIncPercentDistribution = trackConnector.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
@@ -145,7 +145,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             PersistantCoverage coverage = ((CoverageAndDiffResultPersistant) data).getCoverage();
             this.detectTSSs(coverage);
 
-            //TODO: annotation finden/ändern
+            //TODO: feature finden/ändern
         } else 
         if (data instanceof Byte && ((Byte) data) == 1) {
             this.finish();
@@ -258,8 +258,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     || fwdCov1 <= this.maxInitialReadCount 
                     && diffFwd > this.increaseReadCount2) {
 
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, true);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detAnnotations));
+                DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detFeatures));
             }
             if (diffRev > this.increaseReadCount 
                     && percentDiffRev > this.increaseReadPercent 
@@ -267,18 +267,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     || revCov2 <= this.maxInitialReadCount 
                     && diffRev > this.increaseReadCount2) {
 
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, false);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detAnnotations));
+                DetectedFeatures detFeatures = this.findNextFeature(pos, false);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detFeatures));
             }
 
         } else {
             if (diffFwd > this.increaseReadCount && percentDiffFwd > this.increaseReadPercent) {
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos + 1, true);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detAnnotations));
+                DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detFeatures));
             }
             if (diffRev > this.increaseReadCount && percentDiffRev > this.increaseReadPercent) {
-                DetectedAnnotations detAnnotations = this.findNextAnnotation(pos, false);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detAnnotations));
+                DetectedFeatures detFeatures = this.findNextFeature(pos, false);
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detFeatures));
             }
             
         }
@@ -293,154 +293,154 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     }
 
     /**
-     * Detects and returns the genomic annotations, which can be associated to the
-     * given transcription start site and strand. This can be eiter an annotation starting at the
+     * Detects and returns the genomic features, which can be associated to the
+     * given transcription start site and strand. This can be eiter an feature starting at the
      * predicted transcription start site, which would be a correct start, or it will contain
-     * the maximal two closest annotations found in a vicinity of 500bp up- or 
+     * the maximal two closest features found in a vicinity of 500bp up- or 
      * downstream of the transcription start site.
      * @param tssPos the predicted transcription start site position
      * @param isFwdStrand the strand, on which the transcription start site is located
-     * @return the genomic annotations, which can be associated to the
+     * @return the genomic features, which can be associated to the
      * given transcription start site and strand.
      */
-    private DetectedAnnotations findNextAnnotation(int tssPos, boolean isFwdStrand) {
+    private DetectedFeatures findNextFeature(int tssPos, boolean isFwdStrand) {
         final int maxDeviation = 1000;
         int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
         int maxStartPos = tssPos + maxDeviation > this.refSeqLength ? refSeqLength : tssPos + maxDeviation;
-        PersistantAnnotation annotation;
-        DetectedAnnotations detectedAnnotations = new DetectedAnnotations();
+        PersistantFeature feature;
+        DetectedFeatures detectedFeatures = new DetectedFeatures();
         int start;
-        boolean fstFittingAnnotation = true;
+        boolean fstFittingFeature = true;
         if (isFwdStrand) {
-            for (int i = this.lastAnnotationIdxGenStartsFwd; i < this.genomeAnnotations.size()-1; ++i) {
-                annotation = this.genomeAnnotations.get(i);
-                start = annotation.getStart();
+            for (int i = this.lastFeatureIdxGenStartsFwd; i < this.genomeFeatures.size()-1; ++i) {
+                feature = this.genomeFeatures.get(i);
+                start = feature.getStart();
 
                 /*
-                 * We use all annotations, because also mRNA or rRNA annotations can contribute to TSS detection,
+                 * We use all features, because also mRNA or rRNA features can contribute to TSS detection,
                  * as they also depict expressed sequences from the reference
                  */
-                if (start >= minStartPos && annotation.isFwdStrand() && start <= maxStartPos) {
+                if (start >= minStartPos && feature.isFwdStrand() && start <= maxStartPos) {
 
-                    if (fstFittingAnnotation) {
-                        this.lastAnnotationIdxGenStartsFwd = i; //this is the first annotation in the interval
-                        fstFittingAnnotation = false;
+                    if (fstFittingFeature) {
+                        this.lastFeatureIdxGenStartsFwd = i; //this is the first feature in the interval
+                        fstFittingFeature = false;
                     }
 
-                    if (start < tssPos && annotation.getStop() > tssPos) {
-                        //store annotation as next upstream annotation, but search for closer
-                        //upstream annotation & correctly annotated transcription start site
+                    if (start < tssPos && feature.getStop() > tssPos) {
+                        //store feature as next upstream feature, but search for closer
+                        //upstream feature & correctly annotated transcription start site
                         
                         /* 
-                         * Also check, if gene and CDS annotation are available and covering each other.
-                         * Handle this case by not storing the current annotation, if it is 
-                         * a CDS annotation completely covered by a gene annotation. In all other
-                         * cases the annotation can be stored, since we also use CDS annotations for TSS detection,
-                         * if no gene annotation is available.
+                         * Also check, if gene and CDS feature are available and covering each other.
+                         * Handle this case by not storing the current feature, if it is 
+                         * a CDS feature completely covered by a gene feature. In all other
+                         * cases the feature can be stored, since we also use CDS features for TSS detection,
+                         * if no gene feature is available.
                          */
-                        PersistantAnnotation upstreamAnno = detectedAnnotations.getUpstreamAnnotation();
+                        PersistantFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
                         if (    upstreamAnno != null && 
-                                annotation.getType() == FeatureType.CDS && 
+                                feature.getType() == FeatureType.CDS && 
                                 upstreamAnno.getType() == FeatureType.GENE &&
-                                upstreamAnno.getStop() >= annotation.getStop()) {
-//                            System.out.println("CDS covered by gene annotation Fwd");
+                                upstreamAnno.getStop() >= feature.getStop()) {
+//                            System.out.println("CDS covered by gene feature Fwd");
                             continue;
                         }
                         
-                        detectedAnnotations.setUpstreamAnnotation(annotation);
+                        detectedFeatures.setUpstreamFeature(feature);
                         
                     } else if (start == tssPos) {
                         //store correctly annotated transcription start site
-                        detectedAnnotations.setCorrectStartAnnotation(annotation);
-                        detectedAnnotations.setUpstreamAnnotation(null);
+                        detectedFeatures.setCorrectStartFeature(feature);
+                        detectedFeatures.setUpstreamFeature(null);
                         break;
                     } else if (start > tssPos) {
                         /*
-                         * Store next downstream annotation, transcription start is earlier than annotated,
-                         * except the current annotation is a CDS annotation and no gene annotation is present for
+                         * Store next downstream feature, transcription start is earlier than annotated,
+                         * except the current feature is a CDS feature and no gene feature is present for
                          * that gene, starting earlier.
                          */
-                        if (annotation.getType() == FeatureType.CDS && 
-                                annotation.getStart() == this.genomeAnnotations.get(i+1).getStart() &&
-                                this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE) {
-                            detectedAnnotations.setDownstreamAnnotation(this.genomeAnnotations.get(i+1));
+                        if (feature.getType() == FeatureType.CDS && 
+                                feature.getStart() == this.genomeFeatures.get(i+1).getStart() &&
+                                this.genomeFeatures.get(i+1).getType() == FeatureType.GENE) {
+                            detectedFeatures.setDownstreamFeature(this.genomeFeatures.get(i+1));
 //                            System.out.println("Gene covers CDS with same annotated TSS Fwd");
                         } else {
-                            detectedAnnotations.setDownstreamAnnotation(annotation);
+                            detectedFeatures.setDownstreamFeature(feature);
                         }
                         
                         break;
                     }
 
                 } else if (start >= maxStartPos) {
-                    if (fstFittingAnnotation) {
-                        this.lastAnnotationIdxGenStartsFwd = i; //this is the first annotation in the interval
+                    if (fstFittingFeature) {
+                        this.lastFeatureIdxGenStartsFwd = i; //this is the first feature in the interval
                     }
                     break;
                 }
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for (int i = this.lastAnnotationIdxGenStartsRev; i < this.genomeAnnotations.size(); ++i) {
-                annotation = this.genomeAnnotations.get(i);
-                start = annotation.getStop();
+            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size(); ++i) {
+                feature = this.genomeFeatures.get(i);
+                start = feature.getStop();
 
-                if (start >= minStartPos && annotation.isFwdStrand() == isFwdStrand && start <= maxStartPos) {
+                if (start >= minStartPos && feature.isFwdStrand() == isFwdStrand && start <= maxStartPos) {
 
-                    if (fstFittingAnnotation) {
-                        this.lastAnnotationIdxGenStartsRev = i; //this is the first annotation in the interval
-                        fstFittingAnnotation = false;
+                    if (fstFittingFeature) {
+                        this.lastFeatureIdxGenStartsRev = i; //this is the first feature in the interval
+                        fstFittingFeature = false;
                     }
 
                     if (start < tssPos) {
-                        //store annotation as next bigger annotation, but search for closer
-                        //bigger annotation & correctly annotated transcription start site
+                        //store feature as next bigger feature, but search for closer
+                        //bigger feature & correctly annotated transcription start site
                         
                         /*
-                         * Store next upstream annotation. transcription start is earlier than annotated,
-                         * except the current annotation is a CDS annotation and no gene annotation is present for
+                         * Store next upstream feature. transcription start is earlier than annotated,
+                         * except the current feature is a CDS feature and no gene feature is present for
                          * that gene, starting earlier.
                          */
-                        PersistantAnnotation upstreamAnno = detectedAnnotations.getUpstreamAnnotation();
+                        PersistantFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
                         if (    upstreamAnno != null && 
-                                annotation.getType() == FeatureType.CDS && 
+                                feature.getType() == FeatureType.CDS && 
                                 start == upstreamAnno.getStop() &&
                                 upstreamAnno.getType() == FeatureType.GENE) {
-                            //TODO: this does not work if annotations start at the same position on rev and fwd strand!
-//                            System.out.println("CDS covered by gene annotation Rev");
-                            continue; // we want to keep the gene instead the CDS annotation
+                            //TODO: this does not work if features start at the same position on rev and fwd strand!
+//                            System.out.println("CDS covered by gene feature Rev");
+                            continue; // we want to keep the gene instead the CDS feature
                         }
                         
-                        detectedAnnotations.setDownstreamAnnotation(annotation);
+                        detectedFeatures.setDownstreamFeature(feature);
                         
                     } else if (start == tssPos) {
                         //store correctly annotated transcription start site
-                        detectedAnnotations.setCorrectStartAnnotation(annotation);
-                        detectedAnnotations.setDownstreamAnnotation(null);
+                        detectedFeatures.setCorrectStartFeature(feature);
+                        detectedFeatures.setDownstreamFeature(null);
                         break;
-                    } else if (start > tssPos && annotation.getStart() < tssPos) {
-                        //store next upstream annotation, translation start is further in gene
+                    } else if (start > tssPos && feature.getStart() < tssPos) {
+                        //store next upstream feature, translation start is further in gene
                         
-                        if (    annotation.getType() == FeatureType.CDS && 
-                                this.genomeAnnotations.get(i+1).getType() == FeatureType.GENE &&
-                                this.genomeAnnotations.get(i+1).getStart() <= annotation.getStart()) {
-                            detectedAnnotations.setUpstreamAnnotation(this.genomeAnnotations.get(i+1));
+                        if (    feature.getType() == FeatureType.CDS && 
+                                this.genomeFeatures.get(i+1).getType() == FeatureType.GENE &&
+                                this.genomeFeatures.get(i+1).getStart() <= feature.getStart()) {
+                            detectedFeatures.setUpstreamFeature(this.genomeFeatures.get(i+1));
 //                            System.out.println("Gene covers CDS with same annotated TSS Rev");
                         } else {                      
-                            detectedAnnotations.setUpstreamAnnotation(annotation);
+                            detectedFeatures.setUpstreamFeature(feature);
                         }
                         break;
                     }
 
                 } else if (start >= maxStartPos) {
-                    if (fstFittingAnnotation) {
-                        this.lastAnnotationIdxGenStartsRev = i;
+                    if (fstFittingFeature) {
+                        this.lastFeatureIdxGenStartsRev = i;
                     }
                     break;
                 }
             }
         }
-        return detectedAnnotations;
+        return detectedFeatures;
     }
     
     /**

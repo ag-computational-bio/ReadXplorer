@@ -1,7 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.connector.TrackConnector;
-import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedAnnotations;
+import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 
@@ -36,19 +36,19 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
     /**
      * Acutally adds the detected TSS to the list of detected TSSs, but also
      * elongates currently unannotated transcripts (with no up- or downstream 
-     * annotations on the same strand) up to the minimum coverage, set in the
+     * features on the same strand) up to the minimum coverage, set in the
      * constructor, is reached.
      * @param tss the transcription start site to add to the list
      */
     @Override
     protected void addDetectStart(TranscriptionStart tss) {
-        DetectedAnnotations annos = tss.getDetAnnotations();
+        DetectedFeatures features = tss.getDetFeatures();
         int currentPos = tss.getPos();
         
-        //only if no annotation is available, detect the length of the unannotated new transcript
-        if (    annos.getCorrectStartAnnotation() == null && 
-                annos.getDownstreamAnnotation() == null &&
-                annos.getUpstreamAnnotation() == null) {
+        //only if no feature is available, detect the length of the unannotated new transcript
+        if (    features.getCorrectStartFeature() == null && 
+                features.getDownstreamFeature() == null &&
+                features.getUpstreamFeature() == null) {
             
             if (tss.isFwdStrand()) {
                 while (currentCoverage.getBestMatchFwdMult(currentPos) > minCoverage) {
@@ -64,7 +64,7 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
             
             // instead of an ordinary TranscriptStart we add the TranscriptStart with unannotated transcript information
             detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getInitialCoverage(), 
-                    tss.getStartCoverage(), tss.getDetAnnotations(), currentPos));
+                    tss.getStartCoverage(), tss.getDetFeatures(), currentPos));
             
         } else {
             detectedStarts.add(tss);

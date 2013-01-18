@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dialogMenus;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.parser.output.OutputParser;
 import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -28,7 +28,9 @@ import org.openide.util.NbBundle;
  * @author Rolf Hilker
  */
 public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
-
+    
+    private static final long serialVersionUID = 1L;
+    
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     
     public MenuItemFactory() {
@@ -75,12 +77,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for storing a sequence in fasta format.
      * The sequence to store has to be known, when the method is called.
      * @param sequence the sequence to store as fasta
-     * @param annotation the annotation whose sequence is to be converted to fasta
+     * @param feature the feature whose sequence is to be converted to fasta
      *                it contains the header information, but not the sequence
      * @return jmenuitem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final PersistantAnnotation annotation){
-        return this.initStoreFastaItem(sequence, annotation, -1, -1);
+    public JMenuItem getStoreFastaItem(final String sequence, final PersistantFeature feature){
+        return this.initStoreFastaItem(sequence, feature, -1, -1);
 
     }
 
@@ -97,15 +99,15 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     }
 
     /**
-     * Initializes a store fasta item either from an annotation or with given start
+     * Initializes a store fasta item either from an feature or with given start
      * and stop indices.
      * @param sequence the sequence to store in fasta format
-     * @param annotation the annotation containing the header information, <code>null</code> if not from an annotation
-     * @param seqStart the startpoint of the sequence (-1 if annotation is used!)
-     * @param seqEnd the endpoint of the sequence (-1 if annotation is used!)
+     * @param feature the feature containing the header information, <code>null</code> if not from an feature
+     * @param seqStart the startpoint of the sequence (-1 if feature is used!)
+     * @param seqEnd the endpoint of the sequence (-1 if feature is used!)
      * @return a menu item capable of storing a sequence in fasta format
      */
-    private JMenuItem initStoreFastaItem(final String sequence, final PersistantAnnotation annotation,
+    private JMenuItem initStoreFastaItem(final String sequence, final PersistantFeature feature,
             final int seqStart, final int seqEnd) {
 
         JMenuItem storeFastaItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta"));
@@ -114,8 +116,8 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String output;
-                if (annotation != null) {
-                    output = this.generateFastaFromAnnotation();
+                if (feature != null) {
+                    output = this.generateFastaFromFeature();
                 } else {
                     String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ").concat(String.valueOf(seqEnd));
                     output = OutputParser.generateFasta(sequence, header);
@@ -126,10 +128,10 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             /**
              * Generates a string ready for output in a fasta file.
              */
-            private String generateFastaFromAnnotation() {
-                String ecNumber = annotation.getEcNumber() != null ? annotation.getEcNumber() : "no EC number";
-                String locus = annotation.getLocus() != null ? annotation.getLocus() : "no locus";
-                String product = annotation.getProduct() != null ? annotation.getProduct() : "no product";
+            private String generateFastaFromFeature() {
+                String ecNumber = feature.getEcNumber() != null ? feature.getEcNumber() : "no EC number";
+                String locus = feature.getLocus() != null ? feature.getLocus() : "no locus";
+                String product = feature.getProduct() != null ? feature.getProduct() : "no product";
 
                 return OutputParser.generateFasta(sequence, ecNumber, locus, product);
             }
@@ -141,7 +143,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     /**
      * Returns a JMenuItem for copying one or more CDS sequences.
      * The text to copy has to be known, when the method is called.
-     * @param sequencesToCopy the CDS sequence(s) to copy
+     * @param sequencesToStore the CDS sequence(s) to store
+     * @param regions the regions to store
+     * @param referenceName the name of the reference
      * @return the JMenuItem for copying one or more CDS sequences.
      */
     public JMenuItem getStoreFastaForCdsItem(final List<String> sequencesToStore, final List<Region> regions,
@@ -234,7 +238,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Creates a JMenuItem which updates the navigator bar associated with the given
      * BoundsInfoManager to the new position, when it is pressed.
      * @param boundsManager the bounds info manager, whose navigator bar is to be updated
-     * @param newPos the updated position for the bounds info manager
+     * @param cdsRegions the cds regions for which jumping to their start position should be enabled
      * @return the JMenuItem with the above described functionality
      */
     public JMenuItem getJumpToPosItem(final BoundsInfoManager boundsManager, final List<Region> cdsRegions) {
