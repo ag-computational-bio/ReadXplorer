@@ -159,7 +159,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     }
 
     /**
-     * Adds a list of filtered features to this panel.
+     * Adds a list of covered features to this panel.
      * @param coveredFeaturesResult 
      */
     public void addCoveredFeatures(CoveredFeatureResult coveredFeaturesResult) {
@@ -191,9 +191,10 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         this.coveredFeaturesTable.setRowSorter(sorter);
         sorter.setModel(model);
         
+        ParameterSetCoveredFeatures parameters = ((ParameterSetCoveredFeatures) coveredFeaturesResult.getParameters());
         this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class,
-                "ResultPanelCoveredFeatures.parametersLabel.text", coveredFeaturesResult.getParameters().getMinCoveredPercent(), 
-                coveredFeaturesResult.getParameters().getMinCoverageCount()));
+                "ResultPanelCoveredFeatures.parametersLabel.text", parameters.getMinCoveredPercent(), 
+                parameters.getMinCoverageCount()));
     }
     
     /**

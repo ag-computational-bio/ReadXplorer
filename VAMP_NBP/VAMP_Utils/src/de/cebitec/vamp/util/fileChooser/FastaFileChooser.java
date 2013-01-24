@@ -12,14 +12,17 @@ import org.openide.util.NbBundle;
  * @author Rolf Hilker
  */
 public class FastaFileChooser extends VampFileChooser {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new file chooser for saving a sequence in fasta format.
-     * @param fileExtensions
+     * @param fileExtension
+     * @param fileDescription 
      * @param sequence
      */
     public FastaFileChooser(final String[] fileExtension, final String fileDescription, final String sequence){
-        super(VampFileChooser.SAVE_DIALOG, fileExtension, fileDescription, sequence);
+        super(fileExtension, fileDescription, sequence);
+        this.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }
 
 

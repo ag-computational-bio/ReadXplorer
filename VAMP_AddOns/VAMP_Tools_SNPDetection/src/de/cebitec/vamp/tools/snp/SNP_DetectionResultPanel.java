@@ -84,7 +84,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         alignmentButton = new javax.swing.JButton();
         alignmentButton1 = new javax.swing.JButton();
         parametersLabel = new javax.swing.JLabel();
-        metricsButton = new javax.swing.JButton();
+        statisticsButton = new javax.swing.JButton();
 
         snpTable.setAutoCreateRowSorter(true);
         snpTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -155,10 +155,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
         parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.parametersLabel.text")); // NOI18N
 
-        metricsButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.metricsButton.text")); // NOI18N
-        metricsButton.addActionListener(new java.awt.event.ActionListener() {
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.statisticsButton.text")); // NOI18N
+        statisticsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                metricsButtonActionPerformed(evt);
+                statisticsButtonActionPerformed(evt);
             }
         });
 
@@ -169,7 +169,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 335, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(metricsButton)
+                .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -189,7 +189,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                     .addComponent(alignmentButton)
                     .addComponent(alignmentButton1)
                     .addComponent(parametersLabel)
-                    .addComponent(metricsButton))
+                    .addComponent(statisticsButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -206,9 +206,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         this.setFdnamlPath();
     }//GEN-LAST:event_alignmentButton1ActionPerformed
 
-    private void metricsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metricsButtonActionPerformed
+    private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
         JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpData.getSnpStatistics()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_metricsButtonActionPerformed
+    }//GEN-LAST:event_statisticsButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -216,9 +216,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     private javax.swing.JButton alignmentButton1;
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton metricsButton;
     private javax.swing.JLabel parametersLabel;
     private javax.swing.JTable snpTable;
+    private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -435,7 +435,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
      * Allows to set the path to the fdnaml executable to be used for tree reconstructions.
      */
     private void setFdnamlPath() {
-        VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, new String[1], "") {
+        VampFileChooser fc = new VampFileChooser(new String[1], "") {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -448,6 +448,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 NbPreferences.forModule(SNP_DetectionResultPanel.class).put(SNP_Phylogeny.FDNAML_PATH, fileLocation);
             }
         };
+        fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }
     
     /**

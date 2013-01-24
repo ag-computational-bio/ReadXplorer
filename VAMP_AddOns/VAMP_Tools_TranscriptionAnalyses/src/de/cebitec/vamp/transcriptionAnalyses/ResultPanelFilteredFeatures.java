@@ -9,9 +9,9 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -29,18 +29,19 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private BoundsInfoManager bim;
-    private List<FilteredFeature> filteredFeatures;
-    private final ParameterSetFilteredFeatures filterFeaturesParameters;
+    private FilteredFeaturesResult filterFeaturesResult;
+    private HashMap<String, Integer> filterStatisticsMap;
+    
+    public static final String FEATURES_TOTAL = "Total number of filtered features";
     
     /**
      * Panel showing a result of an analysis filtering for features with a
      * min and max certain readcount.
-     * @param filterFeaturesParameters parameter set used for this feature filtering
      */
-    public ResultPanelFilteredFeatures(ParameterSetFilteredFeatures filterFeaturesParameters) {
+    public ResultPanelFilteredFeatures() {
         initComponents();
-        this.filterFeaturesParameters = filterFeaturesParameters;
-        this.filteredFeatures = new ArrayList<>();
+        this.filterStatisticsMap = new HashMap<>();
+        this.filterStatisticsMap.put(FEATURES_TOTAL, 0);
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.filteredFeaturesTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -105,6 +106,11 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
         parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.parametersLabel.text")); // NOI18N
 
         statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.statisticsButton.text")); // NOI18N
+        statisticsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statisticsButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -131,9 +137,13 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        FilteredFeaturesColumns filteredFeaturesData = new FilteredFeaturesColumns(this.filteredFeatures);
+        FilteredFeaturesColumns filteredFeaturesData = new FilteredFeaturesColumns(this.filterFeaturesResult, this.filterStatisticsMap);
         ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", filteredFeaturesData); 
     }//GEN-LAST:event_exportButtonActionPerformed
+
+    private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
+        JOptionPane.showMessageDialog(this, new FilterFeaturesStatsPanel(filterStatisticsMap), "Feature Filtering Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
@@ -161,15 +171,21 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     }
 
     /**
-     * Adds a list of filtered features to this panel.
-     * @param filteredFeatures 
+     * Adds a list of filtered features to this panel contained in the result object.
+     * @param filterFeaturesResult a filtering for features result 
      */
-    public void addFilteredFeatures(List<FilteredFeature> filteredFeatures) {
+    public void addFilteredFeatures(FilteredFeaturesResult filterFeaturesResult) {
         final int nbColumns = 3;
-        this.filteredFeatures.addAll(filteredFeatures);
+        
+        if (this.filterFeaturesResult == null) {
+            this.filterFeaturesResult = filterFeaturesResult;
+        } else {
+            this.filterFeaturesResult.getResults().addAll(filterFeaturesResult.getResults());
+        }
+        
         DefaultTableModel model = (DefaultTableModel) this.filteredFeaturesTable.getModel();        
 
-        for (FilteredFeature filteredAnno : filteredFeatures) {
+        for (FilteredFeature filteredAnno : this.filterFeaturesResult.getResults()) {
             
             Object[] rowData = new Object[nbColumns];
             rowData[0] = filteredAnno.getFilteredFeature();
@@ -183,14 +199,17 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
         this.filteredFeaturesTable.setRowSorter(sorter);
         sorter.setModel(model);
         
+        ParameterSetFilteredFeatures parameters = (ParameterSetFilteredFeatures) filterFeaturesResult.getParameters();
         this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-                "ResultPanelFilteredFeatures.parametersLabel.text", filterFeaturesParameters.getMinNumberReads(), filterFeaturesParameters.getMaxNumberReads()));
+                "ResultPanelFilteredFeatures.parametersLabel.text", parameters.getMinNumberReads(), parameters.getMaxNumberReads()));
+        
+        this.filterStatisticsMap.put(FEATURES_TOTAL, this.filterStatisticsMap.get(FEATURES_TOTAL) + filterFeaturesResult.getResults().size());
     }
     
     /**
      * @return the number of features filtered during the associated analysis
      */
     public int getResultSize() {
-        return this.filteredFeatures.size();
+        return this.filterFeaturesResult.getResults().size();
     }
 }

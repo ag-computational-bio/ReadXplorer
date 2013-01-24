@@ -158,7 +158,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId).getAnalysisCoveredFeatures();
                 CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackList);
-                result.setDetectionParameters(parameters);
+                result.setParameters(parameters);
                 result.setFeatureListSize(analysisCoveredFeatures.getGenomeFeatureSize());
 
                 if (coveredFeaturesResultPanel == null) {

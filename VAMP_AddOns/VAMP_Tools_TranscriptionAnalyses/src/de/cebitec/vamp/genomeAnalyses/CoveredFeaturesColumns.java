@@ -76,6 +76,8 @@ public class CoveredFeaturesColumns implements ExcelExportDataI {
         
 
         //create statistics sheet
+        ParameterSetCoveredFeatures parameters = (ParameterSetCoveredFeatures) this.coveredFeaturesResult.getParameters();
+        
         List<List<Object>> statisticsExportData = new ArrayList<>();
         List<Object> statisticsExport = new ArrayList<>();
 
@@ -93,12 +95,12 @@ public class CoveredFeaturesColumns implements ExcelExportDataI {
 
         statisticsExport = new ArrayList<>();
         statisticsExport.add("Minimum covered percent:");
-        statisticsExport.add(this.coveredFeaturesResult.getParameters().getMinCoveredPercent());
+        statisticsExport.add(parameters.getMinCoveredPercent());
         statisticsExportData.add(statisticsExport);
 
         statisticsExport = new ArrayList<>();
         statisticsExport.add("Minimum counted coverage:");
-        statisticsExport.add(this.coveredFeaturesResult.getParameters().getMinCoverageCount());
+        statisticsExport.add(parameters.getMinCoverageCount());
         statisticsExportData.add(statisticsExport);
 
         statisticsExport = new ArrayList<>(); //placeholder between parameters and statistics

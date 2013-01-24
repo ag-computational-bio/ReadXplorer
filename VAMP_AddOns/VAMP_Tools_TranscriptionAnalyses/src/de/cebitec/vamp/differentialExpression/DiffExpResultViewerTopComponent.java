@@ -248,7 +248,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"csv"}, "csv") {
+        VampFileChooser fc = new VampFileChooser(new String[]{"csv"}, "csv") {
+            private static final long serialVersionUID = 1L;
             @Override
             public void save(String fileLocation) {
                 analysisHandler.saveResultsAsCSV(resultComboBox.getSelectedIndex(), fileLocation);
@@ -258,6 +259,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             public void open(String fileLocation) {
             }
         };
+        fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_saveTableButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createGraphicsButton;

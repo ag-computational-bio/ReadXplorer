@@ -17,8 +17,10 @@ import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -35,22 +37,30 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
 
+    public static final String TSS_TOTAL = "Total number of detected TSSs";
+    public static final String TSS_CORRECT = "Correct TSS";
+    public static final String TSS_UPSTREAM = "TSS with upstream feature";
+    public static final String TSS_DOWNSTREAM = "TSS with downstream feature";
+    public static final String TSS_FWD = "TSS on fwd strand";
+    public static final String TSS_REV = "TSS on rev strand";
+    public static final String TSS_UNANNOTATED = "Unannotated Transcripts";
+    public static int UNUSED_STATISTICS_VALUE = -1;
+    
     private BoundsInfoManager boundsInfoManager;
-    private List<TranscriptionStart> tSSs;
     private List<String> promotorRegions;
     private ReferenceViewer referenceViewer;
-    private final ParameterSetTSS tssParameters;
+    private TssDetectionResult tssResult;
+    private HashMap<String, Integer> statisticsMap;
+    
     
     /**
      * This panel is capable of showing a table with transcription start sites
      * and contains an export button, which exports the data into an excel file.
-     * @param tssParameters parameter set used for this transcription start site detection
      */
-    public ResultPanelTranscriptionStart(ParameterSetTSS tssParameters) {
-        initComponents();
-        this.tssParameters = tssParameters;
-        this.tSSs = new ArrayList<>();
-        
+    public ResultPanelTranscriptionStart() {
+        this.initComponents();
+        this.initStatsMap();
+       
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
 
@@ -59,6 +69,20 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                 showTSSPosition();
             }
         });
+    }
+
+    /**
+     * Initializes the statistics map.
+     */
+    private void initStatsMap() {
+        statisticsMap = new HashMap<>();
+        statisticsMap.put(TSS_TOTAL, 0);
+        statisticsMap.put(TSS_CORRECT, 0);
+        statisticsMap.put(TSS_UPSTREAM, 0);
+        statisticsMap.put(TSS_DOWNSTREAM, 0);
+        statisticsMap.put(TSS_FWD, 0);
+        statisticsMap.put(TSS_REV, 0);
+        statisticsMap.put(TSS_UNANNOTATED, 0);
     }
     
     /**
@@ -135,6 +159,11 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.parametersLabel.text")); // NOI18N
 
         statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.statisticsButton.text")); // NOI18N
+        statisticsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statisticsButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -173,7 +202,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         //get the promotor region for each TSS
         int promotorStart;
         int refSeqLength = ref.getSequence().length();
-        for (TranscriptionStart tSS : this.tSSs) {
+        for (TranscriptionStart tSS : this.tssResult.getResults()) {
             if (tSS.isFwdStrand()) {
                 promotorStart = tSS.getPos() - 70;
                 promotorStart = promotorStart < 0 ? 0 : promotorStart;
@@ -185,10 +214,15 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
             }
             this.promotorRegions.add(promotor);
         }
+        tssResult.setPromotorRegions(promotorRegions);
         
-        TranscriptionStartColumns tSSColumns = new TranscriptionStartColumns(this.tSSs, this.promotorRegions); 
+        TranscriptionStartColumns tSSColumns = new TranscriptionStartColumns(tssResult, statisticsMap); 
         ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", tSSColumns); 
     }//GEN-LAST:event_exportButtonActionPerformed
+
+    private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
+        JOptionPane.showMessageDialog(this, new TssDetectionStatsPanel(statisticsMap), "TSS Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
@@ -200,21 +234,40 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
     /**
      * Adds a list of transcription start site objects to this panel's table.
-     * @param tSSs transcription start sites to add
+     * @param tssResult transcription start sites detection result to add
      */
-    public void addTSSs(List<TranscriptionStart> tSSs) {
+    public void addTSSs(TssDetectionResult tssResult) {
+        
+        if (this.tssResult == null) {
+            this.tssResult = tssResult;
+        } else {
+            this.tssResult.getResults().addAll(tssResult.getResults());
+        }
+        
         final int nbColumns = 11;
         
-        this.tSSs.addAll(tSSs);
+        int noCorrectStarts = 0;
+        int noUpstreamFeature = 0;
+        int noDownstreamFeature = 0;
+        int noFwdFeatures = 0;
+        int noRevFeatures = 0;
+        int noUnannotatedTranscripts = 0;
+        
         DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();  
         String strand;
         DetectedFeatures detFeatures;
         PersistantFeature feature;
         TransStartUnannotated tSSU;
 
-        for (TranscriptionStart tSS : tSSs) {
+        for (TranscriptionStart tSS : tssResult.getResults()) {
             
-            strand = tSS.isFwdStrand() ? "Fwd" : "Rev";
+            if (tSS.isFwdStrand()) {
+                strand = "Fwd";
+                ++noFwdFeatures;
+            } else {
+               strand = "Rev"; 
+               ++noRevFeatures;
+            }
             
             Object[] rowData = new Object[nbColumns];
             rowData[0] = tSS.getPos();
@@ -230,21 +283,55 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
             
             detFeatures = tSS.getDetFeatures();
             feature = detFeatures.getCorrectStartFeature();
-            rowData[6] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
+            if (feature != null) {
+                rowData[6] = PersistantFeature.getFeatureName(feature);
+                ++noCorrectStarts;
+            } else {
+                rowData[6] = "-";
+            }
             feature = detFeatures.getUpstreamFeature();
-            rowData[7] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
+            if (feature != null) {
+                rowData[7] = PersistantFeature.getFeatureName(feature);
+                ++noUpstreamFeature;
+            } else {
+                rowData[7] = "-";
+            }
             feature = detFeatures.getDownstreamFeature();
-            rowData[8] = feature != null ? PersistantFeature.getFeatureName(feature) : "-";
+            if (feature != null) {
+                rowData[8] = PersistantFeature.getFeatureName(feature);
+                ++noDownstreamFeature;
+            } else {
+                rowData[8] = "-";
+            }
             
             if (tSS instanceof TransStartUnannotated) {
                 tSSU = (TransStartUnannotated) tSS;
                 rowData[9] = true;
                 rowData[10] = tSSU.getDetectedStop();
+                ++noUnannotatedTranscripts;
             } else {
                 
             }
+            
 
             model.addRow(rowData);
+            
+        }
+        
+        
+        //create statistics
+        
+        ParameterSetTSS tssParameters = (ParameterSetTSS) this.tssResult.getParameters();
+        statisticsMap.put(TSS_TOTAL, statisticsMap.get(TSS_TOTAL) + this.tssResult.getResults().size());
+        statisticsMap.put(TSS_CORRECT, statisticsMap.get(TSS_CORRECT) + noCorrectStarts);
+        statisticsMap.put(TSS_UPSTREAM, statisticsMap.get(TSS_UPSTREAM) + noUpstreamFeature);
+        statisticsMap.put(TSS_DOWNSTREAM, statisticsMap.get(TSS_DOWNSTREAM) + noDownstreamFeature);
+        statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_REV) + noFwdFeatures);
+        statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
+        if (tssParameters.isPerformUnannotatedTranscriptDet()) {
+            statisticsMap.put(TSS_UNANNOTATED, statisticsMap.get(TSS_UNANNOTATED) + noUnannotatedTranscripts);
+        } else {
+            statisticsMap.put(TSS_UNANNOTATED, ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE);
         }
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>();
@@ -273,6 +360,6 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
      * @return The number of detected TSS
      */
     public int getResultSize() {
-        return this.tSSs.size();
+        return this.tssResult.getResults().size();
     }
 }

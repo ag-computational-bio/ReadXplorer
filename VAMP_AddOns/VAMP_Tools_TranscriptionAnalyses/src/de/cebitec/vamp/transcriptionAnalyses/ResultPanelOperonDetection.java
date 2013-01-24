@@ -10,10 +10,10 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -29,10 +29,14 @@ import javax.swing.table.TableRowSorter;
 public class ResultPanelOperonDetection extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
+    
+    public static final String OPERONS_TOTAL = "Total number of detected operons";
+    public static final String OPERONS_WITH_OVERLAPPING_READS = "Operons with reads overlapping only one feature edge";
+    public static final String OPERONS_WITH_INTERNAL_READS = "Operons with internal reads";
 
     private BoundsInfoManager bim;
-    private List<Operon> operonDetection;
-    private final ParameterSetOperonDet operonDetParameters;
+    private OperonDetectionResult operonResult;
+    private HashMap<String, Integer> operonDetStats;
 
     /**
      * This panel is capable of showing a table with detected operons and
@@ -41,8 +45,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
      */
     public ResultPanelOperonDetection(ParameterSetOperonDet operonDetParameters) {
         initComponents();
-        this.operonDetParameters = operonDetParameters;
-        this.operonDetection = new ArrayList<>();
+        this.initStatsMap();        
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -52,6 +55,15 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
                 showOperonDetectionPosition();
             }
         });
+    }
+    /**
+     * Initializes the statistics map.
+     */
+    private void initStatsMap() {
+        operonDetStats = new HashMap<>();
+        operonDetStats.put(OPERONS_TOTAL, 0);
+        operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, 0);
+        operonDetStats.put(OPERONS_WITH_INTERNAL_READS, 0);
     }
 
     /**
@@ -113,6 +125,11 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.parametersLabel.text")); // NOI18N
 
         statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.statisticsButton.text")); // NOI18N
+        statisticsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statisticsButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -140,9 +157,14 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        OperonColumns operonColumns = new OperonColumns(operonDetection);
+        OperonColumns operonColumns = new OperonColumns(operonResult, operonDetStats);
         ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", operonColumns);
     }//GEN-LAST:event_exportButtonActionPerformed
+
+    private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
+        JOptionPane.showMessageDialog(this, new OperonDetectionStatsPanel(operonDetStats), "Operon detection Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_statisticsButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
@@ -151,9 +173,15 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
-    public void addDetectedOperons(List<Operon> operonDetection) {
+    public void addDetectedOperons(OperonDetectionResult operonResult) {
         final int nbColumns = 9;
-        this.operonDetection.addAll(operonDetection);
+        
+        if (this.operonResult == null) {
+            this.operonResult = operonResult;
+        } else {
+            this.operonResult.getResults().addAll(operonResult.getResults());
+        }
+        
         DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();
         LineWrapCellRenderer lineWrapCellRenderer = new LineWrapCellRenderer();
         operonDetectionTable.getColumnModel().getColumn(0).setCellRenderer(lineWrapCellRenderer);
@@ -165,8 +193,13 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         operonDetectionTable.getColumnModel().getColumn(6).setCellRenderer(lineWrapCellRenderer);
         operonDetectionTable.getColumnModel().getColumn(7).setCellRenderer(lineWrapCellRenderer);
         operonDetectionTable.getColumnModel().getColumn(8).setCellRenderer(lineWrapCellRenderer);
+        
+        int operonsWithOverlapping = 0;
+        int operonsWithInternal = 0;
+        boolean hasOverlappingReads;
+        boolean hasInternalReads;
 
-        for (Operon operon : operonDetection) {
+        for (Operon operon : operonResult.getResults()) {
             String annoName1 = "";
             String annoName2 = "";
             String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrand() ? "Fwd" : "Rev") + "\n";
@@ -176,6 +209,8 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
             String readsAnno2 = "";
             String internalReads = "";
             String spanningReads = "";
+            hasOverlappingReads = false;
+            hasInternalReads = false;
             
             for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
                 annoName1 += opAdj.getFeature1().getLocus() + "\n";
@@ -186,6 +221,9 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
                 readsAnno2 += opAdj.getReadsFeature2() + "\n";
                 internalReads += opAdj.getInternalReads() + "\n";
                 spanningReads += opAdj.getSpanningReads() + "\n";
+                
+                hasInternalReads =    opAdj.getInternalReads() > 0;
+                hasOverlappingReads = opAdj.getReadsFeature1() > 0 || opAdj.getReadsFeature2() > 0;
             }
             Object[] rowData = new Object[nbColumns];
             rowData[0] = annoName1;
@@ -200,6 +238,9 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
             if (!annoName1.isEmpty() && !annoName2.isEmpty()) {
                 model.addRow(rowData);
             }
+            
+            if (hasOverlappingReads) { ++operonsWithOverlapping; }
+            if (hasInternalReads)    { ++operonsWithInternal; }
         }
         
         TableRowSorter<TableModel> sorter = new TableRowSorter<>();
@@ -210,7 +251,12 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
         }
         
         this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-                "ResultPanelOperonDetection.parametersLabel.text", operonDetParameters.getMinSpanningReads()));
+                "ResultPanelOperonDetection.parametersLabel.text", 
+                ((ParameterSetOperonDet) operonResult.getParameters()).getMinSpanningReads()));
+        
+        this.operonDetStats.put(OPERONS_TOTAL, this.operonDetStats.get(OPERONS_TOTAL) + operonResult.getResults().size());
+        this.operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, this.operonDetStats.get(OPERONS_WITH_OVERLAPPING_READS) + operonsWithOverlapping);
+        this.operonDetStats.put(OPERONS_WITH_INTERNAL_READS, this.operonDetStats.get(OPERONS_WITH_INTERNAL_READS) + operonsWithInternal);
     }
     
     /**
@@ -275,6 +321,6 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
      * @return The number of detected operons
      */
     public int getResultSize() {
-        return this.operonDetection.size();
+        return this.operonResult.getResults().size();
     }
 }

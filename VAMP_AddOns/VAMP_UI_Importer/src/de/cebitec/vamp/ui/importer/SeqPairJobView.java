@@ -51,7 +51,7 @@ public class SeqPairJobView extends javax.swing.JPanel implements ListSelectionL
         TrackJob trackJob = seqPairJobContainer.getTrackJob1();
         if (     seqPairJobContainer.getOrientation() == 1){ orientation = "rf"; }
         else if (seqPairJobContainer.getOrientation() == 2){ orientation = "ff/rr"; }
-        String file2Name = seqPairJobContainer.getTrackJob2().getFile() != null 
+        String file2Name = seqPairJobContainer.getTrackJob2() != null 
                 ? seqPairJobContainer.getTrackJob2().getFile().getName() : "-";
        
         model.addRow(new Object[] {

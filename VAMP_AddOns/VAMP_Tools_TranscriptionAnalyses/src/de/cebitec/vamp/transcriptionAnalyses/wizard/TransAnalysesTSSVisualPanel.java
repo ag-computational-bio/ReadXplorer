@@ -197,9 +197,9 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private void unannotatedTranscriptsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unannotatedTranscriptsBoxActionPerformed
         this.detectUnannotatedTranscripts = this.unannotatedTranscriptsBox.isSelected();
         if (this.detectUnannotatedTranscripts) {
-            this.transcriptExtensionField.setEnabled(false);
-        } else {
             this.transcriptExtensionField.setEnabled(true);
+        } else {
+            this.transcriptExtensionField.setEnabled(false);
         }
     }//GEN-LAST:event_unannotatedTranscriptsBoxActionPerformed
 

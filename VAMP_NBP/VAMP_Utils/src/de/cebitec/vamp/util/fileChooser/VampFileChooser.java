@@ -25,24 +25,20 @@ public abstract class VampFileChooser  extends JFileChooser {
 
     /**
      * Creates a new vamp file chooser.
-     * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
-     * VampFileChooser.SAVE_DIALOG for storing a file.
      * @param fileExtensions the file extensions to use. If the first entry is the empty string, no file filter is set
      * @param fileDescription description for the files in the file filter
      */
-    public VampFileChooser(final int option, final String[] fileExtensions, String fileDescription){
-        this(option, fileExtensions, fileDescription, null);
+    public VampFileChooser(final String[] fileExtensions, String fileDescription){
+        this(fileExtensions, fileDescription, null);
     }
 
     /**
      * Creates a new vamp file chooser.
-     * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
-     * VampFileChooser.SAVE_DIALOG for storing a file.
      * @param fileExtensions the file extensions to use. If the first entry is the empty string, no file filter is set
      * @param fileDescription description for the files in the file filter
      * @param data the data which might be used for file choosers storing data
      */
-    public VampFileChooser(final int option, final String[] fileExtensions, String fileDescription, final Object data) {
+    public VampFileChooser(final String[] fileExtensions, String fileDescription, final Object data) {
         this.data = data;
         this.fileExtensions = fileExtensions;
         this.fileDescription = fileDescription;
@@ -50,7 +46,6 @@ public abstract class VampFileChooser  extends JFileChooser {
             this.setFileFilter(new FileNameExtensionFilter(fileDescription, fileExtensions));
         }
         this.pref = NbPreferences.forModule(Object.class);
-        this.openFileChooser(option);
     }
 
     /**
@@ -58,7 +53,7 @@ public abstract class VampFileChooser  extends JFileChooser {
      * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
      * VampFileChooser.SAVE_DIALOG for storing a file.
      */
-    private void openFileChooser(final int option) {
+    public void openFileChooser(final int option) {
 
         ////////////// open file chooser /////////////////////////
         String currentDirectory = this.pref.get(Properties.VAMP_FILECHOOSER_DIRECTORY, ".");

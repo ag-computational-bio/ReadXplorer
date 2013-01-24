@@ -1,11 +1,13 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.databackend.ParameterSetI;
+
 /**
  * Data storage for all parameters associated with an operon detection.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetOperonDet {
+public class ParameterSetOperonDet implements ParameterSetI<ParameterSetOperonDet> {
     
     private boolean performOperonAnalysis;
     private int minSpanningReads;

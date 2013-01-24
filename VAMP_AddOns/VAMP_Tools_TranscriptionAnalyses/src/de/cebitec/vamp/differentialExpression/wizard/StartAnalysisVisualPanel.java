@@ -9,6 +9,7 @@ import java.io.File;
 import javax.swing.JPanel;
 
 public final class StartAnalysisVisualPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
     
     private boolean checkBoxchecked = false;
 
@@ -100,7 +101,8 @@ public final class StartAnalysisVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"rdata"}, "rdata") {
+        VampFileChooser fc = new VampFileChooser(new String[]{"rdata"}, "rdata") {
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void save(String fileLocation) {
@@ -110,6 +112,7 @@ public final class StartAnalysisVisualPanel extends JPanel {
             @Override
             public void open(String fileLocation) {}
         };
+        fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_fileChooserButtonActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed

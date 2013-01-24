@@ -3,7 +3,9 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
+import de.cebitec.vamp.util.GeneralUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -14,15 +16,18 @@ import java.util.List;
  */
 class FilteredFeaturesColumns implements ExcelExportDataI {
 
-    List<FilteredFeature> filteredFeatures;
+    FilteredFeaturesResult filteredFeaturesResult;
+    private final HashMap<String, Integer> filterStatisticsMap;
     
     /** 
      * Converts a List of FilteredGenes into the format readable for the ExcelExporter.
      * Generates all three, the sheet names, headers and data to write.
-     * @param filteredFeatures the list of filtered genes
+     * @param filteredFeaturesResult the result holding the list of filtered genes
+     * @param filterStatisticsMap statistics for the filter result
      */
-    public FilteredFeaturesColumns(List<FilteredFeature> filteredGenes) {
-        this.filteredFeatures = filteredGenes;
+    public FilteredFeaturesColumns(FilteredFeaturesResult filteredFeaturesResult, HashMap<String, Integer> filterStatisticsMap) {
+        this.filteredFeaturesResult = filteredFeaturesResult;
+        this.filterStatisticsMap = filterStatisticsMap;
     }
     
     @Override
@@ -38,6 +43,12 @@ class FilteredFeaturesColumns implements ExcelExportDataI {
         
         dataColumnDescriptions.add(resultDescriptions);
         
+        //add feature filering statistic sheet header
+        List<String> statisticColumnDescriptions = new ArrayList<>();
+        statisticColumnDescriptions.add("Feature Filtering Parameter and Statistics Table");
+
+        dataColumnDescriptions.add(statisticColumnDescriptions);
+        
         return dataColumnDescriptions;
     }
 
@@ -47,7 +58,7 @@ class FilteredFeaturesColumns implements ExcelExportDataI {
         List<List<List<Object>>> filteredGenesExport = new ArrayList<>();
         List<List<Object>> filteredGenesResult = new ArrayList<>();
         
-        for (FilteredFeature filteredFeature : this.filteredFeatures) {      
+        for (FilteredFeature filteredFeature : this.filteredFeaturesResult.getResults()) {      
             List<Object> filteredGeneRow = new ArrayList<>();
             
             filteredGeneRow.add(PersistantFeature.getFeatureName(filteredFeature.getFilteredFeature()));
@@ -61,6 +72,48 @@ class FilteredFeaturesColumns implements ExcelExportDataI {
         
         filteredGenesExport.add(filteredGenesResult);
         
+        //create statistics sheet
+        ParameterSetFilteredFeatures filterParameters = (ParameterSetFilteredFeatures) this.filteredFeaturesResult.getParameters();
+        List<List<Object>> statisticsExportData = new ArrayList<>();
+        List<Object> statisticsExport = new ArrayList<>();
+
+        statisticsExport.add("Feature filtering statistics for tracks:");
+        statisticsExport.add(GeneralUtils.generateConcatenatedString(filteredFeaturesResult.getTrackList()));
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>(); //placeholder between title and parameters
+        statisticsExport.add("");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Feature Filtering parameters:");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Minimum number of reads in a feature:");
+        statisticsExport.add(filterParameters.getMinNumberReads());
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Maximum number of reads in a feature:");
+        statisticsExport.add(filterParameters.getMaxNumberReads());
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>(); //placeholder between parameters and statistics
+        statisticsExport.add("");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Feature filtering statistics:");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add(ResultPanelFilteredFeatures.FEATURES_TOTAL);
+        statisticsExport.add(filterStatisticsMap.get(ResultPanelFilteredFeatures.FEATURES_TOTAL));
+        statisticsExportData.add(statisticsExport);
+
+        filteredGenesExport.add(statisticsExportData);
+        
         return filteredGenesExport;
     }
     
@@ -68,7 +121,7 @@ class FilteredFeaturesColumns implements ExcelExportDataI {
     public List<String> dataSheetNames() {
         List<String> sheetNames = new ArrayList<>();
         sheetNames.add("Filtered Features Table");
-        sheetNames.add("Filtered Feature Parameters/Stats");
+        sheetNames.add("Parameters and Statistics");
         return sheetNames;
     }
 }

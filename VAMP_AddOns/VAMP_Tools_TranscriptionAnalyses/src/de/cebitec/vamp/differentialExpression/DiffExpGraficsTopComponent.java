@@ -262,7 +262,8 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     }//GEN-LAST:event_plotButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        new VampFileChooser(VampFileChooser.SAVE_DIALOG, new String[]{"svg"}, "svg") {
+        VampFileChooser fc = new VampFileChooser(new String[]{"svg"}, "svg") {
+            private static final long serialVersionUID = 1L;
             @Override
             public void save(String fileLocation) {
                 Path from = currentlyDisplayed.toPath();
@@ -279,6 +280,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
             public void open(String fileLocation) {
             }
         };
+        fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_saveButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox groupComboBox;

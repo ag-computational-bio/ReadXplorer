@@ -3,7 +3,9 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
+import de.cebitec.vamp.util.GeneralUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -12,10 +14,12 @@ import java.util.List;
  */
 public class OperonColumns implements ExcelExportDataI {
 
-    private List<Operon> operonDetection;
+    private OperonDetectionResult operonDetectionResult;
+    private HashMap<String, Integer> operonResultStatsMap;
 
-    public OperonColumns(List<Operon> operonDetection) {
-        this.operonDetection = operonDetection;
+    public OperonColumns(OperonDetectionResult operonResults, HashMap<String, Integer> operonResultStatsMap) {
+        this.operonDetectionResult = operonResults;
+        this.operonResultStatsMap = operonResultStatsMap;
     }
 
     @Override
@@ -34,6 +38,12 @@ public class OperonColumns implements ExcelExportDataI {
         dataColumnDescriptions.add("Spanning Reads");
         
         allSheetDescriptions.add(dataColumnDescriptions);
+        
+        //add tss detection statistic sheet header
+        List<String> statisticColumnDescriptions = new ArrayList<>();
+        statisticColumnDescriptions.add("Operon Detection Parameters and Statistics");
+
+        allSheetDescriptions.add(statisticColumnDescriptions);
 
         return allSheetDescriptions;
     }
@@ -43,7 +53,7 @@ public class OperonColumns implements ExcelExportDataI {
         List<List<List<Object>>> exportData = new ArrayList<>();
         List<List<Object>> operonResults = new ArrayList<>();
 
-        for (Operon operon : operonDetection) {
+        for (Operon operon : operonDetectionResult.getResults()) {
             String annoName1 = "";
             String annoName2 = "";
             String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrand() ? "Fwd" : "Rev") + "\n";
@@ -81,6 +91,53 @@ public class OperonColumns implements ExcelExportDataI {
         
         exportData.add(operonResults);
         
+        //create statistics sheet
+        ParameterSetOperonDet operonDetectionParameters = (ParameterSetOperonDet) this.operonDetectionResult.getParameters();
+        List<List<Object>> statisticsExportData = new ArrayList<>();
+        List<Object> statisticsExport = new ArrayList<>();
+
+        statisticsExport.add("Operon detection statistics for tracks:");
+        statisticsExport.add(GeneralUtils.generateConcatenatedString(this.operonDetectionResult.getTrackList()));
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>(); //placeholder between title and parameters
+        statisticsExport.add("");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Operon detection parameters:");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Minimum number of spanning reads:");
+        statisticsExport.add(operonDetectionParameters.getMinSpanningReads());
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>(); //placeholder between parameters and statistics
+        statisticsExport.add("");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add("Operon detection statistics:");
+        statisticsExportData.add(statisticsExport);
+
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add(ResultPanelOperonDetection.OPERONS_TOTAL);
+        statisticsExport.add(operonResultStatsMap.get(ResultPanelOperonDetection.OPERONS_TOTAL));
+        statisticsExportData.add(statisticsExport);
+                
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS);
+        statisticsExport.add(operonResultStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS));
+        statisticsExportData.add(statisticsExport);
+        
+        statisticsExport = new ArrayList<>();
+        statisticsExport.add(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS);
+        statisticsExport.add(operonResultStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS));
+        statisticsExportData.add(statisticsExport);
+
+        exportData.add(statisticsExportData);
+        
         return exportData;
     }
 
@@ -88,7 +145,7 @@ public class OperonColumns implements ExcelExportDataI {
     public List<String> dataSheetNames() {
         List<String> sheetNames = new ArrayList<>();
         sheetNames.add("Operon Detection Table");
-        sheetNames.add("Operon Detection Parameters/Stats");
+        sheetNames.add("Parameters and Statistics");
         return sheetNames;
     }
 }

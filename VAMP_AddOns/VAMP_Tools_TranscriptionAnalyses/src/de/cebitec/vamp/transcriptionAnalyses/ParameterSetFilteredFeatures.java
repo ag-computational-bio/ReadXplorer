@@ -1,11 +1,13 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.databackend.ParameterSetI;
+
 /**
  * Data storage for all parameters associated with filtering features.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetFilteredFeatures {
+public class ParameterSetFilteredFeatures implements ParameterSetI<ParameterSetFilteredFeatures> {
     
     private boolean performFilterAnalysis;
     private int minNumberReads;
@@ -46,6 +48,5 @@ public class ParameterSetFilteredFeatures {
 
     public void setMaxNumberReads(int maxNumberReads) {
         this.maxNumberReads = maxNumberReads;
-    }
-    
+    }    
 }

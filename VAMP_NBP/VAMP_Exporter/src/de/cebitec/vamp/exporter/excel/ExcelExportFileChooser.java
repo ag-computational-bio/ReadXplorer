@@ -29,7 +29,8 @@ public class ExcelExportFileChooser extends VampFileChooser {
      * @param exportData the data object to be exported (needs to implement {@link ExcelExportDataI}).
      */
     public ExcelExportFileChooser(final String[] fileExtensions, String fileDescription, ExcelExportDataI exportData) {
-        super(VampFileChooser.SAVE_DIALOG, fileExtensions, fileDescription, exportData);
+        super(fileExtensions, fileDescription, exportData);
+        this.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }
 
     @Override

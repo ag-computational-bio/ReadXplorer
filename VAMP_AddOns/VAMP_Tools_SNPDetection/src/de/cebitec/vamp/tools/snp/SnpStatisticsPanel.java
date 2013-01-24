@@ -12,13 +12,14 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     
-    private final SnpResultStatistics snpResultMetrics;
+    private final SnpResultStatistics snpResultStatistics;
 
     /**
      * Creates a new panel for showing the the statistics of a SNP detection result.
+     * @param snpResultStatistics the snp results statistics to display
      */
-    public SnpStatisticsPanel(SnpResultStatistics snpResultMetrics) {
-        this.snpResultMetrics = snpResultMetrics;
+    public SnpStatisticsPanel(SnpResultStatistics snpResultStatistics) {
+        this.snpResultStatistics = snpResultStatistics;
         initComponents();
         this.initAdditionalComponents();
     }
@@ -122,13 +123,13 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         snpEffectTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Total number of SNPs", String.valueOf(this.snpResultMetrics.getTotalNoSnps())},
-                {"Intergenic SNPs", String.valueOf(this.snpResultMetrics.getNoIntergenicSnps())},
-                {"Synonymous SNPs", String.valueOf(this.snpResultMetrics.getNoSynonymousSnps())},
-                {"Chemically neutral SNPs", String.valueOf(this.snpResultMetrics.getNoChemicallyNeutralSnps())},
-                {"Missense SNPs", String.valueOf(this.snpResultMetrics.getNoMissenseSnps())},
-                {"Insertions", String.valueOf(this.snpResultMetrics.getNoAAInsertions())},
-                {"Deletions", String.valueOf(this.snpResultMetrics.getNoAADeletions())}
+                {"Total number of SNPs", String.valueOf(this.snpResultStatistics.getTotalNoSnps())},
+                {"Intergenic SNPs", String.valueOf(this.snpResultStatistics.getNoIntergenicSnps())},
+                {"Synonymous SNPs", String.valueOf(this.snpResultStatistics.getNoSynonymousSnps())},
+                {"Chemically neutral SNPs", String.valueOf(this.snpResultStatistics.getNoChemicallyNeutralSnps())},
+                {"Missense SNPs", String.valueOf(this.snpResultStatistics.getNoMissenseSnps())},
+                {"Insertions", String.valueOf(this.snpResultStatistics.getNoAAInsertions())},
+                {"Deletions", String.valueOf(this.snpResultStatistics.getNoAADeletions())}
             },
             new String [] {
                 NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0"), 
@@ -157,9 +158,9 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
         
         snpTypeTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    {"Substitutions", String.valueOf(this.snpResultMetrics.getNoSubstitutions())},
-                    {"Insertions", String.valueOf(this.snpResultMetrics.getNoInsertions())},
-                    {"Deletions", String.valueOf(this.snpResultMetrics.getNoDeletions())}
+                    {"Substitutions", String.valueOf(this.snpResultStatistics.getNoSubstitutions())},
+                    {"Insertions", String.valueOf(this.snpResultStatistics.getNoInsertions())},
+                    {"Deletions", String.valueOf(this.snpResultStatistics.getNoDeletions())}
                 },
                 new String[]{
                     NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0"), 

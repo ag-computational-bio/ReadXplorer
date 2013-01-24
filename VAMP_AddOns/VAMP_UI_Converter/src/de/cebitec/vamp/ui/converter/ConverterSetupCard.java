@@ -154,7 +154,7 @@ public class ConverterSetupCard extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void openFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFileButtonActionPerformed
-        new VampFileChooser(VampFileChooser.OPEN_DIALOG, currentConverter.getFileExtensions(), currentConverter.getInputFileDescription()) {
+        VampFileChooser fc = new VampFileChooser(currentConverter.getFileExtensions(), currentConverter.getInputFileDescription()) {
             
             private static final long serialVersionUID = 1L;
 
@@ -170,6 +170,7 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                 isRequiredInfoSet();
             }
         };
+        fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }//GEN-LAST:event_openFileButtonActionPerformed
 
     private void converterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_converterComboBoxActionPerformed

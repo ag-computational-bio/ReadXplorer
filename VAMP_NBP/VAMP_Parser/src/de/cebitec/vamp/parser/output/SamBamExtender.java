@@ -58,9 +58,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
     /**
      * A SamBamExtender needs exactly two arguments:
-     * @param trackJob the track job including a sam or bam file for
+     * - trackJob the track job including a sam or bam file for
      * extension with more data.
-     * @param refGenome the reference genome belonging to the trackJob
+     * - refGenome the reference genome belonging to the trackJob
      */
     @Override
     public void setDataToConvert(Object... data) {
@@ -95,9 +95,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private void extendSamBamFile() throws ParsingException {
 
         File fileToExtend = trackJob.getFile();
-        String fileName = fileToExtend.getName();
 
-        this.notifyObservers(NbBundle.getMessage(SamBamExtender.class, "Converter.Convert.Start", fileName));
         File outputFile;
         SAMFileWriter samBamFileWriter;
 
@@ -138,7 +136,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                         stop = record.getAlignmentEnd();
                         refSeq = this.refGenome.substring(start - 1, stop);
 
-                        if (!ParserCommonMethods.checkRead(this, readSeq, this.refSeqLength, cigar, start, stop, fileName, lineno)) {
+                        if (!ParserCommonMethods.checkRead(this, readSeq, this.refSeqLength, cigar, start, stop, fileToExtend.getName(), lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         

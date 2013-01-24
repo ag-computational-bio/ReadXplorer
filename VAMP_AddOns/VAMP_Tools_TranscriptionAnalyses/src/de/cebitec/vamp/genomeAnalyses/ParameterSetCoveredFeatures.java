@@ -1,11 +1,13 @@
 package de.cebitec.vamp.genomeAnalyses;
 
+import de.cebitec.vamp.databackend.ParameterSetI;
+
 /**
  * Data storage for all parameters associated with filtering features.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetCoveredFeatures {
+public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCoveredFeatures> {
     
     private int minCoveredPercent;
     private int minCoverageCount;
@@ -56,5 +58,6 @@ public class ParameterSetCoveredFeatures {
      */
     public void setMinCoverageCount(int minCoverageCount) {
         this.minCoverageCount = minCoverageCount;
-    }
+    }   
+    
 }

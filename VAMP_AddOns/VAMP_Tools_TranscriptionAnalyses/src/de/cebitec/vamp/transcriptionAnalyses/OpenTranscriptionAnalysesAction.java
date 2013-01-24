@@ -63,20 +63,21 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private ResultPanelFilteredFeatures filteredGenesResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
     
-    boolean performTSSAnalysis;
-    boolean performFilterAnalysis;
-    boolean performOperonAnalysis;
-    boolean autoTssParamEstimation = false;
-    int minTotalIncrease = 0;
-    int minPercentIncrease = 0;
-    int maxLowCovInitCount = 0;
-    int minLowCovIncrease = 0;
-    boolean performUnannotatedTranscriptDet = false;
-    int minTranscriptExtensionCov = 0;
-    int minNumberReads = 0;
-    int maxNumberReads = 0;
-    boolean autoOperonParamEstimation = false;
-    int minSpanningReads = 0;
+    private boolean performTSSAnalysis;
+    private boolean performFilterAnalysis;
+    private boolean performOperonAnalysis;
+    private boolean autoTssParamEstimation = false;
+    private int minTotalIncrease = 0;
+    private int minPercentIncrease = 0;
+    private int maxLowCovInitCount = 0;
+    private int minLowCovIncrease = 0;
+    private boolean performUnannotatedTranscriptDet = false;
+    private int minTranscriptExtensionCov = 0;
+    private int minNumberReads = 0;
+    private int maxNumberReads = 0;
+    private boolean autoOperonParamEstimation = false;
+    private int minSpanningReads = 0;
+    private HashMap<Integer, String> trackList;
 
     /**
      * Action for opening a new transcription analyses frame. It opens a track
@@ -107,6 +108,10 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             this.tracks = otp.getSelectedTracks();
+            this.trackList = new HashMap<>();
+            for (PersistantTrack track : otp.getSelectedTracks()) {
+                this.trackList.put(track.getId(), track.getDescription());
+            }
             
             this.transcAnalysesTopComp.open();
             this.runWizardAndTranscriptionAnalysis();
@@ -254,59 +259,59 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 parametersTss.setMinTotalIncrease(analysisTSS.getIncreaseReadCount()); //if automatic is on, the parameters are different now
                 parametersTss.setMinPercentIncrease(analysisTSS.getIncreaseReadPercent());
                 if (transcriptionStartResultPanel == null) {
-                    transcriptionStartResultPanel = new ResultPanelTranscriptionStart(parametersTss);
+                    transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
                     transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
                 }
-                transcriptionStartResultPanel.addTSSs(analysisTSS.getResults());
+                
+                TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackList);
+                tssResult.setParameters(parametersTss);
+                transcriptionStartResultPanel.addTSSs(tssResult);
                 
                 if (finishedCovAnalyses >= tracks.size()) {
                     String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
                     this.transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
                 }
-                
-                System.out.println("Size: " + transcriptionStartResultPanel.getResultSize());
-
-                //TODO: put this in some analysis information panel
-                System.out.println("Minimal increase of read count: " + analysisTSS.getIncreaseReadCount());
-                System.out.println("Minimal increase in %: " + analysisTSS.getIncreaseReadPercent());
-                if (analysisTSS.getIncreaseReadCount2() > 0) {
-                    System.out.println("Additional low coverage restrictions:");
-                    System.out.println("Min. increase of read count: " + analysisTSS.getIncreaseReadCount2());
-                    System.out.println("Max. initial read count: " + analysisTSS.getMaxInitialReadCount());
-                }
             }
-            if (parametersFilterFeatures.isPerformFilterAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
-                
+            if (dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
                 ++finishedMappingAnalyses;
 
-                List<FilteredFeature> filteredGenes = trackToAnalysisMap.get(trackId).getAnalysisFilteredGenes().getResults();
+                if (parametersFilterFeatures.isPerformFilterAnalysis()) {
 
-                if (filteredGenesResultPanel == null) {
-                    filteredGenesResultPanel = new ResultPanelFilteredFeatures(parametersFilterFeatures);
-                    filteredGenesResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
+                    List<FilteredFeature> filteredGenes = trackToAnalysisMap.get(trackId).getAnalysisFilteredGenes().getResults();
+
+                    if (filteredGenesResultPanel == null) {
+                        filteredGenesResultPanel = new ResultPanelFilteredFeatures();
+                        filteredGenesResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
+                    }
+
+                    FilteredFeaturesResult filteredFeatResult = new FilteredFeaturesResult(trackList, filteredGenes);
+                    filteredFeatResult.setParameters(parametersFilterFeatures);
+                    filteredGenesResultPanel.addFilteredFeatures(filteredFeatResult);
+
+                    if (finishedMappingAnalyses >= tracks.size()) {
+                        String panelName = "Filtered features for " + trackNames + " (" + filteredGenesResultPanel.getResultSize() + " hits)";
+                        this.transcAnalysesTopComp.openAnalysisTab(panelName, filteredGenesResultPanel);
+                    }
+
+                    //TODO: prozentualer increase
+                    //feature finden/ändern
+
                 }
-                filteredGenesResultPanel.addFilteredFeatures(filteredGenes);
-                
-                if (finishedMappingAnalyses >= tracks.size()) {
-                    String panelName = "Filtered features for " + trackNames + " (" + filteredGenesResultPanel.getResultSize() + " hits)";
-                    this.transcAnalysesTopComp.openAnalysisTab(panelName, filteredGenesResultPanel);
-                }
+                if (parametersOperonDet.isPerformOperonAnalysis()) {
 
-                //TODO: prozentualer increase
-                //feature finden/ändern
+                    if (operonResultPanel == null) {
+                        operonResultPanel = new ResultPanelOperonDetection(parametersOperonDet);
+                        operonResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
+                    }
+                    OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackList,
+                            trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
+                    operonDetectionResult.setParameters(parametersOperonDet);
+                    operonResultPanel.addDetectedOperons(operonDetectionResult);
 
-            }
-            if (parametersOperonDet.isPerformOperonAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
-
-                if (operonResultPanel == null) {
-                    operonResultPanel = new ResultPanelOperonDetection(parametersOperonDet);
-                    operonResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
-                }
-                operonResultPanel.addDetectedOperons(trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
-                
-                if (finishedMappingAnalyses >= tracks.size()) {
-                    String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
-                    this.transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
+                    if (finishedMappingAnalyses >= tracks.size()) {
+                        String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
+                        this.transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
+                    }
                 }
             }
         } catch (ClassCastException e) {

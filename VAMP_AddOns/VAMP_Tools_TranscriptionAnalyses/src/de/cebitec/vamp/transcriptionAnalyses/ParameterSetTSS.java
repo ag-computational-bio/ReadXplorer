@@ -1,11 +1,13 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.databackend.ParameterSetI;
+
 /**
  * Data storage for all parameters associated with a transcription analysis.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetTSS {
+public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     
     private boolean performTSSAnalysis;
     private boolean autoTssParamEstimation;
@@ -96,6 +98,5 @@ public class ParameterSetTSS {
 
     public void setMinTranscriptExtensionCov(int minTranscriptExtensionCov) {
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
-    }
-    
+    }    
 }
