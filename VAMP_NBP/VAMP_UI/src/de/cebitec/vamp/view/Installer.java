@@ -90,8 +90,8 @@ public class Installer extends ModuleInstall {
 
             // close remaining windows
             TopComponent dashboard = WindowManager.getDefault().findTopComponent("DashboardWindowTopComponent");
-            for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){
-                    if (tc!=dashboard) tc.close();
+            for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
+                    if (tc != dashboard) { tc.close(); }
             }
             // log out before exitting
             ProjectConnector pc = ProjectConnector.getInstance();

@@ -96,9 +96,6 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             int seqPairId = 1;
             while (samItor.hasNext()) {
                 ++lineno;
-                if (lineno == 371) {
-                System.out.println(lineno);
-                }
                 //separate all mappings of same pair by seq pair tag and hand it over to classification then
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag()) {

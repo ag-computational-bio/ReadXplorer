@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import java.util.Iterator;
 import java.util.List;
@@ -48,11 +48,12 @@ public class ImportOverviewCard extends javax.swing.JPanel {
             overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.seqPairs") + ":\n");
             for(Iterator<SeqPairJobContainer> it = seqPairJobList.iterator(); it.hasNext(); ){
                 SeqPairJobContainer seqPairCont = it.next();
-                String file2Name = seqPairCont.getTrackJob2().getFile() != null ? seqPairCont.getTrackJob2().getFile().getAbsolutePath() : "-";
+                String file2Name = seqPairCont.getTrackJob2() != null ? seqPairCont.getTrackJob2().getFile().getAbsolutePath() : "-";
                 overviewTextArea.append(seqPairCont.getTrackJob1().getFile().getAbsolutePath()+"\n");
                 overviewTextArea.append("\t"+seqPairCont.getTrackJob1().getDescription()+"\n");
                 overviewTextArea.append(file2Name + "\n");
-                overviewTextArea.append("\t"+seqPairCont.getTrackJob2().getDescription()+"\n");
+                String description2 = seqPairCont.getTrackJob2() != null ? seqPairCont.getTrackJob2().getDescription() : "-";
+                overviewTextArea.append("\t"+description2+"\n");
             }
         }
         

@@ -1,6 +1,9 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Data storage for a track.
@@ -103,7 +106,8 @@ public class PersistantTrack {
     
     
     /**
-     * check if the given track is equal to this one 
+     * Checks if the given track is equal to this one.
+     * @param o object to compare to this one
      */
     @Override
     public boolean equals(Object o) {
@@ -120,7 +124,20 @@ public class PersistantTrack {
                );
                     
         }
-        else return super.equals(o);
+        else { return super.equals(o); }
+    }
+    
+    /**
+     * Generates a list of track names from a collection of persistant tracks.
+     * @param tracks the tracks whose descriptions need to be returned in a list
+     * @return The list of track names from the given collection of persistant tracks.
+     */
+    public static List<String> generateTrackDescriptionList(Collection<PersistantTrack> tracks) {
+        List<String> trackNameList = new ArrayList<>();
+        for (PersistantTrack track : tracks) {
+            trackNameList.add(track.getDescription());
+        }
+        return trackNameList;
     }
 
 }

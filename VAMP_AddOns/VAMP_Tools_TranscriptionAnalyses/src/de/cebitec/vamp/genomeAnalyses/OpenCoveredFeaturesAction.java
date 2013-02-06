@@ -52,7 +52,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     private int finishedCovAnalyses = 0;
     private ResultPanelCoveredFeatures coveredFeaturesResultPanel;
     ParameterSetCoveredFeatures parameters;
-    private HashMap<Integer, String> trackList;
+    private HashMap<Integer, PersistantTrack> trackMap;
 
     public OpenCoveredFeaturesAction(ReferenceViewer context) {
         this.context = context;
@@ -76,9 +76,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             this.tracks = otp.getSelectedTracks();
-            this.trackList = new HashMap<>();
+            this.trackMap = new HashMap<>();
             for (PersistantTrack track : otp.getSelectedTracks()) {
-                this.trackList.put(track.getId(), track.getDescription());
+                this.trackMap.put(track.getId(), track);
             }
 
             this.coveredAnnoAnalysisTopComp = (CoveredFeaturesAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoveredFeaturesAnalysisTopComponent");
@@ -157,9 +157,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 ++finishedCovAnalyses;
                 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId).getAnalysisCoveredFeatures();
-                CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackList);
+                CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap);
                 result.setParameters(parameters);
-                result.setFeatureListSize(analysisCoveredFeatures.getGenomeFeatureSize());
+                result.setFeatureListSize(analysisCoveredFeatures.getNoGenomeFeatures());
 
                 if (coveredFeaturesResultPanel == null) {
                     coveredFeaturesResultPanel = new ResultPanelCoveredFeatures();

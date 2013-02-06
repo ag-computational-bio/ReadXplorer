@@ -1,6 +1,5 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -151,14 +150,14 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * @param trackIds the list of track ids (associated to the reference viewer) for which the snp 
      *          detection should be carried out.
      */
-    public void openDetectionTab(ReferenceViewer referenceViewer, SnpData snpData) {
+    public void openDetectionTab(ReferenceViewer referenceViewer, SnpDetectionResult snpData) {
         String title = "SNP Detection for selected tracks";
         JPanel snpDetectionPanel = this.getSnpDetectionPanel(referenceViewer, snpData);
         snpTabs.addTab(title, snpDetectionPanel);
         snpTabs.setTabComponentAt(snpTabs.getTabCount() - 1, new TabWithCloseX(snpTabs));
         
         if (snpData.getSnpList().size() > 0) {
-            String tracksString = GeneralUtils.generateConcatenatedString(snpData.getTrackNames());
+            String tracksString = GeneralUtils.generateConcatenatedString(snpData.getTrackNameList());
             title = "SNP Detection for " + tracksString + " ("
                     + snpData.getSnpList().size() + " hits)";
             snpTabs.setTitleAt(snpTabs.getTabCount() - 1, title);
@@ -178,7 +177,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
      * all have to belong to the reference genome set in the reference viewer
      * @return complete snp detection panel
      */
-    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, SnpData snpData) {
+    private javax.swing.JPanel getSnpDetectionPanel(ReferenceViewer referenceViewer, SnpDetectionResult snpData) {
         // initialise components
         final JPanel snpDetectionPanel = new JPanel();
         final SNP_DetectionResultPanel resultPanel = new SNP_DetectionResultPanel();

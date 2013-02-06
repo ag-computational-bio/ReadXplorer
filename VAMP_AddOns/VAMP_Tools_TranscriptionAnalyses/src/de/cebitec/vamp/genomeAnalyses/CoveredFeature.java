@@ -1,6 +1,7 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.TrackResultEntry;
 
 /**
  * Data structure for storing an feature (gene), which is detected as 
@@ -8,7 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoveredFeature {
+public class CoveredFeature extends TrackResultEntry {
     
     private PersistantFeature coveredFeature;
     private int annoLength;
@@ -21,7 +22,8 @@ public class CoveredFeature {
      * @param coveredFeature the feature which is detected as covered
      * @param noCoveredBases the number of covered bases of this feature
      */
-    public CoveredFeature(PersistantFeature coveredFeature) {
+    public CoveredFeature(PersistantFeature coveredFeature, int trackId) {
+        super(trackId);
         this.coveredFeature = coveredFeature;
         this.annoLength = Math.abs(coveredFeature.getStop() - coveredFeature.getStart());
     }

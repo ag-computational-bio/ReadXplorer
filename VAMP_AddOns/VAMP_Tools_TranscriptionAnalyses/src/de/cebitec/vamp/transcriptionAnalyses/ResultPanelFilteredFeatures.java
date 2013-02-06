@@ -9,9 +9,12 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -32,7 +35,8 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     private FilteredFeaturesResult filterFeaturesResult;
     private HashMap<String, Integer> filterStatisticsMap;
     
-    public static final String FEATURES_TOTAL = "Total number of filtered features";
+    public static final String FEATURES_FILTERED = "Total number of filtered features";
+    public static final String FEATURES_TOTAL = "Total number of reference features";
     
     /**
      * Panel showing a result of an analysis filtering for features with a
@@ -41,7 +45,7 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     public ResultPanelFilteredFeatures() {
         initComponents();
         this.filterStatisticsMap = new HashMap<>();
-        this.filterStatisticsMap.put(FEATURES_TOTAL, 0);
+        this.filterStatisticsMap.put(FEATURES_FILTERED, 0);
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.filteredFeaturesTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -73,14 +77,14 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Feature", "Start", "Stop"
+                "Feature", "Track", "Strand", "Start", "Stop", "Read Count"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, true
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -93,8 +97,11 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
         });
         filteredFeaturesPane.setViewportView(filteredFeaturesTable);
         filteredFeaturesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title0")); // NOI18N
-        filteredFeaturesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title3")); // NOI18N
-        filteredFeaturesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title4")); // NOI18N
+        filteredFeaturesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title3_1")); // NOI18N
+        filteredFeaturesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title3")); // NOI18N
+        filteredFeaturesTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title4_1")); // NOI18N
+        filteredFeaturesTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title5")); // NOI18N
+        filteredFeaturesTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.filteredFeaturesTable.columnModel.title4")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelFilteredFeatures.class, "ResultPanelFilteredFeatures.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -137,8 +144,7 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        FilteredFeaturesColumns filteredFeaturesData = new FilteredFeaturesColumns(this.filterFeaturesResult, this.filterStatisticsMap);
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", filteredFeaturesData); 
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", filterFeaturesResult); 
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
@@ -172,38 +178,50 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
 
     /**
      * Adds a list of filtered features to this panel contained in the result object.
-     * @param filterFeaturesResult a filtering for features result 
+     * @param filterFeaturesResultNew a filtering for features result 
      */
-    public void addFilteredFeatures(FilteredFeaturesResult filterFeaturesResult) {
-        final int nbColumns = 3;
-        
+    public void addFilteredFeatures(final FilteredFeaturesResult filterFeaturesResultNew) {
+        final int nbColumns = 6;
+        final List<FilteredFeature> features = new ArrayList<>(filterFeaturesResultNew.getResults());
+
         if (this.filterFeaturesResult == null) {
-            this.filterFeaturesResult = filterFeaturesResult;
+            this.filterFeaturesResult = filterFeaturesResultNew;
+            this.filterStatisticsMap.put(FEATURES_TOTAL, filterFeaturesResultNew.getNoGenomeFeatures());
         } else {
-            this.filterFeaturesResult.getResults().addAll(filterFeaturesResult.getResults());
-        }
-        
-        DefaultTableModel model = (DefaultTableModel) this.filteredFeaturesTable.getModel();        
-
-        for (FilteredFeature filteredAnno : this.filterFeaturesResult.getResults()) {
-            
-            Object[] rowData = new Object[nbColumns];
-            rowData[0] = filteredAnno.getFilteredFeature();
-            rowData[1] = filteredAnno.getFilteredFeature().isFwdStrand() ? "Fwd" : "Rev";
-            rowData[2] = filteredAnno.getReadCount();
-
-            model.addRow(rowData);
+            this.filterFeaturesResult.getResults().addAll(filterFeaturesResultNew.getResults());
         }
 
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-        this.filteredFeaturesTable.setRowSorter(sorter);
-        sorter.setModel(model);
-        
-        ParameterSetFilteredFeatures parameters = (ParameterSetFilteredFeatures) filterFeaturesResult.getParameters();
-        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-                "ResultPanelFilteredFeatures.parametersLabel.text", parameters.getMinNumberReads(), parameters.getMaxNumberReads()));
-        
-        this.filterStatisticsMap.put(FEATURES_TOTAL, this.filterStatisticsMap.get(FEATURES_TOTAL) + filterFeaturesResult.getResults().size());
+        SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+            @Override
+            public void run() {
+
+                DefaultTableModel model = (DefaultTableModel) filteredFeaturesTable.getModel();
+
+                for (FilteredFeature filteredFeature : features) {
+
+                    Object[] rowData = new Object[nbColumns];
+                    rowData[0] = filteredFeature.getFilteredFeature();
+                    rowData[1] = filterFeaturesResultNew.getTrackMap().get(filteredFeature.getTrackId());
+                    rowData[2] = filteredFeature.getFilteredFeature().isFwdStrandString();
+                    rowData[3] = filteredFeature.getFilteredFeature().getStart();
+                    rowData[4] = filteredFeature.getFilteredFeature().getStop();
+                    rowData[5] = filteredFeature.getReadCount();
+
+                    model.addRow(rowData);
+                }
+
+                TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+                filteredFeaturesTable.setRowSorter(sorter);
+                sorter.setModel(model);
+
+                ParameterSetFilteredFeatures parameters = (ParameterSetFilteredFeatures) filterFeaturesResult.getParameters();
+                parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
+                        "ResultPanelFilteredFeatures.parametersLabel.text", parameters.getMinNumberReads(), parameters.getMaxNumberReads()));
+
+                filterStatisticsMap.put(FEATURES_FILTERED, filterStatisticsMap.get(FEATURES_FILTERED) + features.size());
+                filterFeaturesResult.setStatsMap(filterStatisticsMap);
+            }
+        });
     }
     
     /**

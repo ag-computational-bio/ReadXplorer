@@ -8,8 +8,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -130,16 +129,15 @@ public class GeneralUtils {
     }
     
     /**
-     * Generates a string, which concatenates the map of strings for user friendly
+     * Generates a string, which concatenates the list of strings for user friendly
      * displaying in the gui with an " and ".
-     * @param stringMap the map of strings, which should be concatenated
+     * @param strings the list of strings, which should be concatenated
      * @return the string containing all strings concatenated with "and"
      */
-    public static String generateConcatenatedString(Map<Integer, String> stringMap) {
+    public static String generateConcatenatedString(List<String> strings) {
         StringBuilder concatString = new StringBuilder();
-        Iterator<Integer> strings = stringMap.keySet().iterator();
-        while (strings.hasNext()) {
-            concatString = concatString.append(stringMap.get(strings.next())).append(" and ");
+        for (String string : strings) {
+            concatString = concatString.append(string).append(" and ");
         }
         if (concatString.length() > 5) {
             concatString = concatString.delete(concatString.length() - 5, concatString.length());

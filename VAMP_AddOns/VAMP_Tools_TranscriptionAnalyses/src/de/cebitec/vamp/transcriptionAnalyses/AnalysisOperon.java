@@ -242,7 +242,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 //only in this case a new operon starts:
                 if (lastAnnoId != feature1.getId() && lastAnnoId != 0) {
 
-                    operon = new Operon();
+                    operon = new Operon(trackConnector.getTrackID());
                     operon.addAllOperonAdjacencies(operonAdjacencies);
                     operonList.add(operon); //only here the operons are added to final list
                     operonAdjacencies.clear();
@@ -258,7 +258,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             }
         }
         if (!operonAdjacencies.isEmpty()) {
-            operon = new Operon();
+            operon = new Operon(trackConnector.getTrackID());
             operon.addAllOperonAdjacencies(operonAdjacencies);
             operonList.add(operon); //only here the operons are added to final list
         }

@@ -87,7 +87,8 @@ public class FilterFeaturesStatsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         filterFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    {ResultPanelFilteredFeatures.FEATURES_TOTAL, String.valueOf(this.filteredFeaturesStatsMap.get(ResultPanelFilteredFeatures.FEATURES_TOTAL))}
+                    {ResultPanelFilteredFeatures.FEATURES_FILTERED, this.filteredFeaturesStatsMap.get(ResultPanelFilteredFeatures.FEATURES_FILTERED)},
+                    {ResultPanelFilteredFeatures.FEATURES_TOTAL, this.filteredFeaturesStatsMap.get(ResultPanelFilteredFeatures.FEATURES_TOTAL)}
                 },
                 new String[]{
                     NbBundle.getMessage(FilterFeaturesStatsPanel.class, "FilterFeaturesStatsPanel.filterFeatureStatsTable.columnModel.title0"),

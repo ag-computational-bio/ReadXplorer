@@ -4,6 +4,7 @@ import de.cebitec.vamp.util.TabWithCloseX;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -125,9 +126,15 @@ public final class TranscriptionAnalysesTopComponent extends TopComponent {
      * @param panelName title of the new tab to create
      * @param resultPanel the panel to place in the new tab 
      */
-    public void openAnalysisTab(String panelName, JPanel resultPanel) { //TranscriptionAnalysesPanel transAnalysisPanel, 
-        this.analysesTabbedPane.add(panelName, resultPanel);
-        this.analysesTabbedPane.setTabComponentAt(this.analysesTabbedPane.getTabCount() - 1, new TabWithCloseX(this.analysesTabbedPane));
-        this.analysesTabbedPane.setSelectedIndex(this.analysesTabbedPane.getTabCount() - 1);
+    public void openAnalysisTab(final String panelName, final JPanel resultPanel) { //TranscriptionAnalysesPanel transAnalysisPanel, 
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                analysesTabbedPane.add(panelName, resultPanel);
+                analysesTabbedPane.setTabComponentAt(analysesTabbedPane.getTabCount() - 1, new TabWithCloseX(analysesTabbedPane));
+                analysesTabbedPane.setSelectedIndex(analysesTabbedPane.getTabCount() - 1);
+            }
+        });
     }
 }

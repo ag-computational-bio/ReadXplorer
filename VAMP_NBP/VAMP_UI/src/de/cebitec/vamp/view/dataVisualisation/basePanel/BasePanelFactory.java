@@ -418,20 +418,27 @@ public class BasePanelFactory {
 
     private JPanel getGenomeViewerLegend(AbstractViewer viewer) {
         JPanel legend = new JPanel();
-        legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
+        JPanel legend1 = new JPanel();
+        JPanel legend2 = new JPanel();
+        legend.setLayout(new BorderLayout());
+        legend1.setLayout(new BoxLayout(legend1, BoxLayout.PAGE_AXIS));
+        legend2.setLayout(new BoxLayout(legend2, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(this.getLegendEntry(ColorProperties.CDS, FeatureType.CDS, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.GENE, FeatureType.GENE, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.EXON, FeatureType.EXON, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.REPEAT_UNIT, FeatureType.REPEAT_UNIT, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.MRNA, FeatureType.MRNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.CDS, FeatureType.CDS, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.GENE, FeatureType.GENE, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.EXON, FeatureType.EXON, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.REPEAT_UNIT, FeatureType.REPEAT_UNIT, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.MRNA, FeatureType.MRNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
 
+        legend.add(legend1, BorderLayout.WEST);
+        legend.add(legend2, BorderLayout.EAST);
+        
         return legend;
     }
 

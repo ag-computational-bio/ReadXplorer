@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,6 +92,13 @@ public class PersistantFeature implements PersistantFeatureI {
      */
     public boolean isFwdStrand() {
         return isFwdStrand;
+    }
+    
+    /**
+     * @return SequenceUtils.STRAND_FWD_STRING ("Fwd") or SequenceUtils.STRAND_REV_STRING ("Rev")
+     */
+    public String isFwdStrandString() {
+        return isFwdStrand ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING;
     }
 
     /**

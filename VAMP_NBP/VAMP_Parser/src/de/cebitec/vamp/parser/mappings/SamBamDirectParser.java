@@ -29,7 +29,7 @@ public class SamBamDirectParser implements MappingParserI {
 
     private static String name = "SAM/BAM Direct Access Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
-    private static String fileDescription = "SAM/BAM Output";
+    private static String fileDescription = "SAM/BAM Read Mappings";
     
     private SeqPairProcessorI seqPairProcessor;
     private List<Observer> observers;

@@ -105,13 +105,13 @@ public class BioJavaParser implements ReferenceParserI {
             Iterator<Feature> featIt;
             RichFeature feature;
             String parsedType;
-            String locusTag = "unknown locus tag";
-            String product = null;
+            String locusTag;
+            String product;
             int start;
             int stop;
             int strand;
-            String ecNumber = null;
-            String geneName = null;
+            String ecNumber;
+            String geneName;
             List<ParsedSubFeature> subFeatures;
             Location location;
             Iterator<Note> noteIter;
@@ -127,6 +127,13 @@ public class BioJavaParser implements ReferenceParserI {
 
             // take only the first sequence from file, if exists
             while (seqIter.hasNext()) {
+                locusTag = "unknown locus tag";;
+                geneName = "";
+                start = 0;
+                stop = 0;
+                strand = -1;
+                ecNumber = "";
+                product = "";
                 try {
                     seq = seqIter.nextRichSequence();
 //                    this.sendErrorMsg("rich seq set");

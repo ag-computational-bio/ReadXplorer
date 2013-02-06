@@ -259,7 +259,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     && diffFwd > this.increaseReadCount2) {
 
                 DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detFeatures));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, 
+                        fwdCov1, fwdCov2, detFeatures, trackConnector.getTrackID()));
             }
             if (diffRev > this.increaseReadCount 
                     && percentDiffRev > this.increaseReadPercent 
@@ -268,17 +269,20 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     && diffRev > this.increaseReadCount2) {
 
                 DetectedFeatures detFeatures = this.findNextFeature(pos, false);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detFeatures));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, 
+                        revCov2, revCov1, detFeatures, trackConnector.getTrackID()));
             }
 
         } else {
             if (diffFwd > this.increaseReadCount && percentDiffFwd > this.increaseReadPercent) {
                 DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, fwdCov1, fwdCov2, detFeatures));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, 
+                        fwdCov1, fwdCov2, detFeatures, trackConnector.getTrackID()));
             }
             if (diffRev > this.increaseReadCount && percentDiffRev > this.increaseReadPercent) {
                 DetectedFeatures detFeatures = this.findNextFeature(pos, false);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, revCov2, revCov1, detFeatures));
+                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, 
+                        revCov2, revCov1, detFeatures, trackConnector.getTrackID()));
             }
             
         }

@@ -22,9 +22,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.openide.util.NbBundle;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
+//import org.openide.util.NbBundle;
+//import org.openide.windows.IOProvider;
+//import org.openide.windows.InputOutput;
 
 /**
  * The histogram viewer. Showing the match an deviating coverage for each position
@@ -35,7 +35,7 @@ import org.openide.windows.InputOutput;
 public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
-    private InputOutput io;
+//    private InputOutput io;
     private static int height = 500;
     private TrackConnector trackConnector;
     private PersistantReference refGen;
@@ -77,7 +77,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
-        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
+//        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
         this.refGen = refGen;
         this.trackConnector = trackConnector;
         this.setInDrawingMode(false);

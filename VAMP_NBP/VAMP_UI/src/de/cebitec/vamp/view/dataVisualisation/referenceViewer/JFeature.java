@@ -1,8 +1,8 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,7 +21,7 @@ import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 
 /**
- * Contains the content of an feature and takes care of the painting process.
+ * Contains the content of a feature and takes care of the painting process.
  * Also contains its popup menu.
  *
  * @author ddoppmeier, rhilker

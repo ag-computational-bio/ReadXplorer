@@ -26,11 +26,11 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
 
     public final static long serialVersionUID = 724742799;
     private ReferenceConnector refGenConnector;
-    CheckList checkList;
+    private CheckList checkList;
 
     /** Creates new form OpenTrackPanelList */
     public OpenTrackPanelList() {
-        initComponents();
+        this.initComponents();
         this.initAdditionalComponents();
     }
 

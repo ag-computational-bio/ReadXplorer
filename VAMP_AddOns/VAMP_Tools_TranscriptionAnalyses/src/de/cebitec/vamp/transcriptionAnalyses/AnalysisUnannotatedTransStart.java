@@ -25,11 +25,23 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
     
     private int minCoverage;
+    private final TrackConnector trackCon;
 
+    /**
+     * Analysis for a TSS detection including detection of unannotated transcripts.
+     * @param trackConnector
+     * @param increaseReadCount
+     * @param increaseReadPercent
+     * @param maxInitialReadCount
+     * @param increaseReadCount2
+     * @param tssAutomatic
+     * @param minCoverage
+     */
     public AnalysisUnannotatedTransStart(TrackConnector trackConnector, int increaseReadCount, int increaseReadPercent, 
             int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic, int minCoverage) {
            
         super(trackConnector, increaseReadCount, increaseReadPercent, maxInitialReadCount, increaseReadCount2, tssAutomatic);
+        this.trackCon = trackConnector;
         this.minCoverage = minCoverage;
     }
     
@@ -64,7 +76,7 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
             
             // instead of an ordinary TranscriptStart we add the TranscriptStart with unannotated transcript information
             detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getInitialCoverage(), 
-                    tss.getStartCoverage(), tss.getDetFeatures(), currentPos));
+                    tss.getStartCoverage(), tss.getDetFeatures(), currentPos, trackCon.getTrackID()));
             
         } else {
             detectedStarts.add(tss);

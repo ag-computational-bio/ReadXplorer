@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.h2.jdbc.JdbcSQLException;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -120,28 +121,28 @@ public class ProjectConnector extends Observable {
     public Map<PersistantReference,List<PersistantTrack>> getGenomesAndTracks() {
        List<PersistantReference> genomes = this.getGenomes();
        List<PersistantTrack> tracks = this.getTracks();
-       HashMap<Integer, List<PersistantTrack>> tracks_by_reference_id = new HashMap<>();
+       HashMap<Integer, List<PersistantTrack>> tracksByReferenceId = new HashMap<>();
        for(PersistantTrack t : tracks) {
-           List<PersistantTrack> list = tracks_by_reference_id.get(t.getRefGenID());
-           if (list==null) {
+           List<PersistantTrack> list = tracksByReferenceId.get(t.getRefGenID());
+           if (list == null) {
                list = new ArrayList<>();
-               tracks_by_reference_id.put(t.getRefGenID(), list);
+               tracksByReferenceId.put(t.getRefGenID(), list);
            }
            list.add(t);
        }
        
-       HashMap<PersistantReference, List<PersistantTrack>> tracks_by_reference
+       HashMap<PersistantReference, List<PersistantTrack>> tracksByReference
                = new HashMap<>();
        for(PersistantReference reference : genomes) {
-           List<PersistantTrack> current_track_list = tracks_by_reference_id.get(reference.getId());
+           List<PersistantTrack> currentTrackList = tracksByReferenceId.get(reference.getId());
            //if the current reference genome does not have any tracks, 
            //just create an empty list
-           if (current_track_list == null) { current_track_list = new ArrayList<>(); }
-           tracks_by_reference.put(reference, current_track_list);
+           if (currentTrackList == null) { currentTrackList = new ArrayList<>(); }
+           tracksByReference.put(reference, currentTrackList);
        }
     
         
-       return tracks_by_reference;
+       return tracksByReference;
     }
 
     public boolean isConnected() {

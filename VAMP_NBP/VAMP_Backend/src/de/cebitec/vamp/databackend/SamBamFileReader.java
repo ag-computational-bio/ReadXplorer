@@ -2,31 +2,32 @@ package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
+import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.SamUtils;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.File;
 import java.util.*;
+import net.sf.samtools.SAMException;
 import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeIOException;
-import org.openide.util.Exceptions;
 
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
  *
  * @author -Rolf Hilker-
  */
-public class SamBamFileReader { //TODO: add observer
+public class SamBamFileReader implements Observable {
 
     public static final String cigarRegex = "[MIDNSPX=]+";
     private final File dataFile;
     private final int trackId;
+    private SamUtils samUtils;
     private SAMFileReader samFileReader;
     private String header;
-    private boolean hasIndex;
-    private List<de.cebitec.vamp.util.Observer> observer;
+    private List<de.cebitec.vamp.util.Observer> observers;
 
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam
@@ -38,15 +39,31 @@ public class SamBamFileReader { //TODO: add observer
      * @throws RuntimeIOException
      */
     public SamBamFileReader(File dataFile, int trackId) throws RuntimeIOException {
-        this.observer = new ArrayList<>();
+        this.observers = new ArrayList<>();
         this.dataFile = dataFile;
         this.trackId = trackId;
-
+        this.samUtils = new SamUtils();
+        
+        this.initializeReader();
+    }
+    
+    /**
+     * Initializes or re-initializes the bam file reader.
+     */
+    private void initializeReader() {
         samFileReader = new SAMFileReader(this.dataFile);
         samFileReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
         header = samFileReader.getFileHeader().getTextHeader();
-        hasIndex = samFileReader.hasIndex();
-
+        this.checkIndex();
+    }
+    
+    /**
+     * Checks if the index of the bam file is present or creates it.
+     */
+    private void checkIndex() {
+        if (!samFileReader.hasIndex()) {
+            samUtils.createIndex(samFileReader, new File(dataFile.getAbsolutePath().concat(Properties.BAM_INDEX_EXT)));
+        }
     }
 
     /**
@@ -62,54 +79,63 @@ public class SamBamFileReader { //TODO: add observer
      */
     public Collection<PersistantMapping> getMappingsFromBam(PersistantReference refGenome, int from, int to, boolean needDiffs) {
 
-        List<PersistantMapping> mappings = new ArrayList<>();
-        SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
-        String refSeq = refGenome.getSequence().toUpperCase();
-        String refSubSeq;
-        int id = 0;
-        String cigar;
-        SAMRecord record;
-        int start;
-        int stop;
-        boolean isFwdStrand;
-        Integer classification;
-        Integer count;
-        boolean classify;
-        PersistantMapping mapping;
+        Collection<PersistantMapping> mappings = new ArrayList<>();
+        
+        try {
+            this.checkIndex();
+            
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+            String refSeq = refGenome.getSequence().toUpperCase();
+            String refSubSeq;
+            int id = 0;
+            String cigar;
+            SAMRecord record;
+            int start;
+            int stop;
+            boolean isFwdStrand;
+            Integer classification;
+            Integer count;
+            boolean classify;
+            PersistantMapping mapping;
 
-        while (samRecordIterator.hasNext()) {
-            record = samRecordIterator.next();
-            start = record.getAlignmentStart();
-            stop = record.getAlignmentEnd();
+            while (samRecordIterator.hasNext()) {
+                record = samRecordIterator.next();
+                start = record.getAlignmentStart();
+                stop = record.getAlignmentEnd();
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
-            isFwdStrand = !record.getReadNegativeStrandFlag();
-            classification = (Integer) record.getAttribute("Yc");
-            count = (Integer) record.getAttribute("Yt");
+                isFwdStrand = !record.getReadNegativeStrandFlag();
+                classification = (Integer) record.getAttribute("Yc");
+                count = (Integer) record.getAttribute("Yt");
 
-            //find check alignment via cigar string and add diffs to mapping
-            cigar = record.getCigarString();
-            if (cigar.contains("M")) {
-                refSubSeq = refSeq.substring(start - 1, stop);
-            } else {
-                refSubSeq = null;
+                //find check alignment via cigar string and add diffs to mapping
+                cigar = record.getCigarString();
+                if (cigar.contains("M")) {
+                    refSubSeq = refSeq.substring(start - 1, stop);
+                } else {
+                    refSubSeq = null;
+                }
+
+                if (classification != null && count != null) { //since both data fields are always written together
+                    classify = classification == (int) Properties.PERFECT_COVERAGE
+                            || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
+                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify);
+                } else {
+                    count = 1;
+                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, true);
+                }
+
+                this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
+                        record.getReadString(), refSubSeq, mapping);
+
+                mappings.add(mapping);
             }
+            samRecordIterator.close();
 
-            if (classification != null && count != null) { //since both data fields are always written together
-                classify = classification == (int) Properties.PERFECT_COVERAGE
-                        || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify);
-            } else {
-                count = 1;
-                mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, true);
-            }
-
-            this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
-                    record.getReadString(), refSubSeq, mapping);
-
-            mappings.add(mapping);
+        } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
+            this.notifyObservers(e);
         }
-        samRecordIterator.close();
+        
         return mappings;
     }
 
@@ -122,24 +148,33 @@ public class SamBamFileReader { //TODO: add observer
      * @return the reduced mappings for the given interval
      */
     public Collection<PersistantMapping> getAllReducedMappingsFromBam(PersistantReference refGenome) {
-        List<PersistantMapping> mappings = new ArrayList<>();
-        SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), 0, 0, false);
-        SAMRecord record;
-        int start;
-        int stop;
-        boolean isFwdStrand;
-        PersistantMapping mapping;
+        Collection<PersistantMapping> mappings = new ArrayList<>();
 
-        while (samRecordIterator.hasNext()) {
-            record = samRecordIterator.next();
-            start = record.getAlignmentStart();
-            stop = record.getAlignmentEnd();
+        try {
+            this.checkIndex();
+            
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), 0, 0, false);
+            SAMRecord record;
+            int start;
+            int stop;
+            boolean isFwdStrand;
+            PersistantMapping mapping;
+
+            while (samRecordIterator.hasNext()) {
+                record = samRecordIterator.next();
+                start = record.getAlignmentStart();
+                stop = record.getAlignmentEnd();
 //            start = start < 0 ? 0 : start;
-            isFwdStrand = !record.getReadNegativeStrandFlag();
-            mapping = new PersistantMapping(start, stop, isFwdStrand);
-            mappings.add(mapping);
+                isFwdStrand = !record.getReadNegativeStrandFlag();
+                mapping = new PersistantMapping(start, stop, isFwdStrand);
+                mappings.add(mapping);
+            }
+            samRecordIterator.close();
+
+        } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
+            this.notifyObservers(e);
         }
-        samRecordIterator.close();
+        
         return mappings;
     }
 
@@ -158,80 +193,90 @@ public class SamBamFileReader { //TODO: add observer
     public Collection<PersistantSeqPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome,
             int from, int to, boolean diffsAndGapsNeeded) {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
+        Collection<PersistantSeqPairGroup> seqPairGroups = new ArrayList<>();
+        
+        try {
+            this.checkIndex();
 
-        SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
-        String refSeq = refGenome.getSequence().toUpperCase();
-        String refSubSeq;
-        int id = 0;
-        String cigar;
-        SAMRecord record;
-        int startPos; //in the genome, to get the index: -1
-        int stop;
-        boolean isFwdStrand;
-        Integer classification;
-        Integer count;
-        Integer pairId;
-        Integer pairType;
-        long seqPairId;
-        byte seqPairType;
-        int mateStart;
-        boolean bothVisible;
-        boolean isBestMapping;
-        PersistantMapping mapping;
-        PersistantSeqPairGroup newGroup;
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+            String refSeq = refGenome.getSequence().toUpperCase();
+            String refSubSeq;
+            int id = 0;
+            String cigar;
+            SAMRecord record;
+            int startPos; //in the genome, to get the index: -1
+            int stop;
+            boolean isFwdStrand;
+            Integer classification;
+            Integer count;
+            Integer pairId;
+            Integer pairType;
+            long seqPairId;
+            byte seqPairType;
+            int mateStart;
+            boolean bothVisible;
+            boolean isBestMapping;
+            PersistantMapping mapping;
+            PersistantSeqPairGroup newGroup;
 
-        while (samRecordIterator.hasNext()) {
-            record = samRecordIterator.next();
-            startPos = record.getAlignmentStart();
-            stop = record.getAlignmentEnd();
+            while (samRecordIterator.hasNext()) {
+                record = samRecordIterator.next();
+                startPos = record.getAlignmentStart();
+                stop = record.getAlignmentEnd();
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
-            isFwdStrand = !record.getReadNegativeStrandFlag();
-            classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
-            count = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
-            pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
-            pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
-            mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
-            bothVisible = mateStart > from && mateStart < to;
+                isFwdStrand = !record.getReadNegativeStrandFlag();
+                classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                count = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
+                pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
+                mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
+                bothVisible = mateStart > from && mateStart < to;
 
 
-            //check alignment via cigar string and add diffs to mapping
-            cigar = record.getCigarString();
-            if (cigar.contains("M")) {
-                refSubSeq = refSeq.substring(startPos - 1, stop);
-            } else {
-                refSubSeq = null;
-            }
+                //check alignment via cigar string and add diffs to mapping
+                cigar = record.getCigarString();
+                if (cigar.contains("M")) {
+                    refSubSeq = refSeq.substring(startPos - 1, stop);
+                } else {
+                    refSubSeq = null;
+                }
 
-            if (classification != null && count != null) { //since both data fields are always written together
-                isBestMapping = classification == (int) Properties.PERFECT_COVERAGE
-                        || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, isBestMapping);
-            } else {
-                count = 1;
-                mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, false);
-            }
-            if (pairId != null && pairType != null) { //since both data fields are always written together
+                if (classification != null && count != null) { //since both data fields are always written together
+                    isBestMapping = classification == (int) Properties.PERFECT_COVERAGE
+                            || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
+                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, isBestMapping);
+                } else {
+                    count = 1;
+                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, false);
+                }
+                if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new seqPair if not exists
-                seqPairId = (long) pairId;
-                seqPairType = Byte.valueOf(pairType.toString());
-                if (!seqPairs.containsKey(seqPairId)) {
-                    newGroup = new PersistantSeqPairGroup();
-                    newGroup.setSeqPairId(pairId);
-                    seqPairs.put(seqPairId, newGroup);
-                } //TODO: check where ids are needed
-                seqPairs.get(seqPairId).addPersistantMapping(mapping, seqPairType, Long.valueOf(id), -1, 1);
-            }
+                    seqPairId = (long) pairId;
+                    seqPairType = Byte.valueOf(pairType.toString());
+                    if (!seqPairs.containsKey(seqPairId)) {
+                        newGroup = new PersistantSeqPairGroup();
+                        newGroup.setSeqPairId(pairId);
+                        seqPairs.put(seqPairId, newGroup);
+                    } //TODO: check where ids are needed
+                    seqPairs.get(seqPairId).addPersistantMapping(mapping, seqPairType, Long.valueOf(id), -1, 1);
+                }
 
-            if (diffsAndGapsNeeded) {
-                this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, count,
-                        record.getReadString(), refSubSeq, mapping);
-            }
+                if (diffsAndGapsNeeded) {
+                    this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, count,
+                            record.getReadString(), refSubSeq, mapping);
+                }
 
+            }
+            samRecordIterator.close();
+            seqPairGroups = seqPairs.values();
+
+
+        } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
+            this.notifyObservers(e);
         }
-        samRecordIterator.close();
 
-        return seqPairs.values();
+        return seqPairGroups;
     }
 
     /**
@@ -251,7 +296,7 @@ public class SamBamFileReader { //TODO: add observer
      */
     public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, int from, int to,
             boolean diffsAndGapsNeeded, byte trackNeeded) {
-
+        
         int[] perfectCoverageFwd = new int[0];
         int[] perfectCoverageRev = new int[0];
         int[] bestMatchCoverageFwd = new int[0];
@@ -286,10 +331,14 @@ public class SamBamFileReader { //TODO: add observer
         List<PersistantReferenceGap> gaps = new ArrayList<>();
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
+
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
         if (diffsAndGapsNeeded) {
             refSeq = refGenome.getSequence().toUpperCase();
         }
         try {
+            this.checkIndex();
+            
             SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
 
             SAMRecord record;
@@ -394,10 +443,13 @@ public class SamBamFileReader { //TODO: add observer
                 coverage.setCommonRevMultTrack2(commonCoverageRevTrack2);
             }
 
-        } catch (NullPointerException | IllegalArgumentException | SAMFormatException | ArrayIndexOutOfBoundsException e) {
-            Exceptions.printStackTrace(e); //TODO: replace by notify observer
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
+
+        } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
+            this.notifyObservers(e);
         }
-        return new CoverageAndDiffResultPersistant(coverage, diffs, gaps, true, from, to);
+
+        return result;
     }
 
     /**
@@ -529,5 +581,29 @@ public class SamBamFileReader { //TODO: add observer
         }
 
         return new PersistantDiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
+    }
+    
+    /**
+     * Closes this reader.
+     */
+    public void close() {
+        samFileReader.close();
+    }
+
+    @Override
+    public void registerObserver(de.cebitec.vamp.util.Observer observer) {
+        this.observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(de.cebitec.vamp.util.Observer observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Object data) {
+        for (de.cebitec.vamp.util.Observer observer : observers) {
+            observer.update(data);
+        }
     }
 }

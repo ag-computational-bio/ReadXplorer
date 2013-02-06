@@ -44,6 +44,36 @@ and open the template in the editor.
                     <param name="textColor" value="blue">
                 </object></li>
         </UL>
+        <h2>SAM/BAM Direct Access Import</h2>
+        <p style="font-size:0.9em">
+            This is the recommended parser for all SAM/BAM files. It works much faster than importing the whole data sets
+            into the DB. Also the visualization will me much more efficient, when using the direct access import.<br>
+            Your original SAM/BAM file is never altered. VAMP creates intermediate files during the import process
+            next to the original SAM/BAM file. At the end an extended version of the original file is created in
+            the same directory. In this extended bam file VAMP stores all neccessary classification information
+            and of course the complete mapping data. Besides the mapping, an index file is created for quicker access of the data.<br>
+            When a direct access track is opened, all data is read directly from the corresponding extended mapping file.
+            If this file is moved, then VAMP asks for the new path to that mapping file. If the index file should be missing,
+            VAMP creates a new index file.
+        </p>
+        <p></p>
+        <p></p>
+        <h2>Sequence pair import</h2>
+        <p style="font-size:0.9em">
+            VAMP also allows to import Sequence pair data, such as mate pair or paired end data.<br>
+            Requirements: <u>Two mapping files</u> with either all first reads or all second reads of 
+            the sequence pair.<br>
+            OR<br>
+            <u>One mapping file</u> with all reads of both pairs in arbitrary sorting order.<br>
+            Distance: Choose the estimated distance from the start of a sequence pair to the end of the pair 
+            (e.g. read 1 (100-150), read 2 (300-350) has distance 250).<br>
+            Direction: The two character code abbreviates the orientation of read 1 and read 2, where "f" means 
+            forward and "r" means reverse.<br>
+            Deviaton: Must be given in percent, e.g. "70" for small pairs whith high deviation or "30" for 
+            larger mate pairs. <br>
+            For choosing resonable values it is recommended to analyze the data for these
+            parameters before importing.
+        </p>
         <p></p>
         <h2>SAM/BAM Stepwise Parser</h2>
         <p style="font-size:0.9em">
@@ -55,21 +85,6 @@ and open the template in the editor.
             step size. On the other hand, don't choose a too large value for the step size. The import is faster
             with a medium step size, because the data structures will not grow too large, which means the access to 
             them remains faster.
-        </p>
-        <p></p>
-        <h2>Sequence pair import</h2>
-        <p style="font-size:0.9em">
-            VAMP also allows to import Sequence pair data, such as mate pair or paired end data.<br>
-            Requirements: Two mapping files with either all first reads or all second reads of 
-            the sequence pair.<br>
-            Distance: Choose the estimated distance from the start of a sequence pair to the end of the pair 
-            (e.g. read 1 (100-150), read 2 (300-350) has distance 250).<br>
-            Direction: The two character code abbreviates the orientation of read 1 and read 2, where "f" means 
-            forward and "r" means reverse.<br>
-            Deviaton: Must be given in percent, e.g. "70" for small pairs which high deviation or "30" for 
-            larger mate pairs. <br>
-            For choosing resonable values it is recommended to analyze the data for these
-            parameters before importing.
         </p>
         <p></p>
         <h2>Position table for track import</h2>

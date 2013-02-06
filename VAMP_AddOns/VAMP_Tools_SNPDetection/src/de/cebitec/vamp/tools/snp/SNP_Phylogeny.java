@@ -1,7 +1,7 @@
 package de.cebitec.vamp.tools.snp;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
-import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,23 +31,23 @@ public class SNP_Phylogeny {
     public static String FDNAML_PATH = "PathFdnaml";
 
     InputOutput io;
-    SnpData snpData;
+    SnpDetectionResult snpData;
     HashMap<Integer, HashMap<String, Snp>> sortedSnps;
 
-    public SNP_Phylogeny(SnpData snpData) {
+    public SNP_Phylogeny(SnpDetectionResult snpData) {
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(SNP_Phylogeny.class, "SNP_Phylogeny.output.name"), false);
         this.snpData = snpData;
         createAlignment(snpData);
     }
 
-    private void createAlignment(SnpData snpData) {
+    private void createAlignment(SnpDetectionResult snpData) {
 
-        int numberOfTracks = 0;
-        HashMap<Long, HashMap<Integer, String>> bases = new HashMap<Long, HashMap<Integer, String>>();
-        HashMap<Long, String> refBases = new HashMap<Long, String>();
+        int numberOfTracks;
+        HashMap<Long, HashMap<Integer, String>> bases = new HashMap<>();
+        HashMap<Long, String> refBases = new HashMap<>();
         List<SnpI> snps = snpData.getSnpList();
-        Map<Integer, String> trackNames = snpData.getTrackNames();
-        List<Integer> trackIdsWithSnps = new ArrayList<Integer>();
+        Map<Integer, PersistantTrack> trackNames = snpData.getTrackMap();
+        List<Integer> trackIdsWithSnps = new ArrayList<>();
 
         for (SnpI snpi : snps) {
 
@@ -74,7 +75,7 @@ public class SNP_Phylogeny {
 
             // save bases per track in a hashmap again hashed to their position
             if (!bases.containsKey(position)) {
-                HashMap<Integer, String> track = new HashMap<Integer, String>();
+                HashMap<Integer, String> track = new HashMap<>();
                 bases.put(position, track);
             }
             HashMap<Integer, String> track = bases.get(position);
@@ -85,27 +86,27 @@ public class SNP_Phylogeny {
 
 
         // add reference base to all position maps, where it is missing for at least one track
-        Iterator positionIterator = bases.entrySet().iterator();
+        Iterator<Entry<Long, HashMap<Integer, String>>> positionIterator = bases.entrySet().iterator();
         while (positionIterator.hasNext()) {
 
-            Map.Entry posToBaseMap = (Map.Entry) positionIterator.next();
-            HashMap<Integer, String> positionEntry = (HashMap<Integer, String>) posToBaseMap.getValue();
+            Map.Entry<Long, HashMap<Integer, String>> posToBaseMap = positionIterator.next();
+            HashMap<Integer, String> positionEntry = posToBaseMap.getValue();
             // fill positions without snpData with reference base
 
             for (int trackId : trackIdsWithSnps) {
                 if (!positionEntry.containsKey(trackId)) {
-                    positionEntry.put(trackId, String.valueOf(refBases.get((Long) posToBaseMap.getKey())));
+                    positionEntry.put(trackId, String.valueOf(refBases.get(posToBaseMap.getKey())));
                 }
             }
         }
 
         HashMap<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap(trackIdsWithSnps);
         String[] alignment = new String[numberOfTracks + 1];
-        for (Long l : new TreeSet<Long>(bases.keySet())) {
+        for (Long l : new TreeSet<>(bases.keySet())) {
             HashMap<Integer, String> snpsAtPosMap = bases.get(l);
-            for (Integer trackId : new TreeSet<Integer>(snpsAtPosMap.keySet())) {
+            for (Integer trackId : new TreeSet<>(snpsAtPosMap.keySet())) {
                 if (alignment[trackIdToIndex.get(trackId)] == null) {
-                    alignment[trackIdToIndex.get(trackId)] = ">" + trackNames.get(trackId) + System.getProperty("line.separator");
+                    alignment[trackIdToIndex.get(trackId)] = ">" + trackNames.get(trackId).getDescription() + System.getProperty("line.separator");
                 }
                 alignment[trackIdToIndex.get(trackId)] += snpsAtPosMap.get(trackId);
             }
@@ -201,7 +202,7 @@ public class SNP_Phylogeny {
      * @return mapping from each track id to a corresponding index.
      */
     private HashMap<Integer, Integer> getTrackIdToIndexMap(List<Integer> trackIdList) {
-        HashMap<Integer, Integer> trackIdToIndexMap = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> trackIdToIndexMap = new HashMap<>();
         int i = 0;
         for (int trackId : trackIdList) {
             trackIdToIndexMap.put(trackId, i++);

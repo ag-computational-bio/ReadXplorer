@@ -22,7 +22,7 @@ public class SamBamParser implements MappingParserI {
 
     private static String name = "SAM/BAM Parser";
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam", "sam", "SAM", "Sam"};
-    private static String fileDescription = "BAM or SAM Output";
+    private static String fileDescription = "SAM/BAM Read Mappings";
     
     private SeqPairProcessorI seqPairProcessor;
     private HashMap<String, Integer> seqToIDMap;

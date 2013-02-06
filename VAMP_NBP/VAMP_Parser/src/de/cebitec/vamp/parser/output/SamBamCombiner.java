@@ -5,6 +5,7 @@ import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SamUtils;
 import java.io.File;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class SamBamCombiner implements Observable, Observer {
                 try (SAMFileReader samReaderNew = new SAMFileReader(outputFile)) { //close is performed by try statement
                     SamUtils utils = new SamUtils();
                     utils.registerObserver(this);
-                    utils.createIndex(samReaderNew, new File(outputFile + ".bai"));
+                    utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
                 }
             }
             

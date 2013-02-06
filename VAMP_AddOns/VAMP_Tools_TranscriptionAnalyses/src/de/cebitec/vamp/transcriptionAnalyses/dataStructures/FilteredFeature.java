@@ -1,6 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.TrackResultEntry;
 
 /**
  * Data structure for storing a feature (gene), which is detected as expressed
@@ -8,7 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
  * 
  * @author -Rolf Hilker-
  */
-public class FilteredFeature {
+public class FilteredFeature extends TrackResultEntry {
 
     private PersistantFeature filteredFeature;
     private int readCount;
@@ -17,7 +18,8 @@ public class FilteredFeature {
      * Creates a new FilteredFeature.
      * @param filteredFeature the feature (gene) which is detected as expressed.
      */
-    public FilteredFeature(PersistantFeature filteredFeature) {
+    public FilteredFeature(PersistantFeature filteredFeature, int trackId) {
+        super(trackId);
         this.filteredFeature = filteredFeature;
     }
 

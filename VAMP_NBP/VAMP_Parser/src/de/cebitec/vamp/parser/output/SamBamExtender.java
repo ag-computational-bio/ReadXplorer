@@ -180,7 +180,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
         SAMFileReader samReaderNew = new SAMFileReader(outputFile);
         SamUtils utils = new SamUtils();
         utils.registerObserver(this);
-        utils.createIndex(samReaderNew, new File(outputFile + ".bai"));
+        utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
     }
 
     @Override

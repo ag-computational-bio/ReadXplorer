@@ -3,7 +3,6 @@ package de.cebitec.vamp.tools.snp;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
@@ -54,10 +53,10 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
     private static final long serialVersionUID = 1L;
     
     private ProjectConnector proCon;
-    private SnpData snpData;
+    private SnpDetectionResult snpData;
     private int referenceId;
     private List<Integer> trackIds;
-    private Map<Integer, String> trackList;
+    private Map<Integer, PersistantTrack> trackList;
     private SNP_DetectionTopComponent snpDetectionTopComp;
 
     /**
@@ -90,7 +89,7 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
             this.trackList = new HashMap<>();
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 this.trackIds.add(track.getId());
-                this.trackList.put(track.getId(), track.getDescription());
+                this.trackList.put(track.getId(), track);
             }
             
             this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
@@ -171,7 +170,7 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
 
             ph.start();
             List<SnpI> snps = proCon.findSNPs(percent, num, trackIds);
-            snpData = new SnpData(snps, trackList);
+            snpData = new SnpDetectionResult(snps, trackList);
             snpData.setSearchParameters(percent, num);
             CentralLookup.getDefault().remove(this);
             this.notifyObservers(snpData);

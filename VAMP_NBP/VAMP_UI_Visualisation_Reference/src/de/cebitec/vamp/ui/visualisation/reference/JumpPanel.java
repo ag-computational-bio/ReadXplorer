@@ -432,13 +432,13 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private void fillFeatureList() {
         List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGen.getRefLength());
         
-        List<PersistantFeature> featList = new ArrayList<PersistantFeature>(features);
+        List<PersistantFeature> featList = new ArrayList<>(features);
         Collections.sort(featList, new FeatureNameSorter());
-        PersistantFeature[] featureData = featList.toArray(new PersistantFeature[0]);
+        PersistantFeature[] featureData = featList.toArray(new PersistantFeature[featList.size()]);
 
         //Create new Model for Table
         featureTable.setModel(new FeatureTableModel(featureData));
-        featureTable.setRowSorter(new TableRowSorter<TableModel>(featureTable.getModel()));
+        featureTable.setRowSorter(new TableRowSorter<>(featureTable.getModel()));
         featureTable.getColumnModel().getColumn(2).setPreferredWidth(150);
         updateFilter();
 
@@ -454,11 +454,11 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             if (radioFeatureButton.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 0);
             } else if (radioGene.isSelected()) {
-                rf = RowFilter.regexFilter(filterTextfield.getText(), 1);
-            } else if (radioProduct.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 2);
-            } else if (radioEC.isSelected()){
+            } else if (radioProduct.isSelected()) {
                 rf = RowFilter.regexFilter(filterTextfield.getText(), 3);
+            } else if (radioEC.isSelected()){
+                rf = RowFilter.regexFilter(filterTextfield.getText(), 4);
             }
 
         } catch (java.util.regex.PatternSyntaxException e) {

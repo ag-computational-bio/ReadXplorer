@@ -4,6 +4,7 @@ import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SamUtils;
 import java.io.BufferedReader;
 import java.io.File;
@@ -269,7 +270,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
             SAMFileReader samFileReader = new SAMFileReader(outputFile);
             SamUtils samUtils = new SamUtils();
             samUtils.registerObserver(this);
-            samUtils.createIndex(samFileReader, new File(outputFile + ".bai"));
+            samUtils.createIndex(samFileReader, new File(outputFile + Properties.BAM_INDEX_EXT));
             samFileReader.close();
 
             long finish = System.currentTimeMillis();

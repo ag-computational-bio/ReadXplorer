@@ -1,5 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
+import de.cebitec.vamp.databackend.dataObjects.TrackResultEntry;
+
 /**
  * Data structure for storing a gene start with position, strand, initial coverage
  * (coverage directly before predicted gene start) and start coverage (coverage 
@@ -7,7 +9,7 @@ package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
  *
  * @author -Rolf Hilker-
  */
-public class TranscriptionStart {
+public class TranscriptionStart extends TrackResultEntry {
     
     private int pos;
     private boolean isFwdStrand;
@@ -23,7 +25,9 @@ public class TranscriptionStart {
      * @param startCoverage The coverage at the detected gene start position (getPos()).
      * @param detFeatures object containing the features associated to this predicted gene start
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, DetectedFeatures detFeatures) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int initialCoverage, 
+            int startCoverage, DetectedFeatures detFeatures, int trackId) {
+        super(trackId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
         this.initialCoverage = initialCoverage;
@@ -65,6 +69,4 @@ public class TranscriptionStart {
     public DetectedFeatures getDetFeatures() {
         return this.detFeatures;
     }
-    
-    
 }

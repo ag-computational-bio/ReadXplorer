@@ -21,8 +21,8 @@ public class TransStartUnannotated extends TranscriptionStart {
      * @param detectedStop The stop position of the predicted unannotated transcript
      */
     public TransStartUnannotated(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, 
-            DetectedFeatures detFeatures, int detectedStop) {
-        super(pos, isFwdStrand, initialCoverage, startCoverage, detFeatures);
+            DetectedFeatures detFeatures, int detectedStop, int trackId) {
+        super(pos, isFwdStrand, initialCoverage, startCoverage, detFeatures, trackId);
         this.detectedStop = detectedStop;
     }
 

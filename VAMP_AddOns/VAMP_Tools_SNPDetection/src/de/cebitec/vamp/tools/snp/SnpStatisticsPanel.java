@@ -1,6 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.databackend.dataObjects.SnpResultStatistics;
+import java.util.Map;
 import org.openide.util.NbBundle;
 
 /**
@@ -12,14 +12,14 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     
-    private final SnpResultStatistics snpResultStatistics;
+    private final Map<String, Integer> snpStatsMap;
 
     /**
      * Creates a new panel for showing the the statistics of a SNP detection result.
-     * @param snpResultStatistics the snp results statistics to display
+     * @param snpStatsMap the snp results statistics to display
      */
-    public SnpStatisticsPanel(SnpResultStatistics snpResultStatistics) {
-        this.snpResultStatistics = snpResultStatistics;
+    public SnpStatisticsPanel(Map<String, Integer> snpStatsMap) {
+        this.snpStatsMap = snpStatsMap;
         initComponents();
         this.initAdditionalComponents();
     }
@@ -123,13 +123,13 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         snpEffectTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Total number of SNPs", String.valueOf(this.snpResultStatistics.getTotalNoSnps())},
-                {"Intergenic SNPs", String.valueOf(this.snpResultStatistics.getNoIntergenicSnps())},
-                {"Synonymous SNPs", String.valueOf(this.snpResultStatistics.getNoSynonymousSnps())},
-                {"Chemically neutral SNPs", String.valueOf(this.snpResultStatistics.getNoChemicallyNeutralSnps())},
-                {"Missense SNPs", String.valueOf(this.snpResultStatistics.getNoMissenseSnps())},
-                {"Insertions", String.valueOf(this.snpResultStatistics.getNoAAInsertions())},
-                {"Deletions", String.valueOf(this.snpResultStatistics.getNoAADeletions())}
+                {SNP_DetectionResultPanel.SNPS_TOTAL, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_TOTAL))},
+                {SNP_DetectionResultPanel.SNPS_INTERGENEIC, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_INTERGENEIC))},
+                {SNP_DetectionResultPanel.SNPS_SYNONYMOUS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_SYNONYMOUS))},
+                {SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL))},
+                {SNP_DetectionResultPanel.SNPS_MISSSENSE, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_MISSSENSE))},
+                {SNP_DetectionResultPanel.SNPS_AA_INSERTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_AA_INSERTIONS))},
+                {SNP_DetectionResultPanel.SNPS_AA_DELETIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_AA_DELETIONS))}
             },
             new String [] {
                 NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0"), 
@@ -158,9 +158,9 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
         
         snpTypeTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    {"Substitutions", String.valueOf(this.snpResultStatistics.getNoSubstitutions())},
-                    {"Insertions", String.valueOf(this.snpResultStatistics.getNoInsertions())},
-                    {"Deletions", String.valueOf(this.snpResultStatistics.getNoDeletions())}
+                    {SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS))},
+                    {SNP_DetectionResultPanel.SNPS_INSERTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_INSERTIONS))},
+                    {SNP_DetectionResultPanel.SNPS_DELETIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_DELETIONS))}
                 },
                 new String[]{
                     NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0"), 

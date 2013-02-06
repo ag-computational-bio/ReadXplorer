@@ -6,8 +6,8 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);
         
         for (PersistantFeature feature : this.genomeFeatures) {
-            this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature));
+            this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
         }
     }
     
@@ -152,7 +152,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         return this.coveredFeatures;
     }
     
-    public int getGenomeFeatureSize() {
+    public int getNoGenomeFeatures() {
         return this.genomeFeatures.size();
     }
 }

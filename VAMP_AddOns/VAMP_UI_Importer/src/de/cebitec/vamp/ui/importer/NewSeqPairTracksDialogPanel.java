@@ -36,7 +36,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
     private ReferenceJob[] refGenJobs;
     private final JokParser jokParser;
     private final SamBamParser samBamParser;
-    private final SamBamDirectParser samBamDirecParser;
+    private final SamBamDirectParser samBamDirectParser;
     private MappingParserI[] parsers;
     private MappingParserI currentParser;
     private int distance; //distance of the sequences in a sequence pair in bp
@@ -51,8 +51,8 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         // choose the default parser. first entry is shown in combobox by default
         this.jokParser = new JokParser(new SeqPairDBProcessor());
         this.samBamParser = new SamBamParser(new SeqPairDBProcessor());
-        this.samBamDirecParser = new SamBamDirectParser();
-        this.parsers = new MappingParserI[] { this.samBamDirecParser };
+        this.samBamDirectParser = new SamBamDirectParser();
+        this.parsers = new MappingParserI[] { this.samBamDirectParser };
         this.currentParser = parsers[0];
         mappingFiles1 = new ArrayList<>();
         mappingFiles2 = new ArrayList<>();
@@ -108,6 +108,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         jLabel1.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.jLabel1.text")); // NOI18N
 
         chooseButton1.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.chooseButton1.text")); // NOI18N
+        chooseButton1.setToolTipText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.chooseButton1.toolTipText")); // NOI18N
         chooseButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chooseButton1ActionPerformed(evt);
@@ -116,6 +117,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
 
         mappingFile1Field.setEditable(false);
         mappingFile1Field.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.mappingFile1Field.text")); // NOI18N
+        mappingFile1Field.setToolTipText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.mappingFile1Field.toolTipText")); // NOI18N
 
         nameLabel.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.nameLabel.text")); // NOI18N
 
@@ -139,8 +141,10 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
 
         mappingFile2Field.setEditable(false);
         mappingFile2Field.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.mappingFile2Field.text")); // NOI18N
+        mappingFile2Field.setToolTipText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.mappingFile2Field.toolTipText")); // NOI18N
 
         chooseButton2.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.chooseButton2.text")); // NOI18N
+        chooseButton2.setToolTipText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.chooseButton2.toolTipText")); // NOI18N
         chooseButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chooseButton2ActionPerformed(evt);
@@ -364,6 +368,8 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
             mappingFile1Field.setText("");
             mappingFile2Field.setText("");
             nameField.setText("");
+            this.multiTrackList.setModel(new DefaultListModel<String>());
+            
         }
 }//GEN-LAST:event_parserComboBoxActionPerformed
 
@@ -397,7 +403,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
         this.parserComboBox.removeAllItems();
         if (!this.isDbUsed) {
             //update the parsers to only display the bam parser.
-            this.parserComboBox.addItem(this.samBamDirecParser);
+            this.parserComboBox.addItem(this.samBamDirectParser);
         } else {
             this.parserComboBox.addItem(this.samBamParser);
             this.parserComboBox.addItem(this.jokParser);
@@ -494,6 +500,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
                             multiTrackList.setModel(model);
                         }
                     }
+                    nameField.setText("Note: each track gets its file name");
                 } else {
                     File file = this.getSelectedFile();
                     this.addFile(file);

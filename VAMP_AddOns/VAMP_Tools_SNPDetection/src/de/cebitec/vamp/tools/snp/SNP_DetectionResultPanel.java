@@ -12,10 +12,9 @@ import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
-import de.cebitec.vamp.databackend.dataObjects.SnpData;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
-import de.cebitec.vamp.databackend.dataObjects.SnpResultStatistics;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.util.PositionUtils;
@@ -42,9 +41,20 @@ import org.openide.util.NbPreferences;
  */
 public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
+    public static final String SNPS_TOTAL = "Total number of SNPs";
+    public static final String SNPS_INTERGENEIC = "Intergenic SNPs";
+    public static final String SNPS_SYNONYMOUS = "Synonymous SNPs";
+    public static final String SNPS_CHEMIC_NEUTRAL = "Chemically neutral SNPs";
+    public static final String SNPS_MISSSENSE = "Missense SNPs";
+    public static final String SNPS_AA_INSERTIONS = "AA Insertions";
+    public static final String SNPS_AA_DELETIONS = "AA Deletions";
+    public static final String SNPS_SUBSTITUTIONS = "Substitutions";
+    public static final String SNPS_INSERTIONS = "Insertions";
+    public static final String SNPS_DELETIONS = "Deletions";
+    
     private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
-    private SnpData snpData;
+    private SnpDetectionResult snpData;
     private PersistantReference reference;
     
 
@@ -207,7 +217,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_alignmentButton1ActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpData.getSnpStatistics()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpData.getStatsMap()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
 
@@ -226,7 +236,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
      * SNP result table is generated
      * @param snpData the snps to show
      */
-    public void addSNPs(SnpData snpData) {
+    public void addSNPs(SnpDetectionResult snpData) {
         
         //snp effect statistics
         int noIntergenicSnps = 0;
@@ -245,7 +255,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         final int snpDataSize = 17;
         this.snpData = snpData;
         List<SnpI> snps = this.snpData.getSnpList();
-        Map<Integer, String> trackNames = this.snpData.getTrackNames();
+        Map<Integer, PersistantTrack> trackNames = this.snpData.getTrackMap();
         DefaultTableModel model = (DefaultTableModel) snpTable.getModel();        
 
         //get all features from the reference to determine amino acid 
@@ -392,18 +402,20 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 return intA.compareTo(intB);
             }
         });
-        SnpResultStatistics snpStatistics = new SnpResultStatistics();
-        snpStatistics.setTotalNoSnps(this.snpData.getSnpList().size());
-        snpStatistics.setNoIntergenicSnps(noIntergenicSnps);
-        snpStatistics.setNoSynonymousSnps(noSynonymousSnps);
-        snpStatistics.setNoChemicallyNeutralSnps(noChemicallyNeutralSnps);
-        snpStatistics.setNoMissenseSnps(noMissenseSnps);
-        snpStatistics.setNoAAInsertions(noAAInsertions);
-        snpStatistics.setNoAADeletions(noAADeletions);
-        snpStatistics.setNoSubstitutions(noSubstitutions);
-        snpStatistics.setNoInsertions(noInsertions);
-        snpStatistics.setNoDeletions(noDeletions);
-        this.snpData.setSnpStatistics(snpStatistics);
+        Map<String, Integer> snpStatsMap = new HashMap<>();
+        
+        snpStatsMap.put(SNPS_TOTAL, this.snpData.getSnpList().size());
+        snpStatsMap.put(SNPS_INTERGENEIC, noIntergenicSnps);
+        snpStatsMap.put(SNPS_SYNONYMOUS, noSynonymousSnps);
+        snpStatsMap.put(SNPS_CHEMIC_NEUTRAL, noChemicallyNeutralSnps);
+        snpStatsMap.put(SNPS_MISSSENSE, noMissenseSnps);
+        snpStatsMap.put(SNPS_AA_INSERTIONS, noAAInsertions);
+        snpStatsMap.put(SNPS_AA_DELETIONS, noAADeletions);
+        snpStatsMap.put(SNPS_SUBSTITUTIONS, noSubstitutions);
+        snpStatsMap.put(SNPS_INSERTIONS, noInsertions);
+        snpStatsMap.put(SNPS_DELETIONS, noDeletions);
+        
+        this.snpData.setStatsMap(snpStatsMap);
         
         this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, 
                 "SNP_DetectionResultPanel.parametersLabel.text", snpData.getMinPercentDeviation(), snpData.getMinNoDeviatingCoverage()));
