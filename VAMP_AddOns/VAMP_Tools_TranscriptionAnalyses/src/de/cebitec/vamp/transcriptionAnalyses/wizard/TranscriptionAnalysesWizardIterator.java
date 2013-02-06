@@ -171,7 +171,6 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
         }
         ++index;
         wiz.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, index);
-        System.out.println(wiz.getProperty(WizardDescriptor.PROP_CONTENT_DATA).toString());
     }
 
     @Override
@@ -180,6 +179,9 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             throw new NoSuchElementException();
         }
         --index;
+//        if (index == 0) {
+//            
+//        }
         wiz.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, index);
     }
 

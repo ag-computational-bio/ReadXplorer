@@ -127,7 +127,7 @@ public class BioJavaParser implements ReferenceParserI {
 
             // take only the first sequence from file, if exists
             while (seqIter.hasNext()) {
-                locusTag = "unknown locus tag";;
+                locusTag = "unknown locus tag";
                 geneName = "";
                 start = 0;
                 stop = 0;
