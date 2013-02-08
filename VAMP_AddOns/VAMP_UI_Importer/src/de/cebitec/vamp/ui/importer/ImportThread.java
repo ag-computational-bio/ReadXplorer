@@ -406,12 +406,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             samBamDirectSeqPairClassifier.registerObserver(this);
                             samBamDirectSeqPairClassifier.classifySeqPairs();
                             this.deleteOldWorkFile(lastWorkFile);
+                            samBamDirectParser.removeObserver(this);
                         } //else case with 2 already imported tracks is prohibited
 
                         //create position table
                         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
                         posTableCreator.registerObserver(this);
                         ParsedTrack track = posTableCreator.createPosTable(trackJob1, referenceSeq);
+                        posTableCreator.removeObserver(this);
 //                            posTableCreator.getStatistics();
 
                         this.storeDirectAccessTrack(track); // store track entry in db
@@ -587,6 +589,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 Exceptions.printStackTrace(ex); //TODO: remove this error handling
             }
             inputFile.setWritable(true);
+            samBamDirectParser.removeObserver(this);
         }
 
         //generate position table data from track
@@ -594,6 +597,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
         posTableCreator.registerObserver(this);
         ParsedTrack track = posTableCreator.createPosTable(trackJob, referenceSeq);
+        posTableCreator.removeObserver(this);
 
         this.storeDirectAccessTrack(track);
     }

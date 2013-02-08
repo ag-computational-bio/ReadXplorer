@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
@@ -230,7 +229,8 @@ public class SamBamPosTableCreator implements Observable {
         statsContainer.setMappingInfos(this.mappingInfos);
         track = new ParsedTrack(trackJob, statsContainer, coverageContainer);
         this.notifyObservers(track);
-        this.coverageContainer.clearCoverageContainer();
+        this.mappingInfos = new HashMap<>();
+        this.coverageContainer = new CoverageContainer();
         
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamDirectParser.class, "PosTableCreator.Finished", fileName);
@@ -286,14 +286,6 @@ public class SamBamPosTableCreator implements Observable {
     }
 
     /**
-     * @return the mapping infos for this dataset after extension, empty before
-     * extension.
-     */
-    public Map<Integer, Integer> getMappingInfos() {
-        return this.mappingInfos;
-    }
-
-    /**
      * Update the last interval of the given list or create a new interval in 
      * the given list, if the new boundaries are beyond the boundaries of the 
      * last interval in the list.
@@ -309,6 +301,6 @@ public class SamBamPosTableCreator implements Observable {
         } else { //increase length of first pair (start remains, stop is enlarged)
             coveredIntervals.get(lastIndex).setSecond(stop);
         }
-    }
+    }    
     
 }

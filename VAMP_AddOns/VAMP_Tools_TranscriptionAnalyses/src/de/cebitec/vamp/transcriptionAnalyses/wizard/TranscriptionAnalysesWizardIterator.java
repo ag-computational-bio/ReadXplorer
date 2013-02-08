@@ -179,9 +179,6 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             throw new NoSuchElementException();
         }
         --index;
-//        if (index == 0) {
-//            
-//        }
         wiz.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, index);
     }
 

@@ -53,6 +53,7 @@ public class TrackParser implements TrackParserI {
             
             track.getParsedMappingContainer().setMappingInfos(null);
         }
+        mappingParser.removeObserver(observer);
         mappingParser = null;
         System.gc();
         
