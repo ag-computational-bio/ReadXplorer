@@ -36,7 +36,18 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
     public static enum Tool {
 
-        DeSeq, BaySeq, SimpleTest;
+        DeSeq("DESeq"), BaySeq("baySeq"), SimpleTest("Simple Test");
+
+        private Tool(String stringRep) {
+            this.stringRep = stringRep;
+        }
+               
+        private String stringRep;
+        
+        @Override
+        public String toString(){
+            return stringRep;
+        }
     }
     
     public static enum AnalysisStatus {

@@ -87,7 +87,7 @@ public class DeSeq {
                 //Remove all the sides that don't appear under any condition because
                 //those rows produce "NA" rows in the results table.
                 gnuR.eval("inputData <- inputData[rowSums(inputData) > 0,]");
-                
+
                 //Now we need to hand over the experimental design behind the data.
                 concatenate = new StringBuilder();
                 numberOfSubDesigns = 0;
@@ -126,7 +126,12 @@ public class DeSeq {
                 if (analysisData.isWorkingWithoutReplicates()) {
                     // If there are no replicates for each condition we need to tell
                     // the function to ignore this fact.
-                    gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                    REXP res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                    //For some reasons the above computation fails on some data sets.
+                    //In those cases the following computation should do the trick.
+                    if (res == null) {
+                        gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
+                    }
                 } else {
                     //The dispersion is estimated
                     REXP res = gnuR.eval("cD <- estimateDispersions(cD)");

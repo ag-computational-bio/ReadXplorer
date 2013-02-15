@@ -40,9 +40,9 @@ public final class StartAnalysisVisualPanel extends JPanel {
         fileNameField = new javax.swing.JTextField();
         fileChooserButton = new javax.swing.JButton();
 
+        jTextArea1.setEditable(false);
         jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
         jTextArea1.setColumns(20);
-        jTextArea1.setEditable(false);
         jTextArea1.setFont(jTextArea1.getFont());
         jTextArea1.setRows(5);
         jTextArea1.setText(org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.jTextArea1.text")); // NOI18N
