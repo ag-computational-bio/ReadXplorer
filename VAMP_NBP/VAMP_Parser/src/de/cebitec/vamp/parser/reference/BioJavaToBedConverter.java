@@ -2,11 +2,11 @@
 //
 //import de.cebitec.vamp.api.objects.FeatureType;
 //import de.cebitec.vamp.parser.ReferenceJob;
-//import de.cebitec.vamp.parser.common.ParsedAnnotation;
+//import de.cebitec.vamp.parser.common.ParsedFeature;
 //import de.cebitec.vamp.parser.common.ParsedReference;
-//import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
+//import de.cebitec.vamp.parser.common.ParsedSubFeature;
 //import de.cebitec.vamp.parser.common.ParsingException;
-//import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
+//import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 //import de.cebitec.vamp.util.Observer;
 //import java.io.BufferedReader;
 //import java.io.BufferedWriter;
@@ -74,7 +74,7 @@
 //    }
 //
 //    @Override
-//    public void convertReference(ReferenceJob referenceJob, AnnotationFilter filter) throws ParsingException {
+//    public void convertReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
 //        
 //        
 //        outf = open('test/annotation/vitis_vinifera.bed', 'w')
@@ -98,9 +98,9 @@
 //                outf.write(bed_line)
 //    outf.close()
 //                
-//        refGenome.setAnnotationFilter(filter);
+//        refGenome.setFeatureFilter(filter);
 //        //at first store all eonxs in one data structure and add them to the ref genome at the end
-//        List<ParsedAnnotation> exons = new ArrayList<ParsedAnnotation>();
+//        List<ParsedFeature> exons = new ArrayList<ParsedFeature>();
 //
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile());
 //        try {
@@ -140,7 +140,7 @@
 //                        int strand = 0;
 //                        String ecNumber = null;
 //                        String geneName = null;
-//                        List<ParsedSubAnnotation> subAnnotations = new ArrayList<ParsedSubAnnotation>();
+//                        List<ParsedSubFeature> subFeatures = new ArrayList<ParsedSubFeature>();
 //                        Location location = annotation.getLocation();
 //
 //                        parsedType = annotation.getType();
@@ -148,7 +148,7 @@
 //                        stop = location.getMax();
 //                        if (start >= stop) {
 //                            this.sendErrorMsg("Start bigger than stop in " + referenceJob.getFile().getAbsolutePath() 
-//                                    + ". Found start: " + start + ", stop: " + stop + ". Annotation ignored.");
+//                                    + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
 //                            continue;
 //                        }
 //                        try {
@@ -159,7 +159,7 @@
 //                        }
 //
 //                        //Determine annotation tags
-//                        Iterator<Note> noteIter = annotation.getRichAnnotation().getNoteSet().iterator();
+//                        Iterator<Note> noteIter = annotation.getRichFeature().getNoteSet().iterator();
 //                        while (noteIter.hasNext()) {
 //                            Note note = noteIter.next();
 //                            String name = note.getTerm().getName();
@@ -209,7 +209,7 @@
 //                            type = FeatureType.EXON;
 //                            System.out.println("exon found"); //if exon is within range of lastGene = belongs to it
 //                            
-//                            exons.add(new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, subAnnotations));
+//                            exons.add(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures));
 //                            continue;
 //                        } else {
 //                            this.sendErrorMsg(referenceJob.getFile().getName()
@@ -226,25 +226,25 @@
 //                         */
 //                        //check annotation for subannotations
 //                        if (location.toString().contains("join")) {
-//                            Iterator<Location> subAnnotationIter = location.blockIterator();
+//                            Iterator<Location> subFeatureIter = location.blockIterator();
 //                            int subStart = -1;
 //                            int subStop = -1;
-//                            while (subAnnotationIter.hasNext()) {
+//                            while (subFeatureIter.hasNext()) {
 //
-//                                String pos = subAnnotationIter.next().toString();
+//                                String pos = subFeatureIter.next().toString();
 //                                //array always contains at least 2 entries
 //                                String[] posArray = pos.split("\\..");
 //                                subStart = Integer.parseInt(posArray[0]);
 //                                subStop = Integer.parseInt(posArray[1]);
-//                                subAnnotations.add(new ParsedSubAnnotation(subStart, subStop, type));
+//                                subFeatures.add(new ParsedSubFeature(subStart, subStop, type));
 //                            }
 //                        }
 //
 //                        //TODO: filter unknown annotations, if a known annotation exists with same locus! best to do not here
-//                        ParsedAnnotation currentAnnotation = new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, subAnnotations);
-//                        refGenome.addAnnotation(currentAnnotation);
-////                        if (currentAnnotation.getType() == FeatureType.GENE){
-////                            lastGenes.add(currentAnnotation);
+//                        ParsedFeature currentFeature = new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures);
+//                        refGenome.addFeature(currentFeature);
+////                        if (currentFeature.getType() == FeatureType.GENE){
+////                            lastGenes.add(currentFeature);
 ////                        }
 //
 //                    }
@@ -259,7 +259,7 @@
 //        } catch (Exception ex) {
 //            this.sendErrorMsg(ex.getMessage());
 //        }
-//        refGenome.addSubAnnotations(exons);
+//        refGenome.addSubFeatures(exons);
 //        return refGenome;
 //        
 //    }

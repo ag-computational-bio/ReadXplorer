@@ -1,88 +1,88 @@
 package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 
 /**
- * @author MKD, rhilker
- * 
- * A putative operon is a data structure for storing two neighboring annotations,
- * which might form an operon. It also contains the read counts only associated to annotation1/2,
+ * A putative operon is a data structure for storing two neighboring features,
+ * which might form an operon. It also contains the read counts only associated to feature1/2,
  * the spanning and the internal read counts.
+ *
+ * @author MKD, rhilker
  */
 public class OperonAdjacency {
 
-    private PersistantAnnotation annotation1;
-    private PersistantAnnotation annotation2;
-    private int readsAnnotation1;
+    private PersistantFeature feature1;
+    private PersistantFeature feature2;
+    private int readsFeature1;
     private int spanningReads;
-    private int readsAnnotation2;
+    private int readsFeature2;
     private int internalReads;
   
     /**
      * A putative operon is a data structure for storing two neighboring
-     * annotations, which might form an operon. It also contains the read counts
-     * only associated to annotation1/2, the spanning and the internal read
+     * features, which might form an operon. It also contains the read counts
+     * only associated to feature1/2, the spanning and the internal read
      * counts.
      */
-    public OperonAdjacency(PersistantAnnotation annotation1, PersistantAnnotation annotation2) {
-        this.annotation1 = annotation1;
-        this.annotation2 = annotation2;
+    public OperonAdjacency(PersistantFeature feature1, PersistantFeature feature2) {
+        this.feature1 = feature1;
+        this.feature2 = feature2;
     }
 
     /**
-     * @return the first annotation of the operon
+     * @return the first feature of the operon
      */
-    public PersistantAnnotation getAnnotation1() {
-        return annotation1;
+    public PersistantFeature getFeature1() {
+        return feature1;
     }
 
     /**
-     * @return the second annotation of the operon
+     * @return the second feature of the operon
      */
-    public PersistantAnnotation getAnnotation2() {
-        return annotation2;
+    public PersistantFeature getFeature2() {
+        return feature2;
     }
 
     /**
-     * @return the reads associated with Annotation1
+     * @return the reads associated with Feature1
      */
-    public int getReadsAnnotation1() {
-        return readsAnnotation1;
+    public int getReadsFeature1() {
+        return readsFeature1;
     }
 
     /**
-     * @param readsAnnotation1 the reads associated with Annotation1
+     * @param readsFeature1 the reads associated with Feature1
      */
-    public void setReadsAnnotation1(int readsAnnotation1) {
-        this.readsAnnotation1 = readsAnnotation1;
+    public void setReadsFeature1(int readsFeature1) {
+        this.readsFeature1 = readsFeature1;
     }
 
     /**
-     * @return the number of reads spanning from annotation 1 into 2
+     * @return the number of reads spanning from feature 1 into 2
      */
     public int getSpanningReads() {
         return spanningReads;
     }
 
     /**
-     * @param spanningReads set the number of reads spanning from annotation 1 into 2
+     * @param spanningReads set the number of reads spanning from feature 1 into 2
      */
     public void setSpanningReads(int spanningReads) {
         this.spanningReads = spanningReads;
     }
 
     /**
-     * @return the readsAnnotation2
+     * @return the readsFeature2
      */
-    public int getReadsAnnotation2() {
-        return readsAnnotation2;
+    public int getReadsFeature2() {
+        return readsFeature2;
     }
 
     /**
-     * @param readsAnnotation2 the readsAnnotation2 to set
+     * @param readsFeature2 the readsFeature2 to set
      */
-    public void setReadsAnnotation2(int readsAnnotation2) {
-        this.readsAnnotation2 = readsAnnotation2;
+    public void setReadsFeature2(int readsFeature2) {
+        this.readsFeature2 = readsFeature2;
     }
 
     /**

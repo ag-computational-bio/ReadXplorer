@@ -44,7 +44,6 @@ public class CoverageThread extends RequestThread {
     private ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResultPersistant currentCov;
     private int coveredWidth;
-    private IntervalRequest latestRequest;
     private double requestCounter;
     private double skippedCounter;
     private boolean isDbUsed = false;
@@ -141,7 +140,7 @@ public class CoverageThread extends RequestThread {
         // round down to multiple of sub interval length 
         int result = centerMiddle / getMinimumSubIntervalLength() * getMinimumSubIntervalLength();
         // and extend with one extra subinterval 
-        result = result - getMinimumSubIntervalLength();
+        result -= getMinimumSubIntervalLength();
         
         return result < 0 ? 0 : result;
     }
@@ -161,8 +160,8 @@ public class CoverageThread extends RequestThread {
         int result = this.calcCenterLeft(request) + MINIMUMINTERVALLENGTH;
         
         //take care of intervals bigger than the minimum length
-        if (result<request.getTo()) return ((request.getTo() / getMinimumSubIntervalLength())+1) * getMinimumSubIntervalLength();
-        else return result;
+        if (result < request.getTo()) { return ((request.getTo() / getMinimumSubIntervalLength())+1) * getMinimumSubIntervalLength(); }
+        else { return result; }
     }
     
     /**
@@ -182,9 +181,11 @@ public class CoverageThread extends RequestThread {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
             this.referenceGenome = refConnector.getRefGenome();
         }
-        SamBamFileReader externalDataReader;
-        externalDataReader = new SamBamFileReader(file, track.getId());
-        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
+        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId());
+        CoverageAndDiffResultPersistant result = externalDataReader.getCoverageFromBam(
+                this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
+        externalDataReader.close();
+        return result;
 
     }
 

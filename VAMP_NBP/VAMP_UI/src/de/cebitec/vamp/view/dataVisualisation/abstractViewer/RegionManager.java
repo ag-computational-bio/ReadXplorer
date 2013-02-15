@@ -44,7 +44,7 @@ public class RegionManager {
         this.regionVisualizer = regionVisualizer;
         this.parentViewer = parentViewer;
         this.highlightListener = highlightListener;
-        this.cdsRegions = new ArrayList<Region>();
+        this.cdsRegions = new ArrayList<>();
         
         BoundsInfo bounds = parentViewer.getBoundsInfo();
         this.codonFilter = new StartCodonFilter(bounds.getLogLeft(), bounds.getLogRight(), refGen);
@@ -103,6 +103,7 @@ public class RegionManager {
      * Detects the occurences of the given pattern in the currently shown interval
      * or the next occurence of the pattern in the genome.
      * @param pattern Pattern to search for
+     * @return the closest position of the next occurrence of the pattern 
      */
     public int showPattern(String pattern) {
         this.patternFilter.setPattern(pattern);
@@ -131,16 +132,16 @@ public class RegionManager {
      */
     public void findCodons() {
         //create the list of component types, that should be removed (only patterns)
-        List<Byte> typeList = new ArrayList<Byte>();
+        List<Byte> typeList = new ArrayList<>();
         typeList.add(Properties.START);
         typeList.add(Properties.STOP);
         this.regionVisualizer.removeAll(typeList);
         this.highlightListener.clearSpecialRegions();
         this.codonFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
-        this.regionVisualizer.determineAnnotationFrame();
-        byte frameCurrAnnotation = this.regionVisualizer.getFrameCurrAnnotation();
+        this.regionVisualizer.determineFeatureFrame();
+        byte frameCurrFeature = this.regionVisualizer.getFrameCurrFeature();
 
-        this.codonFilter.setCurrAnnotationData(frameCurrAnnotation);
+        this.codonFilter.setCurrFeatureData(frameCurrFeature);
         List<Region> codonHitsToHighlight = this.codonFilter.findRegions();
         for (Region region : codonHitsToHighlight) {
 

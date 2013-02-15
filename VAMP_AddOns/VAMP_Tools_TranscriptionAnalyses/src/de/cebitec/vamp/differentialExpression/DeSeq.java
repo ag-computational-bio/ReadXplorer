@@ -28,7 +28,7 @@ public class DeSeq {
     }
 
     public List<DeSeqAnalysisHandler.Result> process(DeSeqAnalysisData analysisData,
-            int numberOfAnnotations, int numberOfTracks, File saveFile)
+            int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
             IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
@@ -66,7 +66,7 @@ public class DeSeq {
                 concatenate.deleteCharAt(concatenate.length() - 1);
                 concatenate.append(")");
                 //Then the big count data matrix is created out of the single track data handed over.
-                gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfAnnotations + ")");
+                gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
                 //The colum names are created...
                 concatenate = new StringBuilder("c(");
                 List<PersistantTrack> tracks = analysisData.getSelectedTraks();

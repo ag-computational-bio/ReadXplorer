@@ -132,17 +132,17 @@ public class SequencePairViewer extends AbstractViewer {
     private void createAndShowNewLayout(int from, int to) {
 //        this.paintPanel.removeAll();
         
-        //check for annotation types in the exclusion list and adapt database query for performance
-        List<FeatureType> excludedAnnotationTypes = this.getExcludedFeatureTypes();
+        //check for feature types in the exclusion list and adapt database query for performance
+        List<FeatureType> excludedFeatureTypes = this.getExcludedFeatureTypes();
         byte includedTypeFlag = Properties.BOTH;
-        if (excludedAnnotationTypes.contains(FeatureType.SINGLE_MAPPING) &&
-            excludedAnnotationTypes.contains(FeatureType.PERFECT_PAIR) && 
-            excludedAnnotationTypes.contains(FeatureType.DISTORTED_PAIR)){
+        if (excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING) &&
+            excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR) && 
+            excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR)){
             includedTypeFlag = Properties.NONE;
-        } else if (excludedAnnotationTypes.contains(FeatureType.SINGLE_MAPPING)){
+        } else if (excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING)){
             includedTypeFlag = Properties.SEQ_PAIRS;
-        } else if (excludedAnnotationTypes.contains(FeatureType.PERFECT_PAIR) && 
-                   excludedAnnotationTypes.contains(FeatureType.DISTORTED_PAIR)) {
+        } else if (excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR) && 
+                   excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR)) {
             includedTypeFlag = Properties.SINGLE_MAPPINGS;
         }
 

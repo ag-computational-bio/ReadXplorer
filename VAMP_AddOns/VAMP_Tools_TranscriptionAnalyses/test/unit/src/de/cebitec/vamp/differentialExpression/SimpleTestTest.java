@@ -27,7 +27,7 @@ import org.openide.util.Exceptions;
 public class SimpleTestTest {
 
     private static SimpleTest instance = new SimpleTest();
-    private static int numberOfAnnotations;
+    private static int numberOfFeatures;
     private static List<String> loci;
     private static List<String> tracks;
     private static List<List<Integer>> allCountData;
@@ -100,7 +100,7 @@ public class SimpleTestTest {
             selectedTraks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
         }
 
-        numberOfAnnotations = loci.size();
+        numberOfFeatures = loci.size();
 
         groupA = new int[4];
         groupA[0] = 1;
@@ -143,7 +143,7 @@ public class SimpleTestTest {
         List expResult = null;
         List result = null;
         try {
-            result = instance.process(analysisData, numberOfAnnotations, saveFile);
+            result = instance.process(analysisData, numberOfFeatures, saveFile);
         } catch (JRILibraryNotInPathException | IllegalStateException | UnknownGnuRException ex) {
             Exceptions.printStackTrace(ex);
         }

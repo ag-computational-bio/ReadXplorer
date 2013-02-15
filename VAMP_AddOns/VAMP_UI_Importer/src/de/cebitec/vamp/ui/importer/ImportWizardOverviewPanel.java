@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;

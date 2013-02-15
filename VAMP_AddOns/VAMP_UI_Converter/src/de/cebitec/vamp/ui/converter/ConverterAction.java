@@ -6,12 +6,14 @@ import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
-import org.openide.awt.ActionRegistration;
+import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
-import org.openide.awt.ActionID;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
@@ -38,16 +40,18 @@ public final class ConverterAction implements ActionListener {
     public static final String PROP_REFERENCE_NAME = "referenceName";
     public static final String PROP_REFERENCE_LENGTH = "referenceLength";
     
-    private WizardDescriptor.Panel<WizardDescriptor>[] panels;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
     
     @Override
+    @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
   
         if (panels == null) {
-            panels = new WizardDescriptor.Panel[]{new ConverterWizardPanel()};
+            panels = new ArrayList<>();
+            panels.add(new ConverterWizardPanel());
         }
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(VisualisationUtils.getWizardPanels(panels));
+        WizardDescriptor wizardDescriptor = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
         wizardDescriptor.setTitle(NbBundle.getMessage(ConverterAction.class, "TTL_ConvertWizardTitle"));

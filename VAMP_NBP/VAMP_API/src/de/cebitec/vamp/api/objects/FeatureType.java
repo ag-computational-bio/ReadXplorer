@@ -1,14 +1,14 @@
 package de.cebitec.vamp.api.objects;
 
 /**
- *@author ddoppmeier, rhilker
- * 
  * Enumeration for all different features types used in vamp. This does not only
- * include genetic annotations, but also features displayed in viewers.
+ * include genetic features, but also features displayed in viewers.
  * Each type is created with an integer and a string representation and
  * it can return values for both. 
  * It also allows to return the feature type represented by a given integer
  * or string.
+ * 
+ *@author ddoppmeier, rhilker
  */
 public enum FeatureType {
     
@@ -216,30 +216,19 @@ public enum FeatureType {
      * FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType(String type){
-        if (type.equals(UNDEFINED_STRING)){
-            return UNDEFINED;
-        } else if (type.equals(MRNA_STRING)){
-            return MRNA;
-        } else if (type.equals(CDS_STRING)){
-            return CDS;
-        } else if (type.equals(MISC_RNA_STRING)){
-            return MISC_RNA;
-        } else if (type.equals(RRNA_STRING)){
-            return RRNA;
-        } else if (type.equals(REPEAT_UNIT_STRING)){
-            return REPEAT_UNIT;
-        } else if (type.equals(SOURCE_STRING)){
-            return SOURCE;
-        } else if (type.equals(TRNA_STRING)){
-            return TRNA;
-        } else if (type.equals(GENE_STRING)){
-            return GENE;
-        } else if (type.equals(MIRNA_STRING)){
-            return MIRNA;
-        } else if (type.equals(EXON_STRING)){
-            return EXON;
-        } else {
-            return UNDEFINED;
+        switch (type) {
+            case UNDEFINED_STRING:      return UNDEFINED;
+            case MRNA_STRING:           return MRNA;
+            case CDS_STRING:            return CDS;
+            case MISC_RNA_STRING:       return MISC_RNA;
+            case RRNA_STRING:           return RRNA;
+            case REPEAT_UNIT_STRING:    return REPEAT_UNIT;
+            case SOURCE_STRING:         return SOURCE;
+            case TRNA_STRING:           return TRNA;
+            case GENE_STRING:           return GENE;
+            case MIRNA_STRING:          return MIRNA;
+            case EXON_STRING:           return EXON;
+            default:                    return UNDEFINED;
         }
     }
     

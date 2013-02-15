@@ -16,25 +16,32 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" attributes="0">
+              <Component id="parametersLabel" pref="484" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="statisticsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="0" pref="724" max="32767" attributes="0"/>
+          <Component id="tssScrollPane" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="jScrollPane1" pref="274" max="32767" attributes="0"/>
+              <Component id="tssScrollPane" pref="505" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="exportButton" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="exportButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="parametersLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="statisticsButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+    <Container class="javax.swing.JScrollPane" name="tssScrollPane">
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
@@ -44,16 +51,17 @@
         <Component class="javax.swing.JTable" name="tSSTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="11" rowCount="0">
+              <Table columnCount="12" rowCount="0">
                 <Column editable="false" title="Position" type="java.lang.Integer"/>
+                <Column editable="false" title="Track" type="java.lang.Object"/>
                 <Column editable="false" title="Strand" type="java.lang.String"/>
                 <Column editable="false" title="Initial Coverage" type="java.lang.Integer"/>
                 <Column editable="false" title="Start Coverage" type="java.lang.Integer"/>
                 <Column editable="false" title="Coverage Increase" type="java.lang.Integer"/>
                 <Column editable="false" title="Coverage Increase %" type="java.lang.Integer"/>
-                <Column editable="false" title="Correct Annotation" type="java.lang.String"/>
-                <Column editable="false" title="Next Upstream Annotation" type="java.lang.String"/>
-                <Column editable="false" title="Next Downstream Annotation" type="java.lang.String"/>
+                <Column editable="false" title="Correct Feature" type="java.lang.String"/>
+                <Column editable="false" title="Next Upstream Feature" type="java.lang.String"/>
+                <Column editable="false" title="Next Downstream Feature" type="java.lang.String"/>
                 <Column editable="false" title="Unannotated Transcript" type="java.lang.Boolean"/>
                 <Column editable="false" title="Transcript Stop" type="java.lang.Integer"/>
               </Table>
@@ -63,6 +71,13 @@
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title11" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -123,6 +138,20 @@
                   <Editor/>
                   <Renderer/>
                 </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title10" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
               </TableColumnModel>
             </Property>
             <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
@@ -140,6 +169,23 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="parametersLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.parametersLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="statisticsButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.statisticsButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="statisticsButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

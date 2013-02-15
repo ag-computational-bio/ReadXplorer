@@ -32,7 +32,7 @@ public final class LogoutAction implements ActionListener {
             //do not close the dashboard window, if opened!
             TopComponent dashboard = WindowManager.getDefault().findTopComponent("DashboardWindowTopComponent");
             for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
-                if (tc!=dashboard) tc.close();
+                if (tc != dashboard) { tc.close(); }
 //                TopComponent tc1 = WindowManager.getDefault().findTopComponent("RNAFolderTopComponent");
 //                if (tc1 != null){ //useful if rna viewer should be openend after closing DB connection
 //                    tc.close();

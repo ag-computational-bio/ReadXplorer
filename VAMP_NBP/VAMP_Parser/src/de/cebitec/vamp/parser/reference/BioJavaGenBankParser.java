@@ -1,12 +1,12 @@
 package de.cebitec.vamp.parser.reference;
 
-import de.cebitec.vamp.parser.common.ParsedAnnotation;
-import de.cebitec.vamp.parser.common.ParsedReference;
-import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
-import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
+import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedReference;
+import de.cebitec.vamp.parser.common.ParsedSubFeature;
+import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -42,13 +42,13 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
     private static String parserName = "BioJava GenBank";
     private static String fileDescription = "GenBank file";
     
-    private ArrayList<Observer> observers = new ArrayList<Observer>();
+    private ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
     @Override
-    public ParsedReference parseReference(ReferenceJob refGenJob, AnnotationFilter filter) throws ParsingException {
+    public ParsedReference parseReference(ReferenceJob refGenJob, FeatureFilter filter) throws ParsingException {
         ParsedReference refGenome = new ParsedReference();
-        refGenome.setAnnotationFilter(filter);
+        refGenome.setFeatureFilter(filter);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
         try {
@@ -71,21 +71,21 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                 refGenome.setTimestamp(refGenJob.getTimestamp());
                 refGenome.setSequence(seq.seqString());
 
-                // iterate through all annotations
+                // iterate through all features
                 Iterator<Feature> featIt = seq.getFeatureSet().iterator();
                 while (featIt.hasNext()){
                     RichFeature f = (RichFeature) featIt.next();
 
-                    // attributes of annotation that should be stored
-                    String parsedType = null;
+                    // attributes of feature that should be stored
+                    String parsedType;
                     String locusTag = "unknown locus tag";
                     String product = null;
-                    int start = 0;
-                    int stop = 0;
-                    int strand = 0;
+                    int start;
+                    int stop;
+                    int strand;
                     String ecNumber = null;
                     String geneName = null;
-                    List<ParsedSubAnnotation> exons = new ArrayList<ParsedSubAnnotation>();
+                    List<ParsedSubFeature> exons = new ArrayList<>();
 
                     parsedType = f.getType();
                     start = f.getLocation().getMin();
@@ -112,23 +112,23 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                         }
                     }
                     
-                    //check annotation for subannotations (currently only exons)
+                    //check feature for subfeatures (currently only exons)
                     @SuppressWarnings("unchecked")
-                    Iterator<RichFeature> subAnnotationIter = f.features();
-                    while (subAnnotationIter.hasNext()){
+                    Iterator<RichFeature> subFeatureIter = f.features();
+                    while (subFeatureIter.hasNext()){
                         
-                        RichFeature subAnnotation = subAnnotationIter.next();
-                        String type = subAnnotation.getType();
+                        RichFeature subFeature = subFeatureIter.next();
+                        String type = subFeature.getType();
                         
                         if (type.equalsIgnoreCase("exon")){
-                            int subStart = subAnnotation.getLocation().getMin();
-                            int subStop = subAnnotation.getLocation().getMax();
-                            exons.add(new ParsedSubAnnotation(subStart, subStop, FeatureType.EXON));
+                            int subStart = subFeature.getLocation().getMin();
+                            int subStop = subFeature.getLocation().getMax();
+                            exons.add(new ParsedSubFeature(subStart, subStop, FeatureType.EXON));
                         }
                     }
                     
 
-                    /* if the type of the annotation is unknown to vamp (see below),
+                    /* if the type of the feature is unknown to vamp (see below),
                      * an undefined type is used
                      */
                     FeatureType type = FeatureType.UNDEFINED;
@@ -154,11 +154,11 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                         type = FeatureType.MRNA;
                     } else {
                         this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() 
-                                + ": Using unknown annotation type for " + parsedType);
+                                + ": Using unknown feature type for " + parsedType);
                     }
 
-                    //TODO: filter unknown annotations, if a known annotation exists with same locus! best to do not here
-                    refGenome.addAnnotation(new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
+                    //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
+                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
 
                 }
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
@@ -174,13 +174,13 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
     }
     
     /**
-     * Determines the strand of an annotation
-     * @param annotation the annotation whose strand is needed
-     * @param refGenJob the reference genome job this annotation belongs to
+     * Determines the strand of an feature
+     * @param feature the feature whose strand is needed
+     * @param refGenJob the reference genome job this feature belongs to
      * @return SequenceUtils.STRAND_REV (-1), SequenceUtils.STRAND_FWD (1) or 0, if the strand cannot be determined
      */
-    private int determineStrand(RichFeature annotation, ReferenceJob refGenJob) {
-        String strandString = RichLocation.Tools.enrich(annotation.getLocation()).getStrand().toString();
+    private int determineStrand(RichFeature feature, ReferenceJob refGenJob) {
+        String strandString = RichLocation.Tools.enrich(feature.getLocation()).getStrand().toString();
         int strand = 0;
         if (strandString.equals("-")) {
             strand = SequenceUtils.STRAND_REV;

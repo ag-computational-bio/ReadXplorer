@@ -10,15 +10,15 @@ import java.util.Map;
  * Container for all mappings belonging to one track. Contains statistics as well
  * as a all mappings.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ParsedMappingContainer {
     private int numberOfMappings = 0; //the number of created mappings by the mapper
     private int numberOfBM = 0;
     private int numberOfPerfect = 0;
     private int numOfMappings = 0;
-    private int numUniqueSeq = 0;
-    private int numUniqueMappings = 0;
+    private int numUniqueSeq = 0; //mappingseq only occurs once in data set
+    private int numUniqueMappings = 0; //calculate number of unique mappings (map only to one position, but have replicates)
     private int numReads = 0;
     private HashMap<Integer, ParsedMappingGroup> mappings;
     private boolean lastMappingContainer = false;

@@ -1,10 +1,10 @@
 package de.cebitec.vamp.util;
 
 /**
- * @author rhilker
- * 
  * Enumeration for sequence comparisons. The different types can represent for 
  * example if something matches, was substituted, inserted, or deleted. 
+ *
+ * @author rhilker
  */
 public enum SequenceComparison {
     
@@ -39,12 +39,16 @@ public enum SequenceComparison {
     
     private char type;
     
+    /**
+     * Enumeration for sequence comparisons. The different types can represent
+     * for example if something matches, was substituted, inserted, or deleted.
+     */
     private SequenceComparison(char type) {
         this.type = type;
     }
     
     /**
-     * @return the effect type of the current effect.
+     * @return the effect type char of the current effect.
      */
     public char getType(){
         return type;
@@ -74,6 +78,9 @@ public enum SequenceComparison {
         }
     }
     
+    /**
+     * @return the String value of the type char of the current effect
+     */
     @Override
     public String toString(){
         return String.valueOf(type);

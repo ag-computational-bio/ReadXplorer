@@ -130,7 +130,7 @@
                           <Group type="102" attributes="0">
                               <Component id="filterForLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="radioAnnotationButton" min="-2" max="-2" attributes="0"/>
+                              <Component id="radioFeatureButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="radioGene" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -156,7 +156,7 @@
                           <Component id="filterForLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioProduct" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioEC" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="radioAnnotationButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioFeatureButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioGene" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -209,16 +209,16 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioECActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JRadioButton" name="radioAnnotationButton">
+            <Component class="javax.swing.JRadioButton" name="radioFeatureButton">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="buttonGroup1"/>
                 </Property>
                 <Property name="selected" type="boolean" value="true"/>
-                <Property name="text" type="java.lang.String" value="Annotation"/>
+                <Property name="text" type="java.lang.String" value="Feature"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioAnnotationButtonActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioFeatureButtonActionPerformed"/>
               </Events>
             </Component>
             <Component class="javax.swing.JRadioButton" name="radioGene">
@@ -239,7 +239,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTable" name="annotationTable">
+            <Component class="javax.swing.JTable" name="featureTable">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <SerializedValue value="-84,-19,0,5,115,114,0,64,111,114,103,46,110,101,116,98,101,97,110,115,46,109,111,100,117,108,101,115,46,102,111,114,109,46,101,100,105,116,111,114,115,50,46,84,97,98,108,101,77,111,100,101,108,69,100,105,116,111,114,36,78,98,84,97,98,108,101,77,111,100,101,108,-95,8,-65,-35,21,111,108,-106,12,0,0,120,114,0,36,106,97,118,97,120,46,115,119,105,110,103,46,116,97,98,108,101,46,65,98,115,116,114,97,99,116,84,97,98,108,101,77,111,100,101,108,114,-53,-21,56,-82,1,-1,-66,2,0,1,76,0,12,108,105,115,116,101,110,101,114,76,105,115,116,116,0,37,76,106,97,118,97,120,47,115,119,105,110,103,47,101,118,101,110,116,47,69,118,101,110,116,76,105,115,116,101,110,101,114,76,105,115,116,59,120,112,119,8,0,0,0,4,0,0,0,4,117,114,0,19,91,76,106,97,118,97,46,108,97,110,103,46,83,116,114,105,110,103,59,-83,-46,86,-25,-23,29,123,71,2,0,0,120,112,0,0,0,4,116,0,7,84,105,116,108,101,32,49,116,0,7,84,105,116,108,101,32,50,116,0,7,84,105,116,108,101,32,51,116,0,7,84,105,116,108,101,32,52,117,114,0,2,91,90,87,-113,32,57,20,-72,93,-30,2,0,0,120,112,0,0,0,4,1,1,1,1,116,0,16,106,97,118,97,46,108,97,110,103,46,79,98,106,101,99,116,113,0,126,0,12,113,0,126,0,12,113,0,126,0,12,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,112,120"/>

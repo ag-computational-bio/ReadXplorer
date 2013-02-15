@@ -6,53 +6,51 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author MKD, rhilker
- * 
  * Carries out the analysis of a data set for operons.
+ *
+ * @author MKD, rhilker
  */
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
-    private TrackViewer trackViewer;
-    private TrackConnector trackCon;
+    private TrackConnector trackConnector;
     private int minNumberReads;
     private int genomeSize;
-    private List<PersistantAnnotation> genomeAnnotations;
+    private List<PersistantFeature> genomeFeatures;
     private List<Operon> operonList; //final result list of OperonAdjacencies
     private boolean operonDetectionAutomatic;
-    private HashMap<Integer, OperonAdjacency> annoToPutativeOperonMap; //annotation id of mappings to count for annotations
+    private HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
     private List<OperonAdjacency> operonAdjacencies; 
     private int averageReadLength = 0;
     private int averageSeqPairLength = 0;
     private int lastMappingIdx;
-    private int readsAnnotation1 = 0;
+    private int readsFeature1 = 0;
     private int spanningReads = 0;
-    private int readsAnnotation2 = 0;
+    private int readsFeature2 = 0;
     private int internalReads = 0;
 
     /**
      * Carries out the analysis of a data set for operons.
-     * @param trackViewer the trackViewer whose data is to be analyzed
-     * @param minNumberReads the minimal number of spanning reads between neighboring genes
+     * @param trackConnector the trackConnector whose data is to be analyzed
+     * @param minNumberReads the minimal number of spanning reads between neighboring features
      * @param operonDetectionAutomatic true, if the minimal number of spanning reads is not given and
      *      should be calculated by the software
      */
-    public AnalysisOperon(TrackViewer trackViewer, int minNumberReads, boolean operonDetectionAutomatic) {
-        this.trackViewer = trackViewer;
+    public AnalysisOperon(TrackConnector trackConnector, int minNumberReads, boolean operonDetectionAutomatic) {
+        this.trackConnector = trackConnector;
         this.minNumberReads = minNumberReads;
         this.operonDetectionAutomatic = operonDetectionAutomatic;
         this.operonList = new ArrayList<>();
-        this.annoToPutativeOperonMap = new HashMap<>();
+        this.featureToPutativeOperonMap = new HashMap<>();
         this.operonAdjacencies = new ArrayList<>();
         
         this.initDatastructures();
@@ -60,48 +58,45 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         
     /**
      * Initializes the initial data structures needed for an operon detection analysis.
-     * This includes the detection of all neighboring annotations before the actual analysis.
+     * This includes the detection of all neighboring features before the actual analysis.
      */
     private void initDatastructures() {
-        this.trackCon = trackViewer.getTrackCon();
-        List<Integer> trackIds = new ArrayList<>();
-        trackIds.add(trackCon.getTrackID());
-        averageReadLength = trackCon.getAverageReadLength();
-        averageSeqPairLength = trackCon.getAverageSeqPairLength();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackViewer.getReference().getId());
-        this.genomeSize = refConnector.getRefGenome().getRefLength();
-        this.genomeAnnotations = refConnector.getAnnotationsForClosedInterval(0, genomeSize);
+        averageReadLength = trackConnector.getAverageReadLength();
+        averageSeqPairLength = trackConnector.getAverageSeqPairLength();
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
+        this.genomeSize = trackConnector.getRefSequenceLength();
+        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
         
         ////////////////////////////////////////////////////////////////////////////
-        // detecting all neighboring annotations which are not overlapping more than 20bp as putative operons
+        // detecting all neighboring features which are not overlapping more than 20bp as putative operons
         ////////////////////////////////////////////////////////////////////////////
         
-        for (int i = 0; i < this.genomeAnnotations.size() - 1; i++) {
+        for (int i = 0; i < this.genomeFeatures.size() - 1; i++) {
 
-            PersistantAnnotation annotation1 = this.genomeAnnotations.get(i);
-            PersistantAnnotation annotation2 = this.genomeAnnotations.get(i + 1);
+            PersistantFeature feature1 = this.genomeFeatures.get(i);
+            PersistantFeature feature2 = this.genomeFeatures.get(i + 1);
             //we currently only exclude exons from the detection 
-            if (annotation1.getType() != FeatureType.EXON) {
-                if (annotation1.isFwdStrand() == annotation2.isFwdStrand() && annotation2.getType() != FeatureType.EXON) {
-                    if (annotation2.getStart() + 20 <= annotation1.getStop()) { //genes may overlap at the ends, happens quite often
+            if (feature1.getType() != FeatureType.EXON) {
+                if (feature1.isFwdStrand() == feature2.isFwdStrand() && feature2.getType() != FeatureType.EXON) {
+                    if (feature2.getStart() + 20 <= feature1.getStop()) { //features may overlap at the ends, happens quite often
                         //do nothing
                     } else {
-                        this.annoToPutativeOperonMap.put(annotation1.getId(), new OperonAdjacency(annotation1, annotation2));
+                        this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2));
                     }
-                } else { // check next annotations until one on the same strand is found which is not an exon.
+                } else { // check next features until one on the same strand is found which is not an exon.
                     /*
-                     * We keep all neighboring annotations on the same strand,
+                     * We keep all neighboring features on the same strand,
                      * even if their distance is not larger than 1000bp.
                      */
-                    int annoIndex = i + 2;
-                    while ((annotation1.isFwdStrand() != annotation2.isFwdStrand() || 
-                            annotation2.getType() == FeatureType.EXON) && 
-                            annoIndex < this.genomeAnnotations.size() - 1) {
+                    int featureIndex = i + 2;
+                    while ((feature1.isFwdStrand() != feature2.isFwdStrand() || 
+                            feature2.getType() == FeatureType.EXON) && 
+                            featureIndex < this.genomeFeatures.size() - 1) {
                         
-                        annotation2 = this.genomeAnnotations.get(annoIndex++);
+                        feature2 = this.genomeFeatures.get(featureIndex++);
                     }
-                    if (annotation1.isFwdStrand() == annotation2.isFwdStrand() && annotation2.getStart() - annotation1.getStop() < 1000) {
-                        this.annoToPutativeOperonMap.put(annotation1.getId(), new OperonAdjacency(annotation1, annotation2));
+                    if (feature1.isFwdStrand() == feature2.isFwdStrand() && feature2.getStart() - feature1.getStop() < 1000) {
+                        this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2));
                     }
                 }
             }
@@ -137,52 +132,52 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     }
 
     /**
-     * Sums up the read counts for the annotations the mappings are located in.
+     * Sums up the read counts for the features the mappings are located in.
      * @param mappings the set of mappings to be investigated
      */
     public void sumReadCounts(List<PersistantMapping> mappings) {
 
-        PersistantAnnotation annotation1;
-        PersistantAnnotation annotation2;
+        PersistantFeature feature1;
+        PersistantFeature feature2;
         boolean fstFittingMapping;
         PersistantMapping mapping;
         OperonAdjacency putativeOperon;
 
-        for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
-            annotation1 = this.genomeAnnotations.get(i);
-            int id1 = annotation1.getId();
+        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
+            feature1 = this.genomeFeatures.get(i);
+            int id1 = feature1.getId();
             fstFittingMapping = true;
 
-            //we can already neglect all annotations not forming a putative operon
-            if (this.annoToPutativeOperonMap.containsKey(id1)) {
-                annotation2 = this.annoToPutativeOperonMap.get(id1).getAnnotation2();
+            //we can already neglect all features not forming a putative operon
+            if (this.featureToPutativeOperonMap.containsKey(id1)) {
+                feature2 = this.featureToPutativeOperonMap.get(id1).getFeature2();
                 
-                this.readsAnnotation1 = 0;
-                this.readsAnnotation2 = 0;
+                this.readsFeature1 = 0;
+                this.readsFeature2 = 0;
                 this.spanningReads = 0;
                 this.internalReads = 0;
 
-                int annotation1Stop = annotation1.getStop();
-                int annotation2Start = annotation2.getStart();
-                int annotation2Stop = annotation2.getStop();
+                int feature1Stop = feature1.getStop();
+                int feature2Start = feature2.getStart();
+                int feature2Stop = feature2.getStop();
 
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
                     mapping = mappings.get(j);
 
-                    if (mapping.getStart() > annotation2Stop ) {
+                    if (mapping.getStart() > feature2Stop ) {
                         break; //since the mappings are sorted by start position
-                    } else if (mapping.isFwdStrand() != annotation1.isFwdStrand() || mapping.getStop() < annotation1Stop) {
+                    } else if (mapping.isFwdStrand() != feature1.isFwdStrand() || mapping.getStop() < feature1Stop) {
                         continue;
                     }
 
-                    //mappings identified between both annotations
-                    if (mapping.getStart() <= annotation1Stop && mapping.getStop() > annotation1Stop && mapping.getStop() < annotation2Start) {
-                        readsAnnotation1 += mapping.getNbReplicates();
-                    } else if (mapping.getStart() > annotation1Stop && mapping.getStart() < annotation2Start && mapping.getStop() >= annotation2Start) {
-                        readsAnnotation2 += mapping.getNbReplicates();
-                    } else if (mapping.getStart() <= annotation1Stop && mapping.getStop() >= annotation2Start) {
+                    //mappings identified between both features
+                    if (mapping.getStart() <= feature1Stop && mapping.getStop() > feature1Stop && mapping.getStop() < feature2Start) {
+                        readsFeature1 += mapping.getNbReplicates();
+                    } else if (mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start) {
+                        readsFeature2 += mapping.getNbReplicates();
+                    } else if (mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start) {
                         spanningReads += mapping.getNbReplicates();
-                    } else if (mapping.getStart() > annotation1Stop && mapping.getStop() < annotation2Start) {
+                    } else if (mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start) {
                         internalReads += mapping.getNbReplicates();
                     }
 
@@ -192,9 +187,9 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                     }
                 }
 
-                putativeOperon = annoToPutativeOperonMap.get(id1);
-                putativeOperon.setReadsAnnotation1(putativeOperon.getReadsAnnotation1() + readsAnnotation1);
-                putativeOperon.setReadsAnnotation2(putativeOperon.getReadsAnnotation2() + readsAnnotation2);
+                putativeOperon = featureToPutativeOperonMap.get(id1);
+                putativeOperon.setReadsFeature1(putativeOperon.getReadsFeature1() + readsFeature1);
+                putativeOperon.setReadsFeature2(putativeOperon.getReadsFeature2() + readsFeature2);
                 putativeOperon.setSpanningReads(putativeOperon.getSpanningReads() + spanningReads);
                 putativeOperon.setInternalReads(putativeOperon.getInternalReads() + internalReads);
             }
@@ -204,11 +199,11 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     
     /**
      * Method for identifying operons after all read counts were summed up for each
-     * genome annotation.
+     * genome feature.
      */
     public void findOperons() {
-        Object[] annoIds = annoToPutativeOperonMap.keySet().toArray();
-        Arrays.sort(annoIds);
+        Object[] featureIds = featureToPutativeOperonMap.keySet().toArray();
+        Arrays.sort(featureIds);
         OperonAdjacency putativeOperon;
 
         /*
@@ -229,41 +224,41 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
         int count = 0;
         int lastAnnoId = 0;
-        PersistantAnnotation anno1;
-        PersistantAnnotation anno2;
+        PersistantFeature feature1;
+        PersistantFeature feature2;
         Operon operon;
-        for (int i = 0; i < annoIds.length; i++) {
+        for (int i = 0; i < featureIds.length; i++) {
             
-            putativeOperon = annoToPutativeOperonMap.get((Integer) annoIds[i]);
+            putativeOperon = featureToPutativeOperonMap.get((Integer) featureIds[i]);
             spanningReads = putativeOperon.getSpanningReads();
             internalReads = putativeOperon.getInternalReads();
-            anno1 = putativeOperon.getAnnotation1();
-            anno2 = putativeOperon.getAnnotation2();
+            feature1 = putativeOperon.getFeature1();
+            feature2 = putativeOperon.getFeature2();
 
             /* Detect an operon only, if the number of spanning reads is larger than
              * the threshold. */
             if (spanningReads >= minimumSpanningReads) {
 
                 //only in this case a new operon starts:
-                if (lastAnnoId != anno1.getId() && lastAnnoId != 0) {
+                if (lastAnnoId != feature1.getId() && lastAnnoId != 0) {
 
-                    operon = new Operon();
+                    operon = new Operon(trackConnector.getTrackID());
                     operon.addAllOperonAdjacencies(operonAdjacencies);
                     operonList.add(operon); //only here the operons are added to final list
                     operonAdjacencies.clear();
                 }
                 operonAdjacencies.add(putativeOperon);
-                lastAnnoId = anno2.getId();
+                lastAnnoId = feature2.getId();
 
             // TODO: check if parameter ok or new parameter
-            } else if (anno2.getStart() - anno1.getStop() > averageReadLength &&
+            } else if (feature2.getStart() - feature1.getStop() > averageReadLength &&
                     internalReads > minNumberReads) {
                 //create operon
                 System.out.println("found case " + ++count);
             }
         }
         if (!operonAdjacencies.isEmpty()) {
-            operon = new Operon();
+            operon = new Operon(trackConnector.getTrackID());
             operon.addAllOperonAdjacencies(operonAdjacencies);
             operonList.add(operon); //only here the operons are added to final list
         }

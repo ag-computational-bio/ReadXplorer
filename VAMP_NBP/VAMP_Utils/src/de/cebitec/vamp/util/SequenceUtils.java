@@ -11,6 +11,10 @@ public final class SequenceUtils {
     public static final byte STRAND_FWD = 1;
     /** Indicates that something is located on the reverse strand (-1). */
     public static final byte STRAND_REV = -1;
+    /** Indicates that something is located on the forward strand (Fwd). */
+    public static final String STRAND_FWD_STRING = "Fwd";
+    /** Indicates that something is located on the reverse strand (Rev). */
+    public static final String STRAND_REV_STRING = "Rev";
     
     /** String for tagging positions or anything else as not having a gene with "No gene".*/
     public static final String NO_GENE = "No gene";
@@ -31,7 +35,10 @@ public final class SequenceUtils {
     }
 
     /**
-     * Complements a sequence String.
+     * Complements a sequence String. Bases not present in the DNA or RNA
+     * alphabet are not replaced and RNA sequences are translated in DNA
+     * sequences. A = T / a = t U = A / u = a G = C / g = c all other characters
+     * are returned as they were.
      * @param sequence the string to complement
      * @return the complemented string
      */
@@ -46,10 +53,12 @@ public final class SequenceUtils {
                 case 'g': complement.append('c'); break;
                 case 't': complement.append('a'); break;
                 case 'a': complement.append('t'); break;
+                case 'u': complement.append('a'); break;
                 case 'C': complement.append('G'); break;
                 case 'G': complement.append('C'); break;
                 case 'T': complement.append('A'); break;
                 case 'A': complement.append('T'); break;
+                case 'U': complement.append('A'); break; 
                 default : complement.append(currChar);
             }
         }
@@ -80,7 +89,6 @@ public final class SequenceUtils {
      * @return the complemented base
      */
     public static char getDnaComplement(char base) {
-        base = Character.toUpperCase(base);
         char comp;
         switch (base) {
                 case 'C': comp = 'G'; break;

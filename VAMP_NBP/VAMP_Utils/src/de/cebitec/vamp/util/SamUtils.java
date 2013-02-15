@@ -98,9 +98,11 @@ public class SamUtils implements Observable {
         }
     }
     
+    /* Creates either a sam or a bam file writer depending on the ending of the 
+     * oldFile.
+     */
     /**
-     * Creates either a sam or a bam file writer depending on the ending of the 
-     * oldFile. The output file of the new writer is the old file name + the new
+     * Creates a bam file writer. The output file of the new writer is the old file name + the new
      * ending and the appropriate file extension (.sam or .bam).
      * @param oldFile the old file (if data is not stored in a file, just create
      *      a file with a name of your choice
@@ -118,7 +120,7 @@ public class SamUtils implements Observable {
 // commented out part: we currently don't allow to write sam files, only bam! (more efficient)
         
         String[] nameParts = oldFile.getAbsolutePath().split("\\.");
-        String newFileName = oldFile.getAbsolutePath();
+        String newFileName;
 //        String extension;
 //        try {
             newFileName = nameParts[0];

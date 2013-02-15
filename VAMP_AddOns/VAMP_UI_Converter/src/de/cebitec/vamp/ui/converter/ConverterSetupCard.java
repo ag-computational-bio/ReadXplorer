@@ -13,6 +13,8 @@ import org.openide.util.NbBundle;
  */
 public class ConverterSetupCard extends javax.swing.JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     private String filePath;
     private String fileExtension; //TODO: add file extension to converter
     private ConverterI[] availableParsers = new ConverterI[]{new JokToBamConverter()};
@@ -152,7 +154,9 @@ public class ConverterSetupCard extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void openFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFileButtonActionPerformed
-        new VampFileChooser(VampFileChooser.OPEN_DIALOG, currentConverter.getFileExtensions(), currentConverter.getInputFileDescription()) {
+        VampFileChooser fc = new VampFileChooser(currentConverter.getFileExtensions(), currentConverter.getInputFileDescription()) {
+            
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void save(String fileLocation) {
@@ -166,6 +170,7 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                 isRequiredInfoSet();
             }
         };
+        fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }//GEN-LAST:event_openFileButtonActionPerformed
 
     private void converterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_converterComboBoxActionPerformed
@@ -188,12 +193,12 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         String value = this.referenceLengthField.getText();
         String wholeInput = value.concat(input);
         if (input.equals("\b")) {
-            if (GeneralUtils.isValidNumberInput(value)) {
+            if (GeneralUtils.isValidPositiveNumberInput(value)) {
                 this.referenceLength = Integer.valueOf(value);
             } else {
                 this.referenceLength = -1;
             }
-        } else if (GeneralUtils.isValidNumberInput(wholeInput)) {
+        } else if (GeneralUtils.isValidPositiveNumberInput(wholeInput)) {
             this.referenceLength = Integer.valueOf(wholeInput);
         } else {
             JOptionPane.showMessageDialog(this, "Please enter a numerical reference length larger than 0!", "Invalid Length", JOptionPane.ERROR_MESSAGE);

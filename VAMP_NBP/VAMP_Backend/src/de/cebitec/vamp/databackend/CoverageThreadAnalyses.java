@@ -27,6 +27,7 @@ public class CoverageThreadAnalyses extends RequestThread {
 
     private PersistantTrack track;
     private PersistantTrack track2;
+    private List<PersistantTrack> tracks;
     private Connection con;
     private ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResultPersistant currentCov;
@@ -51,7 +52,7 @@ public class CoverageThreadAnalyses extends RequestThread {
         switch (tracks.size()){
             case 1: singleCoverageThread(tracks.get(0)); break;
             case 2: doubleCoverageThread(tracks.get(0), tracks.get(1)); break;
-            default: throw new UnsupportedOperationException("More than two tracks not supported yet.");
+            default: multipleCoverageThread(tracks);
         }
     }
 
@@ -65,6 +66,15 @@ public class CoverageThreadAnalyses extends RequestThread {
         this.track = track;
         this.track2 = track2;
         this.isDbUsed = track.isDbUsed() || track2.isDbUsed();
+    }
+    
+    private void multipleCoverageThread(List<PersistantTrack> multipleTracks) {
+        tracks = multipleTracks;
+        for (PersistantTrack t : tracks) {
+            if (t.isDbUsed()) {
+                this.isDbUsed = true;
+            }
+        }
     }
 
     @Override
@@ -89,7 +99,7 @@ public class CoverageThreadAnalyses extends RequestThread {
         }
         SamBamFileReader externalDataReader;
         externalDataReader = new SamBamFileReader(file, track.getId());
-        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
+        return externalDataReader.getCoverageFromBam(this.referenceGenome, from, to, diffsAndGapsNeeded, Byte.valueOf("0"));
 
     }
 

@@ -1,5 +1,8 @@
 package de.cebitec.vamp.tools.snp;
 
+import java.util.Map;
+import org.openide.util.NbBundle;
+
 /**
  * Panel for showing the the statistics of a SNP detection result.
  *
@@ -9,13 +12,14 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     
-    private final SnpResultStatistics snpResultMetrics;
+    private final Map<String, Integer> snpStatsMap;
 
     /**
      * Creates a new panel for showing the the statistics of a SNP detection result.
+     * @param snpStatsMap the snp results statistics to display
      */
-    public SnpStatisticsPanel(SnpResultStatistics snpResultMetrics) {
-        this.snpResultMetrics = snpResultMetrics;
+    public SnpStatisticsPanel(Map<String, Integer> snpStatsMap) {
+        this.snpStatsMap = snpStatsMap;
         initComponents();
         this.initAdditionalComponents();
     }
@@ -29,64 +33,108 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        snpTypeScrollpane = new javax.swing.JScrollPane();
+        snpTypeTable = new javax.swing.JTable();
+        snpEffectScrollpane = new javax.swing.JScrollPane();
+        snpEffectTable = new javax.swing.JTable();
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        snpTypeTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"", null},
-                {"", null},
-                {"", null},
-                {"", null},
-                {"", null},
-                {"", null},
-                {"", null}
+                {null},
+                {null},
+                {null}
             },
             new String [] {
-                "SNP type", "Count"
+                "SNP type"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false
             };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
-        jScrollPane2.setViewportView(jTable1);
-        jTable1.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.jTable1.columnModel.title0")); // NOI18N
-        jTable1.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.jTable1.columnModel.title1")); // NOI18N
+        snpTypeScrollpane.setViewportView(snpTypeTable);
+        snpTypeTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0")); // NOI18N
+
+        snpEffectTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null}
+            },
+            new String [] {
+                "SNP effect"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        snpEffectScrollpane.setViewportView(snpEffectTable);
+        snpEffectTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(snpTypeScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+            .addComponent(snpEffectScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(snpEffectScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(snpTypeScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JScrollPane snpEffectScrollpane;
+    private javax.swing.JTable snpEffectTable;
+    private javax.swing.JScrollPane snpTypeScrollpane;
+    private javax.swing.JTable snpTypeTable;
     // End of variables declaration//GEN-END:variables
 
     private void initAdditionalComponents() {
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        snpEffectTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Total number of SNPs", String.valueOf(this.snpResultMetrics.getTotalNoSnps())},
-                {"Intergenic SNPs", String.valueOf(this.snpResultMetrics.getNoIntergenicSnps())},
-                {"Synonymous SNPs", String.valueOf(this.snpResultMetrics.getNoSynonymousSnps())},
-                {"Chemically neutral SNPs", String.valueOf(this.snpResultMetrics.getNoChemicallyNeutralSnps())},
-                {"Missense SNPs", String.valueOf(this.snpResultMetrics.getNoMissenseSnps())},
-                {"Insertion", String.valueOf(this.snpResultMetrics.getNoInsertions())},
-                {"Deletion", String.valueOf(this.snpResultMetrics.getNoDeletions())}
+                {SNP_DetectionResultPanel.SNPS_TOTAL, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_TOTAL))},
+                {SNP_DetectionResultPanel.SNPS_INTERGENEIC, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_INTERGENEIC))},
+                {SNP_DetectionResultPanel.SNPS_SYNONYMOUS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_SYNONYMOUS))},
+                {SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL))},
+                {SNP_DetectionResultPanel.SNPS_MISSSENSE, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_MISSSENSE))},
+                {SNP_DetectionResultPanel.SNPS_AA_INSERTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_AA_INSERTIONS))},
+                {SNP_DetectionResultPanel.SNPS_AA_DELETIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_AA_DELETIONS))}
             },
             new String [] {
-                "SNP type", "Count"
+                NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0"), 
+                NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title1")
+                
             }
         ) {
             private static final long serialVersionUID = 1L;
@@ -105,6 +153,35 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        
+        snpTypeTable.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][]{
+                    {SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_SUBSTITUTIONS))},
+                    {SNP_DetectionResultPanel.SNPS_INSERTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_INSERTIONS))},
+                    {SNP_DetectionResultPanel.SNPS_DELETIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_DELETIONS))}
+                },
+                new String[]{
+                    NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0"), 
+                    NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title1")
+                }) {
+            private static final long serialVersionUID = 1L;
+            Class[] types = new Class[]{
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean[]{
+                false, false
+            };
+
+            @Override
+            public Class getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
             }
         });
     }

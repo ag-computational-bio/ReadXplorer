@@ -7,11 +7,17 @@ package de.cebitec.vamp.tools.snp;
  */
 public class SnpResultStatistics {
     
+    //functional stats
     private int totalNoSnps;
     private int noIntergenicSnps;
     private int noSynonymousSnps;
     private int noMissenseSnps;
     private int noChemicallyNeutralSnps;
+    private int noAAInsertions;
+    private int noAADeletions ;
+    
+    //snp type stats
+    private int noSubstitutions;
     private int noInsertions;
     private int noDeletions ;
 
@@ -19,7 +25,7 @@ public class SnpResultStatistics {
      * @return the total number of snps 
      */
     public int getTotalNoSnps() {
-        return totalNoSnps;
+        return this.totalNoSnps;
     }
 
     /**
@@ -34,7 +40,7 @@ public class SnpResultStatistics {
      * @return the number of intergenic snps
      */
     public int getNoIntergenicSnps() {
-        return noIntergenicSnps;
+        return this.noIntergenicSnps;
     }
 
     /**
@@ -49,7 +55,7 @@ public class SnpResultStatistics {
      * @return the number of synonymous snps
      */
     public int getNoSynonymousSnps() {
-        return noSynonymousSnps;
+        return this.noSynonymousSnps;
     }
 
     /**
@@ -64,7 +70,7 @@ public class SnpResultStatistics {
      * @return the number of missense mutation snps
      */
     public int getNoMissenseSnps() {
-        return noMissenseSnps;
+        return this.noMissenseSnps;
     }
 
     /**
@@ -79,7 +85,7 @@ public class SnpResultStatistics {
      * @return the number of chemically neutral snps
      */
     public int getNoChemicallyNeutralSnps() {
-        return noChemicallyNeutralSnps;
+        return this.noChemicallyNeutralSnps;
     }
 
     /**
@@ -91,32 +97,82 @@ public class SnpResultStatistics {
     }
 
     /**
-     * @return the number of insertions
+     * @return the number of snps causing a frame shift by an insertion
      */
-    public int getNoInsertions() {
-        return noInsertions;
+    public int getNoAAInsertions() {
+        return this.noAAInsertions;
     }
 
     /**
-     * set the number of insertions
-     * @param noInsertions the number of insertions
+     * sets the number of snps causing a frame shift by an insertion
+     * @param noAAInsertions the number of snps causing a frame shift by an
+     * insertion
+     */
+    public void setNoAAInsertions(int noAAInsertions) {
+        this.noAAInsertions = noAAInsertions;
+    }
+
+    /**
+     * @return the number of snps causing a frame shift by a deletion
+     */
+    public int getNoAADeletions() {
+        return this.noAADeletions;
+    }
+
+    /**
+     * sets the number of snps causing a frame shift by a deletion
+     * @param noAADeletions the number of snps causing a frame shift by a deletion
+     */
+    public void setNoAADeletions(int noAADeletions) {
+        this.noAADeletions = noAADeletions;
+    }
+
+    /**
+     * @return the number of snps causing an amino acid substitution
+     */
+    public int getNoSubstitutions() {
+        return this.noSubstitutions;
+    }
+
+    /**
+     * sets the number of snps causing an amino acid substitution
+     * @param noSubstitutions the number of snps causing an amino acid substitution
+     */
+    public void setNoSubstitutions(int noSubstitutions) {
+        this.noSubstitutions = noSubstitutions;
+    }
+    
+    /**
+     * @return the number of snps of the type insertion
+     */
+    public int getNoInsertions() {
+        return this.noInsertions;
+    }
+
+    /**
+     * set the number of snps of the type insertion
+     *
+     * @param noInsertions the number of snps of the type insertion
      */
     public void setNoInsertions(int noInsertions) {
         this.noInsertions = noInsertions;
     }
 
     /**
-     * @return the number of deletions
+     * @return the number of snps of the type deletion
      */
     public int getNoDeletions() {
-        return noDeletions;
+        return this.noDeletions;
     }
 
     /**
-     * set the number of deletions
-     * @param noDeletions the number of deletions
+     * sets the number of snps of the type deletion
+     *
+     * @param noDeletions the number of snps of the type deletion
      */
     public void setNoDeletions(int noDeletions) {
         this.noDeletions = noDeletions;
     }
+    
+    
 }

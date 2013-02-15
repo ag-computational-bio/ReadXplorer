@@ -81,7 +81,7 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
-        VampFileChooser fc = new VampFileChooser(VampFileChooser.OPEN_DIALOG, new String[1], "") {
+        VampFileChooser fc = new VampFileChooser(new String[1], "") {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -95,6 +95,7 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
                 newFileLocation = fileLocation;
             }
         };
+        fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }//GEN-LAST:event_resetButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

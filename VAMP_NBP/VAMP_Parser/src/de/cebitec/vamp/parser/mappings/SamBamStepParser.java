@@ -11,7 +11,6 @@ import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -22,7 +21,7 @@ public class SamBamStepParser implements MappingParserI {
 
     private static String name = "SAM/BAM Stepwise Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
-    private static String fileDescription = "SAM Output";
+    private static String fileDescription = "SAM/BAM Read Mappings";
     
     private SeqPairProcessorI seqPairProcessor;
     private HashMap<String, Integer> seqToIDMap;

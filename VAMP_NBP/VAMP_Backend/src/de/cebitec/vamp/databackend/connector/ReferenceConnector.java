@@ -3,9 +3,9 @@ package de.cebitec.vamp.databackend.connector;
 import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.FieldNames;
 import de.cebitec.vamp.databackend.SQLStatements;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.*;
@@ -78,54 +78,54 @@ public class ReferenceConnector {
     }
 
     /**
-     * Fetches all annotations which at least partly overlap a given region 
+     * Fetches all features which at least partly overlap a given region 
      * of the reference.
      * @param from start position of the region of interest
      * @param to end position of the region of interest
-     * @return the list of all annotations found in the interval of interest
+     * @return the list of all features found in the interval of interest
      */
-    public List<PersistantAnnotation> getAnnotationsForRegion(int from, int to){
-        List<PersistantAnnotation> annotations = new ArrayList<>();
+    public List<PersistantFeature> getFeaturesForRegion(int from, int to){
+        List<PersistantFeature> features = new ArrayList<>();
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_ANNOTATIONS_FOR_GENOME_INTERVAL);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
             fetch.setLong(1, refGenID);
             fetch.setInt(2, from);
             fetch.setInt(3, to);
 
             ResultSet rs = fetch.executeQuery();
             while(rs.next()){
-                int id = rs.getInt(FieldNames.ANNOTATION_ID);
-                String ecnum = rs.getString(FieldNames.ANNOTATION_EC_NUM);
-                String locus = rs.getString(FieldNames.ANNOTATION_LOCUS_TAG);
-                String product = rs.getString(FieldNames.ANNOTATION_PRODUCT);
-                int start = rs.getInt(FieldNames.ANNOTATION_START);
-                int stop = rs.getInt(FieldNames.ANNOTATION_STOP);
-                boolean isFwdStrand = rs.getInt(FieldNames.ANNOTATION_STRAND) == SequenceUtils.STRAND_FWD;
-                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.ANNOTATION_TYPE));
-                String gene = rs.getString(FieldNames.ANNOTATION_GENE);
+                int id = rs.getInt(FieldNames.FEATURE_ID);
+                String ecnum = rs.getString(FieldNames.FEATURE_EC_NUM);
+                String locus = rs.getString(FieldNames.FEATURE_LOCUS_TAG);
+                String product = rs.getString(FieldNames.FEATURE_PRODUCT);
+                int start = rs.getInt(FieldNames.FEATURE_START);
+                int stop = rs.getInt(FieldNames.FEATURE_STOP);
+                boolean isFwdStrand = rs.getInt(FieldNames.FEATURE_STRAND) == SequenceUtils.STRAND_FWD;
+                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.FEATURE_TYPE));
+                String gene = rs.getString(FieldNames.FEATURE_GENE);
 
-                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
+                features.add(new PersistantFeature(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
             }
 
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return annotations;
+        return features;
     }
     
     /**
-     * Fetches all annotations which are completely located within a given 
+     * Fetches all features which are completely located within a given 
      * region of the reference.
      * @param left start position of the region of interest
      * @param right end position of the region of interest
-     * @return the list of all annotations found in the interval of interest
+     * @return the list of all features found in the interval of interest
      */
-    public List<PersistantAnnotation> getAnnotationsForClosedInterval(int left, int right){
-        List<PersistantAnnotation> annotations = new ArrayList<>();
+    public List<PersistantFeature> getFeaturesForClosedInterval(int left, int right){
+        List<PersistantFeature> features = new ArrayList<>();
         try {
             
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_ANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL);
             
             fetch.setInt(1, refGenID);
             fetch.setInt(2, left);
@@ -135,57 +135,57 @@ public class ReferenceConnector {
 
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
-                int id = rs.getInt(FieldNames.ANNOTATION_ID);
-                String ecnum = rs.getString(FieldNames.ANNOTATION_EC_NUM);
-                String locus = rs.getString(FieldNames.ANNOTATION_LOCUS_TAG);
-                String product = rs.getString(FieldNames.ANNOTATION_PRODUCT);
-                int start = rs.getInt(FieldNames.ANNOTATION_START);
-                int stop = rs.getInt(FieldNames.ANNOTATION_STOP);
-                boolean isFwdStrand = rs.getInt(FieldNames.ANNOTATION_STRAND) == SequenceUtils.STRAND_FWD;
-                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.ANNOTATION_TYPE));
-                String gene = rs.getString(FieldNames.ANNOTATION_GENE);
+                int id = rs.getInt(FieldNames.FEATURE_ID);
+                String ecnum = rs.getString(FieldNames.FEATURE_EC_NUM);
+                String locus = rs.getString(FieldNames.FEATURE_LOCUS_TAG);
+                String product = rs.getString(FieldNames.FEATURE_PRODUCT);
+                int start = rs.getInt(FieldNames.FEATURE_START);
+                int stop = rs.getInt(FieldNames.FEATURE_STOP);
+                boolean isFwdStrand = rs.getInt(FieldNames.FEATURE_STRAND) == SequenceUtils.STRAND_FWD;
+                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.FEATURE_TYPE));
+                String gene = rs.getString(FieldNames.FEATURE_GENE);
 
-                annotations.add(new PersistantAnnotation(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
+                features.add(new PersistantFeature(id, ecnum, locus, product, start, stop, isFwdStrand, type, gene));
             }
 
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return annotations;
+        return features;
     }
         
     
-    public List<PersistantSubAnnotation> getSubAnnotationsForRegion(int from, int to){
-        List<PersistantSubAnnotation> subAnnotations = new ArrayList<>();
+    public List<PersistantSubFeature> getSubFeaturesForRegion(int from, int to){
+        List<PersistantSubFeature> subFeatures = new ArrayList<>();
         try {
-            PreparedStatement fetchSubAnnotations = con.prepareStatement(SQLStatements.FETCH_SUBANNOTATIONS_FOR_GENOME_INTERVAL);
-            fetchSubAnnotations.setInt(1, refGenID);
-            fetchSubAnnotations.setInt(2, from);
-            fetchSubAnnotations.setInt(3, to);
+            PreparedStatement fetchSubFeatures = con.prepareStatement(SQLStatements.FETCH_SUBFEATURES_FOR_GENOME_INTERVAL);
+            fetchSubFeatures.setInt(1, refGenID);
+            fetchSubFeatures.setInt(2, from);
+            fetchSubFeatures.setInt(3, to);
 
-            ResultSet rs = fetchSubAnnotations.executeQuery();
+            ResultSet rs = fetchSubFeatures.executeQuery();
             while(rs.next()){
-                int parentId = rs.getInt(FieldNames.SUBANNOTATION_PARENT_ID);
-                int start = rs.getInt(FieldNames.SUBANNOTATION_START);
-                int stop = rs.getInt(FieldNames.SUBANNOTATION_STOP);
-                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.SUBANNOTATION_TYPE));
+                int parentId = rs.getInt(FieldNames.SUBFEATURE_PARENT_ID);
+                int start = rs.getInt(FieldNames.SUBFEATURE_START);
+                int stop = rs.getInt(FieldNames.SUBFEATURE_STOP);
+                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.SUBFEATURE_TYPE));
 
-                subAnnotations.add(new PersistantSubAnnotation(parentId, start, stop, type));
+                subFeatures.add(new PersistantSubFeature(parentId, start, stop, type));
             }
 
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return subAnnotations;
+        return subFeatures;
     }
     
-    public List<PersistantSubAnnotation> getSubAnnotationsForClosedInterval(int left, int right){
-        List<PersistantSubAnnotation> subAnnotations = new ArrayList<>();
+    public List<PersistantSubFeature> getSubFeaturesForClosedInterval(int left, int right){
+        List<PersistantSubFeature> subFeatures = new ArrayList<>();
         try {
             
-            PreparedStatement fetchExons = con.prepareStatement(SQLStatements.FETCH_SUBANNOTATIONS_FOR_CLOSED_GENOME_INTERVAL);
+            PreparedStatement fetchExons = con.prepareStatement(SQLStatements.FETCH_SUBFEATURES_FOR_CLOSED_GENOME_INTERVAL);
             
             fetchExons.setInt(1, refGenID);
             fetchExons.setInt(2, left);
@@ -195,19 +195,19 @@ public class ReferenceConnector {
 
             ResultSet rs = fetchExons.executeQuery();
             while(rs.next()){
-                int parentId = rs.getInt(FieldNames.SUBANNOTATION_PARENT_ID);
-                int start = rs.getInt(FieldNames.SUBANNOTATION_START);
-                int stop = rs.getInt(FieldNames.SUBANNOTATION_STOP);
-                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.SUBANNOTATION_TYPE));
+                int parentId = rs.getInt(FieldNames.SUBFEATURE_PARENT_ID);
+                int start = rs.getInt(FieldNames.SUBFEATURE_START);
+                int stop = rs.getInt(FieldNames.SUBFEATURE_STOP);
+                FeatureType type = FeatureType.getFeatureType(rs.getInt(FieldNames.SUBFEATURE_TYPE));
 
-                subAnnotations.add(new PersistantSubAnnotation(parentId, start, stop, type));
+                subFeatures.add(new PersistantSubFeature(parentId, start, stop, type));
             }
 
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return subAnnotations;
+        return subFeatures;
     }
 
     /**

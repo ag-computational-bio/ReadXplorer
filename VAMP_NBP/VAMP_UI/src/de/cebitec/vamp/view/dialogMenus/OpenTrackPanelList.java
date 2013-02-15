@@ -26,11 +26,11 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
 
     public final static long serialVersionUID = 724742799;
     private ReferenceConnector refGenConnector;
-    CheckList checkList;
+    private CheckList checkList;
 
     /** Creates new form OpenTrackPanelList */
     public OpenTrackPanelList() {
-        initComponents();
+        this.initComponents();
         this.initAdditionalComponents();
     }
 
@@ -96,7 +96,7 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
      * @return The tracks selected in the selection list.
      */
     public List<PersistantTrack> getSelectedTracks() {
-        List<PersistantTrack> selectedTracks = new ArrayList<PersistantTrack>();
+        List<PersistantTrack> selectedTracks = new ArrayList<>();
 
         List<Object> trackArray = this.checkList.getModel().getCheckeds();
         for (Object track : trackArray) {

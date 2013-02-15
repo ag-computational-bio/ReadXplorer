@@ -48,31 +48,34 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         boundsManager = new BoundsInfoManager(currentRefGen);
         basePanelFac = new BasePanelFactory(boundsManager, this);
         genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
-
         getApp().showRefGenPanel(genomeViewer);
     }
     
-    public void openRefGen(){
+    /**
+     * Handles the opening of a reference genome viewer. First the list of
+     * reference sequences is shown, and after a selection was made, the
+     * corresponding reference viewer is opened.
+     * @return true, if a reference genome is selected and OK was clicked in the dialog, false otherwise
+     */
+    public boolean openRefGen(){
         OpenRefGenPanel orgp = new OpenRefGenPanel();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(orgp, "Open Reference");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
-        if(dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && orgp.getSelectedReference() != null){
+        boolean canOpenRefViewer = orgp.getSelectedReference() != null && dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION);
+        if (canOpenRefViewer) {
             this.openGenome(orgp.getSelectedReference());
         }
+        
+        return canOpenRefViewer;
     }
 
+    /**
+     * Closes all tracks, which are currently open for the reference viewer of
+     * this top component.
+     */
     public void closeRefGen() {
-        // remove all tracks that are still open
-        List<PersistantTrack> tracks = new ArrayList<>();
-        for(PersistantTrack t : trackToPanel.keySet()){
-            tracks.add(t);
-        }
-        for(Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext(); ){
-            PersistantTrack t = it.next();
-            closeTrack(t);
-        }
 
         // unregister from listeners and remove
         genomeViewer.close();
@@ -87,7 +90,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     
     /**
      * opens the given track on the current genome
-     * @param track 
+     * @param tracks the tracks belonging to the current reference genome
      */
     public void openTracksOnCurrentGenome(Collection<PersistantTrack> tracks) {
         for (PersistantTrack track : tracks) {
@@ -148,17 +151,6 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         currentTracks.add(tp);
     }
 
-    @Deprecated
-    public void closeTrack(PersistantTrack track) {
-        BasePanel trackPanel = trackToPanel.get(track);
-
-        getApp().closeTrackPanel(trackPanel);
-        trackPanel.close();
-        mousePosListener.remove(trackPanel);
-
-        trackToPanel.remove(track);
-    }
-
     @Override
     public void setCurrentMousePosition(int logPos) {
         for(MousePositionListener c : mousePosListener){
@@ -182,7 +174,7 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
     }
 
     public boolean hasRefGen(){
-        return currentRefGen != null ? Boolean.TRUE : Boolean.FALSE;
+        return currentRefGen != null;
     }
 
     public String getDisplayName(){

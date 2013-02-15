@@ -1,10 +1,10 @@
 package de.cebitec.vamp.api.objects;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Interface for jobs having a known number of requests and also storing how 
  * many requests were already carried out.
+ *
+ * @author -Rolf Hilker-
  */
 public interface JobI {
     

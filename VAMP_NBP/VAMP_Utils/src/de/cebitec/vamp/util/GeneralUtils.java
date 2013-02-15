@@ -8,12 +8,13 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Contains general use utilities.
+ * 
+ * @author -Rolf Hilker-
  */
 public class GeneralUtils {
 
@@ -22,6 +23,7 @@ public class GeneralUtils {
      * the percentage is set to 1.5 times the absolute difference as a weight factor.
      * @param value1 smaller value
      * @param value2 larger value
+     * @return the percentage increase 
      */
     public static int calculatePercentageIncrease(int value1, int value2) {
         int percentDiff;
@@ -58,21 +60,46 @@ public class GeneralUtils {
     }
     
     /**
-     * Checks if the input string is a valid number.
+     * Checks if the input string is a valid number larger than 0.
      * @param input input string to check
      * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
      */
-    public static boolean isValidNumberInput(String input) {
+    public static boolean isValidPositiveNumberInput(String input) {
         try {
-            int tmp = Integer.parseInt(input);
-            if (tmp > 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
+            return Integer.parseInt(input) > 0;
+        } catch (NumberFormatException e) {
             return false;
         }
+    }
+    
+    /**
+     * Checks if the input string is a valid number larger than or equal to 0.
+     * @param input input string to check
+     * @return <code>true</code> if it is a valid input
+     * string, <code>false</code> otherwise
+     */
+    public static boolean isValidNumberInput(String input) {
+        try {
+            return Integer.parseInt(input) >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Checks if the input string is a valid number between 1 and 100, so a valid
+     * percentage value.
+     * @param input input string to check
+     * @return <code>true</code> if it is a valid percentage value, <code>false</code> otherwise
+     */
+    public static boolean isValidPercentage(String input) {
+        if (GeneralUtils.isValidPositiveNumberInput(input)) {
+            int value = Integer.valueOf(input);
+            if (value <= 100) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -82,7 +109,7 @@ public class GeneralUtils {
      * @return time as hours, minutes and seconds
      */
     public static ArrayList<Integer> getTime(long timeInMillis) {
-        ArrayList<Integer> timeList = new ArrayList<Integer>();
+        ArrayList<Integer> timeList = new ArrayList<>();
         int remdr = (int) (timeInMillis % (24L * 60 * 60 * 1000));
 
         final int hours = remdr / (60 * 60 * 1000);
@@ -99,5 +126,22 @@ public class GeneralUtils {
         timeList.add(2, seconds);
 
         return timeList;
+    }
+    
+    /**
+     * Generates a string, which concatenates the list of strings for user friendly
+     * displaying in the gui with an " and ".
+     * @param strings the list of strings, which should be concatenated
+     * @return the string containing all strings concatenated with "and"
+     */
+    public static String generateConcatenatedString(List<String> strings) {
+        StringBuilder concatString = new StringBuilder();
+        for (String string : strings) {
+            concatString = concatString.append(string).append(" and ");
+        }
+        if (concatString.length() > 5) {
+            concatString = concatString.delete(concatString.length() - 5, concatString.length());
+        }
+        return concatString.toString();
     }
 }

@@ -12,7 +12,6 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.sql.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -38,7 +37,7 @@ public class ProjectConnector extends Observable {
     private List<MultiTrackConnector> multiTrackConnectors;
     private HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
-    private final static int ANNOTATION_BATCH_SIZE = BATCH_SIZE;
+    private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
     private final static int COVERAGE_BATCH_SIZE = BATCH_SIZE * 3;
     private final static int MAPPING_BATCH_SIZE = BATCH_SIZE;
     private static final int SEQPAIR_BATCH_SIZE = BATCH_SIZE;
@@ -121,28 +120,28 @@ public class ProjectConnector extends Observable {
     public Map<PersistantReference,List<PersistantTrack>> getGenomesAndTracks() {
        List<PersistantReference> genomes = this.getGenomes();
        List<PersistantTrack> tracks = this.getTracks();
-       HashMap<Integer, List<PersistantTrack>> tracks_by_reference_id = new HashMap<Integer, List<PersistantTrack>>();
+       HashMap<Integer, List<PersistantTrack>> tracksByReferenceId = new HashMap<>();
        for(PersistantTrack t : tracks) {
-           List<PersistantTrack> list = tracks_by_reference_id.get(t.getRefGenID());
-           if (list==null) {
-               list = new ArrayList<PersistantTrack>();
-               tracks_by_reference_id.put(t.getRefGenID(), list);
+           List<PersistantTrack> list = tracksByReferenceId.get(t.getRefGenID());
+           if (list == null) {
+               list = new ArrayList<>();
+               tracksByReferenceId.put(t.getRefGenID(), list);
            }
            list.add(t);
        }
        
-       HashMap<PersistantReference, List<PersistantTrack>> tracks_by_reference
-               = new HashMap<PersistantReference, List<PersistantTrack>>();
+       HashMap<PersistantReference, List<PersistantTrack>> tracksByReference
+               = new HashMap<>();
        for(PersistantReference reference : genomes) {
-           List<PersistantTrack> current_track_list = tracks_by_reference_id.get(reference.getId());
+           List<PersistantTrack> currentTrackList = tracksByReferenceId.get(reference.getId());
            //if the current reference genome does not have any tracks, 
            //just create an empty list
-           if (current_track_list==null) current_track_list = new ArrayList<PersistantTrack>();
-           tracks_by_reference.put(reference, current_track_list);
+           if (currentTrackList == null) { currentTrackList = new ArrayList<>(); }
+           tracksByReference.put(reference, currentTrackList);
        }
     
         
-       return tracks_by_reference;
+       return tracksByReference;
     }
 
     public boolean isConnected() {
@@ -168,8 +167,7 @@ public class ProjectConnector extends Observable {
             this.cleanUp();
             
             // notify observers about the change of the database
-            this.setChanged();
-            this.notifyObservers( "disconnect" );
+            this.notifyObserversAbout("disconnect");
         }
     }
 
@@ -203,8 +201,7 @@ public class ProjectConnector extends Observable {
 //            this.connectToProject(projectLocation);
         }
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "connect" );
+        this.notifyObserversAbout("connect");
     }
 
     
@@ -253,12 +250,12 @@ public class ProjectConnector extends Observable {
             //create reversed coverage index (speedup by factor of 3 with many tracks in one database)
             con.prepareStatement(H2SQLStatements.INDEX_COVERAGE_RV).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_ANNOTATIONS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_ANNOTATIONS).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_FEATURES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_FEATURES).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_SUBANNOTATIONS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SUBANNOTATION_PARENT_ID).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SUBANNOTATION_REF_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.SETUP_SUBFEATURES).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SUBFEATURE_PARENT_ID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_SUBFEATURE_REF_ID).executeUpdate();
             
             con.prepareStatement(H2SQLStatements.SETUP_MAPPINGS).executeUpdate();
 //            con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
@@ -313,8 +310,8 @@ public class ProjectConnector extends Observable {
             con.prepareStatement(MySQLStatements.SETUP_POSITIONS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_DIFFS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_COVERAGE).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_ANNOTATIONS).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_SUBANNOTATIONS).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_FEATURES).executeUpdate();
+            con.prepareStatement(MySQLStatements.SETUP_SUBFEATURES).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS).execute();
@@ -374,7 +371,7 @@ public class ProjectConnector extends Observable {
                     FieldNames.TABLE_TRACK, FieldNames.TRACK_SEQUENCE_PAIR_ID, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_FEATURES, FieldNames.ANNOTATION_GENE, "VARCHAR (20)"));
+                    FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE, "VARCHAR (20)"));
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
                     FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_READ_LENGTH, INT_UNSIGNED));
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
@@ -481,14 +478,14 @@ public class ProjectConnector extends Observable {
     private void disableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start disabling reference data domain indexing...");
         this.disableDomainIndices(MySQLStatements.DISABLE_REFERENCE_INDICES, null);
-        this.disableDomainIndices(MySQLStatements.DISABLE_ANNOTATION_INDICES, null);
+        this.disableDomainIndices(MySQLStatements.DISABLE_FEATURE_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done disabling reference data domain indexing");
     }
 
     private void enableReferenceIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start enabling reference data domain indexing...");
         this.enableDomainIndices(MySQLStatements.ENABLE_REFERENCE_INDICES, null);
-        this.enableDomainIndices(MySQLStatements.ENABLE_ANNOTATION_INDICES, null);
+        this.enableDomainIndices(MySQLStatements.ENABLE_FEATURE_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done enabling reference data domain indexing");
     }
     
@@ -545,60 +542,60 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting reference sequence data");
     }
 
-    private void storeAnnotations(ParsedReference reference) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting annotations...");
+    private void storeFeatures(ParsedReference reference) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting features...");
         try {
-            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_ANNOTATION_ID, con);
-            PreparedStatement insertAnnotation = con.prepareStatement(SQLStatements.INSERT_ANNOTATION);
-            PreparedStatement insertSubAnnotation = con.prepareStatement(SQLStatements.INSERT_SUBANNOTATION);
+            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_FEATURE_ID, con);
+            PreparedStatement insertFeature = con.prepareStatement(SQLStatements.INSERT_FEATURE);
+            PreparedStatement insertSubFeature = con.prepareStatement(SQLStatements.INSERT_SUBFEATURE);
 
             int batchCounter = 1;
             int batchCountSubfeat = 1;
             int referenceId = reference.getID();
-            Iterator<ParsedAnnotation> featIt = reference.getAnnotations().iterator();
+            Iterator<ParsedFeature> featIt = reference.getFeatures().iterator();
             while (featIt.hasNext()) {
                 
                 batchCounter++;
-                ParsedAnnotation annotation = featIt.next();
-                insertAnnotation.setLong(1, id);
-                insertAnnotation.setLong(2, referenceId);
-                insertAnnotation.setInt(3, annotation.getType().getTypeInt());
-                insertAnnotation.setInt(4, annotation.getStart());
-                insertAnnotation.setInt(5, annotation.getStop());
-                insertAnnotation.setString(6, annotation.getLocusTag());
-                insertAnnotation.setString(7, annotation.getProduct());
-                insertAnnotation.setString(8, annotation.getEcNumber());
-                insertAnnotation.setInt(9, annotation.getStrand());
-                insertAnnotation.setString(10, annotation.getGeneName());
-                insertAnnotation.addBatch();
+                ParsedFeature feature = featIt.next();
+                insertFeature.setLong(1, id);
+                insertFeature.setLong(2, referenceId);
+                insertFeature.setInt(3, feature.getType().getTypeInt());
+                insertFeature.setInt(4, feature.getStart());
+                insertFeature.setInt(5, feature.getStop());
+                insertFeature.setString(6, feature.getLocusTag());
+                insertFeature.setString(7, feature.getProduct());
+                insertFeature.setString(8, feature.getEcNumber());
+                insertFeature.setInt(9, feature.getStrand());
+                insertFeature.setString(10, feature.getGeneName());
+                insertFeature.addBatch();
 
-                for (ParsedSubAnnotation subAnnotation : annotation.getSubAnnotations()) {
+                for (ParsedSubFeature subFeature : feature.getSubFeatures()) {
                     batchCountSubfeat++;
-                    insertSubAnnotation.setLong(1, id);
-                    insertSubAnnotation.setLong(2, referenceId);
-                    insertSubAnnotation.setInt(3, subAnnotation.getType().getTypeInt());
-                    insertSubAnnotation.setInt(4, subAnnotation.getStart());
-                    insertSubAnnotation.setInt(5, subAnnotation.getStop());
-                    insertSubAnnotation.addBatch();
+                    insertSubFeature.setLong(1, id);
+                    insertSubFeature.setLong(2, referenceId);
+                    insertSubFeature.setInt(3, subFeature.getType().getTypeInt());
+                    insertSubFeature.setInt(4, subFeature.getStart());
+                    insertSubFeature.setInt(5, subFeature.getStop());
+                    insertSubFeature.addBatch();
                     
-                    if (batchCountSubfeat == ANNOTATION_BATCH_SIZE) {
+                    if (batchCountSubfeat == FEATURE_BATCH_SIZE) {
                         batchCountSubfeat = 1;
-                        insertSubAnnotation.executeBatch();
+                        insertSubFeature.executeBatch();
                     }
                 }
                 
-                if (batchCounter == ANNOTATION_BATCH_SIZE) {
+                if (batchCounter == FEATURE_BATCH_SIZE) {
                     batchCounter = 1;
-                    insertAnnotation.executeBatch();
+                    insertFeature.executeBatch();
                 }
                 ++id;
                 //  it.remove();
             }
 
-            insertAnnotation.executeBatch();
-            insertSubAnnotation.executeBatch();
-            insertAnnotation.close();
-            insertSubAnnotation.close();
+            insertFeature.executeBatch();
+            insertSubFeature.executeBatch();
+            insertFeature.close();
+            insertSubFeature.close();
 
 
         } catch (SQLException ex) {
@@ -606,7 +603,7 @@ public class ProjectConnector extends Observable {
         }
 
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting annotations");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting features");
     }
 
     private void lockReferenceDomainTables() {
@@ -627,7 +624,7 @@ public class ProjectConnector extends Observable {
             }
 
             this.storeGenome(reference);
-            this.storeAnnotations(reference);
+            this.storeFeatures(reference);
 
             if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
                 this.enableReferenceIndices();
@@ -642,8 +639,7 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName());
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "addRefGenome" );
+        this.notifyObserversAbout("addRefGenome");
         
         return reference.getID();
     }
@@ -719,8 +715,7 @@ public class ProjectConnector extends Observable {
             }
             
             // notify observers about the change of the database
-            this.setChanged();
-            this.notifyObservers( "storeCoverage" );
+            this.notifyObserversAbout("storeCoverage");
             
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
         }
@@ -777,8 +772,7 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "storeTrack" );
+        this.notifyObserversAbout("storeTrack");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
     }
@@ -1104,8 +1098,11 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "addTrack" );
+        this.notifyObserversAbout("addTrack");
+        
+        //ensure, that there is no cache for this track
+        ObjectCache.getInstance().deleteFamily("loadCoverage."+track.getID());
+        ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track."+track.getID());
         
         return track.getID();
     }
@@ -1385,6 +1382,10 @@ public class ProjectConnector extends Observable {
             deletePosTable.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track...");
             deleteTrack.execute();
+            
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track Cache...");
+            ObjectCache.getInstance().deleteFamily("loadCoverage."+trackID);
+            ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track."+trackID);
 
             con.commit();
 
@@ -1402,10 +1403,14 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "deleteTrack" );
+        this.notifyObserversAbout("deleteTrack");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of track \"{0}\"", trackID);
+    }
+    
+    private void notifyObserversAbout(final String message) {
+        this.setChanged();
+        this.notifyObservers(message);        
     }
 
     
@@ -1414,23 +1419,23 @@ public class ProjectConnector extends Observable {
         try {
             con.setAutoCommit(false);
 
-            PreparedStatement deleteAnnotations = con.prepareStatement(SQLStatements.DELETE_ANNOTATIONS_FROM_GENOME);
-            deleteAnnotations.setLong(1, refGenID);
-            PreparedStatement deleteSubeatures = con.prepareStatement(SQLStatements.DELETE_SUBANNOTATIONS_FROM_GENOME);
+            PreparedStatement deleteFeatures = con.prepareStatement(SQLStatements.DELETE_FEATURES_FROM_GENOME);
+            deleteFeatures.setLong(1, refGenID);
+            PreparedStatement deleteSubeatures = con.prepareStatement(SQLStatements.DELETE_SUBFEATURES_FROM_GENOME);
             deleteSubeatures.setLong(1, refGenID);
             PreparedStatement deleteGenome = con.prepareStatement(SQLStatements.DELETE_GENOME);
             deleteGenome.setLong(1, refGenID);
 
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting annotations...");
-            deleteAnnotations.execute();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Sub annotations...");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting features...");
+            deleteFeatures.execute();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Sub features...");
             deleteSubeatures.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Genome...");
             deleteGenome.execute();
 
             con.commit();
 
-            deleteAnnotations.close();
+            deleteFeatures.close();
             deleteSubeatures.close();
             deleteGenome.close();
 
@@ -1441,8 +1446,7 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "deleteGenomes" );
+        this.notifyObserversAbout("deleteGenomes");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
@@ -1575,8 +1579,7 @@ public class ProjectConnector extends Observable {
         }
         
         // notify observers about the change of the database
-        this.setChanged();
-        this.notifyObservers( "storeSeqPairData" );
+         this.notifyObserversAbout("storeSeqPairData");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair data");
     }
@@ -1820,8 +1823,7 @@ public class ProjectConnector extends Observable {
             }
             
             // notify observers about the change of the database
-            this.setChanged();
-            this.notifyObservers( "storePositionTable" );
+            this.notifyObserversAbout("storeSeqPairData");
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
         }

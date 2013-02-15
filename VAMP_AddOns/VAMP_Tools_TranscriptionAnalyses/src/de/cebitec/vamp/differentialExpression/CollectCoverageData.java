@@ -4,7 +4,7 @@ import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.MappingThreadAnalyses;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
@@ -25,12 +25,12 @@ public class CollectCoverageData implements ThreadListener {
      */
     private PersistantTrack track;
     /**
-     * The whole sete of annotations for the current genome.
+     * The whole sete of features for the current genome.
      */
-    private List<PersistantAnnotation> genomeAnnotations;
+    private List<PersistantFeature> genomeFeatures;
     /**
      * The storage holding the collected coverage data, also named count data.
-     * The Key value of this HashMap is the ID of the annotation. The value
+     * The Key value of this HashMap is the ID of the feature. The value
      * value represents the corresponding number of counted coverage data.
      */
     private Map<Integer, Integer> countData = new HashMap<>();
@@ -40,10 +40,10 @@ public class CollectCoverageData implements ThreadListener {
     private List<PersistantMapping> mappings = null;
     /**
      * Adjusts how many bases downstream from the start position of an
-     * annotation a mapping should still be considered a hit. The annotation in
+     * feature a mapping should still be considered a hit. The feature in
      * the database are manly CDS positions. So it is normal that a lot of
      * mappings will start in an are downstream of the start position of the
-     * annotation.
+     * feature.
      */
     private final static int STARTOFFSET = 30;
 
@@ -55,7 +55,7 @@ public class CollectCoverageData implements ThreadListener {
      * @param perfAnalysis Instance of the calling instance of AnalysisHandler.
      */
     public CollectCoverageData(PersistantTrack track, AnalysisHandler perfAnalysis) {
-        this.genomeAnnotations = perfAnalysis.getPersAnno();
+        this.genomeFeatures = perfAnalysis.getPersAnno();
         this.track = track;
     }
 
@@ -77,37 +77,37 @@ public class CollectCoverageData implements ThreadListener {
             }
         }
         Collections.sort(mappings);
-        updateReadCountForAnnotations(mappings);
+        updateReadCountForFeatures(mappings);
         return countData;
     }
 
     /**
-     * Updates the read count for the annotations with the given mappings. This
-     * only works if the list of mappings and the list of annotations are sorted
+     * Updates the read count for the features with the given mappings. This
+     * only works if the list of mappings and the list of features are sorted
      * according to the start position.
      *
      * @param mappings the mappings
      */
-    private void updateReadCountForAnnotations(List<PersistantMapping> mappings) {
+    private void updateReadCountForFeatures(List<PersistantMapping> mappings) {
         int lastMappingIdx = 0;
-        PersistantAnnotation annotation;
+        PersistantFeature feature;
         boolean fstFittingMapping;
 
-        for (int i = 0; i < this.genomeAnnotations.size(); ++i) {
-            annotation = this.genomeAnnotations.get(i);
-            int featStart = annotation.getStart() - STARTOFFSET;
-            int featStop = annotation.getStop();
-            int key = annotation.getId();
+        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
+            feature = this.genomeFeatures.get(i);
+            int featStart = feature.getStart() - STARTOFFSET;
+            int featStop = feature.getStop();
+            int key = feature.getId();
             fstFittingMapping = true;
             //If no matching mapping is found, we still need to know that by
-            //writing down a count of zero for this annotation.
+            //writing down a count of zero for this feature.
             countData.put(key, 0);
 
             for (int j = lastMappingIdx; j < mappings.size(); ++j) {
                 PersistantMapping mapping = mappings.get(j);
 
-                //mappings identified within a annotation
-                if (mapping.getStop() > featStart && annotation.isFwdStrand() == mapping.isFwdStrand()
+                //mappings identified within a feature
+                if (mapping.getStop() > featStart && feature.isFwdStrand() == mapping.isFwdStrand()
                         && mapping.getStart() < featStop) {
 
                     if (fstFittingMapping == true) {
@@ -117,7 +117,7 @@ public class CollectCoverageData implements ThreadListener {
                     int value = countData.get(key) + 1;
                     countData.put(key, value);
 
-                    //still mappings left, but need next annotation
+                    //still mappings left, but need next feature
                 } else if (mapping.getStart() > featStop) {
                     break;
                 }

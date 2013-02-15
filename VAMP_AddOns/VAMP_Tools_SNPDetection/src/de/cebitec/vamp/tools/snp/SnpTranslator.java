@@ -4,9 +4,9 @@ import de.cebitec.common.sequencetools.AminoAcidProperties;
 import de.cebitec.common.sequencetools.GeneticCode;
 import de.cebitec.common.sequencetools.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
-import de.cebitec.vamp.databackend.dataObjects.PersistantAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubAnnotation;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
@@ -22,13 +22,13 @@ import org.openide.util.NbPreferences;
 /**
  * @author rhilker
  * 
- * Generates all translations possible for a given snp for the given genomic annotations
+ * Generates all translations possible for a given snp for the given genomic features
  * and a reference sequence. A translation is only generated if one of the following holds:
- * - The current annotation has no subannotations and the position is not at a border while the current
+ * - The current feature has no subfeatures and the position is not at a border while the current
  * triplet violates the border.
- * - The current annotation has subannotations and the snp is located in such a subannotation.
- * - The snp is located in a subannotation at a border, but this is not the last subannotation
- * (depending on the strand) and the triplet can be completed from the neighboring subannotation.
+ * - The current feature has subfeatures and the snp is located in such a subfeature.
+ * - The snp is located in a subfeature at a border, but this is not the last subfeature
+ * (depending on the strand) and the triplet can be completed from the neighboring subfeature.
  */
 public class SnpTranslator {
 
@@ -36,25 +36,25 @@ public class SnpTranslator {
     private final Preferences pref;
     private final String refSeq;
     private int refLength;
-    private final List<PersistantAnnotation> genomicAnnotations;
+    private final List<PersistantFeature> genomicFeatures;
     private GeneticCode code;
     private int lastIndex;
     private int lastPos;
     private int pos;
 
     /**
-     * Generates all translations possible for a given snp for the given genomic annotations
+     * Generates all translations possible for a given snp for the given genomic features
      * and a reference sequence. A translation is only generated if one of the following holds:
-     * - The current annotation has no subannotations and the position is not at a border while the current
+     * - The current feature has no subfeatures and the position is not at a border while the current
      * triplet violates the border.
-     * - The current annotation has subannotations and the snp is located in such a subannotation.
-     * - The snp is located in a subannotation at a border, but this is not the last subannotation
-     * (depending on the strand) and the triplet can be completed from the neighboring subannotation.
-     * @param genomicAnnotations all annotations of the reference genome
+     * - The current feature has subfeatures and the snp is located in such a subfeature.
+     * - The snp is located in a subfeature at a border, but this is not the last subfeature
+     * (depending on the strand) and the triplet can be completed from the neighboring subfeature.
+     * @param genomicFeatures all features of the reference genome
      * @param refSeq the reference sequence
      */
-    public SnpTranslator(List<PersistantAnnotation> genomicAnnotations, PersistantReference reference) {
-        this.genomicAnnotations = genomicAnnotations;
+    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantReference reference) {
+        this.genomicFeatures = genomicFeatures;
         this.refSeq = reference.getSequence();
         this.refLength = reference.getRefLength();
         lastIndex = 0;
@@ -71,78 +71,78 @@ public class SnpTranslator {
     }
     
     /**
-     * @param position check, if this position is covered by at least one annotation (gene) 
-     * @return the list of annotations covering the given position
+     * @param position check, if this position is covered by at least one feature (gene) 
+     * @return the list of features covering the given position
      */
-    public List<PersistantAnnotation> checkCoveredByAnnotation(String position) {
+    public List<PersistantFeature> checkCoveredByFeature(String position) {
 
-        //find annotation/s which cover current snp position
-        List<PersistantAnnotation> annotationsFound = new ArrayList<PersistantAnnotation>();
+        //find feature/s which cover current snp position
+        List<PersistantFeature> featuresFound = new ArrayList<>();
 
         pos = PositionUtils.convertPosition(position);
         if (lastPos > pos) {
             lastIndex = 0;
         } //since positions in table cannot be sorted completely, because they are strings
 
-        while (lastIndex < this.genomicAnnotations.size()) {
+        while (lastIndex < this.genomicFeatures.size()) {
 
-            PersistantAnnotation annotation = this.genomicAnnotations.get(lastIndex++);
-            if (annotation.getStart() <= pos && annotation.getStop() >= pos) {
+            PersistantFeature feature = this.genomicFeatures.get(lastIndex++);
+            if (feature.getStart() <= pos && feature.getStop() >= pos) {
                 //found hit, also try next index
-                annotationsFound.add(annotation);
-            } else if (annotation.getStop() < pos) {
+                featuresFound.add(feature);
+            } else if (feature.getStop() < pos) {
                 //do nothing
-            } else { //for your information: if (annotation.getStop() > pos && annotation.getStart() > pos){
-                lastIndex -= annotationsFound.size() + 1;
+            } else { //for your information: if (feature.getStop() > pos && feature.getStart() > pos){
+                lastIndex -= featuresFound.size() + 1;
                 break; //stop
             }
         }
         
         lastPos = pos;
         
-        return annotationsFound;
+        return featuresFound;
 
     }
 
     /**
-     * Generates all translations possible for a given snp for the given genomic annotations (genes)
+     * Generates all translations possible for a given snp for the given genomic features (genes)
      * and reference sequence (set in the constructor) and stores them in the given Snp object. 
      * A translation is only generated if one of the following holds:
-     * - The current annotation has no subannotations and the position is not at a border while the current
+     * - The current feature has no subfeatures and the position is not at a border while the current
      * triplet violates the border.
-     * - The current annotation has subannotations and the snp is located in such a subannotation.
-     * - The snp is located in a subannotation at a border, but this is not the last subannotation
-     * (depending on the strand) and the triplet can be completed from the neighboring subannotation.
+     * - The current feature has subfeatures and the snp is located in such a subfeature.
+     * - The snp is located in a subfeature at a border, but this is not the last subfeature
+     * (depending on the strand) and the triplet can be completed from the neighboring subfeature.
      * @param snp the snp object to check
      */
-    public void checkForAnnotation(Snp snp) {
+    public void checkForFeature(Snp snp) {
 
-        //find annotation/s which cover current snp position
-        List<PersistantAnnotation> annotationsFound = new ArrayList<PersistantAnnotation>();
-//        List<PersistantSubannotation> subannotationsFound = new ArrayList<PersistantSubannotation>();
+        //find feature/s which cover current snp position
+        List<PersistantFeature> featuresFound = new ArrayList<>();
+//        List<PersistantSubfeature> subfeaturesFound = new ArrayList<PersistantSubfeature>();
 
         this.pos = PositionUtils.convertPosition(snp.getPosition());
         this.lastIndex = this.lastPos > this.pos ? 0 : this.lastIndex;
         //since positions in table are sorted alphabetically, because they are strings
 
-        while (lastIndex < this.genomicAnnotations.size()) {
+        while (lastIndex < this.genomicFeatures.size()) {
 
-            PersistantAnnotation annotation = this.genomicAnnotations.get(this.lastIndex++);
-            if (annotation.getStart() <= pos && annotation.getStop() >= pos) {
+            PersistantFeature feature = this.genomicFeatures.get(this.lastIndex++);
+            if (feature.getStart() <= pos && feature.getStop() >= pos) {
                 //found hit, also try next index
-                annotationsFound.add(annotation);
-            } else if (annotation.getStart() < pos) {
+                featuresFound.add(feature);
+            } else if (feature.getStart() < pos) {
                 //do nothing
-            } else { //for your information: if (annotation.getStop() > pos && annotation.getStart() > pos){
-                this.lastIndex -= (annotationsFound.size() + 1);
+            } else { //for your information: if (feature.getStop() > pos && feature.getStart() > pos){
+                this.lastIndex -= (featuresFound.size() + 1);
                 break; //stop
             }
         }
-        lastIndex -= (annotationsFound.size() + 1);
-        lastIndex = lastIndex < 0 ? 0 : lastIndex; //to always ensure not to forget about the last visited annotations
+        lastIndex -= (featuresFound.size() + 1);
+        lastIndex = lastIndex < 0 ? 0 : lastIndex; //to always ensure not to forget about the last visited features
 
         //amino acid substitution calculations
-        List<CodonSnp> codonSnpList = this.calcSnpList(annotationsFound, snp);
+        List<CodonSnp> codonSnpList = this.calcSnpList(featuresFound, snp);
         for (CodonSnp codon : codonSnpList) {
             snp.addCodon(codon);
         }
@@ -151,18 +151,18 @@ public class SnpTranslator {
     }
 
     /**
-     * Checks if the position of the handed in snp is covered by a subannotation (exon)
-     * and returns the subannotation.
-     * @param annotation the annotation whose subannotations are checked
+     * Checks if the position of the handed in snp is covered by a subfeature (exon)
+     * and returns the subfeature.
+     * @param feature the feature whose subfeatures are checked
      * @param snp the snp object to check
-     * @return the subannotation covering the current position or null, if no subannotation covers
+     * @return the subfeature covering the current position or null, if no subfeature covers
      *          this position
      */
-    private PersistantSubAnnotation checkForSubannotation(PersistantAnnotation annotation, int pos) {
-        for (PersistantSubAnnotation subannotation : annotation.getSubAnnotations()){
-            if (subannotation.getStart() <= pos && subannotation.getStop() >= pos) {
+    private PersistantSubFeature checkForSubfeature(PersistantFeature feature, int pos) {
+        for (PersistantSubFeature subfeature : feature.getSubFeatures()){
+            if (subfeature.getStart() <= pos && subfeature.getStop() >= pos) {
                 //found hit
-                return subannotation;
+                return subfeature;
             }
         }
         return null;
@@ -170,83 +170,83 @@ public class SnpTranslator {
 
     /**
      * Calculates the list of snp codons belonging to a single snp. This list is larger than one
-     * if more than one annotations have been found at the "pos" position in the reference genome.
-     * @param annotationsFound list of annotations in the reference genome for current position "pos"
+     * if more than one features have been found at the "pos" position in the reference genome.
+     * @param featuresFound list of features in the reference genome for current position "pos"
      * @param pos position of the current snp
      * @param refSeq whole reference genome sequence
      * @param snp complete snp object
      * @param code genetic code to retrieve the amino acid translation
      * @return list of CodonSnps for the current snp position "pos"
      */
-    private List<CodonSnp> calcSnpList(List<PersistantAnnotation> annotationsFound, Snp snp) {
+    private List<CodonSnp> calcSnpList(List<PersistantFeature> featuresFound, Snp snp) {
         
         boolean posDirectAtLeftBorder = this.pos < 2; //pos is never smaller than 1, 1 is min
         boolean posAtLeftBorder = this.pos < 3; 
         boolean posAtRightBorder = this.pos + 2 > this.refLength;
         boolean posDirectAtRightBorder = this.pos + 1 > this.refLength;
                 
-        //handle annotation knowledge:
+        //handle feature knowledge:
         //get each strand and triplet for correct reading frame for translation
-        List<CodonSnp> codonSnpList = new ArrayList<CodonSnp>();
-        for (PersistantAnnotation annotation : annotationsFound) {
-            int annotationStart;
+        List<CodonSnp> codonSnpList = new ArrayList<>();
+        for (PersistantFeature feature : featuresFound) {
+            int featureStart;
             int mod;
             String tripletRef = "";
             String tripletSnp = "";
             int subPos = 0;
             
             /* 
-             * Check for subannotations and calculate length of spliced mRNA and snp position on this mRNA.
-             * Also need to check, if the current position is at a border of its subannotation. Then we need
-             * the neighboring subannotations for the refrence sequence of the translation triplet and also
-             * the distance along all subannotations up to our snp position.
+             * Check for subfeatures and calculate length of spliced mRNA and snp position on this mRNA.
+             * Also need to check, if the current position is at a border of its subfeature. Then we need
+             * the neighboring subfeatures for the refrence sequence of the translation triplet and also
+             * the distance along all subfeatures up to our snp position.
              */
-            boolean fwdStrand = annotation.isFwdStrand();
+            boolean fwdStrand = feature.isFwdStrand();
             boolean posAtLeftSubBorder = false;
             boolean posAtRightSubBorder = false;
-            boolean snpInSubannotation = false; //if not and we have subannotations, then this snp will not be translated
-            PersistantSubAnnotation subfeatBefore = null;
-            PersistantSubAnnotation borderSubfeat = null; //only set if pos is at borders
-            PersistantSubAnnotation subfeatAfter = null;
-            for (PersistantSubAnnotation subannotation : annotation.getSubAnnotations()) {
+            boolean snpInSubfeature = false; //if not and we have subfeatures, then this snp will not be translated
+            PersistantSubFeature subfeatBefore = null;
+            PersistantSubFeature borderSubfeat = null; //only set if pos is at borders
+            PersistantSubFeature subfeatAfter = null;
+            for (PersistantSubFeature subfeature : feature.getSubFeatures()) {
                     
-                int annotationStartOnStrand = fwdStrand ? subannotation.getStart() : subannotation.getStop();
-                annotationStart = subannotation.getStart();
+                int featureStartOnStrand = fwdStrand ? subfeature.getStart() : subfeature.getStop();
+                featureStart = subfeature.getStart();
 
-                if (subannotation.getStop() >= this.pos && annotationStart <= this.pos) {
-                    subPos += (Math.abs(this.pos - annotationStartOnStrand)+1);
-                    //only set subfeatAtPos, if position is at a border of the subannotation
-                    posAtLeftSubBorder = this.pos - 2 < annotationStart;
-                    posAtRightSubBorder = this.pos + 2 > subannotation.getStop();
-                    borderSubfeat = !posAtLeftSubBorder && !posAtRightSubBorder ? null : subannotation;
-                    snpInSubannotation = true;
-                } else if (annotationStart < this.pos) {
-                    //get distance in annotation and left neighbor subannotation of subannotation with position
-                    if (fwdStrand) { subPos += (subannotation.getStop() - (annotationStart-1)); }
-                    if (subfeatBefore == null || subfeatBefore.getStart() < subannotation.getStart()) {
-                        subfeatBefore = subannotation;
+                if (subfeature.getStop() >= this.pos && featureStart <= this.pos) {
+                    subPos += (Math.abs(this.pos - featureStartOnStrand)+1);
+                    //only set subfeatAtPos, if position is at a border of the subfeature
+                    posAtLeftSubBorder = this.pos - 2 < featureStart;
+                    posAtRightSubBorder = this.pos + 2 > subfeature.getStop();
+                    borderSubfeat = !posAtLeftSubBorder && !posAtRightSubBorder ? null : subfeature;
+                    snpInSubfeature = true;
+                } else if (featureStart < this.pos) {
+                    //get distance in feature and left neighbor subfeature of subfeature with position
+                    if (fwdStrand) { subPos += (subfeature.getStop() - (featureStart-1)); }
+                    if (subfeatBefore == null || subfeatBefore.getStart() < subfeature.getStart()) {
+                        subfeatBefore = subfeature;
                     }
-                } else if (annotationStart > this.pos) {
-                    if (!fwdStrand) { subPos += (annotationStartOnStrand - (subannotation.getStart()-1)); }
-                    //get right neighbor subannotation of subannotation with position
-                    if (subfeatAfter == null || subfeatAfter.getStart() > subannotation.getStart()) {
-                        subfeatAfter = subannotation;
+                } else if (featureStart > this.pos) {
+                    if (!fwdStrand) { subPos += (featureStartOnStrand - (subfeature.getStart()-1)); }
+                    //get right neighbor subfeature of subfeature with position
+                    if (subfeatAfter == null || subfeatAfter.getStart() > subfeature.getStart()) {
+                        subfeatAfter = subfeature;
                     }
                 }
             }
             
-            if (!annotation.getSubAnnotations().isEmpty() && !snpInSubannotation){ 
-                continue; // we have subannotations, but the snp is not in them, so we skip it!
+            if (!feature.getSubFeatures().isEmpty() && !snpInSubfeature){ 
+                continue; // we have subfeatures, but the snp is not in them, so we skip it!
             }
            
             try { //we need to catch, if any of the positions is out of bounds!
 
-                if (subPos <= 1 || borderSubfeat == null) { //there are no subannotations, or pos is not at border in subannotation
+                if (subPos <= 1 || borderSubfeat == null) { //there are no subfeatures, or pos is not at border in subfeature
 
-                    int annotationStartOnStrand = fwdStrand ? annotation.getStart() : annotation.getStop();
+                    int featureStartOnStrand = fwdStrand ? feature.getStart() : feature.getStop();
                     
                     if (subPos == 0) {
-                        mod = (this.pos - annotationStartOnStrand+1) % 3;
+                        mod = (this.pos - featureStartOnStrand+1) % 3;
                     } else {
                         mod = subPos % 3;
                     }
@@ -261,7 +261,7 @@ public class SnpTranslator {
                         tripletRef = refSeq.substring(this.pos - 3, this.pos);
                         tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase());
                     }
-                } else { //snp is located in a subannotation (exon) and at a border of a subannotation
+                } else { //snp is located in a subfeature (exon) and at a border of a subfeature
 
                     mod = subPos % 3;
                     boolean posDirectAtLeftSubBorder = this.pos - 1 < borderSubfeat.getStart();
@@ -270,9 +270,9 @@ public class SnpTranslator {
                     if (!posAtRightBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left base of triplet, get pos to pos+2
 
                         if (posAtRightSubBorder) {
-                            if (posDirectAtRightSubBorder) { //get only last base from other subannotation
+                            if (posDirectAtRightSubBorder) { //get only last base from other subfeature
                                 tripletRef = refSeq.substring(pos - 1, pos) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart() + 1);
-                            } else { //get last two bases from other annotation
+                            } else { //get last two bases from other feature
                                 tripletRef = refSeq.substring(pos - 1, pos + 1) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
                             }
                         } else {
@@ -282,7 +282,7 @@ public class SnpTranslator {
 
                     } else if (mod == 2 && !posDirectAtLeftBorder && !posDirectAtRightBorder) { //middle base of triplet, get pos-1, pos and pos+1
 
-                        if (posDirectAtLeftSubBorder) { //get one base from left subannotation and one from right subannotation
+                        if (posDirectAtLeftSubBorder) { //get one base from left subfeature and one from right subfeature
                             tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
                         } else {
                             tripletRef = refSeq.substring(this.pos - 2, this.pos);
@@ -297,9 +297,9 @@ public class SnpTranslator {
                     } else if (!posAtLeftBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
 
                         if (posAtLeftSubBorder) {
-                            if (posDirectAtLeftSubBorder) { //get both left bases from other subannotation
+                            if (posDirectAtLeftSubBorder) { //get both left bases from other subfeature
                                 tripletRef = refSeq.substring(subfeatBefore.getStop() - 2, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
-                            } else { //get last base from other annotation
+                            } else { //get last base from other feature
                                 tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 2, pos);
                             }
                         } else {
@@ -313,14 +313,12 @@ public class SnpTranslator {
                     tripletRef = SequenceUtils.getReverseComplement(tripletRef);
                     tripletSnp = SequenceUtils.getReverseComplement(tripletSnp);
                 }
-            } catch (ArrayIndexOutOfBoundsException e) {
-                continue;
-            } catch (NullPointerException e){
+            } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
                 continue;
             }
 
-            //get annotation id
-            String id = annotation.hasGeneName() ? annotation.getGeneName() : annotation.getLocus();
+            //get feature id
+            String id = feature.hasFeatureName() ? feature.getFeatureName() : feature.getLocus();
 
             //translate string to amino acid and store reference and snp codon
             try {

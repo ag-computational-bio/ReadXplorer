@@ -36,7 +36,7 @@ public class StartCodonFilter implements RegionFilterI {
     private ArrayList<Boolean> selectedStops;
     private Pattern[] startCodons;
     private Pattern[] stopCodons;
-    private int frameCurrAnnotation;
+    private int frameCurrFeature;
     private int nbGeneticCodes;
 
     /**
@@ -49,7 +49,7 @@ public class StartCodonFilter implements RegionFilterI {
      */
     public StartCodonFilter(int absStart, int absStop, PersistantReference refGen){
         this.pref = NbPreferences.forModule(Object.class);
-        this.regions = new ArrayList<Region>();
+        this.regions = new ArrayList<>();
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
@@ -62,7 +62,7 @@ public class StartCodonFilter implements RegionFilterI {
 
         this.resetCodons();
 
-        this.frameCurrAnnotation = StartCodonFilter.INIT; //because this is not a frame value
+        this.frameCurrFeature = StartCodonFilter.INIT; //because this is not a frame value
     }
 
     /**
@@ -90,13 +90,13 @@ public class StartCodonFilter implements RegionFilterI {
                 }
 
                 sequence = refGen.getSequence().substring(start, stop);
-                boolean isAnnotationSelected = this.frameCurrAnnotation != INIT;
+                boolean isFeatureSelected = this.frameCurrFeature != INIT;
 
                 int index = 0;
                 for (int i = 0; i < this.selectedStarts.size(); ++i) {
                     if (this.selectedStarts.get(i)) {
-                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isAnnotationSelected, Properties.START);
-                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isAnnotationSelected, Properties.START);
+                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected, Properties.START);
+                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected, Properties.START);
                     } else {
                         index += 2;
                     }
@@ -104,8 +104,8 @@ public class StartCodonFilter implements RegionFilterI {
                 index = 0;
                 for (int i = 0; i < this.selectedStops.size(); ++i) {
                     if (this.selectedStops.get(i)) {
-                        this.matchPattern(sequence, this.stopCodons[index++], true, offset, isAnnotationSelected, Properties.STOP);
-                        this.matchPattern(sequence, this.stopCodons[index++], false, offset, isAnnotationSelected, Properties.STOP);
+                        this.matchPattern(sequence, this.stopCodons[index++], true, offset, isFeatureSelected, Properties.STOP);
+                        this.matchPattern(sequence, this.stopCodons[index++], false, offset, isFeatureSelected, Properties.STOP);
                     } else {
                         index += 2;
                     }
@@ -130,7 +130,7 @@ public class StartCodonFilter implements RegionFilterI {
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, int offset, boolean restricted,
             int type){
         // match forward
-        final boolean codonFwdStrand = this.frameCurrAnnotation > 0 ? true : false;
+        final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
         if (!restricted || restricted && codonFwdStrand == isForwardStrand){
             Matcher m = p.matcher(sequence);
             while (m.find()) {
@@ -148,8 +148,8 @@ public class StartCodonFilter implements RegionFilterI {
                      * -2 = (pos 5 - 1) % 3 = 1 -> 1 - 3 = frame -2
                      * -3 = (pos 4 - 1) % 3 = 0 -> 0 - 3 = frame -3
                      */
-                    if ((start - 1) % 3 + 1 == this.frameCurrAnnotation ||
-                         (stop - 1) % 3 - 3 == this.frameCurrAnnotation) {
+                    if ((start - 1) % 3 + 1 == this.frameCurrFeature ||
+                         (stop - 1) % 3 - 3 == this.frameCurrFeature) {
                         regions.add(new Region(start, stop, isForwardStrand, type));
                     }
                 } else {
@@ -207,18 +207,18 @@ public class StartCodonFilter implements RegionFilterI {
         return this.selectedStops.get(i);
     }
 
-    public int getFrameCurrAnnotation() {
-        return this.frameCurrAnnotation;
+    public int getFrameCurrFeature() {
+        return this.frameCurrFeature;
     }
 
     /**
-     * Sets the data needed for the current annotation. Currently only the frame is
+     * Sets the data needed for the current feature. Currently only the frame is
      * necessary. This always has to be set first in case the action should only
      * show start codons of the correct frame.
-     * @param frameCurrAnnotation the frame of the currently selected annotation
+     * @param frameCurrFeature the frame of the currently selected feature
      */
-    public void setCurrAnnotationData(int frameCurrAnnotation) {
-        this.frameCurrAnnotation = frameCurrAnnotation;
+    public void setCurrFeatureData(int frameCurrFeature) {
+        this.frameCurrFeature = frameCurrFeature;
     }
 
     /**
@@ -255,8 +255,8 @@ public class StartCodonFilter implements RegionFilterI {
         }
         this.startCodons = new Pattern[startCodonsNew.length*2];
         this.stopCodons = new Pattern[stopCodonsNew.length*2];
-        this.selectedStarts = new ArrayList<Boolean>();
-        this.selectedStops = new ArrayList<Boolean>();
+        this.selectedStarts = new ArrayList<>();
+        this.selectedStops = new ArrayList<>();
         int index = 0;
         String codon;
         for (int i=0; i<startCodonsNew.length; ++i){

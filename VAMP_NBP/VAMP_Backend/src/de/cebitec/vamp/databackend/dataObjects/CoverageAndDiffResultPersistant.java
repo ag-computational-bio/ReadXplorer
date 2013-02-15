@@ -20,7 +20,7 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
     private List<PersistantDiff> diffs;
     private List<PersistantReferenceGap> gaps;
     private boolean diffsAndGapsUsed;
-
+    
     /**
      * Data storage for coverage, diffs and gaps.
      * @param coverage the coverage container to store. If it is not used, you can

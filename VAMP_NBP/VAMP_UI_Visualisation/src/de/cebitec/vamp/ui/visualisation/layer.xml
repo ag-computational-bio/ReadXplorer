@@ -55,11 +55,11 @@
             </file>
         </folder>
         <folder name="Window">
-            <file name="de-cebitec-vamp-ui-visualisation-AppPanelAction.instance">
+<!--            <file name="de-cebitec-vamp-ui-visualisation-AppPanelAction.instance">
                 <attr name="component" methodvalue="de.cebitec.vamp.ui.visualisation.AppPanelTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="de.cebitec.vamp.ui.visualisation.Bundle#CTL_AppPanelAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
-            </file><!--
+            </file>
             <file name="de-cebitec-vamp-ui-visualisation-actions-TrackCloseSelectionAction.instance">
                 <attr name="position" intvalue="230"/>
             </file>-->

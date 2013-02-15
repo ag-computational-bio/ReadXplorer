@@ -1,6 +1,9 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Data storage for a track.
@@ -19,10 +22,11 @@ public class PersistantTrack {
     /**
      * Data storage for a track.
      * @param id
-     * is loaded via direct file access
+     * @param path path of the track, if it is a direct file access track
      * @param description
      * @param date creation date
-     * @param refGenID 
+     * @param refGenID
+     * @param seqPairId  
      */
     public PersistantTrack(int id, String path, String description, Timestamp date, int refGenID, int seqPairId) {
         this.id = id;
@@ -39,20 +43,29 @@ public class PersistantTrack {
     }
 
     /**
-     * @return non-empty String, if this track is stored for direct file access.
+     * @return Non-empty String, if this track is stored for direct file access.
      */
     public String getFilePath() {
         return path;
     }
 
+    /**
+     * @return The vamp database id of the reference genome
+     */
     public int getRefGenID() {
         return refGenID;
     }
 
+    /**
+     * @return The timestamp of the creation time of this track
+     */
     public Timestamp getTimestamp(){
         return date;
     }
 
+    /**
+     * @return Description string of this track
+     */
     public String getDescription(){
         return description;
     }
@@ -65,13 +78,16 @@ public class PersistantTrack {
     }
     
     /**
-     * @return true, if this track is stored within the database, false, if it is
+     * @return True, if this track is stored within the database, false, if it is
      * stored for direct file access.
      */
     public boolean isDbUsed() {
         return this.path.isEmpty();
     }
 
+    /**
+     * @return Returns the description of this track
+     */
     @Override
     public String toString(){
         return description;
@@ -90,7 +106,8 @@ public class PersistantTrack {
     
     
     /**
-     * check if the given track is equal to this one 
+     * Checks if the given track is equal to this one.
+     * @param o object to compare to this one
      */
     @Override
     public boolean equals(Object o) {
@@ -107,7 +124,20 @@ public class PersistantTrack {
                );
                     
         }
-        else return super.equals(o);
+        else { return super.equals(o); }
+    }
+    
+    /**
+     * Generates a list of track names from a collection of persistant tracks.
+     * @param tracks the tracks whose descriptions need to be returned in a list
+     * @return The list of track names from the given collection of persistant tracks.
+     */
+    public static List<String> generateTrackDescriptionList(Collection<PersistantTrack> tracks) {
+        List<String> trackNameList = new ArrayList<>();
+        for (PersistantTrack track : tracks) {
+            trackNameList.add(track.getDescription());
+        }
+        return trackNameList;
     }
 
 }

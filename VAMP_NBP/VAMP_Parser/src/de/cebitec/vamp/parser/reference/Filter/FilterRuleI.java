@@ -1,6 +1,6 @@
 package de.cebitec.vamp.parser.reference.Filter;
 
-import de.cebitec.vamp.parser.common.ParsedAnnotation;
+import de.cebitec.vamp.parser.common.ParsedFeature;
 
 
 /**
@@ -9,6 +9,6 @@ import de.cebitec.vamp.parser.common.ParsedAnnotation;
  */
 public interface FilterRuleI {
 
-    public boolean appliesRule(ParsedAnnotation annotation);
+    public boolean appliesRule(ParsedFeature feature);
 
 }

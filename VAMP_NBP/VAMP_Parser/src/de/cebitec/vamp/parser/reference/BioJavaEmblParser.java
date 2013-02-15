@@ -1,12 +1,12 @@
 package de.cebitec.vamp.parser.reference;
 
-import de.cebitec.vamp.parser.common.ParsedAnnotation;
-import de.cebitec.vamp.parser.common.ParsedReference;
-import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.reference.Filter.AnnotationFilter;
-import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.api.objects.FeatureType;
-import de.cebitec.vamp.parser.common.ParsedSubAnnotation;
+import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.common.ParsedFeature;
+import de.cebitec.vamp.parser.common.ParsedReference;
+import de.cebitec.vamp.parser.common.ParsedSubFeature;
+import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -41,17 +41,17 @@ public class BioJavaEmblParser implements ReferenceParserI {
     // name of this parser for use in ComboBoxes
     private static String parserName = "BioJava EMBL";
     private static String fileDescription = "EMBL file";
-    private ArrayList<Observer> observers = new ArrayList<Observer>();
+    private ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
     public BioJavaEmblParser() {
     }
 
     @Override
-    public ParsedReference parseReference(ReferenceJob refGenJob, AnnotationFilter filter) throws ParsingException {
+    public ParsedReference parseReference(ReferenceJob refGenJob, FeatureFilter filter) throws ParsingException {
 
         ParsedReference refGenome = new ParsedReference();
-        refGenome.setAnnotationFilter(filter);
+        refGenome.setFeatureFilter(filter);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
         try {
@@ -66,7 +66,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
 
             // take only the first sequence from file, if exists
             while (seqIter.hasNext()) {
-                RichSequence seq = null;
+                RichSequence seq;
                 try {
                     try {
                         seq = seqIter.nextRichSequence();
@@ -82,26 +82,26 @@ public class BioJavaEmblParser implements ReferenceParserI {
                     refGenome.setTimestamp(refGenJob.getTimestamp());
                     refGenome.setSequence(seq.seqString());
 
-                    // iterate through all annotations
+                    // iterate through all features
                     Iterator<Feature> featIt = seq.getFeatureSet().iterator();
                     while (featIt.hasNext()) {
                         RichFeature f = (RichFeature) featIt.next();
 
-                        // attributes of annotation that should be stored
-                        String parsedType = null;
+                        // attributes of feature that should be stored
+                        String parsedType;
                         String locusTag = "unknown locus tag";
                         String product = null;
-                        int start = 0;
-                        int stop = 0;
+                        int start;
+                        int stop;
                         int strand = 0;
                         String ecNumber = null;
                         String geneName = null;
-                        List<ParsedSubAnnotation> exons = new ArrayList<ParsedSubAnnotation>();
+                        List<ParsedSubFeature> exons = new ArrayList<>();
 
                         parsedType = f.getType();
                         start = f.getLocation().getMin();
                         stop = f.getLocation().getMax();
-                        Iterator subAnnotationIter = f.getLocation().blockIterator();
+                        Iterator subFeatureIter = f.getLocation().blockIterator();
 
                         @SuppressWarnings("unchecked")
                         Iterator<Note> noteIter = f.getRichAnnotation().getNoteSet().iterator();
@@ -125,7 +125,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
                             }
                         }
 
-                        /* if the type of the annotation is unknown to vamp (see below),
+                        /* if the type of the feature is unknown to vamp (see below),
                          * an undefined type is used
                          */
                         FeatureType type = FeatureType.UNDEFINED;
@@ -151,7 +151,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
                             type = FeatureType.MRNA;
                         } else {
                             this.sendErrorMsg(refGenJob.getFile().getAbsolutePath()
-                                    + ": Using unknown annotation type for " + parsedType);
+                                    + ": Using unknown feature type for " + parsedType);
                         }
 
                         String strandString = RichLocation.Tools.enrich(f.getLocation()).getStrand().toString();
@@ -164,9 +164,9 @@ public class BioJavaEmblParser implements ReferenceParserI {
                                     + "Unknown strand found: " + strandString);
                         }
 
-                        while (subAnnotationIter.hasNext()) {
+                        while (subFeatureIter.hasNext()) {
 
-                            String pos = subAnnotationIter.next().toString();
+                            String pos = subFeatureIter.next().toString();
                             /*for eukaryotic organism its important to see the single cds
                             for looking for introns
                             if we choose min and max we get the first pos of the first cds
@@ -179,7 +179,7 @@ public class BioJavaEmblParser implements ReferenceParserI {
 
                             }
                             
-                            refGenome.addAnnotation(new ParsedAnnotation(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
+                            refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
 
                         }
                     }

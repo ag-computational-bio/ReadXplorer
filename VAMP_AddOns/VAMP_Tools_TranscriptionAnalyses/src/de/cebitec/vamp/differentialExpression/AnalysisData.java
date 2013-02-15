@@ -15,15 +15,15 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class AnalysisData {
 
     /**
-     * Start positions of the reference annotations.
+     * Start positions of the reference features.
      */
     private int[] start;
     /**
-     * Stop positions of the reference annotations.
+     * Stop positions of the reference features.
      */
     private int[] stop;
     /**
-     * ID of the reference annotations.
+     * ID of the reference features.
      */
     private String[] loci;
     /**
@@ -86,23 +86,23 @@ public class AnalysisData {
     }
 
     /**
-     * Return the start positions of the reference annotations.
-     * @return Start positions of the reference annotations.
+     * Return the start positions of the reference features.
+     * @return Start positions of the reference features.
      */
     public int[] getStart() {
         return start;
     }
 
     /**
-     * Return the stop positions of the reference annotations.
-     * @return stop positions of the reference annotations.
+     * Return the stop positions of the reference features.
+     * @return stop positions of the reference features.
      */
     public int[] getStop() {
         return stop;
     }
     /**
-     * Return the Loci of the reference annotations.
-     * @return Loci of the reference annotations as an String Array.
+     * Return the Loci of the reference features.
+     * @return Loci of the reference features as an String Array.
      */
     public String[] getLoci() {
         return loci;

@@ -107,25 +107,25 @@ public class FieldNames {
     public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
 
 
-    //all annotation table fields (table still called Feature table)
-    public final static String ANNOTATION_ID = "ID";
-    public final static String ANNOTATION_REFGEN_ID = "REFERENCE_ID";
-    public final static String ANNOTATION_TYPE = "TYPE";
-    public final static String ANNOTATION_START = "START";
-    public final static String ANNOTATION_STOP = "STOP";
-    public final static String ANNOTATION_LOCUS_TAG = "LOCUS_TAG";
-    public final static String ANNOTATION_PRODUCT = "PRODUCT";
-    public final static String ANNOTATION_EC_NUM = "EC_NUM";
-    public final static String ANNOTATION_STRAND = "STRAND";
-    public static final String ANNOTATION_GENE = "GENE";
+    //all feature table fields (table still called Feature table)
+    public final static String FEATURE_ID = "ID";
+    public final static String FEATURE_REFGEN_ID = "REFERENCE_ID";
+    public final static String FEATURE_TYPE = "TYPE";
+    public final static String FEATURE_START = "START";
+    public final static String FEATURE_STOP = "STOP";
+    public final static String FEATURE_LOCUS_TAG = "LOCUS_TAG";
+    public final static String FEATURE_PRODUCT = "PRODUCT";
+    public final static String FEATURE_EC_NUM = "EC_NUM";
+    public final static String FEATURE_STRAND = "STRAND";
+    public static final String FEATURE_GENE = "GENE";
     
     
-    //all sub annotation table fields (table still called Subfeature table)
-    public final static String SUBANNOTATION_PARENT_ID = "PARENT_ID";
-    public final static String SUBANNOTATION_REFERENCE_ID = "REFERENCE_ID";
-    public final static String SUBANNOTATION_TYPE = "TYPE";
-    public final static String SUBANNOTATION_START = "START";
-    public final static String SUBANNOTATION_STOP = "STOP";
+    //all sub feature table fields (table still called Subfeature table)
+    public final static String SUBFEATURE_PARENT_ID = "PARENT_ID";
+    public final static String SUBFEATURE_REFERENCE_ID = "REFERENCE_ID";
+    public final static String SUBFEATURE_TYPE = "TYPE";
+    public final static String SUBFEATURE_START = "START";
+    public final static String SUBFEATURE_STOP = "STOP";
 
     
     // mapping table fields

@@ -1,5 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
+import de.cebitec.vamp.databackend.dataObjects.TrackResultEntry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +10,13 @@ import java.util.List;
  * Data structure for storing operons. Operons consist of a list of OperonAdjacencies, since
  * each operon can contain more than two genes.
  */
-public class Operon {
+public class Operon extends TrackResultEntry {
     
     private List<OperonAdjacency> operonAdjacencies;
    
-    public Operon() {
-        this.operonAdjacencies = new ArrayList<OperonAdjacency>();
+    public Operon(int trackId) {
+        super(trackId);
+        this.operonAdjacencies = new ArrayList<>();
     }
 
     /**
@@ -27,7 +29,7 @@ public class Operon {
     /**
      * @param operon the operon adjacencies to associate with this operon object.
      */
-    public void setOperonAdjacencies(List newOperonAdjacencys) {
+    public void setOperonAdjacencies(List<OperonAdjacency> newOperonAdjacencys) {
          this.operonAdjacencies = newOperonAdjacencys;
     }
     

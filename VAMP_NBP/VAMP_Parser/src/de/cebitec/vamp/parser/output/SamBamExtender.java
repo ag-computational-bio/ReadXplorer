@@ -58,9 +58,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
     /**
      * A SamBamExtender needs exactly two arguments:
-     * @param trackJob the track job including a sam or bam file for
+     * - trackJob the track job including a sam or bam file for
      * extension with more data.
-     * @param refGenome the reference genome belonging to the trackJob
+     * - refGenome the reference genome belonging to the trackJob
      */
     @Override
     public void setDataToConvert(Object... data) {
@@ -95,9 +95,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private void extendSamBamFile() throws ParsingException {
 
         File fileToExtend = trackJob.getFile();
-        String fileName = fileToExtend.getName();
 
-        this.notifyObservers(NbBundle.getMessage(SamBamExtender.class, "Converter.Convert.Start", fileName));
         File outputFile;
         SAMFileWriter samBamFileWriter;
 
@@ -107,27 +105,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
 
-            
-//commented out because: we currently don't allow to write sam files, only bam! (more efficient)
-            
-            //determine writer type (sam or bam):
-//            String[] nameParts = fileName.split(".");
-//            String extension;
-//            try {
-//                extension = nameParts[nameParts.length - 1];
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                extension = "bam";
-//            }
-
-            SAMFileWriterFactory factory = new SAMFileWriterFactory();
-//            if (extension.toLowerCase().contains("sam")) {
-//                outputFile = new File(fileToExtend.getAbsolutePath() + "_extended.sam");
-//                samBamFileWriter = factory.makeSAMWriter(header, false, outputFile);
-//            } else {
-                outputFile = new File(fileToExtend.getAbsolutePath() + "_extended.bam");
-                samBamFileWriter = factory.makeBAMWriter(header, false, outputFile);
-//            }
-
+            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(fileToExtend, header, false, "_extended.bam");
+            samBamFileWriter = writerAndFile.getFirst();
+            outputFile = writerAndFile.getSecond();
             trackJob.setFile(outputFile);
 
             int lineno = 0;
@@ -156,7 +136,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                         stop = record.getAlignmentEnd();
                         refSeq = this.refGenome.substring(start - 1, stop);
 
-                        if (!ParserCommonMethods.checkRead(this, readSeq, this.refSeqLength, cigar, start, stop, fileName, lineno)) {
+                        if (!ParserCommonMethods.checkRead(this, readSeq, this.refSeqLength, cigar, start, stop, fileToExtend.getName(), lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         
@@ -200,7 +180,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
         SAMFileReader samReaderNew = new SAMFileReader(outputFile);
         SamUtils utils = new SamUtils();
         utils.registerObserver(this);
-        utils.createIndex(samReaderNew, new File(outputFile + ".bai"));
+        utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
     }
 
     @Override

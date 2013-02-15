@@ -36,7 +36,7 @@ public class BaySeq {
      * the baySeq package.
      *
      * @param bseqData The prepared experiment data set.
-     * @param numberOfAnnotations The number of underlying annotations.
+     * @param numberOfFeatures The number of underlying features.
      * @param numberOfTracks The number of underlying tracks.
      * @param saveFile The Gnu R dataset will be saved to this file. If no
      * saving should be done just pass null here.
@@ -52,7 +52,7 @@ public class BaySeq {
      * not normalised results and then all the normalised ones.
      */
     public List<BaySeqAnalysisHandler.Result> process(BaySeqAnalysisData bseqData,
-            int numberOfAnnotations, int numberOfTracks, File saveFile)
+            int numberOfFeatures, int numberOfTracks, File saveFile)
             throws JRILibraryNotInPathException, PackageNotLoadableException,
             IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
@@ -87,14 +87,14 @@ public class BaySeq {
                 }
                 concatenate.deleteCharAt(concatenate.length() - 1);
                 concatenate.append(")");
-                gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfAnnotations + ")");
-                gnuR.assign("inputAnnotationsStart", bseqData.getStart());
-                gnuR.assign("inputAnnotationsStop", bseqData.getStop());
-                gnuR.assign("inputAnnotationsID", bseqData.getLoci());
-                gnuR.eval("annotations <- data.frame(inputAnnotationsID,inputAnnotationsStart,inputAnnotationsStop)");
-                gnuR.eval("colnames(annotations) <- c(\"locus\", \"start\", \"stop\")");
-                gnuR.eval("seglens <- annotations$stop - annotations$start + 1");
-                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = annotations)");
+                gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
+                gnuR.assign("inputFeaturesStart", bseqData.getStart());
+                gnuR.assign("inputFeaturesStop", bseqData.getStop());
+                gnuR.assign("inputFeaturesID", bseqData.getLoci());
+                gnuR.eval("features <- data.frame(inputFeaturesID,inputFeaturesStart,inputFeaturesStop)");
+                gnuR.eval("colnames(features) <- c(\"locus\", \"start\", \"stop\")");
+                gnuR.eval("seglens <- features$stop - features$start + 1");
+                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, feature = features)");
                 gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
                 gnuR.assign("replicates", bseqData.getReplicateStructure());
                 gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
@@ -116,7 +116,7 @@ public class BaySeq {
             }
             int resultIndex = 0;
             for (int j = 1; j <= numberofGroups; j++) {
-                gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + ")");
+                gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ")");
                 REXP result = gnuR.eval("tCounts" + resultIndex);
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
@@ -125,7 +125,7 @@ public class BaySeq {
                 resultIndex++;
             }
             for (int j = 1; j <= numberofGroups; j++) {
-                gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfAnnotations + " , normaliseData=TRUE)");
+                gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)");
                 REXP result = gnuR.eval("tCounts" + resultIndex);
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
