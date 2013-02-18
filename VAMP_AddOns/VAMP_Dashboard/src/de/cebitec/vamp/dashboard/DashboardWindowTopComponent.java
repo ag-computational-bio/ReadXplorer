@@ -196,19 +196,34 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
 
             @Override 
             public void update(Observable o, Object arg) {
-                try {
-                    //run gui updates separately in the AWT Thread
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshData();
+                
+                //dirty fix for a bug in h2 database, that is occuring, when trying
+                //to delete two or more references
+                //the code waits 100ms before updating the dashboard to ensure 
+                //that the reference data has been fully deleted
+                new Thread() {
+                    @Override public synchronized void run() {
+                        try {
+                            this.wait(200);
+                        } catch (InterruptedException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
-                    });
-                }
-                catch(Exception e) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
-                    e.getMessage());
-                }
+                        try {
+                            //run gui updates separately in the AWT Thread
+                            EventQueue.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshData();
+                                }
+                            });
+                        }
+                        catch(Exception e) {
+                            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, 
+                            e.getMessage());
+                        }
+                    }
+                }.start();
+                
             }
         
         }); 

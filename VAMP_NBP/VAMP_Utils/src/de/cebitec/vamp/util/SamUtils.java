@@ -97,7 +97,7 @@ public class SamUtils implements Observable {
             observer.update(data);
         }
     }
-    
+     
     /* Creates either a sam or a bam file writer depending on the ending of the 
      * oldFile.
      */
@@ -118,16 +118,16 @@ public class SamUtils implements Observable {
     public static Pair<SAMFileWriter, File> createSamBamWriter(File oldFile, SAMFileHeader header, boolean presorted, String newEnding) {
 
 // commented out part: we currently don't allow to write sam files, only bam! (more efficient)
-        
-        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
-        String newFileName;
+        //String[] nameParts = oldFile.getAbsolutePath().split("\\.");
+        //String newFileName;
 //        String extension;
 //        try {
-            newFileName = nameParts[0];
+            //newFileName = nameParts[0];
 //            extension = nameParts[nameParts.length - 1];
 //        } catch (ArrayIndexOutOfBoundsException e) {
 //            extension = "bam";
 //        }
+        String newFileName = FileUtils.getFilePathWithoutExtension(oldFile);
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
         File outputFile;
 //        if (extension.toLowerCase().contains("sam")) {

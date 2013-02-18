@@ -10,6 +10,7 @@ import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -1316,12 +1317,20 @@ public class ProjectConnector extends Observable {
 
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
-                int id = rs.getInt(FieldNames.REF_GEN_ID);
-                String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
-                String name = rs.getString(FieldNames.REF_GEN_NAME);
-                String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
-                Timestamp timestamp = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
-                refGens.add(new PersistantReference(id, name, description, sequence, timestamp));
+                try {
+                    int id = rs.getInt(FieldNames.REF_GEN_ID);
+                    String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
+                    String name = rs.getString(FieldNames.REF_GEN_NAME);
+                    //dirty fix for a bug in h2 database stating "lob not found"
+                    String sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
+                    Timestamp timestamp = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
+                    refGens.add(new PersistantReference(id, name, description, sequence, timestamp));
+                } catch (Exception e) {
+                    Logger.getLogger(ProjectConnector.class.getName()).log(Level.INFO, 
+                            "Cound not read reference sequence from dabase (this probably a concurrency issue), ignoring ..  ",
+                            e);
+                }
+                    
             }
 
         } catch (SQLException e) {
