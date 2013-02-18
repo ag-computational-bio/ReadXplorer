@@ -17,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.h2.jdbc.JdbcSQLException;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
