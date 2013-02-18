@@ -69,17 +69,8 @@ public class SimpleTest {
             concatenate.append(")");
             //Then the big count data matrix is created out of the single track data handed over.
             gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
-            //The colum names are created...
-            concatenate = new StringBuilder("c(");
-            List<PersistantTrack> tracks = analysisData.getSelectedTraks();
-            for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                concatenate.append("\"").append(persistantTrack.getDescription()).append("\",");
-            }
-            concatenate.deleteCharAt(concatenate.length() - 1);
-            concatenate.append(")");
-            //...handed over to Gnu R...
-            gnuR.eval("columNames <- " + concatenate.toString());
+            //The colum names are handed over to Gnu R... 
+            gnuR.assign("columNames", analysisData.getTrackDescriptions());
             //...and assigned to the count data matrix.
             gnuR.eval("colnames(inputData) <- columNames");
             //Now we need to name the rows. First hand over the row names to Gnu R...

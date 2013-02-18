@@ -37,6 +37,11 @@ public class AnalysisData {
      * The tracks selected by the user to perform the analysis on.
      */
     private List<PersistantTrack> selectedTraks;
+    
+    /**
+     * Track Descriptions. Each description just appears one time.
+     */
+    private String[] trackDescriptions;
 
     /**
      * Creates a new instance of the AnalysisData class.
@@ -116,6 +121,10 @@ public class AnalysisData {
         return selectedTraks;
     }
 
+    public String[] getTrackDescriptions() {
+        return trackDescriptions;
+    }
+
     public void setStart(int[] start) {
         this.start = start;
     }
@@ -137,5 +146,12 @@ public class AnalysisData {
 
     public void setSelectedTraks(List<PersistantTrack> selectedTraks) {
         this.selectedTraks = selectedTraks;
+        Set<String> tmpSet = new LinkedHashSet<>();
+        int counter = 1;
+        for (int i = 0; i < selectedTraks.size(); i++) {
+            if(!tmpSet.add(selectedTraks.get(i).getDescription())){
+                tmpSet.add(selectedTraks.get(i).getDescription()+"_"+counter++);
+            }
+        }
     }
 }
