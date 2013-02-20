@@ -94,7 +94,7 @@ public class BaySeq {
                 gnuR.eval("features <- data.frame(inputFeaturesID,inputFeaturesStart,inputFeaturesStop)");
                 gnuR.eval("colnames(features) <- c(\"locus\", \"start\", \"stop\")");
                 gnuR.eval("seglens <- features$stop - features$start + 1");
-                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, feature = features)");
+                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)");
                 gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
                 gnuR.assign("replicates", bseqData.getReplicateStructure());
                 gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
