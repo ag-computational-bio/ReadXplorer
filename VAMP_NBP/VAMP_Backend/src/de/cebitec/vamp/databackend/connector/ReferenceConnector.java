@@ -250,5 +250,19 @@ public class ReferenceConnector {
         }
         return namesList;
     }
+    
+    public boolean hasFeatures() {
+        try {
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_EXIST);
+            fetch.setLong(1, refGenID);
+
+            ResultSet rs = fetch.executeQuery();
+            return rs.next();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
 
 }

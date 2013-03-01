@@ -507,6 +507,15 @@ public class SQLStatements {
             + "WHERE "
             + FieldNames.REF_GEN_ID + " = ?";
     
+    //Select ID from first feature belonging to the referece genome
+    public final static String CHECK_IF_FEATURES_EXIST =
+            "SELECT " +
+                FieldNames.FEATURE_ID +
+            " FROM " +
+                FieldNames.TABLE_FEATURES +
+            " WHERE " +
+                FieldNames.FEATURE_REFGEN_ID+" = ? and " +
+                FieldNames.FEATURE_ID+"=1";
     
     public final static String FETCH_FEATURES_FOR_GENOME_INTERVAL =
             "SELECT " +
