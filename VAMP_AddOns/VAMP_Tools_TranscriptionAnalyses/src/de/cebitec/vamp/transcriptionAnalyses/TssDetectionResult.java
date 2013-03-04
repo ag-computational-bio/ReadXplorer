@@ -127,17 +127,17 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             
             DetectedFeatures detFeatures = tss.getDetFeatures();
             PersistantFeature feature = detFeatures.getCorrectStartFeature();
-            tssRow.add(feature != null ? PersistantFeature.getFeatureName(feature) : "-");
+            tssRow.add(feature != null ? PersistantFeature.Utils.getFeatureName(feature) : "-");
             tssRow.add(feature != null ? feature.getStart() : "-");
             tssRow.add(feature != null ? feature.getStop() : "-");
             
             feature = detFeatures.getUpstreamFeature();
-            tssRow.add(feature != null ? PersistantFeature.getFeatureName(feature) : "-");
+            tssRow.add(feature != null ? PersistantFeature.Utils.getFeatureName(feature) : "-");
             tssRow.add(feature != null ? feature.getStart() : "-");
             tssRow.add(feature != null ? feature.getStop() : "-");
             
             feature = detFeatures.getDownstreamFeature();
-            tssRow.add(feature != null ? PersistantFeature.getFeatureName(feature) : "-");
+            tssRow.add(feature != null ? PersistantFeature.Utils.getFeatureName(feature) : "-");
             tssRow.add(feature != null ? feature.getStart() : "-");
             tssRow.add(feature != null ? feature.getStop() : "-");
             

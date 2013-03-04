@@ -76,6 +76,12 @@ public class SQLStatements {
     * already drop this table which was replaced by STATISTICS.
     */
     public static final String DROP_TABLE_STATICS = "DROP TABLE IF EXISTS STATICS";
+    
+    /**
+     * Only needed as long as older databases are floating around and did not
+     * already drop this table which is not necessary anymore.
+     */
+    public static String DROP_TABLE_SUBFEATURES = "DROP TABLE IF EXISTS SUBFEATURES";
          
          
     //////////////////  statements for data insertion  ////////////////////////
@@ -135,6 +141,7 @@ public class SQLStatements {
             + "(" +
             FieldNames.FEATURE_ID+", " +
             FieldNames.FEATURE_REFGEN_ID+", "+
+            FieldNames.FEATURE_PARENT_IDS+", "+
             FieldNames.FEATURE_TYPE+", " +
             FieldNames.FEATURE_START+", " +
             FieldNames.FEATURE_STOP+", " +
@@ -144,19 +151,7 @@ public class SQLStatements {
             FieldNames.FEATURE_STRAND+", "+
             FieldNames.FEATURE_GENE+
             " ) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?) ";
-    
-    
-    public final static String INSERT_SUBFEATURE =
-            "INSERT INTO " + FieldNames.TABLE_SUBFEATURES + " "
-            + "(" +
-            FieldNames.SUBFEATURE_PARENT_ID+", " +
-            FieldNames.SUBFEATURE_REFERENCE_ID+", " +
-            FieldNames.SUBFEATURE_TYPE+", " +
-            FieldNames.SUBFEATURE_START+", " +
-            FieldNames.SUBFEATURE_STOP+
-            " ) "
-            + "VALUES (?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?) ";
     
     
     public final static String INSERT_TRACK =
@@ -455,13 +450,6 @@ public class SQLStatements {
                 FieldNames.FEATURE_REFGEN_ID+" = ?";
     
     
-    public final static String DELETE_SUBFEATURES_FROM_GENOME = //TODO: test delete feature details
-            "DELETE FROM "
-            + FieldNames.TABLE_SUBFEATURES
-            + " WHERE " +
-                FieldNames.SUBFEATURE_REFERENCE_ID + " = ?";
-    
-    
     public final static String DELETE_GENOME =
             "DELETE FROM "
             + FieldNames.TABLE_REFERENCE + " "
@@ -482,10 +470,18 @@ public class SQLStatements {
                 + "R." + FieldNames.REF_GEN_ID + ", "
                 + "R." + FieldNames.REF_GEN_NAME + ", "
                 + "R." + FieldNames.REF_GEN_DESCRIPTION + ", "
-                + "R." + FieldNames.REF_GEN_SEQUENCE + ",  "
-                + "R." + FieldNames.REF_GEN_TIMESTAMP + " "
-            + "FROM "
+                + "R." + FieldNames.REF_GEN_TIMESTAMP
+            + " FROM "
                 + FieldNames.TABLE_REFERENCE + " AS R ";
+    
+    /** Fetch the reference sequence for a given reference id. */
+    public static final String FETCH_REFERENCE_SEQ =
+            "SELECT "
+                + FieldNames.REF_GEN_SEQUENCE
+            + " FROM "
+                + FieldNames.TABLE_REFERENCE
+            + " WHERE "
+                + FieldNames.REF_GEN_ID + " = ?";
     
     
     public final static String FETCH_TRACKS =
@@ -511,6 +507,7 @@ public class SQLStatements {
     public final static String FETCH_FEATURES_FOR_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_PARENT_IDS+", "+
                 FieldNames.FEATURE_TYPE+", " +
                 FieldNames.FEATURE_START+", "+
                 FieldNames.FEATURE_STOP+", "+
@@ -531,6 +528,7 @@ public class SQLStatements {
     public final static String FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_PARENT_IDS+", "+
                 FieldNames.FEATURE_TYPE+", " +
                 FieldNames.FEATURE_START+", "+
                 FieldNames.FEATURE_STOP+", "+
@@ -547,36 +545,6 @@ public class SQLStatements {
                 FieldNames.FEATURE_STOP + " between ? and ? " +
                 " ORDER BY " + FieldNames.FEATURE_START;
     
-    
-         public static final String FETCH_SUBFEATURES_FOR_GENOME_INTERVAL =
-            "SELECT " +
-                FieldNames.SUBFEATURE_PARENT_ID+", "+
-                FieldNames.SUBFEATURE_START+", "+
-                FieldNames.SUBFEATURE_STOP+", " +
-                FieldNames.SUBFEATURE_TYPE+" " +
-            "FROM "
-            + FieldNames.TABLE_SUBFEATURES + " "
-            + "WHERE "
-                + FieldNames.SUBFEATURE_REFERENCE_ID + " = ? and "
-                + FieldNames.SUBFEATURE_STOP+" >= ? and "
-                + FieldNames.SUBFEATURE_START+" <= ? " +
-            "ORDER BY " + FieldNames.SUBFEATURE_START;
-            
-         
-         public static final String FETCH_SUBFEATURES_FOR_CLOSED_GENOME_INTERVAL =
-            "SELECT " +
-                FieldNames.SUBFEATURE_PARENT_ID+", "+
-                FieldNames.SUBFEATURE_START+", "+
-                FieldNames.SUBFEATURE_STOP+", " +
-                FieldNames.SUBFEATURE_TYPE+" " +
-            "FROM "
-            + FieldNames.TABLE_SUBFEATURES + " "
-            + "WHERE "
-                + FieldNames.SUBFEATURE_REFERENCE_ID + " = ? and "
-                + FieldNames.SUBFEATURE_START + " between ? and ? and "
-                + FieldNames.SUBFEATURE_STOP + " between ? and ? " +
-                " ORDER BY " + FieldNames.SUBFEATURE_START;
-                
                 
     public final static String FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK =
             "SELECT "
@@ -1578,8 +1546,8 @@ public class SQLStatements {
     public static final String GET_CURRENT_READLENGTH =
             "SELECT "
             + FieldNames.MAPPING_STOP + ", "
-            + FieldNames.MAPPING_START + " "
-            + "FROM "
+            + FieldNames.MAPPING_START
+            + " FROM "
             + FieldNames.TABLE_MAPPING
             + " WHERE "
             + FieldNames.MAPPING_TRACK + " = ? "
@@ -1589,13 +1557,30 @@ public class SQLStatements {
     public static final String FETCH_COVERAGE_DISTRIBUTION =
             "SELECT "
             + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + ", "
-            + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " "
+            + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT
             + " FROM "
             + FieldNames.TABLE_COVERAGE_DISTRIBUTION
             + " WHERE "
             + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " = ? AND "
             + FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " = ? ";
-     
+    
+    
+    public static String INIT_FEATURE_PARENT_ID =
+            "UPDATE "
+            + FieldNames.TABLE_FEATURES
+            + " SET "
+            + FieldNames.FEATURE_PARENT_IDS
+            + " = 0 "
+            + " WHERE "
+            + FieldNames.FEATURE_PARENT_IDS + " IS NULL ";
+    
+    
+    public static final String NOT_NULL_FEATURE_PARENT_ID =
+            "ALTER TABLE "
+            + FieldNames.TABLE_FEATURES
+            + " ALTER COLUMN "
+            + FieldNames.FEATURE_PARENT_IDS
+            + " SET NOT NULL";
     
 //             public static final String COPY_TO_FEATURE_DETAILS_TABLE =
 //                " INSERT INTO " + FieldNames.TABLE_FEATURE_DETAILS + " ("

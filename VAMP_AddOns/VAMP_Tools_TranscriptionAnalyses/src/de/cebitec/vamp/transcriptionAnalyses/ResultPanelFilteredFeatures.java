@@ -9,6 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -213,6 +214,7 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
                 TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                 filteredFeaturesTable.setRowSorter(sorter);
                 sorter.setModel(model);
+                TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
 
                 ParameterSetFilteredFeatures parameters = (ParameterSetFilteredFeatures) filterFeaturesResult.getParameters();
                 parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,

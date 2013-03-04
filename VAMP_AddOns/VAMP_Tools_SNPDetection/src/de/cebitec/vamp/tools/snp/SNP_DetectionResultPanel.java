@@ -11,7 +11,6 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
@@ -21,7 +20,7 @@ import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.SequenceComparison;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import java.util.Comparator;
+import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +105,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
@@ -261,13 +260,6 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         //get all features from the reference to determine amino acid 
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
         List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForClosedInterval(0, reference.getRefLength());
-        Map<Integer, PersistantFeature> featureMap = new HashMap<>();
-        for (PersistantFeature feature : featuresSorted){
-            featureMap.put(feature.getId(), feature); //ids are unique
-        }
-        List<PersistantSubFeature> subFeaturesSorted = refGenCon.getSubFeaturesForClosedInterval(0, reference.getRefLength());
-        PersistantFeature.addSubFeatures(featureMap, subFeaturesSorted);
-        featureMap.clear();
         
         SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, reference);
         
@@ -387,21 +379,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>();
         this.snpTable.setRowSorter(sorter);
         sorter.setModel(model);
-        sorter.setComparator(0, new Comparator<String>() {
-
-            @Override
-            public int compare(String a, String b) {
-                if (a.contains("_")) {
-                    a = a.substring(0, a.length() - 2);
-                }
-                if (b.contains("_")) {
-                    b = b.substring(0, b.length() - 2);
-                }
-                Integer intA = Integer.parseInt(a);
-                Integer intB = Integer.parseInt(b);
-                return intA.compareTo(intB);
-            }
-        });
+        TableComparatorProvider.setPositionComparator(sorter, 0);
+        TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+        
         Map<String, Integer> snpStatsMap = new HashMap<>();
         
         snpStatsMap.put(SNPS_TOTAL, this.snpData.getSnpList().size());

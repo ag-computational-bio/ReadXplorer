@@ -115,7 +115,7 @@ public class AnalysisFilterFeatures implements Observer, AnalysisI<List<Filtered
                     if (mapping.getStop() > featStart && feature.isFwdStrand() == mapping.isFwdStrand()
                             && mapping.getStart() < featStop) {
 
-                        if (fstFittingMapping == true) {
+                        if (fstFittingMapping) {
                             this.lastMappingIdx = j;
                             fstFittingMapping = false;
                         }

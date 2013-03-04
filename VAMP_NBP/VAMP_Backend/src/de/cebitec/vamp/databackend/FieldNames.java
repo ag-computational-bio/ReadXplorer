@@ -18,7 +18,6 @@ public class FieldNames {
     public final static String TABLE_DIFF = "DIFF";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
-    public static final String TABLE_SUBFEATURES = "SUBFEATURES";
     public final static String TABLE_MAPPING = "MAPPING";
     public final static String TABLE_TRACK = "TRACK";
     public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
@@ -107,25 +106,18 @@ public class FieldNames {
     public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
 
 
-    //all feature table fields (table still called Feature table)
-    public final static String FEATURE_ID = "ID";
-    public final static String FEATURE_REFGEN_ID = "REFERENCE_ID";
-    public final static String FEATURE_TYPE = "TYPE";
-    public final static String FEATURE_START = "START";
-    public final static String FEATURE_STOP = "STOP";
-    public final static String FEATURE_LOCUS_TAG = "LOCUS_TAG";
-    public final static String FEATURE_PRODUCT = "PRODUCT";
-    public final static String FEATURE_EC_NUM = "EC_NUM";
-    public final static String FEATURE_STRAND = "STRAND";
+    //all feature table fields
+    public static final String FEATURE_ID = "ID";
+    public static final String FEATURE_REFGEN_ID = "REFERENCE_ID";
+    public static final String FEATURE_PARENT_IDS = "PARENT_IDS"; //should be 0, if no parent exists
+    public static final String FEATURE_TYPE = "TYPE";
+    public static final String FEATURE_START = "START";
+    public static final String FEATURE_STOP = "STOP";
+    public static final String FEATURE_LOCUS_TAG = "LOCUS_TAG";
+    public static final String FEATURE_PRODUCT = "PRODUCT";
+    public static final String FEATURE_EC_NUM = "EC_NUM";
+    public static final String FEATURE_STRAND = "STRAND";
     public static final String FEATURE_GENE = "GENE";
-    
-    
-    //all sub feature table fields (table still called Subfeature table)
-    public final static String SUBFEATURE_PARENT_ID = "PARENT_ID";
-    public final static String SUBFEATURE_REFERENCE_ID = "REFERENCE_ID";
-    public final static String SUBFEATURE_TYPE = "TYPE";
-    public final static String SUBFEATURE_START = "START";
-    public final static String SUBFEATURE_STOP = "STOP";
 
     
     // mapping table fields

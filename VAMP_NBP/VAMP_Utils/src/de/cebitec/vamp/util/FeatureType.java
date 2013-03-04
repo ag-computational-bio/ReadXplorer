@@ -1,4 +1,4 @@
-package de.cebitec.vamp.api.objects;
+package de.cebitec.vamp.util;
 
 /**
  * Enumeration for all different features types used in vamp. This does not only
@@ -116,8 +116,12 @@ public enum FeatureType {
     private static final String MRNA_STRING = "mRNA";
     private static final String CDS_STRING = "CDS";
     private static final String MISC_RNA_STRING = "misc RNA";
+    /** misc RNA string with underscore "misc_RNA". */
+    private static final String MISC_RNA_STRING_USCORE = "misc_RNA";
     private static final String RRNA_STRING = "rRNA";
     private static final String REPEAT_UNIT_STRING = "Repeat unit";
+    /** Repeat unit string with underscore "repeat_unit". */
+    private static final String REPEAT_UNIT_STRING_USCORE = "Repeat_unit";
     private static final String SOURCE_STRING = "Source";
     private static final String TRNA_STRING = "tRNA";
     private static final String GENE_STRING = "Gene";
@@ -182,31 +186,19 @@ public enum FeatureType {
      * FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType(int type){
-        switch (type) {
-            case UNDEFINED_INT:
-                return UNDEFINED;
-            case MRNA_INT:
-                return MRNA;
-            case CDS_INT:
-                return CDS;
-            case MISC_RNA_INT:
-                return MISC_RNA;
-            case RRNA_INT:
-                return RRNA;
-            case REPEAT_UNIT_INT:
-                return REPEAT_UNIT;
-            case SOURCE_INT:
-                return SOURCE;
-            case TRNA_INT:
-                return TRNA;
-            case GENE_INT:
-                return GENE;
-            case MIRNA_INT:
-                return MIRNA;
-            case EXON_INT:
-                return EXON;
-            default:
-                return UNDEFINED;
+        switch (type) { 
+            case UNDEFINED_INT:     return UNDEFINED;
+            case MRNA_INT:          return MRNA;
+            case CDS_INT:           return CDS;
+            case MISC_RNA_INT:      return MISC_RNA;
+            case RRNA_INT:          return RRNA;
+            case REPEAT_UNIT_INT:   return REPEAT_UNIT;
+            case SOURCE_INT:        return SOURCE;
+            case TRNA_INT:          return TRNA;
+            case GENE_INT:          return GENE;
+            case MIRNA_INT:         return MIRNA;
+            case EXON_INT:          return EXON;
+            default:                return UNDEFINED;
         }
     }
     
@@ -216,20 +208,34 @@ public enum FeatureType {
      * FeatureType.UNDEFINED is returned.
      */
     public static FeatureType getFeatureType(String type){
-        switch (type) {
-            case UNDEFINED_STRING:      return UNDEFINED;
-            case MRNA_STRING:           return MRNA;
-            case CDS_STRING:            return CDS;
-            case MISC_RNA_STRING:       return MISC_RNA;
-            case RRNA_STRING:           return RRNA;
-            case REPEAT_UNIT_STRING:    return REPEAT_UNIT;
-            case SOURCE_STRING:         return SOURCE;
-            case TRNA_STRING:           return TRNA;
-            case GENE_STRING:           return GENE;
-            case MIRNA_STRING:          return MIRNA;
-            case EXON_STRING:           return EXON;
-            default:                    return UNDEFINED;
+        FeatureType featType;
+        if (type.equalsIgnoreCase(UNDEFINED_STRING)) {
+            featType = UNDEFINED;
+        } else if (type.equalsIgnoreCase(MRNA_STRING)) {
+            featType = MRNA;
+        } else if (type.equalsIgnoreCase(CDS_STRING)) {
+            featType = CDS;
+        } else if (type.equalsIgnoreCase(MISC_RNA_STRING) || type.equalsIgnoreCase(MISC_RNA_STRING_USCORE)) {
+            featType = MISC_RNA;
+        } else if (type.equalsIgnoreCase(RRNA_STRING)) {
+            featType = RRNA;
+        } else if (type.equalsIgnoreCase(REPEAT_UNIT_STRING) || type.equalsIgnoreCase(REPEAT_UNIT_STRING_USCORE)) {
+            featType = REPEAT_UNIT;
+        } else if (type.equalsIgnoreCase(SOURCE_STRING)) {
+            featType = SOURCE;
+        } else if (type.equalsIgnoreCase(TRNA_STRING)) {
+            featType = TRNA;
+        } else if (type.equalsIgnoreCase(GENE_STRING)) {
+            featType = GENE;
+        } else if (type.equalsIgnoreCase(MIRNA_STRING)) {
+            featType = MIRNA;
+        } else if (type.equalsIgnoreCase(EXON_STRING)) {
+            featType = EXON;
+        } else {
+            featType = UNDEFINED;
         }
+        
+        return featType;
     }
     
     @Override

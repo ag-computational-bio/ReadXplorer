@@ -79,7 +79,7 @@ public class FilteredFeaturesResult extends ResultTrackAnalysis<ParameterSetFilt
         for (FilteredFeature filteredFeature : this.getResults()) {
             List<Object> filteredGeneRow = new ArrayList<>();
 
-            filteredGeneRow.add(PersistantFeature.getFeatureName(filteredFeature.getFilteredFeature()));
+            filteredGeneRow.add(PersistantFeature.Utils.getFeatureName(filteredFeature.getFilteredFeature()));
             filteredGeneRow.add(this.getTrackMap().get(filteredFeature.getTrackId()));
             filteredGeneRow.add(filteredFeature.getFilteredFeature().getStart());
             filteredGeneRow.add(filteredFeature.getFilteredFeature().getStop());

@@ -4,7 +4,9 @@ import java.awt.Component;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  * Class containing general visualization related methods.
@@ -61,5 +63,12 @@ public class VisualisationUtils {
             }
         }
         return wizardPanels;
+    }
+    
+    public static void displayOutOfMemoryError(Component parentPanel) {
+        String msg = NbBundle.getMessage(VisualisationUtils.class, "OOM_Message",
+                "An out of memory error occured during fetching the references. Please restart the software with more memory.");
+        String title = NbBundle.getMessage(VisualisationUtils.class, "OOM_Header", "Restart Software");
+        JOptionPane.showMessageDialog(parentPanel, msg, title, JOptionPane.INFORMATION_MESSAGE);
     }
 }

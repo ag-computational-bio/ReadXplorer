@@ -211,9 +211,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
             if (newDialog.getValue() == DialogDescriptor.OK_OPTION && dialogPane.isRequiredInfoSet()) {
                 if (dialogPane instanceof NewReferenceDialogPanel) {
                     NewReferenceDialogPanel nrdp = (NewReferenceDialogPanel) dialogPane;
-                    refJobView.add(new ReferenceJob(null, nrdp.getReferenceFile(), nrdp.getParser(), 
-                            nrdp.getDescription(), nrdp.getReferenceName(), 
-                            new Timestamp(System.currentTimeMillis())));
+                    refJobView.add(nrdp.getReferenceJob());
                 
                 } else if (dialogPane instanceof NewSeqPairTracksDialogPanel) {
                     NewSeqPairTracksDialogPanel seqPairPane = (NewSeqPairTracksDialogPanel) dialogPane;

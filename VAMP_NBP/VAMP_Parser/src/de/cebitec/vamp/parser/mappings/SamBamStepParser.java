@@ -66,6 +66,7 @@ public class SamBamStepParser implements MappingParserI {
         String readSeqWithoutGaps;
         String cigar;
         String filename = trackJob.getFile().getName();
+        String refName = trackJob.getRefGen().getName();
         this.noUniqueMappings = 0;
         int start;
         int stop;
@@ -90,7 +91,7 @@ public class SamBamStepParser implements MappingParserI {
             SAMRecordIterator itor = sam.iterator();
             itorAll = itor;
         }
-        SAMRecord nextRecord;
+        SAMRecord recrod;
         int end = trackJob.getStop();
         end += shift;
 
@@ -98,20 +99,20 @@ public class SamBamStepParser implements MappingParserI {
             try {
                 lineno++;
 
-                nextRecord = (record == null) ? (itorAll.hasNext() ? itorAll.next() : null) : record;
+                recrod = (record == null) ? (itorAll.hasNext() ? itorAll.next() : null) : record;
                 //no more mappings
-                if (nextRecord == null) {
+                if (recrod == null) {
                     mappingContainer.setLastMappingContainer(true);
                     break;
                 }
                 record = null;
 
-                if (!nextRecord.getReadUnmappedFlag()) {
+                if (!recrod.getReadUnmappedFlag() && recrod.getReferenceName().equals(refName)) {
 
-                    readname = nextRecord.getReadName();
-                    start = nextRecord.getAlignmentStart();
-                    cigar = nextRecord.getCigarString();
-                    readSeqWithoutGaps = nextRecord.getReadString();
+                    readname = recrod.getReadName();
+                    start = recrod.getAlignmentStart();
+                    cigar = recrod.getCigarString();
+                    readSeqWithoutGaps = recrod.getReadString();
 
                     if (cigar.contains("D") || cigar.contains("I") || cigar.contains("S") || cigar.contains("N")) {
                         stop = ParserCommonMethods.countStopPosition(cigar, start, readSeqWithoutGaps.length());
@@ -126,7 +127,7 @@ public class SamBamStepParser implements MappingParserI {
                         readSeq = readSeqWithoutGaps;
                     }
 
-                    isRevStrand = nextRecord.getReadNegativeStrandFlag();
+                    isRevStrand = recrod.getReadNegativeStrandFlag();
 
                     //check parameters
                     if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filename, lineno)) {
@@ -149,7 +150,7 @@ public class SamBamStepParser implements MappingParserI {
                     direction = isRevStrand ? (byte) -1 : 1;
                     ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
 
-                    if (nextRecord.getReadNegativeStrandFlag()) {
+                    if (recrod.getReadNegativeStrandFlag()) {
                         readSeqWithoutGaps = SequenceUtils.getReverseComplement(readSeqWithoutGaps);
                     }
 
@@ -187,13 +188,12 @@ public class SamBamStepParser implements MappingParserI {
                         }
                     }
 
-                } else {
-                    this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.Parsing.CorruptData", lineno, nextRecord.getReadName()));
-                }
+                } // else read is unmapped or belongs to another reference
             } catch (SAMFormatException e) {
-                this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                        "Parser.Parsing.CorruptData", lineno, e.toString()));
+                if (!e.getMessage().contains("MAPQ should be 0")) {
+                    this.notifyObservers(NbBundle.getMessage(SamBamStepParser.class,
+                            "Parser.Parsing.CorruptData", lineno, e.toString()));
+                } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
             }
 
         }

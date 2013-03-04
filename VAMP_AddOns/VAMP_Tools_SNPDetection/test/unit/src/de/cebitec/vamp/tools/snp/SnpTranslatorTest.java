@@ -1,11 +1,11 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,13 +70,13 @@ public class SnpTranslatorTest {
     @Test
     public void testCalcSnpList() {
         System.out.println("CalcSnpListTest");
-        PersistantFeature feat1 = new PersistantFeature(1, "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
-        PersistantFeature feat2 = new PersistantFeature(2, "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
-        PersistantFeature feat3 = new PersistantFeature(3, "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
-        PersistantFeature feat4 = new PersistantFeature(4, "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
-        PersistantFeature feat5 = new PersistantFeature(5, "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
-        PersistantFeature feat6 = new PersistantFeature(6, "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
-        PersistantFeature feat7 = new PersistantFeature(7, "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
+        PersistantFeature feat1 = new PersistantFeature(1, "0", "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
+        PersistantFeature feat2 = new PersistantFeature(2, "0", "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
+        PersistantFeature feat3 = new PersistantFeature(3, "0", "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
+        PersistantFeature feat4 = new PersistantFeature(4, "0", "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
+        PersistantFeature feat5 = new PersistantFeature(5, "0", "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
+        PersistantFeature feat6 = new PersistantFeature(6, "0", "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
+        PersistantFeature feat7 = new PersistantFeature(7, "0", "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
         PersistantSubFeature subfeat1 = new PersistantSubFeature(1, 1, 7, FeatureType.EXON); //ttt aaa g
         PersistantSubFeature subfeat2 = new PersistantSubFeature(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
         PersistantSubFeature subfeat3 = new PersistantSubFeature(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt

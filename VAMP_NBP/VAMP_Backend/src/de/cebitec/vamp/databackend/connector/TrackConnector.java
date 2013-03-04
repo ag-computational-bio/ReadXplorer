@@ -342,12 +342,13 @@ public class TrackConnector {
             int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM,
             double coverageComplete, int numReads) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics");
-        try {
+        
+        try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
+             PreparedStatement updateStatistics = con.prepareStatement(SQLStatements.UPDATE_STATISTICS)) {
+            
             int hasTrack = GenericSQLQueries.getIntegerFromDB(SQLStatements.CHECK_FOR_TRACK_IN_STATS_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-
             if (hasTrack == 0) {
-                PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
-
+                
                 int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
                 id++;
                 int covPerf = (int) (coveragePerf / 100 * refSeqLength);
@@ -371,9 +372,7 @@ public class TrackConnector {
                 insertStatistics.setInt(11, numReads);
                 insertStatistics.setLong(12, averageReadLength); //it is -1, if it was not set before.
                 insertStatistics.execute();
-                insertStatistics.close();
             } else {
-                PreparedStatement updateStatistics = con.prepareStatement(SQLStatements.UPDATE_STATISTICS);
                 int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
                 id++;
                 int covPerf = (int) (coveragePerf / 100 * refSeqLength);
@@ -391,39 +390,41 @@ public class TrackConnector {
                 updateStatistics.setInt(9, numReads);
                 updateStatistics.setLong(10, trackID);
                 updateStatistics.executeUpdate();
-                updateStatistics.close();
             }
-
-
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track statistics");
-
     }
 
+    /**
+     * Store the sequence pair statistics for a sequence pair data set.
+     * @param numSeqPairs
+     * @param numPerfectSeqPairs
+     * @param numUniqueSeqPairs
+     * @param numUniquePerfectSeqPairs
+     * @param numSingleMappings 
+     */
     public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs,
             int numUniquePerfectSeqPairs, int numSingleMappings) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
-        try {
-            PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.ADD_SEQPAIR_STATISTICS);
-            PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID);
-
+        
+        try (PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.ADD_SEQPAIR_STATISTICS);
+             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID)) {
+            
             // get latest id for track
             long id = 0;
             ResultSet rs = latestID.executeQuery();
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
-            latestID.close();
             id++;
             
             //calculate average seq pair length
             int averageSeqPairLength = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_SEQ_PAIR_LENGTH, SQLStatements.GET_NUM, con, trackID);
                 
-
             addSeqPairStats.setLong(1, id);
             addSeqPairStats.setInt(2, numSeqPairs);
             addSeqPairStats.setInt(3, numPerfectSeqPairs);
@@ -432,7 +433,6 @@ public class TrackConnector {
             addSeqPairStats.setInt(6, numSingleMappings);
             addSeqPairStats.setLong(7, averageSeqPairLength);
             addSeqPairStats.execute();
-            addSeqPairStats.close();
 
         } catch (SQLException ex) {
             ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
@@ -764,11 +764,11 @@ public class TrackConnector {
 
         PersistantSeqPairGroup seqPairData = new PersistantSeqPairGroup();
         seqPairData.setSeqPairId(seqPairId);
-        try {
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID);
+             PreparedStatement fetch2 = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID2);
+             PreparedStatement fetchSingleReads = con.prepareStatement(SQLStatements.FETCH_SINGLE_MAPPINGS_FOR_SEQ_PAIR_ID);) {
 
             //sequence pair processing
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID);
-            PreparedStatement fetch2 = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID2);
             fetch.setLong(1, seqPairId);
             fetch2.setLong(1, seqPairId);
 
@@ -789,12 +789,11 @@ public class TrackConnector {
                 long mapping2Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
                 byte seqPairType = rs.getByte(FieldNames.SEQ_PAIR_TYPE);
                 int seqPairReplicates = rs.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
-
+                
                 PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
                 seqPairData.addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
 
             }
-            fetch.close();
 
             ResultSet rs2 = fetch2.executeQuery();
             while (rs2.next()) {
@@ -813,15 +812,15 @@ public class TrackConnector {
                 long mapping2Id = rs2.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
                 byte seqPairType = rs2.getByte(FieldNames.SEQ_PAIR_TYPE);
                 int seqPairReplicates = rs2.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
+                
+                rs2.close();
 
                 PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
                 seqPairData.addPersistantMapping(mapping, seqPairType, mapping1Id, mapping2Id, seqPairReplicates);
 
             }
-            fetch2.close();
 
             //single mapping processing
-            PreparedStatement fetchSingleReads = con.prepareStatement(SQLStatements.FETCH_SINGLE_MAPPINGS_FOR_SEQ_PAIR_ID);
             fetchSingleReads.setLong(1, seqPairId);
 
             rs = fetchSingleReads.executeQuery();
@@ -839,6 +838,8 @@ public class TrackConnector {
                 long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID);
                 PersistantMapping mapping = new PersistantMapping((int) mapping1Id, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
 
+                rs.close();
+                
                 seqPairData.addPersistantMapping(mapping, Properties.TYPE_UNPAIRED_PAIR, -1, -1, -1);
 
             }
@@ -864,8 +865,8 @@ public class TrackConnector {
         DiscreteCountingDistribution coverageDistribution = new DiscreteCountingDistribution();
         coverageDistribution.setType(type);
 
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_DISTRIBUTION);
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_DISTRIBUTION)) {
+            
             fetch.setInt(1, this.trackID);
             fetch.setByte(2, type);
 
@@ -876,7 +877,6 @@ public class TrackConnector {
                 coverageDistribution.setCountForIndex(coverageIntervalId, count);
             }
             rs.close();
-            fetch.close();
 
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);

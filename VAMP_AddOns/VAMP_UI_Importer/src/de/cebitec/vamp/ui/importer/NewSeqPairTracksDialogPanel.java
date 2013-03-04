@@ -6,8 +6,6 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.api.objects.NewJobDialogI;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.mappings.*;
@@ -16,7 +14,6 @@ import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +25,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker
  */
-public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements NewJobDialogI {
+public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 776435254;
     private List<File> mappingFiles1;
@@ -724,56 +721,7 @@ public class NewSeqPairTracksDialogPanel extends javax.swing.JPanel implements N
      * have to be available for the import of new tracks too.
      */
     public void setReferenceJobs(List<ReferenceJob> jobs) {
-        List<ReferenceJob> list = new ArrayList<>();
-
-        try {
-            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-                PersistantReference r = it.next();
-                list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
-            }
-        } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        list.addAll(jobs);
-
-        ReferenceJob[] gens = new ReferenceJob[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            gens[i] = list.get(i);
-        }
-
-        refGenBox.setModel(new DefaultComboBoxModel<>(gens));
-    }
-
-    /**
-     * @return all reference genomes which are stored in the db until now.
-     */
-    private ReferenceJob[] getRefGenJobs() {
-        List<ReferenceJob> list = new ArrayList<>();
-        
-        try {
-            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-                PersistantReference r = it.next();
-                list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
-            }
-        } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        ReferenceJob[] gens = new ReferenceJob[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            gens[i] = list.get(i);
-        }
-
-        return gens;
+        refGenBox.setModel(new DefaultComboBoxModel<>(this.getReferenceJobs(jobs)));
     }
     
     /**

@@ -1,19 +1,21 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.polyTree.Node;
+import de.cebitec.vamp.util.polyTree.Polytree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * A persistant feature. Containing background information about a feature, such as id,
- * ec number, locus, product, start and stop positions, strand and type.
+ * A persistant feature. Containing background information about a feature, such
+ * as id, ec number, locus, product, start and stop positions, strand and type.
  *
  * @author ddoppmeier, rhilker
  */
-public class PersistantFeature implements PersistantFeatureI {
+public class PersistantFeature extends Node implements PersistantFeatureI {
     
     private int id;
     private String ecNumber;
@@ -25,9 +27,14 @@ public class PersistantFeature implements PersistantFeatureI {
     private FeatureType type;
     private String featureName;
     private List<PersistantSubFeature> subFeatures;
+    private List<Integer> parentIds;
+    private int frame;
 
     /**
      * @param id id of the feature in db 
+     * @param parentIds The string containing all ids of the parents of this 
+     * feature separated by ";", if it has at least one. If not this string is 
+     * empty.
      * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA, FeatureType.SOURCE,
               FeatureType.T_RNA, FeatureType.MISC_RNA, FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA
      * @param start start position
@@ -38,10 +45,12 @@ public class PersistantFeature implements PersistantFeatureI {
      * @param ecnum ec number
      * @param featureName name of the feature, if it exists (e.g. "dnaA")
      */
-    public PersistantFeature(int id, String ecnum, String locus, String product, 
+    public PersistantFeature(int id, String parentIds, String ecnum, String locus, String product, 
                 int start, int stop, boolean isFwdStrand, FeatureType type, String featureName) {
+        super(type, null);
         this.subFeatures = new ArrayList<>();
         this.id = id;
+        this.parentIds = this.separateParentIds(parentIds);
         this.ecNumber = ecnum;
         this.locus = locus;
         this.product = product;
@@ -52,25 +61,64 @@ public class PersistantFeature implements PersistantFeatureI {
         this.featureName = featureName;
     }
 
+    /**
+     * Separates the parent id string into a list of parent ids.
+     * @param parentIds The parent ids string to separate
+     * @return A list of parent ids.
+     */
+    private List<Integer> separateParentIds(String parentIds) {
+        List<Integer> parentIdList = new ArrayList<>();
+        String[] parentIdArray = parentIds.split(";");
+        for (int i = 0; i < parentIdArray.length; ++i) {
+            try {
+                parentIdList.add(Integer.parseInt(parentIdArray[i]));
+            } catch (NumberFormatException e) {
+                //ignore and continue
+            }
+        }
+        return parentIdList;
+    }
+
+    /**
+     * @return The ec number, if it was set.
+     */
     public String getEcNumber() {
         return ecNumber;
     }
 
+    /**
+     * @return The unique id of this feature
+     */
     public int getId() {
         return id;
     }
 
     /**
-     * @return true, if the feature has a locus, false otherwise
+     * @return The id of the parent of this feature, if it has one. If not "0"
+     * has to be used to signal that this feature is a top level feature.
+     */
+    public List<Integer> getParentIds() {
+        return parentIds;
+    }
+
+    /**
+     * @return <code>true</code>, if the feature has a locus, 
+     * <code>false</code> otherwise.
      */
     public boolean hasLocus() {
         return this.locus != null;
     }
     
+    /**
+     * @return The locus of the feature, if it is set.
+     */
     public String getLocus() {
         return locus;
     }
 
+    /**
+     * @return The product of the feature, if it is set.
+     */
     public String getProduct() {
         return product;
     }
@@ -125,10 +173,28 @@ public class PersistantFeature implements PersistantFeatureI {
         return this.featureName != null;
     }
 
+    /**
+     * @return the locus of this feature, if it is set, otherwise a description
+     * including the start and stop position
+     */
     @Override
     public String toString(){
         return this.locus != null && !this.locus.isEmpty() ? 
                 this.locus : "Feature with start: " + this.start + ", stop: " + this.stop;
+    }
+
+    /**
+     * @param frame The <tt>frame</tt> in which this feature should be displayed
+     */
+    public void setFrame(int frame) {
+        this.frame = frame;
+    }
+
+    /**
+     * @return The frame in which this feature should be displayed
+     */
+    public int getFrame() {
+        return frame;
     }
 
     /**
@@ -148,54 +214,128 @@ public class PersistantFeature implements PersistantFeatureI {
     }
     
     /**
-     * Utility method for creating a mapping of features to their id.
-     * @param features list of features for which the mapping should be creates
-     * @return the map of feature ids to their corresponding feature
+     * Static inner class containig all utility methods for 
+     * <tt>PersistantFeatures</tt>.
      */
-    public static Map<Integer, PersistantFeature> getFeatureMap(List<PersistantFeature> features){
-        Map<Integer, PersistantFeature> featureMap = new HashMap<>();
-        for (PersistantFeature feature : features){
-            featureMap.put(feature.getId(), feature); //ids are unique
+    public static class Utils {
+
+        /**
+         * Utility method for creating a mapping of features to their id.
+         * @param features List of features for which the mapping should be
+         * created
+         * @return The map of feature ids to their corresponding feature
+         */
+        public static Map<Integer, PersistantFeature> getFeatureMap(List<PersistantFeature> features) {
+            Map<Integer, PersistantFeature> featureMap = new HashMap<>();
+            for (PersistantFeature feature : features) {
+                featureMap.put(feature.getId(), feature); //ids are unique
+            }
+            return featureMap;
         }
-        return featureMap;
-    }
-    
-    
-    /**
-     * Utility method for adding a list of sub features to their parent features list.
-     * @param features the list of features, to which the subfeatures are added
-     * @param subFeaturesSorted the sorted list of subfeatures by increasing start position
-     */
-    public static void addSubFeatures(Map<Integer, PersistantFeature> features, 
-            List<PersistantSubFeature> subFeaturesSorted) {
-        
-        int id;
-        for (PersistantSubFeature subFeature : subFeaturesSorted) {
-            id = subFeature.getParentId();
-            if (features.containsKey(id)) { //just to be on the save side; should not occur
-                features.get(id).addSubFeature(subFeature);
+
+        /**
+         * Utility method for adding a list of sub features to their parent
+         * features list.
+         * @param features the list of features, to which the subfeatures are
+         * added
+         * @param subFeaturesSorted the sorted list of subfeatures by increasing
+         * start position
+         */
+        public static void addSubFeatures(Map<Integer, PersistantFeature> features,
+                List<PersistantSubFeature> subFeaturesSorted) {
+
+            int id;
+            for (PersistantSubFeature subFeature : subFeaturesSorted) {
+                id = subFeature.getParentId();
+                if (features.containsKey(id)) { //just to be on the save side; should not occur
+                    features.get(id).addSubFeature(subFeature);
+                }
             }
         }
-    }
-    
-    /**
-     * Retrieves the best possible name for the feature. First it checks the gene
-     * name, then the locus information and if both are not given it returns
-     * "Feature with start: x, stop: y"
-     * @param feature the feature whose name is wanted
-     * @return the best possible name for the feature or null, if the feature was null.
-     */
-    public static String getFeatureName(PersistantFeature feature) {
-        String featureName = null;
-        if (feature != null) {
-            if (feature.getFeatureName() != null && !feature.getFeatureName().isEmpty()) {
-                featureName = feature.getFeatureName();
-            } else if (feature.getLocus() != null && !feature.getLocus().isEmpty()) {
-                featureName = feature.getLocus();
-            } else {
-                featureName = "Feature with start: " + feature.getStart() + ", stop: " + feature.getStop();
+
+        /**
+         * Creates a list of polytree structures from a list of features. In a
+         * polytree a node can have multiple parents and children. Features
+         * without parents are the roots and all features with parents are place
+         * as children of their parents in the tree.
+         * @param features The features to join in a polytree structure
+         * @return the list of polytrees for the features
+         */
+        public static List<Polytree> createFeatureTrees(List<PersistantFeature> features) {
+            Map<Integer, PersistantFeature> featMap = PersistantFeature.Utils.getFeatureMap(features);
+            PersistantFeature.Utils.addParentFeatures(featMap, features);
+            List<Polytree> featTrees = new ArrayList<>();
+            Polytree tree;
+            List<Node> roots;
+            List<Node> omitList = new ArrayList<>();
+            List<Node> parentList;
+            for (PersistantFeature feat : features) {
+
+                if (feat.isRoot() && !omitList.contains(feat)) {
+                    roots = new ArrayList<>();
+                    roots.add(feat);
+                    tree = new Polytree(roots);
+                    featTrees.add(tree);
+                    
+                    //check root children for more than one parent and add other parents to roots
+                    for (Node child : feat.getNodeChildren()) {
+                        parentList = child.getParents();
+                        if (parentList.size() > 1) {
+                            for (Node parent : parentList) {
+                                if (!roots.contains(parent)) {
+                                    roots.add(parent);
+                                    omitList.add(parent); //these parents will be visited later in the feature list
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return featTrees;
+        }
+
+        /**
+         * Utility method for adding a list of sub features to their parent
+         * features list.
+         * @param features the map of features, to which the subfeatures are
+         * added
+         * @param featuresSorted the sorted list of features to add to their
+         * parents by increasing start position
+         */
+        public static void addParentFeatures(Map<Integer, PersistantFeature> features,
+                List<PersistantFeature> featuresSorted) {
+
+            List<Integer> ids;
+            for (PersistantFeature feature : featuresSorted) {
+                ids = feature.getParentIds();
+                for (int id : ids) {
+                    if (features.containsKey(id)) {
+                        features.get(id).addChild(feature);
+                    } //else we cannot add the child to its parent
+                }
             }
         }
-        return featureName;
+
+        /**
+         * Retrieves the best possible name for the feature. First it checks the
+         * gene name, then the locus information and if both are not given it
+         * returns "Feature with start: x, stop: y"
+         * @param feature the feature whose name is wanted
+         * @return the best possible name for the feature or null, if the
+         * feature was null.
+         */
+        public static String getFeatureName(PersistantFeature feature) {
+            String featureName = null;
+            if (feature != null) {
+                if (feature.getFeatureName() != null && !feature.getFeatureName().isEmpty()) {
+                    featureName = feature.getFeatureName();
+                } else if (feature.getLocus() != null && !feature.getLocus().isEmpty()) {
+                    featureName = feature.getLocus();
+                } else {
+                    featureName = "Feature with start: " + feature.getStart() + ", stop: " + feature.getStop();
+                }
+            }
+            return featureName;
+        }
     }
 }

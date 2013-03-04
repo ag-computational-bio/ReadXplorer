@@ -1,6 +1,6 @@
 package de.cebitec.vamp.parser.reference.Filter;
 
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.parser.common.ParsedFeature;
 
 /**

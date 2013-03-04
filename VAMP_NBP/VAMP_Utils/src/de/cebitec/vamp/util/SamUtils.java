@@ -37,6 +37,12 @@ import net.sf.samtools.util.RuntimeEOFException;
  */
 public class SamUtils implements Observable {
     
+    public static final String SORT_PREFIX = "_sort";
+    public static final String SORT_READSEQ_STRING = SORT_PREFIX + "_readSequence";
+    public static final String SORT_READNAME_STRING = SORT_PREFIX + "_readName";
+    public static final String EXTENDED_STRING = "_extended";
+    public static final String COMBINED_STRING = "_combined";
+    
     private List<Observer> observers;
 
     public SamUtils() {
@@ -50,7 +56,7 @@ public class SamUtils implements Observable {
      * @param reader SAMFileReader for input BAM file
      * @param output  File for output index file
      *
-     * @author Martha Borkan
+     * @author Martha Borkan, rhilker
      */
     public void createIndex(SAMFileReader reader, File output) {
 
@@ -70,6 +76,10 @@ public class SamUtils implements Observable {
                 indexer.processAlignment(record);
             } catch (RuntimeEOFException e) {
                 this.notifyObservers(e);
+            } catch (SAMFormatException e) {
+                if (!e.getMessage().contains("MAPQ should be 0")) {
+                    this.notifyObservers(e.getMessage());
+                } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
             } catch (SAMException e) {
                 this.notifyObservers("If you tried to create an index on a sam "
                         + "file this is the reason for the exception. Indexes"
@@ -111,32 +121,65 @@ public class SamUtils implements Observable {
      * @param presorted if true, SAMRecords must be added to the SAMFileWriter
      *      in order that agrees with header.sortOrder.
      * @param newEnding the ending is added to the end of the file name of the 
-     *      old file
+     *      old file (this is not the file extension)
      * @return a pair consisting of: the sam or bam file writer ready for 
      *      writing as the first element and the new file as the second element
      */
     public static Pair<SAMFileWriter, File> createSamBamWriter(File oldFile, SAMFileHeader header, boolean presorted, String newEnding) {
 
 // commented out part: we currently don't allow to write sam files, only bam! (more efficient)
-        
-        String[] nameParts = oldFile.getAbsolutePath().split("\\.");
-        String newFileName;
 //        String extension;
 //        try {
-            newFileName = nameParts[0];
 //            extension = nameParts[nameParts.length - 1];
 //        } catch (ArrayIndexOutOfBoundsException e) {
 //            extension = "bam";
 //        }
         SAMFileWriterFactory factory = new SAMFileWriterFactory();
-        File outputFile;
 //        if (extension.toLowerCase().contains("sam")) {
 //            outputFile = new File(newFileName + newEnding + ".sam");
 //            return new Pair<>(factory.makeSAMWriter(header, presorted, outputFile), outputFile);
 //        } else {
-            outputFile = new File(newFileName + newEnding + ".bam");
-            return new Pair<>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
+        File outputFile = SamUtils.getFileWithBamExtension(oldFile, newEnding);
+        return new Pair<>(factory.makeBAMWriter(header, presorted, outputFile), outputFile);
 //        }
+    }
+    
+    /**
+     * 
+     * @param inputFile the input file whose extension should be changed
+     * @param newEnding the ending is added to the end of the file name of the
+     * old file (this is not the file extension)
+     * @return 
+     */
+    public static File getFileWithBamExtension(File inputFile, String newEnding) {
+        String[] nameParts = inputFile.getAbsolutePath().split("\\.");
+        String newFilePath = "";
+        for (int i = 0; i < nameParts.length - 1; ++i) { //only remove old file extension
+            newFilePath = newFilePath + nameParts[i] + ".";
+        }
+        if (!newFilePath.isEmpty()) {
+            newFilePath = newFilePath.substring(0, newFilePath.length() - 1);
+            newFilePath = SamUtils.removeVampFileEndings(SORT_READNAME_STRING, newFilePath);
+            newFilePath = SamUtils.removeVampFileEndings(SORT_READSEQ_STRING, newFilePath);
+            newFilePath = SamUtils.removeVampFileEndings(EXTENDED_STRING, newFilePath);
+        } else {
+            newFilePath = inputFile.getAbsolutePath();
+        }
+        return new File(newFilePath + newEnding + ".bam");
+    }
+
+    /**
+     * Removes a file ending used by VAMP from the end of a file name. Note:
+     * This is not the file extension!
+     * @param fileEnding the file ending to remove
+     * @param filePath the file path to chech for the ending
+     * @return the new file path without the given ending
+     */
+    private static String removeVampFileEndings(String fileEnding, String filePath) {
+        if (filePath.endsWith(fileEnding)) {
+            filePath = filePath.substring(0, filePath.length() - fileEnding.length());
+        }
+        return filePath;
     }
     
     /**
@@ -150,14 +193,12 @@ public class SamUtils implements Observable {
      *          sortOrderToCheck
      */
     public static boolean isSortedBy(File fileToCheck, SAMFileHeader.SortOrder sortOrderToCheck) {
-        boolean hadToSortCoordinate = false;
         try (SAMFileReader samReader = new SAMFileReader(fileToCheck)) {
             try {
-                hadToSortCoordinate = samReader.getFileHeader().getSortOrder().equals(sortOrderToCheck);
+                return samReader.getFileHeader().getSortOrder().equals(sortOrderToCheck);
             } catch (IllegalArgumentException e) { //if "*" or other weird words were used as sort order we assume the file is unsorted
-                hadToSortCoordinate = false;
+                return false;
             }
         }
-        return hadToSortCoordinate;
     }
 }
