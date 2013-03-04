@@ -105,6 +105,7 @@ public class H2SQLStatements {
             + " ("
             + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.FEATURE_REFGEN_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_PARENT_IDS + " VARCHAR (1000) NOT NULL, "
             + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
             + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.FEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
@@ -119,28 +120,7 @@ public class H2SQLStatements {
     public final static String INDEX_FEATURES = 
             "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES 
             + " (" + FieldNames.FEATURE_REFGEN_ID + ") ";
-            
     
-    public static final String SETUP_SUBFEATURES =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
-            + " ("
-            + FieldNames.SUBFEATURE_PARENT_ID + " BIGINT NOT NULL, "
-            + FieldNames.SUBFEATURE_REFERENCE_ID + " BIGINT NOT NULL, "
-            + FieldNames.SUBFEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURE_START + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.SUBFEATURE_STOP + " BIGINT UNSIGNED NOT NULL "
-            + ") ";
-    
-    
-    public final static String INDEX_SUBFEATURE_PARENT_ID =
-            "CREATE INDEX IF NOT EXISTS INDEX_SUBFEATURE_PID ON " + FieldNames.TABLE_SUBFEATURES + " "
-            + "(" + FieldNames.SUBFEATURE_PARENT_ID + ") ";
-            
-        
-    public final static String INDEX_SUBFEATURE_REF_ID =
-            "CREATE INDEX IF NOT EXISTS INDEX_SUBFEATURE_RID ON " + FieldNames.TABLE_SUBFEATURES + " "
-            + "(" + FieldNames.SUBFEATURE_REFERENCE_ID + ") ";
-
     
     public final static String SETUP_MAPPINGS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_MAPPING

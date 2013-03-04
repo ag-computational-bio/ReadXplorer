@@ -1,7 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;

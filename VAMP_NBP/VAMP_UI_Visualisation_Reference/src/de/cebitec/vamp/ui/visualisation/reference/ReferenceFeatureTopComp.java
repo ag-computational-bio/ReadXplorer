@@ -1,10 +1,14 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.util.polyTree.Node;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
@@ -16,7 +20,8 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays something.
+ * Top component which displays the details of the currently selected 
+ * reference feature.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceFeature//EN", autostore = false)
 public final class ReferenceFeatureTopComp extends TopComponent implements LookupListener {
@@ -28,6 +33,10 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "ReferenceFeatureTopComp";
 
+    /**
+     * Top component which displays the details of the currently selected
+     * reference feature.
+     */
     public ReferenceFeatureTopComp() {
         this.initComponents();
         this.setName(NbBundle.getMessage(ReferenceFeatureTopComp.class, "CTL_ReferenceFeatureTopComp"));
@@ -64,6 +73,12 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
         productText = new javax.swing.JTextArea();
         geneField = new javax.swing.JTextField();
         geneLabel = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        parentList = new javax.swing.JList<>();
+        parentLabel = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        subfeatureList = new javax.swing.JList<>();
+        subfeatureLabel = new javax.swing.JLabel();
 
         typeLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         org.openide.awt.Mnemonics.setLocalizedText(typeLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.typeLabel.text")); // NOI18N
@@ -131,6 +146,18 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
         org.openide.awt.Mnemonics.setLocalizedText(geneLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.geneLabel.text")); // NOI18N
         geneLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.geneLabel.toolTipText")); // NOI18N
 
+        jScrollPane2.setViewportView(parentList);
+
+        parentLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        org.openide.awt.Mnemonics.setLocalizedText(parentLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.parentLabel.text")); // NOI18N
+        parentLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.parentLabel.toolTipText")); // NOI18N
+
+        jScrollPane3.setViewportView(subfeatureList);
+
+        subfeatureLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        org.openide.awt.Mnemonics.setLocalizedText(subfeatureLabel, org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.subfeatureLabel.text")); // NOI18N
+        subfeatureLabel.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceFeatureTopComp.class, "ReferenceFeatureTopComp.subfeatureLabel.toolTipText")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -145,17 +172,21 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
                     .addComponent(ecNumLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(locusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(typeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(startLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(startLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(parentLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(subfeatureLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(locusField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(geneField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(startField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(stopField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(ecNumField)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                     .addComponent(strandText, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -193,7 +224,15 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(strandText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(strandLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(181, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(parentLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(subfeatureLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -207,8 +246,12 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
     private javax.swing.JTextField geneField;
     private javax.swing.JLabel geneLabel;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextField locusField;
     private javax.swing.JLabel locusLabel;
+    private javax.swing.JLabel parentLabel;
+    private javax.swing.JList<PersistantFeature> parentList;
     private javax.swing.JLabel productLabel;
     private javax.swing.JTextArea productText;
     private javax.swing.JTextField startField;
@@ -217,6 +260,8 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
     private javax.swing.JLabel stopLabel;
     private javax.swing.JLabel strandLabel;
     private javax.swing.JTextField strandText;
+    private javax.swing.JLabel subfeatureLabel;
+    private javax.swing.JList<PersistantFeature> subfeatureList;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JTextField typeText;
     // End of variables declaration//GEN-END:variables
@@ -314,22 +359,27 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
 
     /**
      * Displays the feature details in their belonging visual components.
-     * @param anno the feature whose details should be shown
+     * @param feat the feature whose details should be shown
      */
-    public void showFeatureDetails(PersistantFeature anno) {
+    public void showFeatureDetails(PersistantFeature feat) {
         
         String strand = "";
-        if (anno != null) {
-            this.ecNumField.setText(anno.getEcNumber());
-            this.startField.setText(String.valueOf(anno.getStart()));
-            this.stopField.setText(String.valueOf(anno.getStop()));
-            this.productText.setText(anno.getProduct());
-            this.productText.setToolTipText(anno.getProduct());
-            this.locusField.setText(anno.getLocus());
-            this.geneField.setText(anno.getFeatureName());
-            this.typeText.setText(anno.getType().getTypeString());
+        if (feat != null) {
+            Vector<PersistantFeature> parentVect = this.getFeatureVector(feat.getParents(), "Root feature");
+            Vector<PersistantFeature> childrenVect = this.getFeatureVector(feat.getNodeChildren(), "No children");
+            
+            this.ecNumField.setText(feat.getEcNumber());
+            this.startField.setText(String.valueOf(feat.getStart()));
+            this.stopField.setText(String.valueOf(feat.getStop()));
+            this.productText.setText(feat.getProduct());
+            this.productText.setToolTipText(feat.getProduct());
+            this.locusField.setText(feat.getLocus());
+            this.geneField.setText(feat.getFeatureName());
+            this.typeText.setText(feat.getType().getTypeString());
+            this.parentList.setListData(parentVect);
+            this.subfeatureList.setListData(childrenVect);
 
-            strand = anno.isFwdStrand() ? "forward" : "reverse";
+            strand = feat.isFwdStrand() ? "forward" : "reverse";
         } else {
             this.ecNumField.setText("");
             this.startField.setText("");
@@ -343,5 +393,27 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
         this.strandText.setText(strand);
         this.productText.setCaretPosition(0);
     }
+    
+    /**
+     * Transforms the given node list into a vector of persistant features.
+     * The vector only contains elements, if the nodes are instances of 
+     * <tt>PersistantFeature</tt>.
+     * @param featureList The list of features to convert
+     * @param replacement The replacement string in case the list is empty
+     * @return The vector of features
+     */
+    private Vector<PersistantFeature> getFeatureVector(List<Node> featureList, String replacement) {
+       Vector<PersistantFeature> featureVect = new Vector<>();
+       for (Node parentNode : featureList) {
+           if (parentNode instanceof PersistantFeature) {
+               PersistantFeature feature = (PersistantFeature) parentNode;
+               featureVect.add(feature);
+           }
+       }
+       if (featureVect.isEmpty()) {
+           featureVect.add(new PersistantFeature(0, "", "", replacement, "", 0, 0, true, FeatureType.UNDEFINED, ""));
+       }
+       return featureVect;
+   }
 
 }

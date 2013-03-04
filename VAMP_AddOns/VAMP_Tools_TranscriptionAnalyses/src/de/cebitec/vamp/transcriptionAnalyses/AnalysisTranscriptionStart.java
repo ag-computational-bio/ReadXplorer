@@ -1,7 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -11,6 +10,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Properties;

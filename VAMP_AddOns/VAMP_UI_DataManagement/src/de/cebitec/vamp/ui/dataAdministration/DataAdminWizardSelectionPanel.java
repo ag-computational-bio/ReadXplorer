@@ -7,17 +7,16 @@ import de.cebitec.vamp.parser.Job;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
+import de.cebitec.vamp.util.VisualisationUtils;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.*;
-import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
 
 public class DataAdminWizardSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
@@ -27,7 +26,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
      */
     private SelectionCard component;
     private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>(1); // or can use ChangeSupport in NB 6.0
+    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -76,7 +75,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
         synchronized (listeners) {
-            it = new HashSet<ChangeListener>(listeners).iterator();
+            it = new HashSet<>(listeners).iterator();
         }
         ChangeEvent ev = new ChangeEvent(this);
         while (it.hasNext()) {
@@ -85,9 +84,9 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
     }
 
     private Map<String, List<? extends Job>> getDeletableReferencesAndTracks(){
-        List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
-        List<TrackJob> trackJobs = new ArrayList<TrackJob>();
-        HashMap<Integer, ReferenceJob> indexedRefs = new HashMap<Integer, ReferenceJob>();
+        List<ReferenceJob> refJobs = new ArrayList<>();
+        List<TrackJob> trackJobs = new ArrayList<>();
+        HashMap<Integer, ReferenceJob> indexedRefs = new HashMap<>();
         
         try {
 
@@ -117,14 +116,11 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
             }
         
         } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(DataAdminWizardSelectionPanel.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(DataAdminWizardSelectionPanel.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(this.component, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            VisualisationUtils.displayOutOfMemoryError(this.component);
         }
 
         // fill result map
-        Map<String, List<? extends Job>> deletableStuff = new HashMap<String, List<? extends Job>>();
+        Map<String, List<? extends Job>> deletableStuff = new HashMap<>();
         deletableStuff.put("references", refJobs);
         deletableStuff.put("tracks", trackJobs);
         return deletableStuff;

@@ -9,8 +9,8 @@ import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
-import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -266,7 +266,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
                 operonDetectionTable.setRowSorter(sorter);
                 sorter.setModel(model);
                 for (int i = 3; i < 8; ++i) {
-                    sorter.setComparator(i, getStringComparator());
+                    TableComparatorProvider.setStringComparator(sorter, i);
                 }
 
                 parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
@@ -281,37 +281,6 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
             }
         });
-    }
-    
-    /**
-     * Creates a String comparator, that cuts the string after the first line
-     * break "\n" and compares it to the second string afterwards as an Integer.
-     * If one of the values is not an integer, they are compared as strings.
-     * @return the comparator
-     */
-    private Comparator<String> getStringComparator() {
-        
-        Comparator<String> stringComparator = new Comparator<String>() {
-
-            @Override
-            public int compare(String a, String b) {
-                if (a.contains("\n")) {
-                    a = a.substring(0, a.indexOf('\n'));
-                }
-                if (b.contains("\n")) {
-                    b = b.substring(0, b.indexOf('\n'));
-                }
-                try {
-                    Integer intA = Integer.parseInt(a);
-                    Integer intB = Integer.parseInt(b);
-                    return intA.compareTo(intB);
-                } catch (NumberFormatException e) {
-                    return a.compareTo(b);
-                }
-            }
-        };
-        
-        return stringComparator;
     }
 
     /**

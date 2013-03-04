@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.controller.TrackCacher;
 import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;

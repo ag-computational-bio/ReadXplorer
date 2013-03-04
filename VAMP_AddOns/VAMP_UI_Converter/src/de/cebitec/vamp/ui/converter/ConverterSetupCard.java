@@ -1,9 +1,12 @@
 package de.cebitec.vamp.ui.converter;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.output.ConverterI;
 import de.cebitec.vamp.parser.output.JokToBamConverter;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import java.util.List;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
@@ -22,6 +25,7 @@ public class ConverterSetupCard extends javax.swing.JPanel {
     private String referenceName;
     private int referenceLength;
     private boolean canConvert;
+    private PersistantReference selectedReference;
     
     /**
      * Creates new form ConverterSetupCard
@@ -29,6 +33,8 @@ public class ConverterSetupCard extends javax.swing.JPanel {
     public ConverterSetupCard() {
         initComponents();
         this.initAdditionalData();
+        this.selectedReference = (PersistantReference) this.refComboBox.getSelectedItem();
+        this.setVisibleComponents(true);
     }
     
     private void initAdditionalData() {
@@ -48,7 +54,7 @@ public class ConverterSetupCard extends javax.swing.JPanel {
     private void initComponents() {
 
         headerLabel = new javax.swing.JLabel();
-        converterComboBox = new javax.swing.JComboBox(this.availableParsers);
+        converterComboBox = new javax.swing.JComboBox<>(this.availableParsers);
         converterLabel = new javax.swing.JLabel();
         fileLabel = new javax.swing.JLabel();
         fileTextField = new javax.swing.JTextField();
@@ -57,10 +63,14 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         referenceNameField = new javax.swing.JTextField();
         referenceLengthField = new javax.swing.JTextField();
         referenceLengthLabel = new javax.swing.JLabel();
+        refComboBox = new javax.swing.JComboBox<>(this.getDbReferences());
+        refComboLabel = new javax.swing.JLabel();
+        refCheckBox = new javax.swing.JCheckBox();
+        refSelectionLabel = new javax.swing.JLabel();
 
         headerLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.headerLabel.text")); // NOI18N
 
-        converterComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Jok to BAM" }));
+        converterComboBox.setToolTipText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.converterComboBox.toolTipText")); // NOI18N
         converterComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 converterComboBoxActionPerformed(evt);
@@ -99,6 +109,24 @@ public class ConverterSetupCard extends javax.swing.JPanel {
 
         referenceLengthLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.referenceLengthLabel.text")); // NOI18N
 
+        refComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refComboBoxActionPerformed(evt);
+            }
+        });
+
+        refComboLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.refComboLabel.text")); // NOI18N
+
+        refCheckBox.setSelected(true);
+        refCheckBox.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.refCheckBox.text")); // NOI18N
+        refCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refCheckBoxActionPerformed(evt);
+            }
+        });
+
+        refSelectionLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.refSelectionLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -115,16 +143,22 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                             .addComponent(fileLabel)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(referenceLengthLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(referenceNameLabel)))
+                                .addComponent(referenceNameLabel))
+                            .addComponent(refComboLabel)
+                            .addComponent(refSelectionLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(converterComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, 285, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(refCheckBox)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(converterComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(referenceNameField, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(fileTextField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(openFileButton))
-                            .addComponent(referenceLengthField, javax.swing.GroupLayout.Alignment.TRAILING))))
+                            .addComponent(referenceLengthField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(refComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -143,12 +177,20 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                     .addComponent(openFileButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(referenceNameLabel)
-                    .addComponent(referenceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(refCheckBox)
+                    .addComponent(refSelectionLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(referenceLengthLabel)
-                    .addComponent(referenceLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(refComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(refComboLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(referenceNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(referenceNameLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(referenceLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(referenceLengthLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -208,18 +250,48 @@ public class ConverterSetupCard extends javax.swing.JPanel {
 
     }//GEN-LAST:event_referenceLengthFieldKeyTyped
 
+    private void refComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refComboBoxActionPerformed
+       this.selectedReference = (PersistantReference) refComboBox.getSelectedItem();
+    }//GEN-LAST:event_refComboBoxActionPerformed
+
+    private void refCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refCheckBoxActionPerformed
+        boolean useRefFromDb = this.refCheckBox.isSelected();
+        this.setVisibleComponents(useRefFromDb);
+        this.isRequiredInfoSet();
+    }//GEN-LAST:event_refCheckBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox converterComboBox;
+    private javax.swing.JComboBox<ConverterI> converterComboBox;
     private javax.swing.JLabel converterLabel;
     private javax.swing.JLabel fileLabel;
     private javax.swing.JTextField fileTextField;
     private javax.swing.JLabel headerLabel;
     private javax.swing.JButton openFileButton;
+    private javax.swing.JCheckBox refCheckBox;
+    private javax.swing.JComboBox<PersistantReference> refComboBox;
+    private javax.swing.JLabel refComboLabel;
+    private javax.swing.JLabel refSelectionLabel;
     private javax.swing.JTextField referenceLengthField;
     private javax.swing.JLabel referenceLengthLabel;
     private javax.swing.JTextField referenceNameField;
     private javax.swing.JLabel referenceNameLabel;
     // End of variables declaration//GEN-END:variables
+    
+    /**
+     * @return Querries and returns all reference sequences stored in the current
+     * DB.
+     */
+    private PersistantReference[] getDbReferences() {
+        ProjectConnector connector = ProjectConnector.getInstance();
+        PersistantReference[] refs = new PersistantReference[0];
+        if (connector.isConnected()) {
+            List<PersistantReference> references = connector.getGenomes();
+            refs = references.toArray(refs);
+        }
+        return refs;
+    }
+    
+    
     /**
      * Selects the correct converter depending on the chosen one.
      */
@@ -234,8 +306,14 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * Fires the appropriate event, if the required info is set or not and the
+     * conversion can be started or not.
+     */
     public void isRequiredInfoSet() {
-        if (filePath != null && currentConverter != null && referenceName != null && !referenceName.isEmpty() && referenceLength >= 0) {
+        if (filePath != null && currentConverter != null && 
+                (referenceName != null && !referenceName.isEmpty() && referenceLength >= 0 || 
+                refCheckBox.isSelected())) {
             canConvert = true;
         } else {
             canConvert = false;
@@ -247,21 +325,54 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         return currentConverter;
     }
 
+    /**
+     * @return The file path of the file to convert
+     */
     public String getFilePath() {
         return filePath;
     }
 
+    /**
+     * @return The length of the reference sequence.
+     */
     public int getReferenceLength() {
-        return referenceLength;
+        if (this.refCheckBox.isSelected()) {
+            return selectedReference.getRefLength();
+        } else {
+            return referenceLength;
+        }
     }
 
+    /**
+     * @return The name of the reference to use as reference identifier for all
+     * mappings.
+     */
     public String getReferenceName() {
-        return referenceName;
+        if (this.refCheckBox.isSelected()) {
+            return selectedReference.getName();
+        } else {
+            return referenceName;
+        }
     }
     
     @Override
     public String getName() {
         return NbBundle.getMessage(ConverterSetupCard.class, "CTL_ConverterSetupCard.name");
+    }
+
+    /**
+     * Set the reference genome components to their correct visibility state.
+     * @param useRefFromDb true, if the options for a reference sequence from
+     * the DB should be visible, false, if the options for manually entering
+     * the reference data should be visible.
+     */
+    private void setVisibleComponents(boolean useRefFromDb) {
+        this.refComboBox.setVisible(useRefFromDb);
+        this.refComboLabel.setVisible(useRefFromDb);
+        this.referenceLengthField.setVisible(!useRefFromDb);
+        this.referenceLengthLabel.setVisible(!useRefFromDb);
+        this.referenceNameField.setVisible(!useRefFromDb);
+        this.referenceNameLabel.setVisible(!useRefFromDb);
     }
 
 }

@@ -1,6 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -58,7 +58,7 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
         jLabel2 = new javax.swing.JLabel();
         intervalToField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        statisticsList = new javax.swing.JList();
+        statisticsList = new javax.swing.JList<>();
         jLabel5 = new javax.swing.JLabel();
         currentPosField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -77,10 +77,10 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
         intervalToField.setEditable(false);
         intervalToField.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.intervalToField.toolTipText")); // NOI18N
 
-        statisticsList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { " " };
+        statisticsList.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { null };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         statisticsList.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.statisticsList.toolTipText")); // NOI18N
         jScrollPane1.setViewportView(statisticsList);
@@ -163,7 +163,7 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JList statisticsList;
+    private javax.swing.JList<String> statisticsList;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files only,
@@ -216,8 +216,7 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
             this.codonSelector.setGenomeViewer(referenceViewer);
             
             // update visible feature list
-            Map<FeatureType, Integer> featureStats = referenceViewer.getFeatureStats();
-            this.showFeatureStatsForInterval(featureStats);
+            this.showFeatureStatsForInterval(referenceViewer.getFeatureStats());
 
             // update intervall
             BoundsInfo boundsInfo = referenceViewer.getBoundsInfo();
@@ -292,7 +291,7 @@ public final class ReferenceIntervalTopComp extends TopComponent implements Look
 
     private void showFeatureStatsForInterval(Map<FeatureType, Integer> featureStats) {
         statisticsList.removeAll();
-        DefaultListModel model = new DefaultListModel();
+        DefaultListModel<String> model = new DefaultListModel<>();
 
         Set<FeatureType> keys = featureStats.keySet();
         for(Iterator<FeatureType> it = keys.iterator(); it.hasNext(); ){

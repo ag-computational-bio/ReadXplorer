@@ -29,14 +29,14 @@ public class GenericSQLQueries {
      */
     public static int getIntegerFromDB(String sqlStatement, String identifier, Connection con, long trackID){
         int num = -1;
-        try {
-            PreparedStatement fetch = con.prepareStatement(sqlStatement);
+        try (PreparedStatement fetch = con.prepareStatement(sqlStatement)) {
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
             if (rs.next()) {
                 num = rs.getInt(identifier);
             }
+            rs.close();
         } catch (SQLException ex) {
             Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -52,13 +52,13 @@ public class GenericSQLQueries {
      */
     public static long getLatestIDFromDB(String sqlStatement, Connection con) {
         long id = 0;
-        try {
-            PreparedStatement latestID = con.prepareStatement(sqlStatement);
+        try (PreparedStatement latestID = con.prepareStatement(sqlStatement)) {
 
             ResultSet rs = latestID.executeQuery();
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
+            rs.close();
             latestID.close();
         } catch (SQLException ex) {
             Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);

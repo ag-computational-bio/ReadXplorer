@@ -1,12 +1,11 @@
 package de.cebitec.vamp.parser.reference;
 
-import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParsedFeature;
 import de.cebitec.vamp.parser.common.ParsedReference;
-import de.cebitec.vamp.parser.common.ParsedSubFeature;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -33,7 +32,7 @@ import org.biojavax.bio.seq.io.RichStreamReader;
 
 /**
  *
- * @author ddoppmei
+ * @author ddoppmei, rhilker
  * @deprecated use BioJavaParser
  */
 public class BioJavaGenBankParser implements ReferenceParserI, Observable {
@@ -70,22 +69,32 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                 refGenome.setName(refGenJob.getName());
                 refGenome.setTimestamp(refGenJob.getTimestamp());
                 refGenome.setSequence(seq.seqString());
+                
+                FeatureType type;
+                RichFeature f;
+
+                // attributes of feature that should be stored
+                String parsedType;
+                String locusTag;
+                String product;
+                int start;
+                int stop;
+                int strand;
+                String ecNumber;
+                String geneName;
+                List<ParsedFeature> subFeatures;
 
                 // iterate through all features
                 Iterator<Feature> featIt = seq.getFeatureSet().iterator();
                 while (featIt.hasNext()){
-                    RichFeature f = (RichFeature) featIt.next();
+                    f = (RichFeature) featIt.next();
 
                     // attributes of feature that should be stored
-                    String parsedType;
-                    String locusTag = "unknown locus tag";
-                    String product = null;
-                    int start;
-                    int stop;
-                    int strand;
-                    String ecNumber = null;
-                    String geneName = null;
-                    List<ParsedSubFeature> exons = new ArrayList<>();
+                    locusTag = "unknown locus tag";
+                    product = null;
+                    ecNumber = null;
+                    geneName = null;
+                    subFeatures = new ArrayList<>();
 
                     parsedType = f.getType();
                     start = f.getLocation().getMin();
@@ -102,7 +111,7 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                         if (name.equals("locus_tag")){
                             locusTag = value;
                         } else if (name.equalsIgnoreCase("locus")){
-                          locusTag = value;
+                            locusTag = value;
                         } else if (name.equals("product")){
                             product = value;
                         } else if (name.equals("EC_number")){
@@ -112,53 +121,29 @@ public class BioJavaGenBankParser implements ReferenceParserI, Observable {
                         }
                     }
                     
-                    //check feature for subfeatures (currently only exons)
+                    
+                    //check feature for subfeatures
                     @SuppressWarnings("unchecked")
                     Iterator<RichFeature> subFeatureIter = f.features();
                     while (subFeatureIter.hasNext()){
                         
                         RichFeature subFeature = subFeatureIter.next();
-                        String type = subFeature.getType();
+                        type = FeatureType.getFeatureType(subFeature.getType());
                         
-                        if (type.equalsIgnoreCase("exon")){
-                            int subStart = subFeature.getLocation().getMin();
-                            int subStop = subFeature.getLocation().getMax();
-                            exons.add(new ParsedSubFeature(subStart, subStop, FeatureType.EXON));
-                        }
+                        int subStart = subFeature.getLocation().getMin();
+                        int subStop = subFeature.getLocation().getMax();
+                        subFeatures.add(new ParsedFeature(type, subStart, subStop, strand,
+                                locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
                     }
                     
-
                     /* if the type of the feature is unknown to vamp (see below),
                      * an undefined type is used
                      */
-                    FeatureType type = FeatureType.UNDEFINED;
-
-                    // look for known types
-                    if (parsedType.equalsIgnoreCase("CDS")){
-                        type = FeatureType.CDS;
-                    } else if (parsedType.equalsIgnoreCase("repeat_unit")){
-                        type = FeatureType.REPEAT_UNIT;
-                    } else if (parsedType.equalsIgnoreCase("rRNA")){
-                        type = FeatureType.RRNA;
-                    } else if (parsedType.equalsIgnoreCase("source")){
-                        type = FeatureType.SOURCE;
-                    } else if (parsedType.equalsIgnoreCase("tRNA")){
-                        type = FeatureType.TRNA;
-                    } else if (parsedType.equalsIgnoreCase("misc_RNA")){
-                        type = FeatureType.MISC_RNA;
-                    } else if (parsedType.equalsIgnoreCase("miRNA")){
-                        type = FeatureType.MIRNA;
-                    } else if (parsedType.equalsIgnoreCase("gene")){
-                        type = FeatureType.GENE;
-                    } else if (parsedType.equalsIgnoreCase("mRNA")){
-                        type = FeatureType.MRNA;
-                    } else {
-                        this.sendErrorMsg(refGenJob.getFile().getAbsolutePath() 
-                                + ": Using unknown feature type for " + parsedType);
-                    }
+                    type = FeatureType.getFeatureType(parsedType);
+                    
 
                     //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
-                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, exons));
+                    refGenome.addFeature(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null));
 
                 }
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");

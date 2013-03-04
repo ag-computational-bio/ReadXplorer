@@ -35,6 +35,7 @@ import javax.swing.SwingWorker;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFileWriter;
+import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecordIterator;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -99,7 +100,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private ParsedTrack parseTrack(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start parsing track data from source \"{0} with track job ID {1}\"", new Object[]{trackJob.getFile().getAbsolutePath(), trackJob.getID()});
         
-        String sequenceString = this.getReference(trackJob);
+        String sequenceString = this.getReferenceSeq(trackJob);
         TrackParser parser = new TrackParser();
         ParsedTrack track = parser.parseMappings(trackJob, sequenceString, this, covContainer);
 
@@ -213,7 +214,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * @param trackJob the track job whose reference genome is needed
      * @return the reference genome string
      */
-    private String getReference(TrackJob trackJob) { 
+    private String getReferenceSeq(TrackJob trackJob) { 
         String referenceSeq = null;
         try {
             int id = trackJob.getRefGen().getID();
@@ -351,7 +352,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         TrackJob trackJob1 = seqPairJobContainer.getTrackJob1();
                         TrackJob trackJob2 = seqPairJobContainer.getTrackJob2();
                         Map<String, Pair<Integer, Integer>> classificationMap;
-                        String referenceSeq = this.getReference(trackJob1);
+                        String referenceSeq = this.getReferenceSeq(trackJob1);
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
                         
@@ -373,7 +374,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             }
 
                             //sort file by read sequence for efficient classification
-                            this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.readseq, "readSequence");
+                            this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
                             if (isTwoTracks) { //only if a new file was created before, we want to delete the obsolete one
                                 this.deleteOldWorkFile(lastWorkFile);
                             }
@@ -396,7 +397,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             }
 
                             //sort by read name for efficient seq pair classification
-                            this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.queryname, "readName");
+                            this.sortSamBam(trackJob1, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING);
                             this.deleteOldWorkFile(lastWorkFile);
                             lastWorkFile = trackJob1.getFile();
 
@@ -500,7 +501,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         long finish;
         String msg;
         
-        if (!trackJob.isSorted()) { this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, "readSequence"); }
+        if (!trackJob.isSorted()) { this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING); }
         
         while (!isLastTrack) {
             
@@ -551,7 +552,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      */
     private void parseDirectAccessTrack(TrackJob trackJob) {
         
-        String referenceSeq = this.getReference(trackJob);
+        String referenceSeq = this.getReferenceSeq(trackJob);
         
         /*
          * Algorithm:
@@ -568,7 +569,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             File inputFile = trackJob.getFile();
             inputFile.setReadOnly(); //prevents changes or deletion of original file!
             //sort file by read sequence for efficient classification
-            this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, "readSequence");
+            this.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
             File lastWorkFile = trackJob.getFile();
 
             //generate classification data in sorted file
@@ -592,7 +593,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             samBamDirectParser.removeObserver(this);
         }
 
-        //generate position table data from track
+        //generate position table and statistics data for track
         //file needs to be sorted by coordinate for efficient calculation
         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
         posTableCreator.registerObserver(this);
@@ -724,15 +725,22 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.sort.Start", sortOrderMsg));
         long start = System.currentTimeMillis();
         String msg;
+        Pair<SAMFileWriter, File> writerAndFile = null;
         
         try (SAMFileReader samBamReader = new SAMFileReader(trackJob.getFile())) {
             SAMRecordIterator samItor = samBamReader.iterator();
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(sortOrder);
-            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(trackJob.getFile(), header, false, ".sort_" + sortOrderMsg);
+            writerAndFile = SamUtils.createSamBamWriter(trackJob.getFile(), header, false, sortOrderMsg);
             SAMFileWriter writer = writerAndFile.getFirst();
             while (samItor.hasNext()) {
-                writer.addAlignment(samItor.next());
+                try {
+                    writer.addAlignment(samItor.next());
+                } catch (SAMFormatException e) {
+                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                        this.update(e.getMessage());
+                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                }
             }
             samItor.close();
             writer.close();
@@ -741,8 +749,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         
             msg = NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.sort.Finish", sortOrderMsg);
         } catch (Exception e) {
-            Exceptions.printStackTrace(e);
-            trackJob.setFile(new File(trackJob.getFile() + ".sort_" + sortOrderMsg));
+            this.noErrors = false;
+            io.getOut().println(e.getMessage());
+            if (writerAndFile != null) {
+                trackJob.setFile(writerAndFile.getSecond());
+            } else {
+                trackJob.setFile(new File(trackJob.getFile(), sortOrderMsg));
+            }
             msg = NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.sort.Failed", trackJob.getFile());
         }
         long finish = System.currentTimeMillis();

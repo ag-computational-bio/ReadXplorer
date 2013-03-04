@@ -11,6 +11,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.VisualisationUtils;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,8 +22,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import org.openide.util.NbBundle;
 
 /*
  * TODO: finish coverage thread for direct bam support. already done: loadCoverage
@@ -208,16 +207,15 @@ public class CoverageThread extends RequestThread {
         cov.incArraysToIntervalSize();
         
         
-        
         if (this.isDbUsed) {
             
             String cacheFamily = "loadCoverage."+trackID;
             String cacheKey = from + "." + to;
             Object cachedResult = ObjectCache.getInstance().get(cacheFamily, cacheKey);
-            if (cachedResult!=null) {
+            if (cachedResult != null) {
                 result = (CoverageAndDiffResultPersistant) cachedResult;
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-                "Needed "+(stopwatch.getElapsedTimeAsString())+" to load Coverage data from cache");
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Needed {0} to load Coverage data from cache", 
+                        (stopwatch.getElapsedTimeAsString()));
                 return result;
             }
             
@@ -228,15 +226,10 @@ public class CoverageThread extends RequestThread {
             
 
             ResultSet rs = fetch.executeQuery();
-            
-        
-           
-                                    
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-                                "sql:"+fetch.toString());
-            
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-             "Needed "+(stopwatch.getElapsedTimeAsString())+" to execute fetch coverage query");
+                  
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "sql:{0}", fetch.toString());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Needed {0} to execute fetch coverage query", 
+                    (stopwatch.getElapsedTimeAsString()));
             stopwatch.reset();
                         
                         
@@ -274,8 +267,8 @@ public class CoverageThread extends RequestThread {
             result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
             
             
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-                "Needed "+(stopwatch.getElapsedTimeAsString())+" to calculate Coverage ("+counter+" items)");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Needed {0} to calculate Coverage ({1} items)", 
+                    new Object[]{stopwatch.getElapsedTimeAsString(), counter});
             
             ObjectCache.getInstance().set(cacheFamily, cacheKey, result);
             
@@ -684,19 +677,11 @@ public class CoverageThread extends RequestThread {
                 }
             }
         } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(CoverageThread.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(CoverageThread.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(new JPanel(), msg, title, JOptionPane.INFORMATION_MESSAGE);
+            VisualisationUtils.displayOutOfMemoryError(JOptionPane.getRootFrame());
             this.interrupt();
         } catch (SQLException e) {
-            String msg;
-            String title;
             if (e.getMessage().contains("Out of memory")) {
-                msg = NbBundle.getMessage(CoverageThread.class, "OOM_Message",
-                        "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-                title = NbBundle.getMessage(CoverageThread.class, "OOM_Header", "Restart Software");
-                JOptionPane.showMessageDialog(new JPanel(), msg, title, JOptionPane.INFORMATION_MESSAGE);
+                VisualisationUtils.displayOutOfMemoryError(JOptionPane.getRootFrame());
                 this.interrupt();
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, e);

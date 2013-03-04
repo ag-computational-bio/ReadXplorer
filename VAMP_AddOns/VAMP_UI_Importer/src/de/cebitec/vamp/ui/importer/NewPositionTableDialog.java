@@ -8,7 +8,6 @@ package de.cebitec.vamp.ui.importer;
 import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
@@ -19,8 +18,6 @@ import de.cebitec.vamp.parser.mappings.SamBamParser;
 import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import java.awt.Component;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,14 +26,13 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
-import org.openide.util.NbBundle;
 
 /**
  * The dialog panel for importing only position tables for an existing track.
  *
  * @author rhilker
  */
-public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
+public class NewPositionTableDialog extends RefDataPanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
@@ -52,7 +48,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
     
     /** The dialog panel for importing only position tables for an existing track. */
     public NewPositionTableDialog() {
-        this.getRefGenJobs();
+        this.refGenJobs = this.getRefGenJobs();
         this.initComponents();
         // choose the default parser. first entry is shown in combobox by default
         this.setTrackJobs((ReferenceJob) this.refGenCombo.getSelectedItem());
@@ -102,35 +98,7 @@ public class NewPositionTableDialog extends JPanel implements NewJobDialogI {
     private void setStepwiseField(boolean setFields) {
         this.stepSizeLabel.setVisible(setFields);
         this.stepSizeSpinner.setVisible(setFields);
-    }
-    
-    
-    private ReferenceJob[] getRefGenJobs() {
-        if (this.refGenJobs == null) {
-            List<ReferenceJob> list = new ArrayList<>();
-
-            try {
-                List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
-                for (Iterator<PersistantReference> refIt = refs.iterator(); refIt.hasNext();) {
-                    PersistantReference ref = refIt.next();
-                    list.add(new ReferenceJob(ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp()));
-                }
-            } catch (OutOfMemoryError e) {
-                String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
-                        "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-                String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
-                JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
-            }
-
-            this.refGenJobs = new ReferenceJob[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                this.refGenJobs[i] = list.get(i);
-            }
-        }
-
-        return this.refGenJobs;
-    }
-    
+    }    
     
     private void setTrackJobs(ReferenceJob refJob) {
         

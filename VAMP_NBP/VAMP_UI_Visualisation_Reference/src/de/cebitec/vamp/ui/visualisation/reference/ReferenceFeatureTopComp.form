@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="strandLabel" alignment="0" max="32767" attributes="0"/>
@@ -27,17 +27,21 @@
                   <Component id="locusLabel" alignment="1" max="32767" attributes="0"/>
                   <Component id="typeLabel" max="32767" attributes="0"/>
                   <Component id="startLabel" alignment="0" max="32767" attributes="0"/>
+                  <Component id="parentLabel" alignment="1" max="32767" attributes="0"/>
+                  <Component id="subfeatureLabel" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane3" pref="0" max="32767" attributes="0"/>
                   <Component id="locusField" alignment="1" max="32767" attributes="2"/>
                   <Component id="geneField" alignment="1" max="32767" attributes="2"/>
                   <Component id="startField" alignment="1" max="32767" attributes="2"/>
                   <Component id="stopField" alignment="1" max="32767" attributes="2"/>
                   <Component id="ecNumField" max="32767" attributes="2"/>
-                  <Component id="jScrollPane1" pref="219" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="212" max="32767" attributes="0"/>
                   <Component id="strandText" alignment="1" max="32767" attributes="0"/>
                   <Component id="typeText" alignment="1" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" alignment="0" pref="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -86,7 +90,17 @@
                   <Component id="strandText" min="-2" max="-2" attributes="0"/>
                   <Component id="strandLabel" min="-2" pref="20" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="181" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="parentLabel" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="jScrollPane2" min="-2" pref="44" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="subfeatureLabel" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="jScrollPane3" min="-2" pref="72" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -257,6 +271,68 @@
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComp.geneLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JList" name="parentList">
+          <Properties>
+            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
+              <StringArray count="0"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;()"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistantFeature&gt;"/>
+          </AuxValues>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JLabel" name="parentLabel">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComp.parentLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComp.parentLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JList" name="subfeatureList">
+          <Properties>
+            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
+              <StringArray count="0"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;()"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistantFeature&gt;"/>
+          </AuxValues>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JLabel" name="subfeatureLabel">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="11"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComp.subfeatureLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/visualisation/reference/Bundle.properties" key="ReferenceFeatureTopComp.subfeatureLabel.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

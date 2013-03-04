@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
@@ -59,6 +60,7 @@ public class SamBamPosTableCreator implements Observable {
         
         long startTime = System.currentTimeMillis();
         String fileName = trackJob.getFile().getName();
+        String refName = trackJob.getRefGen().getName();
         this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class, "PosTableCreator.Start", fileName));
         
         List<ParsedMapping> batchOverlappingMappings = new ArrayList<>();
@@ -106,59 +108,59 @@ public class SamBamPosTableCreator implements Observable {
                     ++lineno;
 
                     record = samItor.next();
-                    if (!record.getReadUnmappedFlag()) {
+                    if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
+
+                        cigar = record.getCigarString();
+                        start = record.getAlignmentStart();
+                        stop = record.getAlignmentEnd();
+                        readSeq = record.getReadString();
+                        refSeq = refSeqWhole.substring(start - 1, stop);
+
                         classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
-                        if (    classification == null
-                             || classification == (int) Properties.PERFECT_COVERAGE 
-                             || classification == (int) Properties.BEST_MATCH_COVERAGE) {
+                        if (classification != null) {
+                            readClass = (int) classification;
+                        } else {
+                            readClass = Properties.COMPLETE_COVERAGE;
+                        }
+
+                        if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                            continue; //continue, and ignore read, if it contains inconsistent information
+                        }
+
+                        //statistics claculations: count no reads and distinct sequences ////////////
+                        if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when mapping to diff. pos
+                            noReads += readNamesSameSeq.size();
+                            if (readsDifferentPos.size() == 1) {
+                                ++noUniqueMappings;
+                            }
+                            readNamesSameSeq.clear();
+                            readsDifferentPos.clear();
+                        }
+                        if (!readNamesSameSeq.contains(readName)) {
+                            readNamesSameSeq.add(readName);
+                        }
+                        if (!readsDifferentPos.contains(start)) {
+                            readsDifferentPos.add(start);
+                        }
+                        lastReadSeq = readSeq;
+
+                        this.updateIntervals(coveredCommonIntervals, start, stop);
+                        if (readClass == Properties.PERFECT_COVERAGE) {
+                            this.updateIntervals(coveredPerfectIntervals, start, stop);
+                            this.updateIntervals(coveredBestMatchIntervals, start, stop);
+                            ++noPerfect;
+                            ++noBestMatch;
+                        } else if (readClass == Properties.BEST_MATCH_COVERAGE) {
+                            this.updateIntervals(coveredBestMatchIntervals, start, stop);
+                            ++noBestMatch;
+                        }
+                        ////////////////////////////////////////////////////////////////////////
+
+                        if (classification == null
+                                || classification == (int) Properties.PERFECT_COVERAGE
+                                || classification == (int) Properties.BEST_MATCH_COVERAGE) {
                             // if the classification is not stored, we have to use all available mappings for the pos table
                             // (this practice will cause detecting unwanted SNPs, but the alternative is 0 SNPs)
-                            
-                            cigar = record.getCigarString();
-                            start = record.getAlignmentStart();
-                            stop = record.getAlignmentEnd();
-                            readSeq = record.getReadString();
-                            refSeq = refSeqWhole.substring(start - 1, stop);
-                            Integer rClass = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
-                            if (rClass != null) {
-                                readClass = (int) rClass;
-                            } else {
-                                readClass = Properties.COMPLETE_COVERAGE;
-                            }
-
-                            if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
-                                continue; //continue, and ignore read, if it contains inconsistent information
-                            }
-                            
-                            //statistics claculations: count no reads and distinct sequences ////////////
-                            if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when mapping to diff. pos
-                                noReads += readNamesSameSeq.size();
-                                if (readsDifferentPos.size() == 1) {
-                                    ++noUniqueMappings;
-                                }
-                                readNamesSameSeq.clear();
-                                readsDifferentPos.clear();
-                            }
-                            if (!readNamesSameSeq.contains(readName)) {
-                                readNamesSameSeq.add(readName);
-                            }
-                            if (!readsDifferentPos.contains(start)) {
-                                readsDifferentPos.add(start);
-                            }
-                            lastReadSeq = readSeq;
-                            
-                            this.updateIntervals(coveredCommonIntervals, start, stop);
-                            if (readClass == Properties.PERFECT_COVERAGE) {
-                                this.updateIntervals(coveredPerfectIntervals, start, stop);
-                                this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                                ++noPerfect;
-                                ++noBestMatch;
-                            } else if (readClass == Properties.BEST_MATCH_COVERAGE) {
-                                this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                                ++noBestMatch;
-                            }
-                            
-                            ///////////////////////////////////////////////////////////////////////////
 
                             /*
                              * The cigar values are as follows: 0 (M) = alignment match
@@ -185,22 +187,26 @@ public class SamBamPosTableCreator implements Observable {
                             if (stop > nextBatch) {
                                 batchOverlappingMappings.add(mapping);
                             }
-                            if (start > nextBatch) { //e.g. 300.001
-                                track = new ParsedTrack(trackJob, null, coverageContainer);
-                                track.setBatchPos(stop);
-                                this.notifyObservers(track);
-                                this.coverageContainer.clearCoverageContainer();
-                                this.refillCoverageContainer(batchOverlappingMappings, nextBatch);
-                                nextBatch += batchSize;
-                                batchOverlappingMappings.clear();
-                            }
 
                             //saruman starts genome at 0 other algorithms like bwa start genome at 1
                         }
-                    } else {
-                        this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
-                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
-                    }
+                        
+                        //handling that always has to be performed
+                        if (start > nextBatch) { //e.g. 300.001
+                            track = new ParsedTrack(trackJob, null, coverageContainer);
+                            track.setBatchPos(stop);
+                            this.notifyObservers(track);
+                            this.coverageContainer.clearCoverageContainer();
+                            this.refillCoverageContainer(batchOverlappingMappings, nextBatch);
+                            nextBatch += batchSize;
+                            batchOverlappingMappings.clear();
+                        }
+
+                    } // else read is unmapped or belongs to another reference
+                } catch (SAMFormatException e) {
+                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                        this.notifyObservers(e.getMessage());
+                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 } catch (Exception e) {
                     this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                             "Parser.Parsing.CorruptData", lineno, e.toString()));

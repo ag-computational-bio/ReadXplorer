@@ -1,13 +1,15 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeatureI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.util.polyTree.Node;
+import de.cebitec.vamp.util.polyTree.NodeVisitor;
+import de.cebitec.vamp.util.polyTree.Polytree;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -35,7 +37,6 @@ public class ReferenceViewer extends AbstractViewer {
     private int labelMargin;
     private ReferenceConnector refGenConnector;
     private ArrayList<JFeature> features;
-    private ArrayList<JFeature> subFeatures;
 
     public final static String PROP_FEATURE_STATS_CHANGED = "feats changed";
     public final static String PROP_FEATURE_SELECTED = "feat selected";
@@ -52,7 +53,6 @@ public class ReferenceViewer extends AbstractViewer {
     public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome){
         super(boundsInfoManager, basePanel, refGenome);
         this.features = new ArrayList<>();
-        this.subFeatures = new ArrayList<>();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         this.featureStats = new EnumMap<>(FeatureType.class);
         this.getExcludedFeatureTypes().add(FeatureType.UNDEFINED);
@@ -91,10 +91,9 @@ public class ReferenceViewer extends AbstractViewer {
     @Override
     public void close(){
         super.close();
-        refGenConnector = null;
-        featureStats.clear();
+        this.refGenConnector = null;
+        this.featureStats.clear();
         this.features.clear();
-        this.subFeatures.clear();
         this.getExcludedFeatureTypes().clear();
     }
 
@@ -111,38 +110,36 @@ public class ReferenceViewer extends AbstractViewer {
 //        firePropertyChange(PROP_INTERVAL_CHANGED, null, getBoundsInfo());
     }
 
-    private void createFeatures(){
+    /**
+     * Creates all feature components to display in this viewer.
+     */
+    private void createFeatures() {
         this.removeAll();
         this.features.clear();
-        this.subFeatures.clear();
         this.featureStats.clear();
         
-        if (this.hasLegend()){
+        if (this.hasLegend()) {
             this.add(this.getLegendLabel());
             this.add(this.getLegendPanel());
         }
-        if (this.hasSequenceBar()){
+        if (this.hasSequenceBar()) {
             this.add(this.getSequenceBar());
         }
 
         List<PersistantFeature> featureList = refGenConnector.getFeaturesForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight(), FeatureType.ANY);
-        Map<Integer, PersistantFeature> featureMap = PersistantFeature.getFeatureMap(featureList);
-        List<PersistantSubFeature> subFeatureList = refGenConnector.getSubFeaturesForRegion(
-                getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+        List<Polytree> featureTrees = PersistantFeature.Utils.createFeatureTrees(featureList);
         
-        //at first add sub features to their parent features
-        PersistantFeature.addSubFeatures(featureMap, subFeatureList);
-        featureMap.clear();
-        
-        for (PersistantFeature feature : featureList){
-            this.addFeatureComponent(feature);
-            this.registerFeatureInStats(feature);
+        int frame = 0;
+        for (Polytree featTree : featureTrees) { //this means if two roots are on different frames, 
+            for (Node root : featTree.getRoots()) { //all children are painted on the frame of the last root node
+                frame = this.determineFrame((PersistantFeature) root); 
+            }
+            PaintNodeVisitor paintVisitor = new PaintNodeVisitor(frame);
+            featTree.bottomUp(paintVisitor);
         }
         
-        for (JFeature jSubFeature : this.subFeatures) {
-            this.add(jSubFeature);
-        }
+        //Correct painting order is guaranteed by the node visitor
         for (JFeature jFeature : this.features) {
             this.add(jFeature);
         }
@@ -150,65 +147,29 @@ public class ReferenceViewer extends AbstractViewer {
         firePropertyChange(PROP_FEATURE_STATS_CHANGED, null, featureStats);
     }
 
-    
-    private void registerFeatureInStats(PersistantFeatureI feature){
+    /**
+     * Registers the feature in the viewer statistics for displaying information
+     * about the currently viewed reference interval.
+     * @param feature the feature to register
+     */
+    private void registerFeatureInStats(PersistantFeatureI feature) {
         FeatureType type = feature.getType();
-        if(!this.featureStats.containsKey(type)){
+        if (!this.featureStats.containsKey(type)) {
             this.featureStats.put(type, 0);
         }
-        this.featureStats.put(type, this.featureStats.get(type)+1);
+        this.featureStats.put(type, this.featureStats.get(type) + 1);
     }
 
     /**
      * Creates a feature component for a given feature and adds it to the reference viewer.
      * @param feature the feature to add to the viewer.
      */
-    private void addFeatureComponent(PersistantFeature feature){
-        int frame = this.determineFrame(feature);
+    private void addFeatureComponent(PersistantFeature feature) {
+        int frame = feature.getFrame();
         int yCoord = this.determineYFromFrame(frame);
         PaintingAreaInfo bounds = getPaintingAreaInfo();
         
-        //handle sub features of the feature (e.g. exons)
-        boolean subfeatAdded = false;
-        for (PersistantSubFeature subFeature : feature.getSubFeatures()) {
-            this.registerFeatureInStats(subFeature);
-
-            if (!this.getExcludedFeatureTypes().contains(subFeature.getType())) {
-                byte border = JFeature.BORDER_NONE;
-                // get left boundary of the feature
-                double phyStart = this.getPhysBoundariesForLogPos(subFeature.getStart()).getLeftPhysBound();
-                if (phyStart < bounds.getPhyLeft()) {
-                    phyStart = bounds.getPhyLeft();
-                    border = JFeature.BORDER_LEFT;
-                }
-
-                // get right boundary of the feature
-                double phyStop = this.getPhysBoundariesForLogPos(subFeature.getStop()).getRightPhysBound();
-                if (phyStop > bounds.getPhyRight()) {
-                    phyStop = bounds.getPhyRight();
-                    border = border == JFeature.BORDER_LEFT ? JFeature.BORDER_BOTH : JFeature.BORDER_RIGHT;
-                }
-
-                // set a minimum length to be displayed, otherwise a high zoomlevel could
-                // lead to dissapearing features
-                double length = phyStop - phyStart;
-                if (length < 3) {
-                    length = 3;
-                }
-
-                PersistantFeature subFeatureFeature = new PersistantFeature(feature.getId(), feature.getEcNumber(),
-                        feature.getLocus(), feature.getProduct(), subFeature.getStart(), subFeature.getStop(),
-                        feature.isFwdStrand(), subFeature.getType(), feature.getFeatureName());
-                JFeature jSubFeature = new JFeature(subFeatureFeature, length, this, border);
-                int yFrom = yCoord - (jSubFeature.getHeight() / 2);
-                jSubFeature.setBounds((int) phyStart, yFrom, jSubFeature.getSize().width, jSubFeature.getHeight());
-
-                this.subFeatures.add(jSubFeature);
-                subfeatAdded = true;
-            }
-        }
-
-        if (!this.getExcludedFeatureTypes().contains(feature.getType()) || subfeatAdded) {
+        if (!this.getExcludedFeatureTypes().contains(feature.getType())) {
             byte border = JFeature.BORDER_NONE;
             // get left boundary of the feature
             double phyStart = this.getPhysBoundariesForLogPos(feature.getStart()).getLeftPhysBound();
@@ -266,11 +227,9 @@ public class ReferenceViewer extends AbstractViewer {
     public int determineFrame(PersistantFeature feature) {
         int frame;
 
-        if (feature.isFwdStrand()) {
-            // forward strand
+        if (feature.isFwdStrand()) { // forward strand
             frame = (feature.getStart() - 1) % 3 + 1;
-        } else {
-            // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
+        } else { // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
             frame = (feature.getStop() - 1) % 3 - 3;
         }
         return frame;
@@ -299,6 +258,12 @@ public class ReferenceViewer extends AbstractViewer {
         this.drawSingleScaleLine(g, this.determineYFromFrame(-3), "-3");
     }
 
+    /**
+     * Draws a line for a frame.
+     * @param g the graphics to paint on
+     * @param yCord the y-coordinate to start painting at
+     * @param label the frame to paint
+     */
     private void drawSingleScaleLine(Graphics2D g, int yCord, String label){
         int labelHeight = g.getFontMetrics().getMaxAscent();
         int labelWidth = g.getFontMetrics().stringWidth(label);
@@ -328,17 +293,24 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public void changeToolTipText(int logPos) {
-        if(this.isMouseOverPaintingRequested()){
+        if (this.isMouseOverPaintingRequested()) {
             this.setToolTipText(String.valueOf(logPos));
         } else {
             this.setToolTipText("");
         }
     }
 
+    /**
+     * @return The feature statistics for the currently viewed reference 
+     * interval.
+     */
     public Map<FeatureType, Integer> getFeatureStats() {
         return this.featureStats;
     }
 
+    /**
+     * @return The currently selected feature by the user.
+     */
     public JFeature getCurrentlySelectedFeature() {
         return this.currentlySelectedFeature;
     }
@@ -377,6 +349,35 @@ public class ReferenceViewer extends AbstractViewer {
      */
     public int getTrackCount(){
         return this.trackCount;
+    }
+    
+    /**
+     * Visitor creating the <tt>JFeature</tt> to display and adding it to the
+     * viewer stats for the visited feature. Also updates the frame according to
+     * the <tt>frame</tt> set in the constructor.
+     */
+    private class PaintNodeVisitor implements NodeVisitor {
+
+        private int frame;
+
+        /**
+         * Visitor creating the <tt>JFeature</tt> to display and adding it to
+         * the viewer stats for the visited feature. Also updates the frame
+         * according to the <tt>frame</tt> set in the constructor.
+         */
+        public PaintNodeVisitor(int frame) {
+            this.frame = frame;
+        }
+        
+        @Override
+        public void visit(Node node) {
+            if (node instanceof PersistantFeature) {
+                PersistantFeature feature = (PersistantFeature) node;
+                feature.setFrame(frame);
+                addFeatureComponent(feature);
+                registerFeatureInStats(feature);
+            }
+        }
     }
 
 }

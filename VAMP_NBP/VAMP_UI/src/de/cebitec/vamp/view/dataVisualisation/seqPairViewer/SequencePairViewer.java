@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;

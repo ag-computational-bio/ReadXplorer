@@ -3,6 +3,9 @@ package de.cebitec.vamp.util.fileChooser;
 import de.cebitec.vamp.util.Properties;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -22,6 +25,8 @@ public abstract class VampFileChooser  extends JFileChooser {
     private String[] fileExtensions;
     private String fileDescription;
     private Preferences pref;
+    private String directoryProperty;
+    private String currentDirectory;
 
     /**
      * Creates a new vamp file chooser.
@@ -46,6 +51,7 @@ public abstract class VampFileChooser  extends JFileChooser {
             this.setFileFilter(new FileNameExtensionFilter(fileDescription, fileExtensions));
         }
         this.pref = NbPreferences.forModule(Object.class);
+        directoryProperty = Properties.VAMP_FILECHOOSER_DIRECTORY;
     }
 
     /**
@@ -56,7 +62,7 @@ public abstract class VampFileChooser  extends JFileChooser {
     public void openFileChooser(final int option) {
 
         ////////////// open file chooser /////////////////////////
-        String currentDirectory = this.pref.get(Properties.VAMP_FILECHOOSER_DIRECTORY, ".");
+        currentDirectory = this.pref.get(directoryProperty, ".");
         if (currentDirectory.isEmpty()){
             currentDirectory = ".";
         }
@@ -74,7 +80,10 @@ public abstract class VampFileChooser  extends JFileChooser {
         ///////////////// store directory ////////////////////////////////////
         try {
             currentDirectory = this.getCurrentDirectory().getCanonicalPath();
-            NbPreferences.forModule(Object.class).put(Properties.VAMP_FILECHOOSER_DIRECTORY, currentDirectory);
+            this.pref.put(directoryProperty, currentDirectory);
+            this.pref.flush();
+        } catch (BackingStoreException e) {
+            Logger.getLogger(VampFileChooser.class.getName()).log(Level.SEVERE, null, e);
         } catch (IOException ex) {
             // do nothing, path is not stored in properties...
         }
@@ -140,5 +149,12 @@ public abstract class VampFileChooser  extends JFileChooser {
      */
     public abstract void open(String fileLocation);
 
-
+    /**
+     * Set the directory property which shall be used to store the directory
+     * of the selected file/s.
+     * @param directoryProperty 
+     */
+    public void setDirectoryProperty(String directoryProperty) {
+        this.directoryProperty = directoryProperty;
+    }
 }

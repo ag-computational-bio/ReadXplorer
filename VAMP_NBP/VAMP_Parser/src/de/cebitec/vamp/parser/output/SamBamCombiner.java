@@ -75,7 +75,9 @@ public class SamBamCombiner implements Observable, Observer {
             }
 
             //determine writer type (sam or bam):
-            Pair<SAMFileWriter, File> writerAndFilePair = SamUtils.createSamBamWriter(fileToExtend, header, !sortCoordinate, "_combined");
+            Pair<SAMFileWriter, File> writerAndFilePair = SamUtils.createSamBamWriter(
+                    fileToExtend, header, !sortCoordinate, SamUtils.COMBINED_STRING);
+            
             SAMFileWriter samBamFileWriter = writerAndFilePair.getFirst();
             File outputFile = writerAndFilePair.getSecond();
             trackJob1.setFile(outputFile);
@@ -120,6 +122,10 @@ public class SamBamCombiner implements Observable, Observer {
                 samBamFileWriter.addAlignment(record);
             } catch (RuntimeEOFException e) {
                 this.notifyObservers("Read could not be added to new file: " + record.getReadName());
+            } catch (SAMFormatException e) {
+                if (!e.getMessage().contains("MAPQ should be 0")) {
+                    this.notifyObservers(e.getMessage());
+                } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
             }
         }
     }

@@ -7,7 +7,6 @@ import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
 import de.cebitec.vamp.util.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.*;
@@ -31,7 +30,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private List<Observer> observers;
     private String refGenome;
     private int refSeqLength;
-    private Map<Integer, Integer> mappingInfos;
 
     /**
      * Extends a SAM/BAM file !!sorted by read sequence!! with VAMP
@@ -42,7 +40,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      */
     public SamBamExtender(Map<String, Pair<Integer, Integer>> classificationMap) {
         this.classificationMap = classificationMap;
-        this.mappingInfos = new HashMap<>();
     }
 
     /**
@@ -95,6 +92,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private void extendSamBamFile() throws ParsingException {
 
         File fileToExtend = trackJob.getFile();
+        String refName = trackJob.getRefGen().getName();
 
         File outputFile;
         SAMFileWriter samBamFileWriter;
@@ -105,7 +103,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
 
-            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(fileToExtend, header, false, "_extended.bam");
+            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(
+                    fileToExtend, header, false, SamUtils.EXTENDED_STRING);
+            
             samBamFileWriter = writerAndFile.getFirst();
             outputFile = writerAndFile.getSecond();
             trackJob.setFile(outputFile);
@@ -128,7 +128,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
                 try {
                     record = samBamItor.next();
-                    if (!record.getReadUnmappedFlag()) {
+                    if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
                         readName = record.getReadName();
@@ -170,6 +170,10 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                     samBamFileWriter.addAlignment(record);
                 } catch (NumberFormatException | RuntimeEOFException e) {
                     this.notifyObservers("Last record in file is incomplete! Ignoring last record.");
+                } catch (SAMFormatException e) {
+                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                        this.notifyObservers(e.getMessage());
+                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 }
             }
             

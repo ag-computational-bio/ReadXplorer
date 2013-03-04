@@ -31,10 +31,16 @@
                               <Component id="referenceLengthLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="referenceNameLabel" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="refComboLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="refSelectionLabel" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="converterComboBox" alignment="1" pref="285" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="refCheckBox" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="converterComboBox" alignment="1" max="32767" attributes="0"/>
                           <Component id="referenceNameField" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="fileTextField" max="32767" attributes="0"/>
@@ -42,6 +48,7 @@
                               <Component id="openFileButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="referenceLengthField" alignment="1" max="32767" attributes="0"/>
+                          <Component id="refComboBox" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -67,13 +74,23 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="referenceNameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="referenceNameField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="refCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="refSelectionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="referenceLengthLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="refComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="refComboLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="referenceNameField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="referenceNameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="referenceLengthField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="referenceLengthLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -90,17 +107,16 @@
     </Component>
     <Component class="javax.swing.JComboBox" name="converterComboBox">
       <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="1">
-            <StringItem index="0" value="Jok to BAM"/>
-          </StringArray>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.converterComboBox.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="converterComboBoxActionPerformed"/>
       </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox(this.availableParsers)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(this.availableParsers)"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;ConverterI&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="converterLabel">
@@ -166,6 +182,45 @@
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.referenceLengthLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="refComboBox">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="0"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="refComboBoxActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(this.getDbReferences())"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistantReference&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="refComboLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.refComboLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="refCheckBox">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.refCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="refCheckBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="refSelectionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.refSelectionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

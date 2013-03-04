@@ -25,7 +25,7 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
         this.setUnitIncrement(10);
 
         this.currentValue = init;
-        listeners = new ArrayList<AdjustmentPanelListenerI>();
+        listeners = new ArrayList<>();
         this.addAdjustmentListener(new AdjustmentListener() {
 
             @Override

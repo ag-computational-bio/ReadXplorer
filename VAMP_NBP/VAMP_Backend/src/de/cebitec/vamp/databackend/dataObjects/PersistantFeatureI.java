@@ -1,6 +1,6 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
-import de.cebitec.vamp.api.objects.FeatureType;
+import de.cebitec.vamp.util.FeatureType;
 
 /**
  *
