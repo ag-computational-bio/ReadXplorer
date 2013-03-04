@@ -11,8 +11,9 @@ package de.cebitec.vamp.api.objects;
  *@author ddoppmeier, rhilker
  */
 public enum FeatureType {
-    
-    
+        
+    /** getType() returns '-1' = To be used if feature type does not matter. */
+    ANY(FeatureType.ANY_INT, FeatureType.ANY_STRING),
     /** getType() returns '0' = To be used for a feature with unknown type. */
     UNDEFINED(FeatureType.UNDEFINED_INT, FeatureType.UNDEFINED_STRING),
     /** getType() returns '1' = To be used for mRNAs. */
@@ -35,7 +36,7 @@ public enum FeatureType {
     MIRNA(FeatureType.MIRNA_INT, FeatureType.MIRNA_STRING), 
     /** getType() returns '10' = To be used for exons. */
     EXON(FeatureType.EXON_INT, FeatureType.EXON_STRING),
-    
+
     //feature types for the track viewer
     PERFECT_COVERAGE(FeatureType.PERFECT_COVERAGE_INT, FeatureType.PERFECT_COVERAGE_STRING),
     BEST_MATCH_COVERAGE(FeatureType.BEST_MATCH_COVERAGE_INT, FeatureType.BEST_MATCH_COVERAGE_STRING),
@@ -67,6 +68,7 @@ public enum FeatureType {
     SINGLE_MAPPING(FeatureType.SINGLE_MAPPING_INT, FeatureType.SINGLE_MAPPING_STRING);
 
     //feature types supported by the reference viewer
+    private static final int ANY_INT = -1;
     private static final int UNDEFINED_INT = 0;
     private static final int MRNA_INT = 1;
     private static final int CDS_INT = 2;
@@ -112,6 +114,7 @@ public enum FeatureType {
     
     
     //feature types supported by the reference viewer
+    private static final String ANY_STRING = "any";
     private static final String UNDEFINED_STRING = "unknown";
     private static final String MRNA_STRING = "mRNA";
     private static final String CDS_STRING = "CDS";
@@ -157,6 +160,11 @@ public enum FeatureType {
     private int typeInt;
     private String typeString;
     
+    /**
+     * FeatureTypes that are GUI selectable.
+     */
+    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {ANY, GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA};
+   
     private FeatureType(int typeInt, String typeString) {
         this.typeInt = typeInt;
         this.typeString = typeString;
@@ -183,6 +191,8 @@ public enum FeatureType {
      */
     public static FeatureType getFeatureType(int type){
         switch (type) {
+            case ANY_INT:
+                return ANY;
             case UNDEFINED_INT:
                 return UNDEFINED;
             case MRNA_INT:
@@ -217,6 +227,7 @@ public enum FeatureType {
      */
     public static FeatureType getFeatureType(String type){
         switch (type) {
+            case ANY_STRING:            return ANY;
             case UNDEFINED_STRING:      return UNDEFINED;
             case MRNA_STRING:           return MRNA;
             case CDS_STRING:            return CDS;
@@ -236,5 +247,5 @@ public enum FeatureType {
     public String toString(){
         return this.getTypeString();
     }
-
+    
 }

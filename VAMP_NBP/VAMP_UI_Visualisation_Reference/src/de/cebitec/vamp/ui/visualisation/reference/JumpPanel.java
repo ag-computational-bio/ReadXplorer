@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
@@ -430,7 +431,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     }
 
     private void fillFeatureList() {
-        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGen.getRefLength());
+        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGen.getRefLength(), FeatureType.ANY);
         
         List<PersistantFeature> featList = new ArrayList<>(features);
         Collections.sort(featList, new FeatureNameSorter());

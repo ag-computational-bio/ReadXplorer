@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
@@ -36,7 +37,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
     public static enum Tool {
 
-        DeSeq("DESeq"), BaySeq("baySeq"), SimpleTest("Simple Test");
+        SimpleTest("Simple Test"), DeSeq("DESeq"), BaySeq("baySeq");
 
         private Tool(String stringRep) {
             this.stringRep = stringRep;
@@ -66,7 +67,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
-        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize);
+        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, FeatureType.GENE);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             CollectCoverageData collCovData = new CollectCoverageData(currentTrack, this);

@@ -84,13 +84,22 @@ public class ReferenceConnector {
      * @param to end position of the region of interest
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistantFeature> getFeaturesForRegion(int from, int to){
+    public List<PersistantFeature> getFeaturesForRegion(int from, int to, FeatureType featureType){
         List<PersistantFeature> features = new ArrayList<>();
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
-            fetch.setLong(1, refGenID);
-            fetch.setInt(2, from);
-            fetch.setInt(3, to);
+            PreparedStatement fetch;
+            if (featureType == FeatureType.ANY) {
+                fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
+                fetch.setLong(1, refGenID);
+                fetch.setInt(2, from);
+                fetch.setInt(3, to);
+            } else {
+                fetch = con.prepareStatement(SQLStatements.FETCH_SPECIFIED_FEATURES_FOR_GENOME_INTERVAL);
+                fetch.setLong(1, refGenID);
+                fetch.setInt(2, from);
+                fetch.setInt(3, to);
+                fetch.setInt(4, featureType.getTypeInt());
+            }
 
             ResultSet rs = fetch.executeQuery();
             while(rs.next()){

@@ -126,7 +126,7 @@ public class ReferenceViewer extends AbstractViewer {
         }
 
         List<PersistantFeature> featureList = refGenConnector.getFeaturesForRegion(
-                getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());
+                getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight(), FeatureType.ANY);
         Map<Integer, PersistantFeature> featureMap = PersistantFeature.getFeatureMap(featureList);
         List<PersistantSubFeature> subFeatureList = refGenConnector.getSubFeaturesForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight());

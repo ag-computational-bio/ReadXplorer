@@ -536,6 +536,25 @@ public class SQLStatements {
                 FieldNames.FEATURE_START+" <= ? " + 
             " ORDER BY " + FieldNames.FEATURE_START;
     
+    public final static String FETCH_SPECIFIED_FEATURES_FOR_GENOME_INTERVAL =
+            "SELECT " +
+                FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_TYPE+", " +
+                FieldNames.FEATURE_START+", "+
+                FieldNames.FEATURE_STOP+", "+
+                FieldNames.FEATURE_EC_NUM+", "+
+                FieldNames.FEATURE_LOCUS_TAG+", "+
+                FieldNames.FEATURE_PRODUCT+", "+
+                FieldNames.FEATURE_STRAND+", "+
+                FieldNames.FEATURE_GENE +
+            " FROM " 
+            + FieldNames.TABLE_FEATURES
+            + " WHERE " +
+                FieldNames.FEATURE_REFGEN_ID+" = ? and " +
+                FieldNames.FEATURE_STOP+" >= ? and " +
+                FieldNames.FEATURE_START+" <= ? and " + 
+                FieldNames.FEATURE_TYPE+" = ? " + 
+            " ORDER BY " + FieldNames.FEATURE_START;
     
     public final static String FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL =
             "SELECT " +

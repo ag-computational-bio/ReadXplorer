@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
@@ -13,7 +12,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +51,7 @@ public class SimpleTest {
                 jarPath.close();
             } catch (IOException ex) {
                 currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load calculation functions. The simple test will not work!", currentTimestamp);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load calculation functions. The Simple Test will not work!", currentTimestamp);
                 return (null);
             }
 
@@ -84,6 +82,10 @@ public class SimpleTest {
             gnuR.assign("groupB", analysisData.getGroupB());
             gnuR.eval("groupB <- c(groupB)");
 
+            if (saveFile != null) {
+                gnuR.saveDataToFile(saveFile);
+            }
+
             //We need to distinguish between an experiment with no replicates and an
             //experiement with such. In der first case results will be unreliable.
             if (analysisData.isWorkingWithoutReplicates()) {
@@ -91,7 +93,9 @@ public class SimpleTest {
                 //is just a rewriting the table to a fitting format for the
                 //following function. The Means notet are just the absolute value
                 //from each condition and the variance is just set to the string "-".
-                gnuR.eval("means <- createMeansTableTwoConds(inputData)");
+                //However, if just one condition has no replicate the mean value of
+                //the condition having replicates will be used.
+                gnuR.eval("means <- createMeansTableTwoConds(inputData,groupA,groupB)");
             } else {
                 //First we build the means for each row coresponding to the given groups
                 gnuR.eval("means <- createMeansTable(inputData,groupA,groupB)");
@@ -109,9 +113,6 @@ public class SimpleTest {
                 gnuR.eval("res <- calculateConfidence(ratios)");
             }
 
-            if (saveFile != null) {
-                gnuR.saveDataToFile(saveFile);
-            }
             //Ordered by expression in group A.
             gnuR.eval("res0 <- head(res[rev(order(res$ratioAB)),],100)");
             REXP result = gnuR.eval("res0");
@@ -135,6 +136,10 @@ public class SimpleTest {
             colNames = gnuR.eval("colnames(res2)");
             rowNames = gnuR.eval("rownames(res2)");
             results.add(new AnalysisHandler.Result(rvec, colNames, rowNames, "Ordered by confidence"));
+
+            if (saveFile != null) {
+                gnuR.saveDataToFile(saveFile);
+            }
         } //We don't know what errors Gnu R might cause, so we have to catch all.
         //The new generated exception can than be caught an handelt by the AnalysisHandler
         catch (Exception e) {
