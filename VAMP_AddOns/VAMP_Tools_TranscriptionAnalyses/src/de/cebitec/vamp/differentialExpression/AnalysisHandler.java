@@ -67,7 +67,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
-        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, FeatureType.GENE);
+        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, FeatureType.ANY);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             CollectCoverageData collCovData = new CollectCoverageData(currentTrack, this);
