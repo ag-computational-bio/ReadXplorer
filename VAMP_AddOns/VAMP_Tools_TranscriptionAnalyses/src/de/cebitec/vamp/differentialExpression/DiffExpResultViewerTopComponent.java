@@ -1,15 +1,12 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.differentialExpression.AnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -24,7 +21,6 @@ import javax.swing.table.TableModel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -50,9 +46,11 @@ preferredID = "DiffExpResultViewerTopComponent")
     "HINT_DiffExpResultViewerTopComponent=This is a DiffExpResultViewer window"
 })
 public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
+    
+    private static final long serialVersionUID = 1L;
 
     private TableModel tm;
-    private ComboBoxModel cbm;
+    private ComboBoxModel<Object> cbm;
     private ArrayList<TableModel> tableModels = new ArrayList<>();
     private TopComponent GraficsTopComponent;
     private AnalysisHandler analysisHandler;
@@ -69,7 +67,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         this.usedTool = usedTool;
 
         tm = new DefaultTableModel();
-        cbm = new DefaultComboBoxModel();
+        cbm = new DefaultComboBoxModel<>();
 
         initComponents();
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
@@ -116,14 +114,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         List<String> descriptions = new ArrayList<>();
         for (Iterator<AnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
             AnalysisHandler.Result currentResult = it.next();
-            Vector colNames = currentResult.getColnames();
+            Vector<Object> colNames = new Vector<>(currentResult.getColnames());
             colNames.add(0, " ");
             TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
         }
 
-        resultComboBox.setModel(new DefaultComboBoxModel(descriptions.toArray()));
+        resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
         topCountsTable.setModel(tableModels.get(0));
 
         createGraphicsButton.setEnabled(true);
@@ -147,7 +145,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        resultComboBox = new javax.swing.JComboBox();
+        resultComboBox = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         topCountsTable = new javax.swing.JTable();
         jProgressBar1 = new javax.swing.JProgressBar();
@@ -267,7 +265,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private javax.swing.JLabel jLabel2;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox resultComboBox;
+    private javax.swing.JComboBox<Object> resultComboBox;
     private javax.swing.JButton saveTableButton;
     private javax.swing.JTable topCountsTable;
     // End of variables declaration//GEN-END:variables

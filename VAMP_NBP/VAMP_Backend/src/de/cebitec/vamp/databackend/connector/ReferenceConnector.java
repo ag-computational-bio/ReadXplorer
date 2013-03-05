@@ -97,6 +97,11 @@ public class ReferenceConnector {
 
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            //dirty fix for a bug in h2 database stating "lob not found"
+            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.INFO,
+                    "Cound not read reference sequence from dabase (this probably a concurrency issue), ignoring ..  ",
+                    e);
         }
 
         return sequence;
@@ -107,11 +112,14 @@ public class ReferenceConnector {
      * of the reference.
      * @param from start position of the region of interest
      * @param to end position of the region of interest
+     * @param featureType type of features to retrieve from the db. Either 
+     *      FeatureType.ANY or a specified type
      * @return the list of all features found in the interval of interest
      */
     public List<PersistantFeature> getFeaturesForRegion(int from, int to, FeatureType featureType){
         List<PersistantFeature> features = new ArrayList<>();
         try {
+            PreparedStatement fetch;
             if (featureType == FeatureType.ANY) {
                 fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
                 fetch.setLong(1, refGenID);

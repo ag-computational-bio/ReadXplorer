@@ -48,12 +48,12 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         List<Result> results;
         if (!AnalysisHandler.TESTING_MODE) {
             Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            BaySeqAnalysisData baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTraks().size(), this.groups, this.replicateStructure);
+            BaySeqAnalysisData baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), this.groups, this.replicateStructure);
             prepareFeatures(baySeqAnalysisData);
             prepareCountData(baySeqAnalysisData, allCountData);
-            results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTraks().size(), getSaveFile());
+            results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
         } else {
-            results = baySeq.process(null, 3232, getSelectedTraks().size(), getSaveFile());
+            results = baySeq.process(null, 3232, getSelectedTracks().size(), getSaveFile());
         }
 
         setResults(results);

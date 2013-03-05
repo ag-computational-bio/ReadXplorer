@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
@@ -8,6 +7,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
 import java.io.File;
 import java.sql.Timestamp;
@@ -148,7 +148,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         return persAnno;
     }
 
-    public List<PersistantTrack> getSelectedTraks() {
+    public List<PersistantTrack> getSelectedTracks() {
         return selectedTraks;
     }
 
@@ -205,11 +205,11 @@ public abstract class AnalysisHandler extends Thread implements Observable {
 
         private String description;
         private RVector rawTableContents;
-        private Vector<Vector> tableContents = null;
+        private Vector<Vector<Object>> tableContents = null;
         private REXP rawColNames;
-        private Vector colNames = null;
+        private Vector<Object> colNames = null;
         private REXP rawRowNames;
-        private Vector rowNames = null;
+        private Vector<Object> rowNames = null;
 
         public Result(RVector tableContents, REXP colnames, REXP rownames, String description) {
             rawTableContents = tableContents;
@@ -218,30 +218,30 @@ public abstract class AnalysisHandler extends Thread implements Observable {
             this.description = description;
         }
 
-        public Vector<Vector> getTableContentsContainingRowNames() {
+        public Vector<Vector<Object>> getTableContentsContainingRowNames() {
             Vector rnames = getRownames();
-            Vector<Vector> data = getTableContents();
+            Vector<Vector<Object>> data = getTableContents();
             for (int i = 0; i < rnames.size(); i++) {
                 data.get(i).add(0, rnames.get(i));
             }
             return data;
         }
 
-        public Vector<Vector> getTableContents() {
+        public Vector<Vector<Object>> getTableContents() {
             if (tableContents == null) {
                 tableContents = convertRresults(rawTableContents);
             }
             return tableContents;
         }
 
-        public Vector getColnames() {
+        public Vector<Object> getColnames() {
             if (colNames == null) {
                 colNames = convertNames(rawColNames);
             }
             return colNames;
         }
 
-        public Vector getRownames() {
+        public Vector<Object> getRownames() {
             if (rowNames == null) {
                 rowNames = convertNames(rawRowNames);
             }
@@ -252,42 +252,24 @@ public abstract class AnalysisHandler extends Thread implements Observable {
             return description;
         }
 
-        private Vector convertNames(REXP currentValues) {
+        private Vector<Object> convertNames(REXP currentValues) {
             int currentType = currentValues.getType();
-            Vector current = null;
+            Vector<Object> current = new Vector<Object>();
             switch (currentType) {
                 case REXP.XT_ARRAY_DOUBLE:
                     double[] currentDoubleValues = currentValues.asDoubleArray();
-                    if (current == null) {
-                        current = new Vector();
-                    }
-                    for (int j = 0; j < currentDoubleValues.length; j++) {
-                        current.add(currentDoubleValues[j]);
-                    }
+                    current.addAll(Arrays.asList(currentDoubleValues));
                     break;
                 case REXP.XT_ARRAY_INT:
                     int[] currentIntValues = currentValues.asIntArray();
-                    if (current == null) {
-                        current = new Vector();
-                    }
-                    for (int j = 0; j < currentIntValues.length; j++) {
-                        current.add(currentIntValues[j]);
-                    }
+                    current.addAll(Arrays.asList(currentIntValues));
                     break;
                 case REXP.XT_ARRAY_STR:
                     String[] currentStringValues = currentValues.asStringArray();
-                    if (current == null) {
-                        current = new Vector();
-                    }
-                    for (int j = 0; j < currentStringValues.length; j++) {
-                        current.add(currentStringValues[j]);
-                    }
+                    current.addAll(Arrays.asList(currentStringValues));
                     break;
                 case REXP.XT_ARRAY_BOOL_INT:
                     int[] currentBoolValues = currentValues.asIntArray();
-                    if (current == null) {
-                        current = new Vector();
-                    }
                     for (int j = 0; j < currentBoolValues.length; j++) {
                         if (currentBoolValues[j] == 1) {
                             current.add(true);
@@ -298,9 +280,6 @@ public abstract class AnalysisHandler extends Thread implements Observable {
                     break;
                 case REXP.XT_FACTOR:
                     RFactor factor = currentValues.asFactor();
-                    if (current == null) {
-                        current = new Vector();
-                    }
                     for (int j = 0; j < factor.size(); j++) {
                         current.add(factor.at(j));
                     }
@@ -310,17 +289,17 @@ public abstract class AnalysisHandler extends Thread implements Observable {
             return current;
         }
 
-        private Vector<Vector> convertRresults(RVector currentRVector) {
-            Vector<Vector> current = new Vector<>();
+        private Vector<Vector<Object>> convertRresults(RVector currentRVector) {
+            Vector<Vector<Object>> current = new Vector<>();
             for (int i = 0; i < currentRVector.size(); i++) {
                 REXP currentValues = currentRVector.at(i);
-                Vector converted = convertNames(currentValues);
+                Vector<Object> converted = convertNames(currentValues);
 
                 for (int j = 0; j < converted.size(); j++) {
                     try {
                         current.get(j);
                     } catch (ArrayIndexOutOfBoundsException e) {
-                        current.add(new Vector());
+                        current.add(new Vector<Object>());
                     }
                     current.get(j).add(converted.get(j));
                 }
