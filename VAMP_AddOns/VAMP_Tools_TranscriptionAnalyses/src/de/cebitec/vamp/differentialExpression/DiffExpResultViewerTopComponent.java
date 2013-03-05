@@ -114,7 +114,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         List<String> descriptions = new ArrayList<>();
         for (Iterator<AnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
             AnalysisHandler.Result currentResult = it.next();
-            Vector<Object> colNames = new Vector<>(currentResult.getColnames());
+            Vector colNames = new Vector(currentResult.getColnames());
             colNames.add(0, " ");
             TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
             descriptions.add(currentResult.getDescription());

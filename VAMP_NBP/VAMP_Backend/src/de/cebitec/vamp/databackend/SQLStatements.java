@@ -536,6 +536,7 @@ public class SQLStatements {
     public final static String FETCH_SPECIFIED_FEATURES_FOR_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.FEATURE_ID+", "+
+                FieldNames.FEATURE_PARENT_IDS+", "+
                 FieldNames.FEATURE_TYPE+", " +
                 FieldNames.FEATURE_START+", "+
                 FieldNames.FEATURE_STOP+", "+
