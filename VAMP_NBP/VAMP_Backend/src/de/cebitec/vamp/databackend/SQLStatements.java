@@ -513,6 +513,15 @@ public class SQLStatements {
                 FieldNames.FEATURE_REFGEN_ID+" = ? and " +
                 FieldNames.FEATURE_ID+"=1";
     
+    public final static String CHECK_IF_FEATURES_OF_TYPE_EXIST =
+            "SELECT " +
+                FieldNames.FEATURE_ID +
+            " FROM " +
+                FieldNames.TABLE_FEATURES +
+            " WHERE " +
+                FieldNames.FEATURE_REFGEN_ID+" = ? and " +
+                FieldNames.FEATURE_TYPE+" = ?";
+    
     public final static String FETCH_FEATURES_FOR_GENOME_INTERVAL =
             "SELECT " +
                 FieldNames.FEATURE_ID+", "+

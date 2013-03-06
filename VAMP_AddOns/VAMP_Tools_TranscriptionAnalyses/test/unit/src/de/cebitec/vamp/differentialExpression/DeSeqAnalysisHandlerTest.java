@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.util.FeatureType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,13 +70,13 @@ public class DeSeqAnalysisHandlerTest implements de.cebitec.vamp.util.Observer {
     @Test
     public void testPerformAnalysis() {
         System.out.println("perform single analysis");
-        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null);
+        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null, FeatureType.ANY);
         instance.registerObserver(this);
         instance.start();
         instance.endAnalysis();
 
         System.out.println("perform multi analysis");
-        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null);
+        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null, FeatureType.ANY);
         instance.registerObserver(this);
         instance.start();
         instance.endAnalysis();

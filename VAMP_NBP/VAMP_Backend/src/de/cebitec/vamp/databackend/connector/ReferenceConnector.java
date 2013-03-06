@@ -116,11 +116,11 @@ public class ReferenceConnector {
      *      FeatureType.ANY or a specified type
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistantFeature> getFeaturesForRegion(int from, int to, FeatureType featureType){
+    public List<PersistantFeature> getFeaturesForRegion(int from, int to, FeatureType feature){
         List<PersistantFeature> features = new ArrayList<>();
         try {
             PreparedStatement fetch;
-            if (featureType == FeatureType.ANY) {
+            if (feature == FeatureType.ANY) {
                 fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
                 fetch.setLong(1, refGenID);
                 fetch.setInt(2, from);
@@ -130,7 +130,7 @@ public class ReferenceConnector {
                 fetch.setLong(1, refGenID);
                 fetch.setInt(2, from);
                 fetch.setInt(3, to);
-                fetch.setInt(4, featureType.getTypeInt());
+                fetch.setInt(4, feature.getTypeInt());
             }
 
             ResultSet rs = fetch.executeQuery();
@@ -242,10 +242,17 @@ public class ReferenceConnector {
         return namesList;
     }
     
-    public boolean hasFeatures() {
+    public boolean hasFeatures(FeatureType type) {
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_EXIST);
-            fetch.setLong(1, refGenID);
+            PreparedStatement fetch;
+            if (type == FeatureType.ANY) {
+                fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_EXIST);
+                fetch.setLong(1, refGenID);
+            } else {
+                fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST);
+                fetch.setLong(1, refGenID);
+                fetch.setLong(2, type.getTypeInt());
+            }
 
             ResultSet rs = fetch.executeQuery();
             return rs.next();

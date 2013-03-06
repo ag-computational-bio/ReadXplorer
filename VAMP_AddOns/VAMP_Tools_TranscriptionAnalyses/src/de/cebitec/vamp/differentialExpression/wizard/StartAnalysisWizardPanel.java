@@ -1,5 +1,8 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -13,6 +16,7 @@ public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPane
      * component from this class, just use getComponent().
      */
     private StartAnalysisVisualPanel component;
+    private Integer genomeID;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -55,6 +59,7 @@ public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPane
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        genomeID = (Integer) wiz.getProperty("genomeID");
     }
 
     @Override
@@ -65,9 +70,18 @@ public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPane
             File file = new File(path);
             wiz.putProperty("saveFile", file);
         }
+        FeatureType feature = getComponent().getFeatureType();
+        wiz.putProperty("featureType", feature);
     }
 
     @Override
     public void validate() throws WizardValidationException {
+        FeatureType feature = getComponent().getFeatureType();
+        if (feature != FeatureType.ANY) {
+            ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(genomeID);
+            if (!referenceConnector.hasFeatures(feature)) {
+                throw new WizardValidationException(null, "The selected reference genome does not contain annotations of the type " + feature.getTypeString() + ".", null);
+            }
+        }
     }
 }

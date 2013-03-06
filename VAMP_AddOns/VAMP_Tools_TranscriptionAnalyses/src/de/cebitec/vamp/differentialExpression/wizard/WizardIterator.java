@@ -9,6 +9,7 @@ import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.Group;
 import de.cebitec.vamp.differentialExpression.SimpleTestAnalysisHandler;
+import de.cebitec.vamp.util.FeatureType;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,10 +74,11 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
                 File saveFile = (File) wiz.getProperty("saveFile");
                 Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
+                FeatureType feature = (FeatureType) wiz.getProperty("featureType");
                 AnalysisHandler handler = null;
 
                 if (tool == AnalysisHandler.Tool.BaySeq) {
-                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID, replicateStructure, saveFile);
+                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID, replicateStructure, saveFile, feature);
                 }
 
                 if (tool == AnalysisHandler.Tool.DeSeq) {
@@ -89,7 +91,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
                         fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                     }
-                    handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile);
+                    handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, 
+                                             fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature);
                 }
 
                 if (tool == AnalysisHandler.Tool.SimpleTest) {
@@ -106,7 +109,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         groupB[i] = groupBList.get(i);
                     }
 
-                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, workingWithoutReplicates, saveFile);
+                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, workingWithoutReplicates, saveFile, feature);
                 }
 
                 DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);

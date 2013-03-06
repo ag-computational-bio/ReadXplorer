@@ -4,6 +4,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
+import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -46,8 +47,8 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
     public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks,
             Map<String, String[]> design, boolean moreThanTwoConditions,
             List<String> fittingGroupOne, List<String> fittingGroupTwo,
-            Integer refGenomeID, boolean workingWithoutReplicates, File saveFile) {
-        super(selectedTraks, refGenomeID, saveFile);
+            Integer refGenomeID, boolean workingWithoutReplicates, File saveFile, FeatureType feature) {
+        super(selectedTraks, refGenomeID, saveFile, feature);
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
                 design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, workingWithoutReplicates);
     }

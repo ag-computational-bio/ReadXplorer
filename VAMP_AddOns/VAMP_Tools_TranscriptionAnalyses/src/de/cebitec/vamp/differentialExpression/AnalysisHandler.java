@@ -33,6 +33,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     private List<Result> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private File saveFile = null;
+    private FeatureType feature;
     public static boolean TESTING_MODE = false;
 
     public static enum Tool {
@@ -42,23 +43,24 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         private Tool(String stringRep) {
             this.stringRep = stringRep;
         }
-               
         private String stringRep;
-        
+
         @Override
-        public String toString(){
+        public String toString() {
             return stringRep;
         }
     }
-    
+
     public static enum AnalysisStatus {
+
         RUNNING, FINISHED, ERROR;
     }
 
-    public AnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID, File saveFile) {
+    public AnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID, File saveFile, FeatureType feature) {
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
+        this.feature = feature;
     }
 
     protected Map<Integer, Map<Integer, Integer>> collectCountData() {
@@ -67,7 +69,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
-        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, FeatureType.ANY);
+        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, feature);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             CollectCoverageData collCovData = new CollectCoverageData(currentTrack, this);
@@ -251,7 +253,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         public String getDescription() {
             return description;
         }
-        
+
         /*
          * The manual array copy used in this method several times is intended!
          * This way the primitive data types are automatically converted to their 

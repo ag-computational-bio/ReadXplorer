@@ -4,6 +4,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
+import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -35,8 +36,8 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
     }
 
     public SimpleTestAnalysisHandler(List<PersistantTrack> selectedTraks,
-            int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,File saveFile) {
-        super(selectedTraks, refGenomeID, saveFile);
+            int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,File saveFile, FeatureType feature) {
+        super(selectedTraks, refGenomeID, saveFile, feature);
         simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(), 
                                         groupA, groupB, workingWithoutReplicates);
         simpleTestAnalysisData.setSelectedTraks(selectedTraks);

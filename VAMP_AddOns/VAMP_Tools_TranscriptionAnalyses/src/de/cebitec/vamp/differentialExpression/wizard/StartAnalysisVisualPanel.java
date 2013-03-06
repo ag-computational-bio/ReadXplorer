@@ -4,13 +4,16 @@
  */
 package de.cebitec.vamp.differentialExpression.wizard;
 
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
 public final class StartAnalysisVisualPanel extends JPanel {
     private static final long serialVersionUID = 1L;
-    
+    private ComboBoxModel<FeatureType> cbm = new DefaultComboBoxModel<>(FeatureType.SELECTABLE_FEATURE_TYPES);
     private boolean checkBoxchecked = false;
 
     /**
@@ -40,6 +43,8 @@ public final class StartAnalysisVisualPanel extends JPanel {
         jCheckBox1 = new javax.swing.JCheckBox();
         fileNameField = new javax.swing.JTextField();
         fileChooserButton = new javax.swing.JButton();
+        featureTypeComboBox = new javax.swing.JComboBox(cbm);
+        jLabel1 = new javax.swing.JLabel();
 
         jTextArea1.setEditable(false);
         jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
@@ -67,6 +72,8 @@ public final class StartAnalysisVisualPanel extends JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.jLabel1.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -76,13 +83,15 @@ public final class StartAnalysisVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(fileNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(fileChooserButton))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel1)
+                            .addComponent(featureTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE))
+                        .addGap(0, 4, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -90,13 +99,17 @@ public final class StartAnalysisVisualPanel extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(featureTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fileNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fileChooserButton))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -122,9 +135,11 @@ public final class StartAnalysisVisualPanel extends JPanel {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox featureTypeComboBox;
     private javax.swing.JButton fileChooserButton;
     private javax.swing.JTextField fileNameField;
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
@@ -135,5 +150,9 @@ public final class StartAnalysisVisualPanel extends JPanel {
 
     public boolean isCheckBoxchecked() {
         return checkBoxchecked;
+    }
+    
+    public FeatureType getFeatureType(){
+        return (FeatureType) featureTypeComboBox.getSelectedItem();
     }
 }
