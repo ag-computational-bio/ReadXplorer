@@ -2,8 +2,8 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.differentialExpression.AnalysisHandler;
 import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
 import de.cebitec.vamp.differentialExpression.GnuR;
@@ -55,7 +55,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private String[] deSeqTwoCondsIndex;
     private String[] deSeqMoreCondsIndex;
     private String[] simpleTestIndex;
-    private AnalysisHandler.Tool tool;
+    private DeAnalysisHandler.Tool tool;
     private WizardDescriptor wiz;
 
     @Override
@@ -75,13 +75,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 File saveFile = (File) wiz.getProperty("saveFile");
                 Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
                 FeatureType feature = (FeatureType) wiz.getProperty("featureType");
-                AnalysisHandler handler = null;
+                DeAnalysisHandler handler = null;
 
-                if (tool == AnalysisHandler.Tool.BaySeq) {
+                if (tool == DeAnalysisHandler.Tool.BaySeq) {
                     handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID, replicateStructure, saveFile, feature);
                 }
 
-                if (tool == AnalysisHandler.Tool.DeSeq) {
+                if (tool == DeAnalysisHandler.Tool.DeSeq) {
                     boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
                     boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
 
@@ -95,7 +95,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                                              fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature);
                 }
 
-                if (tool == AnalysisHandler.Tool.SimpleTest) {
+                if (tool == DeAnalysisHandler.Tool.SimpleTest) {
                     List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
                     boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
                     int[] groupA = new int[groupAList.size()];
@@ -218,17 +218,17 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
         }
         if (index == 0) {
             String[] contentData = null;
-            tool = (AnalysisHandler.Tool) wiz.getProperty("tool");
-            if (tool == AnalysisHandler.Tool.DeSeq) {
+            tool = (DeAnalysisHandler.Tool) wiz.getProperty("tool");
+            if (tool == DeAnalysisHandler.Tool.DeSeq) {
                 currentPanels = deSeqTwoCondsPanels;
                 contentData = deSeqIndex;
             }
-            if (tool == AnalysisHandler.Tool.BaySeq) {
+            if (tool == DeAnalysisHandler.Tool.BaySeq) {
                 currentPanels = baySeqPanels;
                 contentData = baySeqIndex;
             }
 
-            if (tool == AnalysisHandler.Tool.SimpleTest) {
+            if (tool == DeAnalysisHandler.Tool.SimpleTest) {
                 currentPanels = simpleTestPanels;
                 contentData = simpleTestIndex;
             }
@@ -237,7 +237,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
             }
         }
-        if ((index == 1) && (tool == AnalysisHandler.Tool.DeSeq)) {
+        if ((index == 1) && (tool == DeAnalysisHandler.Tool.DeSeq)) {
             String[] contentData = null;
             boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
             if (moreThanTwoConditions) {

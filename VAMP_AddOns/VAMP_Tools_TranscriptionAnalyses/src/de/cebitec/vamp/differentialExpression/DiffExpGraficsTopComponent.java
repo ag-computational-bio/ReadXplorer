@@ -62,7 +62,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     public DiffExpGraficsTopComponent() {
     }
 
-    public DiffExpGraficsTopComponent(AnalysisHandler handler) {
+    public DiffExpGraficsTopComponent(DeAnalysisHandler handler) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         cbm = new DefaultComboBoxModel(BaySeqAnalysisHandler.Plot.values());
         initComponents();

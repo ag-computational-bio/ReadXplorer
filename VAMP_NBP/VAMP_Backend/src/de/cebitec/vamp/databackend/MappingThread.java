@@ -300,7 +300,7 @@ public class MappingThread extends RequestThread {
      * @param trackID the ID of the track the received mappings should be from
      * @return list of mappings
      */
-    public List<PersistantMapping> loadAllReducedMappings() {
+    public List<PersistantMapping> loadReducedMappings(IntervalRequest request) {
 
         Connection connection = ProjectConnector.getInstance().getConnection();
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -308,8 +308,10 @@ public class MappingThread extends RequestThread {
 
         List<PersistantMapping> mappings = new ArrayList<>();
         if (this.isDbUsed) {
-            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_MAPPINGS_BY_TRACK_ID)) {
+            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_REDUCED_MAPPINGS_BY_TRACK_ID_AND_INTERVAL)) {
                 fetch.setLong(1, trackId);
+                fetch.setLong(2, request.getFrom());
+                fetch.setLong(3, request.getTo());
 
                 ResultSet rs = fetch.executeQuery();
                 while (rs.next()) {
@@ -327,7 +329,7 @@ public class MappingThread extends RequestThread {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             }
         } else { //handle retrieving of data from other source than a DB
-            mappings = new ArrayList<>(externalDataReader.getAllReducedMappingsFromBam(this.refGenome));
+            mappings = new ArrayList<>(externalDataReader.getReducedMappingsFromBam(this.refGenome,request.getFrom(),request.getTo()));
         }
         currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);

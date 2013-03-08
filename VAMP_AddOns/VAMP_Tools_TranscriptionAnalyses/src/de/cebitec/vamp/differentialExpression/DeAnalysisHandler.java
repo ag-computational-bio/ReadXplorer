@@ -1,7 +1,10 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.AnalysesHandler;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
@@ -9,6 +12,7 @@ import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
+import de.cebitec.vamp.util.Pair;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
@@ -23,17 +27,20 @@ import org.rosuda.JRI.RVector;
  *
  * @author kstaderm
  */
-public abstract class AnalysisHandler extends Thread implements Observable {
+public abstract class DeAnalysisHandler extends Thread implements Observable, DataVisualisationI {
 
     private ReferenceConnector referenceConnector;
     private int genomeSize;
     private List<PersistantFeature> persAnno;
     private List<PersistantTrack> selectedTraks;
+    private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
     private Integer refGenomeID;
     private List<Result> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private File saveFile = null;
     private FeatureType feature;
+    private Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<>();
+    private int resultsReceivedBack = 0;
     public static boolean TESTING_MODE = false;
 
     public static enum Tool {
@@ -56,15 +63,15 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         RUNNING, FINISHED, ERROR;
     }
 
-    public AnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID, File saveFile, FeatureType feature) {
+    public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID, File saveFile, FeatureType feature) {
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
         this.feature = feature;
     }
 
-    protected Map<Integer, Map<Integer, Integer>> collectCountData() {
-        Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<>();
+    private void startAnalysis() {
+        collectCoverageDataInstances = new HashMap<>();
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
@@ -72,13 +79,17 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, feature);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
-            CollectCoverageData collCovData = new CollectCoverageData(currentTrack, this);
-            allCountData.put(currentTrack.getId(), collCovData.startCollecting());
+            TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(currentTrack);
+            CollectCoverageData collCovData = new CollectCoverageData(persAnno);
+            collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
+            AnalysesHandler handler = new AnalysesHandler(connector, this, "Collecting coverage data of track number "+currentTrack.getId()+".");
+            handler.setReducedMappingsNeeded(true);
+            handler.registerObserver(collCovData);
+            handler.startAnalysis();
         }
-        return allCountData;
     }
 
-    protected void prepareFeatures(AnalysisData analysisData) {
+    protected void prepareFeatures(DeAnalysisData analysisData) {
         int[] featuresStart = new int[getPersAnno().size()];
         int[] featuresStop = new int[getPersAnno().size()];
         String[] loci = new String[getPersAnno().size()];
@@ -96,7 +107,7 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         analysisData.setSelectedTraks(selectedTraks);
     }
 
-    protected void prepareCountData(AnalysisData analysisData, Map<Integer, Map<Integer, Integer>> allCountData) {
+    protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<Integer, Integer>> allCountData) {
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             Integer key = it.next().getId();
             Integer[] data = new Integer[getPersAnno().size()];
@@ -115,10 +126,11 @@ public abstract class AnalysisHandler extends Thread implements Observable {
     }
 
     /**
-     * All steps necessary for the analysis. This Method is called when start()
-     * is calles on the instance of this class.
+     * When all countData is collected this method is called and the processing
+     * with the tool corresponding to the implementing class should start.
+     * @return 
      */
-    public abstract void performAnalysis() throws PackageNotLoadableException,
+    protected abstract List<Result> processWithTool() throws PackageNotLoadableException,
             JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
 
     /**
@@ -142,6 +154,10 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         return refGenomeID;
     }
 
+    public Map<Integer, Map<Integer, Integer>> getAllCountData() {
+        return allCountData;
+    }
+
     public File getSaveFile() {
         return saveFile;
     }
@@ -158,26 +174,14 @@ public abstract class AnalysisHandler extends Thread implements Observable {
         return results;
     }
 
+    public Map<Integer, CollectCoverageData> getCollectCoverageDataInstances() {
+        return collectCoverageDataInstances;
+    }
+
     @Override
     public void run() {
         notifyObservers(AnalysisStatus.RUNNING);
-        try {
-            performAnalysis();
-        } catch (PackageNotLoadableException | UnknownGnuRException ex) {
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-            notifyObservers(AnalysisStatus.ERROR);
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-            this.interrupt();
-        } catch (IllegalStateException ex) {
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp);
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-        } catch (JRILibraryNotInPathException ex) {
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-        }
+        startAnalysis();
     }
 
     @Override
@@ -201,6 +205,33 @@ public abstract class AnalysisHandler extends Thread implements Observable {
             de.cebitec.vamp.util.Observer currentObserver = it.next();
             currentObserver.update(data);
         }
+    }
+
+    @Override
+    public void showData(Object data) {
+        Pair<Integer, String> res = (Pair<Integer, String>) data;
+        allCountData.put(res.getFirst(), getCollectCoverageDataInstances().get(res.getFirst()).getCountData());
+
+        if (++resultsReceivedBack == getCollectCoverageDataInstances().size()) {
+            try {
+                results = processWithTool();
+            } catch (PackageNotLoadableException | UnknownGnuRException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                notifyObservers(AnalysisStatus.ERROR);
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+                this.interrupt();
+            } catch (IllegalStateException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp);
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+            } catch (JRILibraryNotInPathException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        notifyObservers(AnalysisStatus.FINISHED);
     }
 
     public static class Result {

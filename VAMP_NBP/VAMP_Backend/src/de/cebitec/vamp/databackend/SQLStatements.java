@@ -852,6 +852,21 @@ public class SQLStatements {
             + "WHERE "
             + FieldNames.MAPPING_TRACK + " "
             + "=?";
+    
+        /**
+     * kstaderm: Return all the Mappings belonging to a given track.
+     */
+    public static final String LOAD_REDUCED_MAPPINGS_BY_TRACK_ID_AND_INTERVAL =
+            "SELECT "
+            + FieldNames.MAPPING_DIRECTION + ", "
+            + FieldNames.MAPPING_START + ", "
+            + FieldNames.MAPPING_STOP + " "
+            + "FROM "
+            + FieldNames.TABLE_MAPPING + " "
+            + "WHERE "
+            + FieldNames.MAPPING_TRACK + " "
+            + "=? and "
+            + FieldNames.MAPPING_ID + " BETWEEN ? AND ? ";
     /*
      * <1min variante mit start between ? and ? 3min: variante mit start < ? &
      * start < ? 7min: variante mit start < ? & stop > ?

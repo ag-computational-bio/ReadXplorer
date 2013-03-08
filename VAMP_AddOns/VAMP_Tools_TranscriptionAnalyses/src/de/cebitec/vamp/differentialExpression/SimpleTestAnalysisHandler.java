@@ -8,13 +8,12 @@ import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author kstaderm
  */
-public class SimpleTestAnalysisHandler extends AnalysisHandler {
+public class SimpleTestAnalysisHandler extends DeAnalysisHandler {
 
     private SimpleTest simpleTest = new SimpleTest();
     private SimpleTestAnalysisData simpleTestAnalysisData;
@@ -36,26 +35,20 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
     }
 
     public SimpleTestAnalysisHandler(List<PersistantTrack> selectedTraks,
-            int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,File saveFile, FeatureType feature) {
+            int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates, File saveFile, FeatureType feature) {
         super(selectedTraks, refGenomeID, saveFile, feature);
-        simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(), 
-                                        groupA, groupB, workingWithoutReplicates);
+        simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(),
+                groupA, groupB, workingWithoutReplicates);
         simpleTestAnalysisData.setSelectedTraks(selectedTraks);
     }
 
     @Override
-    public void performAnalysis() throws JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
-        if (!AnalysisHandler.TESTING_MODE) {
-            Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            prepareFeatures(simpleTestAnalysisData);
-            prepareCountData(simpleTestAnalysisData, allCountData);
-            results = simpleTest.process(simpleTestAnalysisData, getPersAnno().size(), getSaveFile());
-        } else {
-            results = simpleTest.process(simpleTestAnalysisData, 3434, getSaveFile());
-        }
-        setResults(results);
-        notifyObservers(AnalysisStatus.FINISHED);
+        prepareFeatures(simpleTestAnalysisData);
+        prepareCountData(simpleTestAnalysisData, getAllCountData());
+        results = simpleTest.process(simpleTestAnalysisData, getPersAnno().size(), getSaveFile());
+        return results;
     }
 
     @Override
@@ -69,8 +62,8 @@ public class SimpleTestAnalysisHandler extends AnalysisHandler {
         simpleTest.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
-    public File plot(SimpleTestAnalysisHandler.Plot plot) throws IOException, 
-                            IllegalStateException, PackageNotLoadableException {
+    public File plot(SimpleTestAnalysisHandler.Plot plot) throws IOException,
+            IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == SimpleTestAnalysisHandler.Plot.ABvsConf) {

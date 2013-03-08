@@ -1,6 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.differentialExpression.AnalysisHandler.AnalysisStatus;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.event.ItemEvent;
@@ -53,14 +53,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private ComboBoxModel<Object> cbm;
     private ArrayList<TableModel> tableModels = new ArrayList<>();
     private TopComponent GraficsTopComponent;
-    private AnalysisHandler analysisHandler;
-    private AnalysisHandler.Tool usedTool;
+    private DeAnalysisHandler analysisHandler;
+    private DeAnalysisHandler.Tool usedTool;
     private boolean moreThanTwoCondsForDeSeq = false;
 
     public DiffExpResultViewerTopComponent() {
     }
 
-    public DiffExpResultViewerTopComponent(AnalysisHandler handler, AnalysisHandler.Tool usedTool) {
+    public DiffExpResultViewerTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool usedTool) {
 //        BoundsInfoManager man = getLookup().lookupAll(ViewController.class).iterator().next().getBoundsManager();
         Lookup look = getLookup();
         this.analysisHandler = handler;
@@ -110,10 +110,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void addResults() {
-        List<AnalysisHandler.Result> results = analysisHandler.getResults();
+        List<DeAnalysisHandler.Result> results = analysisHandler.getResults();
         List<String> descriptions = new ArrayList<>();
-        for (Iterator<AnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
-            AnalysisHandler.Result currentResult = it.next();
+        for (Iterator<DeAnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
+            DeAnalysisHandler.Result currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             colNames.add(0, " ");
             TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);

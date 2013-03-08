@@ -147,13 +147,13 @@ public class SamBamFileReader implements Observable {
      * @param refGenome reference genome used in the bam file
      * @return the reduced mappings for the given interval
      */
-    public Collection<PersistantMapping> getAllReducedMappingsFromBam(PersistantReference refGenome) {
+    public Collection<PersistantMapping> getReducedMappingsFromBam(PersistantReference refGenome, int from, int to) {
         Collection<PersistantMapping> mappings = new ArrayList<>();
 
         try {
             this.checkIndex();
             
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), 0, 0, false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
             SAMRecord record;
             int start;
             int stop;

@@ -49,16 +49,16 @@ preferredID = "DeSeqGraficsTopComponent")
 })
 public final class DeSeqGraficsTopComponent extends TopComponent {
 
-    private AnalysisHandler analysisHandler;
+    private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel cbm;
     private File currentlyDisplayed;
-    private AnalysisHandler.Tool tool;
+    private DeAnalysisHandler.Tool tool;
 
     public DeSeqGraficsTopComponent() {
     }
     
-    public DeSeqGraficsTopComponent(AnalysisHandler handler, AnalysisHandler.Tool tool) {
+    public DeSeqGraficsTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool tool) {
         analysisHandler = handler;
         this.tool = tool;
         cbm = new DefaultComboBoxModel(SimpleTestAnalysisHandler.Plot.values());
@@ -66,7 +66,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
         setupGrafics();
     }
 
-    public DeSeqGraficsTopComponent(AnalysisHandler handler, boolean moreThanTwoConditions, AnalysisHandler.Tool tool) {
+    public DeSeqGraficsTopComponent(DeAnalysisHandler handler, boolean moreThanTwoConditions, DeAnalysisHandler.Tool tool) {
         analysisHandler = handler;
         this.tool = tool;
         cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
@@ -159,7 +159,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
             messages.setText("");
             plotButton.setEnabled(false);
             saveButton.setEnabled(false);
-            if (tool == AnalysisHandler.Tool.DeSeq) {
+            if (tool == DeAnalysisHandler.Tool.DeSeq) {
                 DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
                 currentlyDisplayed = ((DeSeqAnalysisHandler) analysisHandler).plot(selectedPlot);
             } else {

@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
@@ -54,7 +53,7 @@ public class DeSeq {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load plotting functions. You woun't be able to plot your results!", currentTimestamp);
             }
 
-            if (!AnalysisHandler.TESTING_MODE) {
+            if (!DeAnalysisHandler.TESTING_MODE) {
                 //Handing over the count data to Gnu R.
                 int i = 1;
                 StringBuilder concatenate = new StringBuilder("c(");
@@ -222,7 +221,7 @@ public class DeSeq {
                 gnuR.eval("save.image(\"" + path + "\")");
             }
         } //We don't know what errors Gnu R might cause, so we have to catch all.
-        //The new generated exception can than be caught an handelt by the AnalysisHandler
+        //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch (Exception e) {
             throw new UnknownGnuRException(e);
         }

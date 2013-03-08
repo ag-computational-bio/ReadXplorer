@@ -4,7 +4,7 @@ package de.cebitec.vamp.differentialExpression;
  *
  * @author kstaderm
  */
-public class SimpleTestAnalysisData extends AnalysisData {
+public class SimpleTestAnalysisData extends DeAnalysisData {
 
     private int[] groupA;
     private int[] groupB;

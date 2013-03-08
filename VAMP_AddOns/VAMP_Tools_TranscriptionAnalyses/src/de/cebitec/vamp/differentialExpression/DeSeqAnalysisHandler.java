@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author kstaderm
  */
-public class DeSeqAnalysisHandler extends AnalysisHandler {
+public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     private DeSeq deSeq = new DeSeq();
     private DeSeqAnalysisData deSeqAnalysisData;
@@ -39,7 +39,7 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
             if (moreThanTwoConditions) {
                 return new Plot[]{DispEsts};
             } else {
-                return new Plot[]{DispEsts,DE,HIST};
+                return new Plot[]{DispEsts, DE, HIST};
             }
         }
     }
@@ -54,21 +54,16 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
     }
 
     @Override
-    public void performAnalysis() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
-        if (!AnalysisHandler.TESTING_MODE) {
-            Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            prepareFeatures(deSeqAnalysisData);
-            prepareCountData(deSeqAnalysisData, allCountData);
-            results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
-        } else {
-            results = deSeq.process(deSeqAnalysisData, 3434, getSelectedTracks().size(), getSaveFile());
-        }
-        setResults(results);
-        notifyObservers(AnalysisStatus.FINISHED);
+        prepareFeatures(deSeqAnalysisData);
+        prepareCountData(deSeqAnalysisData, getAllCountData());
+        results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        return results;
+
     }
-    
-    public boolean moreThanTwoCondsForDeSeq(){
+
+    public boolean moreThanTwoCondsForDeSeq() {
         return deSeqAnalysisData.moreThanTwoConditions();
     }
 

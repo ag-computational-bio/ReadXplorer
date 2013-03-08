@@ -9,22 +9,21 @@ import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author kstaderm
  */
-public class BaySeqAnalysisHandler extends AnalysisHandler {
+public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
-    private int[] replicateStructure;
     private List<Group> groups;
     private BaySeq baySeq = new BaySeq();
+    private BaySeqAnalysisData baySeqAnalysisData;
 
     public static enum Plot {
 
         Priors("Priors"),
-        MACD("\"MA\"-Plot for the count data"), 
+        MACD("\"MA\"-Plot for the count data"),
         Posteriors("Posterior likelihoods of differential expression against log-ratio");
         String representation;
 
@@ -38,28 +37,11 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         }
     }
 
-    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, 
+    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups,
             Integer refGenomeID, int[] replicateStructure, File saveFile, FeatureType feature) {
         super(selectedTraks, refGenomeID, saveFile, feature);
-        this.groups = groups;
-        this.replicateStructure = replicateStructure;
-    }
-
-    @Override
-    public void performAnalysis() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
-        List<Result> results;
-        if (!AnalysisHandler.TESTING_MODE) {
-            Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            BaySeqAnalysisData baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), this.groups, this.replicateStructure);
-            prepareFeatures(baySeqAnalysisData);
-            prepareCountData(baySeqAnalysisData, allCountData);
-            results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
-        } else {
-            results = baySeq.process(null, 3232, getSelectedTracks().size(), getSaveFile());
-        }
-
-        setResults(results);
-        notifyObservers(AnalysisStatus.FINISHED);
+        baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), groups, replicateStructure);
+        this.groups=groups;
     }
 
     @Override
@@ -68,8 +50,16 @@ public class BaySeqAnalysisHandler extends AnalysisHandler {
         baySeq = null;
     }
 
-    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException, 
-                                                                        IllegalStateException, PackageNotLoadableException {
+    @Override
+    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+        prepareFeatures(baySeqAnalysisData);
+        prepareCountData(baySeqAnalysisData, getAllCountData());
+        List<Result> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        return results;
+    }
+
+    public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException,
+            IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("VAMP_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {

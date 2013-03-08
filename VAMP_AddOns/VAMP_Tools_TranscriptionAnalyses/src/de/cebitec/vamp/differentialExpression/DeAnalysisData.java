@@ -12,7 +12,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  * @author kstaderm
  */
-public class AnalysisData {
+public class DeAnalysisData {
 
     /**
      * Start positions of the reference features.
@@ -44,10 +44,10 @@ public class AnalysisData {
     private String[] trackDescriptions;
 
     /**
-     * Creates a new instance of the AnalysisData class.
+     * Creates a new instance of the DeAnalysisData class.
      * @param capacity Number of selected tracks.
      */
-    public AnalysisData(int capacity) {
+    public DeAnalysisData(int capacity) {
         countData = new ArrayBlockingQueue<>(capacity);
     }
 
