@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
 import java.io.File;
@@ -47,7 +48,7 @@ preferredID = "DeSeqGraficsTopComponent")
     "CTL_DeSeqGraficsTopComponent=Create graphics",
     "HINT_DeSeqGraficsTopComponent=This is a DeSeqGrafics window"
 })
-public final class DeSeqGraficsTopComponent extends TopComponent {
+public final class DeSeqGraficsTopComponent extends TopComponent implements Observer {
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
@@ -57,7 +58,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
 
     public DeSeqGraficsTopComponent() {
     }
-    
+
     public DeSeqGraficsTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool tool) {
         analysisHandler = handler;
         this.tool = tool;
@@ -183,6 +184,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         VampFileChooser fc = new VampFileChooser(new String[]{"svg"}, "svg") {
             private static final long serialVersionUID = 1L;
+
             @Override
             public void save(String fileLocation) {
                 Path from = currentlyDisplayed.toPath();
@@ -191,7 +193,9 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
                     Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
                     messages.setText("SVG image saved to " + outputFile.toString());
                 } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
                 }
             }
 
@@ -218,7 +222,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        analysisHandler.removeObserver(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -261,5 +265,9 @@ public final class DeSeqGraficsTopComponent extends TopComponent {
                 messages.setText("Could not load SVG file. Please try again.");
             }
         });
+    }
+
+    @Override
+    public void update(Object args) {
     }
 }

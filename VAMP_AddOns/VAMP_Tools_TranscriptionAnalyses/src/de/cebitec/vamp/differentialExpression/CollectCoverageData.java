@@ -32,7 +32,8 @@ public class CollectCoverageData implements Observer {
      * manly CDS positions. So it is normal that a lot of mappings will start in
      * an are downstream of the start position of the feature.
      */
-    private final static int STARTOFFSET = 30;
+    private int startOffset;
+    private int stopOffset;
 
     /**
      * Constructor of the class.
@@ -42,8 +43,10 @@ public class CollectCoverageData implements Observer {
      * @param perfAnalysis Instance of the calling instance of
      * DeAnalysisHandler.
      */
-    public CollectCoverageData(List<PersistantFeature> genomeFeatures) {
+    public CollectCoverageData(List<PersistantFeature> genomeFeatures, int startOffset, int stopOffset) {
         this.genomeFeatures = genomeFeatures;
+        this.startOffset = startOffset;
+        this.stopOffset = stopOffset;
     }
 
     /**
@@ -59,8 +62,8 @@ public class CollectCoverageData implements Observer {
 
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
-            int featStart = feature.getStart() - STARTOFFSET;
-            int featStop = feature.getStop();
+            int featStart = feature.getStart() - startOffset;
+            int featStop = feature.getStop() + stopOffset;
             int key = feature.getId();
             fstFittingMapping = true;
             //If no matching mapping is found, we still need to know that by

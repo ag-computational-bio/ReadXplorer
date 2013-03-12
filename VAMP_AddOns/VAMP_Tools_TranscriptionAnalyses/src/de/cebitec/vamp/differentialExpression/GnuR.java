@@ -132,7 +132,7 @@ public class GnuR extends Rengine {
 
         @Override
         public void rWriteConsole(Rengine rngn, String string, int i) {
-            System.out.println(string);
+            ProcessingLog.getInstance().logGNURoutput(string);
         }
 
         @Override

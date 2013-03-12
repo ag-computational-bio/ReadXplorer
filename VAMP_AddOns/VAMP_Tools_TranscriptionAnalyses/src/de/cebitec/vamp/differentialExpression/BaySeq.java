@@ -142,6 +142,8 @@ public class BaySeq {
         catch (Exception e) {
             throw new UnknownGnuRException(e);
         }
+        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp);
         return results;
     }
 

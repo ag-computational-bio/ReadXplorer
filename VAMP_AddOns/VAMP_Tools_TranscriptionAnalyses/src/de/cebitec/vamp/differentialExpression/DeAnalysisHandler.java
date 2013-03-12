@@ -41,6 +41,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private FeatureType feature;
     private Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<>();
     private int resultsReceivedBack = 0;
+    private int startOffset;
+    private int stopOffset;
     public static boolean TESTING_MODE = false;
 
     public static enum Tool {
@@ -63,11 +65,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         RUNNING, FINISHED, ERROR;
     }
 
-    public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID, File saveFile, FeatureType feature) {
+    public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID,
+            File saveFile, FeatureType feature, int startOffset, int stopOffset) {
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
         this.feature = feature;
+        this.startOffset = startOffset;
+        this.stopOffset = stopOffset;
     }
 
     private void startAnalysis() {
@@ -80,9 +85,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(currentTrack);
-            CollectCoverageData collCovData = new CollectCoverageData(persAnno);
+            CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
             collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-            AnalysesHandler handler = new AnalysesHandler(connector, this, "Collecting coverage data of track number "+currentTrack.getId()+".");
+            AnalysesHandler handler = new AnalysesHandler(connector, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
             handler.setReducedMappingsNeeded(true);
             handler.registerObserver(collCovData);
             handler.startAnalysis();
@@ -128,7 +133,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     /**
      * When all countData is collected this method is called and the processing
      * with the tool corresponding to the implementing class should start.
-     * @return 
+     *
+     * @return
      */
     protected abstract List<Result> processWithTool() throws PackageNotLoadableException,
             JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
@@ -138,7 +144,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      * the analysis are closed. So you should clean up everything and release
      * the Gnu R instance at this point.
      */
-    public abstract void endAnalysis();
+    public void endAnalysis(){
+        ProcessingLog.getInstance().resetLog();
+    }
 
     public abstract void saveResultsAsCSV(int selectedIndex, String path);
 
@@ -208,7 +216,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     @Override
-    public void showData(Object data) {
+    public synchronized void showData(Object data) {
         Pair<Integer, String> res = (Pair<Integer, String>) data;
         allCountData.put(res.getFirst(), getCollectCoverageDataInstances().get(res.getFirst()).getCountData());
 

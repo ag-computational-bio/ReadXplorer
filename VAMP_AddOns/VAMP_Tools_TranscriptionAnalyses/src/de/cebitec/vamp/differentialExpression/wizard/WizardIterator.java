@@ -8,6 +8,7 @@ import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.Group;
+import de.cebitec.vamp.differentialExpression.ProcessingLog;
 import de.cebitec.vamp.differentialExpression.SimpleTestAnalysisHandler;
 import de.cebitec.vamp.util.FeatureType;
 import java.awt.Component;
@@ -75,10 +76,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 File saveFile = (File) wiz.getProperty("saveFile");
                 Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
                 FeatureType feature = (FeatureType) wiz.getProperty("featureType");
+                Integer startOffset = (Integer) wiz.getProperty("startOffset");
+                Integer stopOffset = (Integer) wiz.getProperty("stopOffset");
                 DeAnalysisHandler handler = null;
 
                 if (tool == DeAnalysisHandler.Tool.BaySeq) {
-                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID, replicateStructure, saveFile, feature);
+                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, 
+                            genomeID, replicateStructure, saveFile, feature, startOffset, stopOffset);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.DeSeq) {
@@ -92,7 +96,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                     }
                     handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, 
-                                             fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature);
+                            fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature, startOffset, stopOffset);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.SimpleTest) {
@@ -109,13 +113,15 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         groupB[i] = groupBList.get(i);
                     }
 
-                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, workingWithoutReplicates, saveFile, feature);
+                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, 
+                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset);
                 }
 
                 DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
                 diffExpResultViewerTopComponent.open();
                 diffExpResultViewerTopComponent.requestActive();
                 handler.registerObserver(diffExpResultViewerTopComponent);
+                ProcessingLog.getInstance().setProperties(wiz.getProperties());
                 handler.start();
             }
         } else {
@@ -137,6 +143,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             allPanels.add(new DeSeqWizardPanelDesign());
             allPanels.add(new DeSeqWizardPanelFit());
             allPanels.add(new DeSeqWizardPanelConds());
+            allPanels.add(new GeneralSettingsWizardPanel());
             allPanels.add(new StartAnalysisWizardPanel());
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
@@ -159,7 +166,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             baySeqPanels.add(allPanels.get(3));
             baySeqPanels.add(allPanels.get(4));
             baySeqPanels.add(allPanels.get(8));
-            baySeqIndex = new String[]{steps[0], steps[2], steps[3], steps[4], steps[8]};
+            baySeqPanels.add(allPanels.get(9));
+            baySeqIndex = new String[]{steps[0], steps[2], steps[3], steps[4], steps[8], steps[9]};
 
             deSeqIndex = new String[]{steps[0], steps[1], "..."};
 
@@ -169,7 +177,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             deSeqTwoCondsPanels.add(allPanels.get(2));
             deSeqTwoCondsPanels.add(allPanels.get(7));
             deSeqTwoCondsPanels.add(allPanels.get(8));
-            deSeqTwoCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[7], steps[8]};
+            deSeqTwoCondsPanels.add(allPanels.get(9));
+            deSeqTwoCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[7], steps[8], steps[9]};
 
             deSeqMoreCondsPanels = new ArrayList<>();
             deSeqMoreCondsPanels.add(allPanels.get(0));
@@ -178,14 +187,16 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             deSeqMoreCondsPanels.add(allPanels.get(5));
             deSeqMoreCondsPanels.add(allPanels.get(6));
             deSeqMoreCondsPanels.add(allPanels.get(8));
-            deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[6], steps[8]};
+            deSeqMoreCondsPanels.add(allPanels.get(9));
+            deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[6], steps[8], steps[9]};
 
             simpleTestPanels = new ArrayList<>();
             simpleTestPanels.add(allPanels.get(0));
             simpleTestPanels.add(allPanels.get(2));
             simpleTestPanels.add(allPanels.get(7));
             simpleTestPanels.add(allPanels.get(8));
-            simpleTestIndex = new String[]{steps[0], steps[2], steps[7], steps[8]};
+            simpleTestPanels.add(allPanels.get(9));
+            simpleTestIndex = new String[]{steps[0], steps[2], steps[7], steps[8], steps[9]};
 
             currentPanels = baySeqPanels;
         }

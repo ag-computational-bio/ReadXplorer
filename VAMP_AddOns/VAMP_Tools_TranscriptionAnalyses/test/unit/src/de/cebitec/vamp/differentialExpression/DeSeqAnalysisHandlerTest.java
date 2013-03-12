@@ -70,13 +70,13 @@ public class DeSeqAnalysisHandlerTest implements de.cebitec.vamp.util.Observer {
     @Test
     public void testPerformAnalysis() {
         System.out.println("perform single analysis");
-        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null, FeatureType.ANY);
+        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null, FeatureType.ANY, 300, 0);
         instance.registerObserver(this);
         instance.start();
         instance.endAnalysis();
 
         System.out.println("perform multi analysis");
-        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null, FeatureType.ANY);
+        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null, FeatureType.ANY, 300, 0);
         instance.registerObserver(this);
         instance.start();
         instance.endAnalysis();
