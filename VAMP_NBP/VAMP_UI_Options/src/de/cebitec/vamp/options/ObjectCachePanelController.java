@@ -8,8 +8,8 @@ import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
 /**
- *
- * @author jeff
+ * 
+ * @author Evgeny Anisiforov
  */
 @OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_ObjectCache",  
 iconBase = "de/cebitec/vamp/options/objectCache.png",

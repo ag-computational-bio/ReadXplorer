@@ -93,4 +93,19 @@ public class GenericSQLQueries {
                 + " ADD COLUMN "
                 + column + " " + type;
     }
+    
+    /**
+     * Adds a new column to the table.
+     * @param table table
+     * @param column column to add
+     * @param type the type of the column
+     * @return SQL command
+     */
+    public static String genRemoveColumnString(String table, String column) {
+        return "ALTER TABLE "
+                + table
+                + " DROP COLUMN " 
+                + column 
+                ;
+    }
 }

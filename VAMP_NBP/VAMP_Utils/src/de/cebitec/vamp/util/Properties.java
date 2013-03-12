@@ -108,6 +108,8 @@ public class Properties {
     public static final String OBJECTCACHE_AUTOSTART = "OBJECTCACHE_AUTOSTART";
     public static final String OBJECTCACHE_ACTIVE = "OBJECTCACHE_ACTIVE";
     
+    public static final String MAPPER_PATH = "MAPPER_PATH";
+    
     /** Extension to use for bam index files (".bai"). */
     public static final String BAM_INDEX_EXT = ".bai";
 }

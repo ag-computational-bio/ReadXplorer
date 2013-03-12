@@ -127,7 +127,22 @@ public class SamBamFileReader implements Observable {
 
                 this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
                         record.getReadString(), refSubSeq, mapping);
-
+                Object XT = record.getAttribute("XT");
+                String XTasString = null;
+                if ((XT!=null)) {
+                    XTasString = XT.toString();
+                    if (XTasString.equals("U")) {
+                        mapping.setUnique(true);
+                    }
+                }
+                
+                
+                Object originalSequence = record.getAttribute("os");
+                if ((originalSequence!=null) && (originalSequence instanceof String)) mapping.setOriginalSequence((String) originalSequence);
+                Object trimmedFromLeft = record.getIntegerAttribute("tl"); 
+                if ((trimmedFromLeft!=null) && (trimmedFromLeft instanceof Integer)) mapping.setTrimmedFromLeft((Integer) trimmedFromLeft);
+                Object trimmedFromRight = record.getIntegerAttribute("tr");
+                if ((trimmedFromRight!=null) && (trimmedFromRight instanceof Integer)) mapping.setTrimmedFromRight((Integer) trimmedFromRight);
                 mappings.add(mapping);
             }
             samRecordIterator.close();

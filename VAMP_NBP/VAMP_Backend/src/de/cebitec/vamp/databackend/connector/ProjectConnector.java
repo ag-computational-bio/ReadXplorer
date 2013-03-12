@@ -381,6 +381,12 @@ public class ProjectConnector extends Observable {
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
                     FieldNames.TABLE_TRACK, FieldNames.TRACK_PATH, VARCHAR400));
         
+        //delete old "RUN_ID" field from the database to avoid problems with null values in insert statement
+        // an error will be raised by the query, if the field does not exist 
+        // (simply ignore the error) 
+        this.runSqlStatementIgnoreErrors(GenericSQLQueries.genRemoveColumnString( 
+                FieldNames.TABLE_TRACK, "RUN_ID"));
+        
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
     }
@@ -395,6 +401,19 @@ public class ProjectConnector extends Observable {
             con.prepareStatement(statement).executeUpdate();
         } catch (SQLException ex) {
             this.checkRollback(ex);
+        }
+    }
+    
+    /**
+     * Runs a single sql statement and ignores any errors
+     * @param statement sql statement to run
+     */
+    private void runSqlStatementIgnoreErrors(String statement) {
+
+        try {
+            con.prepareStatement(statement).executeUpdate();
+        } catch (SQLException ex) {
+            //ignore
         }
     }
 
@@ -1677,6 +1696,9 @@ public class ProjectConnector extends Observable {
                 double revCov2;
                 String absPosition;
                 
+                int errorCount = 0;
+                int maxErrorCount = 20;
+                
                 while (positionIterator.hasNext()) {
 
                     posString = positionIterator.next();
@@ -1743,8 +1765,15 @@ public class ProjectConnector extends Observable {
                                 snpID++;
                             }
                         } else {
-                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredDiffs + " uncovered position in diffs {0}", position);
+                            //skip error messages, if too many occur to prevent bug in the output panel
+                            errorCount++;
+                            if (errorCount<=maxErrorCount) {
+                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredDiffs + " uncovered position in diffs {0}", position);
+                            }    
                         }
+                    }
+                    if (errorCount>maxErrorCount) {
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "... "+(errorCount-maxErrorCount)+" more errors occured");
                     }
 
                     // ... i=6..10 is ACGTN (GAP); i=11 #diffs

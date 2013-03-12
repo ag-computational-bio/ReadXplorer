@@ -7,7 +7,7 @@ import java.awt.Color;
  * @author ddoppmeier, rhilker
  */
 public class ColorProperties {
-
+    
     /**
      * Private constructor so this utility class can not be instantiated.
      */
@@ -82,6 +82,8 @@ public class ColorProperties {
     public static final Color ALIGNMENT_BASE_READGAP = new Color(255, 255, 255);
     public static final Color ALIGNMENT_BASE_UNDEF = new Color(255, 255, 255);
     public static final Color SKIPPED = new Color(255, 255, 255);
+    public static final Color TRIMMED = Color.GRAY;
+
     // sequence pair specific colors
     public static final Color BLOCK_PERFECT = Color.GREEN;
     public static final Color BLOCK_DIST_LARGE = Color.YELLOW;

@@ -517,7 +517,7 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, FeatureType.ORDINARY_MATCH, viewer));
         legend.add(this.getLegendEntry(ColorProperties.ALIGNMENT_A, FeatureType.DIFF, null));
         legend.add(this.getGradientEntry("Replicates: High to low"));
-
+        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.NONUNIQUE, viewer));
         return legend;
     }
 

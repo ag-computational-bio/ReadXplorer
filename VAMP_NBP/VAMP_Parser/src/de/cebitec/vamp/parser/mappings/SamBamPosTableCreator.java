@@ -7,6 +7,7 @@ import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.util.Benchmark;
+import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
@@ -96,6 +97,7 @@ public class SamBamPosTableCreator implements Observable {
         coveredPerfectIntervals.add(new Pair<>(0, 0));
         int lastIndex;
         Integer classification;
+        ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             SAMRecordIterator samItor = sam.iterator();
@@ -198,13 +200,23 @@ public class SamBamPosTableCreator implements Observable {
                             //saruman starts genome at 0 other algorithms like bwa start genome at 1
                         }
                     } else {
-                        this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
+                        //skip error messages, if too many occur to prevent bug in the output panel
+                        if (errorLimit.allowOutput()) {
+                            this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
                                 "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                        }
                     }
                 } catch (Exception e) {
-                    this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                    //skip error messages, if too many occur to prevent bug in the output panel
+                    if (errorLimit.allowOutput()) {
+                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                             "Parser.Parsing.CorruptData", lineno, e.toString()));
+                    }
                 }
+                
+            }
+            if (errorLimit.getSkippedCount()>0) {
+                     this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
             }
             samItor.close();
 

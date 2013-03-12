@@ -24,7 +24,8 @@ public class Brick {
     public final static int GENOME_GAP_C = 13;
     public final static int GENOME_GAP_T = 14;
     public final static int UNDEF = 15;
-    public static final int SKIPPED = 16;
+    public final static int SKIPPED = 16;
+    public final static int TRIMMED = 17;
 
     private int type;
 
@@ -61,6 +62,7 @@ public class Brick {
             case Brick.READGAP : return "-";
             case Brick.UNDEF : return "@";
             case Brick.SKIPPED : return ".";
+            case Brick.TRIMMED : return "|";
             default:
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
                 return "@";
