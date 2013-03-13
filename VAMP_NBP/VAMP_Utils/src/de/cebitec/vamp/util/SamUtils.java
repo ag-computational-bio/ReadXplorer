@@ -166,7 +166,11 @@ public class SamUtils implements Observable {
         } else {
             newFilePath = inputFile.getAbsolutePath();
         }
-        return new File(newFilePath + newEnding + ".bam");
+        File newFile = new File(newFilePath + newEnding + ".bam");
+        if (newFile.exists()) {
+            newFile = new File(newFilePath + newEnding + "-vamp.bam");
+        }
+        return newFile;
     }
 
     /**

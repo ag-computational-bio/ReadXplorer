@@ -1,6 +1,5 @@
 package de.cebitec.vamp.view.dataVisualisation.trackViewer;
 
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.controller.TrackCacher;
 import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
@@ -10,6 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -54,7 +54,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     
     private JSlider verticalSlider = null;
  
-    private static int height = 300;
+    private static int height = 230;
     private CoverageInfoI trackInfo;
     private double scaleFactor;
     private int scaleLineStep;
@@ -897,7 +897,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Sets the initial size of the track viewer.
      */
     private void setViewerSize() {
-        this.setPreferredSize(new Dimension(1, 230));
+        this.setPreferredSize(new Dimension(1, height));
         this.revalidate();
     }
 

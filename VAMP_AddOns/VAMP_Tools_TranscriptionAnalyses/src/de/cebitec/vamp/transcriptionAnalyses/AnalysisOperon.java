@@ -1,7 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.api.objects.AnalysisI;
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -10,6 +9,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observer;
 import java.util.*;
 import java.util.logging.Level;
@@ -181,7 +181,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                         internalReads += mapping.getNbReplicates();
                     }
 
-                    if (fstFittingMapping == true) {
+                    if (fstFittingMapping) { //TODO: either add to each if clause above or add surrounding if clause!
                         this.lastMappingIdx = j;
                         fstFittingMapping = false;
                     }

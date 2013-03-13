@@ -27,7 +27,7 @@ import org.openide.util.Exceptions;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class BioJavaGffParser extends FastaReferenceParser {
+public class BioJavaGff3Parser extends FastaReferenceParser {
     
     // Fileextension used by Filechooser to choose files to be parsed by this parser
     private static final String[] fileExtension = new String[]{"gff", "gff3"};
