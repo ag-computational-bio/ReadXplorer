@@ -10,7 +10,6 @@ import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
-import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;

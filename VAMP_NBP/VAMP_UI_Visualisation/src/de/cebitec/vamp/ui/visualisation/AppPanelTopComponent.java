@@ -25,6 +25,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -49,6 +50,8 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private Lookup localLookup;
     private ReferenceViewer referenceViewer;
     private ArrayList<TrackViewer> trackViewerList;
+    private JScrollPane trackScrollPane;
+    private JPanel tracksPanel;
 
     /**
      * Top component which displays the main work area of VAMP, which contains
@@ -62,6 +65,8 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         localLookup = new AbstractLookup(content);
         associateLookup(localLookup);
         this.trackViewerList = new ArrayList<>();
+        this.tracksPanel = new JPanel();
+        this.tracksPanel.setLayout(new javax.swing.BoxLayout(tracksPanel, javax.swing.BoxLayout.PAGE_AXIS));
     }
     
     /**
@@ -83,25 +88,22 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        viewerPane = new javax.swing.JScrollPane();
         visualPanel = new javax.swing.JPanel();
 
         visualPanel.setLayout(new javax.swing.BoxLayout(visualPanel, javax.swing.BoxLayout.PAGE_AXIS));
-        viewerPane.setViewportView(visualPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(viewerPane, javax.swing.GroupLayout.DEFAULT_SIZE, 629, Short.MAX_VALUE)
+            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(viewerPane, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane viewerPane;
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -234,8 +236,13 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
     @Override
     public void showTrackPanel(final JPanel trackPanel) {
+        if (this.trackScrollPane == null) {
+            this.trackScrollPane = new JScrollPane(this.tracksPanel);
+            this.visualPanel.add(this.trackScrollPane);
+        }
+        
         // add the trackPanel
-        visualPanel.add(trackPanel);
+        tracksPanel.add(trackPanel);
         visualPanel.updateUI();
         this.referenceViewer.increaseTrackCount();
 
@@ -275,7 +282,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
 
     @Override
     public void closeTrackPanel(JPanel trackPanel) {
-        visualPanel.remove(trackPanel);
+        tracksPanel.remove(trackPanel);
         visualPanel.updateUI();
 
         // remove the panel's TrackViewer from lookup

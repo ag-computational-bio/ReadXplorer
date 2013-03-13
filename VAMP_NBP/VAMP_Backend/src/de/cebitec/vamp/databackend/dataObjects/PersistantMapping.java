@@ -166,10 +166,10 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     @Override
     public int compareTo(PersistantMapping o) {
         int ret = 0;
-        if(this.start < o.start){
+        if(this.start < o.getStart()){
             ret = -1;
         }
-        if(this.start > o.start){
+        if(this.start > o.getStop()){
             ret = 1;
         }
         return ret;

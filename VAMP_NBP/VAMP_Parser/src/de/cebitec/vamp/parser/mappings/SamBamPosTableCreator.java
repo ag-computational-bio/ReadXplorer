@@ -129,7 +129,7 @@ public class SamBamPosTableCreator implements Observable {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
-                        //statistics claculations: count no reads and distinct sequences ////////////
+                        //statistics calculations: count no reads and distinct sequences ////////////
                         if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when mapping to diff. pos
                             noReads += readNamesSameSeq.size();
                             if (readsDifferentPos.size() == 1) {
@@ -247,6 +247,7 @@ public class SamBamPosTableCreator implements Observable {
         ParsedMappingContainer statsContainer = new ParsedMappingContainer();
         statsContainer.setMappingInfos(this.mappingInfos);
         track = new ParsedTrack(trackJob, statsContainer, coverageContainer);
+        track.setBatchPos(nextBatch);
         this.notifyObservers(track);
         this.mappingInfos = new HashMap<>();
         this.coverageContainer = new CoverageContainer();

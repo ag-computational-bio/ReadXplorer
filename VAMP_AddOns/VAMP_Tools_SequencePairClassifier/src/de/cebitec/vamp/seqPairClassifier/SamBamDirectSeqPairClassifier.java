@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.samtools.*;
 import org.openide.util.NbBundle;
 
@@ -148,6 +150,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             
         } catch (Exception e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.getMessage()));
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, e.getMessage());
         }
         
         return new ParsedSeqPairContainer();
