@@ -7,12 +7,13 @@ import javax.swing.table.TableCellRenderer;
 
 
 /**
- * @author rhilker
- * 
  * A cell renderer with line wrap.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class LineWrapCellRenderer  extends JTextArea implements TableCellRenderer {
-
+    
+    private static final long serialVersionUID = 1L;
     
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -26,7 +27,8 @@ public class LineWrapCellRenderer  extends JTextArea implements TableCellRendere
 //                int textLength = this.getText().length();
 //                int lines = textLength / this.getColumns() +1;//+1, cause we need at least 1 row. 
                 
-                int height = (fontHeight+2) * splittedText.length;                        
+                int height = (fontHeight+2) * splittedText.length;        
+                height = height < 1 ? 1 : height;
                 table.setRowHeight(row, height);   
                 
                 return this;

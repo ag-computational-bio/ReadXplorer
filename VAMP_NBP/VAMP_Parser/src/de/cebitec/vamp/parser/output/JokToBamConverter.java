@@ -391,4 +391,9 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
     public void update(Object data) {
         this.notifyObservers(data); //until now used to send progress and error data to observers
     }
+    
+    @Override
+    public String toString() {
+        return name;
+    }
 }

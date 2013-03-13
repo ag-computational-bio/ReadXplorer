@@ -11,7 +11,7 @@ import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.reference.BioJavaGffIdParser;
-import de.cebitec.vamp.parser.reference.BioJavaGffParser;
+import de.cebitec.vamp.parser.reference.BioJavaGff3Parser;
 import de.cebitec.vamp.parser.reference.BioJavaParser;
 import de.cebitec.vamp.parser.reference.FastaReferenceParser;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
@@ -46,7 +46,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     private String referenceName = null;
     private String[] refSeqIds;
     private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaParser(BioJavaParser.EMBL), 
-            new BioJavaParser(BioJavaParser.GENBANK), new BioJavaGffParser(), new FastaReferenceParser()};
+            new BioJavaParser(BioJavaParser.GENBANK), new BioJavaGff3Parser(), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
     /** Panel displaying the options for importing new references into VAMP. */
@@ -61,7 +61,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
         if (refSeqFile == null || 
                 nameField.getText().isEmpty() || 
                 descriptionField.getText().isEmpty() || 
-                currentParser instanceof BioJavaGffParser && refFeatureFile == null) {
+                currentParser instanceof BioJavaGff3Parser && refFeatureFile == null) {
             return false;
         }
         else {
@@ -264,7 +264,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 }//GEN-LAST:event_filetypeBoxActionPerformed
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        ReferenceParserI usedParser = currentParser instanceof BioJavaGffParser ? new FastaReferenceParser() : currentParser;
+        ReferenceParserI usedParser = currentParser instanceof BioJavaGff3Parser ? new FastaReferenceParser() : currentParser;
         VampFileChooser fileChooser = new VampFileChooser(usedParser.getFileExtensions(), usedParser.getInputFileDescription()) {
             private static final long serialVersionUID = 1L;
 
@@ -366,7 +366,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
      * Updates all components dependent on the chosen input file type.
      */
     private void updateExtraComponents() {
-        if (currentParser instanceof BioJavaGffParser) {
+        if (currentParser instanceof BioJavaGff3Parser) {
             this.fileGffChooserButton.setVisible(true);
             this.fileGffField.setVisible(true);
             this.fileGffLabel.setVisible(true);

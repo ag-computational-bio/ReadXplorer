@@ -124,6 +124,9 @@ public class AnalysisFilterFeatures implements Observer, AnalysisI<List<Filtered
 
                         //still mappings left, but need next feature
                     } else if (mapping.getStart() > featStop) {
+                        if (fstFittingMapping) { //until now no mapping was found for current feature
+                            lastMappingIdx = j; //even if next feature starts at same start position no mapping will be found until mapping index j 
+                        }
                         break;
                     }
                 }

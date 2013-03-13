@@ -196,6 +196,7 @@ public enum FeatureType {
     public static FeatureType getFeatureType(int type){
         switch (type) { 
             case ANY_INT:           return ANY;
+            case MRNA_INT:          return MRNA;
             case CDS_INT:           return CDS;
             case MISC_RNA_INT:      return MISC_RNA;
             case RRNA_INT:          return RRNA;
