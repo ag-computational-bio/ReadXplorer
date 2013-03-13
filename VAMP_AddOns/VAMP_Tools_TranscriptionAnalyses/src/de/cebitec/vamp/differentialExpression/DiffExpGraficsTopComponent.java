@@ -62,7 +62,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     public DiffExpGraficsTopComponent() {
     }
 
-    public DiffExpGraficsTopComponent(AnalysisHandler handler) {
+    public DiffExpGraficsTopComponent(DeAnalysisHandler handler) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         cbm = new DefaultComboBoxModel(BaySeqAnalysisHandler.Plot.values());
         initComponents();
@@ -99,7 +99,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private void addResults() {
         List<Group> groups = baySeqAnalysisHandler.getGroups();
         groupComboBox.setModel(new DefaultComboBoxModel(groups.toArray()));
-        List<PersistantTrack> tracks = baySeqAnalysisHandler.getSelectedTraks();
+        List<PersistantTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
         for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
             PersistantTrack persistantTrack = it.next();
             samplesA.addElement(persistantTrack);

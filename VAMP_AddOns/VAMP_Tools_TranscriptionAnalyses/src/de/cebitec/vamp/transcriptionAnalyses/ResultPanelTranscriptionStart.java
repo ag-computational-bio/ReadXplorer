@@ -16,6 +16,7 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -291,21 +292,21 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                     detFeatures = tSS.getDetFeatures();
                     feature = detFeatures.getCorrectStartFeature();
                     if (feature != null) {
-                        rowData[7] = PersistantFeature.getFeatureName(feature);
+                        rowData[7] = PersistantFeature.Utils.getFeatureName(feature);
                         ++noCorrectStarts;
                     } else {
                         rowData[7] = "-";
                     }
                     feature = detFeatures.getUpstreamFeature();
                     if (feature != null) {
-                        rowData[8] = PersistantFeature.getFeatureName(feature);
+                        rowData[8] = PersistantFeature.Utils.getFeatureName(feature);
                         ++noUpstreamFeature;
                     } else {
                         rowData[8] = "-";
                     }
                     feature = detFeatures.getDownstreamFeature();
                     if (feature != null) {
-                        rowData[9] = PersistantFeature.getFeatureName(feature);
+                        rowData[9] = PersistantFeature.Utils.getFeatureName(feature);
                         ++noDownstreamFeature;
                     } else {
                         rowData[9] = "-";
@@ -340,6 +341,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                 TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                 tSSTable.setRowSorter(sorter);
                 sorter.setModel(model);
+                TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
 
                 String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
                 parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,

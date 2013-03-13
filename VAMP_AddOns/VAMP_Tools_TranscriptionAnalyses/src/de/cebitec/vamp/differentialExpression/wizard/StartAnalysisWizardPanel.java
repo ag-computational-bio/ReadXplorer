@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
-import java.io.File;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -54,17 +53,10 @@ public class StartAnalysisWizardPanel implements WizardDescriptor.ValidatingPane
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        if (getComponent().isCheckBoxchecked()) {
-            //TODO: Input validation
-            String path = getComponent().getSavePath();
-            File file = new File(path);
-            wiz.putProperty("saveFile", file);
-        }
     }
 
     @Override

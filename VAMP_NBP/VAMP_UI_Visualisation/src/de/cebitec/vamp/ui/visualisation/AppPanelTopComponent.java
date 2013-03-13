@@ -5,6 +5,7 @@ import de.cebitec.vamp.api.cookies.CloseRefGenCookie;
 import de.cebitec.vamp.api.cookies.CloseTrackCookie;
 import de.cebitec.vamp.api.cookies.OpenTrackCookie;
 import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
@@ -23,7 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup;
@@ -396,10 +396,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
         try {
             super.paint(g);
         } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(AppPanelTopComponent.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(AppPanelTopComponent.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            VisualisationUtils.displayOutOfMemoryError(this);
         }
     }
 }

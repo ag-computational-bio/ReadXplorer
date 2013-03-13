@@ -11,7 +11,7 @@ import java.util.Set;
  *
  * @author kstaderm
  */
-public class DeSeqAnalysisData extends AnalysisData{
+public class DeSeqAnalysisData extends DeAnalysisData{
 
     private Map<String, String[]> design;
     private Iterator<String> designIterator;

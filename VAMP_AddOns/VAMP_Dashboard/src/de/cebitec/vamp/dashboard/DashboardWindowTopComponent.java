@@ -10,6 +10,7 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference; 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.vamp.util.VisualisationUtils;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.beans.IntrospectionException;
@@ -97,85 +98,83 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             add(jLabel1, BorderLayout.CENTER);
             this.remove(jPanel1);
             jButton1.setVisible(false);
-        }
-        else {
+        } else {
             jButton1.setVisible(true);
-            final List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
+            try {
+                final Map<PersistantReference, List<PersistantTrack>> genomesandtracks =
+                        ProjectConnector.getInstance().getGenomesAndTracks();
 
-            List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
-            
-            final Map<PersistantReference,List<PersistantTrack>> genomesandtracks = 
-                    ProjectConnector.getInstance().getGenomesAndTracks();
+                Node rootNode = new AbstractNode(new Children.Keys() {
+                    @Override
+                    protected Node[] createNodes(Object t) {
+                        PersistantReference genome = (PersistantReference) t;
+                        try {
+                            List<PersistantTrack> tracks = genomesandtracks.get(genome);
 
-            Node rootNode = new AbstractNode(new Children.Keys() {
-
-                @Override
-                protected Node[] createNodes(Object t) {
-                    PersistantReference genome = (PersistantReference) t;
-                    try { 
-                        List<PersistantTrack> tracks = genomesandtracks.get(genome);
-                        
-                        if (tracks!=null) {
-                            List<Item> trackItems = new ArrayList<Item> ();
-                            for(PersistantTrack track : tracks) {
-                                trackItems.add(new Item(track));
+                            if (tracks != null) {
+                                List<Item> trackItems = new ArrayList<Item>();
+                                for (PersistantTrack track : tracks) {
+                                    trackItems.add(new Item(track));
+                                }
+                                return new Node[]{new ItemNode(new Item(genome), new ItemChildren(trackItems))};
+                            } else {
+                                return new Node[]{new ItemNode(new Item(genome))};
                             }
-                            return new Node[] { new ItemNode(new Item(genome), new ItemChildren(trackItems)) };
+                        } catch (IntrospectionException ex) {
+                            Exceptions.printStackTrace(ex);
+                            return new Node[]{};
                         }
-                        else return new Node[] { new ItemNode(new Item(genome)) };
-                    } catch (IntrospectionException ex) {
-                        Exceptions.printStackTrace(ex);
-                        return new Node[] {};
                     }
-                }
-                
-                protected void addNotify() {
-                    super.addNotify();
-                    this.setKeys(genomesandtracks.keySet());
-                    //this.setKeys(dbGens);
-                }
-                
-            });
-            ov = new OutlineView(); //Set the columns of the outline view,
-            
-            //do not show the default property window
-            //this outlineview is meant to be a readonly list
-            ov.setDefaultActionAllowed(false);
-            //using the name of the property 
-            //followed by the text to be displayed in the column header: 
-            ov.setPropertyColumns( "description", "Description", "timestamp", "Date", "mark", "Mark for action"); 
-            //Hide the root node, since we only care about the children: 
-            ov.getOutline().setRootVisible(false); //Add the OutlineView to the TopComponent: 
-            ov.getOutline().setDefaultRenderer(Node.Property.class,
-                                            new CustomOutlineCellRenderer());
-            
-            //use GroupLayout to show the "open selected" button directly under the outlineview
-            GroupLayout layout = new GroupLayout(this);
-            setLayout(layout);
-            layout.setAutoCreateGaps(true);
-            layout.setAutoCreateContainerGaps(true);
-            layout.setHorizontalGroup(
-                 layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                    .addComponent(ov)
-                    .addComponent(jButton1));
 
-            layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                .addComponent(ov, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                // important: add a gap under the button to get the users 
-                // attention to it, i.e. it is not to far away from the outline view
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
-                     GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    );
-            em.setRootContext(rootNode); //Put the Nodes into the Lookup of the TopComponent, 
-            
-            //expand all nodes
-            for(Node n : em.getRootContext().getChildren().getNodes()) {
-                ov.expandNode(n);
+                    protected void addNotify() {
+                        super.addNotify();
+                        this.setKeys(genomesandtracks.keySet());
+                        //this.setKeys(dbGens);
+                    }
+                });
+                ov = new OutlineView(); //Set the columns of the outline view,
+
+                //do not show the default property window
+                //this outlineview is meant to be a readonly list
+                ov.setDefaultActionAllowed(false);
+                //using the name of the property 
+                //followed by the text to be displayed in the column header: 
+                ov.setPropertyColumns("description", "Description", "timestamp", "Date", "mark", "Mark for action");
+                //Hide the root node, since we only care about the children: 
+                ov.getOutline().setRootVisible(false); //Add the OutlineView to the TopComponent: 
+                ov.getOutline().setDefaultRenderer(Node.Property.class,
+                        new CustomOutlineCellRenderer());
+
+                //use GroupLayout to show the "open selected" button directly under the outlineview
+                GroupLayout layout = new GroupLayout(this);
+                setLayout(layout);
+                layout.setAutoCreateGaps(true);
+                layout.setAutoCreateContainerGaps(true);
+                layout.setHorizontalGroup(
+                        layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(ov)
+                        .addComponent(jButton1));
+
+                layout.setVerticalGroup(
+                        layout.createSequentialGroup()
+                        .addComponent(ov, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        // important: add a gap under the button to get the users 
+                        // attention to it, i.e. it is not to far away from the outline view
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+                em.setRootContext(rootNode); //Put the Nodes into the Lookup of the TopComponent, 
+
+                //expand all nodes
+                for (Node n : em.getRootContext().getChildren().getNodes()) {
+                    ov.expandNode(n);
+                }
+                //or like this for one special node: 
+                //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
+
+            } catch (OutOfMemoryError e) {
+                VisualisationUtils.displayOutOfMemoryError(this);
             }
-            //or like this for one special node: 
-            //ov.expandNode(em.getRootContext().getChildren().getNodeAt(0));
         }
         this.repaint();
     }

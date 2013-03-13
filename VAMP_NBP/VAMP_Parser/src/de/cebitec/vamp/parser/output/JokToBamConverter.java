@@ -27,7 +27,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
     private String refSeqName;
     private Integer refSeqLength;
     
-    private static String name = "Jok to BAM Converter";
+    private static String name = "Jok to BAM";
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
     private static String fileDescription = "Saruman Output (jok)";
     private ArrayList<Observer> observers;
@@ -45,7 +45,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
      * A JokToBamConverter needs exactly the following three parameters:
      * @param jokFile the jok file to convert into BAM format.
      * @param refSeqName name of the reference sequence
-     * @param refSeqLength length of the reference sequence 
+     * @param refSeqLength length of the reference sequence
+     * @throws IllegalArgumentException
      */
     @Override
     public void setDataToConvert(Object... data) throws IllegalArgumentException {
@@ -90,181 +91,170 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
         try {
 
             this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Start", fileName));
+            File outputFile;
+            String outFileName;
+            try (BufferedReader br = new BufferedReader(new FileReader(jokFile))) {
+                outputFile = SamUtils.getFileWithBamExtension(jokFile, "");
+                outFileName = outputFile.getName();
+                BAMFileWriter bamFileWriter = new BAMFileWriter(outputFile);
+                bamFileWriter.setSortOrder(SAMFileHeader.SortOrder.coordinate, false);
+                SAMFileHeader fileHeader = new SAMFileHeader();
+                List<SAMSequenceRecord> samRecords = new ArrayList<>();
+                SAMSequenceRecord seqRecord = new SAMSequenceRecord(refSeqName, refSeqLength);
+                samRecords.add(seqRecord);
+                fileHeader.setTextHeader("@HD VN:1.4 SO:coordinate");
+                fileHeader.setSequenceDictionary(new SAMSequenceDictionary(samRecords));
+                bamFileWriter.setHeader(fileHeader);
+                String[] tokens;
+                int lineno = 0;
+                String line;
+                byte direction;
+                String readSeq;
+                String refSeq;
+                int errors;
+                String readwithoutGaps;
+                String readName;
+                int start;
+                int stop;
+                String cigar;
+                SAMRecord samRecord;
+                while ((line = br.readLine()) != null) {
+                    lineno++;
 
-            BufferedReader br = new BufferedReader(new FileReader(jokFile));
-            String outFileName = jokFile.getAbsolutePath() + "_sort.bam";
-            File outputFile = new File(outFileName);
-            BAMFileWriter bamFileWriter = new BAMFileWriter(outputFile);
-            bamFileWriter.setSortOrder(SAMFileHeader.SortOrder.coordinate, false);
-            
-            //Create the bam file header
-            SAMFileHeader fileHeader = new SAMFileHeader();
-//            fileHeader.addComment("");
-            List<SAMSequenceRecord> samRecords = new ArrayList<>();
-            SAMSequenceRecord seqRecord = new SAMSequenceRecord(refSeqName, refSeqLength);
-            samRecords.add(seqRecord);
-            
-            fileHeader.setTextHeader("@HD VN:1.4 SO:coordinate");
-            fileHeader.setSequenceDictionary(new SAMSequenceDictionary(samRecords));
-            bamFileWriter.setHeader(fileHeader);
-//            BAMIndexer bamIndexer = new BAMIndexer(new File(jokFile.getAbsolutePath() + "_sort.bam.bai"), fileHeader);
-//            SAMFileWriterFactory factory = new SAMFileWriterFactory();
-//            SAMFileWriter samFileWriter = factory.makeSAMWriter(fileHeader, false, new File(outputFile + ".sam"));
-
-            //read the input file
-            String[] tokens;
-            int lineno = 0;
-            String line;
-            byte direction;
-            String readSeq;
-            String refSeq;
-            int errors;
-            String readwithoutGaps;
-            String readName;
-            int start;
-            int stop;
-            String cigar;
-            SAMRecord samRecord;
-            while ((line = br.readLine()) != null) {
-                lineno++;
-
-                // tokenize input line
-                tokens = line.split("\\t+", 8);
-                if (tokens.length == 7) { // if the length is not correct the read is not parsed
-                    // cast tokens
-                    readName = tokens[0];
-                    try {
-                        start = Integer.parseInt(tokens[1]);
-                        stop = Integer.parseInt(tokens[2]);
-                        ++start;
-                        ++stop; // some people (no names here...) start counting at 0, I count genome position starting with 1
-                    } catch (NumberFormatException e) { //
-                        if (!tokens[1].equals("*")) {
-                            this.sendMsg("Value for current start position in "
-                                    + outFileName + " line " + lineno + " is not a number or *. "
-                                    + "Found start: " + tokens[1]);
+                    // tokenize input line
+                    tokens = line.split("\\t+", 8);
+                    if (tokens.length == 7) { // if the length is not correct the read is not parsed
+                        // cast tokens
+                        readName = tokens[0];
+                        try {
+                            start = Integer.parseInt(tokens[1]);
+                            stop = Integer.parseInt(tokens[2]);
+                            ++start;
+                            ++stop; // some people (no names here...) start counting at 0, I count genome position starting with 1
+                        } catch (NumberFormatException e) { //
+                            if (!tokens[1].equals("*")) {
+                                this.sendMsg("Value for current start position in "
+                                        + outFileName + " line " + lineno + " is not a number or *. "
+                                        + "Found start: " + tokens[1]);
+                            }
+                            if (!tokens[2].equals("*")) {
+                                this.sendMsg("Value for current stop position in "
+                                        + outFileName + " line " + lineno + " is not a number or *. "
+                                        + "Found stop: " + tokens[2]);
+                            }
+                            continue; //*'s are ignored = unmapped read
                         }
-                        if (!tokens[2].equals("*")) {
-                            this.sendMsg("Value for current stop position in "
-                                    + outFileName + " line " + lineno + " is not a number or *. "
-                                    + "Found stop: " + tokens[2]);
+
+                        direction = 0;
+                        switch (tokens[3]) {
+                            case ">>": direction = 1; break;
+                            case "<<": direction = -1; break;
                         }
-                        continue; //*'s are ignored = unmapped read
-                    }
+                        readSeq = tokens[4];
+                        refSeq = tokens[5];
+                        try {
+                            errors = Integer.parseInt(tokens[6]);
+                        } catch (NumberFormatException e) {
+                            this.sendMsg("Value for current errors in "
+                                    + outFileName + " line " + lineno + " is not a number. "
+                                    + "Found error: " + tokens[2]);
+                            continue;
+                        }
+                        // check tokens
+                        // report empty mappings saruman should not be producing anymore
+                        if (readName == null || readName.isEmpty()) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorReadname",
+                                    outFileName, lineno, readName));
+                            continue;
+                        }
 
-                    direction = 0;
-                    if (tokens[3].equals(">>")) {
-                        direction = 1;
-                    } else if (tokens[3].equals("<<")) {
-                        direction = -1;
-                    }
-                    readSeq = tokens[4];
-                    refSeq = tokens[5];
-                    try {
-                        errors = Integer.parseInt(tokens[6]);
-                    } catch (NumberFormatException e) {
-                        this.sendMsg("Value for current errors in "
-                                + outFileName + " line " + lineno + " is not a number. "
-                                + "Found error: " + tokens[2]);
-                        continue;
-                    }
-                    // check tokens
-                    // report empty mappings saruman should not be producing anymore
-                    if (readName == null || readName.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorReadname",
-                                outFileName, lineno, readName));
-                        continue;
-                    }
-
-                    if (start >= stop) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorStartStop",
-                                outFileName, lineno, start, stop));
-                        continue;
-                    }
-                    if (direction == 0) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorDirectionJok", outFileName, lineno));
-                        continue;
-                    }
-                    if (readSeq == null || readSeq.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorReadEmpty",
-                                outFileName, lineno, readSeq));
-                        continue;
-                    }
-                    if (refSeq == null || refSeq.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorRef",
-                                outFileName, lineno, refSeq));
-                        continue;
-                    }
-                    if (readSeq.length() != refSeq.length()) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorReadLength",
-                                fileName, lineno, readSeq, refSeq));
-                        continue;
-                    }
-                    if (errors < 0 || errors > readSeq.length()) {
-                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
-                                "Parser.checkMapping.ErrorRead",
-                                errors, outFileName, lineno));
-                        continue;
-                    }
-                    
-                    // parse read        
-                     //generate read without gaps
-                    if (readSeq.contains("_")) {
-                        readwithoutGaps = readSeq.replaceAll("_+", "");
+                        if (start >= stop) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorStartStop",
+                                    outFileName, lineno, start, stop));
+                            continue;
+                        }
+                        if (direction == 0) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorDirectionJok", outFileName, lineno));
+                            continue;
+                        }
+                        if (readSeq == null || readSeq.isEmpty()) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorReadEmpty",
+                                    outFileName, lineno, readSeq));
+                            continue;
+                        }
+                        if (refSeq == null || refSeq.isEmpty()) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorRef",
+                                    outFileName, lineno, refSeq));
+                            continue;
+                        }
+                        if (readSeq.length() != refSeq.length()) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorReadLength",
+                                    fileName, lineno, readSeq, refSeq));
+                            continue;
+                        }
+                        if (errors < 0 || errors > readSeq.length()) {
+                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class,
+                                    "Parser.checkMapping.ErrorRead",
+                                    errors, outFileName, lineno));
+                            continue;
+                        }
+                        
+                        // parse read        
+                         //generate read without gaps
+                        if (readSeq.contains("_")) {
+                            readwithoutGaps = readSeq.replaceAll("_+", "");
+                        } else {
+                            readwithoutGaps = readSeq;
+                        }
+                        //Saruman flips only the read string by mapping so we can get the native read direction
+    //                    readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
+                        
+                        cigar = this.createCigar(readSeq, refSeq);
+                        
+                        
+                        //Calculate flags to set for this read as hexadecimal number
+                        
+                        samRecord = new SAMRecord(fileHeader);
+                        samRecord.setReadName(readName);
+                        
+                        samRecord.setReadNegativeStrandFlag(direction == 1 ? false : true); //needed or set with flags?
+                        samRecord.setReadUnmappedFlag(false); //only mapped reads in jok??
+                        
+                        samRecord.setReferenceName(this.refSeqName);
+                        samRecord.setAlignmentStart(start);
+                        samRecord.setMappingQuality(255); //255 means not available, can it even be retrieved from a jok anyway?
+                        samRecord.setCigarString(cigar); //seq of MID... match, insert, del... generate
+                        samRecord.setMateReferenceName("*"); //* means that no information about pairs is available, see if you can get this for pairs somewhere
+                        samRecord.setMateAlignmentStart(0); //0 means that no information about pairs is available, see if you can get this for pairs somewhere
+                        samRecord.setInferredInsertSize(0); //TLEN is set to 0 for single-segment template                   
+                        samRecord.setReadString(readwithoutGaps);
+                        samRecord.setBaseQualityString("*"); //* means not available, could be retrieved from orig file, but that is expensive
+                        
+    //                    samRecord.setFlags(stop); //other fields which could be set
+    //                    samRecord.setAttribute(tag, value);
+    //                    samRecord.setReferenceIndex(lineno);
+    //                    samRecord.setBaseQualityString(name);
+                        
+                        bamFileWriter.addAlignment(samRecord);
+    //                    samFileWriter.addAlignment(samRecord);
+                        
                     } else {
-                        readwithoutGaps = readSeq;
+                        this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.MissingData", lineno, line));
                     }
-                    //Saruman flips only the read string by mapping so we can get the native read direction
-//                    readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
                     
-                    cigar = this.createCigar(readSeq, refSeq);
-                    
-                    
-                    //Calculate flags to set for this read as hexadecimal number
-                    
-                    samRecord = new SAMRecord(fileHeader);
-                    samRecord.setReadName(readName);
-                    
-                    samRecord.setReadNegativeStrandFlag(direction == 1 ? false : true); //needed or set with flags?
-                    samRecord.setReadUnmappedFlag(false); //only mapped reads in jok??
-                    
-                    samRecord.setReferenceName(this.refSeqName);
-                    samRecord.setAlignmentStart(start);
-                    samRecord.setMappingQuality(255); //255 means not available, can it even be retrieved from a jok anyway?
-                    samRecord.setCigarString(cigar); //seq of MID... match, insert, del... generate
-                    samRecord.setMateReferenceName("*"); //* means that no information about pairs is available, see if you can get this for pairs somewhere
-                    samRecord.setMateAlignmentStart(0); //0 means that no information about pairs is available, see if you can get this for pairs somewhere
-                    samRecord.setInferredInsertSize(0); //TLEN is set to 0 for single-segment template                   
-                    samRecord.setReadString(readwithoutGaps);
-                    samRecord.setBaseQualityString("*"); //* means not available, could be retrieved from orig file, but that is expensive
-                    
-//                    samRecord.setFlags(stop); //other fields which could be set
-//                    samRecord.setAttribute(tag, value);
-//                    samRecord.setReferenceIndex(lineno);
-//                    samRecord.setBaseQualityString(name);
-                    
-                    bamFileWriter.addAlignment(samRecord);
-//                    samFileWriter.addAlignment(samRecord);
-                    
-                } else {
-                    this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.MissingData", lineno, line));
+                    // Reads with an error already skip this part because of "continue" statements
+                    if (++noReads % 1000000 == 0) {
+                        this.notifyObservers(noReads + " reads converted...");
+                    }
                 }
-                
-                // Reads with an error already skip this part because of "continue" statements
-                if (++noReads % 1000000 == 0) {
-                    this.notifyObservers(noReads + " reads converted...");
-                }
+                bamFileWriter.close();
             }
-            
-//            samFileWriter.close();
-            bamFileWriter.close();
-            br.close();
             
             //directly create index for new bam file.
             SAMFileReader samFileReader = new SAMFileReader(outputFile);

@@ -1,17 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.differentialExpression.wizard;
 
-import de.cebitec.vamp.util.fileChooser.VampFileChooser;
-import java.io.File;
 import javax.swing.JPanel;
 
 public final class StartAnalysisVisualPanel extends JPanel {
     private static final long serialVersionUID = 1L;
-    
-    private boolean checkBoxchecked = false;
 
     /**
      * Creates new form StartAnalysisVisualPanel
@@ -19,7 +11,6 @@ public final class StartAnalysisVisualPanel extends JPanel {
     public StartAnalysisVisualPanel(StartAnalysisWizardPanel wizardPanel3) {
         initComponents();
         jScrollPane1.setBorder(null);
-        fileNameField.setText(System.getProperty("user.home")+File.separator+"DiffExpResult.rdata");
     }
     
     @Override
@@ -37,9 +28,6 @@ public final class StartAnalysisVisualPanel extends JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        fileNameField = new javax.swing.JTextField();
-        fileChooserButton = new javax.swing.JButton();
 
         jTextArea1.setEditable(false);
         jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
@@ -49,91 +37,26 @@ public final class StartAnalysisVisualPanel extends JPanel {
         jTextArea1.setText(org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.jTextArea1.text")); // NOI18N
         jScrollPane1.setViewportView(jTextArea1);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.jCheckBox1.text")); // NOI18N
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
-            }
-        });
-
-        fileNameField.setText(org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.fileNameField.text")); // NOI18N
-        fileNameField.setEnabled(false);
-
-        org.openide.awt.Mnemonics.setLocalizedText(fileChooserButton, org.openide.util.NbBundle.getMessage(StartAnalysisVisualPanel.class, "StartAnalysisVisualPanel.fileChooserButton.text")); // NOI18N
-        fileChooserButton.setEnabled(false);
-        fileChooserButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fileChooserButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(fileNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(fileChooserButton))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCheckBox1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(fileNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fileChooserButton))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        VampFileChooser fc = new VampFileChooser(new String[]{"rdata"}, "rdata") {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void save(String fileLocation) {
-                fileNameField.setText(fileLocation);                
-            }
-
-            @Override
-            public void open(String fileLocation) {}
-        };
-        fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
-    }//GEN-LAST:event_fileChooserButtonActionPerformed
-
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        checkBoxchecked = (!checkBoxchecked);
-        fileChooserButton.setEnabled(checkBoxchecked);
-        fileNameField.setEnabled(checkBoxchecked);
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton fileChooserButton;
-    private javax.swing.JTextField fileNameField;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
-
-    public String getSavePath(){
-        return fileNameField.getText();
-    }
-
-    public boolean isCheckBoxchecked() {
-        return checkBoxchecked;
-    }
 }

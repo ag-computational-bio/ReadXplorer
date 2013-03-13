@@ -1,5 +1,8 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.util.FeatureType;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -68,7 +71,13 @@ public class SelectTrackWizardPanel implements WizardDescriptor.ValidatingPanel<
     @Override
     public void validate() throws WizardValidationException {
         if (!getComponent().selectionFinished()) {
-            throw new WizardValidationException(null, "Please select a reference genome and at least two tracks", null);
+            throw new WizardValidationException(null, "Please select a reference genome and at least two tracks.", null);
+        } else {
+            ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(getComponent().getSelectedReferenceGenomeID());
+            if(!referenceConnector.hasFeatures(FeatureType.ANY)){
+            throw new WizardValidationException(null, "The selected reference genome does not contain any annotations.", null);  
+            }
         }
+
     }
 }

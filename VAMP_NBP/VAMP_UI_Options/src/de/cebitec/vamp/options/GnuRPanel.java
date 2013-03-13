@@ -77,7 +77,7 @@ final class GnuRPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     void load() {
-        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, "http://cran.mirrors.hoobly.com/"));
+        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/"));
     }
     
     void store() {

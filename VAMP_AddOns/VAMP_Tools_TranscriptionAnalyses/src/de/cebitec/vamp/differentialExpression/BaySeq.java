@@ -78,7 +78,7 @@ public class BaySeq {
             currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
             gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
-            if (!AnalysisHandler.TESTING_MODE) {
+            if (!DeAnalysisHandler.TESTING_MODE) {
                 int i = 1;
                 StringBuilder concatenate = new StringBuilder("c(");
                 while (bseqData.hasCountData()) {
@@ -94,7 +94,7 @@ public class BaySeq {
                 gnuR.eval("features <- data.frame(inputFeaturesID,inputFeaturesStart,inputFeaturesStop)");
                 gnuR.eval("colnames(features) <- c(\"locus\", \"start\", \"stop\")");
                 gnuR.eval("seglens <- features$stop - features$start + 1");
-                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, feature = features)");
+                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)");
                 gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
                 gnuR.assign("replicates", bseqData.getReplicateStructure());
                 gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
@@ -138,10 +138,12 @@ public class BaySeq {
             }
         }
         //We don't know what errors Gnu R might cause, so we have to catch all.
-        //The new generated exception can than be caught an handelt by the AnalysisHandler
+        //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch (Exception e) {
             throw new UnknownGnuRException(e);
         }
+        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp);
         return results;
     }
 

@@ -22,7 +22,8 @@ import org.openide.util.NbBundle;
 
 /**
  * Sam/Bam parser for the data needed for a direct file access track. This means
- * the classification of the reads has to be carried out.
+ * the classification of the reads has to be carried out. The sam/bam file has
+ * to be sorted by readname for this classification.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -47,7 +48,8 @@ public class SamBamDirectParser implements MappingParserI {
     /**
      * Parser for parsing sam and bam data files for direct access in vamp. 
      * Use this constructor for parsing sequence pair data along with the 
-     * ordinary track data.
+     * ordinary track data. The sam/bam file has to be sorted by readname for this
+     * classification.
      * @param seqPairProcessor the specific sequence pair processor for handling
      *      sequence pair data
      */
@@ -73,12 +75,13 @@ public class SamBamDirectParser implements MappingParserI {
     }
 
     /**
-     * Parses the input determined by the track job.
+     * Parses the input determined by the track job. The sam/bam file has
+     * to be sorted by readname for this classification.
      * @param trackJob the track job to parse
      * @param refSeqWhole the reference sequence
      * @return a direct access data container constisting of:
      * a classification map: The key is the readname and each name
-     * links to a pair consisting of the number of occurences of the read name
+     * links to a pair consisting of the number of occurrences of the read name
      * in the dataset (no mappings) and the lowest diff rate among all hits.
      * Remember that replicates are not needed, they can be deduced from the 
      * reads querried from an interval!
@@ -89,6 +92,7 @@ public class SamBamDirectParser implements MappingParserI {
     public DirectAccessDataContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
 
         String fileName = trackJob.getFile().getName();
+        String refName = trackJob.getRefGen().getName();
         long startTime = System.currentTimeMillis();
         this.notifyObservers(NbBundle.getMessage(JokParser.class, "Parser.Parsing.Start", fileName));
 
@@ -126,7 +130,7 @@ public class SamBamDirectParser implements MappingParserI {
                     ++lineno;
 
                     record = samItor.next();
-                    if (!record.getReadUnmappedFlag()) {
+                    if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
 
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
@@ -172,7 +176,7 @@ public class SamBamDirectParser implements MappingParserI {
 
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
 
-                    } else {
+                    } else { // else read is unmapped or belongs to another reference
                         if (errorLimit.allowOutput()) {
                             this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                                 "Parser.Parsing.CorruptData", lineno, record.getReadName()));
@@ -180,9 +184,11 @@ public class SamBamDirectParser implements MappingParserI {
                     }
                 } catch (SAMFormatException e) {
                     if (errorLimit.allowOutput()) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                            "Parser.Parsing.CorruptData", lineno, e.toString()));
-                    }
+                        if (!e.getMessage().contains("MAPQ should be 0")) {
+                            this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                                "Parser.Parsing.CorruptData", lineno, e.toString()));
+                        }
+                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 }
                 
 

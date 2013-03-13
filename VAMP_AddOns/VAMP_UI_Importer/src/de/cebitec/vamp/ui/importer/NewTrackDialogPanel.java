@@ -6,15 +6,11 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.api.objects.NewJobDialogI;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.mappings.*;
 import java.awt.Component;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,14 +19,13 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
-import org.openide.util.NbBundle;
 
 /**
  * Panel displaying the options for importing new tracks into VAMP.
  *
- * @author jwinneba
+ * @author jwinneba, rhilker
  */
-public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDialogI {
+public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
     private File mappingFile;
@@ -154,58 +149,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
      *      have to be available for the import of new tracks too.
      */
     public void setReferenceJobs(List<ReferenceJob> jobs) {
-        List<ReferenceJob> list = new ArrayList<>();
-
-        try {
-            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-                PersistantReference r = it.next();
-                list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
-            }
-        } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
-
-        list.addAll(jobs);
-
-        ReferenceJob[] gens = new ReferenceJob[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            gens[i] = list.get(i);
-        }
-
-        refGenBox.setModel(new DefaultComboBoxModel<>(gens));
-    }
-
-    /**
-     * @return all reference genomes which are stored in the db until now.
-     */
-    private ReferenceJob[] getRefGenJobs() {
-        List<ReferenceJob> list = new ArrayList<>();
-        
-        try {
-            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-                PersistantReference r = it.next();
-                list.add(new ReferenceJob(r.getId(), null, null, r.getDescription(), r.getName(), r.getTimeStamp()));
-            }
-        } catch (OutOfMemoryError e) {
-            String msg = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Message",
-                    "An out of memory error occured during fetching the references. Please restart the software with more memory.");
-            String title = NbBundle.getMessage(NewPositionTableDialog.class, "OOM_Header", "Restart Software");
-            JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
-//
-//        ReferenceJob[] gens = new ReferenceJob[list.size()];
-//        for (int i = 0; i < list.size(); i++) {
-//            gens[i] = list.get(i);
-//        }
-        ReferenceJob[] gens = new ReferenceJob[1];
-        gens = list.toArray(gens);
-
-        return gens;
+        refGenBox.setModel(new DefaultComboBoxModel<>(this.getReferenceJobs(jobs)));
     }
 
     /** This method is called from within the constructor to
@@ -229,7 +173,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         stepSizeLabel = new javax.swing.JLabel();
         stepSizeSpinner = new javax.swing.JSpinner();
         fileSorted = new javax.swing.JCheckBox();
-        importTypeCombo = new javax.swing.JComboBox();
+        importTypeCombo = new javax.swing.JComboBox<>();
         importTypeLabel = new javax.swing.JLabel();
         alreadyImportedBox = new javax.swing.JCheckBox();
 
@@ -272,8 +216,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
         fileSorted.setSelected(true);
         fileSorted.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.fileSorted.text")); // NOI18N
 
-        importTypeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Database", "Direct File Access" }));
-        importTypeCombo.setSelectedIndex(1);
+        importTypeCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Direct File Access", "Database" }));
         importTypeCombo.setRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
@@ -403,7 +346,7 @@ public class NewTrackDialogPanel extends javax.swing.JPanel implements NewJobDia
     private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
         //identification of import method by index
         int selIndex = this.importTypeCombo.getSelectedIndex();
-        this.useDB = selIndex == 0;
+        this.useDB = selIndex == 1;
 
         this.mappingTypeCombo.removeAllItems();
         if (!this.useDB) {

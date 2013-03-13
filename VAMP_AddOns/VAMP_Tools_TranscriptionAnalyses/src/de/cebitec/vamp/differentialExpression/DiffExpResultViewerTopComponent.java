@@ -1,15 +1,12 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.differentialExpression.AnalysisHandler.AnalysisStatus;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -21,10 +18,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -51,25 +49,27 @@ preferredID = "DiffExpResultViewerTopComponent")
 })
 public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
 
+    private static final long serialVersionUID = 1L;
     private TableModel tm;
-    private ComboBoxModel cbm;
+    private ComboBoxModel<Object> cbm;
     private ArrayList<TableModel> tableModels = new ArrayList<>();
     private TopComponent GraficsTopComponent;
-    private AnalysisHandler analysisHandler;
-    private AnalysisHandler.Tool usedTool;
-    private boolean moreThanTwoCondsForDeSeq = false;
+    private TopComponent LogTopComponent;
+    private DeAnalysisHandler analysisHandler;
+    private DeAnalysisHandler.Tool usedTool;
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Expression Analysis");
 
     public DiffExpResultViewerTopComponent() {
     }
 
-    public DiffExpResultViewerTopComponent(AnalysisHandler handler, AnalysisHandler.Tool usedTool) {
+    public DiffExpResultViewerTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool usedTool) {
 //        BoundsInfoManager man = getLookup().lookupAll(ViewController.class).iterator().next().getBoundsManager();
         Lookup look = getLookup();
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
         tm = new DefaultTableModel();
-        cbm = new DefaultComboBoxModel();
+        cbm = new DefaultComboBoxModel<>();
 
         initComponents();
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
@@ -112,30 +112,26 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void addResults() {
-        List<AnalysisHandler.Result> results = analysisHandler.getResults();
+        List<DeAnalysisHandler.Result> results = analysisHandler.getResults();
         List<String> descriptions = new ArrayList<>();
-        for (Iterator<AnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
-            AnalysisHandler.Result currentResult = it.next();
-            Vector colNames = currentResult.getColnames();
+        for (Iterator<DeAnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
+            DeAnalysisHandler.Result currentResult = it.next();
+            Vector colNames = new Vector(currentResult.getColnames());
             colNames.add(0, " ");
             TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
         }
 
-        resultComboBox.setModel(new DefaultComboBoxModel(descriptions.toArray()));
+        resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
         topCountsTable.setModel(tableModels.get(0));
 
         createGraphicsButton.setEnabled(true);
         saveTableButton.setEnabled(true);
+        showLogButton.setEnabled(true);
         resultComboBox.setEnabled(true);
         topCountsTable.setEnabled(true);
         jLabel1.setEnabled(true);
-        jLabel2.setEnabled(false);
-        jProgressBar1.setIndeterminate(false);
-        jProgressBar1.setValue(100);
-        jProgressBar1.setEnabled(false);
-
     }
 
     /**
@@ -147,13 +143,12 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        resultComboBox = new javax.swing.JComboBox();
+        resultComboBox = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         topCountsTable = new javax.swing.JTable();
-        jProgressBar1 = new javax.swing.JProgressBar();
-        jLabel2 = new javax.swing.JLabel();
         createGraphicsButton = new javax.swing.JButton();
         saveTableButton = new javax.swing.JButton();
+        showLogButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.jLabel1.text")); // NOI18N
         jLabel1.setEnabled(false);
@@ -166,8 +161,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         topCountsTable.setModel(tm);
         topCountsTable.setEnabled(false);
         jScrollPane1.setViewportView(topCountsTable);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.jLabel2.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(createGraphicsButton, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.createGraphicsButton.text")); // NOI18N
         createGraphicsButton.setEnabled(false);
@@ -182,6 +175,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         saveTableButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveTableButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(showLogButton, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.showLogButton.text")); // NOI18N
+        showLogButton.setEnabled(false);
+        showLogButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showLogButtonActionPerformed(evt);
             }
         });
 
@@ -201,9 +202,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                         .addGap(18, 18, 18)
                         .addComponent(createGraphicsButton)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(showLogButton))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 961, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -211,14 +210,12 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(resultComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2)
-                        .addComponent(createGraphicsButton)
-                        .addComponent(saveTableButton)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(resultComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(createGraphicsButton)
+                    .addComponent(saveTableButton)
+                    .addComponent(showLogButton))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
                 .addContainerGap())
@@ -230,6 +227,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             case DeSeq:
                 GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
                         ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq(), usedTool);
+                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
                 break;
@@ -241,6 +239,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 break;
             case SimpleTest:
                 GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
+                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
                 break;
@@ -250,6 +249,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
         VampFileChooser fc = new VampFileChooser(new String[]{"csv"}, "csv") {
             private static final long serialVersionUID = 1L;
+
             @Override
             public void save(String fileLocation) {
                 analysisHandler.saveResultsAsCSV(resultComboBox.getSelectedIndex(), fileLocation);
@@ -261,14 +261,21 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         };
         fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_saveTableButtonActionPerformed
+
+    private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed
+        LogTopComponent = new DiffExpLogTopComponent(analysisHandler);
+        analysisHandler.registerObserver((DiffExpLogTopComponent) LogTopComponent);
+        LogTopComponent.open();
+        LogTopComponent.requestActive();
+    }//GEN-LAST:event_showLogButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createGraphicsButton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox resultComboBox;
+    private javax.swing.JComboBox<Object> resultComboBox;
     private javax.swing.JButton saveTableButton;
+    private javax.swing.JButton showLogButton;
     private javax.swing.JTable topCountsTable;
     // End of variables declaration//GEN-END:variables
 
@@ -304,12 +311,17 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 public void run() {
                     switch (status) {
                         case RUNNING:
-                            jProgressBar1.setIndeterminate(true);
+                            progressHandle.start();
+                            progressHandle.switchToIndeterminate();
                             break;
                         case FINISHED:
                             addResults();
+                            progressHandle.switchToDeterminate(100);
+                            progressHandle.finish();
                             break;
                         case ERROR:
+                            progressHandle.switchToDeterminate(0);
+                            progressHandle.finish();
                             cmp.close();
                             break;
                     }

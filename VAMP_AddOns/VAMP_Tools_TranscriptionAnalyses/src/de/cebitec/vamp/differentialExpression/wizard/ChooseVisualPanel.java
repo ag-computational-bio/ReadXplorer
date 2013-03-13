@@ -1,14 +1,14 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
-import de.cebitec.vamp.differentialExpression.AnalysisHandler;
-import de.cebitec.vamp.differentialExpression.AnalysisHandler.Tool;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
 public final class ChooseVisualPanel extends JPanel {
     
-    private ComboBoxModel cbm = new DefaultComboBoxModel(AnalysisHandler.Tool.values());
+    private ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.values());
 
     /**
      * Creates new form ChooseVisualPanel
@@ -17,7 +17,7 @@ public final class ChooseVisualPanel extends JPanel {
         initComponents();       
     }
     
-    public AnalysisHandler.Tool getSelectedTool(){
+    public DeAnalysisHandler.Tool getSelectedTool(){
         return (Tool) cbm.getSelectedItem();
     }
 

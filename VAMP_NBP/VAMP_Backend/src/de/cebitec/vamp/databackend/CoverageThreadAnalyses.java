@@ -234,7 +234,6 @@ public class CoverageThreadAnalyses extends RequestThread {
                     cov.setCommonRevMultTrack2(pos, rs2.getInt(FieldNames.COVERAGE_N_RV_MULT));
 
                 }
-                fetch2.close();
                 rs2.close();
             } catch (SQLException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
@@ -273,7 +272,6 @@ public class CoverageThreadAnalyses extends RequestThread {
                     cov.setCommonFwdMultTrack1(pos, nFwMultTrack1);
                     cov.setCommonRevMultTrack1(pos, nRvMultTrack1);
                 }
-                fetch.close();
                 rs.close();
 
             } catch (SQLException ex) {

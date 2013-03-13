@@ -86,7 +86,7 @@ public class GnuR extends Rengine {
     }
 
     private void setDefaultCranMirror() {
-        cranMirror = NbPreferences.forModule(Object.class).get(Properties.CRAN_MIRROR, "http://cran.mirrors.hoobly.com/");
+        cranMirror = NbPreferences.forModule(Object.class).get(Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/");
         this.eval("{r <- getOption(\"repos\"); r[\"CRAN\"] <- \"" + cranMirror + "\"; options(repos=r)}");
     }
 
@@ -132,7 +132,7 @@ public class GnuR extends Rengine {
 
         @Override
         public void rWriteConsole(Rengine rngn, String string, int i) {
-            System.out.println(string);
+            ProcessingLog.getInstance().logGNURoutput(string);
         }
 
         @Override

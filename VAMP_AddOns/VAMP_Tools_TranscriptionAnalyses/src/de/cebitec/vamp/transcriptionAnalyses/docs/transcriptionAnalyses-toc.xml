@@ -7,5 +7,6 @@ and open the template in the editor.
 <toc version="2.0">
     <tocitem text="Transcription Analyses">
         <tocitem text="About Transcription Analyses" target="de.cebitec.vamp.transcriptionAnalyses.about"/>
+        <tocitem text="About Differential Expression Analyses" target="de.cebitec.vamp.differentialExpression.about"/>
     </tocitem>
 </toc>

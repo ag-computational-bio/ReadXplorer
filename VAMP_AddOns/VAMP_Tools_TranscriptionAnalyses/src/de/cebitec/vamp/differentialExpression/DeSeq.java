@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
@@ -54,7 +53,7 @@ public class DeSeq {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load plotting functions. You woun't be able to plot your results!", currentTimestamp);
             }
 
-            if (!AnalysisHandler.TESTING_MODE) {
+            if (!DeAnalysisHandler.TESTING_MODE) {
                 //Handing over the count data to Gnu R.
                 int i = 1;
                 StringBuilder concatenate = new StringBuilder("c(");
@@ -67,17 +66,8 @@ public class DeSeq {
                 concatenate.append(")");
                 //Then the big count data matrix is created out of the single track data handed over.
                 gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
-                //The colum names are created...
-                concatenate = new StringBuilder("c(");
-                List<PersistantTrack> tracks = analysisData.getSelectedTraks();
-                for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-                    PersistantTrack persistantTrack = it.next();
-                    concatenate.append("\"").append(persistantTrack.getDescription()).append("\",");
-                }
-                concatenate.deleteCharAt(concatenate.length() - 1);
-                concatenate.append(")");
-                //...handed over to Gnu R...
-                gnuR.eval("columNames <- " + concatenate.toString());
+                //The colum names are handed over to Gnu R...
+                gnuR.assign("columNames", analysisData.getTrackDescriptions());
                 //...and assigned to the count data matrix.
                 gnuR.eval("colnames(inputData) <- columNames");
                 //Now we need to name the rows. First hand over the row names to Gnu R...
@@ -231,10 +221,12 @@ public class DeSeq {
                 gnuR.eval("save.image(\"" + path + "\")");
             }
         } //We don't know what errors Gnu R might cause, so we have to catch all.
-        //The new generated exception can than be caught an handelt by the AnalysisHandler
+        //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch (Exception e) {
             throw new UnknownGnuRException(e);
         }
+        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R finished processing data.", currentTimestamp);
         return results;
     }
 

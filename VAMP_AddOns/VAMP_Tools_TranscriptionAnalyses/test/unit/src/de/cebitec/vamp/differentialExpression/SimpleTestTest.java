@@ -41,7 +41,7 @@ public class SimpleTestTest {
 
     @BeforeClass
     public static void setUpClass() {
-        AnalysisHandler.TESTING_MODE = false;
+        DeAnalysisHandler.TESTING_MODE = false;
         FileReader fr = null;
         tracks = new ArrayList<>();
         loci = new ArrayList<>();

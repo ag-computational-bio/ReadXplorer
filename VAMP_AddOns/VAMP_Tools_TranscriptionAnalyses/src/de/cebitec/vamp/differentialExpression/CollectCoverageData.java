@@ -1,13 +1,9 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.IntervalRequest;
-import de.cebitec.vamp.databackend.MappingThreadAnalyses;
-import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.Observer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,91 +14,63 @@ import java.util.Map;
  *
  * @author kstaderm
  */
-public class CollectCoverageData implements ThreadListener {
+public class CollectCoverageData implements Observer {
 
-    /**
-     * The ID of the track the coverage data should be collected for.
-     */
-    private PersistantTrack track;
     /**
      * The whole sete of features for the current genome.
      */
     private List<PersistantFeature> genomeFeatures;
     /**
      * The storage holding the collected coverage data, also named count data.
-     * The Key value of this HashMap is the ID of the feature. The value
-     * value represents the corresponding number of counted coverage data.
+     * The Key value of this HashMap is the ID of the feature. The value value
+     * represents the corresponding number of counted coverage data.
      */
     private Map<Integer, Integer> countData = new HashMap<>();
     /**
-     * The whole mappings for the track with the given track ID.
+     * Adjusts how many bases downstream from the start position of an feature a
+     * mapping should still be considered a hit. The feature in the database are
+     * manly CDS positions. So it is normal that a lot of mappings will start in
+     * an are downstream of the start position of the feature.
      */
-    private List<PersistantMapping> mappings = null;
-    /**
-     * Adjusts how many bases downstream from the start position of an
-     * feature a mapping should still be considered a hit. The feature in
-     * the database are manly CDS positions. So it is normal that a lot of
-     * mappings will start in an are downstream of the start position of the
-     * feature.
-     */
-    private final static int STARTOFFSET = 30;
+    private int startOffset;
+    private int stopOffset;
 
     /**
      * Constructor of the class.
      *
      * @param trackID The ID of the track the instance of this class should
      * collect the coverage data for
-     * @param perfAnalysis Instance of the calling instance of AnalysisHandler.
+     * @param perfAnalysis Instance of the calling instance of
+     * DeAnalysisHandler.
      */
-    public CollectCoverageData(PersistantTrack track, AnalysisHandler perfAnalysis) {
-        this.genomeFeatures = perfAnalysis.getPersAnno();
-        this.track = track;
+    public CollectCoverageData(List<PersistantFeature> genomeFeatures, int startOffset, int stopOffset) {
+        this.genomeFeatures = genomeFeatures;
+        this.startOffset = startOffset;
+        this.stopOffset = stopOffset;
     }
 
     /**
-     * Starts collecting the coverage Data.
-     *
-     * @return a Map containig the coverage data for the track provided to the
-     * instance of this class at creation time.
-     */
-    public Map<Integer, Integer> startCollecting() {
-        MappingThreadAnalyses analyses = new MappingThreadAnalyses(track);
-        analyses.start();
-        analyses.addRequest(new IntervalRequest(0, 0, this, Properties.REDUCED_MAPPINGS));
-        //TODO:Remove this ugly hot fix and use recalls instead.
-        while(mappings==null){
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ex) {
-            }
-        }
-        Collections.sort(mappings);
-        updateReadCountForFeatures(mappings);
-        return countData;
-    }
-
-    /**
-     * Updates the read count for the features with the given mappings. This
-     * only works if the list of mappings and the list of features are sorted
-     * according to the start position.
+     * Updates the read count for the features with the given mappings.
      *
      * @param mappings the mappings
      */
     private void updateReadCountForFeatures(List<PersistantMapping> mappings) {
+        Collections.sort(mappings);
         int lastMappingIdx = 0;
         PersistantFeature feature;
         boolean fstFittingMapping;
 
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
-            int featStart = feature.getStart() - STARTOFFSET;
-            int featStop = feature.getStop();
+            int featStart = feature.getStart() - startOffset;
+            int featStop = feature.getStop() + stopOffset;
             int key = feature.getId();
             fstFittingMapping = true;
             //If no matching mapping is found, we still need to know that by
             //writing down a count of zero for this feature.
-            countData.put(key, 0);
-
+            if (!countData.containsKey(key)) {
+                countData.put(key, 0);
+            }
             for (int j = lastMappingIdx; j < mappings.size(); ++j) {
                 PersistantMapping mapping = mappings.get(j);
 
@@ -126,13 +94,14 @@ public class CollectCoverageData implements ThreadListener {
     }
 
     @Override
-    public void receiveData(Object data) {
-        MappingResultPersistant results = (MappingResultPersistant) data;
-        mappings = results.getMappings();
+    public void update(Object args) {
+        if (args instanceof MappingResultPersistant) {
+            MappingResultPersistant results = (MappingResultPersistant) args;
+            updateReadCountForFeatures(results.getMappings());
+        }
     }
 
-    @Override
-    public void notifySkipped() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Map<Integer, Integer> getCountData() {
+        return countData;
     }
 }

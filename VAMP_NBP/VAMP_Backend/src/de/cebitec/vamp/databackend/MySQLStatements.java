@@ -78,10 +78,11 @@ public class MySQLStatements {
 
     
        public final static String SETUP_FEATURES =
-            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_FEATURES+" " +
-            "(" +
+            "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_FEATURES +
+            " (" +
             FieldNames.FEATURE_ID+" BIGINT PRIMARY KEY, " +
             FieldNames.FEATURE_REFGEN_ID+" BIGINT UNSIGNED NOT NULL, "+
+            FieldNames.FEATURE_PARENT_IDS + " VARCHAR (1000) NOT NULL, " +
             FieldNames.FEATURE_TYPE+" TINYINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_START+" BIGINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_STOP+" BIGINT UNSIGNED NOT NULL, " +
@@ -91,19 +92,6 @@ public class MySQLStatements {
             FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
             FieldNames.FEATURE_GENE+" VARCHAR (20), " +
             "INDEX ("+FieldNames.FEATURE_REFGEN_ID+") " +
-            ") ";
-       
-       public static final String SETUP_SUBFEATURES =
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_SUBFEATURES
-            + " ("
-                + FieldNames.SUBFEATURE_PARENT_ID + " BIGINT NOT NULL, "
-                + FieldNames.SUBFEATURE_REFERENCE_ID + " BIGINT NOT NULL, "
-                + FieldNames.SUBFEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
-                + FieldNames.SUBFEATURE_START + " BIGINT UNSIGNED NOT NULL, "
-                + FieldNames.SUBFEATURE_STOP + " BIGINT UNSIGNED NOT NULL, "
-                + FieldNames.FEATURE_GENE + " VARCHAR (30), " +
-                "INDEX ("+  FieldNames.SUBFEATURE_PARENT_ID + "), " + 
-                "INDEX ("+  FieldNames.SUBFEATURE_REFERENCE_ID +") " +
             ") ";
 
     
@@ -275,8 +263,7 @@ public class MySQLStatements {
     public final static String LOCK_TABLE_REFERENCE_DOMAIN =
             "LOCK TABLE " +
             FieldNames.TABLE_REFERENCE+ " WRITE, " +
-            FieldNames.TABLE_FEATURES+ " WRITE," +
-            FieldNames.TABLE_SUBFEATURES + " WRITE ";
+            FieldNames.TABLE_FEATURES+ " WRITE,";
 
     
     public final static String LOCK_TABLE_TRACK_DOMAIN =
@@ -299,7 +286,6 @@ public class MySQLStatements {
             "LOCK TABLE "
             + FieldNames.TABLE_REFERENCE+ " WRITE, " 
             + FieldNames.TABLE_FEATURES+ " WRITE,"
-            + FieldNames.TABLE_SUBFEATURES + " WRITE, "
             + FieldNames.TABLE_COVERAGE + " WRITE, "
             + FieldNames.TABLE_TRACK + " WRITE, "
             + FieldNames.TABLE_MAPPING + " WRITE, "

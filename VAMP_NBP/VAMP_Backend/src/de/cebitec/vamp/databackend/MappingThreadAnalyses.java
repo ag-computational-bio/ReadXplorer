@@ -38,12 +38,13 @@ public class MappingThreadAnalyses extends MappingThread {
                     this.currentMappings = this.loadMappingsWithoutDiffs(request);
                 } else {
                     if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
-                        this.currentMappings = this.loadAllReducedMappings();
+                        this.currentMappings = this.loadReducedMappings(request);
                     } else {
                         this.currentMappings = this.loadMappingsById(request);
                     }
                 }
                 request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                currentMappings = null;
 
             } else {
                 try {

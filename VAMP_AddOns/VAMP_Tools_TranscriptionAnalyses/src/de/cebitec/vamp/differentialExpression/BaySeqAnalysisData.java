@@ -6,7 +6,7 @@ import java.util.List;
  *
  * @author kstaderm
  */
-public class BaySeqAnalysisData extends AnalysisData {
+public class BaySeqAnalysisData extends DeAnalysisData {
 
     /**
      * The groups which should be taken into account by the analysis step.

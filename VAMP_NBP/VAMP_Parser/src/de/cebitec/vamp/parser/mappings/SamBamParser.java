@@ -55,6 +55,7 @@ public class SamBamParser implements MappingParserI {
         this.seqToIDMap = new HashMap<>();
         this.readnames = new ArrayList<>();
         int lineno = 0;
+        String refName = trackJob.getRefGen().getName();
         String filepath = trackJob.getFile().getAbsolutePath();
         String readname;
         String refSeq;
@@ -94,7 +95,7 @@ public class SamBamParser implements MappingParserI {
             try {
                 record = itor.next();
                 start = record.getAlignmentStart();
-                if (!record.getReadUnmappedFlag()) {
+                if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
 
                     isReverseStrand = record.getReadNegativeStrandFlag();
                     direction = isReverseStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
@@ -154,17 +155,20 @@ public class SamBamParser implements MappingParserI {
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
                     this.seqPairProcessor.processReadname(seqID, readname);
-                } else {
+                } else { // read is unmapped or belongs to another reference
                     ++counterUnmapped;
                 }
             } catch (MissingResourceException | ParsingException e) {
                 this.sendMsg(e.getMessage());
             } catch (SAMFormatException e) {
                 //skip error messages, if too many occur to prevent bug in the output panel
-                if (errorLimit.allowOutput()) {
-                    this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
-                        "Parser.Parsing.CorruptData", lineno, e.toString()));
-                }
+                if (!e.getMessage().contains("MAPQ should be 0")) {
+                    if (errorLimit.allowOutput()) {
+                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                            "Parser.Parsing.CorruptData", lineno, e.toString()));
+                    }
+                } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+
             }
             
         }

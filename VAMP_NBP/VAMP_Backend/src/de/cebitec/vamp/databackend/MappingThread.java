@@ -89,8 +89,7 @@ public class MappingThread extends RequestThread {
         int to = request.getTo();
 
         if (this.isDbUsed) {
-            try {
-                PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_WITHOUT_DIFFS);
+            try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_WITHOUT_DIFFS)) {
                 fetch.setLong(1, from);
                 fetch.setLong(2, to);
                 fetch.setLong(3, trackId);
@@ -119,7 +118,6 @@ public class MappingThread extends RequestThread {
 
                 }
                 rs.close();
-                fetch.close();
 
             } catch (SQLException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
@@ -151,7 +149,7 @@ public class MappingThread extends RequestThread {
 
         if (from < to && from > 0 && to > 0) {
             if (this.isDbUsed) {
-                try {
+                try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK)) {
 
                     //determine readlength
                     //TODO: ensure this is only calculated when track id or db changed!
@@ -170,7 +168,7 @@ public class MappingThread extends RequestThread {
 
 
                     //mapping processing
-                    PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK);
+                    
                     fetch.setLong(1, from - FIXED_INTERVAL_LENGTH);
                     fetch.setLong(2, to);
                     fetch.setLong(3, from);
@@ -188,11 +186,11 @@ public class MappingThread extends RequestThread {
                         int start = rs.getInt(FieldNames.MAPPING_START);
                         int stop = rs.getInt(FieldNames.MAPPING_STOP);
                         byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                        boolean isForwardStrand = (direction == 1 ? true : false);
+                        boolean isForwardStrand = (direction == SequenceUtils.STRAND_FWD);
                         int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
                         int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                         int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                        boolean isBestMapping = (bestMapping == 1 ? true : false);
+                        boolean isBestMapping = (bestMapping == 1);
                         PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, isForwardStrand, count, errors, sequenceID, isBestMapping);
 
                         // add new mapping if not exists
@@ -220,8 +218,8 @@ public class MappingThread extends RequestThread {
                             }
                         }
                     }
+                    rs.close();
 
-                    fetch.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex.getStackTrace());
                 }
@@ -256,8 +254,7 @@ public class MappingThread extends RequestThread {
         int from = request.getFrom();
         int to = request.getTo();
 
-        try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_BY_ID_WITHOUT_DIFFS);
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_BY_ID_WITHOUT_DIFFS)) {
             fetch.setLong(1, from);
             fetch.setLong(2, to);
 
@@ -285,7 +282,6 @@ public class MappingThread extends RequestThread {
 
             }
             rs.close();
-            fetch.close();
 
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
@@ -304,7 +300,7 @@ public class MappingThread extends RequestThread {
      * @param trackID the ID of the track the received mappings should be from
      * @return list of mappings
      */
-    public List<PersistantMapping> loadAllReducedMappings() {
+    public List<PersistantMapping> loadReducedMappings(IntervalRequest request) {
 
         Connection connection = ProjectConnector.getInstance().getConnection();
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -312,9 +308,10 @@ public class MappingThread extends RequestThread {
 
         List<PersistantMapping> mappings = new ArrayList<>();
         if (this.isDbUsed) {
-            try {
-                PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_MAPPINGS_BY_TRACK_ID);
+            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_REDUCED_MAPPINGS_BY_TRACK_ID_AND_INTERVAL)) {
                 fetch.setLong(1, trackId);
+                fetch.setLong(2, request.getFrom());
+                fetch.setLong(3, request.getTo());
 
                 ResultSet rs = fetch.executeQuery();
                 while (rs.next()) {
@@ -327,13 +324,12 @@ public class MappingThread extends RequestThread {
                     mappings.add(mapping);
                 }
                 rs.close();
-                fetch.close();
 
             } catch (SQLException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             }
         } else { //handle retrieving of data from other source than a DB
-            mappings = new ArrayList<>(externalDataReader.getAllReducedMappingsFromBam(this.refGenome));
+            mappings = new ArrayList<>(externalDataReader.getReducedMappingsFromBam(this.refGenome,request.getFrom(),request.getTo()));
         }
         currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);

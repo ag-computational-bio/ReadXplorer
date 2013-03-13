@@ -1,8 +1,8 @@
 package de.cebitec.vamp.view.dataVisualisation.referenceViewer;
 
-import de.cebitec.vamp.api.objects.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,7 +43,8 @@ public class JFeature extends JComponent {
     private short border;
 
     /**
-     * A component for displaying an feature.
+     * Contains the content of a feature and takes care of the painting process.
+     * Also contains its popup menu.
      * @param feature the feature to display
      * @param length length of the feature on the screen
      * @param refViewer the reference viewer on which the feature is displayed
@@ -68,7 +69,7 @@ public class JFeature extends JComponent {
     }
 
     private String createToolTipText() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(100);
         sb.append("<html>");
         sb.append("<table>");
 
@@ -108,7 +109,7 @@ public class JFeature extends JComponent {
 
         // draw the rectangle
         g.setColor(color);
-        if (feature.getSubFeatures().isEmpty()){
+        if (feature.getNodeChildren().isEmpty()) {
             g.fillRect(0, 0, this.getSize().width, this.height);
             g.setColor(ColorProperties.EXON_BORDER);
             g.drawRect(0, 0, this.getSize().width-1, this.height-1);

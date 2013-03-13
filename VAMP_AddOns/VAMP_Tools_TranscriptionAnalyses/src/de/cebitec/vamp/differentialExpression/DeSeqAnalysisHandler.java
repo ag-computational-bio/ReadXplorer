@@ -4,6 +4,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
+import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Map;
  *
  * @author kstaderm
  */
-public class DeSeqAnalysisHandler extends AnalysisHandler {
+public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     private DeSeq deSeq = new DeSeq();
     private DeSeqAnalysisData deSeqAnalysisData;
@@ -38,41 +39,36 @@ public class DeSeqAnalysisHandler extends AnalysisHandler {
             if (moreThanTwoConditions) {
                 return new Plot[]{DispEsts};
             } else {
-                return new Plot[]{DispEsts,DE,HIST};
+                return new Plot[]{DispEsts, DE, HIST};
             }
         }
     }
 
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks,
-            Map<String, String[]> design, boolean moreThanTwoConditions,
-            List<String> fittingGroupOne, List<String> fittingGroupTwo,
-            Integer refGenomeID, boolean workingWithoutReplicates, File saveFile) {
-        super(selectedTraks, refGenomeID, saveFile);
+    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, String[]> design, boolean moreThanTwoConditions, 
+            List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates, 
+                                                            File saveFile, FeatureType feature, int startOffset, int stopOffset) {
+        super(selectedTraks, refGenomeID, saveFile, feature, startOffset, stopOffset);
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
                 design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, workingWithoutReplicates);
     }
 
     @Override
-    public void performAnalysis() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         List<Result> results;
-        if (!AnalysisHandler.TESTING_MODE) {
-            Map<Integer, Map<Integer, Integer>> allCountData = collectCountData();
-            prepareFeatures(deSeqAnalysisData);
-            prepareCountData(deSeqAnalysisData, allCountData);
-            results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTraks().size(), getSaveFile());
-        } else {
-            results = deSeq.process(deSeqAnalysisData, 3434, getSelectedTraks().size(), getSaveFile());
-        }
-        setResults(results);
-        notifyObservers(AnalysisStatus.FINISHED);
+        prepareFeatures(deSeqAnalysisData);
+        prepareCountData(deSeqAnalysisData, getAllCountData());
+        results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        return results;
+
     }
-    
-    public boolean moreThanTwoCondsForDeSeq(){
+
+    public boolean moreThanTwoCondsForDeSeq() {
         return deSeqAnalysisData.moreThanTwoConditions();
     }
 
     @Override
     public void endAnalysis() {
+        super.endAnalysis();
         deSeq.shutdown();
         deSeq = null;
     }

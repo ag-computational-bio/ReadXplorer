@@ -17,15 +17,17 @@ import org.openide.util.NbBundle;
  * Sam/Bam sequence pair classifier for a direct file access track. This means
  * the classification of the seq pairs has to be carried out. Besides the 
  * classification this class also acts as extender for the given sam/bam file
- * and thus creates an extended copy of the original file after the 
- * classification.
+ * and thus creates an extended copy of the original file after the
+ * classification. The reads have to be sorted by read name for efficient
+ * classification. Note for multichromosomal mappings: The classification works,
+ * no matter on which chromosome the reads were mapped!
  *
  * @author Rolf Hilker
  */
 public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observer, Observable {
 
     private ArrayList<Observer> observers;
-    private TrackJob trackJob1;
+    private TrackJob trackJob;
     private int dist;
     private int minDist;
     private int maxDist;
@@ -43,7 +45,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * means the classification of the seq pairs has to be carried out. Besides
      * the classification this class also acts as extender for the given sam/bam
      * file and thus creates an extended copy of the original file after the
-     * classification.
+     * classification. The reads have to be sorted by read name for efficient
+     * classification. Note for multichromosomal mappings: The classification 
+     * works, no matter on which chromosome the reads were mapped!
      * @param seqPairJobContainer the sequence pair job container to classify
      * @param refSeq the reference sequence belonging to the sequence pair job
      * @param classificationMap the ordinary classification map of the reads. It
@@ -52,7 +56,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     public SamBamDirectSeqPairClassifier(SeqPairJobContainer seqPairJobContainer, String refSeq, 
             Map<String,Pair<Integer,Integer>> classificationMap) {
         this.observers = new ArrayList<>();
-        this.trackJob1 = seqPairJobContainer.getTrackJob1();
+        this.trackJob = seqPairJobContainer.getTrackJob1();
         this.dist = seqPairJobContainer.getDistance();
         this.calculateMinAndMaxDist(dist, seqPairJobContainer.getDeviation());
         this.orienation = seqPairJobContainer.getOrientation();
@@ -61,7 +65,8 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     }
 
     /**
-     * Classifies the seuqence pairs.
+     * Classifies the seuqence pairs. The reads have to be sorted by read name 
+     * for efficient classification.
      * @return an empty seq pair container, because no data needs to be stored
      */
     @Override
@@ -73,20 +78,23 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Start"));
             
             List<SAMRecord> currentRecords1 = new ArrayList<>();
-            List<SAMRecord> currentRecords2 = new ArrayList<>();            
+            List<SAMRecord> currentRecords2 = new ArrayList<>();       
             
             int lineno = 0;
-            SAMFileReader samBamReader = new SAMFileReader(trackJob1.getFile());
+            SAMFileReader samBamReader = new SAMFileReader(trackJob.getFile());
             SAMRecordIterator samItor = samBamReader.iterator();
             
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
             
-            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(trackJob1.getFile(), header, false, "_extended");
+            Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(
+                    trackJob.getFile(), header, false, SamUtils.EXTENDED_STRING);
+            
             this.samBamFileWriter = writerAndFile.getFirst();
+            String refName = trackJob.getRefGen().getName();
             
             File outputFile = writerAndFile.getSecond();
-            trackJob1.setFile(outputFile);
+            trackJob.setFile(outputFile);
             
             SAMRecord record;
             String lastReadName = "";
@@ -98,7 +106,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 ++lineno;
                 //separate all mappings of same pair by seq pair tag and hand it over to classification then
                 record = samItor.next();
-                if (!record.getReadUnmappedFlag()) {
+                if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
                     readNameFull = record.getReadName();
                     pairTag = readNameFull.charAt(readNameFull.length() - 1);
                     readName = readNameFull.substring(0, readNameFull.length() - 2);
@@ -111,9 +119,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                         ++seqPairId;
                         
                     }
-                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getFirstOfPairFlag()) { //TODO: remove pairTag
+                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) { //TODO: remove pairTag
                         currentRecords1.add(record);
-                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2 || record.getSecondOfPairFlag()) {
+                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2 || record.getReadPairedFlag() && record.getSecondOfPairFlag()) {
                         currentRecords2.add(record);
                     }
                     lastReadName = readName;
@@ -139,8 +147,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
             
         } catch (Exception e) {
-            this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.toString()));
-            e.printStackTrace();
+            this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.getMessage()));
         }
         
         return new ParsedSeqPairContainer();

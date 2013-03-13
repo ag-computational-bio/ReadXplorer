@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.util.FeatureType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +32,7 @@ public class DeSeqAnalysisHandlerTest implements de.cebitec.vamp.util.Observer {
 
     @BeforeClass
     public static void setUpClass() {
-        AnalysisHandler.TESTING_MODE = true;
+        DeAnalysisHandler.TESTING_MODE = true;
         selectedTraks = new ArrayList<>();
         for (int i = 0; i < numberOfTracks; i++) {
             Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -69,13 +70,13 @@ public class DeSeqAnalysisHandlerTest implements de.cebitec.vamp.util.Observer {
     @Test
     public void testPerformAnalysis() {
         System.out.println("perform single analysis");
-        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null);
+        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null, FeatureType.ANY, 300, 0);
         instance.registerObserver(this);
         instance.start();
         instance.endAnalysis();
 
         System.out.println("perform multi analysis");
-        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null);
+        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null, FeatureType.ANY, 300, 0);
         instance.registerObserver(this);
         instance.start();
         instance.endAnalysis();
@@ -84,8 +85,8 @@ public class DeSeqAnalysisHandlerTest implements de.cebitec.vamp.util.Observer {
     @Override
     public void update(Object args) {
         List<DeSeqAnalysisHandler.Result> res = instance.getResults();
-        for (Iterator<AnalysisHandler.Result> it = res.iterator(); it.hasNext();) {
-            AnalysisHandler.Result result = it.next();
+        for (Iterator<DeAnalysisHandler.Result> it = res.iterator(); it.hasNext();) {
+            DeAnalysisHandler.Result result = it.next();
             result.getTableContents();
             result.getColnames();
             result.getRownames();
