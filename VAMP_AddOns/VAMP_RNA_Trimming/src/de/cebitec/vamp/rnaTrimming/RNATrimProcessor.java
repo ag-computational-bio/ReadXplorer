@@ -6,12 +6,11 @@ package de.cebitec.vamp.rnaTrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.ThreadListener;
-import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,7 +37,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
@@ -300,73 +298,8 @@ public class RNATrimProcessor  {
         return newPath;  
     }  */
     
-    /**
-    * Join array elements with a string
-    * @param delim Delimiter
-    * @param array Array of elements
-    * @return String
-    */
-    public static String implode(String delim, Object[] array) {
-            String AsImplodedString;
-            if (array.length==0) {
-                    AsImplodedString = "";
-            } 
-            else {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(array[0]);
-                    for (int i=1;i<array.length;i++) {
-                            sb.append(delim);
-                            sb.append(array[i]);
-                    }
-                    AsImplodedString = sb.toString();
-            }
-            return AsImplodedString;
-    }
     
-    /* run a command line tool and write the output to the console */
-    private void runCommandAndWaitUntilEnded(String... command) throws IOException {
-        this.showMsg("executing following command: "+implode(" ", command));
-        ProcessBuilder processBuilder = new ProcessBuilder(command).redirectErrorStream(true);
-        Process process = processBuilder.start();
-        
-        //OutputStream outputStream = process.getOutputStream();
-        java.io.InputStream is = process.getInputStream();
-        java.io.BufferedReader reader = new java.io.BufferedReader(new InputStreamReader(is));
-        // And print each line
-        String s = null;
-        while ((s = reader.readLine()) != null) {
-            this.showMsg(s);
-        }
-        is.close();
-        
-        //Wait to get exit value
-        try {
-            int exitValue = process.waitFor();
-            this.showMsg("\n\nExit Value is " + exitValue);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
     
-    private String mapFastaFile(String reference, String fasta) throws IOException {     
-        ProgressHandle ph = ProgressHandleFactory.createHandle(
-                NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.mapFastaFile.Start", sourcePath), 
-                new Cancellable() {
-            public boolean cancel() {
-                return handleCancel();
-            }
-        });
-        ph.start();
-        
-        String basename = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(fasta);
-        File fastafile = new File(basename);
-        basename = fastafile.getName();
-        this.runCommandAndWaitUntilEnded(NbPreferences.forModule(Object.class).get(Properties.MAPPER_PATH, "/dev/null"), reference, fasta, basename);
-        
-        ph.finish();
-        return fastafile.getAbsolutePath()+".sam";
-    }
 
     
     /**
@@ -532,7 +465,7 @@ public class RNATrimProcessor  {
         NbBundle.getMessage(RNATrimProcessor.class, "RNATrimProcessor.output.name");
         this.io = IOProvider.getDefault().getIO("RNATrimProcessor", true);
         this.io.setOutputVisible(true);
-        this.io.getOut().println("test");
+        this.io.getOut().println("");
         this.sourcePath = sourcePath;
         method.setMaximumTrimLength(maximumTrim);
         
@@ -578,7 +511,7 @@ public class RNATrimProcessor  {
                 String sam = null;
                 String extractedSam = null;
                 try {
-                    if (!canceled) sam = mapFastaFile(referencePath, fasta);
+                    if (!canceled) sam = MappingApi.mapFastaFile(io, referencePath, fasta);
                     if (!canceled) extractedSam = extractOriginalSequencesInSamFile(sam, true);
                     if (!canceled) showMsg("Extraction ready!");
                 } catch (IOException ex) {

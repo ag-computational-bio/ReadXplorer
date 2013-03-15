@@ -2,4 +2,4 @@ Manifest-Version: 1.0
 OpenIDE-Module: de.cebitec.vamp.mapping
 OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/mapping/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
-
+OpenIDE-Module-Public-Packages: de.cebitec.vamp.mapping.api.*
