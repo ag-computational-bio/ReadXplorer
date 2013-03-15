@@ -7,6 +7,7 @@ import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.util.Benchmark;
+import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
@@ -98,6 +99,7 @@ public class SamBamPosTableCreator implements Observable {
         coveredPerfectIntervals.add(new Pair<>(0, 0));
         int lastIndex;
         Integer classification;
+        ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             SAMRecordIterator samItor = sam.iterator();
@@ -127,7 +129,7 @@ public class SamBamPosTableCreator implements Observable {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
-                        //statistics claculations: count no reads and distinct sequences ////////////
+                        //statistics calculations: count no reads and distinct sequences ////////////
                         if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when mapping to diff. pos
                             noReads += readNamesSameSeq.size();
                             if (readsDifferentPos.size() == 1) {
@@ -201,16 +203,27 @@ public class SamBamPosTableCreator implements Observable {
                             nextBatch += batchSize;
                             batchOverlappingMappings.clear();
                         }
-
-                    } // else read is unmapped or belongs to another reference
-                } catch (SAMFormatException e) {
-                    if (!e.getMessage().contains("MAPQ should be 0")) {
-                        this.notifyObservers(e.getMessage());
-                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                    } else {
+                        //skip error messages, if too many occur to prevent bug in the output panel
+                        if (errorLimit.allowOutput()) {
+                            this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
+                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                        }
+                    }
                 } catch (Exception e) {
-                    this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                    //skip error messages, if too many occur to prevent bug in the output panel
+                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                    //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                        if (errorLimit.allowOutput()) {
+                            this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                             "Parser.Parsing.CorruptData", lineno, e.toString()));
+                        }
+                    }
                 }
+                
+            }
+            if (errorLimit.getSkippedCount()>0) {
+                     this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
             }
             samItor.close();
 
@@ -234,6 +247,7 @@ public class SamBamPosTableCreator implements Observable {
         ParsedMappingContainer statsContainer = new ParsedMappingContainer();
         statsContainer.setMappingInfos(this.mappingInfos);
         track = new ParsedTrack(trackJob, statsContainer, coverageContainer);
+        track.setBatchPos(nextBatch);
         this.notifyObservers(track);
         this.mappingInfos = new HashMap<>();
         this.coverageContainer = new CoverageContainer();

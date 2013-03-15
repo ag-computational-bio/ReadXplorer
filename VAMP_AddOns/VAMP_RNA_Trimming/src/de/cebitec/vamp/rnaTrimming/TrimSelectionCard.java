@@ -4,16 +4,8 @@
  */
 package de.cebitec.vamp.rnaTrimming;
 
-import de.cebitec.vamp.rnaTrimming.TrimMethod;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import de.cebitec.vamp.util.FileUtils;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import javax.swing.JFileChooser;
-import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -59,37 +51,7 @@ public class TrimSelectionCard extends javax.swing.JPanel {
         
     }
     
-    private File showFileOpenDialogAndChangePrefs(String prefName, FileNameExtensionFilter fileNameExtensionFilter,
-            JTextField textField) {
-        JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(fileNameExtensionFilter);
-        Preferences prefs2 = Preferences.userNodeForPackage(TrimSelectionCard.class);
-        String path = prefs2.get(prefName, null);
-        if(path!=null){
-            fc.setCurrentDirectory(new File(path));
-        }
-        int result = fc.showOpenDialog(this);
-
-        if (result == 0) {
-            // file chosen
-            File file = fc.getSelectedFile();
-
-            if (file.canRead()) {
-                Preferences prefs = Preferences.userNodeForPackage(TrimSelectionCard.class);
-                prefs.put(prefName, file.getAbsolutePath());
-                textField.setText(file.getAbsolutePath());
-                try {
-                    prefs.flush();
-                } catch (BackingStoreException ex) {
-                    Logger.getLogger(TrimSelectionCard.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                return file;
-            } else {
-                Logger.getLogger(TrimSelectionCard.class.getName()).log(Level.WARNING, "Could not read file");
-            }
-        }
-        return null;
-    }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -159,67 +121,67 @@ public class TrimSelectionCard extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(trimMaximumSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(trimMaximumLabel)
-                            .add(trimMethodLabel)
-                            .add(trimMethodCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(sourceFileLabel1))
-                        .add(0, 0, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(referenceFileField)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(openReferenceButton))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(sourceFileLabel)
-                                .add(0, 269, Short.MAX_VALUE))
-                            .add(layout.createSequentialGroup()
-                                .add(sourceFileField)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(openSourceButton)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(trimMaximumSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(trimMaximumLabel)
+                            .addComponent(trimMethodLabel)
+                            .addComponent(trimMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(sourceFileLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(referenceFileField)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(openReferenceButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(sourceFileLabel)
+                                .addGap(0, 269, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(sourceFileField)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(openSourceButton)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(sourceFileLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(referenceFileField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(openReferenceButton))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sourceFileLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(sourceFileField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(openSourceButton))
-                .add(11, 11, 11)
-                .add(trimMaximumLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(trimMaximumSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(trimMethodLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(trimMethodCombo, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addComponent(sourceFileLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(referenceFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(openReferenceButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sourceFileLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sourceFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(openSourceButton))
+                .addGap(11, 11, 11)
+                .addComponent(trimMaximumLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(trimMaximumSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(trimMethodLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(trimMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(111, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void openSourceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSourceButtonActionPerformed
-        File file = this.showFileOpenDialogAndChangePrefs("TrimSelection.Filepath",
+        File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Filepath",
                 new FileNameExtensionFilter("SAM Sequence Mapping File", "sam"),
-                sourceFileField);
+                sourceFileField, TrimSelectionCard.class, this);
         if (file!=null) {
             sourceFile = file;
         }
@@ -246,12 +208,12 @@ public class TrimSelectionCard extends javax.swing.JPanel {
     }//GEN-LAST:event_trimMethodComboActionPerformed
 
     private void openReferenceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openReferenceButtonActionPerformed
-        File file = this.showFileOpenDialogAndChangePrefs("TrimSelection.Referencepath",
+        File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Referencepath",
                 new FileNameExtensionFilter("Fasta File", "fasta"), 
-                referenceFileField);
+                referenceFileField, TrimSelectionCard.class, this); 
         if (file!=null) {
             referenceFile = file;
-        }
+        } 
     }//GEN-LAST:event_openReferenceButtonActionPerformed
     
     @Override

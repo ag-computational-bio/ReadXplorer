@@ -2,11 +2,14 @@ package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -91,6 +94,8 @@ public class SamBamStepParser implements MappingParserI {
             SAMRecordIterator itor = sam.iterator();
             itorAll = itor;
         }
+        ErrorLimit errorLimit = new ErrorLimit();
+        
         SAMRecord recrod;
         int end = trackJob.getStop();
         end += shift;
@@ -106,7 +111,8 @@ public class SamBamStepParser implements MappingParserI {
                     break;
                 }
                 record = null;
-
+                int errorCount = 0;
+                int maxErrorCount = 20;
                 if (!recrod.getReadUnmappedFlag() && recrod.getReferenceName().equals(refName)) {
 
                     readname = recrod.getReadName();
@@ -188,15 +194,30 @@ public class SamBamStepParser implements MappingParserI {
                         }
                     }
 
-                } // else read is unmapped or belongs to another reference
+                } else {
+                    //skip error messages, if too many occur to prevent bug in the output panel
+                    if (errorLimit.allowOutput()) {
+                        this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,
+                            "Parser.Parsing.CorruptData", lineno, recrod.getReadName()));
+                    }
+                }
+                
             } catch (SAMFormatException e) {
+                //skip error messages, if too many occur to prevent bug in the output panel
                 if (!e.getMessage().contains("MAPQ should be 0")) {
-                    this.notifyObservers(NbBundle.getMessage(SamBamStepParser.class,
-                            "Parser.Parsing.CorruptData", lineno, e.toString()));
+                    if (errorLimit.allowOutput()) {
+                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                        "Parser.Parsing.CorruptData", lineno, e.toString()));
+                    }
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
             }
-
+            
+            
         }
+        if (errorLimit.getSkippedCount()>0) {
+                        this.sendMsg( "... "+(errorLimit.getSkippedCount())+" more errors occured");
+        }
+        
 
         this.seqToIDMap = null; //release resources
 

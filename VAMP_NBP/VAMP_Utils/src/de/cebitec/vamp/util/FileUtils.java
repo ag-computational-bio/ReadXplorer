@@ -1,8 +1,16 @@
 package de.cebitec.vamp.util;
 
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import javax.swing.JFileChooser;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Utils for work with files and directories
@@ -55,4 +63,46 @@ public class FileUtils {
     public static int countLinesInFile(String filepath) {
         return countLinesInFile(new File(filepath));
     }
+    
+    /**
+     * displays a file open dialog and copies the result to an edit field
+     * @param prefName
+     * @param fileNameExtensionFilter
+     * @param textField
+     * @param forClass
+     * @param parent
+     * @return 
+     */
+    public static File showFileOpenDialogAndChangePrefs(String prefName, FileNameExtensionFilter fileNameExtensionFilter,
+            JTextField textField, Class forClass, Component parent) {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(fileNameExtensionFilter);
+        Preferences prefs2 = Preferences.userNodeForPackage(forClass);
+        String path = prefs2.get(prefName, null);
+        if(path!=null){
+            fc.setCurrentDirectory(new File(path));
+        }
+        int result = fc.showOpenDialog(parent);
+
+        if (result == 0) {
+            // file chosen
+            File file = fc.getSelectedFile();
+
+            if (file.canRead()) {
+                Preferences prefs = Preferences.userNodeForPackage(forClass);
+                prefs.put(prefName, file.getAbsolutePath());
+                textField.setText(file.getAbsolutePath());
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex) {
+                    Logger.getLogger(forClass.getName()).log(Level.SEVERE, null, ex);
+                }
+                return file;
+            } else {
+                Logger.getLogger(forClass.getName()).log(Level.WARNING, "Could not read file");
+            }
+        }
+        return null;
+    }
+    
 }

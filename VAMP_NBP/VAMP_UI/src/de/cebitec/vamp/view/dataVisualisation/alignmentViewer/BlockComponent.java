@@ -148,7 +148,19 @@ public class BlockComponent extends JComponent {
         sb.append(createTableRow("Mismatches", String.valueOf(mapping.getDifferences())));
         this.appendDiffs(mapping, sb);
         this.appendGaps(mapping, sb);
-
+        
+        if (mapping.getUnique()) {
+            sb.append(createTableRow("Unique", "yes"));
+        }
+        if (mapping.getOriginalSequence()!=null) {
+            sb.append(createTableRow("Original (full) sequence", mapping.getOriginalSequence()));
+        }
+        if (mapping.getTrimmedFromLeft()>0) {
+            sb.append(createTableRow("Trimmed chars from left", mapping.getTrimmedFromLeft()+""));
+        }
+        if (mapping.getTrimmedFromRight()>0) {
+            sb.append(createTableRow("Trimmed chars from right", mapping.getTrimmedFromRight()+""));
+        }
 
         sb.append("</table>");
         sb.append("</html>");
@@ -305,6 +317,7 @@ public class BlockComponent extends JComponent {
             case Brick.GENOME_GAP_T : label = "T"; break;
             case Brick.GENOME_GAP_N : label = "N"; break;
             case Brick.SKIPPED : label = "."; break;
+            case Brick.TRIMMED : label = "⌿"; break;
             case Brick.UNDEF : label = "@"; 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
                 break;
@@ -339,6 +352,7 @@ public class BlockComponent extends JComponent {
             case Brick.GENOME_GAP_T : c = ColorProperties.ALIGNMENT_T; break;
             case Brick.GENOME_GAP_N : c = ColorProperties.ALIGNMENT_N; break;
             case Brick.SKIPPED : c = ColorProperties.SKIPPED; break;
+            case Brick.TRIMMED : c = ColorProperties.TRIMMED; break;
             case Brick.UNDEF : c = ColorProperties.ALIGNMENT_BASE_UNDEF;
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
                 break;

@@ -20,6 +20,8 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     private int differences;
     private int sequenceID;
     private boolean isBestMatch;
+    private Boolean unique;
+    private String originalSequence = null;
 
     /**
      * Data structure for storing a mapping on a reference genome.
@@ -45,6 +47,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
         this.differences = errors;
         this.sequenceID = sequenceID;
         this.isBestMatch = isBestMapping;
+        this.unique = false;
     }
     
     /*
@@ -56,6 +59,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
         this.start = start;
         this.stop = stop;
         this.isFwdStrand = isFwdStrand;
+        this.unique = false;
     }
 
     public int getNbReplicates() {
@@ -162,13 +166,77 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     @Override
     public int compareTo(PersistantMapping o) {
         int ret = 0;
-        if(this.start < o.start){
+        if(this.start < o.getStart()){
             ret = -1;
         }
-        if(this.start > o.start){
+        if(this.start > o.getStop()){
             ret = 1;
         }
         return ret;
     }
+    
+    /**
+     * sets the unique info of the mapping
+     * @param b true if the mapping is unique
+     */
+    public void setUnique(boolean b) {
+        this.unique = b;
+    }
+    
+    /**
+     * is the mapping unique?
+     * @return true if the mapping is unique
+     */
+    public Boolean getUnique() {
+        return this.unique;
+    }
+
+    /**
+     * @return the original sequence of the read
+     * this info is used only if the rna trim module has been used
+     * and the corresponding custom tag is contained in the sam/bam file
+     */
+    public String getOriginalSequence() {
+        return originalSequence;
+    }
+
+    /**
+     * @param originalSequence the originalSequence to set
+     */
+    public void setOriginalSequence(String originalSequence) {
+        this.originalSequence = originalSequence;
+    }
+    
+    private int trimmedFromLeft = 0;
+    private int trimmedFromRight = 0;
+
+    /**
+     * @return the trimmedFromLeft
+     */
+    public int getTrimmedFromLeft() {
+        return trimmedFromLeft;
+    }
+
+    /**
+     * @param trimmedFromLeft the trimmedFromLeft to set
+     */
+    public void setTrimmedFromLeft(int trimmedFromLeft) {
+        this.trimmedFromLeft = trimmedFromLeft;
+    }
+
+    /**
+     * @return the trimmedFromRight
+     */
+    public int getTrimmedFromRight() {
+        return trimmedFromRight;
+    }
+
+    /**
+     * @param trimmedFromRight the trimmedFromRight to set
+     */
+    public void setTrimmedFromRight(int trimmedFromRight) {
+        this.trimmedFromRight = trimmedFromRight;
+    }
+   
 
 }

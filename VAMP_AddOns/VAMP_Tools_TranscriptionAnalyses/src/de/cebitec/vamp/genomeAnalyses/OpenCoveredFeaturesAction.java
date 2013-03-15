@@ -178,7 +178,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         }
     }
 
-    private static class AnalysisContainer { //even if there is only one analysis here, we can abstract this better later
+    private static class AnalysisContainer { //TODO:even if there is only one analysis here, we can abstract this better later
 
         private final AnalysisCoveredFeatures analysisCoveredFeatures;
 

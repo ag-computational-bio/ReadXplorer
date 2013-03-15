@@ -2,6 +2,7 @@ package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
@@ -81,7 +82,8 @@ public class SamBamParser implements MappingParserI {
 
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filepath));
-
+        
+        ErrorLimit errorLimit = new ErrorLimit();
         SAMFileReader sam = new SAMFileReader(trackJob.getFile());        
         SAMRecordIterator itor;
         try {
@@ -159,12 +161,19 @@ public class SamBamParser implements MappingParserI {
             } catch (MissingResourceException | ParsingException e) {
                 this.sendMsg(e.getMessage());
             } catch (SAMFormatException e) {
+                //skip error messages, if too many occur to prevent bug in the output panel
                 if (!e.getMessage().contains("MAPQ should be 0")) {
-                    this.notifyObservers(NbBundle.getMessage(SamBamParser.class,
+                    if (errorLimit.allowOutput()) {
+                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                             "Parser.Parsing.CorruptData", lineno, e.toString()));
+                    }
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
-                
+
             }
+            
+        }
+        if (errorLimit.getSkippedCount()>0) {
+                     this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
         }
 
 //        int numberMappings = mappingContainer.getMappingInformations().get(1);

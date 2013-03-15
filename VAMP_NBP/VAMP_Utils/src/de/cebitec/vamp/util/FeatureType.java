@@ -61,6 +61,7 @@ public enum FeatureType {
     BEST_MATCH(FeatureType.BEST_MATCH_INT, FeatureType.BEST_MATCH_STRING),
     ORDINARY_MATCH(FeatureType.ORDINARY_MATCH_INT, FeatureType.ORDINARY_MATCH_STRING),
     DIFF(FeatureType.DIFF_INT, FeatureType.DIFF_STRING),
+    NONUNIQUE(FeatureType.NONUNIQUE_INT, FeatureType.NONUNIQUE_STRING),
     
     //feature types for the sequence pair viewer
     PERFECT_PAIR(FeatureType.PERFECT_PAIR_INT, FeatureType.PERFECT_PAIR_STRING),
@@ -105,6 +106,7 @@ public enum FeatureType {
     private static final int BEST_MATCH_INT = 25;
     private static final int ORDINARY_MATCH_INT = 26;
     private static final int DIFF_INT = 27;
+    private static final int NONUNIQUE_INT = 31;
     
     //feature types for the sequence pair viewer
     private static final int PERFECT_PAIR_INT = 28;
@@ -155,6 +157,7 @@ public enum FeatureType {
     private static final String BEST_MATCH_STRING = "Best Match";
     private static final String ORDINARY_MATCH_STRING = "Ordinary Match";
     private static final String DIFF_STRING = "Diff.";
+    private static final String NONUNIQUE_STRING = "Non unique Match";
     
     //feature types for the sequence pair viewer
     private static final String PERFECT_PAIR_STRING = "Perfect seq. pair";
@@ -196,6 +199,7 @@ public enum FeatureType {
     public static FeatureType getFeatureType(int type){
         switch (type) { 
             case ANY_INT:           return ANY;
+            case MRNA_INT:          return MRNA;
             case CDS_INT:           return CDS;
             case MISC_RNA_INT:      return MISC_RNA;
             case RRNA_INT:          return RRNA;

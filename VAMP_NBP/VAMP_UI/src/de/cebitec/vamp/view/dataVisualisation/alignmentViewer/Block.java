@@ -42,14 +42,20 @@ public class Block implements BlockI {
      */
     private void createBricks() {
         for (int i = absStart; i <= absStop; i++) {
-            if (gapManager.hasGapAt(i)) {
-                if (mapping.hasGenomeGapAtPosition(i)) {
-                    this.fillWithOwnGenomeGaps(mapping, i);
-                } else {
-                    this.fillWithForeignGaps(gapManager.getNumOfGapsAt(i));
-                }
+            if ((mapping.getStart()>i) || (i>mapping.getStop())) {
+                Brick trimmedBrick = new Brick(Brick.TRIMMED);
+                bricks.add(trimmedBrick);
             }
-            this.addDiffOrMatchBrick(mapping, i);
+            else {
+                if (gapManager.hasGapAt(i)) {
+                    if (mapping.hasGenomeGapAtPosition(i)) {
+                        this.fillWithOwnGenomeGaps(mapping, i);
+                    } else {
+                        this.fillWithForeignGaps(gapManager.getNumOfGapsAt(i));
+                    }
+                }
+                this.addDiffOrMatchBrick(mapping, i);
+            }
         }
     }
 

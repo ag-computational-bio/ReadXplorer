@@ -85,12 +85,22 @@ public class Layout implements LayoutI {
 
                 // get start position
                 int start = mapping.getStart();
+                // get stop position
+                int stop = mapping.getStop();
+                
+                
+                if (mapping.getTrimmedFromLeft()>0) {
+                    if (mapping.isFwdStrand()) start = start - mapping.getTrimmedFromLeft();
+                    else stop = stop + mapping.getTrimmedFromLeft();
+                }
+                if (mapping.getTrimmedFromRight()>0) {
+                    if (mapping.isFwdStrand()) stop = stop + mapping.getTrimmedFromRight();
+                    else start = start - mapping.getTrimmedFromRight();
+                }
+                
                 if (start < this.absStart) {
                     start = this.absStart;
                 }
-
-                // get stop position
-                int stop = mapping.getStop();
                 if (stop > this.absStop) {
                     stop = this.absStop;
                 }
@@ -161,6 +171,7 @@ public class Layout implements LayoutI {
     private boolean inExclusionList(PersistantMapping m) {
         if ((m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_MATCH))
                 || (m.getDifferences() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH)) 
+                || (!m.getUnique() && this.exclusionList.contains(FeatureType.NONUNIQUE))
                 || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.ORDINARY_MATCH))){
             return true;
         } else {

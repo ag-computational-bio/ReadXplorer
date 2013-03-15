@@ -6,6 +6,7 @@ import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Benchmark;
+import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import java.util.ArrayList;
@@ -118,6 +119,7 @@ public class SamBamDirectParser implements MappingParserI {
         String readName;
         Pair<Integer, Integer> classificationPair;
         DiffAndGapResult diffGapResult;
+        ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             SAMRecordIterator samItor = sam.iterator();
@@ -174,14 +176,25 @@ public class SamBamDirectParser implements MappingParserI {
 
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
 
-                    } // else read is unmapped or belongs to another reference
+                    } else { // else read is unmapped or belongs to another reference
+                        if (errorLimit.allowOutput()) {
+                            this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                        }
+                    }
                 } catch (SAMFormatException e) {
-                    if (!e.getMessage().contains("MAPQ should be 0")) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                    if (errorLimit.allowOutput()) {
+                        if (!e.getMessage().contains("MAPQ should be 0")) {
+                            this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
                                 "Parser.Parsing.CorruptData", lineno, e.toString()));
+                        }
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 }
+                
 
+            }
+            if (errorLimit.getSkippedCount()>0) {
+                     this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
             }
 
             samItor.close();

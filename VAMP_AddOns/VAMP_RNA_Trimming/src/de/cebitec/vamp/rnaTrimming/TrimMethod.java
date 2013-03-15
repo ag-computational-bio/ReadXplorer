@@ -26,5 +26,5 @@ public abstract class TrimMethod {
         this.maximumTrimLength = maximumTrimLength;
     }
     
-    public abstract String trim(String sequence);
+    public abstract TrimResult trim(String sequence);
 }

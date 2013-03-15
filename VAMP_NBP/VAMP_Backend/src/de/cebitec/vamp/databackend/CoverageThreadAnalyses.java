@@ -181,7 +181,7 @@ public class CoverageThreadAnalyses extends RequestThread {
         if (this.isDbUsed) {
             try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_BEST_FOR_INTERVAL)) {
                 fetch.setLong(1, track.getId());
-                fetch.setInt(2, from);
+                fetch.setInt(2, from); 
                 fetch.setInt(3, to);
 
                 ResultSet rs = fetch.executeQuery();
