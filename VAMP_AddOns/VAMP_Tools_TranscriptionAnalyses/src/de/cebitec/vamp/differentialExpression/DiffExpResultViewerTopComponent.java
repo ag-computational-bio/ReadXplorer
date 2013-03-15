@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
+import de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.event.ItemEvent;
@@ -244,6 +245,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.requestActive();
                 break;
         }
+        PlotTopComponent plotTop = new PlotTopComponent(analysisHandler);
+        analysisHandler.registerObserver(plotTop);
+        plotTop.open();
+        plotTop.requestActive();
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed

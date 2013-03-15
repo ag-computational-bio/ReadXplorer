@@ -4,15 +4,16 @@
  */
 package de.cebitec.vamp.differentialExpression.plotting;
 
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
+import de.cebitec.vamp.util.Observer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -40,18 +41,22 @@ import org.openide.util.NbBundle.Messages;
     "CTL_PlotTopComponent=Plot Window",
     "HINT_PlotTopComponent=This is a Plot window"
 })
-public final class PlotTopComponent extends TopComponent {
+public final class PlotTopComponent extends TopComponent implements Observer{
 
-    private static JFXPanel fxContainer;
+    private DeAnalysisHandler analysisHandler;
+    private static ScatterPlot fxContainer;
     private static final int JFXPANEL_WIDTH_INT = 300;
     private static final int JFXPANEL_HEIGHT_INT = 250;
 
     public PlotTopComponent() {
+    }
+    
+    public PlotTopComponent(DeAnalysisHandler analysisHandler) {
         initComponents();
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
+        this.analysisHandler=analysisHandler;
         init();
-
     }
 
     /**
@@ -68,11 +73,11 @@ public final class PlotTopComponent extends TopComponent {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 380, Short.MAX_VALUE)
+            .addGap(0, 500, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 278, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -81,21 +86,21 @@ public final class PlotTopComponent extends TopComponent {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
+
     @Override
     public void componentOpened() {
         // TODO add custom code on component opening
@@ -103,7 +108,7 @@ public final class PlotTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        analysisHandler.removeObserver(this);
     }
 
     void writeProperties(java.util.Properties p) {
@@ -118,31 +123,22 @@ public final class PlotTopComponent extends TopComponent {
         // TODO read your settings according to their version
     }
 
-    private void createScene() {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        fxContainer.setScene(new Scene(root));
-    }
-
     public void init() {
-        fxContainer = new JFXPanel();
+        fxContainer = new ScatterPlot();
         fxContainer.setPreferredSize(new Dimension(JFXPANEL_WIDTH_INT, JFXPANEL_HEIGHT_INT));
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(fxContainer, BorderLayout.CENTER);
+
         // create JavaFX scene
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                createScene();
+                fxContainer.addData();
             }
         });
+    }
+
+    @Override
+    public void update(Object args) {
     }
 }
