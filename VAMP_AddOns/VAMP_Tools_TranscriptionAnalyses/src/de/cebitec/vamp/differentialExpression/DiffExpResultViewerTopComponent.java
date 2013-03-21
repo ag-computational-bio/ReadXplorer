@@ -245,10 +245,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.requestActive();
                 break;
         }
-        PlotTopComponent plotTop = new PlotTopComponent(analysisHandler);
-        analysisHandler.registerObserver(plotTop);
-        plotTop.open();
-        plotTop.requestActive();
+//        PlotTopComponent plotTop = new PlotTopComponent(analysisHandler);
+//        analysisHandler.registerObserver(plotTop);
+//        plotTop.open();
+//        plotTop.requestActive();
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
