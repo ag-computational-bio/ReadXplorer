@@ -135,7 +135,7 @@ public class GeneralUtils {
      * @return the string containing all strings concatenated with "and"
      */
     public static String generateConcatenatedString(List<String> strings) {
-        StringBuilder concatString = new StringBuilder();
+        /**StringBuilder concatString = new StringBuilder();
         for (String string : strings) {
             concatString = concatString.append(string).append(" and ");
         }
@@ -143,5 +143,34 @@ public class GeneralUtils {
             concatString = concatString.delete(concatString.length() - 5, concatString.length());
         }
         return concatString.toString();
+        */
+        //Evgeny:
+        //generateConcatenatedString is a special case of the implode function, 
+        //so i would suggest to use it here to reduce code duplications :
+        return implode(" and ", strings.toArray());
     }
+    
+    /**
+    * Join array elements with a string
+    * @param delim Delimiter
+    * @param array Array of elements
+    * @return String
+    */
+    public static String implode(String delim, Object[] array) {
+            String AsImplodedString;
+            if (array.length==0) {
+                    AsImplodedString = "";
+            } 
+            else {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(array[0]);
+                    for (int i=1;i<array.length;i++) {
+                            sb.append(delim);
+                            sb.append(array[i]);
+                    }
+                    AsImplodedString = sb.toString();
+            }
+            return AsImplodedString;
+    }
+    
 }
