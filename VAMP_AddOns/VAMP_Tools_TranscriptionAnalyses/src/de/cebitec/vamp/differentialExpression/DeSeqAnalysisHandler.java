@@ -5,6 +5,7 @@ import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -44,9 +45,9 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, String[]> design, boolean moreThanTwoConditions, 
-            List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates, 
-                                                            File saveFile, FeatureType feature, int startOffset, int stopOffset) {
+    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, String[]> design, boolean moreThanTwoConditions,
+            List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
+            File saveFile, FeatureType feature, int startOffset, int stopOffset) {
         super(selectedTraks, refGenomeID, saveFile, feature, startOffset, stopOffset);
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
                 design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, workingWithoutReplicates);
@@ -64,6 +65,10 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public boolean moreThanTwoCondsForDeSeq() {
         return deSeqAnalysisData.moreThanTwoConditions();
+    }
+
+    public Pair<Integer, Integer> getStartStopForLocus(String locus) {
+        return deSeqAnalysisData.getStartStopForLocus(locus);
     }
 
     @Override

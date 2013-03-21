@@ -93,7 +93,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         //TODO
         switch (usedTool) {
             case DeSeq:
-                String loci = (String) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                String locus = (String) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                pos = ((DeSeqAnalysisHandler) analysisHandler).getStartStopForLocus(locus).getFirst();
                 break;
             case BaySeq:
                 pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);

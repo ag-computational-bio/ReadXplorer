@@ -107,9 +107,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             loci[i] = persistantFeature.getLocus();
         }
 
-        analysisData.setStart(featuresStart);
-        analysisData.setStop(featuresStop);
-        analysisData.setLoci(loci);
+        analysisData.setLociAndStartStop(loci, featuresStart, featuresStop);
         analysisData.setSelectedTraks(selectedTraks);
     }
 
