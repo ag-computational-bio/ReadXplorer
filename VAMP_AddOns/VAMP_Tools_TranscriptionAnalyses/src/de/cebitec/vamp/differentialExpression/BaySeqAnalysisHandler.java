@@ -46,7 +46,6 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
     @Override
     public void endAnalysis() {
-        super.endAnalysis();
         baySeq.shutdown();
         baySeq = null;
     }

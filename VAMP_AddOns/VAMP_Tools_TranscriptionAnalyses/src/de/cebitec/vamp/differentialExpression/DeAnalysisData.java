@@ -138,7 +138,7 @@ public class DeAnalysisData {
         int counter = 1;
         for (int i = 0; i < loci.length; i++) {
             if(!tmpSet.add(loci[i])){
-                tmpSet.add(loci[i]+"_"+counter++);
+                tmpSet.add(loci[i]+"_REPNR"+counter++);
             }
         }
         this.loci = tmpSet.toArray(new String[tmpSet.size()]);

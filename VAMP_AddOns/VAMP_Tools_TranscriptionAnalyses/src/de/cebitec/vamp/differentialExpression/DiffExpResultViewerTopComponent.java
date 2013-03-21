@@ -1,5 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent;
 import de.cebitec.vamp.util.Observer;
@@ -8,6 +10,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -64,8 +67,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     public DiffExpResultViewerTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool usedTool) {
-//        BoundsInfoManager man = getLookup().lookupAll(ViewController.class).iterator().next().getBoundsManager();
-        Lookup look = getLookup();
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
@@ -85,31 +86,30 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void showPosition() {
-//        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
-//        int selectedView = model.getLeadSelectionIndex();
-//        int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
-//        int pos = 0;
-//        //TODO
-//        switch (usedTool) {
-//            case DeSeq:
-////                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
-//                break;
-//            case BaySeq:
-//                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
-//                break;
-//            case SimpleTest:
-////                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
-//                String locus = (String) topCountsTable.getModel().getValueAt(selectedModel, 0);
-//                break;
-//        }
-//
-//        Collection<ViewController> viewControllers;
-//        viewControllers = (Collection<ViewController>) getLookup().lookupAll(ViewController.class);
-//        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
-//            ViewController tmpVCon = it.next();
-//            tmpVCon.getBoundsManager().navigatorBarUpdated(pos);
-//
-//        }
+        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
+        int selectedView = model.getLeadSelectionIndex();
+        int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
+        int pos = 0;
+        //TODO
+        switch (usedTool) {
+            case DeSeq:
+                String loci = (String) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                break;
+            case BaySeq:
+                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
+                break;
+            case SimpleTest:
+                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 5);
+                break;
+        }
+        
+        Collection<ViewController> viewControllers;
+        viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
+            ViewController tmpVCon = it.next();
+            tmpVCon.getBoundsManager().navigatorBarUpdated(pos);
+
+        }
     }
 
     private void addResults() {
@@ -327,6 +327,9 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                         case ERROR:
                             progressHandle.switchToDeterminate(0);
                             progressHandle.finish();
+                            LogTopComponent = new DiffExpLogTopComponent();
+                            LogTopComponent.open();
+                            LogTopComponent.requestActive();
                             cmp.close();
                             break;
                     }

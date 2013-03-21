@@ -68,7 +68,6 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     @Override
     public void endAnalysis() {
-        super.endAnalysis();
         deSeq.shutdown();
         deSeq = null;
     }
