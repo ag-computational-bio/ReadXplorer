@@ -67,6 +67,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID,
             File saveFile, FeatureType feature, int startOffset, int stopOffset) {
+        ProcessingLog.getInstance().resetLog();
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
@@ -106,9 +107,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             loci[i] = persistantFeature.getLocus();
         }
 
-        analysisData.setStart(featuresStart);
-        analysisData.setStop(featuresStop);
-        analysisData.setLoci(loci);
+        analysisData.setLociAndStartStop(loci, featuresStart, featuresStop);
         analysisData.setSelectedTraks(selectedTraks);
     }
 
@@ -144,9 +143,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      * the analysis are closed. So you should clean up everything and release
      * the Gnu R instance at this point.
      */
-    public void endAnalysis(){
-        ProcessingLog.getInstance().resetLog();
-    }
+    public abstract void endAnalysis();
 
     public abstract void saveResultsAsCSV(int selectedIndex, String path);
 

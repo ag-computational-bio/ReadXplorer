@@ -63,14 +63,14 @@ public class SimpleTest {
                 gnuR.assign("inputData" + i, analysisData.pollFirstCountData());
                 concatenate.append("inputData").append(i++).append(",");
             }
+            gnuR.assign("inputData" + i, analysisData.getStart());
+            concatenate.append("inputData").append(i++).append(",");
+            gnuR.assign("inputData" + i, analysisData.getStop());
+            concatenate.append("inputData").append(i++).append(",");
             concatenate.deleteCharAt(concatenate.length() - 1);
             concatenate.append(")");
             //Then the big count data matrix is created out of the single track data handed over.
             gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
-            //The colum names are handed over to Gnu R... 
-            gnuR.assign("columNames", analysisData.getTrackDescriptions());
-            //...and assigned to the count data matrix.
-            gnuR.eval("colnames(inputData) <- columNames");
             //Now we need to name the rows. First hand over the row names to Gnu R...
             gnuR.assign("rowNames", analysisData.getLoci());
             //...and then assign them to the count data matrix.
@@ -172,7 +172,7 @@ public class SimpleTest {
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
         gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plot(res[,5],res[,7],xlab=\"ratio A to B\",ylab=\"confidence\")");
+        gnuR.eval("plot(res[,7],res[,9],xlab=\"ratio A to B\",ylab=\"confidence\")");
         gnuR.eval("dev.off()");
     }
 
@@ -184,7 +184,7 @@ public class SimpleTest {
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
         gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plot(res[,6],res[,7],xlab=\"ratio B to A\",ylab=\"confidence\")");
+        gnuR.eval("plot(res[,8],res[,9],xlab=\"ratio B to A\",ylab=\"confidence\")");
         gnuR.eval("dev.off()");
     }
 }

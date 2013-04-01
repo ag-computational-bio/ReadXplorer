@@ -54,7 +54,6 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler {
 
     @Override
     public void endAnalysis() {
-        super.endAnalysis();
         simpleTest.shutdown();
     }
 

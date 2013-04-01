@@ -42,9 +42,12 @@ preferredID = "DiffExpLogTopComponent")
 })
 public final class DiffExpLogTopComponent extends TopComponent implements Observer {
 
-    private DeAnalysisHandler analysisHandler;
+    private DeAnalysisHandler analysisHandler = null;
 
     public DiffExpLogTopComponent() {
+        initComponents();
+        setName(Bundle.CTL_DiffExpLogTopComponent());
+        setToolTipText(Bundle.HINT_DiffExpLogTopComponent());
     }
 
     public DiffExpLogTopComponent(DeAnalysisHandler analysisHandler) {
@@ -142,7 +145,9 @@ public final class DiffExpLogTopComponent extends TopComponent implements Observ
 
     @Override
     public void componentClosed() {
-        analysisHandler.removeObserver(this);
+        if (analysisHandler != null) {
+            analysisHandler.removeObserver(this);
+        }
     }
 
     void writeProperties(java.util.Properties p) {

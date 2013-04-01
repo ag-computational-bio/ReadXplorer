@@ -1,5 +1,6 @@
 package de.cebitec.vamp.controller;
 
+import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -41,6 +42,11 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         mousePosListener = new ArrayList<>();
 
         trackToPanel = new HashMap<>();
+        registerInLookup();
+    }
+    
+    private void registerInLookup(){
+        CentralLookup.getDefault().add(this);
     }
     
     public void openGenome(PersistantReference genome) {

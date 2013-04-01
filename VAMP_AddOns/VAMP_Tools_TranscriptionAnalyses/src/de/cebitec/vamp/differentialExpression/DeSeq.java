@@ -90,6 +90,12 @@ public class DeSeq {
                 }
                 concatenate.deleteCharAt(concatenate.length() - 1);
 
+                if (saveFile != null) {
+                    String path = saveFile.getAbsolutePath();
+                    path = path.replace("\\", "\\\\");
+                    gnuR.eval("save.image(\"" + path + "\")");
+                }
+
                 if (analysisData.moreThanTwoConditions()) {
                     //The individual variables are then used to create the design element
                     gnuR.eval("design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")");
@@ -102,12 +108,6 @@ public class DeSeq {
                     //Now everything is set up and the count data object on which the main
                     //analysis will be performed can be created
                     gnuR.eval("cD <- newCountDataSet(inputData, conds)");
-                }
-
-                if (saveFile != null) {
-                    String path = saveFile.getAbsolutePath();
-                    path = path.replace("\\", "\\\\");
-                    gnuR.eval("save.image(\"" + path + "\")");
                 }
 
                 //We estimate the size factor

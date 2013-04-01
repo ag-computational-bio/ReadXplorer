@@ -1,11 +1,16 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.util.Pair;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import sun.misc.Compare;
 
 /**
  * Holds all the overlapping dataset between all analysis handlers.
@@ -23,9 +28,10 @@ public class DeAnalysisData {
      */
     private int[] stop;
     /**
-     * ID of the reference features.
+     * Contains ID of the reference features as keys and corresponding start
+     * stop pair as values.
      */
-    private String[] loci;
+    private Map<String, Pair<Integer, Integer>> data;
     /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
@@ -37,7 +43,6 @@ public class DeAnalysisData {
      * The tracks selected by the user to perform the analysis on.
      */
     private List<PersistantTrack> selectedTraks;
-    
     /**
      * Track Descriptions. Each description just appears one time.
      */
@@ -45,6 +50,7 @@ public class DeAnalysisData {
 
     /**
      * Creates a new instance of the DeAnalysisData class.
+     *
      * @param capacity Number of selected tracks.
      */
     public DeAnalysisData(int capacity) {
@@ -55,6 +61,7 @@ public class DeAnalysisData {
      * Adds count data as an Integer array to a Queue holding all count data
      * necessary for the analysis. The data must be added in an ascending order
      * starting with the count data belonging to the track with the lowest ID.
+     *
      * @param data count data
      */
     public void addCountDataForTrack(Integer[] data) {
@@ -63,10 +70,12 @@ public class DeAnalysisData {
 
     /**
      * Return the first count data value on the Queue and removes it. So this
-     * method will give you back the cound data added bei the @see addCountDataForTrack()
-     * method. The count data added first will also be the first this method returns.
-     * This method also converts the count data from an Integer array to an int
-     * array so that they can be handed over to Gnu R directly.
+     * method will give you back the cound data added bei the
+     *
+     * @see addCountDataForTrack() method. The count data added first will also
+     * be the first this method returns. This method also converts the count
+     * data from an Integer array to an int array so that they can be handed
+     * over to Gnu R directly.
      * @return count data as int[]
      */
     public int[] pollFirstCountData() {
@@ -80,7 +89,9 @@ public class DeAnalysisData {
 
     /**
      * Checks if there is still count data on the Queue
-     * @return true if there is at least on count data on the Queue or false if it is empty.
+     *
+     * @return true if there is at least on count data on the Queue or false if
+     * it is empty.
      */
     public boolean hasCountData() {
         if (countData.isEmpty()) {
@@ -92,6 +103,7 @@ public class DeAnalysisData {
 
     /**
      * Return the start positions of the reference features.
+     *
      * @return Start positions of the reference features.
      */
     public int[] getStart() {
@@ -100,57 +112,61 @@ public class DeAnalysisData {
 
     /**
      * Return the stop positions of the reference features.
+     *
      * @return stop positions of the reference features.
      */
     public int[] getStop() {
         return stop;
     }
+    
     /**
      * Return the Loci of the reference features.
+     *
      * @return Loci of the reference features as an String Array.
      */
     public String[] getLoci() {
-        return loci;
+        String[] ret = data.keySet().toArray(new String[data.keySet().size()]);
+        return ret;
     }
 
     /**
      * Returns the tracks selected by the user to perform the analysis on.
+     *
      * @return List of PersistantTrack containing the selected tracks.
      */
     public List<PersistantTrack> getSelectedTraks() {
         return selectedTraks;
     }
-
+    
     public String[] getTrackDescriptions() {
         return trackDescriptions;
     }
-
-    public void setStart(int[] start) {
+    
+    public Pair<Integer,Integer> getStartStopForLocus(String locus){
+        return data.get(locus);
+    }
+    
+    public void setLociAndStartStop(String[] loci, int[] start, int[] stop) {
         this.start = start;
-    }
-
-    public void setStop(int[] stop) {
         this.stop = stop;
-    }
-
-    public void setLoci(String[] loci) {
-        Set<String> tmpSet = new LinkedHashSet<>();
+        data = new LinkedHashMap<>();
         int counter = 1;
         for (int i = 0; i < loci.length; i++) {
-            if(!tmpSet.add(loci[i])){
-                tmpSet.add(loci[i]+"_"+counter++);
+            if (data.containsKey(loci[i])) {
+                data.put(loci[i] + "_REPNR" + counter++, new Pair<>(start[i], stop[i]));
+            } else {
+                data.put(loci[i], new Pair<>(start[i], stop[i]));                
             }
         }
-        this.loci = tmpSet.toArray(new String[tmpSet.size()]);
     }
-
+    
     public void setSelectedTraks(List<PersistantTrack> selectedTraks) {
         this.selectedTraks = selectedTraks;
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;
         for (int i = 0; i < selectedTraks.size(); i++) {
-            if(!tmpSet.add(selectedTraks.get(i).getDescription())){
-                tmpSet.add(selectedTraks.get(i).getDescription()+"_"+counter++);
+            if (!tmpSet.add(selectedTraks.get(i).getDescription())) {
+                tmpSet.add(selectedTraks.get(i).getDescription() + "_" + counter++);
             }
         }
     }
