@@ -66,16 +66,16 @@
     </Component>
     <Component class="javax.swing.JSlider" name="intervalLengthSlider">
       <Properties>
-        <Property name="majorTickSpacing" type="int" value="1000"/>
-        <Property name="maximum" type="int" value="5000"/>
-        <Property name="minorTickSpacing" type="int" value="250"/>
+        <Property name="majorTickSpacing" type="int" value="100"/>
+        <Property name="maximum" type="int" value="2000"/>
+        <Property name="minorTickSpacing" type="int" value="50"/>
         <Property name="paintLabels" type="boolean" value="true"/>
         <Property name="paintTicks" type="boolean" value="true"/>
         <Property name="snapToTicks" type="boolean" value="true"/>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.intervalLengthSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
-        <Property name="value" type="int" value="500"/>
+        <Property name="value" type="int" value="100"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSlider" name="minimumCorrelationSlider">

@@ -11,6 +11,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
@@ -28,10 +30,22 @@ import org.openide.windows.InputOutput;
  * @author Evgeny Anisiforov
  */
 public class CorrelationAnalysisProcessor implements ThreadListener {
-    private final InputOutput io;
+    //private final InputOutput io;
     private Integer rightBound;
     private final Integer minCorrelation;
     private StrangDirection currentDirection;
+
+    private void createProcessHandle(String title) {
+        this.ph = ProgressHandleFactory.createHandle(title, new Cancellable() {
+
+            public boolean cancel() {
+                return handleCancel();
+            }
+        });
+        ph.start();
+        ph.switchToDeterminate(this.rightBound);
+    }
+    
     public enum StrangDirection { FWD, REV };
     
     private int steps;
@@ -47,12 +61,13 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      */
     private void showMsg(String msg) {
        
-        this.io.getOut().println(msg);
+        //this.io.getOut().println(msg);
     }
     
+    private CorrelationResultPanel resultView;
     
-    public CorrelationAnalysisProcessor(List<PersistantTrack> list, Integer intervalLength, Integer minCorrelation) {
-        this.io = IOProvider.getDefault().getIO("CorrelationAnalysis", true);
+    public CorrelationAnalysisProcessor(ReferenceViewer referenceViewer, List<PersistantTrack> list, Integer intervalLength, Integer minCorrelation) {
+        /*this.io = IOProvider.getDefault().getIO("CorrelationAnalysis", true);
         this.io.setOutputVisible(true);
         this.io.getOut().println("");
         
@@ -62,30 +77,34 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        io.select();
+        io.select();*/
         
         this.ready = false;
         this.currentPosition = 1;
         this.currentDirection = StrangDirection.FWD;
         
-        this.ph = ProgressHandleFactory.createHandle("Analysing correlation..", new Cancellable() {
-
-            public boolean cancel() {
-                return handleCancel();
-            }
-        });
+        
         
         ArrayList<TrackConnector> tcl = new ArrayList<TrackConnector>();
         for(PersistantTrack track : list) {
             tcl.add(ProjectConnector.getInstance().getMultiTrackConnector(track));
         }
         this.rightBound = tcl.get(0).getRefSequenceLength();
-        ph.start();
-        ph.switchToDeterminate(this.rightBound);
+        
+        this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "FWD"));
         
         this.trackConnectorList = tcl;
         this.intervalLength = intervalLength;
         this.minCorrelation = minCorrelation;
+        
+        //create a new result panel for every result (non singleton topcomponent)
+        resultView = new CorrelationResultPanel();
+        resultView.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
+        resultView.open();
+        resultView.requestActive();
+        resultView.setDisplayName("Correlation Analysis");
+        
+        
         requestNextStep();
     }
     
@@ -149,6 +168,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 double minCorr = ((double) this.minCorrelation) / 100.0;
                 if ((correlation>minCorr) || (correlation<(minCorr*(-1)))) {
                     this.showMsg("correlation of interval ["+this.currentPosition+"-"+to+"] is "+correlation+" on "+direction );
+                    this.resultView.addData(direction, this.currentPosition, to, correlation);
                 }
                 this.currentPosition = to+1;
             }
@@ -162,11 +182,13 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         else {
             
             if (direction.equals(StrangDirection.FWD)) {
+                ph.finish();
+                this.currentDirection = StrangDirection.REV;
+                this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV"));
                 //compute again from the beginning with another strang direction
                 this.currentPosition=1;
-                ph.progress(this.currentPosition);
-                ph.setDisplayName("Analysing correlation.. (Reverse strang direction)");
-                this.currentDirection = StrangDirection.REV;
+                //ph.progress(this.currentPosition);
+                //ph.setDisplayName("Analysing correlation.. (Reverse strang direction)"); 
                 requestNextStep();
             }
             else {

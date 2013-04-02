@@ -6,6 +6,7 @@ package de.cebitec.vamp.rnaTrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
+import de.cebitec.vamp.correlationAnalysis.CorrelationResultPanel;
 import de.cebitec.vamp.rnaTrimming.TrimMethod;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -57,6 +58,7 @@ public final class RNATrimAction implements ActionListener {
             DialogDisplayer.getDefault().notify(nd);
             return;
         }
+
         WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
@@ -71,6 +73,11 @@ public final class RNATrimAction implements ActionListener {
                     (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
                     (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD)
                     );
+            
+             
+            
+            
+            
             /*List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
             List<TrackJob> tracks2del = (List<TrackJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
 

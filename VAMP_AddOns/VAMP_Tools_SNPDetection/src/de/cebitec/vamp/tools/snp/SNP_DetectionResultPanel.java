@@ -412,7 +412,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
     /**
      * Centers the position of the selected SNP in the bounds information manager.
-     * This leads to an update of alle viewers, sharing this bim.
+     * This leads to an update of all viewers, sharing this bim.
      */
     private void showSnpPosition() {
         DefaultListSelectionModel model = (DefaultListSelectionModel) snpTable.getSelectionModel();

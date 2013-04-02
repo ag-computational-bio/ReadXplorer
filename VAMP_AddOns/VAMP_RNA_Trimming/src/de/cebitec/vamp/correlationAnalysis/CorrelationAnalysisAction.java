@@ -74,7 +74,8 @@ public final class CorrelationAnalysisAction implements ActionListener {
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            new CorrelationAnalysisProcessor((List<PersistantTrack>) wiz.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
+            new CorrelationAnalysisProcessor(context,    
+                (List<PersistantTrack>) wiz.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION));
         } else {
