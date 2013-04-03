@@ -60,7 +60,7 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(minimumCorrelationLabel, org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.minimumCorrelationLabel.text")); // NOI18N
 
-        intervalLengthSlider.setMajorTickSpacing(100);
+        intervalLengthSlider.setMajorTickSpacing(500);
         intervalLengthSlider.setMaximum(2000);
         intervalLengthSlider.setMinorTickSpacing(50);
         intervalLengthSlider.setPaintLabels(true);

@@ -66,7 +66,7 @@
     </Component>
     <Component class="javax.swing.JSlider" name="intervalLengthSlider">
       <Properties>
-        <Property name="majorTickSpacing" type="int" value="100"/>
+        <Property name="majorTickSpacing" type="int" value="500"/>
         <Property name="maximum" type="int" value="2000"/>
         <Property name="minorTickSpacing" type="int" value="50"/>
         <Property name="paintLabels" type="boolean" value="true"/>

@@ -5,18 +5,20 @@
 package de.cebitec.vamp.correlationAnalysis;
 
 import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisProcessor.StrangDirection;
-import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JPanel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import org.openide.windows.TopComponent;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
  * @author Evgeny Anisiforov
  */
 //@TopComponent.Registration(mode = "output", openAtStartup = false)
-public class CorrelationResultPanel extends TopComponent {
+public class CorrelationResultPanel extends JPanel {
     private BoundsInfoManager bim;
 
     /**
@@ -24,12 +26,20 @@ public class CorrelationResultPanel extends TopComponent {
      */
     public CorrelationResultPanel() {
         initComponents();
+        DefaultListSelectionModel model = (DefaultListSelectionModel) correlationTable.getSelectionModel();
+        model.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                showItemPosition();
+            }
+        });
     }
     
-    @Override
+    /*@Override
     public int getPersistenceType() {
         return PERSISTENCE_NEVER;
-    }
+    }*/
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -42,9 +52,7 @@ public class CorrelationResultPanel extends TopComponent {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         correlationTable = new javax.swing.JTable();
-        showPositionButton = new javax.swing.JButton();
 
-        correlationTable.setAutoCreateRowSorter(true);
         correlationTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -74,30 +82,15 @@ public class CorrelationResultPanel extends TopComponent {
         correlationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title2")); // NOI18N
         correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(showPositionButton, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.showPositionButton.text")); // NOI18N
-        showPositionButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showPositionButtonActionPerformed(evt);
-            }
-        });
-
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(showPositionButton)
-                .addContainerGap(143, Short.MAX_VALUE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 275, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(showPositionButton)
-                .add(0, 0, Short.MAX_VALUE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -105,19 +98,18 @@ public class CorrelationResultPanel extends TopComponent {
      * Centers the position of the selected correlation fragment in the bounds information manager.
      * This leads to an update of all viewers, sharing this bim.
      */
-    private void showSnpPosition() {
+    private void showItemPosition() {
         DefaultListSelectionModel model = (DefaultListSelectionModel) correlationTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = correlationTable.convertRowIndexToModel(selectedView);
-        Integer pos = (Integer) correlationTable.getModel().getValueAt(selectedModel, 1);
+        if (selectedModel>=0) {
+            Integer pos = (Integer) correlationTable.getModel().getValueAt(selectedModel, 1);
+            bim.navigatorBarUpdated(pos);
+        }
 
-        bim.navigatorBarUpdated(pos);
+        
     }
-    
-    private void showPositionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showPositionButtonActionPerformed
-        showSnpPosition();
-    }//GEN-LAST:event_showPositionButtonActionPerformed
-    
+        
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;
     }
@@ -125,12 +117,16 @@ public class CorrelationResultPanel extends TopComponent {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable correlationTable;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton showPositionButton;
     // End of variables declaration//GEN-END:variables
 
     public void addData(StrangDirection direction, int currentPosition, int to, double correlation) {
         DefaultTableModel model = (DefaultTableModel) this.correlationTable.getModel();
         model.addRow(new Object[] {direction, currentPosition, to, correlation});
+    }
+    
+    public void ready() {
+        //correlationTable.setAutoCreateRowSorter(true);
+        correlationTable.setRowSorter(new TableRowSorter(this.correlationTable.getModel()));
     }
     
     

@@ -97,13 +97,17 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.intervalLength = intervalLength;
         this.minCorrelation = minCorrelation;
         
-        //create a new result panel for every result (non singleton topcomponent)
-        resultView = new CorrelationResultPanel();
-        resultView.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
-        resultView.open();
+        
+        CorrelationResultTopComponent tc = CorrelationResultTopComponent.findInstance();
+        tc.open();
+        tc.requestActive();
+        resultView = CorrelationResultTopComponent.findInstance().openResultTab(referenceViewer);
+        //resultView.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
+        
+        /*resultView.open();
         resultView.requestActive();
         resultView.setDisplayName("Correlation Analysis");
-        
+        */
         
         requestNextStep();
     }
@@ -194,6 +198,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             else {
                 ph.finish();
                 ready = true;
+                this.resultView.ready();
             }
             
         }
