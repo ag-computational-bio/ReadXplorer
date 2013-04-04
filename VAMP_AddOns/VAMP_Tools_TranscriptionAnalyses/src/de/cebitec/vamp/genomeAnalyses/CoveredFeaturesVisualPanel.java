@@ -10,6 +10,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
 
     private int minCoveragePercent;
     private int minCoverageCount;
+    private boolean whateverStrand;
     
     /**
      * Creates new form CoveredFeaturesVisualPanel
@@ -38,6 +39,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         minCoverageCountField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tssTextArea = new javax.swing.JTextArea();
+        StrandCheckBox = new javax.swing.JCheckBox();
 
         minCoveragePercentField.setText(org.openide.util.NbBundle.getMessage(CoveredFeaturesVisualPanel.class, "CoveredFeaturesVisualPanel.minCoveragePercentField.text")); // NOI18N
 
@@ -57,6 +59,9 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         tssTextArea.setWrapStyleWord(true);
         jScrollPane1.setViewportView(tssTextArea);
 
+        StrandCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(StrandCheckBox, org.openide.util.NbBundle.getMessage(CoveredFeaturesVisualPanel.class, "CoveredFeaturesVisualPanel.StrandCheckBox.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -72,14 +77,15 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
                         .addComponent(minCoverageCountField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(minCoverageCountLabel))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(StrandCheckBox))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(minCoveragePercentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -88,10 +94,14 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(minCoverageCountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(minCoverageCountLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(StrandCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox StrandCheckBox;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField minCoverageCountField;
     private javax.swing.JLabel minCoverageCountLabel;
@@ -107,6 +117,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
     private void initAdditionalComponents() {
         this.minCoveragePercent = Integer.parseInt(this.minCoveragePercentField.getText());
         this.minCoverageCount = Integer.parseInt(this.minCoverageCountField.getText());
+        this.whateverStrand = this.StrandCheckBox.isSelected();
 
         this.minCoveragePercentField.getDocument().addDocumentListener(this.createDocumentListener());
         this.minCoverageCountField.getDocument().addDocumentListener(this.createDocumentListener());
@@ -134,11 +145,28 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         return isValidated;
     }
 
+    /**
+     * @return The minimum covered percent of a genome feature to be considered
+     *      in this analysis.
+     */
     public int getMinCoveredPercent() {
         return minCoveragePercent;
     }
 
+    /**
+     * @return The minimum coverage count at a certain genome position to count
+     *      for the coverage of a genome feature.
+     */
     public int getMinCoverageCount() {
         return minCoverageCount;
+    }
+
+    /**
+     * @return <tt>true</tt>, if the strand does not matter for this analysis,
+     *      false, if only mappings on the strand of the respective feature 
+     *      should be considered.
+     */
+    public boolean getIsWhateverStrand() {
+        return whateverStrand;
     }
 }

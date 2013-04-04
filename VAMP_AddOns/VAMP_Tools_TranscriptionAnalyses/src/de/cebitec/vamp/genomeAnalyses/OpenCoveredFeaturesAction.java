@@ -119,6 +119,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     private void startCoveredFeaturesDetection(WizardDescriptor wiz) {
         int minCoveredPercent = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT);
         int minCoverageCount = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT);
+        boolean whateverStrand = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_WHATEVER_STRAND);
         parameters = new ParameterSetCoveredFeatures(minCoveredPercent, minCoverageCount);
         
         TrackConnector connector;
@@ -127,7 +128,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             connector = ProjectConnector.getInstance().getTrackConnector(track);
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this, 
                     NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
-            AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, minCoveredPercent, minCoverageCount);
+            AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, minCoveredPercent, minCoverageCount, whateverStrand);
             covAnalysisHandler.registerObserver(analysisCoveredFeatures);
             covAnalysisHandler.setCoverageNeeded(true);
 
@@ -152,6 +153,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                         trackNames = trackNames.concat(track.getDescription()).concat(" and ");
                     }
                     trackNames = trackNames.substring(0, trackNames.length() - 5);
+                    if (trackNames.length() > 120) {
+                        trackNames = trackNames.substring(0, 120).concat("...");
+                    }
                 }
 
                 ++finishedCovAnalyses;

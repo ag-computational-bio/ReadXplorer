@@ -19,17 +19,20 @@ import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.*;
 import de.cebitec.vamp.view.dialogMenus.ResetTrackFilePanel;
+import de.cebitec.vamp.view.login.LoginProperties;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.List;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import net.sf.samtools.util.RuntimeIOException;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  * Factory used to initialize all different kinds of base panels.
@@ -80,7 +83,7 @@ public class BasePanelFactory {
         try {
             tc = connector.getTrackConnector(track);
         } catch (RuntimeIOException e) {
-            PersistantTrack newTrack = this.openResetFilePathDialog(track, connector, basePanel);
+            PersistantTrack newTrack = this.getNewFilePath(track, connector, basePanel);
             if (newTrack != null) {
                 tc = connector.getTrackConnector(newTrack);
             } else {
@@ -145,7 +148,7 @@ public class BasePanelFactory {
                 for (int i = 0; i < tracks.size(); ++i) {
                     PersistantTrack track = tracks.get(i);
                     if (!(new File(track.getFilePath())).exists()) {
-                        tracks.set(i, this.openResetFilePathDialog(track, connector, basePanel));
+                        tracks.set(i, this.getNewFilePath(track, connector, basePanel));
                         
                     }
                 }
@@ -332,11 +335,59 @@ public class BasePanelFactory {
         checker.addActionListener(new FeatureTypeListener(type, viewer));
         return checker;
     }
+    
+    /**
+     * In case a direct access track was moved to another place this method
+     * first tries to find the track in the current directory used for resetting
+     * track file paths and if it cannot be found it calls the
+     * <tt>openResetFilePathDialog</tt> method to open a dialog for resetting
+     * the file path to the current location of the file.
+     * @param the track whose path has to be resetted
+     * @param connector the connector
+     * @param b the base panel
+     * @return the track connector for the updated track or null, if it did not
+     * work
+     */
+    private PersistantTrack getNewFilePath(PersistantTrack track, ProjectConnector connector, BasePanel b) {
+        PersistantTrack newTrack;
+        Preferences prefs = NbPreferences.forModule(Object.class);
+        File oldTrackFile = new File(track.getFilePath());
+        String basePath = prefs.get("ResetTrack.Filepath", ".");
+        newTrack = this.checkFileExists(basePath, oldTrackFile, track);
+        if (newTrack == null) {
+            prefs = Preferences.userNodeForPackage(LoginProperties.class);
+            basePath = new File(prefs.get(LoginProperties.LOGIN_DATABASE_H2, ".")).getParentFile().getAbsolutePath();
+            newTrack = this.checkFileExists(basePath, oldTrackFile, track);
+        }
+        if (newTrack == null) {
+            newTrack = this.openResetFilePathDialog(track, connector, b);
+        }
+        return newTrack;
+    }
+    
+    /**
+     * Checks if a file exists and creates a new track, if it exists.
+     * @param prefs the prefs to get the base path from
+     * @param pref the preference for the base path
+     * @param oldTrackFile the old track file to replace
+     * @param track the old track to replace
+     * @return the new track, if the file exists, null otherwise
+     */
+    private PersistantTrack checkFileExists(String basePath, File oldTrackFile, PersistantTrack track) {
+        PersistantTrack newTrack = null;
+        File newTrackFile = new File(basePath + "/" + oldTrackFile.getName());
+        if (newTrackFile.exists()) {
+            newTrack = new PersistantTrack(track.getId(),
+                    newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
+                    track.getRefGenID(), track.getSeqPairId());
+        }
+        return newTrack;
+    }
 
     /**
-     * In case a direct access track was moved to another place and cannot be found
-     * this method opens a dialog for resetting the file path to the current location
-     * of the file.
+     * In case a direct access track was moved to another place and cannot be
+     * found this method opens a dialog for resetting the file path to the
+     * current location of the file.
      * @param track the track whose path has to be resetted
      * @param connector the connector
      * @param b the base panel

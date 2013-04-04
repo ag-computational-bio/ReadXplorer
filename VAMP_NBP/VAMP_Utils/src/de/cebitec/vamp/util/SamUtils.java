@@ -51,44 +51,49 @@ public class SamUtils implements Observable {
     
     
     /**
-     * Generates a BAM index file from an input BAM file
-     *
+     * Generates a BAM index file from an input BAM file.
      * @param reader SAMFileReader for input BAM file
      * @param output  File for output index file
      *
+     * @return true, if the index creation succeeded, false otherwise
      * @author Martha Borkan, rhilker
      */
-    public void createIndex(SAMFileReader reader, File output) {
+    public boolean createIndex(SAMFileReader reader, File output) {
 
+        boolean success = true;
         BAMIndexer indexer = new BAMIndexer(output, reader.getFileHeader());
         reader.enableFileSource(true);
         int totalRecords = 0;
 
-        // create and write the content
-        SAMRecordIterator samItor = reader.iterator();
-        SAMRecord record;
-        while (samItor.hasNext()) {
-            try {
-                record = samItor.next();
-                if (++totalRecords % 500000 == 0) {
-                    this.notifyObservers(totalRecords + " reads indexed ...");
+        try {
+            // create and write the content
+            SAMRecordIterator samItor = reader.iterator();
+            SAMRecord record;
+            while (samItor.hasNext()) {
+                try {
+                    record = samItor.next();
+                    if (++totalRecords % 500000 == 0) {
+                        this.notifyObservers(totalRecords + " reads indexed ...");
+                    }
+                    indexer.processAlignment(record);
+                } catch (RuntimeEOFException e) {
+                    this.notifyObservers(e);
+                } catch (SAMFormatException e) {
+                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                        this.notifyObservers(e.getMessage());
+                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 }
-                indexer.processAlignment(record);
-            } catch (RuntimeEOFException e) {
-                this.notifyObservers(e);
-            } catch (SAMFormatException e) {
-                if (!e.getMessage().contains("MAPQ should be 0")) {
-                    this.notifyObservers(e.getMessage());
-                } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
-            } catch (SAMException e) {
-                this.notifyObservers("If you tried to create an index on a sam "
-                        + "file this is the reason for the exception. Indexes"
-                        + "can only be created for bam files!");
-                this.notifyObservers(e);
             }
+            this.notifyObservers("All " + totalRecords + " reads indexed!");
+        } catch (SAMException e) {
+            this.notifyObservers("If you tried to create an index on a sam "
+                    + "file this is the reason for the exception. Indexes"
+                    + "can only be created for bam files!");
+            this.notifyObservers(e);
+            success = false;
         }
-        this.notifyObservers("All " + totalRecords + " reads indexed!");
         indexer.finish();
+        return success;
     }
 
     @Override

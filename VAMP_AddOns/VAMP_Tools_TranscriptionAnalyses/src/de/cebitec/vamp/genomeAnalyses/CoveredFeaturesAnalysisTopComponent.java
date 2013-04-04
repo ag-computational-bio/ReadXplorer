@@ -37,7 +37,7 @@ preferredID = "CoveredFeaturesAnalysisTopComponent")
 })
 public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
     
-    public static final String PREFERRED_ID = "CoveredFeaturesTopComponent";
+    public static final String PREFERRED_ID = "CoveredFeaturesAnalysisTopComponent";
     private static final long serialVersionUID = 1L;
 
     /**

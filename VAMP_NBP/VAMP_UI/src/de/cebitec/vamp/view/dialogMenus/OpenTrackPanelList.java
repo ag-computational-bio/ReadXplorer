@@ -11,10 +11,14 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.JScrollPane;
 import org.japura.gui.CheckList;
+import org.japura.gui.event.ListCheckListener;
+import org.japura.gui.event.ListEvent;
 import org.japura.gui.model.DefaultListCheckModel;
 import org.japura.gui.model.ListCheckModel;
+import org.openide.util.NbBundle;
 
 /**
  * A JPanel which contains a list of tracks and displays them as a list of checkboxes and
@@ -27,11 +31,18 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
     public final static long serialVersionUID = 724742799;
     private ReferenceConnector refGenConnector;
     private CheckList checkList;
-
+    
+    public final static String PROP_SELECTED_ITEMS = "PROP_SELECTED_ITEMS";
+    
     /** Creates new form OpenTrackPanelList */
     public OpenTrackPanelList() {
         this.initComponents();
         this.initAdditionalComponents();
+    }
+    
+    @Override
+    public String getName() {
+        return NbBundle.getMessage(OpenTrackPanelList.class, "OpenTrackPanelList.name");
     }
 
     /** 
@@ -89,8 +100,22 @@ public class OpenTrackPanelList extends javax.swing.JPanel {
         this.checkList.setModel(model);
         scrollPane.setViewportView(this.checkList);
         this.add(scrollPane, BorderLayout.CENTER);
+        this.checkList.getModel().addListCheckListener(new ListCheckListener() {
+
+            @Override
+            public void removeCheck(ListEvent le) {
+                firePropertyChange(PROP_SELECTED_ITEMS, null, null);
+            }
+
+            @Override
+            public void addCheck(ListEvent le) {
+                firePropertyChange(PROP_SELECTED_ITEMS, null, null);
+            }
+        });
+        
     }
 
+    private final static Logger LOG = Logger.getLogger(OpenTrackPanelList.class.getName());
     
     /**
      * @return The tracks selected in the selection list.

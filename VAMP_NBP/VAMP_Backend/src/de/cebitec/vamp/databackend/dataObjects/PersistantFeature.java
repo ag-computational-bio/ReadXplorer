@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.util.polyTree.Node;
 import de.cebitec.vamp.util.polyTree.Polytree;
@@ -71,7 +72,9 @@ public class PersistantFeature extends Node implements PersistantFeatureI {
         String[] parentIdArray = parentIds.split(";");
         for (int i = 0; i < parentIdArray.length; ++i) {
             try {
-                parentIdList.add(Integer.parseInt(parentIdArray[i]));
+                if (!parentIdArray[i].equals(Properties.NO_PARENT_STRING)) {
+                    parentIdList.add(Integer.parseInt(parentIdArray[i]));
+                }
             } catch (NumberFormatException e) {
                 //ignore and continue
             }

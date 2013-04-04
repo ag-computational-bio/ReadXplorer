@@ -1,8 +1,9 @@
 package de.cebitec.vamp.parser.output;
 
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.mappings.PreprocessorI;
 import de.cebitec.vamp.util.Benchmark;
-import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
@@ -22,31 +23,34 @@ import org.openide.util.NbBundle;
  *
  * @author -Rolf Hilker-
  */
-public class SamBamCombiner implements Observable, Observer {
+public class SamBamCombiner implements CombinerI {
     
     private final TrackJob trackJob1;
     private final TrackJob trackJob2;
     private boolean sortCoordinate;
     private List<Observer> observers;
+    private String referenceSeq;
     
     /**
      * Allows to combine two mapping files (e.g. read 1 and read2 of the same
      * pairs) in one file. The first trackjob contains the new file name
      * afterwards, while the second trackjob contains an empty file name to
      * prevent reuse of it after the combination. The merge process is started
-     * by calling "combineTracks".
+     * by calling "combineData".
      * @param trackJob1 containing the first file before the merge and the new
      *      file name after the merge process
      * @param trackJob2 containing the second file, which is merged with the first
      *      an its file path is reset to an empty string afterwards
      * @param sortCoordinate true, if the combined file should be sorted by 
      * coordinate and false otherwise
+     * @param referenceSeq the complete reference sequence 
      */
-    public SamBamCombiner(TrackJob trackJob1, TrackJob trackJob2, boolean sortCoordinate) {
+    public SamBamCombiner(TrackJob trackJob1, TrackJob trackJob2, boolean sortCoordinate, String referenceSeq) {
         this.trackJob1 = trackJob1;
         this.trackJob2 = trackJob2;
         this.sortCoordinate = sortCoordinate;
         this.observers = new ArrayList<>();
+        this.referenceSeq = referenceSeq;
     }
     
     /**
@@ -54,8 +58,13 @@ public class SamBamCombiner implements Observable, Observer {
      * pairs) in one file. The first trackjob contains the new file name
      * afterwards, while the second trackjob contains an empty file name to
      * prevent reuse of it after the combination.
+     * @throws OutOfMemoryError 
      */
-    public void combineTracks() {
+    @Override
+    public boolean combineData() throws ParsingException, OutOfMemoryError {
+        
+        boolean success = true;
+        
         long startTime = System.currentTimeMillis();
         //only proceed if the second track job contains a file
         File fileToExtend = trackJob1.getFile();
@@ -66,6 +75,7 @@ public class SamBamCombiner implements Observable, Observer {
             this.notifyObservers(NbBundle.getMessage(SamBamCombiner.class, "Combiner.Combine.Start", fileName + " and " + file2.getName()));
 
             SAMFileReader samBamReader = new SAMFileReader(fileToExtend);
+            samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samBamItor = samBamReader.iterator();
             SAMFileHeader header = samBamReader.getFileHeader();
             if (sortCoordinate) {
@@ -96,9 +106,11 @@ public class SamBamCombiner implements Observable, Observer {
 
             if (sortCoordinate) { 
                 try (SAMFileReader samReaderNew = new SAMFileReader(outputFile)) { //close is performed by try statement
+                    samReaderNew.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
                     SamUtils utils = new SamUtils();
                     utils.registerObserver(this);
-                    utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
+                    success = utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
+                    utils.removeObserver(this);
                 }
             }
             
@@ -106,6 +118,8 @@ public class SamBamCombiner implements Observable, Observer {
             String msg = NbBundle.getMessage(SamBamCombiner.class, "Combiner.Combine.Finished", fileName + " and " + file2.getName());
             this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
         }
+        
+        return success;
     }
     
     /**

@@ -382,40 +382,31 @@ public final class ParserCommonMethods {
         refAndRead[1] =  newreadSeq;
         return  refAndRead;
     }
-    
+
     /**
-     * Checks whether a given read contains no inconsistent information. Tests
-     * whether: readSeq or refSeq is null or empty, cigar only contains valid
-     * operations, start and stop are in reference range.
-     * @param parent parent observable, which is notified on inconsistent information
-     * @param readSeq 
-     * @param refSeqLength
-     * @param cigar
-     * @param start
-     * @param stop
-     * @param filename
-     * @param lineno
+     * Checks a read for common properties: <br>1. Empty or null read sequence
+     * <br>2. mapping beyond the reference sequence length or to negative
+     * positions <br>3. a start position larger than the stop position
+     * @param parent the parent observable to receive messages
+     * @param readSeq the read sequence
+     * @param refSeqLength the length of the reference sequence
+     * @param start the start of the mapping
+     * @param stop the stop of the mapping
+     * @param filename the file name of which the mapping originates
+     * @param lineno the line number in the file
      * @return true, if the read is consistent, false otherwise
      */
-    public static boolean checkRead(
-            Observable parent, 
-            String readSeq, 
-            int refSeqLength, 
-            String cigar,
-            int start, 
-            int stop, 
-            String filename, 
+    public static boolean checkRead(Observable parent,
+            String readSeq,
+            int refSeqLength,
+            int start,
+            int stop,
+            String filename,
             int lineno) {
-        
         boolean isConsistent = true;
         if (readSeq == null || readSeq.isEmpty()) {
             parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
                     "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
-            isConsistent = false;
-        }
-        if (!cigar.matches("[MHISDPXN=\\d]+")) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
-                    "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
             isConsistent = false;
         }
         if (refSeqLength < start || refSeqLength < stop) {
@@ -429,9 +420,100 @@ public final class ParserCommonMethods {
                     "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
             isConsistent = false;
         }
+
+        return isConsistent;
+    }
+    
+    /**
+     * Checks a read for common properties: 
+     * <br>1. Empty or null read sequence
+     * <br>2. mapping beyond the reference sequence length or to negative
+     * positions 
+     * <br>3. a start position larger than the stop position
+     * <br>4. an error in the cigar string
+     * @param parent the parent observable to receive messages
+     * @param readSeq the read sequence
+     * @param refSeqLength the length of the reference sequence
+     * @param cigar the cigar of the mapping
+     * @param start the start of the mapping
+     * @param stop the stop of the mapping
+     * @param filename the file name of which the mapping originates
+     * @param lineno the line number in the file
+     * @return true, if the read is consistent, false otherwise
+     */
+    public static boolean checkReadSam(
+            Observable parent, 
+            String readSeq, 
+            int refSeqLength, 
+            String cigar,
+            int start, 
+            int stop, 
+            String filename, 
+            int lineno) {
+        
+        boolean isConsistent = ParserCommonMethods.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
+        if (!cigar.matches("[MHISDPXN=\\d]+")) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
+            isConsistent = false;
+        }
         
         return isConsistent;
-    }    
+    } 
+    
+    /**
+     * Checks a read for common properties: 
+     * <br>1. Empty or null read sequence
+     * <br>2. mapping beyond the reference sequence length or to negative
+     * positions 
+     * <br>3. a start position larger than the stop position
+     * <br>4. an empty read name
+     * <br>5. an empty refrence sequence
+     * <br>6. an unknown mapping orientation
+     * @param parent the parent observable to receive messages
+     * @param readSeq the read sequence
+     * @param readname the name of the read
+     * @param refSeq reference sequence beloning to the mapping (not the complete reference genome)
+     * @param refSeqLength the length of the reference sequence
+     * @param start the start of the mapping
+     * @param stop the stop of the mapping
+     * @param direction direction of the mapping
+     * @param filename the file name of which the mapping originates
+     * @param lineno the line number in the file
+     * @return true, if the read is consistent, false otherwise
+     */
+    public static boolean checkReadJok(
+            Observable parent,
+            String readSeq,
+            String readname,
+            String refSeq,
+            int refSeqLength,
+            int start,
+            int stop,
+            int direction,
+            String filename,
+            int lineno) {
+        
+        boolean isConsistent = ParserCommonMethods.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
+        
+        if (readname == null || readname.isEmpty()) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorReadname", filename, lineno, readname));
+            isConsistent = false;
+        }
+        if (direction == 0) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorDirectionJok", filename, lineno));
+            isConsistent = false;
+        }
+        if (refSeq == null || refSeq.isEmpty()) {
+            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+                    "Parser.checkMapping.ErrorRef", filename, lineno, refSeq));
+            isConsistent = false;
+        }
+        
+        return isConsistent;
+    }
 
     /**
      * In fact deletions in the read shift the stop position of the

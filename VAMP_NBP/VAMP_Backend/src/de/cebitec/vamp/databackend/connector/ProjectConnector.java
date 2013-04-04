@@ -362,13 +362,16 @@ public class ProjectConnector extends Observable {
         //delete old "RUN_ID" field from the database to avoid problems with null values in insert statement
         // an error will be raised by the query, if the field does not exist 
         // (simply ignore the error) 
-        this.runSqlStatementIgnoreErrors(GenericSQLQueries.genRemoveColumnString( 
+        this.runSqlStatement(GenericSQLQueries.genRemoveColumnString( 
                 FieldNames.TABLE_TRACK, "RUN_ID"));
 
         //Add column parent id to feature table
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES, FieldNames.FEATURE_PARENT_IDS, VARCHAR1000));
         this.runSqlStatement(SQLStatements.INIT_FEATURE_PARENT_ID);
         this.runSqlStatement(SQLStatements.NOT_NULL_FEATURE_PARENT_ID);
+        //Drop old PARENT_ID column
+        this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
+                FieldNames.TABLE_FEATURES, "PARENT_ID"));
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
@@ -1566,7 +1569,7 @@ public class ProjectConnector extends Observable {
      * @param trackID the track id whose data shall be delete from the DB
      * @throws StorageException 
      */
-    public void deleteTrack(long trackID) throws StorageException {
+    public void deleteTrack(int trackID) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \"{0}\"", trackID);
         try (PreparedStatement deleteDiffs = con.prepareStatement(SQLStatements.DELETE_DIFFS_FROM_TRACK);
              PreparedStatement deleteSeqPairPivot = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_PIVOT);
@@ -1596,11 +1599,11 @@ public class ProjectConnector extends Observable {
                 
                 con.commit();
             }
-            deleteMappings.setLong(1, trackID);
-            deleteCoverage.setLong(1, trackID);
-            deleteStatistics.setLong(1, trackID);
-            deletePosTable.setLong(1, trackID);
-            deleteTrack.setLong(1, trackID);
+            deleteMappings.setInt(1, trackID);
+            deleteCoverage.setInt(1, trackID);
+            deleteStatistics.setInt(1, trackID);
+            deletePosTable.setInt(1, trackID);
+            deleteTrack.setInt(1, trackID);
 
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Diffs...");
             deleteDiffs.execute();
@@ -1622,6 +1625,7 @@ public class ProjectConnector extends Observable {
             con.commit();
 
             con.setAutoCommit(true);
+            this.trackConnectors.remove(trackID);
 
         } catch (SQLException ex) {
             throw new StorageException(ex);

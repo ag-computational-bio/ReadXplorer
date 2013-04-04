@@ -8,6 +8,7 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.mappings.SamBamStepParser;
 import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
+import de.cebitec.vamp.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.beans.PropertyChangeEvent;
@@ -216,8 +217,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 } else if (dialogPane instanceof NewSeqPairTracksDialogPanel) {
                     NewSeqPairTracksDialogPanel seqPairPane = (NewSeqPairTracksDialogPanel) dialogPane;
                     
-                    if (seqPairPane.isUseMultipleImport()) {
-                        List<File> mappingFiles1 = seqPairPane.getMappingFiles1();
+                    if (seqPairPane.useMultipleImport()) {
+                        List<File> mappingFiles1 = seqPairPane.getMappingFiles();
                         List<File> mappingFiles2 = seqPairPane.getMappingFiles2();
 
                         int largestSize = mappingFiles1.size() > mappingFiles2.size() ? mappingFiles1.size() : mappingFiles2.size();
@@ -231,30 +232,24 @@ public class ImportSetupCard extends javax.swing.JPanel {
                             if (i < mappingFiles2.size()) {
                                 file2 = mappingFiles2.get(i);
                             }
-                            this.addSeqPairJobToList(seqPairPane, file1, file2, seqPairPane.isUseMultipleImport());
+                            this.addSeqPairJobToList(seqPairPane, file1, file2);
                         }
                     } else {
-                        this.addSeqPairJobToList(seqPairPane, seqPairPane.getMappingFile1(), seqPairPane.getMappingFile2(), seqPairPane.isUseMultipleImport());
+                        this.addSeqPairJobToList(seqPairPane, seqPairPane.getMappingFile1(), seqPairPane.getMappingFile2());
                     }
 
                 } else if (dialogPane instanceof NewTrackDialogPanel) {
-                    NewTrackDialogPanel ntdp = (NewTrackDialogPanel) dialogPane;
-                    ReferenceJob refJob = ntdp.getReferenceJob();
+                    NewTrackDialogPanel newTrackPanel = (NewTrackDialogPanel) dialogPane;
                     
-                    TrackJob trackJob = new TrackJob(trackID++, ntdp.isDbUsed(), 
-                            ntdp.getMappingFile(), 
-                            ntdp.getTrackName(), 
-                            refJob, 
-                            ntdp.getParser(), 
-                            ntdp.isAlreadyImported(), 
-                            new Timestamp(System.currentTimeMillis()));
-                    
-                    trackJob.setIsStepwise((ntdp.getParser() instanceof SamBamStepParser));
-                    trackJob.setStepSize(ntdp.getstepSize());
-                     trackJob.setIsSorted(ntdp.isFileSorted());
-                    refJob.registerTrackWithoutRunJob(trackJob);
-                    trackJobView.add(trackJob);
-                
+                    for (File mappingFile : newTrackPanel.getMappingFiles()) {
+
+                        TrackJob trackJob = this.createTrackJob(newTrackPanel, mappingFile);
+
+                        trackJob.setIsStepwise((newTrackPanel.getCurrentParser() instanceof SamBamStepParser));
+                        trackJob.setStepSize(newTrackPanel.getStepSize());
+                        trackJob.setIsSorted(newTrackPanel.isFileSorted());
+                        trackJobView.add(trackJob);
+                    }
                 } else if (dialogPane instanceof NewPositionTableDialog) {
                     NewPositionTableDialog posTableDialog = (NewPositionTableDialog) dialogPane;
                     ReferenceJob refJob = posTableDialog.getReferenceJob();
@@ -265,11 +260,11 @@ public class ImportSetupCard extends javax.swing.JPanel {
                             posTableDialog.getMappingFile(), 
                             "", 
                             refJob, 
-                            posTableDialog.getParser(), 
+                            posTableDialog.getCurrentParser(), 
                             true, 
                             new Timestamp(System.currentTimeMillis()));
                     
-                    trackJob.setIsStepwise((posTableDialog.getParser() instanceof SamBamStepParser));
+                    trackJob.setIsStepwise((posTableDialog.getCurrentParser() instanceof SamBamStepParser));
                     trackJob.setStepSize(posTableDialog.getStepSize());
                     refJob.registerTrackWithoutRunJob(trackJob);
                     this.positionTableJobView.add(trackJob);
@@ -342,20 +337,17 @@ public class ImportSetupCard extends javax.swing.JPanel {
      * Creates and adds a sequence pair job to the list of sequence pair jobs.
      * @param seqPairPane 
      */
-    private void addSeqPairJobToList(NewSeqPairTracksDialogPanel seqPairPane, File mappingFile1, File mappingFile2, boolean useMultipleImport) {
+    private void addSeqPairJobToList(NewSeqPairTracksDialogPanel seqPairPane, File mappingFile1, File mappingFile2) {
 
-        ReferenceJob refJob = seqPairPane.getReferenceJob();
         if (mappingFile1 == null) {
             mappingFile1 = mappingFile2;
             mappingFile2 = null;
         }
         
-        TrackJob trackJob1 = this.createTrackJob(seqPairPane, mappingFile1, useMultipleImport);
+        TrackJob trackJob1 = this.createTrackJob(seqPairPane, mappingFile1);
         TrackJob trackJob2 = null;
-        refJob.registerTrackWithoutRunJob(trackJob1);
         if (mappingFile2 != null) {
-            trackJob2 = this.createTrackJob(seqPairPane, mappingFile2, useMultipleImport);
-            refJob.registerTrackWithoutRunJob(trackJob2);
+            trackJob2 = this.createTrackJob(seqPairPane, mappingFile2);
         }
 
         this.seqPairTrackJobsView.add(new SeqPairJobContainer(trackJob1, trackJob2,
@@ -364,18 +356,21 @@ public class ImportSetupCard extends javax.swing.JPanel {
     
     /**
      * Creates a new track job for a sequence pair import.
-     * @param seqPairPane panel with details
+     * @param importPanel panel with details
      * @param mappingFile mapping file to add to the track job
      * @param useMultipleImport true, if multiple files were selected in the panel
      * @return the new track job
      */
-    private TrackJob createTrackJob(NewSeqPairTracksDialogPanel seqPairPane, File mappingFile, boolean useMultipleImport) {
-        return new TrackJob(trackID++, seqPairPane.isDbUsed(),
+    private TrackJob createTrackJob(ImportTrackBasePanel importPanel, File mappingFile) {
+        ReferenceJob refJob = importPanel.getReferenceJob();
+        TrackJob trackJob = new TrackJob(trackID++, importPanel.isDbUsed(),
                 mappingFile,
-                useMultipleImport && mappingFile != null ? mappingFile.getName() : seqPairPane.getTrackName(),
-                seqPairPane.getReferenceJob(),
-                seqPairPane.getParser(),
-                seqPairPane.isAlreadyImported(),
+                importPanel.useMultipleImport() && mappingFile != null ? mappingFile.getName() : importPanel.getTrackName(),
+                importPanel.getReferenceJob(),
+                importPanel.getCurrentParser(),
+                importPanel.isAlreadyImported(),
                 new Timestamp(System.currentTimeMillis()));
+        refJob.registerTrackWithoutRunJob(trackJob);
+        return trackJob;
     }
 }

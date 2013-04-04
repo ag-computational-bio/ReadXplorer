@@ -95,6 +95,7 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
                 newFileLocation = fileLocation;
             }
         };
+        fc.setDirectoryProperty("ResetTrack.Filepath");
         fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }//GEN-LAST:event_resetButtonActionPerformed
 

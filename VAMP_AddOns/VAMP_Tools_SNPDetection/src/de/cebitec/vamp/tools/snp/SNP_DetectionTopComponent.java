@@ -145,7 +145,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
     }
 
     /**
-     * This method needas to be called in order to open a new tab for snp detection.
+     * This method needs to be called in order to open a new tab for snp detection.
      * @param referenceViewer the reference viewer for which the snp detection should be carried out.
      * @param trackIds the list of track ids (associated to the reference viewer) for which the snp 
      *          detection should be carried out.

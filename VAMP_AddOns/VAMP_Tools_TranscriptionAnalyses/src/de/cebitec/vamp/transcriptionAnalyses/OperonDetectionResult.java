@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.GeneralUtils;
-import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +60,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
         for (Operon operon : this.detectedOperons) {
             String annoName1 = "";
             String annoName2 = "";
-            String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrand() ? 
-                    SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_FWD_STRING) + "\n";
+            String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString()) + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";

@@ -6,7 +6,10 @@ import de.cebitec.vamp.parser.output.ConverterI;
 import de.cebitec.vamp.parser.output.JokToBamConverter;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.dialogMenus.FileSelectionPanel;
+import java.io.File;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
@@ -14,11 +17,10 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ConverterSetupCard extends javax.swing.JPanel {
+public class ConverterSetupCard extends FileSelectionPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private String filePath;
     private String fileExtension; //TODO: add file extension to converter
     private ConverterI[] availableParsers = new ConverterI[]{new JokToBamConverter()};
     private ConverterI currentConverter;
@@ -35,6 +37,8 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         this.initAdditionalData();
         this.selectedReference = (PersistantReference) this.refComboBox.getSelectedItem();
         this.setVisibleComponents(true);
+        this.multiTrackScrollPane.setVisible(false);
+        this.multiTrackListLabel.setVisible(false);
     }
     
     private void initAdditionalData() {
@@ -67,6 +71,11 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         refComboLabel = new javax.swing.JLabel();
         refCheckBox = new javax.swing.JCheckBox();
         refSelectionLabel = new javax.swing.JLabel();
+        multipleFileCheckBox = new javax.swing.JCheckBox();
+        multipleFileLabel = new javax.swing.JLabel();
+        multiTrackScrollPane = new javax.swing.JScrollPane();
+        multiTrackList = new javax.swing.JList<>();
+        multiTrackListLabel = new javax.swing.JLabel();
 
         headerLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.headerLabel.text")); // NOI18N
 
@@ -127,6 +136,19 @@ public class ConverterSetupCard extends javax.swing.JPanel {
 
         refSelectionLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.refSelectionLabel.text")); // NOI18N
 
+        multipleFileCheckBox.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.multipleFileCheckBox.text")); // NOI18N
+        multipleFileCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                multipleFileCheckBoxActionPerformed(evt);
+            }
+        });
+
+        multipleFileLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.multipleFileLabel.text")); // NOI18N
+
+        multiTrackScrollPane.setViewportView(multiTrackList);
+
+        multiTrackListLabel.setText(org.openide.util.NbBundle.getMessage(ConverterSetupCard.class, "ConverterSetupCard.multiTrackListLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -145,12 +167,12 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                                 .addComponent(referenceLengthLabel, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(referenceNameLabel))
                             .addComponent(refComboLabel)
-                            .addComponent(refSelectionLabel))
+                            .addComponent(refSelectionLabel)
+                            .addComponent(multipleFileLabel)
+                            .addComponent(multiTrackListLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(refCheckBox)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(converterComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(referenceNameField, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
@@ -158,7 +180,12 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(openFileButton))
                             .addComponent(referenceLengthField, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(refComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(refComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(multipleFileCheckBox)
+                                    .addComponent(refCheckBox))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -181,6 +208,10 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                     .addComponent(refSelectionLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(multipleFileCheckBox)
+                    .addComponent(multipleFileLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(refComboLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -191,6 +222,10 @@ public class ConverterSetupCard extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(referenceLengthField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(referenceLengthLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(multiTrackListLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -207,11 +242,29 @@ public class ConverterSetupCard extends javax.swing.JPanel {
 
             @Override
             public void open(String fileLocation) {
-                fileTextField.setText(fileLocation);
-                filePath = fileLocation;
+                
+                if (useMultipleImport()) {
+                    File[] files = this.getSelectedFiles();
+                    getMappingFiles().clear();
+
+                    for (int i = 0; i < files.length; ++i) {
+                        addFile(files[i], fileTextField);
+                        fileTextField.setText(files[i].getName());
+                    }
+
+                    fileTextField.setText(getMappingFiles().size() + " tracks to import");
+                    DefaultListModel<String> model = new DefaultListModel<>();
+                    fillMultipleImportTable(model, getMappingFiles(), "Mapping file list:");
+                    multiTrackList.setModel(model);
+                } else {
+                    File file = this.getSelectedFile();
+                    addFile(file, fileTextField);
+                }
                 isRequiredInfoSet();
             }
         };
+        fc.setDirectoryProperty("Converter.Filepath");
+        fc.setMultiSelectionEnabled(this.useMultipleImport());
         fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }//GEN-LAST:event_openFileButtonActionPerformed
 
@@ -260,12 +313,21 @@ public class ConverterSetupCard extends javax.swing.JPanel {
         this.isRequiredInfoSet();
     }//GEN-LAST:event_refCheckBoxActionPerformed
 
+    private void multipleFileCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multipleFileCheckBoxActionPerformed
+        this.updateGuiForMultipleFiles(multipleFileCheckBox, multiTrackScrollPane, multiTrackList, multiTrackListLabel, fileTextField);
+    }//GEN-LAST:event_multipleFileCheckBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<ConverterI> converterComboBox;
     private javax.swing.JLabel converterLabel;
     private javax.swing.JLabel fileLabel;
     private javax.swing.JTextField fileTextField;
     private javax.swing.JLabel headerLabel;
+    private javax.swing.JList<String> multiTrackList;
+    private javax.swing.JLabel multiTrackListLabel;
+    private javax.swing.JScrollPane multiTrackScrollPane;
+    private javax.swing.JCheckBox multipleFileCheckBox;
+    private javax.swing.JLabel multipleFileLabel;
     private javax.swing.JButton openFileButton;
     private javax.swing.JCheckBox refCheckBox;
     private javax.swing.JComboBox<PersistantReference> refComboBox;
@@ -311,7 +373,7 @@ public class ConverterSetupCard extends javax.swing.JPanel {
      * conversion can be started or not.
      */
     public void isRequiredInfoSet() {
-        if (filePath != null && currentConverter != null && 
+        if (!getMappingFiles().isEmpty() && currentConverter != null && 
                 (referenceName != null && !referenceName.isEmpty() && referenceLength >= 0 || 
                 refCheckBox.isSelected())) {
             canConvert = true;
@@ -323,13 +385,6 @@ public class ConverterSetupCard extends javax.swing.JPanel {
 
     public ConverterI getSelectedConverter() {
         return currentConverter;
-    }
-
-    /**
-     * @return The file path of the file to convert
-     */
-    public String getFilePath() {
-        return filePath;
     }
 
     /**

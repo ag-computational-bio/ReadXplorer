@@ -11,7 +11,7 @@ import java.util.Map;
 import org.openide.util.NbBundle;
 
 /**
- * The parser to use for parsing a track.
+ * The parser to use for parsing a track to store in the DB.
  *
  * @author ddoppmeier
  */
@@ -19,6 +19,16 @@ public class TrackParser implements TrackParserI {
  
     CoverageContainer coverageContainer ;
 
+    /**
+     * Parses the mappings of a track to store in the DB.
+     * @param trackJob
+     * @param sequenceString
+     * @param observer
+     * @param covContainer
+     * @return
+     * @throws ParsingException
+     * @throws OutOfMemoryError 
+     */
     @Override
     public ParsedTrack parseMappings(TrackJob trackJob, String sequenceString, Observer observer, 
                     CoverageContainer covContainer) throws ParsingException, OutOfMemoryError {
@@ -50,8 +60,6 @@ public class TrackParser implements TrackParserI {
             
             Map<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInfos();
             mappingInfos.put(5, parser.getNbUniqueSeq());
-            
-            track.getParsedMappingContainer().setMappingInfos(null);
         }
         mappingParser.removeObserver(observer);
         mappingParser = null;

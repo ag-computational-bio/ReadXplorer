@@ -9,57 +9,56 @@ import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.mappings.*;
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.io.File;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
+import org.openide.util.NbBundle;
 
 /**
  * Panel displaying the options for importing new tracks into VAMP.
  *
  * @author jwinneba, rhilker
  */
-public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
+public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
-    private File mappingFile;
     private ReferenceJob[] refGenJobs;
     
     private final JokParser jokParser;
+    private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamParser samBamParser;
     private final SamBamStepParser samBamStepParser;
     private final SamBamDirectParser samBamDirectParser;
     private MappingParserI[] parsers;
     
-    private MappingParserI currentParser;
     private int stepSize = 0;
     private static final int maxVal = 1000000000;
     private static final int minVal = 10000;
     private static final int step = 1000;
     private static final int defaultVal = 300000;
-    private boolean useDB = false;
 
     /** 
      * Panel displaying the options for importing new tracks into VAMP. 
      */
     public NewTrackDialogPanel() {
-        this.refGenJobs = this.getRefGenJobs();
+        this.refGenJobs = this.getReferenceJobs();
         this.jokParser = new JokParser();
+        this.jokToBamDirectParser = new JokToBamDirectParser();
         this.samBamParser = new SamBamParser();
         this.samBamStepParser = new SamBamStepParser();
         this.samBamDirectParser = new SamBamDirectParser();
-        this.parsers = new MappingParserI[] { this.samBamDirectParser };
+        this.parsers = new MappingParserI[] { this.samBamDirectParser, jokToBamDirectParser };
         // choose the default parser. first entry is shown in combobox by default
-        this.currentParser = this.parsers[0];
+        this.setCurrentParser(this.parsers[0]);
         this.initComponents();
         this.setStepwiseField(false);
-        this.setJSpinner();
+        this.setStepSizeSpinner();
+        this.multiTrackScrollPane.setVisible(false);
+        this.multiTrackListLabel.setVisible(false);
 
     }
 
@@ -69,60 +68,34 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
      */
     @Override
     public boolean isRequiredInfoSet() {
-        if (mappingFile == null || refGenBox.getSelectedItem() == null || nameField.getText().isEmpty()) {
+        if (getMappingFiles().isEmpty() || refGenBox.getSelectedItem() == null || nameField.getText().isEmpty()) {
             return false;
         } else {
             return true;
         }
     }
-    
-    /**
-     * @return true, if the track should be stored into the database and false, if 
-     * direct file access is desired.
-     */
-    public boolean isDbUsed() {
-        return this.useDB;
-    }
-    
-    /**
-     * @return true, if this direct access track was already imported in another
-     * vamp db. In that case the sam/bam file does not have to be extended anymore, 
-     * because all needed data is already stored in the file.
-     */
-    public boolean isAlreadyImported() {
-        return this.alreadyImportedBox.isSelected();
-    }
-
-    public File getMappingFile() {
-        return mappingFile;
-    }
 
     /**
      * @return The name of this track.
      */
+    @Override
     public String getTrackName() {
         return nameField.getText();
     }
 
     /**
-     * @return the reference genome associated with this track job.
+     * @return The reference genome associated with this track job.
      */
+    @Override
     public ReferenceJob getReferenceJob() {
         return (ReferenceJob) refGenBox.getSelectedItem();
-    }
-
-    /**
-     * @return the parser, which shall be used for parsing this track job.
-     */
-    public MappingParserI getParser() {
-        return currentParser;
     }
 
     public boolean isFileSorted() {
         return fileSorted.isSelected();
     }
 
-    public Integer getstepSize() {
+    public Integer getStepSize() {
         stepSize = (Integer) stepSizeSpinner.getValue();
 
         return stepSize;
@@ -131,7 +104,7 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
     /**
      * Creates the jspinner for setting the step size of the import.
      */
-    private void setJSpinner() {
+    private void setStepSizeSpinner() {
         stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal, maxVal, step));
         JFormattedTextField txt = ((JSpinner.NumberEditor) stepSizeSpinner.getEditor()).getTextField();
         ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
@@ -176,6 +149,10 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
         importTypeCombo = new javax.swing.JComboBox<>();
         importTypeLabel = new javax.swing.JLabel();
         alreadyImportedBox = new javax.swing.JCheckBox();
+        multipleImportCheckBox = new javax.swing.JCheckBox();
+        multiTrackScrollPane = new javax.swing.JScrollPane();
+        multiTrackList = new javax.swing.JList<>();
+        multiTrackListLabel = new javax.swing.JLabel();
 
         mappingTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.mappingTypeLabel.text")); // NOI18N
 
@@ -236,44 +213,64 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
         importTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.importTypeLabel.text")); // NOI18N
 
         alreadyImportedBox.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.alreadyImportedBox.text")); // NOI18N
+        alreadyImportedBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alreadyImportedBoxActionPerformed(evt);
+            }
+        });
+
+        multipleImportCheckBox.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.multipleImportCheckBox.text")); // NOI18N
+        multipleImportCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                multipleImportCheckBoxActionPerformed(evt);
+            }
+        });
+
+        multiTrackScrollPane.setViewportView(multiTrackList);
+
+        multiTrackListLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.multiTrackListLabel.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(importTypeLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(importTypeCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(refGenLabel)
+                    .addComponent(stepSizeLabel)
+                    .addComponent(nameLabel)
+                    .addComponent(mappingFileLabel)
+                    .addComponent(mappingTypeLabel)
+                    .addComponent(multiTrackListLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(importTypeLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(importTypeCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(refGenLabel)
-                            .addComponent(stepSizeLabel)
-                            .addComponent(nameLabel)
-                            .addComponent(mappingFileLabel)
-                            .addComponent(mappingTypeLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(mappingTypeCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(alreadyImportedBox)
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fileSorted))
+                            .addComponent(multipleImportCheckBox))
+                        .addGap(0, 45, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(refGenBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(mappingFileField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chooseButton))
-                            .addComponent(nameField)
-                            .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(alreadyImportedBox)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(stepSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(fileSorted)))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap())
+                            .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nameField, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mappingTypeCombo, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -306,59 +303,72 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
                     .addComponent(stepSizeLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(alreadyImportedBox)
-                .addContainerGap(85, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(multipleImportCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(multiTrackListLabel)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
-        JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-        Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
+        VampFileChooser fc = new VampFileChooser(getCurrentParser().getFileExtensions(), getCurrentParser().getInputFileDescription()) {
+            private static final long serialVersionUID = 1L;
 
-        String path = prefs2.get("RefGenome.Filepath", null);
-        if (path != null) {
-            fc.setCurrentDirectory(new File(path));
-        }
-        int result = fc.showOpenDialog(this);
-
-
-        if (result == 0) {
-            // file chosen
-            File file = fc.getSelectedFile();
-
-            if (file.canRead()) {
-                mappingFile = file;
-                mappingFileField.setText(mappingFile.getAbsolutePath());
-                nameField.setText(mappingFile.getName());
-                Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
-                prefs.put("RefGenome.Filepath", mappingFile.getAbsolutePath());
-                try {
-                    prefs.flush();
-                } catch (BackingStoreException ex) {
-                    Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.WARNING, "Couldn't read file");
+            @Override
+            public void save(String fileLocation) {
+                throw new UnsupportedOperationException("Not supported.");
             }
-        }
+
+            @Override
+            public void open(String fileLocation) {
+
+                // file chosen
+                if (useMultipleImport()) {
+                    File[] files = this.getSelectedFiles();
+                    getMappingFiles().clear();
+
+                    for (int i = 0; i < files.length; ++i) {
+                        addFile(files[i], mappingFileField);
+                        nameField.setText(files[i].getName());
+                    }
+
+                    mappingFileField.setText(getMappingFiles().size() + " tracks to import");
+                    DefaultListModel<String> model = new DefaultListModel<>();
+                    fillMultipleImportTable(model, getMappingFiles(), "Mapping file list:");
+                    multiTrackList.setModel(model);
+                    nameField.setText("Note: each track gets its file name");
+                } else {
+                    File file = this.getSelectedFile();
+                    addFile(file, mappingFileField);
+                    nameField.setText(file.getName());
+                }
+            }
+        };
+        
+        fc.setDirectoryProperty("NewTrack.Filepath");
+        fc.setMultiSelectionEnabled(this.useMultipleImport());
+        fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
 }//GEN-LAST:event_chooseButtonActionPerformed
 
     private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
         //identification of import method by index
-        int selIndex = this.importTypeCombo.getSelectedIndex();
-        this.useDB = selIndex == 1;
+        this.setIsDbUsed(this.importTypeCombo.getSelectedIndex() == 1);
 
         this.mappingTypeCombo.removeAllItems();
-        if (!this.useDB) {
+        if (!this.isDbUsed()) {
             //update the parsers to only display the bam parser.
             this.mappingTypeCombo.addItem(this.samBamDirectParser);
+            this.mappingTypeCombo.addItem(this.jokToBamDirectParser);
         } else {
             this.mappingTypeCombo.addItem(this.samBamParser);
             this.mappingTypeCombo.addItem(this.samBamStepParser);
             this.mappingTypeCombo.addItem(this.jokParser);
         }
         //already imported checkbox only visible, if direct track access
-        this.alreadyImportedBox.setVisible(!this.useDB);
+        this.alreadyImportedBox.setVisible(!this.isDbUsed());
             
             //has to be placed in the !useDB block of the if clause, if used
         
@@ -396,9 +406,10 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
 
     private void mappingTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mappingTypeComboActionPerformed
         MappingParserI newparser = (MappingParserI) this.mappingTypeCombo.getSelectedItem();
-        if (this.currentParser != newparser) {
-            this.currentParser = newparser;
-            this.mappingFile = null;
+        if (this.getCurrentParser() != newparser) {
+            this.setCurrentParser(newparser);
+            this.multiTrackList.setModel(new DefaultListModel<String>());
+            this.getMappingFiles().clear();
             this.mappingFileField.setText("");
             this.nameField.setText("");
             this.setStepwiseField(false);
@@ -410,8 +421,30 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
                         "Stepwise parser",
                         JOptionPane.WARNING_MESSAGE);
             }
+            if (newparser instanceof SamBamDirectParser) {
+                this.alreadyImportedBox.setEnabled(true);
+            } else {
+                this.alreadyImportedBox.setEnabled(false);
+                this.alreadyImportedBox.setSelected(false);
+                this.setIsAlreadyImported(false);
+            }
         }
     }//GEN-LAST:event_mappingTypeComboActionPerformed
+
+    private void multipleImportCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multipleImportCheckBoxActionPerformed
+        this.updateGuiForMultipleFiles(multipleImportCheckBox, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFileField);
+        if (this.useMultipleImport()) {
+            nameField.setEnabled(false);
+            nameField.setText(NbBundle.getMessage(NewTrackDialogPanel.class, "MultipleImportTrackNameMsg"));
+        } else {
+            this.nameField.setEnabled(true);
+            this.nameField.setText("");
+        }
+    }//GEN-LAST:event_multipleImportCheckBoxActionPerformed
+
+    private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
+        this.setIsAlreadyImported(this.alreadyImportedBox.isSelected());
+    }//GEN-LAST:event_alreadyImportedBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox alreadyImportedBox;
@@ -423,6 +456,10 @@ public class NewTrackDialogPanel extends RefDataPanel implements NewJobDialogI {
     private javax.swing.JLabel mappingFileLabel;
     private javax.swing.JComboBox<MappingParserI> mappingTypeCombo;
     private javax.swing.JLabel mappingTypeLabel;
+    private javax.swing.JList<String> multiTrackList;
+    private javax.swing.JLabel multiTrackListLabel;
+    private javax.swing.JScrollPane multiTrackScrollPane;
+    private javax.swing.JCheckBox multipleImportCheckBox;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JComboBox<ReferenceJob> refGenBox;

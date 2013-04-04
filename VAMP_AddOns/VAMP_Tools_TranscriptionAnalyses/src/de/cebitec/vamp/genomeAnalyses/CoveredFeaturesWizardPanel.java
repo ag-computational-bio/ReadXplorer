@@ -18,6 +18,7 @@ public class CoveredFeaturesWizardPanel implements WizardDescriptor.Panel<Wizard
     
     public static final String PROP_MIN_COVERED_PERCENT = "minCoveredPercent";
     public static final String PROP_MIN_COVERAGE_COUNT = "minCoverageCount";
+    public static final String PROP_WHATEVER_STRAND = "whateverStrand";
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -98,6 +99,7 @@ public class CoveredFeaturesWizardPanel implements WizardDescriptor.Panel<Wizard
         if (isValid()) {
             wiz.putProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT, this.component.getMinCoveredPercent());
             wiz.putProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT, this.component.getMinCoverageCount());
+            wiz.putProperty(CoveredFeaturesWizardPanel.PROP_WHATEVER_STRAND, this.component.getIsWhateverStrand());
         }
     }
 }

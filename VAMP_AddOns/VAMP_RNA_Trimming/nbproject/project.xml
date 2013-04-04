@@ -55,6 +55,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>de.cebitec.vamp.view</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>net.sf.samtools</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -78,6 +86,15 @@
                     <run-dependency>
                         <release-version>1</release-version>
                         <specification-version>1.28.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.settings</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.35.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -128,11 +145,23 @@
                         <specification-version>8.15.2</specification-version>
                     </run-dependency>
                 </dependency>
+                <dependency>
+                    <code-name-base>org.openide.windows</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>6.55.2</specification-version>
+                    </run-dependency>
+                </dependency>
             </module-dependencies>
             <public-packages/>
             <class-path-extension>
                 <runtime-relative-path>ext/jfxrt.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jfxrt.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/commons-math3-3.1.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-math3-3.1.1.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>
