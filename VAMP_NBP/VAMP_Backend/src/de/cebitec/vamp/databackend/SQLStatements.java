@@ -510,8 +510,7 @@ public class SQLStatements {
             " FROM " +
                 FieldNames.TABLE_FEATURES +
             " WHERE " +
-                FieldNames.FEATURE_REFGEN_ID+" = ? and " +
-                FieldNames.FEATURE_ID+"=1";
+                FieldNames.FEATURE_REFGEN_ID+" = ? LIMIT 1";
     
     public final static String CHECK_IF_FEATURES_OF_TYPE_EXIST =
             "SELECT " +

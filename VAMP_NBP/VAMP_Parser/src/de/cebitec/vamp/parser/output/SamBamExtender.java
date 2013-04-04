@@ -49,8 +49,8 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      * @throws ParsingException
      */
     @Override
-    public void convert() throws ParsingException {
-        this.extendSamBamFile();
+    public boolean convert() throws ParsingException {
+        return this.extendSamBamFile();
     }
 
     /**
@@ -89,8 +89,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      * it in a new file.
      * @throws ParsingException
      */
-    private void extendSamBamFile() throws ParsingException {
-
+    private boolean extendSamBamFile() throws ParsingException {
         File fileToExtend = trackJob.getFile();
         String refName = trackJob.getRefGen().getName();
 
@@ -99,6 +98,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
         try (SAMFileReader samBamReader = new SAMFileReader(fileToExtend)) {
 
+            samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samBamItor = samBamReader.iterator();
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
@@ -136,7 +136,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                         stop = record.getAlignmentEnd();
                         refSeq = this.refGenome.substring(start - 1, stop);
 
-                        if (!ParserCommonMethods.checkRead(this, readSeq, this.refSeqLength, cigar, start, stop, fileToExtend.getName(), lineno)) {
+                        if (!ParserCommonMethods.checkReadSam(this, readSeq, this.refSeqLength, cigar, start, stop, fileToExtend.getName(), lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         
@@ -182,9 +182,12 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
         }
 
         SAMFileReader samReaderNew = new SAMFileReader(outputFile);
+        samReaderNew.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
         SamUtils utils = new SamUtils();
         utils.registerObserver(this);
-        utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
+        boolean success = utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
+
+        return success;
     }
 
     @Override

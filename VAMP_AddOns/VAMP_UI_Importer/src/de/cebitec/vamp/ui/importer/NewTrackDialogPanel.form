@@ -17,47 +17,51 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
+              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+              <Component id="importTypeLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="importTypeCombo" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="refGenLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="stepSizeLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="nameLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="mappingFileLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="mappingTypeLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="multiTrackListLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                      <Component id="importTypeLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="importTypeCombo" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="refGenLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="stepSizeLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="nameLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="mappingFileLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="mappingTypeLabel" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="mappingTypeCombo" alignment="1" max="32767" attributes="0"/>
+                          <Component id="alreadyImportedBox" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="stepSizeSpinner" min="-2" pref="95" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="fileSorted" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="multipleImportCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="45" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="refGenBox" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="mappingFileField" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chooseButton" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="multiTrackScrollPane" alignment="0" max="32767" attributes="0"/>
                           <Component id="nameField" alignment="0" max="32767" attributes="0"/>
-                          <Component id="refGenBox" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="alreadyImportedBox" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="stepSizeSpinner" min="-2" pref="95" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="fileSorted" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="mappingTypeCombo" alignment="0" max="32767" attributes="0"/>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -98,7 +102,14 @@
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="alreadyImportedBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="85" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="multipleImportCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="multiTrackListLabel" min="-2" max="-2" attributes="0"/>
+                  <Component id="multiTrackScrollPane" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="137" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -225,6 +236,46 @@
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/importer/Bundle.properties" key="NewTrackDialogPanel.alreadyImportedBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="alreadyImportedBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="multipleImportCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/importer/Bundle.properties" key="NewTrackDialogPanel.multipleImportCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="multipleImportCheckBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="multiTrackScrollPane">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JList" name="multiTrackList">
+          <Properties>
+            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
+              <StringArray count="0"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;()"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JLabel" name="multiTrackListLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/ui/importer/Bundle.properties" key="NewTrackDialogPanel.multiTrackListLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

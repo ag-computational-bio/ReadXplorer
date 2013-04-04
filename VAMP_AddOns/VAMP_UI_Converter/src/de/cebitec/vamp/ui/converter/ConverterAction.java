@@ -47,10 +47,8 @@ public final class ConverterAction implements ActionListener {
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
   
-        if (panels == null) {
-            panels = new ArrayList<>();
-            panels.add(new ConverterWizardPanel());
-        }
+        panels = new ArrayList<>();
+        panels.add(new ConverterWizardPanel());
         WizardDescriptor wizardDescriptor = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));

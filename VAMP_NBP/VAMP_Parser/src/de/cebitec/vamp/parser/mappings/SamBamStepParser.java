@@ -2,14 +2,15 @@ package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.parser.output.SamBamSorter;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.SamUtils;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -20,7 +21,7 @@ import org.openide.util.NbBundle;
  *
  * @author jstraube
  */
-public class SamBamStepParser implements MappingParserI {
+public class SamBamStepParser implements MappingParserI, Observer {
 
     private static String name = "SAM/BAM Stepwise Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
@@ -58,9 +59,51 @@ public class SamBamStepParser implements MappingParserI {
         this();
         this.seqPairProcessor = seqPairProcessor;
     }
+    
+    /**
+     * Does nothing, as the sam bam step parser currently does not need any
+     * conversions.
+     * @param trackJob
+     * @param referenceSequence
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
 
+    /**
+     * Sorts the file by read sequence.
+     * @param trackJob the trackjob to sort
+     * @return true, if the method succeeded
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        boolean success = true;
+        if (!trackJob.isSorted()) {
+            SamBamSorter sorter = new SamBamSorter();
+            sorter.registerObserver(this);
+            success = sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
+        }
+        return success;
+    }
+    
+    /**
+     * First calls the preprocessing method, which sorts the sam/bam file by
+     * read sequence in this implementation and then parses the input 
+     * determined by the track job.
+     * @param trackJob the track job to parse
+     * @param refSeqWhole complete reference sequence 
+     */
     @Override
     public ParsedMappingContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException {
+        
+        this.preprocessData(trackJob);
+        
         this.seqToIDMap = new HashMap<>();
         String readname;
         String refSeq;
@@ -91,6 +134,7 @@ public class SamBamStepParser implements MappingParserI {
 
         if (itorAll == null) {
             SAMFileReader sam = new SAMFileReader(trackJob.getFile());
+            sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator itor = sam.iterator();
             itorAll = itor;
         }
@@ -136,7 +180,7 @@ public class SamBamStepParser implements MappingParserI {
                     isRevStrand = recrod.getReadNegativeStrandFlag();
 
                     //check parameters
-                    if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filename, lineno)) {
+                    if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, filename, lineno)) {
                         continue; //continue, and ignore read, if it contains inconsistent information
                     }
 
@@ -258,6 +302,11 @@ public class SamBamStepParser implements MappingParserI {
         for (Observer observer : this.observers) {
             observer.update(this.msg);
         }
+    }
+
+    @Override
+    public void update(Object args) {
+        this.notifyObservers(args);
     }
 
     /**

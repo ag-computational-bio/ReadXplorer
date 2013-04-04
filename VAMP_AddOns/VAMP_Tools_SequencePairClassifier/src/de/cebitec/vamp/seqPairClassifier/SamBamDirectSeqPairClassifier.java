@@ -3,8 +3,10 @@ package de.cebitec.vamp.seqPairClassifier;
 import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
+import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
 import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
+import de.cebitec.vamp.parser.output.SamBamSorter;
 import de.cebitec.vamp.util.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     private SAMFileWriter samBamFileWriter;
     private Map<String,Pair<Integer,Integer>> classificationMap; 
     private final String refSeq;
+    private boolean deleteSortedFile;
    
     private int average_Seq_Pair_Length = 0; //TODO: calculate average size etc. for statistics
     private int add_Seq_Pair_length = 0;
@@ -65,17 +68,38 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         this.classificationMap = classificationMap;
         this.refSeq = refSeq;
     }
-
+    
     /**
-     * Classifies the seuqence pairs. The reads have to be sorted by read name 
-     * for efficient classification.
-     * @return an empty seq pair container, because no data needs to be stored
+     * Sorts the file by read name.
+     * @param trackJob the trackjob to preprocess
+     * @return true, if the method succeeded, false otherwise
+     * @throws ParsingException
+     * @throws OutOfMemoryError
      */
     @Override
-    public ParsedSeqPairContainer classifySeqPairs() {
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        SamBamSorter sorter = new SamBamSorter();
+        sorter.registerObserver(this);
+        boolean success = sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING);
+        this.deleteSortedFile = success;
+        return success;
+    }
+
+    /**
+     * First preprocesses the track job stored in this classifier by sorting it
+     * by read name in this implementation and then classifies the seuqence
+     * pairs. The reads have to be sorted by read name for efficient
+     * classification.
+     * @return an empty seq pair container, because no data needs to be stored
+     * @throws ParsingException  
+     */
+    @Override
+    public ParsedSeqPairContainer classifySeqPairs() throws ParsingException, OutOfMemoryError {
+        
+        this.preprocessData(trackJob);
+        File oldWorkFile = trackJob.getFile();
         
         try {
-            
             long start = System.currentTimeMillis();
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Start"));
             
@@ -84,6 +108,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             
             int lineno = 0;
             SAMFileReader samBamReader = new SAMFileReader(trackJob.getFile());
+            samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samItor = samBamReader.iterator();
             
             SAMFileHeader header = samBamReader.getFileHeader();
@@ -96,7 +121,6 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             String refName = trackJob.getRefGen().getName();
             
             File outputFile = writerAndFile.getSecond();
-            trackJob.setFile(outputFile);
             
             SAMRecord record;
             String lastReadName = "";
@@ -139,6 +163,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             samBamReader.close();
             
             samBamReader = new SAMFileReader(outputFile);
+            samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             File indexFile = new File(outputFile.getAbsolutePath() + ".bai");
             SamUtils utils = new SamUtils();
             utils.createIndex(samBamReader, indexFile);
@@ -147,6 +172,11 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             long finish = System.currentTimeMillis();
             String msg = NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Finish");
             this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
+            
+            //delete the sorted/preprocessed file
+            if (deleteSortedFile) { GeneralUtils.deleteOldWorkFile(oldWorkFile); }
+            
+            trackJob.setFile(outputFile);
             
         } catch (Exception e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.getMessage()));

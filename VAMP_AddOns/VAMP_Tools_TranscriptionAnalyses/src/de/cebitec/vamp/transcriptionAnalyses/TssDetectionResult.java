@@ -126,20 +126,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add(percentageIncrease);
             
             DetectedFeatures detFeatures = tss.getDetFeatures();
-            PersistantFeature feature = detFeatures.getCorrectStartFeature();
-            tssRow.add(feature != null ? PersistantFeature.Utils.getFeatureName(feature) : "-");
-            tssRow.add(feature != null ? feature.getStart() : "-");
-            tssRow.add(feature != null ? feature.getStop() : "-");
-            
-            feature = detFeatures.getUpstreamFeature();
-            tssRow.add(feature != null ? PersistantFeature.Utils.getFeatureName(feature) : "-");
-            tssRow.add(feature != null ? feature.getStart() : "-");
-            tssRow.add(feature != null ? feature.getStop() : "-");
-            
-            feature = detFeatures.getDownstreamFeature();
-            tssRow.add(feature != null ? PersistantFeature.Utils.getFeatureName(feature) : "-");
-            tssRow.add(feature != null ? feature.getStart() : "-");
-            tssRow.add(feature != null ? feature.getStop() : "-");
+            this.addFeatureRows(detFeatures.getCorrectStartFeature(), tssRow);
+            this.addFeatureRows(detFeatures.getUpstreamFeature(), tssRow);
+            this.addFeatureRows(detFeatures.getDownstreamFeature(), tssRow);
             
             if (tss instanceof TransStartUnannotated) {
                 TransStartUnannotated unannoStart = (TransStartUnannotated) tss;
@@ -215,6 +204,25 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         sheetNames.add("Transcription Analysis Table");
         sheetNames.add("Parameters and Statistics");
         return sheetNames;
+    }
+    
+    /**
+     * Adds the rows corresponding to a feature to the given tssRow (name, 
+     * start, stop).
+     * @param feature the feature to add. In case it is null the row receives 
+     * "-" entries.
+     * @param tssRow the row to which the data should be added
+     */
+    private void addFeatureRows(PersistantFeature feature, List<Object> tssRow) {
+        if (feature != null) {
+            tssRow.add(PersistantFeature.Utils.getFeatureName(feature));
+            tssRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
+            tssRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
+        } else {
+            tssRow.add("-");
+            tssRow.add("-");
+            tssRow.add("-");
+        }
     }
     
 }

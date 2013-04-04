@@ -112,4 +112,7 @@ public class Properties {
     
     /** Extension to use for bam index files (".bai"). */
     public static final String BAM_INDEX_EXT = ".bai";
+    
+    /** '-1' For reference features, which do not have a parent. */
+    public static final String NO_PARENT_STRING = "-1";
 }

@@ -33,7 +33,7 @@ public class UniqueJokParser implements MappingParserI {
     private HashMap<String, Integer> seqToIDMap;
 
     public UniqueJokParser() {
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
         this.seqPairProcessor = new SeqPairProcessorDummy();
     }
     
@@ -52,12 +52,39 @@ public class UniqueJokParser implements MappingParserI {
         this();
         this.seqPairProcessor = seqPairProcessor;
     }
+    
+    /**
+     * Does nothing, as the unique jok parser currently does not need any
+     * conversions.
+     * @param trackJob
+     * @param referenceSequence
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
+
+    /**
+     * Not implemented for this parser implementation, as currently no
+     * preprocessing is needed.
+     * @param trackJob the trackjob to preprocess
+     * @return true, if the method succeeded
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
 
     @Override
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
-        this.seqToIDMap = new HashMap<String, Integer>();
+        this.seqToIDMap = new HashMap<>();
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());

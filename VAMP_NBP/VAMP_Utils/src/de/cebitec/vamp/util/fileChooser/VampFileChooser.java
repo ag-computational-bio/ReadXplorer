@@ -62,7 +62,9 @@ public abstract class VampFileChooser  extends JFileChooser {
     public void openFileChooser(final int option) {
 
         ////////////// open file chooser /////////////////////////
-        currentDirectory = this.pref.get(directoryProperty, ".");
+        if (currentDirectory == null || currentDirectory.isEmpty()) {
+            currentDirectory = this.pref.get(directoryProperty, ".");
+        }
         if (currentDirectory.isEmpty()){
             currentDirectory = ".";
         }
@@ -104,7 +106,7 @@ public abstract class VampFileChooser  extends JFileChooser {
                 fileLocation = fileLocation.concat(".".concat(fileExtensions[0]));
             }
             boolean done = this.checkFileExists(fileLocation, this);
-            if (!done){
+            if (!done) {
                 this.save(fileLocation);
             }
         }
@@ -156,5 +158,14 @@ public abstract class VampFileChooser  extends JFileChooser {
      */
     public void setDirectoryProperty(String directoryProperty) {
         this.directoryProperty = directoryProperty;
+    }
+    
+    /**
+     * Sets the directory to use as starting directory for this file chooser.
+     * @param directory the directory to use as starting directory for this 
+     * file chooser
+     */
+    public void setDirectory(String directory) {
+        this.currentDirectory = directory;
     }
 }

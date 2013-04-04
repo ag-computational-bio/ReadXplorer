@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.common;
 
 import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.polyTree.Node;
 import java.util.ArrayList;
 import java.util.List;
@@ -192,7 +193,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
         for (String parentId : parentIds) {
             builder.append(parentId).append(";");
         }
-        return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : builder.toString();
+        return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : Properties.NO_PARENT_STRING;
     }
 
     /**

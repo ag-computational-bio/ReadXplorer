@@ -59,7 +59,6 @@ public class GenericSQLQueries {
                 id = rs.getLong("LATEST_ID");
             }
             rs.close();
-            latestID.close();
         } catch (SQLException ex) {
             Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -90,7 +89,7 @@ public class GenericSQLQueries {
     public static String genAddColumnString(String table, String column, String type) {
         return "ALTER TABLE "
                 + table
-                + " ADD COLUMN "
+                + " ADD COLUMN IF NOT EXISTS "
                 + column + " " + type;
     }
     
@@ -98,14 +97,12 @@ public class GenericSQLQueries {
      * Adds a new column to the table.
      * @param table table
      * @param column column to add
-     * @param type the type of the column
      * @return SQL command
      */
     public static String genRemoveColumnString(String table, String column) {
         return "ALTER TABLE "
                 + table
-                + " DROP COLUMN " 
-                + column 
-                ;
+                + " DROP COLUMN IF EXISTS " 
+                + column;
     }
 }

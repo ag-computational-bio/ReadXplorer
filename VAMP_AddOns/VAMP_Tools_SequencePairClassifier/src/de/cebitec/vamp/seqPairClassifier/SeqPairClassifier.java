@@ -1,5 +1,6 @@
 package de.cebitec.vamp.seqPairClassifier;
 
+import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
 import de.cebitec.vamp.util.Observable;
@@ -72,6 +73,19 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
         this.dist = dist;
         this.orienation = orientation;
         this.calculateMinAndMaxDist(dist, deviation);
+    }
+
+    /**
+     * Not implemented for this classifier implementation, as currently no
+     * preprocessing is needed.
+     * @param trackJob
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        return true;
     }
     
     /**
