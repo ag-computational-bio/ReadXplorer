@@ -170,7 +170,7 @@ public enum FeatureType {
     /**
      * FeatureTypes that are GUI selectable.
      */
-    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {ANY, GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA};
+    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA};
    
     private FeatureType(int typeInt, String typeString) {
         this.typeInt = typeInt;

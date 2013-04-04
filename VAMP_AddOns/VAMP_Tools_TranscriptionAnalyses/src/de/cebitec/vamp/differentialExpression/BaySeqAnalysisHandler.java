@@ -38,8 +38,8 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     }
 
     public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups,
-            Integer refGenomeID, int[] replicateStructure, File saveFile, FeatureType feature, int startOffset, int stopOffset) {
-        super(selectedTraks, refGenomeID, saveFile, feature, startOffset, stopOffset);
+            Integer refGenomeID, int[] replicateStructure, File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset);
         baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), groups, replicateStructure);
         this.groups=groups;
     }

@@ -10,32 +10,33 @@ import de.cebitec.vamp.util.SequenceUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The reference genome connector is responsible for the connection to a 
+ * The reference genome connector is responsible for the connection to a
  * reference genome.
  *
  * @author ddoppmeier
  */
 public class ReferenceConnector {
-    
+
     private int refGenID;
     private Connection con;
 //    private String projectFolder;
 //    private boolean isFolderSet = false;
     private PersistantReference reference;
     private List<PersistantTrack> associatedTracks;
-    
 
     /**
-     * The reference genome connector is responsible for the connection to a 
+     * The reference genome connector is responsible for the connection to a
      * reference genome.
+     *
      * @param refGenID id of the associated reference genome
      */
-    ReferenceConnector(int refGenID){
+    ReferenceConnector(int refGenID) {
         this.refGenID = refGenID;
         ProjectConnector projectConnector = ProjectConnector.getInstance();
         this.con = projectConnector.getConnection();
@@ -45,16 +46,16 @@ public class ReferenceConnector {
     }
 
     /**
-     * @return Fetches the reference genome of the reference associated with this
-     * connector. If it was called once, it is kept in memory and does not need
-     * to be fetched from the DB again.
+     * @return Fetches the reference genome of the reference associated with
+     * this connector. If it was called once, it is kept in memory and does not
+     * need to be fetched from the DB again.
      */
     public PersistantReference getRefGenome() {
         if (this.reference == null) {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID);
             try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_SINGLE_GENOME)) {
                 fetch.setLong(1, refGenID);
-                
+
                 ResultSet rs = fetch.executeQuery();
                 if (rs.next()) {
                     String name = rs.getString(FieldNames.REF_GEN_NAME);
@@ -72,7 +73,7 @@ public class ReferenceConnector {
 
         return this.reference;
     }
-    
+
     /**
      *
      * @return Fetches the reference sequence of the reference associated with
@@ -88,7 +89,7 @@ public class ReferenceConnector {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading reference sequence with id  \"{0}\" from database", refGenID);
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_REFERENCE_SEQ)) {
             fetch.setLong(1, refGenID);
-            
+
             ResultSet rs = fetch.executeQuery();
             if (rs.next()) {
                 sequence = rs.getString(FieldNames.REF_GEN_SEQUENCE);
@@ -108,19 +109,20 @@ public class ReferenceConnector {
     }
 
     /**
-     * Fetches all features which at least partly overlap a given region 
-     * of the reference.
+     * Fetches all features which at least partly overlap a given region of the
+     * reference.
+     *
      * @param from start position of the region of interest
      * @param to end position of the region of interest
-     * @param featureType type of features to retrieve from the db. Either 
-     *      FeatureType.ANY or a specified type
+     * @param featureType type of features to retrieve from the db. Either
+     * FeatureType.ANY or a specified type
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistantFeature> getFeaturesForRegion(int from, int to, FeatureType feature){
+    public List<PersistantFeature> getFeaturesForRegion(int from, int to, FeatureType featureType) {
         List<PersistantFeature> features = new ArrayList<>();
         try {
             PreparedStatement fetch;
-            if (feature == FeatureType.ANY) {
+            if (featureType == FeatureType.ANY) {
                 fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
                 fetch.setLong(1, refGenID);
                 fetch.setInt(2, from);
@@ -130,7 +132,7 @@ public class ReferenceConnector {
                 fetch.setLong(1, refGenID);
                 fetch.setInt(2, from);
                 fetch.setInt(3, to);
-                fetch.setInt(4, feature.getTypeInt());
+                fetch.setInt(4, featureType.getTypeInt());
             }
 
             ResultSet rs = fetch.executeQuery();
@@ -158,18 +160,37 @@ public class ReferenceConnector {
 
         return features;
     }
-    
+
     /**
-     * Fetches all features which are completely located within a given 
-     * region of the reference.
+     * Fetches all features which at least partly overlap a given region of the
+     * reference.
+     *
+     * @param from start position of the region of interest
+     * @param to end position of the region of interest
+     * @param usedFeatures list of features used to retrieve from the db.
+     * @return the list of all features found in the interval of interest
+     */
+    public List<PersistantFeature> getFeaturesForRegion(int from, int to, List<FeatureType> usedFeatures) {
+        List<PersistantFeature> features = new ArrayList<>();
+        for (Iterator<FeatureType> it = usedFeatures.iterator(); it.hasNext();) {
+            FeatureType featureType = it.next();
+            features.addAll(getFeaturesForRegion(from, to, featureType));
+        }
+        return features;
+    }
+
+    /**
+     * Fetches all features which are completely located within a given region
+     * of the reference.
+     *
      * @param left start position of the region of interest
      * @param right end position of the region of interest
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistantFeature> getFeaturesForClosedInterval(int left, int right){
+    public List<PersistantFeature> getFeaturesForClosedInterval(int left, int right) {
         List<PersistantFeature> features = new ArrayList<>();
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL)) {
-            
+
             fetch.setInt(1, refGenID);
             fetch.setInt(2, left);
             fetch.setInt(3, right);
@@ -199,11 +220,11 @@ public class ReferenceConnector {
 
         return features;
     }
-        
+
     /**
      * @return the tracks associated to this reference connector.
      */
-    public List<PersistantTrack> getAssociatedTracks() {  
+    public List<PersistantTrack> getAssociatedTracks() {
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACKS_FOR_GENOME)) {
             this.associatedTracks.clear();
             fetch.setLong(1, refGenID);
@@ -225,10 +246,11 @@ public class ReferenceConnector {
 
         return associatedTracks;
     }
-    
+
     /**
      * Calculates and returns the names of all tracks belonging to this
      * reference hashed to their track id.
+     *
      * @return the names of all tracks of this reference hashed to their track
      * id.
      */
@@ -241,7 +263,16 @@ public class ReferenceConnector {
         }
         return namesList;
     }
-    
+
+    public boolean hasFeatures(List<FeatureType> typeList) {
+        boolean ret = false;
+        for (Iterator<FeatureType> it = typeList.iterator(); it.hasNext();) {
+            FeatureType featureType = it.next();
+            ret = (ret || hasFeatures(featureType));
+        }
+        return ret;
+    }
+
     public boolean hasFeatures(FeatureType type) {
         try {
             PreparedStatement fetch;
@@ -262,5 +293,4 @@ public class ReferenceConnector {
             return false;
         }
     }
-
 }

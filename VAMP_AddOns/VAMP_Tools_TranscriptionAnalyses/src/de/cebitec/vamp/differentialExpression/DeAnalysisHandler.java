@@ -38,7 +38,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private List<Result> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private File saveFile = null;
-    private FeatureType feature;
+    private List<FeatureType> selectedFeatures;
     private Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<>();
     private int resultsReceivedBack = 0;
     private int startOffset;
@@ -66,12 +66,12 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID,
-            File saveFile, FeatureType feature, int startOffset, int stopOffset) {
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
-        this.feature = feature;
+        this.selectedFeatures = selectedFeatures;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
     }
@@ -82,7 +82,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
-        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, feature);
+        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, selectedFeatures);
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(currentTrack);

@@ -97,11 +97,11 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         });
         popup.add(numberColumnHigher);
 
-        stringColumn = new JMenuItem("Set RegExp filter");
+        stringColumn = new JMenuItem("Set pattern filter");
         stringColumn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String input = openPopUp("RegExp used as a filter:");
+                String input = openPopUp("Show only rows that contain the pattern: ");
                 if (input != null) {
                     try {
                         Pattern.compile(input);
@@ -109,7 +109,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                                 (E) lastTable.getModel(), input, lastSelectedColumn);
                         setNewTableModel(newModel);
                     } catch (PatternSyntaxException pse) {
-                        JOptionPane.showMessageDialog(null, "Please insert a valid RegExp pattern.");
+                        JOptionPane.showMessageDialog(null, "Please enter a valid pattern.");
                     }
                 }
             }
@@ -215,7 +215,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         Vector dataVector = tm.getDataVector();
         for (Iterator<Vector> it = dataVector.iterator(); it.hasNext();) {
             Vector row = it.next();
-            if (((String) row.get(column)).matches(pattern)) {
+            if (((String) row.get(column)).contains(pattern)) {
                 ret.addRow(row);
                 noRow = false;
             }
