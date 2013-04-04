@@ -188,13 +188,13 @@ public class ExcelExporter {
      * only "INTEGER", "STRING, or "UNKNOWN".
      */
     private String getObjectType(Object entry) {
-        if (entry instanceof Integer || entry instanceof Double
-                 || entry instanceof Byte || entry instanceof Long
-                 || entry instanceof Float) {
+        if (entry instanceof Integer || entry instanceof Byte || entry instanceof Long) {
             return "INTEGER";
         } else if (entry instanceof String || entry instanceof Character
-                || entry instanceof CharSequence) {
+                || entry instanceof CharSequence || entry instanceof Double) {
             return "STRING";
+        } else if (entry instanceof Float) {
+            return "FLOAT";
         } else {
             return "UNKNOWN";
         }
@@ -223,12 +223,18 @@ public class ExcelExporter {
         } else if (celltype.equals("STRING")) {
             cellvalue = cellvalue instanceof Character ? String.valueOf(cellvalue) : cellvalue;
             cellvalue = cellvalue instanceof CharSequence ? String.valueOf(cellvalue) : cellvalue;
+            cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
             WritableCellFormat string = new WritableCellFormat(arial);
             Label label = new Label(column, row, (String) cellvalue, string);
             sheet.addCell(label);
         } else if (celltype.equals("INTEGER")) {
             WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.INTEGER);
             Double value = Double.parseDouble(cellvalue.toString());
+            Number number = new Number(column, row, value, integerFormat);
+            sheet.addCell(number);
+        } else if (celltype.equals("FLOAT")) {
+            WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.FLOAT);
+            Float value = Float.parseFloat(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);
             sheet.addCell(number);
         } else if (celltype.equals("UNKNOWN")) {

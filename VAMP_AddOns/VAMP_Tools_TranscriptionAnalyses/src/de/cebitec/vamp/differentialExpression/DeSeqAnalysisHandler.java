@@ -50,7 +50,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
             File saveFile, FeatureType feature, int startOffset, int stopOffset) {
         super(selectedTraks, refGenomeID, saveFile, feature, startOffset, stopOffset);
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
-                design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, workingWithoutReplicates);
+                design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, 
+                workingWithoutReplicates);
     }
 
     @Override

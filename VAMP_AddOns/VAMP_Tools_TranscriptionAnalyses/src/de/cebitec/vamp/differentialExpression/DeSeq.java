@@ -163,7 +163,7 @@ public class DeSeq {
                     gnuR.eval("res <- nbinomTest( cD,\"" + levels[0] + "\",\"" + levels[1] + "\")");
                     //Filter for significant genes, given a threshold for the FDR.
                     //TODO: Make threshold user adjustable.
-                    gnuR.eval("resSig <- res[res$padj < 0.1, ]");
+//                  gnuR.eval("resSig <- res[res$padj < "+analysisData.getCutOff().toString()+", ]");
                 }
             } else {
                 if (analysisData.moreThanTwoConditions()) {
@@ -189,7 +189,7 @@ public class DeSeq {
 
             } else {
                 //Significant results sorted by the most significantly differentially expressed genes
-                gnuR.eval("res0 <- resSig[order(resSig$pval), ]");
+                gnuR.eval("res0 <- res[order(res$pval), ]");
                 REXP result = gnuR.eval("res0");
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(res0)");
@@ -198,7 +198,7 @@ public class DeSeq {
                         "Significant results sorted by the most significantly differentially expressed genes"));
 
                 //Significant results sorted by the most strongly down regulated genes
-                gnuR.eval("res1 <- resSig[order(resSig$foldChange, -resSig$baseMean), ]");
+                gnuR.eval("res1 <- res[order(res$foldChange, -res$baseMean), ]");
                 result = gnuR.eval("res1");
                 rvec = result.asVector();
                 colNames = gnuR.eval("colnames(res1)");
@@ -207,7 +207,7 @@ public class DeSeq {
                         "Significant results sorted by the most strongly down regulated genes"));
 
                 //Significant results sorted by the most strongly up regulated genes
-                gnuR.eval("res2 <- resSig[order(-resSig$foldChange, -resSig$baseMean), ]");
+                gnuR.eval("res2 <- res[order(-res$foldChange, -res$baseMean), ]");
                 result = gnuR.eval("res2");
                 rvec = result.asVector();
                 colNames = gnuR.eval("colnames(res2)");

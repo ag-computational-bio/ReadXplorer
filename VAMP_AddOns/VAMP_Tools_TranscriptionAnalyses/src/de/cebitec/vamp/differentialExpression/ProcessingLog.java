@@ -35,6 +35,10 @@ public class ProcessingLog {
             this.properties = properties;
         }
     }
+    
+    public synchronized void addProperty(String key, Object value){
+        properties.put(key, value);
+    }
 
     public synchronized void resetLog() {
         properties = null;

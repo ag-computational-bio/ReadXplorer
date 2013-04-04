@@ -13,20 +13,20 @@ public final class GeneralSettingsVisualPanel extends JPanel {
 
     private ComboBoxModel<FeatureType> cbm = new DefaultComboBoxModel<>(FeatureType.SELECTABLE_FEATURE_TYPES);
     private boolean checkBoxchecked = false;
-    
+
     /**
      * Creates new form GeneralSettingsVisualPanel
      */
     public GeneralSettingsVisualPanel() {
         initComponents();
-                fileNameField.setText(System.getProperty("user.home")+File.separator+"DiffExpResult.rdata");
+        fileNameField.setText(System.getProperty("user.home") + File.separator + "DiffExpResult.rdata");
     }
 
     public boolean verifyInput() {
-        return (verifyComponent(startOffset) && verifyComponent(stopOffset));
+        return (verifyComponentInteger(startOffset) && verifyComponentInteger(stopOffset));
     }
 
-    private boolean verifyComponent(JComponent input) {
+    private boolean verifyComponentInteger(JComponent input) {
         String text = ((JTextField) input).getText();
         try {
             Integer value = Integer.parseInt(text);
@@ -55,9 +55,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     public FeatureType getFeatureType() {
         return (FeatureType) featureTypeComboBox.getSelectedItem();
     }
-    
-    
-    public String getSavePath(){
+
+    public String getSavePath() {
         return fileNameField.getText();
     }
 
@@ -127,19 +126,19 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(featureTypeComboBox, 0, 380, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(fileNameField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fileChooserButton))
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -183,7 +182,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
             }
 
             @Override
-            public void open(String fileLocation) {}
+            public void open(String fileLocation) {
+            }
         };
         fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_fileChooserButtonActionPerformed
@@ -191,7 +191,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     private void fileNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileNameFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fileNameFieldActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox featureTypeComboBox;
     private javax.swing.JButton fileChooserButton;
