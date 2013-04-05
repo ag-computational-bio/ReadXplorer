@@ -181,9 +181,20 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         Vector dataVector = tm.getDataVector();
         for (Iterator<Vector> it = dataVector.iterator(); it.hasNext();) {
             Vector row = it.next();
-            if (((Double) row.get(column)) < cutoff) {
-                ret.addRow(row);
-                noRow = false;
+            Object currentEntry = row.get(column);
+            if (currentEntry instanceof Integer) {
+                Integer currentEntryValue = (Integer) currentEntry;
+                if (currentEntryValue < cutoff) {
+                    ret.addRow(row);
+                    noRow = false;
+                }
+            }
+            if (currentEntry instanceof Double) {
+                Double currentEntryValue = (Double) currentEntry;
+                if (currentEntryValue < cutoff) {
+                    ret.addRow(row);
+                    noRow = false;
+                }
             }
         }
         if (noRow) {
@@ -198,9 +209,20 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         Vector dataVector = tm.getDataVector();
         for (Iterator<Vector> it = dataVector.iterator(); it.hasNext();) {
             Vector row = it.next();
-            if (((Double) row.get(column)) > cutoff) {
-                ret.addRow(row);
-                noRow = false;
+            Object currentEntry = row.get(column);
+            if (currentEntry instanceof Integer) {
+                Integer currentEntryValue = (Integer) currentEntry;
+                if (currentEntryValue > cutoff) {
+                    ret.addRow(row);
+                    noRow = false;
+                }
+            }
+            if (currentEntry instanceof Double) {
+                Double currentEntryValue = (Double) currentEntry;
+                if (currentEntryValue > cutoff) {
+                    ret.addRow(row);
+                    noRow = false;
+                }
             }
         }
         if (noRow) {
