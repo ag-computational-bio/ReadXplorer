@@ -98,8 +98,8 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add(PersistantFeature.Utils.getFeatureName(feature));
             coveredFeatureRow.add(this.getTrackMap().get(coveredFeature.getTrackId()));
             coveredFeatureRow.add(feature.isFwdStrandString());
-            coveredFeatureRow.add(feature.getStart());
-            coveredFeatureRow.add(feature.getStop());
+            coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
+            coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
             coveredFeatureRow.add(feature.getStop() - feature.getStart());
             coveredFeatureRow.add(coveredFeature.getPercentCovered());
             coveredFeatureRow.add(coveredFeature.getNoCoveredBases());

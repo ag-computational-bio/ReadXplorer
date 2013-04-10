@@ -4,10 +4,14 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent;
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.util.TableRightClickFilter;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +22,6 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import org.netbeans.api.progress.ProgressHandle;
@@ -27,7 +29,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
@@ -62,6 +63,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Expression Analysis");
+    private TableRightClickFilter<UnchangeableDefaultTableModel> rktm = new TableRightClickFilter<>(UnchangeableDefaultTableModel.class);
 
     public DiffExpResultViewerTopComponent() {
     }
@@ -70,17 +72,35 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
-        tm = new DefaultTableModel();
+        tm = new UnchangeableDefaultTableModel();
         cbm = new DefaultComboBoxModel<>();
 
         initComponents();
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
-        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
-        model.addListSelectionListener(new ListSelectionListener() {
+        topCountsTable.getTableHeader().addMouseListener(rktm);
+        topCountsTable.addMouseListener(new MouseListener() {
             @Override
-            public void valueChanged(ListSelectionEvent e) {
-                showPosition();
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    showPosition();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
             }
         });
     }
@@ -90,7 +110,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
         int pos = 0;
-        //TODO
         switch (usedTool) {
             case DeSeq:
                 String locus = (String) topCountsTable.getModel().getValueAt(selectedModel, 1);
@@ -103,7 +122,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 5);
                 break;
         }
-        
+
         Collection<ViewController> viewControllers;
         viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
         for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
@@ -120,7 +139,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             DeAnalysisHandler.Result currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             colNames.add(0, " ");
-            TableModel tmpTableModel = new DefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
+            TableModel tmpTableModel = new UnchangeableDefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
         }
@@ -201,9 +220,9 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                         .addComponent(resultComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(saveTableButton)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(createGraphicsButton)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(showLogButton))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 961, Short.MAX_VALUE))
                 .addContainerGap())
@@ -253,19 +272,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
-        VampFileChooser fc = new VampFileChooser(new String[]{"csv"}, "csv") {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void save(String fileLocation) {
-                analysisHandler.saveResultsAsCSV(resultComboBox.getSelectedIndex(), fileLocation);
-            }
-
-            @Override
-            public void open(String fileLocation) {
-            }
-        };
-        fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
+        ExcelExportFileChooser fc = new ExcelExportFileChooser(new String[]{"xls"},
+                "xls", new TableToExcel(resultComboBox.getSelectedItem().toString(), (UnchangeableDefaultTableModel) topCountsTable.getModel()));
     }//GEN-LAST:event_saveTableButtonActionPerformed
 
     private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed
@@ -274,7 +282,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         LogTopComponent.open();
         LogTopComponent.requestActive();
     }//GEN-LAST:event_showLogButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createGraphicsButton;
     private javax.swing.JLabel jLabel1;
@@ -346,7 +353,40 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     public void itemStateChanged(ItemEvent e) {
         int state = e.getStateChange();
         if (state == ItemEvent.SELECTED) {
+            rktm.resetOriginalTableModel();
             topCountsTable.setModel(tableModels.get(resultComboBox.getSelectedIndex()));
         }
+    }
+    
+    public static class UnchangeableDefaultTableModel extends DefaultTableModel{
+
+        public UnchangeableDefaultTableModel() {
+            super();
+        }
+
+        public UnchangeableDefaultTableModel(Object[][] data, Object[] columnNames) {
+            super(data, columnNames);
+        }
+
+        public UnchangeableDefaultTableModel(Object[] columnNames, int rowCount) {
+            super(columnNames, rowCount);
+        }
+
+        public UnchangeableDefaultTableModel(Vector data, Vector columnNames) {
+            super(data, columnNames);
+        }
+
+        public UnchangeableDefaultTableModel(Vector columnNames, int rowCount) {
+            super(columnNames, rowCount);
+        }
+
+        public UnchangeableDefaultTableModel(int rowCount, int columnCount) {
+            super(rowCount, columnCount);
+        }
+     
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }   
     }
 }

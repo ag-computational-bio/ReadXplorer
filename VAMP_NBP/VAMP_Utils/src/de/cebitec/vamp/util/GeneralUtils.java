@@ -6,10 +6,13 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import org.openide.util.NbBundle;
 
 /**
  * Contains general use utilities.
@@ -148,6 +151,30 @@ public class GeneralUtils {
         //generateConcatenatedString is a special case of the implode function, 
         //so i would suggest to use it here to reduce code duplications :
         return implode(" and ", strings.toArray());
+    }
+    
+    /**
+     * Deletes the given file and if existent also the corresponding ".bai" 
+     * index file.
+     * @param lastWorkFile the file to delete
+     * @return true, if the file could be deleted, false otherwise
+     * @throws IOException  
+     */
+    public static boolean deleteOldWorkFile(File lastWorkFile) throws IOException {
+        boolean deleted = false;
+        if (lastWorkFile.canWrite()) {
+            try {
+                Files.delete(lastWorkFile.toPath());
+                deleted = true;
+                File indexFile = new File(lastWorkFile.getAbsolutePath().concat(".bai"));
+                if (indexFile.canWrite()) {
+                    Files.delete(indexFile.toPath());
+                }
+            } catch (IOException ex) {
+                throw new IOException(NbBundle.getMessage(GeneralUtils.class, "MSG_GeneralUtils.FileDeletionError", lastWorkFile.getAbsolutePath()));
+            }
+        }
+        return deleted;
     }
     
     /**

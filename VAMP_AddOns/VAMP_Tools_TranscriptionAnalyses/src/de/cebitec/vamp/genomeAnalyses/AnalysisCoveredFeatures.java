@@ -23,11 +23,11 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
     private TrackConnector trackConnector;
     private int minCoveragePercent;
     private int minCountedCoverage;
+    private boolean whateverStrand;
     private int refSeqLength;
     private List<PersistantFeature> genomeFeatures;
     private HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
     private List<CoveredFeature> coveredFeatures;
-    private CoveredFeatureResult coveredFeaturesResult;
     
     private int lastFeatureIdx;
 
@@ -40,11 +40,15 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * analysis
      * @param minCountedCoverage minimum coverage at a certain position to be
      * taken into account for the analysis
+     * @param whateverStrand <tt>true</tt>, if the strand does not matter for 
+     *      this analysis, false, if only mappings on the strand of the 
+     *      respective feature should be considered.
      */
-    public AnalysisCoveredFeatures(TrackConnector trackConnector, int minCoveragePercent, int minCountedCoverage) {
+    public AnalysisCoveredFeatures(TrackConnector trackConnector, int minCoveragePercent, int minCountedCoverage, boolean whateverStrand) {
         this.trackConnector = trackConnector;
         this.minCoveragePercent = minCoveragePercent;
         this.minCountedCoverage = minCountedCoverage;
+        this.whateverStrand = whateverStrand;
         
         this.coveredFeatures = new ArrayList<>();
         this.coveredFeatureCount = new HashMap<>();
@@ -109,17 +113,27 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
                 if (featureStop >= rightBound) {
                     this.lastFeatureIdx = i;
                 }
-
-                if (feature.isFwdStrand()) {
+                
+                if (whateverStrand) {
                     for (int j = featureStart; j < featureStop; ++j) {
-                        if (coverage.getBestMatchFwdMult(j) >= this.minCountedCoverage) {
+                        if (    coverage.getBestMatchFwdMult(j) >= this.minCountedCoverage ||
+                                coverage.getBestMatchRevMult(j) >= this.minCountedCoverage) {
                             ++noCoveredBases;
                         }
-                    }
-                } else { //reverse strand
-                    for (int j = featureStart; j < featureStop; ++j) {
-                        if (coverage.getBestMatchRevMult(j) >= this.minCountedCoverage) {
-                            ++noCoveredBases;
+                    }                    
+                } else {
+
+                    if (feature.isFwdStrand()) {
+                        for (int j = featureStart; j < featureStop; ++j) {
+                            if (coverage.getBestMatchFwdMult(j) >= this.minCountedCoverage) {
+                                ++noCoveredBases;
+                            }
+                        }
+                    } else { //reverse strand
+                        for (int j = featureStart; j < featureStop; ++j) {
+                            if (coverage.getBestMatchRevMult(j) >= this.minCountedCoverage) {
+                                ++noCoveredBases;
+                            }
                         }
                     }
                 }

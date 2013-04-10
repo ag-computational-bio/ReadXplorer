@@ -4,58 +4,54 @@
  */
 package de.cebitec.vamp.differentialExpression.plotting;
 
+import de.cebitec.vamp.differentialExpression.ConvertData;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.util.Observer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.ScatterChart;
-import javafx.scene.chart.XYChart;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
         dtd = "-//de.cebitec.vamp.differentialExpression.plotting//Plot//EN",
-        autostore = false)
+autostore = false)
 @TopComponent.Description(
         preferredID = "PlotTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+//iconBase="SET/PATH/TO/ICON/HERE", 
+persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "output", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_PlotAction",
-        preferredID = "PlotTopComponent")
+preferredID = "PlotTopComponent")
 @Messages({
     "CTL_PlotAction=Plot",
     "CTL_PlotTopComponent=Plot Window",
     "HINT_PlotTopComponent=This is a Plot window"
 })
-public final class PlotTopComponent extends TopComponent implements Observer{
+public final class PlotTopComponent extends TopComponent implements Observer {
 
     private DeAnalysisHandler analysisHandler;
     private static ScatterPlot fxContainer;
-    private static final int JFXPANEL_WIDTH_INT = 300;
-    private static final int JFXPANEL_HEIGHT_INT = 250;
+    private static final int JFXPANEL_WIDTH_INT = 680;
+    private static final int JFXPANEL_HEIGHT_INT = 455;
 
     public PlotTopComponent() {
     }
-    
+
     public PlotTopComponent(DeAnalysisHandler analysisHandler) {
         initComponents();
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
-        this.analysisHandler=analysisHandler;
+        this.analysisHandler = analysisHandler;
         init();
     }
 
@@ -68,17 +64,34 @@ public final class PlotTopComponent extends TopComponent implements Observer{
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        typeOfPlotComboBox = new javax.swing.JComboBox();
+        plotButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
+            .addGap(0, 680, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGap(0, 455, Short.MAX_VALUE)
         );
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.jLabel1.text")); // NOI18N
+
+        typeOfPlotComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.plotButton.text")); // NOI18N
+        plotButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.jButton1.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -86,19 +99,51 @@ public final class PlotTopComponent extends TopComponent implements Observer{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(typeOfPlotComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(plotButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton1)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(typeOfPlotComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(plotButton)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
+        // create JavaFX scene
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                fxContainer.addData(ConvertData.mAplotData(analysisHandler.getResults().get(0).getTableContents(), DeAnalysisHandler.Tool.DeSeq), "test");
+//                fxContainer.addData();
+            }
+        });
+    }//GEN-LAST:event_plotButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton plotButton;
+    private javax.swing.JComboBox typeOfPlotComboBox;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -124,18 +169,11 @@ public final class PlotTopComponent extends TopComponent implements Observer{
     }
 
     public void init() {
-        fxContainer = new ScatterPlot();
-        fxContainer.setPreferredSize(new Dimension(JFXPANEL_WIDTH_INT, JFXPANEL_HEIGHT_INT));
+        Dimension plotDimension = new Dimension(JFXPANEL_WIDTH_INT, JFXPANEL_HEIGHT_INT);
+        fxContainer = new ScatterPlot("A", "M", plotDimension);
+        fxContainer.setPreferredSize(plotDimension);
         jPanel1.setLayout(new BorderLayout());
         jPanel1.add(fxContainer, BorderLayout.CENTER);
-
-        // create JavaFX scene
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                fxContainer.addData();
-            }
-        });
     }
 
     @Override

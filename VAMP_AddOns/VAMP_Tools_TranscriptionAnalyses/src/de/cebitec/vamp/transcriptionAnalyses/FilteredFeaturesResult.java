@@ -7,7 +7,6 @@ import de.cebitec.vamp.exporter.excel.ExcelExportDataI;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
 import de.cebitec.vamp.util.GeneralUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,15 +74,17 @@ public class FilteredFeaturesResult extends ResultTrackAnalysis<ParameterSetFilt
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> filteredFeaturesExport = new ArrayList<>();
         List<List<Object>> filteredFeaturesResult = new ArrayList<>();
-
+        PersistantFeature feat;
+        
         for (FilteredFeature filteredFeature : this.getResults()) {
             List<Object> filteredGeneRow = new ArrayList<>();
 
-            filteredGeneRow.add(PersistantFeature.Utils.getFeatureName(filteredFeature.getFilteredFeature()));
+            feat = filteredFeature.getFilteredFeature();
+            filteredGeneRow.add(PersistantFeature.Utils.getFeatureName(feat));
             filteredGeneRow.add(this.getTrackMap().get(filteredFeature.getTrackId()));
-            filteredGeneRow.add(filteredFeature.getFilteredFeature().getStart());
-            filteredGeneRow.add(filteredFeature.getFilteredFeature().getStop());
-            filteredGeneRow.add(filteredFeature.getFilteredFeature().isFwdStrandString());
+            filteredGeneRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
+            filteredGeneRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
+            filteredGeneRow.add(feat.isFwdStrandString());
             filteredGeneRow.add(filteredFeature.getReadCount());
 
             filteredFeaturesResult.add(filteredGeneRow);

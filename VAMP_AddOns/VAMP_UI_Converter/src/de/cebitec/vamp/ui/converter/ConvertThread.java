@@ -9,9 +9,9 @@ import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
 /**
- * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
- * 
  * Thread carrying out the conversion of one file into another format.
+ *
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ConvertThread extends Thread implements Observer {
     

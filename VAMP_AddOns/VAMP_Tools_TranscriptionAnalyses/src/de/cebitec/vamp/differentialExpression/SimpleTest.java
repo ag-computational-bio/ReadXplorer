@@ -114,7 +114,7 @@ public class SimpleTest {
             }
 
             //Ordered by expression in group A.
-            gnuR.eval("res0 <- head(res[rev(order(res$ratioAB)),],100)");
+            gnuR.eval("res0 <- res[rev(order(res$ratioAB)),]");
             REXP result = gnuR.eval("res0");
             RVector rvec = result.asVector();
             REXP colNames = gnuR.eval("colnames(res0)");
@@ -122,7 +122,7 @@ public class SimpleTest {
             results.add(new DeAnalysisHandler.Result(rvec, colNames, rowNames, "Ordered by expression in group A"));
 
             //Ordered by expression in group B.
-            gnuR.eval("res1 <- head(res[rev(order(res$ratioBA)),],100)");
+            gnuR.eval("res1 <- res[rev(order(res$ratioBA)),]");
             result = gnuR.eval("res1");
             rvec = result.asVector();
             colNames = gnuR.eval("colnames(res1)");
@@ -130,7 +130,7 @@ public class SimpleTest {
             results.add(new DeAnalysisHandler.Result(rvec, colNames, rowNames, "Ordered by expression in group B"));
 
             //Ordered by confidence.
-            gnuR.eval("res2 <- head(res[rev(order(res$confidence)),],100)");
+            gnuR.eval("res2 <- res[rev(order(res$confidence)),]");
             result = gnuR.eval("res2");
             rvec = result.asVector();
             colNames = gnuR.eval("colnames(res2)");

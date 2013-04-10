@@ -56,6 +56,7 @@ public class CollectCoverageData implements Observer {
      */
     private void updateReadCountForFeatures(List<PersistantMapping> mappings) {
         Collections.sort(mappings);
+        Collections.sort(genomeFeatures);
         int lastMappingIdx = 0;
         PersistantFeature feature;
         boolean fstFittingMapping;

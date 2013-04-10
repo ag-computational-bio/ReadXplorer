@@ -16,29 +16,23 @@ import de.cebitec.vamp.parser.mappings.JokParser;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
 import de.cebitec.vamp.parser.mappings.SamBamParser;
 import de.cebitec.vamp.parser.mappings.SamBamStepParser;
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
-import java.io.File;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 
 /**
  * The dialog panel for importing only position tables for an existing track.
- *
- * @author rhilker
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class NewPositionTableDialog extends RefDataPanel implements NewJobDialogI {
+public class NewPositionTableDialog extends ImportTrackBasePanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
-    private File mappingFile;
     private ReferenceJob[] refGenJobs;
     private MappingParserI[] parsers = new MappingParserI[]{new JokParser(), new SamBamParser(), new SamBamStepParser()};
-    private MappingParserI currentParser;
     private int stepSize = 0;
     private static final int maxVal = 1000000000;
     private static final int minVal = 10000;
@@ -48,11 +42,11 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
     
     /** The dialog panel for importing only position tables for an existing track. */
     public NewPositionTableDialog() {
-        this.refGenJobs = this.getRefGenJobs();
+        this.refGenJobs = this.getReferenceJobs();
         this.initComponents();
         // choose the default parser. first entry is shown in combobox by default
         this.setTrackJobs((ReferenceJob) this.refGenCombo.getSelectedItem());
-        currentParser = parsers[0];
+        setCurrentParser(parsers[0]);
         this.setStepwiseField(false);
         stepSizeSpinner.setModel(new SpinnerNumberModel(defaultVal, minVal, maxVal, step));
         JFormattedTextField txt = ((JSpinner.NumberEditor) stepSizeSpinner.getEditor()).getTextField();
@@ -61,7 +55,7 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
 
     @Override
     public boolean isRequiredInfoSet() {
-        if (mappingFile == null || refGenCombo.getSelectedItem() == null || parentTrackCombo.getSelectedItem() == null) {
+        if (getMappingFile() == null || refGenCombo.getSelectedItem() == null || parentTrackCombo.getSelectedItem() == null) {
             return false;
         } else {
             return true;
@@ -69,23 +63,16 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
     }
 
     
-    public File getMappingFile() {
-        return mappingFile;
-    }
-
-    
     public TrackJob getParentTrack() {
         return (TrackJob) this.parentTrackCombo.getSelectedItem();
     }
 
-    
+    /**
+     * @return The reference genome associated with this track job.
+     */
+    @Override
     public ReferenceJob getReferenceJob() {
         return (ReferenceJob) this.refGenCombo.getSelectedItem();
-    }
-
-    
-    public MappingParserI getParser() {
-        return this.currentParser;
     }
 
     
@@ -113,7 +100,7 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
                         null, track.getDescription(), refJob, null, true, track.getTimestamp());
             }
 
-            this.parentTrackCombo.setModel(new DefaultComboBoxModel(tracks));
+            this.parentTrackCombo.setModel(new DefaultComboBoxModel<>(tracks));
             this.parentTrackCombo.setEnabled(true);
         } else {
             this.parentTrackCombo.setEnabled(false);
@@ -130,16 +117,16 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        parserCombo = new javax.swing.JComboBox(parsers);
+        parserCombo = new javax.swing.JComboBox<>(parsers);
         mappingFileField = new javax.swing.JTextField();
         mappingFileLabel = new javax.swing.JLabel();
         parentTrackLabel = new javax.swing.JLabel();
         stepSizeSpinner = new javax.swing.JSpinner();
         stepSizeLabel = new javax.swing.JLabel();
         refGenLabel = new javax.swing.JLabel();
-        refGenCombo = new javax.swing.JComboBox(refGenJobs);
+        refGenCombo = new javax.swing.JComboBox<>(refGenJobs);
         openMappingButton = new javax.swing.JButton();
-        parentTrackCombo = new javax.swing.JComboBox();
+        parentTrackCombo = new javax.swing.JComboBox<>();
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(NewPositionTableDialog.class, "NewPositionTableDialogNew.jLabel1.text")); // NOI18N
 
@@ -240,48 +227,33 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
                 .addContainerGap(31, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void parentTrackComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parentTrackComboActionPerformed
-
-        // TODO add your handling code here:}//GEN-LAST:event_parentTrackComboActionPerformed
-    }
         
         private void openMappingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMappingButtonActionPerformed
-            JFileChooser fc = new JFileChooser();
-            fc.setFileFilter(new FileNameExtensionFilter(currentParser.getInputFileDescription(), currentParser.getFileExtensions()));
-            Preferences prefs2 = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
+            VampFileChooser fc = new VampFileChooser(getCurrentParser().getFileExtensions(), getCurrentParser().getInputFileDescription()) {
+                private static final long serialVersionUID = 1L;
 
-            String path = prefs2.get("RefGenome.Filepath", null);
-            if (path != null) {
-                fc.setCurrentDirectory(new File(path));
-            }
-            int result = fc.showOpenDialog(this);
-            
-            if (result == 0) {
-                // file chosen
-                File file = fc.getSelectedFile();
-
-                if (file.canRead()) {
-                    mappingFile = file;
-                    mappingFileField.setText(mappingFile.getAbsolutePath());
-                    Preferences prefs = Preferences.userNodeForPackage(NewReferenceDialogPanel.class);
-                    prefs.put("RefGenome.Filepath", mappingFile.getAbsolutePath());
-                    try {
-                        prefs.flush();
-                    } catch (BackingStoreException ex) {
-                        Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else {
-                    Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.WARNING, "Couldn't read file");
+                @Override
+                public void save(String fileLocation) {
+                    throw new UnsupportedOperationException("Not supported.");
                 }
-            }
+
+                @Override
+                public void open(String fileLocation) {
+
+                    // file chosen
+                    addFile(this.getSelectedFile(), mappingFileField);
+                }
+            };
+            
+            fc.setDirectoryProperty("NewPositionTable.Filepath");
+            fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
     }//GEN-LAST:event_openMappingButtonActionPerformed
 
     private void parserComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserComboActionPerformed
         MappingParserI newparser = (MappingParserI) parserCombo.getSelectedItem();
-        if (currentParser != newparser) {
-            currentParser = newparser;
-            mappingFile = null;
+        if (getCurrentParser() != newparser) {
+            setCurrentParser(newparser);
+            getMappingFiles().clear();
             mappingFileField.setText("");
             setStepwiseField((newparser instanceof SamBamStepParser));
         }
@@ -291,17 +263,26 @@ public class NewPositionTableDialog extends RefDataPanel implements NewJobDialog
         this.setTrackJobs((ReferenceJob) this.refGenCombo.getSelectedItem());
     }//GEN-LAST:event_refGenComboActionPerformed
 
+    private void parentTrackComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parentTrackComboActionPerformed
+
+    }//GEN-LAST:event_parentTrackComboActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField mappingFileField;
     private javax.swing.JLabel mappingFileLabel;
     private javax.swing.JButton openMappingButton;
-    private javax.swing.JComboBox parentTrackCombo;
+    private javax.swing.JComboBox<TrackJob> parentTrackCombo;
     private javax.swing.JLabel parentTrackLabel;
-    private javax.swing.JComboBox parserCombo;
-    private javax.swing.JComboBox refGenCombo;
+    private javax.swing.JComboBox<MappingParserI> parserCombo;
+    private javax.swing.JComboBox<ReferenceJob> refGenCombo;
     private javax.swing.JLabel refGenLabel;
     private javax.swing.JLabel stepSizeLabel;
     private javax.swing.JSpinner stepSizeSpinner;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public String getTrackName() {
+        throw new UnsupportedOperationException("This panel has a parent track, not only a name!");
+    }
 }

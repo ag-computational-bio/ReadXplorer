@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.util.polyTree.Node;
 import de.cebitec.vamp.util.polyTree.Polytree;
@@ -15,7 +16,7 @@ import java.util.Map;
  *
  * @author ddoppmeier, rhilker
  */
-public class PersistantFeature extends Node implements PersistantFeatureI {
+public class PersistantFeature extends Node implements PersistantFeatureI, Comparable<PersistantFeature> {
     
     private int id;
     private String ecNumber;
@@ -71,7 +72,9 @@ public class PersistantFeature extends Node implements PersistantFeatureI {
         String[] parentIdArray = parentIds.split(";");
         for (int i = 0; i < parentIdArray.length; ++i) {
             try {
-                parentIdList.add(Integer.parseInt(parentIdArray[i]));
+                if (!parentIdArray[i].equals(Properties.NO_PARENT_STRING)) {
+                    parentIdList.add(Integer.parseInt(parentIdArray[i]));
+                }
             } catch (NumberFormatException e) {
                 //ignore and continue
             }
@@ -212,7 +215,26 @@ public class PersistantFeature extends Node implements PersistantFeatureI {
     public void addSubFeature(PersistantSubFeature parsedSubFeature) {
         this.subFeatures.add(parsedSubFeature);
     }
-    
+
+    /**
+     * Compares two PersistantFeature based on their start position. '0' is returned for
+     * equal start positions, 1, if the start position of the other is larger
+     * and -1, if the start position of this mapping is larger.
+     * @param feature mapping to compare to this mapping 
+     * @return '0' for equal start positions, 1, if the start
+     * position of the other is larger and -1, if the start position of this
+     * mapping is larger.
+     */
+    @Override
+    public int compareTo(PersistantFeature feature) {
+        int ret = 0;
+        if (this.start < feature.getStart()) {
+            ret = -1;
+        } else if (this.start > feature.getStart()) {
+            ret = 1;
+        }
+        return ret;
+    } 
     /**
      * Static inner class containig all utility methods for 
      * <tt>PersistantFeatures</tt>.

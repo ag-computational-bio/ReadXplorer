@@ -2,13 +2,16 @@ package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
+import de.cebitec.vamp.parser.output.SamBamSorter;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.SamUtils;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.MissingResourceException;
+import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -48,10 +51,40 @@ public class SamBamParser implements MappingParserI {
         this();
         this.seqPairProcessor = seqPairProcessor;
     }
+    
+    /**
+     * Does nothing, as the sam bam parser currently does not need any
+     * conversions.
+     * @param trackJob
+     * @param referenceSequence
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
+    
+    /**
+     * Not implemented for this parser implementation, as currently no 
+     * preprocessing is needed.
+     * @param trackJob the trackjob to preprocess
+     * @return true, if the method succeeded
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
 
     @Override
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
+        
+        this.preprocessData(trackJob);
+        
         this.seqToIDMap = new HashMap<>();
         this.readnames = new ArrayList<>();
         int lineno = 0;
@@ -84,7 +117,8 @@ public class SamBamParser implements MappingParserI {
         this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filepath));
         
         ErrorLimit errorLimit = new ErrorLimit();
-        SAMFileReader sam = new SAMFileReader(trackJob.getFile());        
+        SAMFileReader sam = new SAMFileReader(trackJob.getFile());    
+        sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
         SAMRecordIterator itor;
         try {
             itor = sam.iterator();
@@ -117,7 +151,7 @@ public class SamBamParser implements MappingParserI {
                     }
 
                     //check parameters
-                    if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, filepath, lineno)) {
+                    if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, filepath, lineno)) {
                         continue;
                     }
 

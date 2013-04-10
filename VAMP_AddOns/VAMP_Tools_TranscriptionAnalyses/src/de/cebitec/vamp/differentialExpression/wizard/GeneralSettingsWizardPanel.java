@@ -4,6 +4,8 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -74,7 +76,14 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
             File file = new File(path);
             wiz.putProperty("saveFile", file);
         }
-        wiz.putProperty("featureType", getComponent().getFeatureType());
+
+        List<FeatureType> usedFeatures = getComponent().getFeatureType();
+        //If all possible features are selected, we use the ANY feature type
+        if (usedFeatures.size() == FeatureType.SELECTABLE_FEATURE_TYPES.length) {
+            usedFeatures = new ArrayList<>();
+            usedFeatures.add(FeatureType.ANY);
+        }
+        wiz.putProperty("featureType", usedFeatures);
     }
 
     @Override
@@ -82,11 +91,15 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
         if (!getComponent().verifyInput()) {
             throw new WizardValidationException(null, "Please enter a number greater or equal to zero as start/stop offset.", null);
         }
-        FeatureType feature = getComponent().getFeatureType();
-        if (feature != FeatureType.ANY) {
-            ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(genomeID);
-            if (!referenceConnector.hasFeatures(feature)) {
-                throw new WizardValidationException(null, "The selected reference genome does not contain annotations of the type " + feature.getTypeString() + ".", null);
+        List<FeatureType> usedFeatures = getComponent().getFeatureType();
+        if (usedFeatures.isEmpty()) {
+            throw new WizardValidationException(null, "Please select at least one type of annotation.", null);
+        } else {
+            if (usedFeatures.size() < FeatureType.SELECTABLE_FEATURE_TYPES.length) {
+                ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(genomeID);
+                if (!referenceConnector.hasFeatures(usedFeatures)) {
+                    throw new WizardValidationException(null, "The selected reference genome does not contain annotations of the selected type(s).", null);
+                }
             }
         }
     }

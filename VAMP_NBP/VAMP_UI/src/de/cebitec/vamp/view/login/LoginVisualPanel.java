@@ -27,10 +27,6 @@ public final class LoginVisualPanel extends JPanel {
     private String defaultdatabaseh2;
     private String defaultuser;
     private String defaulthostname;
-    private static String LOGIN_DATABASE_MYSQL = "login.database.mysql";
-    private static String LOGIN_USER = "login.user";
-    private static String LOGIN_HOSTNAME = "login.hostname";
-    private static String LOGIN_DATABASE_H2= "login.database.h2";
 
     /** Creates new form LoginVisualPanel */
     public LoginVisualPanel() {
@@ -45,18 +41,18 @@ public final class LoginVisualPanel extends JPanel {
     }
     
     private void setLoginData() {
-        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel.class);
-        defaultuser = prefs.get(LOGIN_USER , null);
-        defaultDatabaseMySQL = prefs.get(LOGIN_DATABASE_MYSQL, null);
-        defaulthostname = prefs.get(LOGIN_HOSTNAME, null);
-        defaultdatabaseh2 = prefs.get(LOGIN_DATABASE_H2, null);
+        Preferences prefs = Preferences.userNodeForPackage(LoginProperties.class);
+        defaultuser = prefs.get(LoginProperties.LOGIN_USER , null);
+        defaultDatabaseMySQL = prefs.get(LoginProperties.LOGIN_DATABASE_MYSQL, null);
+        defaulthostname = prefs.get(LoginProperties.LOGIN_HOSTNAME, null);
+        defaultdatabaseh2 = prefs.get(LoginProperties.LOGIN_DATABASE_H2, null);
         userField.setText(defaultuser);
         urlField.setText(defaulthostname);
         databaseField.setText(defaultDatabaseMySQL);
     }
 
     public Map<String, String> getLoginData(){
-        Map<String, String> loginData = new HashMap<String, String>();
+        Map<String, String> loginData = new HashMap<>();
 
         String adapter = dbTypeBox.getSelectedItem().toString();
         String hostname, database, user, password;
@@ -99,12 +95,12 @@ public final class LoginVisualPanel extends JPanel {
 
         if (saveDataCheckBox.isSelected()) {
             if (adapter.equalsIgnoreCase("mysql")){
-                prefs.put(LOGIN_HOSTNAME, loginData.get(LoginWizardPanel.PROP_HOST));
-                prefs.put(LOGIN_USER, loginData.get(LoginWizardPanel.PROP_USER));
-                prefs.put(LOGIN_DATABASE_MYSQL, loginData.get(LoginWizardPanel.PROP_DATABASE));
+                prefs.put(LoginProperties.LOGIN_HOSTNAME, loginData.get(LoginWizardPanel.PROP_HOST));
+                prefs.put(LoginProperties.LOGIN_USER, loginData.get(LoginWizardPanel.PROP_USER));
+                prefs.put(LoginProperties.LOGIN_DATABASE_MYSQL, loginData.get(LoginWizardPanel.PROP_DATABASE));
             }
             else if (adapter.equalsIgnoreCase("h2")){
-                prefs.put(LOGIN_DATABASE_H2, loginData.get(LoginWizardPanel.PROP_DATABASE));
+                prefs.put(LoginProperties.LOGIN_DATABASE_H2, loginData.get(LoginWizardPanel.PROP_DATABASE));
             }
             else{
                 // should not reach here
@@ -112,12 +108,12 @@ public final class LoginVisualPanel extends JPanel {
         }
         else {
             if (adapter.equalsIgnoreCase("mysql")){
-                prefs.put(LOGIN_HOSTNAME, "");
-                prefs.put(LOGIN_DATABASE_MYSQL, "");
-                prefs.put(LOGIN_USER, "");
+                prefs.put(LoginProperties.LOGIN_HOSTNAME, "");
+                prefs.put(LoginProperties.LOGIN_DATABASE_MYSQL, "");
+                prefs.put(LoginProperties.LOGIN_USER, "");
             }
             else if (adapter.equalsIgnoreCase("h2")){
-                prefs.put(LOGIN_DATABASE_H2, "");
+                prefs.put(LoginProperties.LOGIN_DATABASE_H2, "");
             }
             else{
                 // should not reach here
@@ -269,12 +265,12 @@ public final class LoginVisualPanel extends JPanel {
         Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel.class);
         String db = dbTypeBox.getSelectedItem().toString();
         if (db.equalsIgnoreCase("h2")) {
-            String path = prefs2.get(LOGIN_DATABASE_H2, null);
+            String path = prefs2.get(LoginProperties.LOGIN_DATABASE_H2, null);
             if (path != null) {
                 fc.setCurrentDirectory(new File(path));
             }
         } else {
-            String path = prefs2.get(LOGIN_DATABASE_MYSQL, null);
+            String path = prefs2.get(LoginProperties.LOGIN_DATABASE_MYSQL, null);
             if (path != null) {
                 fc.setCurrentDirectory(new File(path));
             }

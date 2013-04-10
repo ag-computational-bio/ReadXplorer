@@ -83,7 +83,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false, false
@@ -208,8 +208,8 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
                     rowData[0] = feature;
                     rowData[1] = coveredFeaturesResultNew.getTrackMap().get(coveredFeature.getTrackId());
                     rowData[2] = feature.isFwdStrandString();
-                    rowData[3] = feature.getStart();
-                    rowData[4] = feature.getStop();
+                    rowData[3] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+                    rowData[4] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
                     rowData[5] = feature.getStop() - feature.getStart();
                     rowData[6] = coveredFeature.getPercentCovered();
                     rowData[7] = coveredFeature.getNoCoveredBases();

@@ -10,10 +10,10 @@ import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.mappings.*;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,36 +22,33 @@ import org.openide.util.NbBundle;
 
 /**
  * Panel allowing for input of two sequence pair mapping files.
- *
- * @author Rolf Hilker
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobDialogI {
+public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 776435254;
-    private List<File> mappingFiles1;
     private List<File> mappingFiles2;
     private ReferenceJob[] refGenJobs;
     private final JokParser jokParser;
+    private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamParser samBamParser;
     private final SamBamDirectParser samBamDirectParser;
     private MappingParserI[] parsers;
-    private MappingParserI currentParser;
     private int distance; //distance of the sequences in a sequence pair in bp
     private short deviation; //deviation allowed from that distance in %
     private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
-    private boolean isDbUsed;
-    private boolean useMultipleImport = false;
 
     /** Panel allowing for input of two sequence pair mapping files. */
     public NewSeqPairTracksDialogPanel() {
-        this.refGenJobs = getRefGenJobs();
+        this.refGenJobs = getReferenceJobs();
         // choose the default parser. first entry is shown in combobox by default
         this.jokParser = new JokParser(new SeqPairDBProcessor());
+        this.jokToBamDirectParser = new JokToBamDirectParser();
         this.samBamParser = new SamBamParser(new SeqPairDBProcessor());
         this.samBamDirectParser = new SamBamDirectParser();
-        this.parsers = new MappingParserI[] { this.samBamDirectParser };
-        this.currentParser = parsers[0];
-        mappingFiles1 = new ArrayList<>();
+        this.parsers = new MappingParserI[] { this.samBamDirectParser , jokToBamDirectParser };
+        this.setCurrentParser(parsers[0]);
         mappingFiles2 = new ArrayList<>();
         initComponents();
         this.alreadyImportedBox.setVisible(true);
@@ -348,7 +345,7 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(multiTrackListLabel))
-                .addContainerGap(156, Short.MAX_VALUE))
+                .addContainerGap(103, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -358,15 +355,22 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
 
     private void parserComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserComboBoxActionPerformed
         MappingParserI newparser = (MappingParserI) parserComboBox.getSelectedItem();
-        if (currentParser != newparser) {
-            currentParser = newparser;
-            mappingFiles1.clear();
+        if (getCurrentParser() != newparser) {
+            setCurrentParser(newparser);
+            this.getMappingFiles().clear();
             mappingFiles2.clear();
             mappingFile1Field.setText("");
             mappingFile2Field.setText("");
             nameField.setText("");
             this.multiTrackList.setModel(new DefaultListModel<String>());
             
+            if (newparser instanceof SamBamDirectParser) {
+                this.alreadyImportedBox.setEnabled(true);
+            } else {
+                this.alreadyImportedBox.setEnabled(false);
+                this.alreadyImportedBox.setSelected(false);
+                this.setIsAlreadyImported(false);
+            }
         }
 }//GEN-LAST:event_parserComboBoxActionPerformed
 
@@ -395,12 +399,13 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
     }//GEN-LAST:event_orientation2ButtonActionPerformed
 
     private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
-        this.isDbUsed = this.importTypeCombo.getSelectedIndex() == 0;
-        this.alreadyImportedBox.setVisible(!this.isDbUsed);
+        this.setIsDbUsed(this.importTypeCombo.getSelectedIndex() == 0);
+        this.alreadyImportedBox.setVisible(!this.isDbUsed());
         this.parserComboBox.removeAllItems();
-        if (!this.isDbUsed) {
+        if (!this.isDbUsed()) {
             //update the parsers to only display the bam parser.
             this.parserComboBox.addItem(this.samBamDirectParser);
+            this.parserComboBox.addItem(this.jokToBamDirectParser);
         } else {
             this.parserComboBox.addItem(this.samBamParser);
             this.parserComboBox.addItem(this.jokParser);
@@ -409,7 +414,8 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
     }//GEN-LAST:event_importTypeComboActionPerformed
 
     private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
-        if (this.alreadyImportedBox.isSelected()) {
+        this.setIsAlreadyImported(this.alreadyImportedBox.isSelected());
+        if (this.isAlreadyImported()) {
             this.chooseButton2.setEnabled(false);
             if (!this.mappingFiles2.isEmpty()) {
                 String title = NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "MSG_NewSeqPairTracksDialogPanel.TrackNumberInfo.Title");
@@ -418,8 +424,8 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
                 this.mappingFiles2.clear();
                 this.mappingFile2Field.setText("");
                 DefaultListModel<String> model = new DefaultListModel<>();
-                this.fillMultipleImportTable(model, mappingFiles1, "Mapping file 1 list:");
-                if (!this.alreadyImportedBox.isSelected()) {
+                this.fillMultipleImportTable(model, getMappingFiles(), "Mapping file 1 list:");
+                if (!this.isAlreadyImported()) {
                     this.fillMultipleImportTable(model, mappingFiles2, "Mapping file 2 list:");
                 }
                 multiTrackList.setModel(model);
@@ -430,30 +436,22 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
     }//GEN-LAST:event_alreadyImportedBoxActionPerformed
 
     private void multipleImportCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multipleImportCheckBoxActionPerformed
-        this.useMultipleImport = this.multipleImportCheckBox.isSelected();
-        if (this.useMultipleImport) {
-            this.multiTrackScrollPane.setVisible(true);
-            this.multiTrackList.setVisible(true);
-            this.multiTrackListLabel.setVisible(true);
+        this.updateGuiForMultipleFiles(multipleImportCheckBox, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFile1Field);
+        if (this.useMultipleImport()) {
             this.nameField.setEnabled(false);
-            this.nameField.setText("Note: each track gets its file name");
+            this.nameField.setText(NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "MultipleImportTrackNameMsg"));
             DefaultListModel<String> model = new DefaultListModel<>();
-            this.fillMultipleImportTable(model, mappingFiles1, "Mapping file 1 list:");
-            if (!this.alreadyImportedBox.isSelected()) {
+            this.fillMultipleImportTable(model, getMappingFiles(), "Mapping file 1 list:");
+            if (!this.isAlreadyImported()) {
                 this.fillMultipleImportTable(model, mappingFiles2, "Mapping file 2 list:");
             }
+            this.mappingFile2Field.setText(mappingFiles2.size() + " tracks to import");
             multiTrackList.setModel(model);
         } else {
-            this.multiTrackScrollPane.setVisible(false);
-            this.multiTrackList.setVisible(false);
-            this.multiTrackListLabel.setVisible(false);
             this.nameField.setEnabled(true);
-            this.mappingFiles1.clear();
-            this.mappingFile1Field.setText("");
+            this.nameField.setText("");
             this.mappingFiles2.clear();
             this.mappingFile2Field.setText("");
-            this.nameField.setText("");
-            this.multiTrackList.setModel(new DefaultListModel<String>());
         }
     }//GEN-LAST:event_multipleImportCheckBoxActionPerformed
 
@@ -463,9 +461,7 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
      * @param isFstFile true, if this is the first file, false if it is the second.
      */
     private void openFileChooser(final boolean isFstFile) {
-//        Preferences prefs2 = Preferences.userNodeForPackage(NewSeqPairTracksDialogPanel.class);
-
-        VampFileChooser fc = new VampFileChooser(currentParser.getFileExtensions(), currentParser.getInputFileDescription()) {
+        VampFileChooser fc = new VampFileChooser(getCurrentParser().getFileExtensions(), getCurrentParser().getInputFileDescription()) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -477,26 +473,24 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
             public void open(String fileLocation) {
                 
                 // file chosen
-                if (this.isMultiSelectionEnabled()) {
-                    List<File> files = Arrays.asList(this.getSelectedFiles());
+                if (useMultipleImport()) {
+                    File[] files = this.getSelectedFiles();
                     if (isFstFile) {
-                        mappingFiles1.clear();
+                        getMappingFiles().clear();
                     } else {
                         mappingFiles2.clear();
                     }
                     
-                    for (File file : files) {
-                        this.addFile(file);
-                        
-                        if (useMultipleImport) {
-                            mappingFile1Field.setText(mappingFiles1.size() + " tracks to import");
-                            mappingFile2Field.setText(mappingFiles2.size() + " tracks to import");
-                            DefaultListModel<String> model = new DefaultListModel<>();
-                            fillMultipleImportTable(model, mappingFiles1, "Mapping file 1 list:");
-                            fillMultipleImportTable(model, mappingFiles2, "Mapping file 2 list:");
-                            multiTrackList.setModel(model);
-                        }
+                    for (int i = 0; i < files.length; ++i) {
+                        this.addFile(files[i]);
                     }
+
+                    mappingFile1Field.setText(getMappingFiles().size() + " tracks to import");
+                    mappingFile2Field.setText(mappingFiles2.size() + " tracks to import");
+                    DefaultListModel<String> model = new DefaultListModel<>();
+                    fillMultipleImportTable(model, getMappingFiles(), "Mapping file 1 list:");
+                    fillMultipleImportTable(model, mappingFiles2, "Mapping file 2 list:");
+                    multiTrackList.setModel(model);
                     nameField.setText("Note: each track gets its file name");
                 } else {
                     File file = this.getSelectedFile();
@@ -504,14 +498,6 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
 
 //                    String path = mappingFiles1 == null ? mappingFiles2.get(mappingFiles2.size() - 1).getAbsolutePath()
 //                            : mappingFiles1.get(mappingFiles1.size() - 1).getAbsolutePath();
-
-//                    Preferences prefs = Preferences.userNodeForPackage(NewSeqPairTracksDialogPanel.class);
-//                    prefs.put("RefGenome.Filepath", path);
-//                    try {
-//                        prefs.flush();
-//                    } catch (BackingStoreException ex) {
-//                        Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
                 }
             }
 
@@ -521,13 +507,13 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
             private void addFile(File file) {
                 if (file.canRead()) {
                     if (isFstFile) {
-                        mappingFiles1.add(file);
+                        getMappingFiles().add(file);
                         mappingFile1Field.setText(file.getAbsolutePath());
                         nameField.setText(file.getName());
                     } else {
                         mappingFiles2.add(file);
                         mappingFile2Field.setText(file.getAbsolutePath());
-                        if (mappingFiles1.isEmpty()) {
+                        if (getMappingFiles().isEmpty()) {
                             nameField.setText(file.getName());
                         }
                     }
@@ -537,27 +523,10 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
             }
         };
         
-        fc.setMultiSelectionEnabled(this.useMultipleImport);
+        fc.setDirectoryProperty("NewSeqPairTrack.Filepath");
+        fc.setMultiSelectionEnabled(this.useMultipleImport());
         fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
-    }
-
-    /**
-     * Fills the table showing all tracks selected for a multiple track at once 
-     * import.
-     * @param model the model to which the data should be added
-     * @param mappingFiles the files whose names should be appended to the model
-     * @param title the title above the file names to add
-     */
-    private void fillMultipleImportTable(DefaultListModel<String> model, List<File> mappingFiles, String title) {
-        model.addElement(title);
-        for (File mappingFile : mappingFiles) {
-            model.addElement(mappingFile.getName());
-        }
-        if (mappingFiles.isEmpty()) {
-            model.addElement("-");
-        }
-    }
-    
+    }    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox alreadyImportedBox;
@@ -597,12 +566,12 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
      */
     @Override
     public boolean isRequiredInfoSet() {
-        if (mappingFiles1.isEmpty() && mappingFiles2.isEmpty() 
+        if (getMappingFiles().isEmpty() && mappingFiles2.isEmpty() 
                 || refGenBox.getSelectedItem() == null 
                 || nameField.getText().isEmpty() 
                 || !distanceHasValidInput()  
                 || !deviationHasValidInput() 
-                || !mappingFiles2.isEmpty() && this.alreadyImportedBox.isSelected()) {
+                || !mappingFiles2.isEmpty() && this.isAlreadyImported()) {
             return false;
         } else {
             return true;
@@ -626,22 +595,14 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
     }
 
     /**
-     * @return true, if the track should be stored into the database and false, if 
-     * direct file access is desired
-     */
-    public boolean isDbUsed() {
-        return isDbUsed;
-    }
-
-    /**
      * @return The first mapping file to import, may be null, but one of both
      * files has to be set always
      */
     public File getMappingFile1() {
-        if (mappingFiles1.isEmpty()) {
+        if (getMappingFiles().isEmpty()) {
             return null;
         } else {
-            return this.mappingFiles1.get(0);
+            return getMappingFiles().get(0);
         }
     }
 
@@ -658,14 +619,6 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
     }
     
     /**
-     * @return The complete list of mapping files1 to import for multiple data
-     * set import with the same parameters at once
-     */
-    public List<File> getMappingFiles1() {
-        return this.mappingFiles1;
-    }
-    
-    /**
      * @return The complete list of mapping files2 to import for multiple data
      * set import with the same parameters at once
      */
@@ -676,26 +629,22 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
     /**
      * @return The name of this track job.
      */
+    @Override
     public String getTrackName() {
         return nameField.getText();
     }
 
     /**
-     * @return the reference genome associated with this track job.
+     * @return The reference genome associated with this track job.
      */
+    @Override
     public ReferenceJob getReferenceJob() {
         return (ReferenceJob) refGenBox.getSelectedItem();
     }
 
-    /**
-     * @return the parser, which shall be used for parsing this track job.
-     */
-    public MappingParserI getParser() {
-        return currentParser;
-    }
     
     /**
-     * @return distance of the sequences in a sequence pair in bp (from start1 to stop2)
+     * @return Distance of the sequences in a sequence pair in bp (from start1 to stop2)
      */
     public int getDistance(){
         return this.distance;
@@ -759,23 +708,4 @@ public class NewSeqPairTracksDialogPanel extends RefDataPanel implements NewJobD
             case "ff/rr":   this.orientation = 2; break;
         }
     }
-    
-    /**
-     * @return true, if this direct access track was already imported in another
-     * vamp db. In that case the sam/bam file does not have to be extended
-     * anymore, because all needed data is already stored in the file.
-     */
-    public boolean isAlreadyImported() {
-        return this.alreadyImportedBox.isSelected();
-    }
-
-    /**
-     * @return true, if multiple files arre imported at once, false otherwise
-     */
-    public boolean isUseMultipleImport() {
-        return this.useMultipleImport;
-    }
-    
-    
-
 }

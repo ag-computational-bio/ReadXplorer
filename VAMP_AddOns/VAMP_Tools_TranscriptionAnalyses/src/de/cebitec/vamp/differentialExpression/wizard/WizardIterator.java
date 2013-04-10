@@ -75,7 +75,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
                 File saveFile = (File) wiz.getProperty("saveFile");
                 Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
-                FeatureType feature = (FeatureType) wiz.getProperty("featureType");
+                List<FeatureType> feature = (List<FeatureType>) wiz.getProperty("featureType");
                 Integer startOffset = (Integer) wiz.getProperty("startOffset");
                 Integer stopOffset = (Integer) wiz.getProperty("stopOffset");
                 DeAnalysisHandler handler = null;

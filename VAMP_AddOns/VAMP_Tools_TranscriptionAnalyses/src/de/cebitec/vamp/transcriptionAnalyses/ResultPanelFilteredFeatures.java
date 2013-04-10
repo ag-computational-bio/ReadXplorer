@@ -198,14 +198,16 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
 
                 DefaultTableModel model = (DefaultTableModel) filteredFeaturesTable.getModel();
 
+                PersistantFeature feat;
                 for (FilteredFeature filteredFeature : features) {
-
+                    feat = filteredFeature.getFilteredFeature();
+                    
                     Object[] rowData = new Object[nbColumns];
-                    rowData[0] = filteredFeature.getFilteredFeature();
+                    rowData[0] = feat;
                     rowData[1] = filterFeaturesResultNew.getTrackMap().get(filteredFeature.getTrackId());
-                    rowData[2] = filteredFeature.getFilteredFeature().isFwdStrandString();
-                    rowData[3] = filteredFeature.getFilteredFeature().getStart();
-                    rowData[4] = filteredFeature.getFilteredFeature().getStop();
+                    rowData[2] = feat.isFwdStrandString();
+                    rowData[3] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
+                    rowData[4] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
                     rowData[5] = filteredFeature.getReadCount();
 
                     model.addRow(rowData);

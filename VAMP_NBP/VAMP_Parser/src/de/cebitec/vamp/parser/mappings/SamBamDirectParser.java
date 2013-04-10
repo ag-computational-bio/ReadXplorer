@@ -5,14 +5,17 @@ import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.output.SamBamSorter;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.SamUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -27,7 +30,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class SamBamDirectParser implements MappingParserI {
+public class SamBamDirectParser implements MappingParserI, Observer {
 
     private static String name = "SAM/BAM Direct Access Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
@@ -75,8 +78,37 @@ public class SamBamDirectParser implements MappingParserI {
     }
 
     /**
-     * Parses the input determined by the track job. The sam/bam file has
-     * to be sorted by readname for this classification.
+     * Does nothing, as the sam bam direct parser currently does not need any conversions.
+     * @param trackJob
+     * @param referenceSequence
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
+
+    /**
+     * Sorts the file by read sequence.
+     * @param trackJob the trackjob to preprocess
+     * @return true, if the method succeeded, false otherwise
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        SamBamSorter sorter = new SamBamSorter();
+        sorter.registerObserver(this);
+        boolean success = sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
+        return success;
+    }
+
+    /**
+     * First calls the preprocessing method, which sorts the sam/bam file by
+     * readname in this implementation and then parses the input determined by 
+     * the track job.
      * @param trackJob the track job to parse
      * @param refSeqWhole the reference sequence
      * @return a direct access data container constisting of:
@@ -91,10 +123,12 @@ public class SamBamDirectParser implements MappingParserI {
     @Override
     public DirectAccessDataContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
 
+        boolean success = (boolean) this.preprocessData(trackJob);
+        
         String fileName = trackJob.getFile().getName();
         String refName = trackJob.getRefGen().getName();
         long startTime = System.currentTimeMillis();
-        this.notifyObservers(NbBundle.getMessage(JokParser.class, "Parser.Parsing.Start", fileName));
+        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Start", fileName));
 
         int lineno = 0;
 
@@ -122,6 +156,7 @@ public class SamBamDirectParser implements MappingParserI {
         ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
+            sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samItor = sam.iterator();
 
             SAMRecord record;
@@ -138,7 +173,7 @@ public class SamBamDirectParser implements MappingParserI {
                         stop = record.getAlignmentEnd();
                         refSeq = refSeqWhole.substring(start - 1, stop);
 
-                        if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                        if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
@@ -193,7 +228,7 @@ public class SamBamDirectParser implements MappingParserI {
                 
 
             }
-            if (errorLimit.getSkippedCount()>0) {
+            if (errorLimit.getSkippedCount() > 0) {
                      this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
             }
 
@@ -225,6 +260,11 @@ public class SamBamDirectParser implements MappingParserI {
         for (Observer observer : this.observers) {
             observer.update(data);
         }
+    }
+
+    @Override
+    public void update(Object args) {
+        this.notifyObservers(args);
     }
 
     /**

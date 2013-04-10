@@ -36,8 +36,8 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler {
 
     public SimpleTestAnalysisHandler(List<PersistantTrack> selectedTraks,
             int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates, 
-                        File saveFile, FeatureType feature, int startOffset, int stopOffset) {
-        super(selectedTraks, refGenomeID, saveFile, feature, startOffset, stopOffset);
+                        File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset);
         simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(),
                 groupA, groupB, workingWithoutReplicates);
         simpleTestAnalysisData.setSelectedTraks(selectedTraks);

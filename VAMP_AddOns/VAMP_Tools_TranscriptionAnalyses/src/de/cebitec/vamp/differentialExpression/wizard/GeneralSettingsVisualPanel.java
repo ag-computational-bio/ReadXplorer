@@ -3,30 +3,28 @@ package de.cebitec.vamp.differentialExpression.wizard;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public final class GeneralSettingsVisualPanel extends JPanel {
 
-    private ComboBoxModel<FeatureType> cbm = new DefaultComboBoxModel<>(FeatureType.SELECTABLE_FEATURE_TYPES);
     private boolean checkBoxchecked = false;
-    
+
     /**
      * Creates new form GeneralSettingsVisualPanel
      */
     public GeneralSettingsVisualPanel() {
         initComponents();
-                fileNameField.setText(System.getProperty("user.home")+File.separator+"DiffExpResult.rdata");
+        fileNameField.setText(System.getProperty("user.home") + File.separator + "DiffExpResult.rdata");
     }
 
     public boolean verifyInput() {
-        return (verifyComponent(startOffset) && verifyComponent(stopOffset));
+        return (verifyComponentInteger(startOffset) && verifyComponentInteger(stopOffset));
     }
 
-    private boolean verifyComponent(JComponent input) {
+    private boolean verifyComponentInteger(JComponent input) {
         String text = ((JTextField) input).getText();
         try {
             Integer value = Integer.parseInt(text);
@@ -52,12 +50,11 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         return "General Setup";
     }
 
-    public FeatureType getFeatureType() {
-        return (FeatureType) featureTypeComboBox.getSelectedItem();
+    public List<FeatureType> getFeatureType() {
+        return usedAnnotationsList.getSelectedValuesList();
     }
-    
-    
-    public String getSavePath(){
+
+    public String getSavePath() {
         return fileNameField.getText();
     }
 
@@ -77,11 +74,12 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         jLabel2 = new javax.swing.JLabel();
         startOffset = new javax.swing.JTextField();
         stopOffset = new javax.swing.JTextField();
-        featureTypeComboBox = new javax.swing.JComboBox(cbm);
         jLabel3 = new javax.swing.JLabel();
         fileNameField = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
         fileChooserButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        usedAnnotationsList = new javax.swing.JList(FeatureType.SELECTABLE_FEATURE_TYPES);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.jLabel1.text")); // NOI18N
 
@@ -116,6 +114,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
             }
         });
 
+        jScrollPane1.setViewportView(usedAnnotationsList);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,24 +128,28 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(featureTypeComboBox, 0, 380, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(fileNameField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fileChooserButton))
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(120, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
@@ -153,10 +157,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(featureTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -183,7 +183,8 @@ public final class GeneralSettingsVisualPanel extends JPanel {
             }
 
             @Override
-            public void open(String fileLocation) {}
+            public void open(String fileLocation) {
+            }
         };
         fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_fileChooserButtonActionPerformed
@@ -191,16 +192,16 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     private void fileNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileNameFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_fileNameFieldActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox featureTypeComboBox;
     private javax.swing.JButton fileChooserButton;
     private javax.swing.JTextField fileNameField;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField startOffset;
     private javax.swing.JTextField stopOffset;
+    private javax.swing.JList usedAnnotationsList;
     // End of variables declaration//GEN-END:variables
 }

@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
@@ -102,6 +101,7 @@ public class SamBamPosTableCreator implements Observable {
         ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
+            sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samItor = sam.iterator();
 
             SAMRecord record;
@@ -125,7 +125,7 @@ public class SamBamPosTableCreator implements Observable {
                             readClass = Properties.COMPLETE_COVERAGE;
                         }
 
-                        if (!ParserCommonMethods.checkRead(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                        if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 

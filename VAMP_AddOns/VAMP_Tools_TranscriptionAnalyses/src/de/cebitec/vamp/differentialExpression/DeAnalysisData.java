@@ -2,7 +2,6 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Pair;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
-import sun.misc.Compare;
 
 /**
  * Holds all the overlapping dataset between all analysis handlers.
@@ -118,7 +116,7 @@ public class DeAnalysisData {
     public int[] getStop() {
         return stop;
     }
-    
+
     /**
      * Return the Loci of the reference features.
      *
@@ -126,6 +124,7 @@ public class DeAnalysisData {
      */
     public String[] getLoci() {
         String[] ret = data.keySet().toArray(new String[data.keySet().size()]);
+        ProcessingLog.getInstance().addProperty("Number of annotations", ret.length);
         return ret;
     }
 
@@ -137,15 +136,15 @@ public class DeAnalysisData {
     public List<PersistantTrack> getSelectedTraks() {
         return selectedTraks;
     }
-    
+
     public String[] getTrackDescriptions() {
         return trackDescriptions;
     }
-    
-    public Pair<Integer,Integer> getStartStopForLocus(String locus){
+
+    public Pair<Integer, Integer> getStartStopForLocus(String locus) {
         return data.get(locus);
     }
-    
+
     public void setLociAndStartStop(String[] loci, int[] start, int[] stop) {
         this.start = start;
         this.stop = stop;
@@ -155,11 +154,11 @@ public class DeAnalysisData {
             if (data.containsKey(loci[i])) {
                 data.put(loci[i] + "_REPNR" + counter++, new Pair<>(start[i], stop[i]));
             } else {
-                data.put(loci[i], new Pair<>(start[i], stop[i]));                
+                data.put(loci[i], new Pair<>(start[i], stop[i]));
             }
         }
     }
-    
+
     public void setSelectedTraks(List<PersistantTrack> selectedTraks) {
         this.selectedTraks = selectedTraks;
         Set<String> tmpSet = new LinkedHashSet<>();

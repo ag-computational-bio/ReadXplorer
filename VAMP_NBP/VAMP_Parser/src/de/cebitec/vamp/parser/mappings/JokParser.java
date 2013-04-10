@@ -49,8 +49,37 @@ public class JokParser implements MappingParserI {
         this.seqPairProcessor = seqPairProcessor;
     }
 
+    /**
+     * Does nothing, as the jok parser currently does not need any conversions.
+     * @param trackJob
+     * @param referenceSequence
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError 
+     */
+    @Override
+    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
+
+    /**
+     * Not implemented for this parser implementation, as currently no
+     * preprocessing is needed.
+     * @param trackJob the trackjob to preprocess
+     * @return true, if the method succeeded
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
+
     @Override
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError {
+        
+        this.preprocessData(trackJob);
+        
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         this.seqToIDMap = new HashMap<>();
         String filepath = trackJob.getFile().getAbsolutePath();
@@ -82,7 +111,7 @@ public class JokParser implements MappingParserI {
                 String[] tokens = line.split("\\t+", 8);
                 if (tokens.length == 7) { // if the length is not correct the read is not parsed
                     // cast tokens
-                    String readname = tokens[0];
+                    String readName = tokens[0];
                     try {
                         start = Integer.parseInt(tokens[1]);
                         stop = Integer.parseInt(tokens[2]);
@@ -119,37 +148,10 @@ public class JokParser implements MappingParserI {
                         continue;
                     }
                     //*'s are ignored = unmapped read
-                    // report empty mappings saruman should not be producing anymore
-                    if (readname == null || readname.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,
-                                "Parser.checkMapping.ErrorReadname",
-                                filepath, lineno, readname));
-                        continue;
+                    if (!ParserCommonMethods.checkReadJok(this, readSeq, readName, refSeq, sequenceString.length(), start, stop, direction, filepath, lineno)) {
+                        continue; //continue, and ignore read, if it contains inconsistent information
                     }
-
-                    if (start >= stop) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,
-                                "Parser.checkMapping.ErrorStartStop",
-                                filepath, lineno, start, stop));
-                        continue;
-                    }
-                    if (direction == 0) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,
-                                "Parser.checkMapping.ErrorDirectionJok", filepath, lineno));
-                        continue;
-                    }
-                    if (readSeq == null || readSeq.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,
-                                "Parser.checkMapping.ErrorReadEmpty",
-                                filepath, lineno, readSeq));
-                        continue;
-                    }
-                    if (refSeq == null || refSeq.isEmpty()) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,
-                                "Parser.checkMapping.ErrorRef",
-                                filepath, lineno, refSeq));
-                        continue;
-                    }
+                    
                     //                if (readSeq.length() != refSeq.length()) {
                     //                    this.sendMsg(NbBundle.getMessage(JokParser.class,
                     //                            "Parser.checkMapping.ErrorReadLength",
@@ -181,13 +183,6 @@ public class JokParser implements MappingParserI {
                         stop -= 1;
                     }
 
-                    if (differences < 0 || differences > readSeq.length()) {
-                        this.sendMsg(NbBundle.getMessage(JokParser.class,
-                                "Parser.checkMapping.ErrorRead",
-                                differences, filepath, lineno));
-                        continue;
-                    }
-
                     mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
 
                     if (readSeq.contains("_")) {
@@ -211,7 +206,7 @@ public class JokParser implements MappingParserI {
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
                     sumReadLength += (stop - start);
-                    this.seqPairProcessor.processReadname(seqID, readname);
+                    this.seqPairProcessor.processReadname(seqID, readName);
                 } else {
                     this.sendMsg(NbBundle.getMessage(JokParser.class, "Parser.Parsing.MissingData", lineno, line));
                 }
@@ -285,5 +280,5 @@ public class JokParser implements MappingParserI {
     @Override
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
-    }    
+    }  
 }

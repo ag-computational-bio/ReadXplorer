@@ -34,7 +34,7 @@ public class CoveredFeature extends TrackResultEntry {
      */
     public void setNoCoveredBases(int noCoveredBases) {
         this.noCoveredBases = noCoveredBases;
-        this.percentCovered = this.noCoveredBases / this.annoLength * 100;
+        this.percentCovered = (int) ((float) this.noCoveredBases / this.annoLength * 100);
     }
 
     /**

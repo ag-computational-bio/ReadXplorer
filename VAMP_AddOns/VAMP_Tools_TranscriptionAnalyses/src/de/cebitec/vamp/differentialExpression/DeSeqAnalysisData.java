@@ -59,7 +59,7 @@ public class DeSeqAnalysisData extends DeAnalysisData{
     public List<String> getFittingGroupTwo() {
         return fittingGroupTwo;
     }
-    
+  
     public boolean moreThanTwoConditions(){
         return moreThanTwoConditions;
     }
