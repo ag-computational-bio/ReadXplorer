@@ -39,11 +39,7 @@ public class ConvertData {
             Double R = (Double) row.get(3);
             Double G = (Double) row.get(4);
             Pair<Double, Double> MA = createMAvalues(G,R);
-//            Double M = MA.getFirst();
-//            Double A = MA.getSecond();
-//            if(!M.isInfinite() && !A.isInfinite()){
-               ret.add(MA); 
-//            }             
+            ret.add(MA);            
         }
         return ret;
     }
@@ -53,8 +49,8 @@ public class ConvertData {
     }
     
     private static Pair<Double, Double> createMAvalues(Double G, Double R){       
-        Double M = Math.log((R/G))/Math.log(2);
-        Double A = (Math.log((R*G))/Math.log(2))/2;
+        Double M = (Math.log(R)/Math.log(2))-(Math.log(G)/Math.log(2));
+        Double A = ((Math.log(R)/Math.log(2))+(Math.log(G)/Math.log(2)))/2;
         return new Pair<>(M,A);
     }
 }

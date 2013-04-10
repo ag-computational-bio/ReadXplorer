@@ -44,8 +44,8 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler {
     }
 
     @Override
-    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
-        List<Result> results;
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+        List<ResultDeAnalysis> results;
         prepareFeatures(simpleTestAnalysisData);
         prepareCountData(simpleTestAnalysisData, getAllCountData());
         results = simpleTest.process(simpleTestAnalysisData, getPersAnno().size(), getSaveFile());

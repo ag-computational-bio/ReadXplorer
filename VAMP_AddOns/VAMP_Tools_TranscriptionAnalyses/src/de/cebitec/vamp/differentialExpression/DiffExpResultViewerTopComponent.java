@@ -2,6 +2,7 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
@@ -112,8 +113,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         int pos = 0;
         switch (usedTool) {
             case DeSeq:
-                String locus = (String) topCountsTable.getModel().getValueAt(selectedModel, 1);
-                pos = ((DeSeqAnalysisHandler) analysisHandler).getStartStopForLocus(locus).getFirst();
+                PersistantFeature locus =  (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                pos = locus.getStart();
                 break;
             case BaySeq:
                 pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
@@ -133,10 +134,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void addResults() {
-        List<DeAnalysisHandler.Result> results = analysisHandler.getResults();
+        List<ResultDeAnalysis> results = analysisHandler.getResults();
         List<String> descriptions = new ArrayList<>();
-        for (Iterator<DeAnalysisHandler.Result> it = results.iterator(); it.hasNext();) {
-            DeAnalysisHandler.Result currentResult = it.next();
+        for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
+            ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             colNames.add(0, " ");
             TableModel tmpTableModel = new UnchangeableDefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);

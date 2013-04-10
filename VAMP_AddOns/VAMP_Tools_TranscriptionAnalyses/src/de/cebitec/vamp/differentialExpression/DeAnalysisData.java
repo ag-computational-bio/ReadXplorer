@@ -1,7 +1,9 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Pair;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,18 +20,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class DeAnalysisData {
 
     /**
-     * Start positions of the reference features.
-     */
-    private int[] start;
-    /**
-     * Stop positions of the reference features.
-     */
-    private int[] stop;
-    /**
      * Contains ID of the reference features as keys and corresponding start
      * stop pair as values.
      */
-    private Map<String, Pair<Integer, Integer>> data;
+    private Map<String, PersistantFeature> featureData;
     /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
@@ -105,7 +99,13 @@ public class DeAnalysisData {
      * @return Start positions of the reference features.
      */
     public int[] getStart() {
-        return start;
+        int[] ret = new int[featureData.size()];
+        int i = 0;
+        for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
+            String key = it.next();
+            ret[i] = featureData.get(key).getStart();
+        }
+        return ret;
     }
 
     /**
@@ -114,7 +114,13 @@ public class DeAnalysisData {
      * @return stop positions of the reference features.
      */
     public int[] getStop() {
-        return stop;
+        int[] ret = new int[featureData.size()];
+        int i = 0;
+        for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
+            String key = it.next();
+            ret[i] = featureData.get(key).getStop();
+        }
+        return ret;
     }
 
     /**
@@ -123,7 +129,7 @@ public class DeAnalysisData {
      * @return Loci of the reference features as an String Array.
      */
     public String[] getLoci() {
-        String[] ret = data.keySet().toArray(new String[data.keySet().size()]);
+        String[] ret = featureData.keySet().toArray(new String[featureData.keySet().size()]);
         ProcessingLog.getInstance().addProperty("Number of annotations", ret.length);
         return ret;
     }
@@ -140,21 +146,24 @@ public class DeAnalysisData {
     public String[] getTrackDescriptions() {
         return trackDescriptions;
     }
-
-    public Pair<Integer, Integer> getStartStopForLocus(String locus) {
-        return data.get(locus);
+    
+    public PersistantFeature getPersistantFeatureByGNURName(String gnuRName){
+        return featureData.get(gnuRName);
+    }
+    
+    public boolean existsPersistantFeatureForGNURName(String gnuRName){
+        return featureData.containsKey(gnuRName);
     }
 
-    public void setLociAndStartStop(String[] loci, int[] start, int[] stop) {
-        this.start = start;
-        this.stop = stop;
-        data = new LinkedHashMap<>();
+    public void setFeatures(List<PersistantFeature> features) {
+        featureData = new LinkedHashMap<>();
         int counter = 1;
-        for (int i = 0; i < loci.length; i++) {
-            if (data.containsKey(loci[i])) {
-                data.put(loci[i] + "_REPNR" + counter++, new Pair<>(start[i], stop[i]));
+        for (Iterator<PersistantFeature> it = features.iterator(); it.hasNext();) {
+            PersistantFeature persistantFeature = it.next();
+            if (featureData.containsKey(persistantFeature.getLocus())) {
+                featureData.put(persistantFeature.getLocus() + "_DN_" + counter++, persistantFeature);
             } else {
-                data.put(loci[i], new Pair<>(start[i], stop[i]));
+                featureData.put(persistantFeature.getLocus(), persistantFeature);
             }
         }
     }
@@ -165,8 +174,9 @@ public class DeAnalysisData {
         int counter = 1;
         for (int i = 0; i < selectedTraks.size(); i++) {
             if (!tmpSet.add(selectedTraks.get(i).getDescription())) {
-                tmpSet.add(selectedTraks.get(i).getDescription() + "_" + counter++);
+                tmpSet.add(selectedTraks.get(i).getDescription() + "_DN_" + counter++);
             }
         }
+        trackDescriptions = tmpSet.toArray(new String[tmpSet.size()]);
     }
 }

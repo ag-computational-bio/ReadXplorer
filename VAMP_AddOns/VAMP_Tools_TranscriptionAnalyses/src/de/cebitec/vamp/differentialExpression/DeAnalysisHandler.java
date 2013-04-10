@@ -19,9 +19,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RFactor;
-import org.rosuda.JRI.RVector;
 
 /**
  *
@@ -35,11 +32,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private List<PersistantTrack> selectedTraks;
     private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
     private Integer refGenomeID;
-    private List<Result> results;
+    private List<ResultDeAnalysis> results;
     private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private File saveFile = null;
     private List<FeatureType> selectedFeatures;
-    private Map<Integer, Map<Integer, Integer>> allCountData = new HashMap<>();
+    private Map<Integer, Map<PersistantFeature, Integer>> allCountData = new HashMap<>();
     private int resultsReceivedBack = 0;
     private int startOffset;
     private int stopOffset;
@@ -96,30 +93,19 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     protected void prepareFeatures(DeAnalysisData analysisData) {
-        int[] featuresStart = new int[getPersAnno().size()];
-        int[] featuresStop = new int[getPersAnno().size()];
-        String[] loci = new String[getPersAnno().size()];
-        int i = 0;
-        for (Iterator<PersistantFeature> it = getPersAnno().iterator(); it.hasNext(); i++) {
-            PersistantFeature persistantFeature = it.next();
-            featuresStart[i] = persistantFeature.getStart();
-            featuresStop[i] = persistantFeature.getStop();
-            loci[i] = persistantFeature.getLocus();
-        }
-
-        analysisData.setLociAndStartStop(loci, featuresStart, featuresStop);
+        analysisData.setFeatures(persAnno);
         analysisData.setSelectedTraks(selectedTraks);
     }
 
-    protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<Integer, Integer>> allCountData) {
+    protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<PersistantFeature, Integer>> allCountData) {
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             Integer key = it.next().getId();
             Integer[] data = new Integer[getPersAnno().size()];
-            Map<Integer, Integer> currentTrack = allCountData.get(key);
+            Map<PersistantFeature, Integer> currentTrack = allCountData.get(key);
             int j = 0;
             for (Iterator<PersistantFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++) {
                 PersistantFeature persistantFeature = it1.next();
-                data[j] = currentTrack.get(persistantFeature.getId());
+                data[j] = currentTrack.get(persistantFeature);
             }
             analysisData.addCountDataForTrack(data);
         }
@@ -135,7 +121,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      *
      * @return
      */
-    protected abstract List<Result> processWithTool() throws PackageNotLoadableException,
+    protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
             JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
 
     /**
@@ -147,7 +133,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     public abstract void saveResultsAsCSV(int selectedIndex, String path);
 
-    public void setResults(List<Result> results) {
+    public void setResults(List<ResultDeAnalysis> results) {
         this.results = results;
     }
 
@@ -159,7 +145,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         return refGenomeID;
     }
 
-    public Map<Integer, Map<Integer, Integer>> getAllCountData() {
+    public Map<Integer, Map<PersistantFeature, Integer>> getAllCountData() {
         return allCountData;
     }
 
@@ -175,7 +161,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         return selectedTraks;
     }
 
-    public List<Result> getResults() {
+    public List<ResultDeAnalysis> getResults() {
         return results;
     }
 
@@ -237,123 +223,5 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             }
         }
         notifyObservers(AnalysisStatus.FINISHED);
-    }
-
-    public static class Result {
-
-        private String description;
-        private RVector rawTableContents;
-        private Vector<Vector> tableContents = null;
-        private REXP rawColNames;
-        private Vector colNames = null;
-        private REXP rawRowNames;
-        private Vector rowNames = null;
-
-        public Result(RVector tableContents, REXP colnames, REXP rownames, String description) {
-            rawTableContents = tableContents;
-            rawColNames = colnames;
-            rawRowNames = rownames;
-            this.description = description;
-        }
-
-        public Vector<Vector> getTableContentsContainingRowNames() {
-            Vector rnames = getRownames();
-            Vector<Vector> data = getTableContents();
-            for (int i = 0; i < rnames.size(); i++) {
-                data.get(i).add(0, rnames.get(i));
-            }
-            return data;
-        }
-
-        public Vector<Vector> getTableContents() {
-            if (tableContents == null) {
-                tableContents = convertRresults(rawTableContents);
-            }
-            return tableContents;
-        }
-
-        public Vector getColnames() {
-            if (colNames == null) {
-                colNames = convertNames(rawColNames);
-            }
-            return colNames;
-        }
-
-        public Vector getRownames() {
-            if (rowNames == null) {
-                rowNames = convertNames(rawRowNames);
-            }
-            return rowNames;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        /*
-         * The manual array copy used in this method several times is intended!
-         * This way the primitive data types are automatically converted to their 
-         * corresponding Object presentation.
-         */
-        private Vector convertNames(REXP currentValues) {
-            int currentType = currentValues.getType();
-            Vector current = new Vector();
-            switch (currentType) {
-                case REXP.XT_ARRAY_DOUBLE:
-                    double[] currentDoubleValues = currentValues.asDoubleArray();
-                    for (int j = 0; j < currentDoubleValues.length; j++) {
-                        current.add(currentDoubleValues[j]);
-                    }
-                    break;
-                case REXP.XT_ARRAY_INT:
-                    int[] currentIntValues = currentValues.asIntArray();
-                    for (int j = 0; j < currentIntValues.length; j++) {
-                        current.add(currentIntValues[j]);
-                    }
-                    break;
-                case REXP.XT_ARRAY_STR:
-                    String[] currentStringValues = currentValues.asStringArray();
-                    for (int j = 0; j < currentStringValues.length; j++) {
-                        current.add(currentStringValues[j]);
-                    }
-                    break;
-                case REXP.XT_ARRAY_BOOL_INT:
-                    int[] currentBoolValues = currentValues.asIntArray();
-                    for (int j = 0; j < currentBoolValues.length; j++) {
-                        if (currentBoolValues[j] == 1) {
-                            current.add(true);
-                        } else {
-                            current.add(false);
-                        }
-                    }
-                    break;
-                case REXP.XT_FACTOR:
-                    RFactor factor = currentValues.asFactor();
-                    for (int j = 0; j < factor.size(); j++) {
-                        current.add(factor.at(j));
-                    }
-                    break;
-
-            }
-            return current;
-        }
-
-        private Vector<Vector> convertRresults(RVector currentRVector) {
-            Vector<Vector> current = new Vector<>();
-            for (int i = 0; i < currentRVector.size(); i++) {
-                REXP currentValues = currentRVector.at(i);
-                Vector converted = convertNames(currentValues);
-
-                for (int j = 0; j < converted.size(); j++) {
-                    try {
-                        current.get(j);
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        current.add(new Vector());
-                    }
-                    current.get(j).add(converted.get(j));
-                }
-            }
-            return current;
-        }
     }
 }

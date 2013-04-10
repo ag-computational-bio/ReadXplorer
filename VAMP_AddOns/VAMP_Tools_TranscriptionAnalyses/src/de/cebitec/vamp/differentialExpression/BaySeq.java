@@ -51,7 +51,7 @@ public class BaySeq {
      * represent the normalised result for group two. So you will first get all
      * not normalised results and then all the normalised ones.
      */
-    public List<BaySeqAnalysisHandler.Result> process(BaySeqAnalysisData bseqData,
+    public List<ResultDeAnalysis> process(BaySeqAnalysisData bseqData,
             int numberOfFeatures, int numberOfTracks, File saveFile)
             throws JRILibraryNotInPathException, PackageNotLoadableException,
             IllegalStateException, UnknownGnuRException {
@@ -71,7 +71,7 @@ public class BaySeq {
         if (processors > 1) {
             processors--;
         }
-        List<BaySeqAnalysisHandler.Result> results = new ArrayList<>();
+        List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
@@ -121,7 +121,7 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, rowNames, "Result of group " + j));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Result of group " + j,bseqData));
                 resultIndex++;
             }
             for (int j = 1; j <= numberofGroups; j++) {
@@ -130,7 +130,7 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new BaySeqAnalysisHandler.Result(rvec, colNames, rowNames, "Normalized result of group " + j));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Normalized result of group " + j,bseqData));
                 resultIndex++;
             }
             if (saveFile != null) {

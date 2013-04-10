@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
@@ -55,8 +56,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
     }
 
     @Override
-    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
-        List<Result> results;
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+        List<ResultDeAnalysis> results;
         prepareFeatures(deSeqAnalysisData);
         prepareCountData(deSeqAnalysisData, getAllCountData());
         results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
@@ -66,10 +67,6 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public boolean moreThanTwoCondsForDeSeq() {
         return deSeqAnalysisData.moreThanTwoConditions();
-    }
-
-    public Pair<Integer, Integer> getStartStopForLocus(String locus) {
-        return deSeqAnalysisData.getStartStopForLocus(locus);
     }
 
     @Override

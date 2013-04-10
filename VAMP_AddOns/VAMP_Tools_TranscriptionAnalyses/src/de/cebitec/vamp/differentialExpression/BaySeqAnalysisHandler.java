@@ -51,10 +51,10 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     }
 
     @Override
-    protected List<Result> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         prepareFeatures(baySeqAnalysisData);
         prepareCountData(baySeqAnalysisData, getAllCountData());
-        List<Result> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        List<ResultDeAnalysis> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
         return results;
     }
 

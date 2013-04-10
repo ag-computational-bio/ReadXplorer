@@ -7,9 +7,18 @@ package de.cebitec.vamp.differentialExpression.plotting;
 import de.cebitec.vamp.differentialExpression.ConvertData;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.Pair;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.RenderingHints;
+import java.util.Iterator;
+import java.util.List;
 import javafx.application.Platform;
+import javax.swing.BoxLayout;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.FastScatterPlot;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -40,9 +49,6 @@ preferredID = "PlotTopComponent")
 public final class PlotTopComponent extends TopComponent implements Observer {
 
     private DeAnalysisHandler analysisHandler;
-    private static ScatterPlot fxContainer;
-    private static final int JFXPANEL_WIDTH_INT = 680;
-    private static final int JFXPANEL_HEIGHT_INT = 455;
 
     public PlotTopComponent() {
     }
@@ -52,7 +58,61 @@ public final class PlotTopComponent extends TopComponent implements Observer {
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
         this.analysisHandler = analysisHandler;
-        init();
+    }
+
+    public void addData(List<Pair<Double, Double>> coordinates) {
+        final NumberAxis domainAxis = new NumberAxis("X");
+        domainAxis.setAutoRangeIncludesZero(false);
+        final NumberAxis rangeAxis = new NumberAxis("Y");
+        rangeAxis.setAutoRangeIncludesZero(false);
+        float data[][] = new float[2][coordinates.size()];
+        double lowerXbound = 0;
+        double higherXbound = 0;
+        double lowerYbound = 0;
+        double higherYbound = 0;
+        for (int i = 0; i < coordinates.size(); i++) {
+            Pair<Double, Double> pair = coordinates.get(i);
+
+            Double x = pair.getSecond();
+            Double y = pair.getFirst();
+
+            if (!x.isInfinite()) {
+                if (x > higherXbound) {
+                    higherXbound = x;
+                }
+                if (x < lowerXbound) {
+                    lowerXbound = x;
+                }
+            }
+            if (!y.isInfinite()) {
+                if (y > higherYbound) {
+                    higherYbound = y;
+                }
+                if (y < lowerYbound) {
+                    lowerYbound = y;
+                }
+            }
+            if (!x.isInfinite() && !y.isInfinite()) {
+                data[0][i] = x.floatValue();
+                data[1][i] = y.floatValue();
+            }
+        }
+        final FastScatterPlot plot = new FastScatterPlot(data, domainAxis, rangeAxis);
+        final JFreeChart chart = new JFreeChart("Fast Scatter Plot", plot);
+//        chart.setLegend(null);
+
+        // force aliasing of the rendered content..
+        chart.getRenderingHints().put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        final ChartPanel panel = new ChartPanel(chart, true);
+        panel.setPreferredSize(new java.awt.Dimension(500, 270));
+        //      panel.setHorizontalZoom(true);
+        //    panel.setVerticalZoom(true);
+        panel.setMinimumDrawHeight(10);
+        panel.setMaximumDrawHeight(2000);
+        panel.setMinimumDrawWidth(20);
+        panel.setMaximumDrawWidth(2000);
+        jPanel1.setLayout(new BorderLayout());
+        jPanel1.add(panel,BorderLayout.CENTER);
     }
 
     /**
@@ -129,15 +189,9 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
-        // create JavaFX scene
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                fxContainer.addData(ConvertData.mAplotData(analysisHandler.getResults().get(0).getTableContents(), DeAnalysisHandler.Tool.DeSeq), "test");
-//                fxContainer.addData();
-            }
-        });
+        addData(ConvertData.mAplotData(analysisHandler.getResults().get(0).getTableContents(), DeAnalysisHandler.Tool.DeSeq));
     }//GEN-LAST:event_plotButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -166,14 +220,6 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
-    }
-
-    public void init() {
-        Dimension plotDimension = new Dimension(JFXPANEL_WIDTH_INT, JFXPANEL_HEIGHT_INT);
-        fxContainer = new ScatterPlot("A", "M", plotDimension);
-        fxContainer.setPreferredSize(plotDimension);
-        jPanel1.setLayout(new BorderLayout());
-        jPanel1.add(fxContainer, BorderLayout.CENTER);
     }
 
     @Override

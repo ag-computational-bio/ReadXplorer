@@ -25,7 +25,7 @@ public class CollectCoverageData implements Observer {
      * The Key value of this HashMap is the ID of the feature. The value value
      * represents the corresponding number of counted coverage data.
      */
-    private Map<Integer, Integer> countData = new HashMap<>();
+    private Map<PersistantFeature, Integer> countData = new HashMap<>();
     /**
      * Adjusts how many bases downstream from the start position of an feature a
      * mapping should still be considered a hit. The feature in the database are
@@ -65,13 +65,12 @@ public class CollectCoverageData implements Observer {
             feature = this.genomeFeatures.get(i);
             int featStart = feature.getStart() - startOffset;
             int featStop = feature.getStop() + stopOffset;
-            int key = feature.getId();
             fstFittingMapping = true;
             //If no matching mapping is found, we still need to know that by
             //writing down a count of zero for this feature.
-            if (!countData.containsKey(key)) {
-                countData.put(key, 0);
-            }
+            if (!countData.containsKey(feature)) {
+                countData.put(feature, 0);
+                }
             for (int j = lastMappingIdx; j < mappings.size(); ++j) {
                 PersistantMapping mapping = mappings.get(j);
 
@@ -83,8 +82,8 @@ public class CollectCoverageData implements Observer {
                         lastMappingIdx = j;
                         fstFittingMapping = false;
                     }
-                    int value = countData.get(key) + 1;
-                    countData.put(key, value);
+                    int value = countData.get(feature) + 1;
+                    countData.put(feature, value);
 
                     //still mappings left, but need next feature
                 } else if (mapping.getStart() > featStop) {
@@ -102,7 +101,7 @@ public class CollectCoverageData implements Observer {
         }
     }
 
-    public Map<Integer, Integer> getCountData() {
+    public Map<PersistantFeature, Integer> getCountData() {
         return countData;
     }
 }

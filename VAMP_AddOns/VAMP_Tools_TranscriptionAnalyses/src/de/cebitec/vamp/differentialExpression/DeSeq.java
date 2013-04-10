@@ -26,7 +26,7 @@ public class DeSeq {
     public DeSeq() {
     }
 
-    public List<DeSeqAnalysisHandler.Result> process(DeSeqAnalysisData analysisData,
+    public List<ResultDeAnalysis> process(DeSeqAnalysisData analysisData,
             int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
             IllegalStateException, UnknownGnuRException {
@@ -36,7 +36,7 @@ public class DeSeq {
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
         gnuR.loadPackage("DESeq");
-        List<DeSeqAnalysisHandler.Result> results = new ArrayList<>();
+        List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
@@ -178,14 +178,14 @@ public class DeSeq {
                 RVector tableContents1 = currentResult1.asVector();
                 REXP colNames1 = gnuR.eval("colnames(res0)");
                 REXP rowNames1 = gnuR.eval("rownames(res0)");
-                results.add(new DeSeqAnalysisHandler.Result(tableContents1, colNames1, rowNames1, "Fitting Group One"));
+                results.add(new ResultDeAnalysis(tableContents1, colNames1, rowNames1, "Fitting Group One", analysisData));
 
                 gnuR.eval("res1 <- data.frame(fit0,pvalsGLM,padjGLM)");
                 REXP currentResult0 = gnuR.eval("res1");
                 RVector tableContents0 = currentResult0.asVector();
                 REXP colNames0 = gnuR.eval("colnames(res1)");
                 REXP rowNames0 = gnuR.eval("rownames(res1)");
-                results.add(new DeSeqAnalysisHandler.Result(tableContents0, colNames0, rowNames0, "Fitting Group Two"));
+                results.add(new ResultDeAnalysis(tableContents0, colNames0, rowNames0, "Fitting Group Two", analysisData));
 
             } else {
                 //Significant results sorted by the most significantly differentially expressed genes
@@ -194,8 +194,8 @@ public class DeSeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(res0)");
                 REXP rowNames = gnuR.eval("rownames(res0)");
-                results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames,
-                        "Significant results sorted by the most significantly differentially expressed genes"));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames,
+                        "Significant results sorted by the most significantly differentially expressed genes", analysisData));
 
                 //Significant results sorted by the most strongly down regulated genes
                 gnuR.eval("res1 <- res[order(res$foldChange, -res$baseMean), ]");
@@ -203,8 +203,8 @@ public class DeSeq {
                 rvec = result.asVector();
                 colNames = gnuR.eval("colnames(res1)");
                 rowNames = gnuR.eval("rownames(res1)");
-                results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames,
-                        "Significant results sorted by the most strongly down regulated genes"));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames,
+                        "Significant results sorted by the most strongly down regulated genes", analysisData));
 
                 //Significant results sorted by the most strongly up regulated genes
                 gnuR.eval("res2 <- res[order(-res$foldChange, -res$baseMean), ]");
@@ -212,8 +212,8 @@ public class DeSeq {
                 rvec = result.asVector();
                 colNames = gnuR.eval("colnames(res2)");
                 rowNames = gnuR.eval("rownames(res2)");
-                results.add(new DeSeqAnalysisHandler.Result(rvec, colNames, rowNames,
-                        "Significant results sorted by the most strongly up regulated genes"));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames,
+                        "Significant results sorted by the most strongly up regulated genes", analysisData));
             }
             if (saveFile != null) {
                 String path = saveFile.getAbsolutePath();

@@ -29,13 +29,13 @@ public class SimpleTest {
     public SimpleTest() {
     }
 
-    public List<DeAnalysisHandler.Result> process(SimpleTestAnalysisData analysisData, int numberOfFeatures, File saveFile)
+    public List<ResultDeAnalysis> process(SimpleTestAnalysisData analysisData, int numberOfFeatures, File saveFile)
             throws JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
         gnuR.clearGnuR();
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
-        List<DeAnalysisHandler.Result> results = new ArrayList<>();
+        List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
@@ -119,7 +119,7 @@ public class SimpleTest {
             RVector rvec = result.asVector();
             REXP colNames = gnuR.eval("colnames(res0)");
             REXP rowNames = gnuR.eval("rownames(res0)");
-            results.add(new DeAnalysisHandler.Result(rvec, colNames, rowNames, "Ordered by expression in group A"));
+            results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Ordered by expression in group A", analysisData));
 
             //Ordered by expression in group B.
             gnuR.eval("res1 <- res[rev(order(res$ratioBA)),]");
@@ -127,7 +127,7 @@ public class SimpleTest {
             rvec = result.asVector();
             colNames = gnuR.eval("colnames(res1)");
             rowNames = gnuR.eval("rownames(res1)");
-            results.add(new DeAnalysisHandler.Result(rvec, colNames, rowNames, "Ordered by expression in group B"));
+            results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Ordered by expression in group B", analysisData));
 
             //Ordered by confidence.
             gnuR.eval("res2 <- res[rev(order(res$confidence)),]");
@@ -135,7 +135,7 @@ public class SimpleTest {
             rvec = result.asVector();
             colNames = gnuR.eval("colnames(res2)");
             rowNames = gnuR.eval("rownames(res2)");
-            results.add(new DeAnalysisHandler.Result(rvec, colNames, rowNames, "Ordered by confidence"));
+            results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Ordered by confidence", analysisData));
 
             if (saveFile != null) {
                 gnuR.saveDataToFile(saveFile);
