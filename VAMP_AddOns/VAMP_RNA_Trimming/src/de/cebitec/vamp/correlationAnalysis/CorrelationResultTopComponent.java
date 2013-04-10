@@ -31,7 +31,7 @@ autostore = false)
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "output", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.correlationAnalysis.CorrelationResultTopComponent")
-@ActionReference(path = "Menu/Window" , position = 951)
+@ActionReference(path = "Menu/Window"/* , position = 951*/)
 @TopComponent.OpenActionRegistration(
     displayName = "#CTL_CorrelationResultAction",
 preferredID = "CorrelationResultTopComponent")
@@ -43,7 +43,7 @@ preferredID = "CorrelationResultTopComponent")
 public final class CorrelationResultTopComponent extends TopComponent {
     
     private static CorrelationResultTopComponent instance;
-    private static final String PREFERRED_ID = "CORRELATION_RESULT_TOP_COMPONENT";
+    private static final String PREFERRED_ID = "CorrelationResultTopComponent";
     
     
     public CorrelationResultTopComponent() {
