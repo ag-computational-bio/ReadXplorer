@@ -8,17 +8,27 @@ import de.cebitec.vamp.differentialExpression.ConvertData;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
-import javafx.application.Platform;
-import javax.swing.BoxLayout;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.AxisState;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.FastScatterPlot;
+import org.jfree.chart.axis.TickType;
+import org.jfree.chart.axis.ValueTick;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.text.TextUtilities;
+import org.jfree.ui.RectangleEdge;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -30,17 +40,17 @@ import org.openide.windows.TopComponent;
  */
 @ConvertAsProperties(
         dtd = "-//de.cebitec.vamp.differentialExpression.plotting//Plot//EN",
-autostore = false)
+        autostore = false)
 @TopComponent.Description(
         preferredID = "PlotTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        //iconBase="SET/PATH/TO/ICON/HERE", 
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "output", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_PlotAction",
-preferredID = "PlotTopComponent")
+        preferredID = "PlotTopComponent")
 @Messages({
     "CTL_PlotAction=Plot",
     "CTL_PlotTopComponent=Plot Window",
@@ -61,11 +71,7 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     }
 
     public void addData(List<Pair<Double, Double>> coordinates) {
-        final NumberAxis domainAxis = new NumberAxis("X");
-        domainAxis.setAutoRangeIncludesZero(false);
-        final NumberAxis rangeAxis = new NumberAxis("Y");
-        rangeAxis.setAutoRangeIncludesZero(false);
-        float data[][] = new float[2][coordinates.size()];
+        XYSeries series = new XYSeries("DE data");
         double lowerXbound = 0;
         double higherXbound = 0;
         double lowerYbound = 0;
@@ -93,26 +99,33 @@ public final class PlotTopComponent extends TopComponent implements Observer {
                 }
             }
             if (!x.isInfinite() && !y.isInfinite()) {
-                data[0][i] = x.floatValue();
-                data[1][i] = y.floatValue();
+                series.add(x, y);
             }
         }
-        final FastScatterPlot plot = new FastScatterPlot(data, domainAxis, rangeAxis);
+        TestAxis domainAxis = new TestAxis("A");
+        domainAxis.setAutoRangeIncludesZero(true);
+        TestAxis rangeAxis = new TestAxis("M");
+        rangeAxis.setAutoRangeIncludesZero(true);
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(false, true);
+        XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
+        xySeriesCollection.addSeries(series);
+        XYPlot plot = new XYPlot(xySeriesCollection, domainAxis, rangeAxis, renderer);
+        plot.setDomainGridlineStroke(new BasicStroke(0f));
+        plot.setRangeGridlineStroke(new BasicStroke(0f));
         final JFreeChart chart = new JFreeChart("Fast Scatter Plot", plot);
-//        chart.setLegend(null);
 
         // force aliasing of the rendered content..
         chart.getRenderingHints().put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         final ChartPanel panel = new ChartPanel(chart, true);
-        panel.setPreferredSize(new java.awt.Dimension(500, 270));
-        //      panel.setHorizontalZoom(true);
-        //    panel.setVerticalZoom(true);
+        panel.setPreferredSize(new java.awt.Dimension(680, 455));
         panel.setMinimumDrawHeight(10);
         panel.setMaximumDrawHeight(2000);
         panel.setMinimumDrawWidth(20);
         panel.setMaximumDrawWidth(2000);
         jPanel1.setLayout(new BorderLayout());
-        jPanel1.add(panel,BorderLayout.CENTER);
+        jPanel1.add(panel, BorderLayout.CENTER);
+        jPanel1.updateUI();
+        this.updateUI();
     }
 
     /**
@@ -191,7 +204,6 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
         addData(ConvertData.mAplotData(analysisHandler.getResults().get(0).getTableContents(), DeAnalysisHandler.Tool.DeSeq));
     }//GEN-LAST:event_plotButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -224,5 +236,43 @@ public final class PlotTopComponent extends TopComponent implements Observer {
 
     @Override
     public void update(Object args) {
+    }
+
+    public class TestAxis extends NumberAxis {
+
+        public TestAxis(String label) {
+            super(label);
+        }
+
+        @Override
+        public AxisState draw(Graphics2D g2, double cursor, Rectangle2D plotArea,
+                Rectangle2D dataArea, RectangleEdge edge,
+                PlotRenderingInfo plotState) {
+            
+            double x = dataArea.getX();
+            double y = dataArea.getY()+25;
+            double height = dataArea.getHeight()-50;
+            double width = dataArea.getWidth();
+            dataArea.setFrame(x, y, width, height);
+            AxisState state = null;
+            // if the axis is not visible, don't draw it...
+            if (!isVisible()) {
+                state = new AxisState(cursor);
+                // even though the axis is not visible, we need ticks for the
+                // gridlines...
+                List ticks = refreshTicks(g2, state, dataArea, edge);
+                state.setTicks(ticks);
+                return state;
+            }
+
+            // draw the tick marks and labels...
+            state = drawTickMarksAndLabels(g2, cursor, plotArea, dataArea, edge);
+
+            // draw the axis label...
+            state = drawLabel(getLabel(), g2, plotArea, dataArea, edge, state);
+            createAndAddEntity(cursor, state, dataArea, edge, plotState);
+            return state;
+
+        }
     }
 }

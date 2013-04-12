@@ -1,8 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.StorageException;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -18,21 +16,13 @@ import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.*;
-import de.cebitec.vamp.view.dialogMenus.ResetTrackFilePanel;
-import de.cebitec.vamp.view.login.LoginProperties;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.util.List;
-import java.util.prefs.Preferences;
 import javax.swing.*;
-import net.sf.samtools.util.RuntimeIOException;
-import org.openide.DialogDescriptor;
-import org.openide.DialogDisplayer;
-import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 
 /**
  * Factory used to initialize all different kinds of base panels.
@@ -78,18 +68,7 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(basePanel);
 
         // create track viewer
-        TrackConnector tc;
-        ProjectConnector connector = ProjectConnector.getInstance();
-        try {
-            tc = connector.getTrackConnector(track);
-        } catch (RuntimeIOException e) {
-            PersistantTrack newTrack = this.getNewFilePath(track, connector, basePanel);
-            if (newTrack != null) {
-                tc = connector.getTrackConnector(newTrack);
-            } else {
-                return null;
-            }
-        }
+        TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);       
         TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
         trackV.setName(track.getDescription());
 
@@ -102,7 +81,7 @@ public class BasePanelFactory {
         JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
         MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
         trackV.setupOptions(optionsLabel, trackPanelOptions);
-        
+
         //assign observers to handle visualization correctly
         legendLabel.registerObserver(optionsLabel);
         optionsLabel.registerObserver(legendLabel);
@@ -125,11 +104,14 @@ public class BasePanelFactory {
     }
 
     /**
-     * Method to get one <code>BasePanel</code> for multiple tracks.
-     * Only 2 tracks at once are currently supported.
+     * Method to get one
+     * <code>BasePanel</code> for multiple tracks. Only 2 tracks at once are
+     * currently supported.
+     *
      * @param tracks to visualize on this <code>BasePanel</code>.
      * @param refGen reference the tracks belong to.
-     * @param combineTracks true, if the coverage of two or more tracks should be combined
+     * @param combineTracks true, if the coverage of two or more tracks should
+     * be combined
      * @return
      */
     public BasePanel getMultipleTracksBasePanel(List<PersistantTrack> tracks, PersistantReference refGen, boolean combineTracks) {
@@ -140,21 +122,8 @@ public class BasePanelFactory {
             viewController.addMousePositionListener(basePanel);
 
             // get double track connector
-            TrackConnector trackCon;
-            ProjectConnector connector = ProjectConnector.getInstance();
-            try {
-                trackCon = connector.getTrackConnector(tracks, combineTracks);
-            } catch (RuntimeIOException e) {
-                for (int i = 0; i < tracks.size(); ++i) {
-                    PersistantTrack track = tracks.get(i);
-                    if (!(new File(track.getFilePath())).exists()) {
-                        tracks.set(i, this.getNewFilePath(track, connector, basePanel));
-                        
-                    }
-                }
-                trackCon = connector.getTrackConnector(tracks, combineTracks);
-            }
-            
+            TrackConnector trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+
             MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, basePanel, refGen, trackCon, combineTracks);
 
             // create and set up legend
@@ -171,7 +140,7 @@ public class BasePanelFactory {
             JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
             MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
             trackV.setupOptions(optionsLabel, trackPanelOptions);
-            
+
             //assign observers to handle visualization correctly
             legendLabel.registerObserver(optionsLabel);
             optionsLabel.registerObserver(legendLabel);
@@ -190,10 +159,10 @@ public class BasePanelFactory {
             basePanel.setTopInfoPanel(cil);
             basePanel.setViewer(trackV, slider);
             basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
-            
+
             String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
             basePanel.setTitlePanel(this.getTitlePanel(title));
-            
+
             viewController.openTrack2(basePanel);
             return basePanel;
         } else if (tracks.size() == 1) {
@@ -213,7 +182,7 @@ public class BasePanelFactory {
         // create a legend
         JPanel alignmentPanelLegend = this.getAlignmentViewLegend(viewer);
         viewer.setupLegend(new MenuLabel(alignmentPanelLegend, MenuLabel.TITLE_LEGEND), alignmentPanelLegend);
-        
+
         // create and set up options (currently normalization)
         JPanel alignmentViewerOptions = this.getAlignmentViewerOptions(viewer);
         MenuLabel optionsLabel = new MenuLabel(alignmentViewerOptions, MenuLabel.TITLE_OPTIONS);
@@ -250,7 +219,8 @@ public class BasePanelFactory {
     }
 
     /**
-     * @param connector track connector of first track of two sequence pair tracks
+     * @param connector track connector of first track of two sequence pair
+     * tracks
      * @return A viewer for sequence pair data
      */
     public BasePanel getSeqPairBasePanel(TrackConnector connector) {
@@ -293,9 +263,9 @@ public class BasePanelFactory {
     /**
      * @param typeColor color of the feature type
      * @param type the feature type whose legend entry is created
-     * @param viewer the viewer to which the legend entry belongs. If no function
-     * is assigend to the legend entry, viewer can be set to null. In this case a
-     * simple label is returned instead of the checkbox.
+     * @param viewer the viewer to which the legend entry belongs. If no
+     * function is assigend to the legend entry, viewer can be set to null. In
+     * this case a simple label is returned instead of the checkbox.
      * @return A legend entry for a feature type.
      */
     private JPanel getLegendEntry(Color typeColor, FeatureType type, AbstractViewer viewer) {
@@ -307,7 +277,7 @@ public class BasePanelFactory {
         color.setBackground(typeColor);
 
         entry.add(color);
-        if (viewer != null){
+        if (viewer != null) {
             entry.add(this.getCheckBox(type, viewer));
         } else {
             entry.add(new JLabel(type.getTypeString()));
@@ -315,13 +285,14 @@ public class BasePanelFactory {
         entry.setAlignmentX(Component.LEFT_ALIGNMENT);
         return entry;
     }
-    
+
     /**
      * @param type the FeatureType for which the checkbox should be created
      * @param viewer the viewer to which the checkbox belongs
-     * @return a check box for the given feature type, connected to the given viewer.
+     * @return a check box for the given feature type, connected to the given
+     * viewer.
      */
-    private JCheckBox getCheckBox(FeatureType type, AbstractViewer viewer){
+    private JCheckBox getCheckBox(FeatureType type, AbstractViewer viewer) {
         JCheckBox checker = new JCheckBox(type.getTypeString());
         //special cases are handled here
         if (type != FeatureType.UNDEFINED) {
@@ -335,97 +306,6 @@ public class BasePanelFactory {
         checker.addActionListener(new FeatureTypeListener(type, viewer));
         return checker;
     }
-    
-    /**
-     * In case a direct access track was moved to another place this method
-     * first tries to find the track in the current directory used for resetting
-     * track file paths and if it cannot be found it calls the
-     * <tt>openResetFilePathDialog</tt> method to open a dialog for resetting
-     * the file path to the current location of the file.
-     * @param the track whose path has to be resetted
-     * @param connector the connector
-     * @param b the base panel
-     * @return the track connector for the updated track or null, if it did not
-     * work
-     */
-    private PersistantTrack getNewFilePath(PersistantTrack track, ProjectConnector connector, BasePanel b) {
-        PersistantTrack newTrack;
-        Preferences prefs = NbPreferences.forModule(Object.class);
-        File oldTrackFile = new File(track.getFilePath());
-        String basePath = prefs.get("ResetTrack.Filepath", ".");
-        newTrack = this.checkFileExists(basePath, oldTrackFile, track);
-        if (newTrack == null) {
-            prefs = Preferences.userNodeForPackage(LoginProperties.class);
-            basePath = new File(prefs.get(LoginProperties.LOGIN_DATABASE_H2, ".")).getParentFile().getAbsolutePath();
-            newTrack = this.checkFileExists(basePath, oldTrackFile, track);
-        }
-        if (newTrack == null) {
-            newTrack = this.openResetFilePathDialog(track, connector, b);
-        }
-        return newTrack;
-    }
-    
-    /**
-     * Checks if a file exists and creates a new track, if it exists.
-     * @param prefs the prefs to get the base path from
-     * @param pref the preference for the base path
-     * @param oldTrackFile the old track file to replace
-     * @param track the old track to replace
-     * @return the new track, if the file exists, null otherwise
-     */
-    private PersistantTrack checkFileExists(String basePath, File oldTrackFile, PersistantTrack track) {
-        PersistantTrack newTrack = null;
-        File newTrackFile = new File(basePath + "/" + oldTrackFile.getName());
-        if (newTrackFile.exists()) {
-            newTrack = new PersistantTrack(track.getId(),
-                    newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
-                    track.getRefGenID(), track.getSeqPairId());
-        }
-        return newTrack;
-    }
-
-    /**
-     * In case a direct access track was moved to another place and cannot be
-     * found this method opens a dialog for resetting the file path to the
-     * current location of the file.
-     * @param track the track whose path has to be resetted
-     * @param connector the connector
-     * @param b the base panel
-     * @return the track connector for the updated track or null, if it did not work
-     */
-    private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector, BasePanel b) {
-        PersistantTrack newTrack = null;
-        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel(track.getFilePath());
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
-        Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        resetFileDialog.setVisible(true);
-
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
-            try {
-                newTrack = new PersistantTrack(track.getId(),
-                        resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
-                        track.getRefGenID(), track.getSeqPairId());
-                connector.resetTrackPath(newTrack);
-                try {
-                    TrackConnector trackConnector = connector.getTrackConnector(newTrack);
-                } catch (RuntimeIOException ex) {
-                    String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.Error");
-                    String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
-                    JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
-                }
-            } catch (StorageException ex) {
-                String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.StorageError");
-                String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
-                JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
-            String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset");
-            String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
-            JOptionPane.showMessageDialog(b, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
-        return newTrack;
-    }
-    
 
     private class ColorPanel extends JPanel {
 
@@ -444,7 +324,6 @@ public class BasePanelFactory {
         entry.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
         JPanel color = new JPanel() {
-
             private static final long serialVersionUID = 1234537;
 
             @Override
@@ -489,7 +368,7 @@ public class BasePanelFactory {
 
         legend.add(legend1, BorderLayout.WEST);
         legend.add(legend2, BorderLayout.EAST);
-        
+
         return legend;
     }
 
@@ -516,9 +395,10 @@ public class BasePanelFactory {
 
         return legend;
     }
-    
+
     /**
-     * @param viewer the track viewer for which the options panel should be created.
+     * @param viewer the track viewer for which the options panel should be
+     * created.
      * @return A new options panel for a track viewer.
      */
     private JPanel getTrackPanelOptions(TrackViewer viewer) {
@@ -528,10 +408,10 @@ public class BasePanelFactory {
 
         return options;
     }
-    
-    
+
     /**
-     * @param viewer the alignment viewer for which the options panel should be created.
+     * @param viewer the alignment viewer for which the options panel should be
+     * created.
      * @return A new options panel for a track viewer.
      */
     private JPanel getAlignmentViewerOptions(AlignmentViewer viewer) {
@@ -584,26 +464,27 @@ public class BasePanelFactory {
 
         return legend;
     }
-    
-    
+
     /**
      * A feature type listener adds or removes the feature type associated with
      * it to to/from the excluded feature list of its associated viewer. Needs
-     * an AbstractButton as source, in order to determine if the button was selected
-     * or not.
+     * an AbstractButton as source, in order to determine if the button was
+     * selected or not.
      */
     private class FeatureTypeListener implements ActionListener {
 
-        FeatureType featureType; 
+        FeatureType featureType;
         AbstractViewer viewer;
-        
+
         /**
-         * A feature type listener adds or removes the feature type associated with
-         * it to to/from the excluded feature list of its associated viewer. Needs
-         * an AbstractButton as source, in order to determine if the button was selected
-         * or not.
+         * A feature type listener adds or removes the feature type associated
+         * with it to to/from the excluded feature list of its associated
+         * viewer. Needs an AbstractButton as source, in order to determine if
+         * the button was selected or not.
+         *
          * @param featureType the feature type handled by this listener
-         * @param viewer the viewer whose excluded feature list should be updated
+         * @param viewer the viewer whose excluded feature list should be
+         * updated
          */
         public FeatureTypeListener(FeatureType featureType, AbstractViewer viewer) {
             this.featureType = featureType;
@@ -612,7 +493,7 @@ public class BasePanelFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (((AbstractButton) e.getSource()).isSelected()){
+            if (((AbstractButton) e.getSource()).isSelected()) {
                 this.viewer.getExcludedFeatureTypes().remove(this.featureType);
             } else {
                 this.viewer.getExcludedFeatureTypes().add(this.featureType);

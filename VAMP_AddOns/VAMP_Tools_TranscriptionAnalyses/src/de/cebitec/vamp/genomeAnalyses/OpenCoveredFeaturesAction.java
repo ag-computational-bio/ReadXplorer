@@ -10,6 +10,7 @@ import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -125,7 +126,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         TrackConnector connector;
         for (PersistantTrack track : this.tracks) {
 
-            connector = ProjectConnector.getInstance().getTrackConnector(track);
+            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this, 
                     NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
             AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, minCoveredPercent, minCoverageCount, whateverStrand);

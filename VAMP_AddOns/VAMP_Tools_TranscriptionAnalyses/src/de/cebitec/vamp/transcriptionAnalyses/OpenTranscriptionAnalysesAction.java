@@ -1,7 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.AnalysesHandler;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -11,6 +10,7 @@ import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -189,7 +189,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             AnalysisFilterFeatures analysisFilteredGenes = null;
             AnalysisOperon analysisOperon = null;
             
-            connector = ProjectConnector.getInstance().getTrackConnector(track);
+            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
                     NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
             AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,

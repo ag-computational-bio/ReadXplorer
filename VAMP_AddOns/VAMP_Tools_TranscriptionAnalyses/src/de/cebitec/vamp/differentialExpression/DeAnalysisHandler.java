@@ -13,6 +13,7 @@ import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.*;
@@ -21,7 +22,6 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- *
  * @author kstaderm
  */
 public abstract class DeAnalysisHandler extends Thread implements Observable, DataVisualisationI {
@@ -80,14 +80,19 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
         persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, selectedFeatures);
+        List<AnalysesHandler> allHandler = new ArrayList<>();
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
-            TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(currentTrack);
+            TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
             CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
             collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-            AnalysesHandler handler = new AnalysesHandler(connector, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
+            AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
             handler.setReducedMappingsNeeded(true);
             handler.registerObserver(collCovData);
+            allHandler.add(handler);
+        }
+        for (Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext();) {
+            AnalysesHandler handler = it.next();
             handler.startAnalysis();
         }
     }

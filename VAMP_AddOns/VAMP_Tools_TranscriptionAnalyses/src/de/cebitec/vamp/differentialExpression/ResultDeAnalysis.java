@@ -18,14 +18,14 @@ public class ResultDeAnalysis {
     private Vector colNames = null;
     private REXP rawRowNames;
     private Vector rowNames = null;
-    private DeAnalysisData data;
+    private DeAnalysisData dEAdata;
 
-    public ResultDeAnalysis(RVector tableContents, REXP colnames, REXP rownames, String description, DeAnalysisData data) {
+    public ResultDeAnalysis(RVector tableContents, REXP colnames, REXP rownames, String description, DeAnalysisData dEAdata) {
         rawTableContents = tableContents;
         rawColNames = colnames;
         rawRowNames = rownames;
         this.description = description;
-        this.data = data;
+        this.dEAdata = dEAdata;
     }
 
     public Vector<Vector> getTableContentsContainingRowNames() {
@@ -87,8 +87,8 @@ public class ResultDeAnalysis {
                 String[] currentStringValues = currentValues.asStringArray();
                 for (int j = 0; j < currentStringValues.length; j++) {
                     String name = currentStringValues[j];
-                    if (data.existsPersistantFeatureForGNURName(name)) {
-                        current.add(data.getPersistantFeatureByGNURName(name));
+                    if (dEAdata.existsPersistantFeatureForGNURName(name)) {
+                        current.add(dEAdata.getPersistantFeatureByGNURName(name));
                     } else {
                         current.add(name);
                     }

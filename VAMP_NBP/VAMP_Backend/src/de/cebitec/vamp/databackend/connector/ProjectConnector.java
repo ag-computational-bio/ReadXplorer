@@ -10,12 +10,14 @@ import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
+import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.h2.jdbc.JdbcSQLException;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -1352,7 +1354,7 @@ public class ProjectConnector extends Observable {
     }
 
     
-    public TrackConnector getTrackConnector(PersistantTrack track) {
+    public TrackConnector getTrackConnector(PersistantTrack track) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if (!trackConnectors.containsKey(trackID)) {
@@ -1362,7 +1364,7 @@ public class ProjectConnector extends Observable {
     }
 
     
-    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) {
+    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
         for (PersistantTrack track : tracks) {
@@ -1381,7 +1383,13 @@ public class ProjectConnector extends Observable {
 //            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
 //        }
 //        return multiTrackConnectors.get(trackID);
-        return new MultiTrackConnector(track, adapter);
+        MultiTrackConnector mtc = null;
+        try {
+            mtc = new MultiTrackConnector(track, adapter);
+        } catch (FileNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return mtc;
     }
     
     

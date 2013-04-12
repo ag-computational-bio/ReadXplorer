@@ -9,10 +9,12 @@ import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.util.Exceptions;
 
 /**
  * Class for handling the data threads for one of the currently started
@@ -111,7 +113,15 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 int numUnneededMappings = 0;
                 List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
                 for (PersistantTrack track : tracksAll) {
-                    TrackConnector connector = ProjectConnector.getInstance().getTrackConnector(track);
+                    TrackConnector connector;
+                    try {
+                        connector = ProjectConnector.getInstance().getTrackConnector(track);
+                    } catch (FileNotFoundException ex) {
+                        //This can only happen is SamBam files are used but in this
+                        //case we are in DbUsed mode. This means this Exception will
+                        //never be thrown.
+                        return;
+                    }
                     if (track.getId() < trackConnector.getTrackID()) {
                         numUnneededMappings += connector.getNumOfUniqueMappings();
                     }

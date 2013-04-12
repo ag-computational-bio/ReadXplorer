@@ -5,6 +5,8 @@ import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +14,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sf.samtools.util.RuntimeIOException;
 
 /**
  * A track connector for a single track. It handles all data requests for this track.
@@ -39,7 +42,7 @@ public class TrackConnector {
      * @param track the track for which this connector is created
      * @param adapter the database adapter type (mysql or h2)
      */
-    protected TrackConnector(PersistantTrack track, String adapter) {
+    protected TrackConnector(PersistantTrack track, String adapter) throws FileNotFoundException {
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
         this.trackID = track.getId();
@@ -51,8 +54,7 @@ public class TrackConnector {
         this.refGenome = refConnector.getRefGenome();
         this.refSeqLength = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
-            File file = new File(this.associatedTracks.get(0).getFilePath());
-            this.externalDataReader = new SamBamFileReader(file, this.trackID);
+            openBAM();
         }
 
         this.startDataThreads(false);
@@ -66,7 +68,7 @@ public class TrackConnector {
      * @param combineTracks true, if the data of these tracks is to be combined, false if 
      *      it should be kept separated
      */
-    protected TrackConnector(int id, List<PersistantTrack> tracks, String adapter, boolean combineTracks) {
+    protected TrackConnector(int id, List<PersistantTrack> tracks, String adapter, boolean combineTracks) throws FileNotFoundException {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
         }
@@ -80,8 +82,7 @@ public class TrackConnector {
         this.refGenome = refConnector.getRefGenome();
         this.refSeqLength = this.refGenome.getRefLength();
         if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
-            File file = new File(this.associatedTracks.get(0).getFilePath());
-            this.externalDataReader = new SamBamFileReader(file, this.trackID);
+            openBAM();
         }
         
         this.startDataThreads(combineTracks);
@@ -944,5 +945,14 @@ public class TrackConnector {
      */
     public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer, String handlerTitle) {
         return new AnalysesHandler(this, visualizer, handlerTitle);
+    }
+
+    private void openBAM() throws FileNotFoundException {
+        try {
+        File file = new File(this.associatedTracks.get(0).getFilePath());
+        this.externalDataReader = new SamBamFileReader(file, this.trackID);
+        } catch (RuntimeIOException e){
+            throw new FileNotFoundException(e.getMessage());
+        }
     }
 }
