@@ -9,6 +9,7 @@ import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -37,17 +38,17 @@ import org.openide.windows.TopComponent;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.differentialExpression//DiffExpResultViewer//EN",
-autostore = false)
+        autostore = false)
 @TopComponent.Description(preferredID = "DiffExpResultViewerTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        //iconBase="SET/PATH/TO/ICON/HERE", 
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent")
 @ActionReference(path = "Menu/Window" /*
- * , position = 333
- */)
+         * , position = 333
+         */)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_DiffExpResultViewerAction",
-preferredID = "DiffExpResultViewerTopComponent")
+        preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
     "CTL_DiffExpResultViewerTopComponent=Differential expression analysis - results",
@@ -113,7 +114,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         int pos = 0;
         switch (usedTool) {
             case DeSeq:
-                PersistantFeature locus =  (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                PersistantFeature locus = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
                 pos = locus.getStart();
                 break;
             case BaySeq:
@@ -128,8 +129,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
         for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
             ViewController tmpVCon = it.next();
-            tmpVCon.getBoundsManager().navigatorBarUpdated(pos);
-
+            BoundsInfoManager bm = tmpVCon.getBoundsManager();
+            if (bm != null) {
+                bm.navigatorBarUpdated(pos);
+            }
         }
     }
 
@@ -358,8 +361,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             topCountsTable.setModel(tableModels.get(resultComboBox.getSelectedIndex()));
         }
     }
-    
-    public static class UnchangeableDefaultTableModel extends DefaultTableModel{
+
+    public static class UnchangeableDefaultTableModel extends DefaultTableModel {
 
         public UnchangeableDefaultTableModel() {
             super();
@@ -384,10 +387,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         public UnchangeableDefaultTableModel(int rowCount, int columnCount) {
             super(rowCount, columnCount);
         }
-     
+
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
-        }   
+        }
     }
 }
