@@ -33,6 +33,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     //private final InputOutput io;
     private Integer rightBound;
     private final Integer minCorrelation;
+    private final Integer minPeakCoverage;
     private StrangDirection currentDirection;
 
     private void createProcessHandle(String title) {
@@ -66,7 +67,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     private CorrelationResultPanel resultView;
     
-    public CorrelationAnalysisProcessor(ReferenceViewer referenceViewer, List<PersistantTrack> list, Integer intervalLength, Integer minCorrelation) {
+    public CorrelationAnalysisProcessor(ReferenceViewer referenceViewer, List<PersistantTrack> list, 
+            Integer intervalLength, Integer minCorrelation, Integer minPeakCoverage) {
         /*this.io = IOProvider.getDefault().getIO("CorrelationAnalysis", true);
         this.io.setOutputVisible(true);
         this.io.getOut().println("");
@@ -96,6 +98,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.trackConnectorList = tcl;
         this.intervalLength = intervalLength;
         this.minCorrelation = minCorrelation;
+        this.minPeakCoverage = minPeakCoverage;
         
         
         CorrelationResultTopComponent tc = CorrelationResultTopComponent.findInstance();
@@ -113,14 +116,12 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     private int getFwdCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position) {
-        return coverageResult.getCoverage().getBestMatchFwdMult(position)
-                + coverageResult.getCoverage().getCommonFwdMult(position)
+        return coverageResult.getCoverage().getCommonFwdMult(position)
                 + coverageResult.getCoverage().getPerfectFwdMult(position);
     }
     
     private int getRevCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position) {
-        return coverageResult.getCoverage().getBestMatchRevMult(position)
-                + coverageResult.getCoverage().getCommonRevMult(position)
+        return coverageResult.getCoverage().getCommonRevMult(position)
                 + coverageResult.getCoverage().getPerfectRevMult(position);
     }
     
@@ -140,6 +141,25 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         return true;
     }
     
+    /** computes the maximum peak covage from the currently loaded result list */
+    private int getPeakCoverage(StrangDirection direction, int position) {
+        int peakCoverage = 0;
+        for (CoverageAndDiffResultPersistant result : this.resultList) {
+            peakCoverage = Math.max(peakCoverage, getCoverageAt(result, position, direction));
+        }
+        return peakCoverage;
+    }
+    
+    /** computes the maximum peak covage from the currently loaded result list */
+    private double getPeakCoverageFromArray(double[] data) {
+        double peakCoverage = 0;
+        for (double d : data) {
+            peakCoverage = Math.max(peakCoverage, d);
+        }
+        return peakCoverage;
+    }
+    
+    
     private double[] copyCoverage(CoverageAndDiffResultPersistant coverageResult, StrangDirection direction, int from, int to) {
         if (to<from) throw new IllegalArgumentException("from value must be less than the to value");
         double[] result = new double[to-from];
@@ -153,7 +173,6 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     private void computeStep(StrangDirection direction) {
         int maximumCoveredPosition = this.resultList.get(0).getCoverage().getRightBound();
-        
         while (this.currentPosition<maximumCoveredPosition-this.intervalLength) {
             //ignore areas containing zeros
             while ((this.currentPosition<maximumCoveredPosition-this.intervalLength)
@@ -168,11 +187,27 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 int to = currentPosition+this.intervalLength;
                 double[] x = copyCoverage(this.resultList.get(0), direction, currentPosition, to);
                 double[] y = copyCoverage(this.resultList.get(1), direction, currentPosition, to);
-                double correlation = new PearsonsCorrelation().correlation(x, y);
-                double minCorr = ((double) this.minCorrelation) / 100.0;
-                if ((correlation>minCorr) || (correlation<(minCorr*(-1)))) {
-                    this.showMsg("correlation of interval ["+this.currentPosition+"-"+to+"] is "+correlation+" on "+direction );
-                    this.resultView.addData(direction, this.currentPosition, to, correlation);
+                double peakCov1 = this.getPeakCoverageFromArray(x);
+                double peakCov2 = this.getPeakCoverageFromArray(y);
+                
+                if ((peakCov1>=this.minPeakCoverage) && 
+                        (peakCov2>=this.minPeakCoverage)) {
+                
+                    double correlation = new PearsonsCorrelation().correlation(x, y);
+                    double minCorr = ((double) this.minCorrelation) / 100.0;
+
+                    if ((correlation>minCorr) || (correlation<(minCorr*(-1)))) {
+                        this.showMsg("correlation of interval ["+this.currentPosition+"-"+to+"] is "+correlation+" on "+direction );
+                        this.resultView.addData(direction, this.currentPosition, to, correlation,
+                                Math.min(peakCov1, peakCov2)
+                                );
+                    }
+                    
+                }
+                else {
+                    this.showMsg("ignore correlation of interval ["+this.currentPosition+"-"+to
+                            +"] is because min coverage is "+peakCov1+" and "+peakCov2 );
+                        
                 }
                 this.currentPosition = to+1;
             }

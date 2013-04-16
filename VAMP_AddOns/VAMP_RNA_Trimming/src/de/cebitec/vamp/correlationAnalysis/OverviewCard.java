@@ -63,7 +63,8 @@ public class OverviewCard extends javax.swing.JPanel {
 
     }
 
-    void showGenereateOverview(List<PersistantTrack> list, String intervallength, String mincorrelation) {
+    void showGenereateOverview(List<PersistantTrack> list, String intervallength, 
+            String mincorrelation, String minpeakcoverage) {
         overviewTextArea.setText("Reference:\n");
         overviewTextArea.append(ProjectConnector.getInstance().getRefGenomeConnector(
                 list.get(0).getRefGenID()).getRefGenome().getName()+"\n"
@@ -79,6 +80,9 @@ public class OverviewCard extends javax.swing.JPanel {
         
         overviewTextArea.append("Minimum correlation:\n");
         overviewTextArea.append(mincorrelation+"%\n"+"\n");
+        
+        overviewTextArea.append("Minimum peak coverage:\n");
+        overviewTextArea.append(minpeakcoverage+"\n"+"\n");
     }
 
 }

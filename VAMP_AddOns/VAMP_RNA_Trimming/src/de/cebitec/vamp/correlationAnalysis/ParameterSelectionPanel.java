@@ -107,6 +107,7 @@ class ParameterSelectionPanel implements WizardDescriptor.FinishablePanel<Wizard
     public void storeSettings(WizardDescriptor settings) {
         settings.putProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH, component.getIntervalLength());
         settings.putProperty(CorrelationAnalysisAction.PROP_MINCORRELATION, component.getMinimumCorrelation());
+        settings.putProperty(CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE, component.getMinimumPeakCoverage());
     }
 
 }

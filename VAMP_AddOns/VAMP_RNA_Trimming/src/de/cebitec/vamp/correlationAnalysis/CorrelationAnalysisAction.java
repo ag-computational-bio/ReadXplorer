@@ -38,13 +38,13 @@ import org.openide.util.NbBundle.Messages;
 id = "de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction")
 @ActionRegistration(
     displayName = "#CTL_CorrelationAnalysisAction")
-@ActionReference(path = "Menu/Tools", position = 3333)
+@ActionReference(path = "Menu/Tools", position = 3333) 
 @Messages("CTL_CorrelationAnalysisAction=analyse tracks correlation ")
 public final class CorrelationAnalysisAction implements ActionListener {
     public final static String PROP_SELECTED_TRACKS = "PROP_SELECTED_TRACKS";
     public final static String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";
     public final static String PROP_MINCORRELATION = "PROP_MINCORRELATION";
-
+    public final static String PROP_MINPEAKCOVERAGE = "PROP_MINPEAKCOVERAGE";
     
 
     private final static Logger LOG = Logger.getLogger(CorrelationAnalysisAction.class.getName());
@@ -77,7 +77,9 @@ public final class CorrelationAnalysisAction implements ActionListener {
             new CorrelationAnalysisProcessor(context,    
                 (List<PersistantTrack>) wiz.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH),
-                (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION));
+                (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION),
+                (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE)
+                    );
         } else {
             //this.snpDetectionTopComp.close();
         }

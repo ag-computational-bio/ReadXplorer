@@ -14,7 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
- *
+ * The Panel that shows results for a correlation analysis of two tracks in a table
  * @author Evgeny Anisiforov
  */
 //@TopComponent.Registration(mode = "output", openAtStartup = false)
@@ -58,14 +58,14 @@ public class CorrelationResultPanel extends JPanel {
 
             },
             new String [] {
-                "Direction", "From", "To", "Correlation"
+                "Direction", "From", "To", "Correlation", "MinPeakCoverage"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -81,12 +81,13 @@ public class CorrelationResultPanel extends JPanel {
         correlationTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title1")); // NOI18N
         correlationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title2")); // NOI18N
         correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
+        correlationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title4")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -119,9 +120,9 @@ public class CorrelationResultPanel extends JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 
-    public void addData(StrangDirection direction, int currentPosition, int to, double correlation) {
+    public void addData(StrangDirection direction, int currentPosition, int to, double correlation, double minPeakCoverage) {
         DefaultTableModel model = (DefaultTableModel) this.correlationTable.getModel();
-        model.addRow(new Object[] {direction, currentPosition, to, correlation});
+        model.addRow(new Object[] {direction, currentPosition, to, correlation, minPeakCoverage});
     }
     
     public void ready() {

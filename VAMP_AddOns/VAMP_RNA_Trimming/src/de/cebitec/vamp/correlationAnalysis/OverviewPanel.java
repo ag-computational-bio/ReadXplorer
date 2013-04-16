@@ -58,7 +58,8 @@ public class OverviewPanel implements WizardDescriptor.Panel<WizardDescriptor> {
         component.showGenereateOverview(
                 (List<PersistantTrack>) settings.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 settings.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH).toString(),
-                settings.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION).toString()
+                settings.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION).toString(),
+                settings.getProperty(CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE).toString()
                 );
     }
 
