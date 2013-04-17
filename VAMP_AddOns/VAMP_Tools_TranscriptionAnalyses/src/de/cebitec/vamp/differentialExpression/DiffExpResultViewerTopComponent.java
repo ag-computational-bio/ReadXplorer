@@ -4,9 +4,12 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
-import de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
+import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.TableRightClickFilter;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -66,11 +69,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private DeAnalysisHandler.Tool usedTool;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Expression Analysis");
     private TableRightClickFilter<UnchangeableDefaultTableModel> rktm = new TableRightClickFilter<>(UnchangeableDefaultTableModel.class);
+    private ReferenceFeatureTopComp refComp;
 
     public DiffExpResultViewerTopComponent() {
     }
 
     public DiffExpResultViewerTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool usedTool) {
+        refComp = ReferenceFeatureTopComp.findInstance();
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
@@ -108,32 +113,39 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     private void showPosition() {
+        PersistantFeature feature = getFeatureFromTable();
+        if (feature != null) {
+            int pos = feature.getStart();
+            Collection<ViewController> viewControllers;
+            viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+            for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
+                ViewController tmpVCon = it.next();
+                BoundsInfoManager bm = tmpVCon.getBoundsManager();
+                if (bm != null) {
+                    bm.navigatorBarUpdated(pos);
+                }
+            }
+            refComp.showFeatureDetails(feature);
+        }
+    }
+
+    private PersistantFeature getFeatureFromTable() {
+        PersistantFeature feature = null;
         DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
-        int pos = 0;
         switch (usedTool) {
             case DeSeq:
-                PersistantFeature locus = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
-                pos = locus.getStart();
+                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
                 break;
             case BaySeq:
-                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 2);
+                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
                 break;
             case SimpleTest:
-                pos = (int) topCountsTable.getModel().getValueAt(selectedModel, 5);
+                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
                 break;
         }
-
-        Collection<ViewController> viewControllers;
-        viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
-            ViewController tmpVCon = it.next();
-            BoundsInfoManager bm = tmpVCon.getBoundsManager();
-            if (bm != null) {
-                bm.navigatorBarUpdated(pos);
-            }
-        }
+        return feature;
     }
 
     private void addResults() {
@@ -143,7 +155,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             colNames.add(0, " ");
-            TableModel tmpTableModel = new UnchangeableDefaultTableModel(currentResult.getTableContentsContainingRowNames(), colNames);
+            Vector<Vector> tableContents = currentResult.getTableContentsContainingRowNames();
+            TableModel tmpTableModel = new UnchangeableDefaultTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
         }

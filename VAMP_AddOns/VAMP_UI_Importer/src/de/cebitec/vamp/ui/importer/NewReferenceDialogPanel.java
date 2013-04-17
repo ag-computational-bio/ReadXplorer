@@ -141,9 +141,9 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 
         nameLabel.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.nameLabel.text")); // NOI18N
 
-        nameField.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                nameFieldKeyTyped(evt);
+        nameField.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                nameFieldPropertyChange(evt);
             }
         });
 
@@ -337,9 +337,9 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
         this.referenceName = (String) this.referenceBox.getSelectedItem();
     }//GEN-LAST:event_referenceBoxActionPerformed
 
-    private void nameFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameFieldKeyTyped
-        this.referenceName = this.nameField.getText();
-    }//GEN-LAST:event_nameFieldKeyTyped
+    private void nameFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_nameFieldPropertyChange
+       this.referenceName = this.nameField.getText();
+    }//GEN-LAST:event_nameFieldPropertyChange
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
