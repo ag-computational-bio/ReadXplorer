@@ -103,7 +103,12 @@ public class ResultDeAnalysis {
             case REXP.XT_FACTOR:
                 RFactor factor = currentValues.asFactor();
                 for (int j = 0; j < factor.size(); j++) {
-                    current.add(factor.at(j));
+                    String name = factor.at(j);
+                    if (dEAdata.existsPersistantFeatureForGNURName(name)) {
+                        current.add(dEAdata.getPersistantFeatureByGNURName(name));
+                    } else {
+                        current.add(name);
+                    }
                 }
                 break;
         }

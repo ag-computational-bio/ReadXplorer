@@ -122,11 +122,6 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         infoText.setEditable(false);
         infoText.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.infoText.text")); // NOI18N
         infoText.setBorder(null);
-        infoText.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                infoTextActionPerformed(evt);
-            }
-        });
         jScrollPane4.setViewportView(infoText);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -228,10 +223,6 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         selectedIndex = -1;
         removeGroupButton.setEnabled(false);
     }//GEN-LAST:event_removeGroupButtonActionPerformed
-
-    private void infoTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_infoTextActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_infoTextActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
