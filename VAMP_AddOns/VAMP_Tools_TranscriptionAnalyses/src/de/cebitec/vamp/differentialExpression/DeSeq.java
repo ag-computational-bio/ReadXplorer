@@ -71,7 +71,7 @@ public class DeSeq {
                 //...and assigned to the count data matrix.
                 gnuR.eval("colnames(inputData) <- columNames");
                 //Now we need to name the rows. First hand over the row names to Gnu R...
-                gnuR.assign("rowNames", analysisData.getLoci());
+                gnuR.assign("rowNames", analysisData.getFeatureNames());
                 //...and then assign them to the count data matrix.
                 gnuR.eval("rownames(inputData) <- rowNames");
                 //Remove all the sides that don't appear under any condition because

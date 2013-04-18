@@ -182,6 +182,10 @@
             <public-packages>
                 <package>de.cebitec.vamp.transcriptionAnalyses</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/SimpleTest.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/SimpleTest.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>

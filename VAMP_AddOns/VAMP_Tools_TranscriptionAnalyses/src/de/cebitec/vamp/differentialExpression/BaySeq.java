@@ -90,7 +90,7 @@ public class BaySeq {
                 gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
                 gnuR.assign("inputFeaturesStart", bseqData.getStart());
                 gnuR.assign("inputFeaturesStop", bseqData.getStop());
-                gnuR.assign("inputFeaturesID", bseqData.getLoci());
+                gnuR.assign("inputFeaturesID", bseqData.getFeatureNames());
                 gnuR.eval("features <- data.frame(inputFeaturesID,inputFeaturesStart,inputFeaturesStop)");
                 gnuR.eval("colnames(features) <- c(\"locus\", \"start\", \"stop\")");
                 gnuR.eval("seglens <- features$stop - features$start + 1");

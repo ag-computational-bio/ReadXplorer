@@ -2,7 +2,6 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.util.Pair;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -124,14 +123,28 @@ public class DeAnalysisData {
     }
 
     /**
-     * Return the Loci of the reference features.
+     * Return the names of the reference features.
      *
-     * @return Loci of the reference features as an String Array.
+     * @return Names of the reference features as an String Array.
      */
-    public String[] getLoci() {
+    public String[] getFeatureNames() {
         String[] ret = featureData.keySet().toArray(new String[featureData.keySet().size()]);
         ProcessingLog.getInstance().addProperty("Number of annotations", ret.length);
         return ret;
+    }
+
+    /**
+     * Returns the reference features.
+     * @return Reference features as an Array.
+     */
+    public PersistantFeature[] getFeatures() {
+        PersistantFeature[] features = new PersistantFeature[featureData.keySet().size()];
+        int i = 0;
+        for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
+            String key = it.next();
+            features[i] = featureData.get(key);
+        }
+        return features;
     }
 
     /**
@@ -146,12 +159,12 @@ public class DeAnalysisData {
     public String[] getTrackDescriptions() {
         return trackDescriptions;
     }
-    
-    public PersistantFeature getPersistantFeatureByGNURName(String gnuRName){
+
+    public PersistantFeature getPersistantFeatureByGNURName(String gnuRName) {
         return featureData.get(gnuRName);
     }
-    
-    public boolean existsPersistantFeatureForGNURName(String gnuRName){
+
+    public boolean existsPersistantFeatureForGNURName(String gnuRName) {
         return featureData.containsKey(gnuRName);
     }
 

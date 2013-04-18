@@ -28,6 +28,12 @@ public class ResultDeAnalysis {
         this.dEAdata = dEAdata;
     }
 
+    public ResultDeAnalysis(Vector<Vector> tableContents, Vector colNames, Vector rowNames) {
+        this.tableContents = tableContents;
+        this.colNames = colNames;
+        this.rowNames = rowNames;
+    }
+
     public Vector<Vector> getTableContentsContainingRowNames() {
         Vector rnames = getRownames();
         Vector<Vector> data = getTableContents();

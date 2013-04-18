@@ -72,7 +72,7 @@ public class SimpleTest {
             //Then the big count data matrix is created out of the single track data handed over.
             gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
             //Now we need to name the rows. First hand over the row names to Gnu R...
-            gnuR.assign("rowNames", analysisData.getLoci());
+            gnuR.assign("rowNames", analysisData.getFeatureNames());
             //...and then assign them to the count data matrix.
             gnuR.eval("rownames(inputData) <- rowNames");
 

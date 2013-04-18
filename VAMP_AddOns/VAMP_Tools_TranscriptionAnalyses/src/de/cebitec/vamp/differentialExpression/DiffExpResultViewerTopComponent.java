@@ -20,6 +20,7 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -29,6 +30,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -63,6 +65,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
     private ArrayList<TableModel> tableModels = new ArrayList<>();
+    private ArrayList<TableRowSorter> tableRowSorter = new ArrayList<>();
     private TopComponent GraficsTopComponent;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
@@ -159,10 +162,34 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             TableModel tmpTableModel = new UnchangeableDefaultTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
+            TableRowSorter<TableModel> tmpRowSorter = new TableRowSorter<>(tmpTableModel);
+            Vector firstRow = tableContents.get(0);
+            int columnCounter = 0;
+            for (Iterator it1 = firstRow.iterator(); it1.hasNext(); columnCounter++) {
+                Object object = it1.next();
+                if (object instanceof Double) {
+                    tmpRowSorter.setComparator(columnCounter, new Comparator<Double>() {
+                        @Override
+                        public int compare(Double o1, Double o2) {
+                            if (o1.doubleValue() == o2.doubleValue()) {
+                                return 0;
+                            }
+                            if (o1.doubleValue() > o2.doubleValue()) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        }
+                    });
+                }
+
+            }
+            tableRowSorter.add(tmpRowSorter);
         }
 
         resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
         topCountsTable.setModel(tableModels.get(0));
+        topCountsTable.setRowSorter(tableRowSorter.get(0));
 
         createGraphicsButton.setEnabled(true);
         saveTableButton.setEnabled(true);
@@ -198,6 +225,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         topCountsTable.setAutoCreateRowSorter(true);
         topCountsTable.setModel(tm);
         topCountsTable.setEnabled(false);
+        topCountsTable.setRowSorter(null);
         jScrollPane1.setViewportView(topCountsTable);
 
         org.openide.awt.Mnemonics.setLocalizedText(createGraphicsButton, org.openide.util.NbBundle.getMessage(DiffExpResultViewerTopComponent.class, "DiffExpResultViewerTopComponent.createGraphicsButton.text")); // NOI18N
@@ -372,6 +400,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         if (state == ItemEvent.SELECTED) {
             rktm.resetOriginalTableModel();
             topCountsTable.setModel(tableModels.get(resultComboBox.getSelectedIndex()));
+            topCountsTable.setRowSorter(tableRowSorter.get(resultComboBox.getSelectedIndex()));
         }
     }
 
