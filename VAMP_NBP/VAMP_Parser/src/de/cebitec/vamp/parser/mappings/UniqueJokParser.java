@@ -1,5 +1,6 @@
 package de.cebitec.vamp.parser.mappings;
 
+import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
@@ -278,5 +279,10 @@ public class UniqueJokParser implements MappingParserI {
     @Override
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
+    }
+
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        //do nothing right now
     }
 }

@@ -11,6 +11,7 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.StatsContainer;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,8 +62,9 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      * This includes the detection of all neighboring features before the actual analysis.
      */
     private void initDatastructures() {
-        averageReadLength = trackConnector.getAverageReadLength();
-        averageSeqPairLength = trackConnector.getAverageSeqPairLength();
+        Map<String, Integer> statsMap = trackConnector.getTrackStats().getStatsMap();
+        averageReadLength = statsMap.get(StatsContainer.AVERAGE_READ_LENGTH);
+        averageSeqPairLength = statsMap.get(StatsContainer.AVERAGE_SEQ_PAIR_SIZE);
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         this.genomeSize = trackConnector.getRefSequenceLength();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);

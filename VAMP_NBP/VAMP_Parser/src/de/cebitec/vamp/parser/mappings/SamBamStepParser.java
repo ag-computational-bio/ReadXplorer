@@ -1,5 +1,6 @@
 package de.cebitec.vamp.parser.mappings;
 
+import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.parser.output.SamBamSorter;
@@ -321,5 +322,10 @@ public class SamBamStepParser implements MappingParserI, Observer {
     @Override
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
+    }
+
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        //do nothing right now
     }
 }

@@ -135,9 +135,13 @@ public class GeneralUtils {
      * Generates a string, which concatenates the list of strings for user friendly
      * displaying in the gui with an " and ".
      * @param strings the list of strings, which should be concatenated
-     * @return the string containing all strings concatenated with "and"
+     * @param maxLength maximum length of the string to return or 0, if no
+     * restriction of the length is desired
+     * @return the string containing all strings concatenated with "and". If the
+     * string is too long it is cut at the maxLength position and "..." is 
+     * appended.
      */
-    public static String generateConcatenatedString(List<String> strings) {
+    public static String generateConcatenatedString(List<String> strings, int maxLength) {
         /**StringBuilder concatString = new StringBuilder();
         for (String string : strings) {
             concatString = concatString.append(string).append(" and ");
@@ -150,7 +154,11 @@ public class GeneralUtils {
         //Evgeny:
         //generateConcatenatedString is a special case of the implode function, 
         //so i would suggest to use it here to reduce code duplications :
-        return implode(" and ", strings.toArray());
+        String concatString = implode(" and ", strings.toArray());
+        if (maxLength > 0 && concatString.length() > maxLength) {
+            concatString = concatString.substring(0, maxLength).concat("...");
+        }
+        return concatString;
     }
     
     /**
@@ -178,26 +186,25 @@ public class GeneralUtils {
     }
     
     /**
-    * Join array elements with a string
-    * @param delim Delimiter
+    * Joins array elements in a String.
+    * @param delim Delimiter between each array element
     * @param array Array of elements
     * @return String
     */
     public static String implode(String delim, Object[] array) {
-            String AsImplodedString;
-            if (array.length==0) {
-                    AsImplodedString = "";
-            } 
-            else {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(array[0]);
-                    for (int i=1;i<array.length;i++) {
-                            sb.append(delim);
-                            sb.append(array[i]);
-                    }
-                    AsImplodedString = sb.toString();
+        String asImplodedString;
+        if (array.length == 0) {
+            asImplodedString = "";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append(array[0]);
+            for (int i = 1; i < array.length; i++) {
+                sb.append(delim);
+                sb.append(array[i]);
             }
-            return AsImplodedString;
+            asImplodedString = sb.toString();
+        }
+        return asImplodedString;
     }
     
 }

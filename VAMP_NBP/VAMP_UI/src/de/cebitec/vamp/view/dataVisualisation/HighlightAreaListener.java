@@ -148,7 +148,6 @@ public class HighlightAreaListener extends MouseAdapter {
     /**
      * Opens the pop up menu showing all available options for the highlighted
      * rectangle.
-     *
      * @param e method to be called after a click, so this is the mouse event
      * resulting from that click
      */
@@ -164,6 +163,8 @@ public class HighlightAreaListener extends MouseAdapter {
             popUp.add(menuItemFactory.getCopyItem(selSequence));
             //add copy position option
             popUp.add(menuItemFactory.getCopyPositionItem(parentComponent.getCurrentMousePosition()));
+            //add center current position option
+            popUp.add(menuItemFactory.getJumpToPosItem(this.parentComponent.getBoundsInfoManager(), parentComponent.getCurrentMousePosition()));
             //add store as fasta file option
             popUp.add(menuItemFactory.getStoreFastaItem(selSequence, seqStart, seqEnd));
             //add calculate secondary structure option
@@ -261,6 +262,8 @@ public class HighlightAreaListener extends MouseAdapter {
             
             //add copy position option
             popUp.add(menuItemFactory.getCopyPositionItem(parentComponent.getCurrentMousePosition()));
+            //add center current position option
+            popUp.add(menuItemFactory.getJumpToPosItem(this.parentComponent.getBoundsInfoManager(), parentComponent.getCurrentMousePosition()));
             
             //add copy CDS option, if on a start codon & on correct frame
             if (this.specialRegionList.containsKey(xPos)) {
@@ -272,7 +275,7 @@ public class HighlightAreaListener extends MouseAdapter {
                     popUp.add(menuItemFactory.getStoreFastaForCdsItem(cdsStrings, cdsRegions, refName));
                     
                     //add jump to end of CDS option
-                    popUp.add(menuItemFactory.getJumpToPosItem(this.parentComponent.getBoundsInfoManager(), cdsRegions));
+                    popUp.add(menuItemFactory.getJumpToStopPosItem(this.parentComponent.getBoundsInfoManager(), cdsRegions));
                 }      
             }
             

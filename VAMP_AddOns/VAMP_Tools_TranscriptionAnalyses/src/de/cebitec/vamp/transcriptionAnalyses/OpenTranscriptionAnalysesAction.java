@@ -263,7 +263,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 transcriptionStartResultPanel.addTSSs(tssResult);
                 
                 if (finishedCovAnalyses >= tracks.size()) {
-                    trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList());
+                    trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
                     String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
                     this.transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
                 }
@@ -288,7 +288,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                     filteredFeatureResultPanel.addFilteredFeatures(filteredFeatResult);
 
                     if (finishedMappingAnalyses >= tracks.size()) {
-                        trackNames = GeneralUtils.generateConcatenatedString(filteredFeatResult.getTrackNameList());
+                        trackNames = GeneralUtils.generateConcatenatedString(filteredFeatResult.getTrackNameList(), 120);
                         String panelName = "Filtered features for " + trackNames + " (" + filteredFeatureResultPanel.getResultSize() + " hits)";
                         this.transcAnalysesTopComp.openAnalysisTab(panelName, filteredFeatureResultPanel);
                     }
@@ -309,7 +309,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                     operonResultPanel.addDetectedOperons(operonDetectionResult);
 
                     if (finishedMappingAnalyses >= tracks.size()) {
-                        trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList());
+                        trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
                         String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
                         this.transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
                     }

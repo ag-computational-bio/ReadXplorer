@@ -122,7 +122,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             int differences;
             String readName;
             Pair<Integer, Integer> data;
-
+   
             while (samBamItor.hasNext()) {
                 ++lineno;
 
@@ -131,7 +131,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                     if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
-                        readName = record.getReadName();
+                        readName = ParserCommonMethods.elongatePairedReadName(record);
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         refSeq = this.refGenome.substring(start - 1, stop);
@@ -225,5 +225,5 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     @Override
     public String[] getFileExtensions() {
         return fileExtension;
-    }
+    }    
 }

@@ -32,7 +32,6 @@ public class SamBamFileReader implements Observable {
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam
      * file.
-     *
      * @param dataFile the file to read from
      * @param trackId the track id of the track whose data is stored in the
      * given file
@@ -69,7 +68,6 @@ public class SamBamFileReader implements Observable {
     /**
      * Retrieves the mappings from the given interval from the sam or bam file
      * set for this data reader and the reference sequence with the given name.
-     *
      * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
@@ -158,8 +156,9 @@ public class SamBamFileReader implements Observable {
      * Retrieves the reduced mappings from the given interval from the sam or
      * bam file set for this data reader and the reference sequence with the
      * given name.
-     *
      * @param refGenome reference genome used in the bam file
+     * @param from left position of the interval to query
+     * @param to right position of the interval to query
      * @return the reduced mappings for the given interval
      */
     public Collection<PersistantMapping> getReducedMappingsFromBam(PersistantReference refGenome, int from, int to) {
@@ -197,7 +196,6 @@ public class SamBamFileReader implements Observable {
      * Retrieves the sequence pair mappings from the given interval from the sam
      * or bam file set for this data reader and the reference sequence with the
      * given name.
-     *
      * @param refGenome reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval

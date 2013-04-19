@@ -1,5 +1,6 @@
 package de.cebitec.vamp.parser.mappings;
 
+import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
@@ -154,6 +155,11 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      */
     public boolean isAlreadyConverted() {
         return this.alreadyConverted;
+    }
+
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        //do nothing right now
     }
     
 }

@@ -2,7 +2,6 @@ package de.cebitec.vamp.parser.output;
 
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.mappings.PreprocessorI;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;

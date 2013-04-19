@@ -229,6 +229,7 @@ public class NewPositionTableDialog extends ImportTrackBasePanel implements NewJ
     }// </editor-fold>//GEN-END:initComponents
         
         private void openMappingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMappingButtonActionPerformed
+            this.getMappingFiles().clear();
             VampFileChooser fc = new VampFileChooser(getCurrentParser().getFileExtensions(), getCurrentParser().getInputFileDescription()) {
                 private static final long serialVersionUID = 1L;
 

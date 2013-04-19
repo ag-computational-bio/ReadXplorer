@@ -222,7 +222,7 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        if (this.trackConnector.getSeqPairToTrackID() > 0) {
+        if (this.trackConnector.isSeqPairTrack()) {
             this.seqPairBasePanel = factory.getSeqPairBasePanel(this.trackConnector);
             this.changeViewerStatus(SEQPAIRCARD, false);
             this.cardPanel.add(this.seqPairBasePanel, SEQPAIRCARD);

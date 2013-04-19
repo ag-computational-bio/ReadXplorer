@@ -129,7 +129,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         for (int i = 0; i < seqPairs.size(); ++i) {
             seqPair = seqPairs.get(i);
             mapping = seqPair.getVisibleMapping();
-            if (!this.parentViewer.inExclusionList(seqPair.getSeqPairType())) {
+            if (!this.inExclusionList(seqPair.getSeqPairType())) {
                 
                 blockColor = this.determineBlockColor(seqPair);
                 this.pairColors.add(blockColor);
@@ -149,6 +149,34 @@ public class BlockComponentPair extends JComponent implements ActionListener {
                 this.addRectAndItsColor(ColorProperties.BLOCK_UNPAIRED, mapping, false);
             }
         }
+    }
+
+    /**
+     * @param seqPairType sequence pair type to check
+     * @return true, if the given sequence typ is on the exclusion list
+     */
+    public boolean inExclusionList(short seqPairType) {
+        List<FeatureType> excludedFeatureTypes = this.parentViewer.getExcludedFeatureTypes();
+        FeatureType typeOfPair;
+        if (seqPairType == Properties.TYPE_PERFECT_PAIR || 
+              seqPairType == Properties.TYPE_PERFECT_UNQ_PAIR) {
+            typeOfPair = FeatureType.PERFECT_PAIR;
+        } else if (seqPairType == Properties.TYPE_DIST_LARGE_PAIR || 
+                   seqPairType == Properties.TYPE_DIST_LARGE_UNQ_PAIR || 
+                   seqPairType == Properties.TYPE_DIST_SMALL_PAIR || 
+                   seqPairType == Properties.TYPE_DIST_SMALL_UNQ_PAIR || 
+                   seqPairType == Properties.TYPE_ORIENT_WRONG_PAIR || 
+                   seqPairType == Properties.TYPE_ORIENT_WRONG_UNQ_PAIR || 
+                   seqPairType == Properties.TYPE_OR_DIST_LARGE_PAIR || 
+                   seqPairType == Properties.TYPE_OR_DIST_LARGE_UNQ_PAIR || 
+                   seqPairType == Properties.TYPE_OR_DIST_SMALL_PAIR || 
+                   seqPairType == Properties.TYPE_OR_DIST_SMALL_UNQ_PAIR) {
+            typeOfPair = FeatureType.DISTORTED_PAIR;
+        } else {
+            typeOfPair = FeatureType.SINGLE_MAPPING;
+        }
+        
+        return excludedFeatureTypes.contains(typeOfPair);
     }
 
     /**
@@ -253,7 +281,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
         Color blockColor;
         int type = seqPair.getSeqPairType();
-        if (type == Properties.TYPE_PERFECT_PAIR) {
+        if (type == Properties.TYPE_PERFECT_PAIR || type == Properties.TYPE_PERFECT_UNQ_PAIR) {
             blockColor = ColorProperties.BLOCK_PERFECT;
         } else if (type == Properties.TYPE_UNPAIRED_PAIR) {
             blockColor = ColorProperties.BLOCK_UNPAIRED;

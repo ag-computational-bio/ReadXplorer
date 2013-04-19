@@ -290,6 +290,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
                     //add copy mouse position option
                     popUp.add(menuItemFactory.getCopyPositionItem(currentLogMousePos));
+                    //add center current position option
+                    popUp.add(menuItemFactory.getJumpToPosItem(boundsManager, getCurrentMousePos()));
                     popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -689,19 +691,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public List<FeatureType> getExcludedFeatureTypes() {
         return this.excludedFeatureTypes;
-    }
-
-    /**
-     * @param seqPairType sequence pair type to check
-     * @return true, if the given sequence typ is on the exclusion list
-     */
-    public boolean inExclusionList(short seqPairType) {
-        if ((seqPairType == Properties.TYPE_PERFECT_PAIR && this.excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR))
-                || (seqPairType != Properties.TYPE_PERFECT_PAIR && this.excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR))) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public boolean isMouseOverPaintingRequested() {

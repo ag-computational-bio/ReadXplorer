@@ -77,6 +77,8 @@ public class BlockComponent extends JComponent {
                     popUp.add(menuItemFactory.getCopyItem(mappingSequence));
                     //add copy position option
                     popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
+                    //add center current position option
+                    popUp.add(menuItemFactory.getJumpToPosItem(parentViewer.getBoundsInformationManager(), parentViewer.getCurrentMousePos()));
                     //add calculate secondary structure option
                     final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
                     if (rnaFolderControl != null) {

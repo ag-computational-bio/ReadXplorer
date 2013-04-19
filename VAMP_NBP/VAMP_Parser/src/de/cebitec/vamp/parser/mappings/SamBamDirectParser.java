@@ -10,12 +10,11 @@ import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
-import de.cebitec.vamp.util.SamUtils;
+import de.cebitec.vamp.util.StatsContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -38,7 +37,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     
     private SeqPairProcessorI seqPairProcessor;
     private List<Observer> observers;
-    private int nbUniqueSeq;
+    private StatsContainer statsContainer;
 
     /**
      * Parser for parsing sam and bam data files for direct access in vamp.
@@ -46,6 +45,8 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     public SamBamDirectParser() {
         this.observers = new ArrayList<>();
         this.seqPairProcessor = new SeqPairProcessorDummy();
+        this.statsContainer = new StatsContainer();
+        this.statsContainer.prepareForTrack();
     }
     
     /**
@@ -101,7 +102,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver(this);
-        boolean success = sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
+        boolean success = true; // sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
         return success;
     }
 
@@ -132,14 +133,6 @@ public class SamBamDirectParser implements MappingParserI, Observer {
 
         int lineno = 0;
 
-        /*
-         * id of each read sequence. Since the same file is used in both
-         * iterations we don't need to store a mapping between read seq and id.
-         * We assign the same id to each read sequence in both iterations. If
-         * the file would change inbetween, this would not work!
-         */
-        String lastReadSeq = "";
-        int seqId = -1;
         //mapping of read name to number of occurences of the read and the lowest error number
         Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
 
@@ -189,9 +182,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                         isRevStrand = record.getReadNegativeStrandFlag();
                         diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
                         differences = diffGapResult.getDifferences();
-
-                        // add data to map
-                        readName = record.getReadName();
+                        readName = ParserCommonMethods.elongatePairedReadName(record);
                         if (!classificationMap.containsKey(readName)) {
                             classificationMap.put(readName, new Pair<>(0, Integer.MAX_VALUE));
                         }
@@ -200,14 +191,6 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                         if (classificationPair.getSecond() > differences) {
                             classificationPair.setSecond(differences);
                         }
-
-                        // increase seqId for new read sequence and reset other fields
-                        if (!lastReadSeq.equals(readSeq)) {
-                            ++seqId;
-                        }
-                        lastReadSeq = readSeq;
-
-                        this.seqPairProcessor.processReadname(seqId, readName);
 
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
 
@@ -225,15 +208,13 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                         }
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 }
-                
 
             }
             if (errorLimit.getSkippedCount() > 0) {
-                     this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
+                     this.notifyObservers( "... " + errorLimit.getSkippedCount() + " more errors occured");
             }
 
             samItor.close();
-            this.nbUniqueSeq = seqId + 1;
         } catch (RuntimeEOFException e) {
             this.notifyObservers("Last read in the file is incomplete, ignoring it.");
         }
@@ -241,6 +222,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully", fileName);
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
+        statsContainer.increaseValue(StatsContainer.NO_READS, classificationMap.size());
 
         return new DirectAccessDataContainer(new CoverageContainer(), classificationMap);
     }
@@ -274,12 +256,21 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
     }
+    
+    /**
+     * Adds a statistics container for handling statistics for the extended track.
+     * @param statsContainer the container
+     */
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        this.statsContainer = statsContainer;
+    }
 
     /**
-     * @return the number of unique sequences in the dataset
+     * @return The statistics parser for handling statistics for the extended
+     * track.
      */
-    public int getNbUniqueSeq() {
-        return this.nbUniqueSeq;
+    public StatsContainer getStatsContainer() {
+        return statsContainer;
     }
-    
 }

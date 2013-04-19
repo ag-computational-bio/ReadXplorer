@@ -314,6 +314,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
+        this.getMappingFiles().clear();
         VampFileChooser fc = new VampFileChooser(getCurrentParser().getFileExtensions(), getCurrentParser().getInputFileDescription()) {
             private static final long serialVersionUID = 1L;
 

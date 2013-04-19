@@ -122,7 +122,6 @@ public class SamUtils implements Observable {
      * @param oldFile the old file (if data is not stored in a file, just create
      *      a file with a name of your choice
      * @param header the header of the new file
-     * @p
      * @param presorted if true, SAMRecords must be added to the SAMFileWriter
      *      in order that agrees with header.sortOrder.
      * @param newEnding the ending is added to the end of the file name of the 
@@ -155,7 +154,8 @@ public class SamUtils implements Observable {
      * @param inputFile the input file whose extension should be changed
      * @param newEnding the ending is added to the end of the file name of the
      * old file (this is not the file extension)
-     * @return 
+     * @return a new bam file, which does not already exist with the given new 
+     * ending
      */
     public static File getFileWithBamExtension(File inputFile, String newEnding) {
         String[] nameParts = inputFile.getAbsolutePath().split("\\.");
@@ -172,8 +172,9 @@ public class SamUtils implements Observable {
             newFilePath = inputFile.getAbsolutePath();
         }
         File newFile = new File(newFilePath + newEnding + ".bam");
-        if (newFile.exists()) {
-            newFile = new File(newFilePath + newEnding + "-vamp.bam");
+        while (newFile.exists()) {
+            newEnding = newEnding.concat("-vamp");
+            newFile = new File(newFilePath + newEnding + ".bam");
         }
         return newFile;
     }

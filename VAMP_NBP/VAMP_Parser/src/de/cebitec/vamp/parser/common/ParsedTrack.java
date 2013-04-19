@@ -1,9 +1,11 @@
 package de.cebitec.vamp.parser.common;
 
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.util.StatsContainer;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Contains all data (description, mappings and coverageContainer) belonging
@@ -20,6 +22,7 @@ public class ParsedTrack {
     private CoverageContainer coverageContainer;
     private boolean isFirstTrack;
     private int batchPos; /** Stop position of the current batch in the ref. genome. */
+    private StatsContainer statsContainer;
 
     /**
      * Contains all data (description, mappings and coverageContainer) belonging
@@ -176,5 +179,34 @@ public class ParsedTrack {
     public void setBatchPos(int batchPos) {
         this.batchPos = batchPos;
     }
+
+    /**
+     * Sets the statistics container for this track.
+     * @param statsContainer The statistics container to set
+     */
+    public void setStatsContainer(StatsContainer statsContainer) {
+        this.statsContainer = statsContainer;
+    }
+
+    /**
+     * @return The statistics container for this track
+     */
+    public StatsContainer getStatsContainer() {
+        if (statsContainer == null) {
+            this.statsContainer = new StatsContainer();
+            this.statsContainer.prepareForTrack();
+            if (mappings.getMappingInfos() != null) {
+                Map<Integer,Integer> mappingInfos = mappings.getMappingInfos();
+                statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, mappingInfos.get(1));
+                statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, mappingInfos.get(2));
+                statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, mappingInfos.get(3));
+                statsContainer.increaseValue(StatsContainer.NO_READS, mappingInfos.get(6));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_SEQS, mappingInfos.get(5));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mappingInfos.get(4));
+            }
+        }
+        return statsContainer;
+    }
+    
 
 }

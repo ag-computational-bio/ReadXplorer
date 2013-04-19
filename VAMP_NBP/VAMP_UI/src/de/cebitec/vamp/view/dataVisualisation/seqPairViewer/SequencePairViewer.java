@@ -1,10 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -14,18 +14,14 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayerI;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.LayoutI;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 
 /**
  * Viewer for sequence pairs.

@@ -141,18 +141,30 @@ public class PersistantSequencePair implements PersistantObject {
         
         String typeString;
         switch (type) {
-            case Properties.TYPE_PERFECT_PAIR:
+            case Properties.TYPE_PERFECT_PAIR: //TODO: use central string values, not one in each viewer/data structure
                 typeString = "Perfect Pair"; break;
+            case Properties.TYPE_PERFECT_UNQ_PAIR:
+                typeString = "Unique Perfect Pair"; break;
             case Properties.TYPE_DIST_SMALL_PAIR:
-                typeString = "Smaller pair"; break;
+                typeString = "Smaller Pair"; break;
+            case Properties.TYPE_DIST_SMALL_UNQ_PAIR:
+                typeString = "Unique Smaller Pair"; break;
             case Properties.TYPE_DIST_LARGE_PAIR:
                 typeString = "Enlarged Pair"; break;
+            case Properties.TYPE_DIST_LARGE_UNQ_PAIR:
+                typeString = "Unique Enlarged Pair"; break;
             case Properties.TYPE_ORIENT_WRONG_PAIR:
                 typeString = "Wrong Orientation Pair"; break;
+            case Properties.TYPE_ORIENT_WRONG_UNQ_PAIR:
+                typeString = "Unique Wrong Orientation Pair"; break;
             case Properties.TYPE_OR_DIST_SMALL_PAIR:
                 typeString = "Smaller Wrong Orientation Pair"; break;
+            case Properties.TYPE_OR_DIST_SMALL_UNQ_PAIR:
+                typeString = "Unique Smaller Wrong Orientation Pair"; break;
             case Properties.TYPE_OR_DIST_LARGE_PAIR:
                 typeString = "Larger Wrong Orientation Pair"; break;
+            case Properties.TYPE_OR_DIST_LARGE_UNQ_PAIR:
+                typeString = "Unique Larger Wrong Orientation Pair"; break;
             case Properties.TYPE_UNPAIRED_PAIR:
                 typeString = "Single Mapping"; break;
             default:
@@ -167,9 +179,8 @@ public class PersistantSequencePair implements PersistantObject {
      * @return the color representing this sequence pair
      */
     public static Color determineSeqPairColor(int type) {
-
-        Color blockColor = Color.black;
-        if (type == Properties.TYPE_PERFECT_PAIR) {
+        Color blockColor;
+        if (type == Properties.TYPE_PERFECT_PAIR || type == Properties.TYPE_PERFECT_UNQ_PAIR) {
             blockColor = ColorProperties.BLOCK_PERFECT;
         } else if (type == Properties.TYPE_UNPAIRED_PAIR) {
             blockColor = ColorProperties.BLOCK_UNPAIRED;
@@ -177,8 +188,6 @@ public class PersistantSequencePair implements PersistantObject {
             blockColor = ColorProperties.BLOCK_DIST_SMALL;
         }
         return blockColor;
-
     }
-    
     
 }

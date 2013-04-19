@@ -22,7 +22,7 @@ import org.openide.util.NbBundle;
  * the classification of the seq pairs has to be carried out. Besides the 
  * classification this class also acts as extender for the given sam/bam file
  * and thus creates an extended copy of the original file after the
- * classification. The reads have to be sorted by read name for efficient
+ * classification. The reads are be sorted by read name for efficient
  * classification. Note for multichromosomal mappings: The classification works,
  * no matter on which chromosome the reads were mapped!
  *
@@ -40,17 +40,16 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     private Map<String,Pair<Integer,Integer>> classificationMap; 
     private final String refSeq;
     private boolean deleteSortedFile;
-   
-    private int average_Seq_Pair_Length = 0; //TODO: calculate average size etc. for statistics
-    private int add_Seq_Pair_length = 0;
-    private int count_Seq_Pair = 0;
+    
+    private StatsContainer statsContainer;
+    private DiscreteCountingDistribution seqPairSizeDistribution;
     
     /**
      * Sam/Bam sequence pair classifier for a direct file access track. This
      * means the classification of the seq pairs has to be carried out. Besides
      * the classification this class also acts as extender for the given sam/bam
      * file and thus creates an extended copy of the original file after the
-     * classification. The reads have to be sorted by read name for efficient
+     * classification. The reads are sorted by read name for efficient
      * classification. Note for multichromosomal mappings: The classification 
      * works, no matter on which chromosome the reads were mapped!
      * @param seqPairJobContainer the sequence pair job container to classify
@@ -67,6 +66,8 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         this.orienation = seqPairJobContainer.getOrientation();
         this.classificationMap = classificationMap;
         this.refSeq = refSeq;
+        this.seqPairSizeDistribution = new DiscreteCountingDistribution(maxDist * 2);
+        seqPairSizeDistribution.setType(Properties.SEQ_PAIR_SIZE_DISTRIBUTION);
     }
     
     /**
@@ -145,9 +146,13 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                         ++seqPairId;
                         
                     }
-                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) { //TODO: remove pairTag
+                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) { //TODO: add new casava tag
+                        record.setReadPairedFlag(true);
+                        record.setFirstOfPairFlag(true);
                         currentRecords1.add(record);
                     } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2 || record.getReadPairedFlag() && record.getSecondOfPairFlag()) {
+                        record.setReadPairedFlag(true);
+                        record.setSecondOfPairFlag(true);
                         currentRecords2.add(record);
                     }
                     lastReadName = readName;
@@ -178,10 +183,13 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             
             trackJob.setFile(outputFile);
             
+            this.statsContainer.setSeqPairDistribution(this.seqPairSizeDistribution);
+            
         } catch (Exception e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.getMessage()));
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, e.getMessage());
         }
+        
         
         return new ParsedSeqPairContainer();
     }
@@ -233,10 +241,6 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
          * <-r2(-1)- -r1(1)-> (stop2 < start1) 2 = ff -r1(1)-> -r2(1)->
          * (stop1<start2) oder <-r2(-1)- <-r1(-1)- (stop2 < start1)
          */
-
-        // For estimating the pair size
-//        int count = 0;
-//        int overall = 0;
       
         if (!currentRecords2.isEmpty()) {
             //both sides of the sequence pair have been mapped
@@ -247,13 +251,13 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
 
                 record1 = currentRecords1.get(0);
                 record2 = currentRecords2.get(0);
-                direction = record1.getReadNegativeStrandFlag() ? (byte) -1 : 1;
+                direction = record1.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
                 start1 = record1.getAlignmentStart();
                 stop1 = record1.getAlignmentEnd();
 
                 start2 = record2.getAlignmentStart();
                 stop2 = record2.getAlignmentEnd();
-                direction2 = record2.getReadNegativeStrandFlag() ? (byte) -1 : 1;
+                direction2 = record2.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
                 //ensures direction values only in 1 and -1 and dir1 != dir2 or equal in case ff/rr
                 
                 //add classification data here, before passing mapping to writer
@@ -266,45 +270,45 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
 
                     //determine insert size between both reads
                     if (case1) {
-                        currDist = Math.abs(start1 - stop2);
+                        currDist = Math.abs(start1 - stop2) + 1; //distance if on different chromosomes??? read 1 + rest chr1 + start chr2 bis read2?
                     } else {
-                        currDist = Math.abs(start2 - stop1);
+                        currDist = Math.abs(start2 - stop1) + 1;
                     }
 
                     if (currDist <= this.maxDist && currDist >= this.minDist) {
-
-                        // For estimating pair size
-//                            ++count;
-//                            overall += currDist;
                         ///////////////////////////// found a perfect pair! /////////////////////////////////
-                        this.addPairedRecord(record1, record2, seqPairId, Properties.TYPE_PERFECT_PAIR);
+                        this.addPairedRecord(new DirectSeqPair(record1, record2, seqPairId, Properties.TYPE_PERFECT_PAIR, currDist));
                     } else if (currDist < this.maxDist) { //both reads of pair mapped, but distance in reference is different
                         ///////////////////////////// imperfect pair, distance too small /////////////////////////////////
-                        this.addPairedRecord(record1, record2, seqPairId, Properties.TYPE_DIST_SMALL_PAIR);
+                        this.addPairedRecord(new DirectSeqPair(record1, record2, seqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist));
                     } else { //////////////// imperfect pair, distance too large //////////////////////////
-                        this.addPairedRecord(record1, record2, seqPairId, Properties.TYPE_DIST_LARGE_PAIR);
+                        this.addPairedRecord(new DirectSeqPair(record1, record2, seqPairId, Properties.TYPE_DIST_LARGE_PAIR, currDist));
                     }
                 } else { //////////////////////////// inversion of one read ////////////////////////////////
                     currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
+                    ++currDist;
 
                     if (currDist <= this.maxDist && currDist >= this.minDist) {////distance fits, orientation not ///////////
-                        this.addPairedRecord(record1, record2, seqPairId, Properties.TYPE_ORIENT_WRONG_PAIR);
+                        this.addPairedRecord(new DirectSeqPair(record1, record2, seqPairId, Properties.TYPE_ORIENT_WRONG_PAIR, currDist));
                     } else if (currDist < this.maxDist) {///// orientation wrong & distance too small //////////////////////////////
-                        this.addPairedRecord(record1, record2, seqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR);
+                        this.addPairedRecord(new DirectSeqPair(record1, record2, seqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist));
                     } else { //////////////// orientation wrong & distance too large //////////////////////////
-                        this.addPairedRecord(record1, record2, seqPairId, Properties.TYPE_OR_DIST_LARGE_PAIR);
+                        this.addPairedRecord(new DirectSeqPair(record1, record2, seqPairId, Properties.TYPE_OR_DIST_LARGE_PAIR, currDist));
                     }
                 }
-            } else {
+            } else if (!currentRecords1.isEmpty()) {
 
+                String totalReadName;
+                DirectSeqPair seqPair;
                 for (SAMRecord recordA : currentRecords1) { //block for one readname, pos and direction can deviate
                     
                     try {
 
-                        direction = recordA.getReadNegativeStrandFlag() ? (byte) -1 : 1;
+                        direction = recordA.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
                         start1 = recordA.getAlignmentStart();
                         stop1 = recordA.getAlignmentEnd();
-                        class1 = this.classificationMap.get(recordA.getReadName());
+                        totalReadName = ParserCommonMethods.elongatePairedReadName(recordA);
+                        class1 = this.classificationMap.get(totalReadName);
                         diffs1 = ParserCommonMethods.countDiffsAndGaps(
                                 recordA.getCigarString(),
                                 recordA.getReadString(),
@@ -318,9 +322,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                 if (!(omitList.contains(recordA) && omitList.contains(recordB))) {
                                     start2 = recordB.getAlignmentStart();
                                     stop2 = recordB.getAlignmentEnd();
-                                    direction2 = recordB.getReadNegativeStrandFlag() ? (byte) -1 : 1;
-
-                                    class2 = this.classificationMap.get(recordB.getReadName());
+                                    direction2 = recordB.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
+                                    totalReadName = ParserCommonMethods.elongatePairedReadName(recordB);
+                                    class2 = this.classificationMap.get(totalReadName);
                                     diffs2 = ParserCommonMethods.countDiffsAndGaps(
                                             recordB.getCigarString(),
                                             recordB.getReadString(),
@@ -335,51 +339,54 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
 
                                         //determine insert size between both reads
                                         if (case1) {
-                                            currDist = Math.abs(start1 - stop2);
+                                            currDist = Math.abs(start1 - stop2) + 1;
                                         } else {
-                                            currDist = Math.abs(start2 - stop1);
+                                            currDist = Math.abs(start2 - stop1) + 1;
                                         }
                                         if (currDist <= this.maxDist && currDist >= this.minDist) { //distance fits
                                             ///////////////////////////// found a perfect pair! /////////////////////////////////
-                                            if (diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) {
+                                            seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_PERFECT_PAIR, currDist);
+                                            if (diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //only perfect and best match mappings pass here
                                                 this.addClassificationData(recordA, diffs1);
                                                 this.addClassificationData(recordB, diffs2);
-                                                this.addPairedRecord(recordA, recordB, seqPairId, Properties.TYPE_PERFECT_PAIR);
+                                                this.addPairedRecord(seqPair);
                                                 omitList.add(recordA);
                                                 omitList.add(recordB);
-                                                add_Seq_Pair_length += currDist;
-                                                count_Seq_Pair++;
-                                            } else {//////////////// store potential perfect pair //////////////////////////
-                                                potPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_PERFECT_PAIR));
+                                            } else {//////////////// store potential perfect pair ////////////////////////// for common mappings
+                                                potPairList.add(seqPair);
                                             }
                                         } else //////////////// distance too small, potential pair //////////////////////////
                                         if (currDist < this.maxDist) {
+                                            seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist);
                                             if (largestSmallerDist < currDist && diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //best mappings
                                                 largestSmallerDist = currDist;
-                                                potSmallPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_DIST_SMALL_PAIR));
+                                                potSmallPairList.add(seqPair);
                                             } else if (largestPotSmallerDist < currDist) { //at least one common mapping in potential pair
                                                 largestPotSmallerDist = currDist; //replace even smaller pair with this one (more likely)
-                                                potPotSmallPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_DIST_SMALL_PAIR));
+                                                potPotSmallPairList.add(seqPair);
                                             }
                                         } else {//////////////// distance too large //////////////////////////
                                             //TODO: something to do if dist too large??
                                         }
                                     } else { //////////////////////////// inversion of one read ////////////////////////////////
                                         currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
+                                        ++currDist;
 
                                         if (currDist <= this.maxDist && currDist >= this.minDist) { ////distance fits, orientation not ///////////
+                                            seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_ORIENT_WRONG_PAIR, currDist);
                                             if (diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //best mappings
-                                                unorPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_ORIENT_WRONG_PAIR));
+                                                unorPairList.add(seqPair);
                                             } else {
-                                                potUnorPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_ORIENT_WRONG_PAIR));
+                                                potUnorPairList.add(seqPair);
                                             }
                                         } else if (currDist < this.maxDist && largestSmallerDist < currDist) {///// orientation wrong & distance too small //////////////////////////////
+                                            seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist);
                                             if (largestUnorSmallerDist < currDist && diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //best mappings
                                                 largestUnorSmallerDist = currDist;
-                                                unorSmallPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR));
+                                                unorSmallPairList.add(seqPair);
                                             } else if (largestPotUnorSmallerDist < currDist) {
                                                 largestPotUnorSmallerDist = currDist;
-                                                potUnorSmallPairList.add(new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR));
+                                                potUnorSmallPairList.add(seqPair);
                                             }
                                         } else { //////////////// orientation wrong & distance too large //////////////////////////
                                             //TODO: something to do??
@@ -431,13 +438,13 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
 
                 for (SAMRecord mapping : currentRecords1) {
                     if (!omitList.contains(mapping)) {
-                        this.addSingleRecord(mapping, seqPairId);
+                        this.addSingleRecord(mapping, seqPairId, false);
                     }
                 }
 
                 for (SAMRecord mapping : currentRecords2) {
                     if (!omitList.contains(mapping)) {
-                        this.addSingleRecord(mapping, seqPairId);
+                        this.addSingleRecord(mapping, seqPairId, false);
                     }
                 }
 
@@ -450,61 +457,59 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 unorSmallPairList.clear();
                 potUnorSmallPairList.clear();
                 omitList.clear();
+            } else {
+                for (SAMRecord record : currentRecords2) { //pos and direction can deviate
+                    this.addSingleRecord(record, seqPairId, true);
+                }
             }
 
         } else { //only one side of the sequence pair could be mapped
             for (SAMRecord record : currentRecords1) { //pos and direction can deviate
-                this.addSingleRecord(record, seqPairId);
+                this.addSingleRecord(record, seqPairId, true);
             }
         }
-
-        //delete? this has already been done in the upper part by iterating over currentRecords2
-//        //also have to iterate over list2, cause there might be single side mapped sequences
-//        for (SAMRecord record2 : currentRecords2) { //block for one readname
-//            
-//            readName2 = record2.getReadName();
-//            int seqID2 = readNameToSeqIdMap2.get(readName2);
-//            
-//            readName2 = readName2.substring(0, readName2.length() - 1);
-//            if (    !readNameToSeqIdMap1.containsKey(
-//                        readName2.concat(
-//                            String.valueOf(Properties.EXT_A1))) && 
-//                    !readNameToSeqIdMap1.containsKey(
-//                        readName2.concat(
-//                            String.valueOf(Properties.EXT_B1)))) { //only scnd side of the sequence pair could be mapped
-//                //pos and direction can deviate
-//                this.seqPairContainer.addMappingToPairId(new Pair<Long, Long>((long) seqID2, seqPairId));
-//            }
-//        }
-//        this.seqPairContainer.setNumOfSingleMappings(this.seqPairContainer.getMappingToPairIdList().size());
-//        average_Seq_Pair_Length = add_Seq_Pair_length / count_Seq_Pair;
-//        this.seqPairContainer.setAverage_Seq_Pair_length(average_Seq_Pair_Length);
     }
     
     
     /**
-     * Adds a new sequence pair mapping object to the list.
-     * @param interimID id for this sequence pair mapping. Interim, because it
-     * has to be shifted when inserting into database to guarantee uniqueness
-     * @param interimMatepairID interimMatepairID id for mappings belonging to
-     * same sequence pair. Interim, because it has to be shifted when inserting
-     * into database to guarantee uniqueness
-     * @param mappingId1
-     * @param mappingId2
+     * Adds a new sequence pair mapping object to the list and sets necessary
+     * sam flags for both records.
+     * @param mapping1 mapping 1 of the read pair to add
+     * @param mapping2 mapping 2 of the read pair to add
+     * @param seqPairId id of the sequence pair to add
      * @param type type of the pair 0 = perfect, 1 = dist too large, 2 = dist
      * too small, 3 = orient wrong 4 = orient wrong and dist too large, 5 =
      * orient wrong and dist too small
+     * @param distance distance of the read pair
      */
-    private void addPairedRecord(SAMRecord mapping1, SAMRecord mapping2, int seqPairId, byte type) {
-        
-        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, type);
-        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPairId);
+    private void addPairedRecord(DirectSeqPair seqPair) {
+        SAMRecord mapping1 = seqPair.getRecord1();
+        SAMRecord mapping2 = seqPair.getRecord2();
+        this.setSeqPairForType(seqPair);
+        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, seqPair.getType());
+        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPair.getSeqPairId());
         mapping1.setMateAlignmentStart(mapping2.getAlignmentStart());
-        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, type);
-        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPairId);
+        mapping1.setMateNegativeStrandFlag(mapping2.getReadNegativeStrandFlag());
+        mapping1.setProperPairFlag(seqPair.getType() == Properties.TYPE_PERFECT_PAIR || seqPair.getType() == Properties.TYPE_PERFECT_UNQ_PAIR);
+        
+        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, seqPair.getType());
+        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPair.getSeqPairId());
         mapping2.setMateAlignmentStart(mapping1.getAlignmentStart());
+        mapping2.setMateNegativeStrandFlag(mapping1.getReadNegativeStrandFlag());
+        mapping2.setProperPairFlag(seqPair.getType() == Properties.TYPE_PERFECT_PAIR || seqPair.getType() == Properties.TYPE_PERFECT_UNQ_PAIR);
+        
+        if (mapping1.getAlignmentStart() < mapping2.getAlignmentStart()) { //different chromosomes means there is no distance here according to sam spec. Still think about a solution for stats
+            mapping1.setInferredInsertSize(seqPair.getDistance());
+            mapping2.setInferredInsertSize(-seqPair.getDistance());
+        } else {
+            mapping1.setInferredInsertSize(-seqPair.getDistance());
+            mapping2.setInferredInsertSize(seqPair.getDistance());
+        }
+        
         this.samBamFileWriter.addAlignment(mapping1);
         this.samBamFileWriter.addAlignment(mapping2);
+        this.seqPairSizeDistribution.increaseDistribution(seqPair.getDistance());
+        this.statsContainer.incSeqPairStats(seqPair.getType(), 1);
     }
     
     /**
@@ -521,10 +526,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         if (!(omitList.contains(record1) || omitList.contains(record2))) {
             this.addClassificationData(record1);
             this.addClassificationData(record2);
-            this.addPairedRecord(record1, record2, potPair.getSeqPairId(), potPair.getType());
+            this.addPairedRecord(potPair);
             omitList.add(record1);
             omitList.add(record2);
-            //TODO: replicate filtering in fetching the seq pairs!
         }
     }
 
@@ -533,12 +537,58 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * pair and classification attributes.
      * @param record the unpaired record to write
      * @param seqPairId the sequence pair id of this single record
+     * @param mateUnmapped true, if the mate of this mapping is unmapped, false
+     * if it is mapped, but does not form a pair with this record
      */
-    private void addSingleRecord(SAMRecord record, int seqPairId) {
+    private void addSingleRecord(SAMRecord record, int seqPairId, boolean mateUnmapped) {
+        if (mateUnmapped) {
+            record.setMateReferenceName("*");
+            record.setMateAlignmentStart(0);
+        }
+        record.setMateUnmappedFlag(mateUnmapped);
+        record.setNotPrimaryAlignmentFlag(!mateUnmapped);
         this.addClassificationData(record);
         record.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, Properties.TYPE_UNPAIRED_PAIR);
         record.setAttribute(Properties.TAG_SEQ_PAIR_ID, seqPairId);
         this.samBamFileWriter.addAlignment(record);
+        this.statsContainer.incSeqPairStats(Properties.TYPE_UNPAIRED_PAIR, 1);
+    }
+
+    /**
+     * Updated the sequence pair for a given sequence pair. If both reads are
+     * only mapped once, the corresponding unique sequence pair type is chosen.
+     * @param seqPair the sequence pair to update in case it is unique
+     */
+    private void setSeqPairForType(DirectSeqPair seqPair) {
+        Integer mapCount1 = this.getMapCount(seqPair.getRecord1());
+        Integer mapCount2 = this.getMapCount(seqPair.getRecord2());
+        if (mapCount1 != null && mapCount2 != null && mapCount1 == 1 && mapCount2 == 1) {
+            switch (seqPair.getType()) {
+                case Properties.TYPE_PERFECT_PAIR : seqPair.setType(Properties.TYPE_PERFECT_UNQ_PAIR); break;
+                case Properties.TYPE_DIST_SMALL_PAIR : seqPair.setType(Properties.TYPE_DIST_SMALL_UNQ_PAIR); break;
+                case Properties.TYPE_DIST_LARGE_PAIR : seqPair.setType(Properties.TYPE_DIST_LARGE_UNQ_PAIR); break;
+                case Properties.TYPE_ORIENT_WRONG_PAIR : seqPair.setType(Properties.TYPE_ORIENT_WRONG_UNQ_PAIR); break;
+                case Properties.TYPE_OR_DIST_SMALL_PAIR : seqPair.setType(Properties.TYPE_OR_DIST_SMALL_UNQ_PAIR); break;
+                case Properties.TYPE_OR_DIST_LARGE_PAIR : seqPair.setType(Properties.TYPE_OR_DIST_LARGE_UNQ_PAIR); break;
+                default: //change nothing
+            }
+        }
+    }
+
+    /**
+     * Calculates the mapping count of a sam record. Note, that the count can be
+     * null, if no classification was carried out until now.
+     *
+     * @param record the record whose mapping count is needed
+     * @return the mapping count of the given sam record
+     */
+    private Integer getMapCount(SAMRecord record) {
+        Integer mapCount = null;
+        String readName = ParserCommonMethods.elongatePairedReadName(record);
+        if (this.classificationMap.get(readName) != null) {
+            mapCount = this.classificationMap.get(readName).getFirst();
+        }
+        return mapCount;
     }
 
     @Override
@@ -571,10 +621,11 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * @param dist distance in bases
      * @param deviation deviation in % (1-100)
      */
-    private void calculateMinAndMaxDist(final int dist, final int deviation) {
+    protected int calculateMinAndMaxDist(final int dist, final int deviation) {
         int devInBP = dist / 100 * deviation;
         this.minDist = dist - devInBP;
         this.maxDist = dist + devInBP;
+        return maxDist;
     }
 
     /**
@@ -584,8 +635,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * @param differences the number of differences the record has to the reference
      */
     private void addClassificationData(SAMRecord record,  int differences) {
-        if (this.classificationMap.get(record.getReadName()) != null) {
-            int lowestDiffRate = this.classificationMap.get(record.getReadName()).getSecond();
+        String readName = ParserCommonMethods.elongatePairedReadName(record);
+        if (this.classificationMap.get(readName) != null) {
+            int lowestDiffRate = this.classificationMap.get(readName).getSecond();
 
             if (differences == 0) { //perfect mapping
                 record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
@@ -599,9 +651,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
             } else { //meaning: differences < lowestDiffRate
                 this.notifyObservers("Cannot contain less than the lowest diff rate number of errors!");
             }
-            record.setAttribute(Properties.TAG_MAP_COUNT, this.classificationMap.get(record.getReadName()).getFirst());
+            record.setAttribute(Properties.TAG_MAP_COUNT, this.classificationMap.get(readName).getFirst());
         } else {
-            //TODO: currently no data is added to reads with errors, since they are not contained in the classification map
+            //currently no data is added to reads with errors, since they are not contained in the classification map
         }
     }
     
@@ -619,4 +671,18 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         this.addClassificationData(record, differences);
     }
 
+    /**
+     * Sets the stats container to keep track of statistics for this track.
+     * @param statsContainer The stats container to add
+     */
+    public void setStatsContainer(StatsContainer statsContainer) {
+        this.statsContainer = statsContainer;
+    }
+
+    /**
+     * @return The stats container to keep track of statistics for this track.
+     */
+    public StatsContainer getStatsContainer() {
+        return statsContainer;
+    }
 }

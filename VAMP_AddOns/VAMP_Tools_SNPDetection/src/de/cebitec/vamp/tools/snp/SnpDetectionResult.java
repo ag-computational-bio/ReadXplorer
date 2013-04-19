@@ -147,7 +147,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         List<Object> statisticsExport;
         
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("SNP detection for tracks:", 
-                GeneralUtils.generateConcatenatedString(this.getTrackNameList())));
+                GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
         

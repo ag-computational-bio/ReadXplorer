@@ -368,16 +368,14 @@ public class MySQLStatements {
                 "C."+FieldNames.COVERAGE_TRACK+" = ? AND " +
                 "C."+FieldNames.COVERAGE_POSITION+" = A."+FieldNames.DIFF_POSITION;
     
-    //public final static String FETCH_SNPS_FROM_SNP_TABLE =
-    //        "SELECT "
     
-        public static final String SETUP_COVERAGE_DISTRIBUTION = 
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COVERAGE_DISTRIBUTION + " ( "
-            + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " BIGINT UNSIGNED NOT NULL,"
-            + " INDEX (" + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + ")) ";
+        public static final String SETUP_COUNT_DISTRIBUTION = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COUNT_DISTRIBUTION + " ( "
+            + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COUNT_DISTRIBUTION_DISTRIBUTION_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COUNT_DISTRIBUTION_BIN_COUNT + " BIGINT UNSIGNED NOT NULL,"
+            + " INDEX (" + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + ")) ";
         
         
         /** Fetches all sequence pair data including replicates for the given interval. */

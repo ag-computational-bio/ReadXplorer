@@ -235,17 +235,17 @@ public class H2SQLStatements {
             + " (" + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID + " ) ";
     
     
-    public static final String SETUP_COVERAGE_DISTRIBUTION = 
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COVERAGE_DISTRIBUTION + " ( "
-            + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE + " TINYINT UNSIGNED NOT NULL, "
-            + FieldNames.COVERAGE_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.COVERAGE_DISTRIBUTION_INC_COUNT + " BIGINT UNSIGNED NOT NULL ) ";
+    public static final String SETUP_COUNT_DISTRIBUTION = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_COUNT_DISTRIBUTION + " ( "
+            + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COUNT_DISTRIBUTION_DISTRIBUTION_TYPE + " TINYINT UNSIGNED NOT NULL, "
+            + FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.COUNT_DISTRIBUTION_BIN_COUNT + " BIGINT UNSIGNED NOT NULL ) ";
     
     
-    public static final String INDEX_COVERAGE_DIST = 
-            "CREATE INDEX IF NOT EXISTS INDEX_COVERAGE_DIST ON " + FieldNames.TABLE_COVERAGE_DISTRIBUTION
-            + " (" + FieldNames.COVERAGE_DISTRIBUTION_TRACK_ID + " ) ";
+    public static final String INDEX_COUNT_DIST = 
+            "CREATE INDEX IF NOT EXISTS INDEX_COUNT_DIST ON " + FieldNames.TABLE_COUNT_DISTRIBUTION
+            + " (" + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " ) ";
   
     //////////////////////////////////////////////////////////////////////////////////////////
     //fetch data querries ////////////////////////////////////////////////////////////////////
