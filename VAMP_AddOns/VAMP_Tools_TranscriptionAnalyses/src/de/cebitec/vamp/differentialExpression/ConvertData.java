@@ -34,6 +34,7 @@ public class ConvertData {
 
     private static List<Pair<Double, Double>> convertDESeqResults(Vector<Vector> resultTable) {
         List<Pair<Double, Double>> ret = new ArrayList<>();
+        //For GNU R Version:
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();
             Double R = (Double) row.get(3);
@@ -41,6 +42,14 @@ public class ConvertData {
             Pair<Double, Double> MA = createMAvalues(G,R);
             ret.add(MA);            
         }
+//        //For new, Java internal Version
+//        for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
+//            Vector row = it.next();
+//            Double R = (Double) row.get(4);
+//            Double G = (Double) row.get(6);
+//            Pair<Double, Double> MA = createMAvalues(G,R);
+//            ret.add(MA);            
+//        }
         return ret;
     }
 
