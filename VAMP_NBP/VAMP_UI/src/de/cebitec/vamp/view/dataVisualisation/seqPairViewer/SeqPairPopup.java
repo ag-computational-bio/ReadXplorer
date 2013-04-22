@@ -49,7 +49,7 @@ public class SeqPairPopup extends JPopupMenu {
     }
     
     private void initDataAndComponents() {
-        PersistantSeqPairGroup seqPairData = this.getSeqPairInfoFromDB();
+        PersistantSeqPairGroup seqPairData = this.getSeqPairInfoFromDB(); //TODO: get infos from elswhere
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));

@@ -181,8 +181,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
 
                             samRecord.setReferenceName(this.refSeqName);
                             samRecord.setAlignmentStart(start);
-                            samRecord.setMappingQuality(255); //255 means not available, can it even be retrieved from a jok anyway?
-                            samRecord.setCigarString(cigar); //seq of MID... match, insert, del... generate
+                            samRecord.setMappingQuality(255); //255 means not available, cannot be retrieved from a jok
+                            samRecord.setCigarString(cigar); //seq of MID... match, insert, del...
                             samRecord.setMateReferenceName("*"); //* means that no information about pairs is available, see if you can get this for pairs somewhere
                             samRecord.setMateAlignmentStart(0); //0 means that no information about pairs is available, see if you can get this for pairs somewhere
                             samRecord.setInferredInsertSize(0); //TLEN is set to 0 for single-segment template                   

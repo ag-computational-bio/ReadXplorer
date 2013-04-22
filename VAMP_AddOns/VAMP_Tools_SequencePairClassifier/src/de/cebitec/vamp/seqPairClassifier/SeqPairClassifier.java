@@ -41,9 +41,6 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
     private short orienation; //orientation of the reads: 0 = fr, 1 = rf, 2 = ff/rr
     private String errorMsg;
     private ParsedSeqPairContainer seqPairContainer;
-    private int average_Seq_Pair_Length = 0;
-    private int add_Seq_Pair_length = 0;
-    private int count_Seq_Pair = 0;
 
     /**
      * Empty constructor, because nothing to do yet. But don't forget to set
@@ -177,10 +174,6 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
          * <-r2(-1)- -r1(1)-> (stop2 < start1) 2 = ff -r1(1)-> -r2(1)->
          * (stop1<start2) oder <-r2(-1)- <-r1(-1)- (stop2 < start1)
          */
-
-        // For estimating the pair size
-//        int count = 0;
-//        int overall = 0;
         
         while (it1.hasNext()) { //block for one readname
             currReadname = it1.next();
@@ -219,27 +212,23 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                         if (currDist <= this.maxDist && currDist >= this.minDist) {
 
                             // For estimating pair size
-//                            System.out.println("curr dist: " + currDist);
-//                            ++count;
-//                            overall += currDist;
-//                            System.out.println("Overall dist: " + overall / count);
                             ///////////////////////////// found a perfect pair! /////////////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR, currDist);
                         } else if (currDist < this.maxDist) { //both reads of pair mapped, but distance in reference is different
                             ///////////////////////////// imperfect pair, distance too small /////////////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist);
                         } else { //////////////// imperfect pair, distance too large //////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_DIST_LARGE_PAIR);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_DIST_LARGE_PAIR, currDist);
                         }
                     } else { //////////////////////////// inversion of one read ////////////////////////////////
                         currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
                         
                         if (currDist <= this.maxDist && currDist >= this.minDist) {////distance fits, orientation not ///////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR, currDist);
                         } else if (currDist < this.maxDist) {///// orientation wrong & distance too small //////////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist);
                         } else { //////////////// orientation wrong & distance too large //////////////////////////
-                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_LARGE_PAIR);
+                            this.addPairedMapping(parsedMapping1.getID(), parsedMapping2.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_LARGE_PAIR, currDist);
                         }
                     }
                 } else {
@@ -270,22 +259,21 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                                     if (currDist <= this.maxDist && currDist >= this.minDist) { //distance fits
                                         ///////////////////////////// found a perfect pair! /////////////////////////////////
                                         if (parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) {
-                                            this.addPairedMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR);
+                                            this.addPairedMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR, currDist);
                                             omitIdList.add(parsedMappingA.getID());
                                             omitIdList.add(parsedMappingB.getID());
-                                            add_Seq_Pair_length += currDist;
-                                            count_Seq_Pair++;
+                                            seqPairContainer.getStatsContainer().getSeqPairSizeDistribution().increaseDistribution(currDist);
                                         } else {//////////////// store potential perfect pair //////////////////////////
-                                            potPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR));
+                                            potPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_PERFECT_PAIR, currDist));
                                         }
                                     } else //////////////// distance too small, potential pair //////////////////////////
                                     if (currDist < this.maxDist) {
                                         if (largestSmallerDist < currDist && parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) { //best mappings
                                             largestSmallerDist = currDist;
-                                            potSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR));
+                                            potSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist));
                                         } else if (largestPotSmallerDist < currDist) { //at least one common mapping in potential pair
                                             largestPotSmallerDist = currDist;
-                                            potPotSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR));
+                                            potPotSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist));
                                         }
                                     } else {//////////////// distance too large //////////////////////////
                                         //TODO: something to do??
@@ -295,17 +283,17 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                                     
                                     if (currDist <= this.maxDist && currDist >= this.minDist) { ////distance fits, orientation not ///////////
                                         if (parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) { //best mappings
-                                            unorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR));
+                                            unorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR, currDist));
                                         } else {
-                                            potUnorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR));
+                                            potUnorPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_ORIENT_WRONG_PAIR, currDist));
                                         }
                                     } else if (currDist < this.maxDist && largestSmallerDist < currDist) {///// orientation wrong & distance too small //////////////////////////////
                                         if (largestUnorSmallerDist < currDist && parsedMappingA.isBestMapping() && parsedMappingB.isBestMapping()) { //best mappings
                                             largestUnorSmallerDist = currDist;
-                                            unorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR));
+                                            unorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist));
                                         } else if (largestPotUnorSmallerDist < currDist) {
                                             largestPotUnorSmallerDist = currDist;
-                                            potUnorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR));
+                                            potUnorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist));
                                         }
                                     } else { //////////////// orientation wrong & distance too large //////////////////////////
                                         //TODO: something to do??
@@ -396,9 +384,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                 ++interimSeqPairId;
             }
         }
-        this.seqPairContainer.setNumOfSingleMappings(this.seqPairContainer.getMappingToPairIdList().size());
-        average_Seq_Pair_Length = add_Seq_Pair_length / count_Seq_Pair;
-        this.seqPairContainer.setAverage_Seq_Pair_length(average_Seq_Pair_Length);
+        this.seqPairContainer.getStatsContainer().incSeqPairStats(Properties.TYPE_UNPAIRED_PAIR, seqPairContainer.getMappingToPairIdList().size());
         
         this.notifyObservers(NbBundle.getMessage(SeqPairClassifier.class, "Classifier.Classification.Finish"));
         
@@ -427,10 +413,11 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
      * @param type type of the pair 0 = perfect, 1 = dist too large, 2 = dist
      * too small, 3 = orient wrong 4 = orient wrong and dist too large, 5 =
      * orient wrong and dist too small
+     * @param the sequence pair distance
      */
-    private void addPairedMapping(long mappingId1, long mappingId2, long seqPairId, byte type) {
+    private void addPairedMapping(long mappingId1, long mappingId2, long seqPairId, byte type, int distance) {
         
-        ParsedSeqPairMapping newSeqPair = new ParsedSeqPairMapping(mappingId1, mappingId2, seqPairId, type);
+        ParsedSeqPairMapping newSeqPair = new ParsedSeqPairMapping(mappingId1, mappingId2, seqPairId, type, distance);
         Pair<Long, Long> mappingIDs = new Pair<>(mappingId1, mappingId2);
         this.seqPairContainer.addParsedSeqPair(mappingIDs, newSeqPair);
     }
@@ -443,6 +430,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
             omitIdList.add(id1);
             omitIdList.add(id2);
         }
+        seqPairContainer.getStatsContainer().getSeqPairSizeDistribution().increaseDistribution(pairMapping.getDistance());
     }
     
     @Override

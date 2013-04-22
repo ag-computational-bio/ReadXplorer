@@ -26,7 +26,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
+          <Component id="seqPairPanel" alignment="0" max="32767" attributes="0"/>
           <Component id="progressbar" alignment="0" pref="188" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
@@ -141,7 +141,7 @@
                   <Component id="compPercentageLabel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <Component id="seqPairPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="progressbar" min="-2" pref="16" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
@@ -262,7 +262,7 @@
         <Property name="horizontalTextPosition" type="int" value="2"/>
       </Properties>
     </Component>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="seqPairPanel">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
@@ -280,16 +280,16 @@
                       <Component id="singleMappingsLabel" min="-2" max="-2" attributes="0"/>
                       <Component id="numPerfSeqPairsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                       <Component id="numSeqPairsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="numUniqSeqPairsLabel" min="-2" max="-2" attributes="0"/>
-                      <Component id="numPerfUniqSeqPairsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="numSmallerPairsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="numLargerPairsLabel" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="numUniqSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
-                      <Component id="numPerfUniqSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
-                      <Component id="singleMappings" pref="41" max="32767" attributes="0"/>
-                      <Component id="numSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
-                      <Component id="numPerfSeqPairsAbsLabel" alignment="0" pref="41" max="32767" attributes="0"/>
+                      <Component id="nummallerPairsAbsLabel" alignment="0" pref="58" max="32767" attributes="0"/>
+                      <Component id="numLargerPairsAbsLabel" alignment="0" pref="58" max="32767" attributes="0"/>
+                      <Component id="singleMappings" pref="58" max="32767" attributes="0"/>
+                      <Component id="numSeqPairsAbsLabel" alignment="0" pref="58" max="32767" attributes="0"/>
+                      <Component id="numPerfSeqPairsAbsLabel" alignment="0" pref="58" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -310,13 +310,13 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="numUniqSeqPairsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="numUniqSeqPairsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
+                      <Component id="numSmallerPairsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="nummallerPairsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="numPerfUniqSeqPairsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="numPerfUniqSeqPairsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
+                      <Component id="numLargerPairsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="numLargerPairsAbsLabel" alignment="0" min="-2" pref="17" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -351,23 +351,23 @@
             <Property name="horizontalTextPosition" type="int" value="2"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numUniqSeqPairsLabel">
+        <Component class="javax.swing.JLabel" name="numSmallerPairsLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Unique Seq. Pairs:"/>
+            <Property name="text" type="java.lang.String" value="Smaller Seq. Pairs:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numUniqSeqPairsAbsLabel">
+        <Component class="javax.swing.JLabel" name="nummallerPairsAbsLabel">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="2"/>
             <Property name="horizontalTextPosition" type="int" value="2"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numPerfUniqSeqPairsLabel">
+        <Component class="javax.swing.JLabel" name="numLargerPairsLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Perf. Uniq. Seq. Pairs:"/>
+            <Property name="text" type="java.lang.String" value="Larger Seq. Pairs:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numPerfUniqSeqPairsAbsLabel">
+        <Component class="javax.swing.JLabel" name="numLargerPairsAbsLabel">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="2"/>
             <Property name="horizontalTextPosition" type="int" value="2"/>

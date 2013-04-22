@@ -18,11 +18,13 @@ import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import de.cebitec.vamp.seqPairClassifier.SamBamDirectSeqPairClassifier;
+import de.cebitec.vamp.seqPairClassifier.SamBamDirectSeqPairStatsParser;
 import de.cebitec.vamp.seqPairClassifier.SeqPairClassifier;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.StatsContainer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -72,8 +74,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         this.posTableJobs = posTableJobs;
         this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.name"));
         this.workunits = refJobs.size() + 2 * trackJobs.size() + 2 * seqPairJobs.size() + 2 * posTableJobs.size();
-
-//        this.validTracksRun = new HashMap<TrackJob, Boolean>();
     }
 
     private ParsedReference parseRefJob(ReferenceJob refGenJob) throws ParsingException, OutOfMemoryError {
@@ -325,6 +325,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
                         boolean success;
+                        StatsContainer statsContainer = new StatsContainer();
+                        statsContainer.prepareForTrack();
+                        statsContainer.prepareForSeqPairTrack();
 
                         if (!trackJob1.isAlreadyImported()) {
 
@@ -350,7 +353,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                         continue;
                                     }
 
-                                    //combine both tracks and continue with trackJob1
+                                    //combine both tracks and continue with trackJob1, they are unsorted now
                                     SamBamCombiner combiner = new SamBamCombiner(trackJob1, trackJob2, false, referenceSeq);
                                     combiner.registerObserver(this);
                                     success = combiner.combineData();
@@ -369,6 +372,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 MappingParserI mappingParser = trackJob1.getParser();
                                 mappingParser.registerObserver(this);
                                 //parser also deletes combined file or other writable input file
+                                mappingParser.setStatsContainer(statsContainer);
                                 Object parsingResult = mappingParser.parseInput(trackJob1, referenceSeq);
                                 if (lastWorkFile != trackJob1.getFile()) { //either combined or write protected orig file
                                     GeneralUtils.deleteOldWorkFile(lastWorkFile); //only delete, if file was changed during parsing
@@ -387,30 +391,50 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 SamBamDirectSeqPairClassifier samBamDirectSeqPairClassifier = new SamBamDirectSeqPairClassifier(
                                         seqPairJobContainer, referenceSeq, classificationMap);
                                 samBamDirectSeqPairClassifier.registerObserver(this);
+                                samBamDirectSeqPairClassifier.setStatsContainer(statsContainer);
                                 samBamDirectSeqPairClassifier.classifySeqPairs();
                                 
                                 //delete the combined file, if it was combined, otherwise the orig. file cannot be deleted
                                 GeneralUtils.deleteOldWorkFile(lastWorkFile);
 
                             } catch (OutOfMemoryError ex) {
-                                this.showMsg("Out of Memory error during parsing of direct access track: " + ex.toString());
+                                this.showMsg("Out of Memory error during parsing of direct access track: " + ex.getMessage());
                                 this.noErrors = false;
                                 continue;
                             } catch (Exception ex) {
-                                this.showMsg("Error during parsing of direct access track: " + ex.toString());
+                                this.showMsg("Error during parsing of direct access track: " + ex.getMessage());
+                                Exceptions.printStackTrace(ex);
                                 this.noErrors = false;
                                 continue;
                             }
-                        } //else case with 2 already imported tracks is prohibited
+                        } else { //else case with 2 already imported tracks is prohibited
+                            //we have to calculate the stats
+                            SamBamDirectSeqPairStatsParser statsParser = new SamBamDirectSeqPairStatsParser(seqPairJobContainer, referenceSeq, null);
+                            statsParser.setStatsContainer(statsContainer);
+                            try {
+                                statsParser.registerObserver(this);
+                                statsParser.classifySeqPairs();
+                            } catch (OutOfMemoryError ex) {
+                                this.showMsg("Out of Memory error during parsing of direct access track: " + ex.getMessage());
+                                this.noErrors = false;
+                                continue;
+                            } catch (Exception ex) {
+                                this.showMsg("Error during parsing of direct access track: " + ex.getMessage());
+                                Exceptions.printStackTrace(ex);
+                                this.noErrors = false;
+                                continue;
+                            }
+                        }
 
                         //create position table
                         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
+                        posTableCreator.addStatsContainer(statsContainer);
                         posTableCreator.registerObserver(this);
                         ParsedTrack track = posTableCreator.createPosTable(trackJob1, referenceSeq);
                         posTableCreator.removeObserver(this);
 //                            posTableCreator.getStatistics();
 
-                        this.storeDirectAccessTrack(track); // store track entry in db
+                        this.storeDirectAccessTrack(track, true); // store track entry in db
                         trackId1 = trackJob1.getID();
                         inputFile1.setWritable(true);
                     }
@@ -566,7 +590,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 success = (boolean) trackJob.getParser().convert(trackJob, referenceSeq);
                 File lastWorkFile = trackJob.getFile();
 
-                //generate classification data in sorted file
+                //generate classification data in file sorted by read sequence
                 mappingParser.registerObserver(this);
                 Object parsingResult = mappingParser.parseInput(trackJob, referenceSeq);
                 GeneralUtils.deleteOldWorkFile(lastWorkFile); //since input file is read only!
@@ -584,27 +608,30 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 }
 
             } catch (OutOfMemoryError ex) {
-                this.showMsg("Out of memory error during parsing of direct access track: " + ex.toString());
+                this.showMsg("Out of memory error during parsing of direct access track: " + ex.getMessage());
                 this.noErrors = false;
                 return;
             } catch (Exception ex) {
-                this.showMsg("Error during parsing of direct access track: " + ex.toString());
+                this.showMsg("Error during parsing of direct access track: " + ex.getMessage());
                 Exceptions.printStackTrace(ex); //TODO: remove this error handling
                 this.noErrors = false;
                 return;
             }
             inputFile.setWritable(true);
             mappingParser.removeObserver(this);
-        }
+        } 
 
         //generate position table and statistics data for track
         //file needs to be sorted by coordinate for efficient calculation
         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
+        StatsContainer statsContainer = new StatsContainer();
+        statsContainer.prepareForTrack();
+        posTableCreator.addStatsContainer(statsContainer);
         posTableCreator.registerObserver(this);
         ParsedTrack track = posTableCreator.createPosTable(trackJob, referenceSeq);
         posTableCreator.removeObserver(this);
 
-        this.storeDirectAccessTrack(track);
+        this.storeDirectAccessTrack(track, false);
     }
 
     @Override
@@ -691,12 +718,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     /**
      * Stores a direct access track in the database and gives appropriate status messages.
      * @param trackJob the information about the track to store
+     * @param seqPairs true, if this is a sequence pair import, false otherwise
      */
-    private void storeDirectAccessTrack(ParsedTrack track) {
+    private void storeDirectAccessTrack(ParsedTrack track, boolean seqPairs) {
         try {
             io.getOut().println(track.getTrackName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
             ProjectConnector.getInstance().storeDirectAccessTrack(track);
             ProjectConnector.getInstance().storeTrackStatistics(track);
+            if (seqPairs) {
+                ProjectConnector.getInstance().storeSeqPairTrackStatistics(track.getStatsContainer(), track.getID());
+            }
             io.getOut().println(this.getBundleString("MSG_ImportThread.import.success.trackdirect"));
             
         } catch(OutOfMemoryError e) {
@@ -725,7 +756,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.extension", trackJob.getFile().getName()));
             long start = System.currentTimeMillis();
             
-            //sort file again by genome coordinate (position) & store classification data
+            //sorts file again by genome coordinate (position) & stores classification data
             SamBamExtender bamExtender = new SamBamExtender(classificationMap);
             bamExtender.setDataToConvert(trackJob, refSeq);
             bamExtender.registerObserver(this);

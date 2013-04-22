@@ -7,7 +7,6 @@ import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observer;
-import java.util.Map;
 import org.openide.util.NbBundle;
 
 /**
@@ -55,12 +54,8 @@ public class TrackParser implements TrackParserI {
             track.setReadnameToSeqIdMap2(mappingParser.getSeqPairProcessor().getReadNameToSeqIDMap2());
 
             mappings = null;
-        } else if (mappingParser instanceof SamBamDirectParser) {
-            SamBamDirectParser parser = (SamBamDirectParser) mappingParser;
-            
-            Map<Integer, Integer> mappingInfos = track.getParsedMappingContainer().getMappingInfos();
-            mappingInfos.put(5, parser.getNbUniqueSeq());
-        }
+        } 
+        
         mappingParser.removeObserver(observer);
         mappingParser = null;
         System.gc();

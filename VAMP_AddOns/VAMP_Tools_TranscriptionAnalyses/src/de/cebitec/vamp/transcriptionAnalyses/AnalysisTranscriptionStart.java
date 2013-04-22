@@ -5,11 +5,11 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.vamp.databackend.dataObjects.DiscreteCountingDistribution;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
+import de.cebitec.vamp.util.DiscreteCountingDistribution;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
@@ -115,8 +115,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.refSeqLength = trackConnector.getRefSequenceLength();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);   
         
-        this.covIncreaseDistribution = trackConnector.getCoverageIncreaseDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
-        this.covIncPercentDistribution = trackConnector.getCoverageIncreaseDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
+        this.covIncreaseDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
+        this.covIncPercentDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
         this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
         
         if (this.tssAutomatic) {
@@ -195,7 +195,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         System.arraycopy(revMultCov, 0, newRevMultCov, 1, revMultCov.length);
         coverage.setBestMatchFwdMult(newFwdMultCov);
         coverage.setBestMatchRevMult(newRevMultCov);
-
+        
         if (this.calcCoverageDistributions) { //this way code is duplicated, but if clause only evaluated once
             for (int i = fixedLeftBound; i < rightBound; ++i) {
                 
@@ -538,7 +538,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
          * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
          */
         
-        return distribution.getMinCountForIndex(selectedIndex - 1);
+        return distribution.getMinValueForIndex(selectedIndex - 1);
     }
 
     /**
@@ -564,8 +564,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void storeDistributions() {
         if (this.calcCoverageDistributions) { //if it was calculated, also store it
-            this.trackConnector.insertCoverageDistribution(covIncreaseDistribution);
-            this.trackConnector.insertCoverageDistribution(covIncPercentDistribution);
+            ProjectConnector.getInstance().insertCountDistribution(covIncreaseDistribution, this.trackConnector.getTrackID());
+            ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
             if (this.tssAutomatic) {
                 this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0);//(int) (this.genomeSize * 0.0005));
                 this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);//(int) (this.genomeSize * 0.0005));

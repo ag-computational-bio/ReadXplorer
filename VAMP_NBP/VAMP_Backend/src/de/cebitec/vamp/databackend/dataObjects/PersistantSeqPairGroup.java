@@ -1,5 +1,6 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Properties;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class PersistantSeqPairGroup {
     private List<PersistantMapping> singleMappings;
 //    private boolean hasNewRead; //set true when new read was added until this variable was send to the observers
 //    private ArrayList<Observer> observers;
+    private List<FeatureType> excludedFeatureTypes;
 
     public PersistantSeqPairGroup(){
 //        observers = new ArrayList<Observer>();
@@ -38,7 +40,7 @@ public class PersistantSeqPairGroup {
         
         boolean stored = false;
         if (type != Properties.TYPE_UNPAIRED_PAIR) {
-            for (PersistantSequencePair seqPair : this.seqPairs) {
+            for (PersistantSequencePair seqPair : this.seqPairs) { //TODO: exponential!!! reduce complexity by hash or else...
 
                 if (mapping.getId() == seqPair.getVisibleMapping().getId()
                         || mapping.getId() == seqPair.getMapping2Id() && seqPair.hasVisibleMapping2()) {
@@ -74,6 +76,7 @@ public class PersistantSeqPairGroup {
      * PersistantSequencePair, if necessary.
      * @param mapping the mapping to add to the group
      * @param type type of the sequence pair this mapping is belonging to (
+     * @param bothVisible true, if both mappings of the pair are visible
      * @see de.cebitec.vamp.util.Properties)
      */
     public void addPersistantDirectAccessMapping(PersistantMapping mapping, byte type, boolean bothVisible) {
@@ -153,5 +156,9 @@ public class PersistantSeqPairGroup {
 //        }
 //        this.hasNewRead = false;
 //    }
+
+    public void setExcludedFeatureTypes(List<FeatureType> excludedFeatureTypes) {
+        this.excludedFeatureTypes = excludedFeatureTypes;
+    }
     
 }

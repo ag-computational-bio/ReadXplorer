@@ -17,7 +17,7 @@ public class LayerPair implements LayerI {
      * Contains a single layer of blocks belonging to  one sequence pair.
      */
     public LayerPair(){
-        blocks = new ArrayList<BlockI>();
+        blocks = new ArrayList<>();
     }
 
     @Override
@@ -30,7 +30,7 @@ public class LayerPair implements LayerI {
         
         //start und stop hier
         StringBuilder sb = new StringBuilder();
-        for(BlockI b : blocks){
+        for (BlockI b : blocks) {
             sb.append(b.toString());
         }
 

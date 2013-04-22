@@ -350,6 +350,7 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButton1ActionPerformed
+        this.getMappingFiles().clear();
         this.openFileChooser(true);
 }//GEN-LAST:event_chooseButton1ActionPerformed
 

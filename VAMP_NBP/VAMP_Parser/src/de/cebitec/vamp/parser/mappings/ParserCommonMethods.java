@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sf.samtools.SAMRecord;
 import org.openide.util.NbBundle;
 
 /**
@@ -548,6 +549,21 @@ public final class ParserCommonMethods {
         }
         stopPosition = startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
         return stopPosition;
+    }
+    
+    /**
+     * Adds a "1" or "2" at the end of the given records read name, if it is a
+     * paired read.
+     * @param record the record whose read name should be elongated, if it is a
+     * paired read
+     * @return The elongated read name
+     */
+    public static String elongatePairedReadName(SAMRecord record) {
+        String readName = record.getReadName();
+        if (record.getReadPairedFlag()) {
+            readName = readName.concat(record.getFirstOfPairFlag() ? "1" : "2");
+        }
+        return readName;
     }
 
     /**

@@ -153,7 +153,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
 
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
                 "Transcription start site detection statistics for tracks:", 
-                GeneralUtils.generateConcatenatedString(this.getTrackNameList())));
+                GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
 

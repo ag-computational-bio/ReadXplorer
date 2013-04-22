@@ -157,7 +157,7 @@ public final class SNP_DetectionTopComponent extends TopComponent {
         snpTabs.setTabComponentAt(snpTabs.getTabCount() - 1, new TabWithCloseX(snpTabs));
         
         if (snpData.getSnpList().size() > 0) {
-            String tracksString = GeneralUtils.generateConcatenatedString(snpData.getTrackNameList());
+            String tracksString = GeneralUtils.generateConcatenatedString(snpData.getTrackNameList(), 120);
             title = "SNP Detection for " + tracksString + " ("
                     + snpData.getSnpList().size() + " hits)";
             snpTabs.setTitleAt(snpTabs.getTabCount() - 1, title);

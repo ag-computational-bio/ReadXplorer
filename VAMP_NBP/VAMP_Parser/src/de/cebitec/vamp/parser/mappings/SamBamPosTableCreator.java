@@ -7,16 +7,16 @@ import de.cebitec.vamp.parser.common.ParsedMapping;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.util.Benchmark;
+import de.cebitec.vamp.util.DiscreteCountingDistribution;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.StatsContainer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
@@ -35,7 +35,8 @@ public class SamBamPosTableCreator implements Observable {
 
     private List<Observer> observers;
     private CoverageContainer coverageContainer;
-    private Map<Integer, Integer> mappingInfos;
+    private StatsContainer statsContainer;
+    private DiscreteCountingDistribution readLengthDistribution;
     
     /**
      * Creates and stores the position table for a sam or bam file, which needs
@@ -45,7 +46,8 @@ public class SamBamPosTableCreator implements Observable {
     public SamBamPosTableCreator() {
         this.observers = new ArrayList<>();
         this.coverageContainer = new CoverageContainer();
-        this.mappingInfos = new HashMap<>();
+        this.readLengthDistribution = new DiscreteCountingDistribution(400);
+        readLengthDistribution.setType(Properties.READ_LENGTH_DISTRIBUTION);
     }
     
     /**
@@ -56,6 +58,7 @@ public class SamBamPosTableCreator implements Observable {
      * @param refSeqWhole reference genome sequence
      * @return  
      */
+    @SuppressWarnings("fallthrough")
     public ParsedTrack createPosTable(TrackJob trackJob, String refSeqWhole) {
         
         long startTime = System.currentTimeMillis();
@@ -71,13 +74,8 @@ public class SamBamPosTableCreator implements Observable {
         int lineno = 0;
         
         String lastReadSeq = "";
-        String readName = "";
-        int noReads = 0;
-        int noUniqueMappings = 0;
-        int noBestMatch = 0;
-        int noPerfect = 0;
-        List<String> readNamesSameSeq = new ArrayList<>();
         List<Integer> readsDifferentPos = new ArrayList<>();
+        int seqCount = 0;
 
         ParsedMapping mapping;
         String refSeq;
@@ -89,6 +87,7 @@ public class SamBamPosTableCreator implements Observable {
         String readSeq;
         String cigar;
         int readClass;
+        int mapCount;
         DiffAndGapResult diffGapResult;
         List<Pair<Integer, Integer>> coveredCommonIntervals = new ArrayList<>();
         List<Pair<Integer, Integer>> coveredBestMatchIntervals = new ArrayList<>();
@@ -96,9 +95,10 @@ public class SamBamPosTableCreator implements Observable {
         coveredCommonIntervals.add(new Pair<>(0, 0));
         coveredBestMatchIntervals.add(new Pair<>(0, 0));
         coveredPerfectIntervals.add(new Pair<>(0, 0));
-        int lastIndex;
         Integer classification;
+        Integer mappingCount;
         ErrorLimit errorLimit = new ErrorLimit();
+        List<String> readNameList = new ArrayList<>();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
@@ -118,44 +118,71 @@ public class SamBamPosTableCreator implements Observable {
                         readSeq = record.getReadString();
                         refSeq = refSeqWhole.substring(start - 1, stop);
 
-                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
-                        if (classification != null) {
-                            readClass = (int) classification;
-                        } else {
-                            readClass = Properties.COMPLETE_COVERAGE;
-                        }
-
                         if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
                         //statistics calculations: count no reads and distinct sequences ////////////
-                        if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when mapping to diff. pos
-                            noReads += readNamesSameSeq.size();
-                            if (readsDifferentPos.size() == 1) {
-                                ++noUniqueMappings;
-                            }
-                            readNamesSameSeq.clear();
-                            readsDifferentPos.clear();
+                        if (!readNameList.contains(record.getReadName())) {
+                            readNameList.add(record.getReadName());
                         }
-                        if (!readNamesSameSeq.contains(readName)) {
-                            readNamesSameSeq.add(readName);
+                        mappingCount = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                        if (mappingCount != null) {
+                            mapCount = mappingCount;
+                        } else {
+                            mapCount = 0;
+                        }
+
+                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                        if (classification != null) {
+                            readClass = classification;
+                            if (mapCount == 1) {
+                                switch (classification) { //fallthrough is necessary
+                                    case (int) Properties.PERFECT_COVERAGE: 
+                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_MAPPINGS, mapCount);
+                                    case (int) Properties.BEST_MATCH_COVERAGE:
+                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_BM_MAPPINGS, mapCount);
+                                    default:
+                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
+                                }
+                            }
+                        } else {
+                            readClass = Properties.COMPLETE_COVERAGE;
+                            if (mapCount == 1) {
+                                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
+                            }
+                        }
+                        readLengthDistribution.increaseDistribution(readSeq.length());
+                        
+                        if (!lastReadSeq.equals(readSeq)) { //same seq counted multiple times when multiple reads with same sequence
+                            if (readsDifferentPos.size() == 1) { //1 means all reads since last clean started at same pos
+                                if (seqCount == 1) { // only one sequence found at same position
+                                    statsContainer.increaseValue(StatsContainer.NO_UNIQUE_SEQS, seqCount);
+                                } else {
+                                    statsContainer.increaseValue(StatsContainer.NO_REPEATED_SEQ, 1);
+                                    //counting the repeated seq and not in how many reads they are contained
+                                }
+                            }
+                            readsDifferentPos.clear();
                         }
                         if (!readsDifferentPos.contains(start)) {
                             readsDifferentPos.add(start);
+                            seqCount = 0;
                         }
+                        ++seqCount;
                         lastReadSeq = readSeq;
 
                         this.updateIntervals(coveredCommonIntervals, start, stop);
                         if (readClass == Properties.PERFECT_COVERAGE) {
                             this.updateIntervals(coveredPerfectIntervals, start, stop);
                             this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                            ++noPerfect;
-                            ++noBestMatch;
+                            statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, 1);
+                            statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, 1);
                         } else if (readClass == Properties.BEST_MATCH_COVERAGE) {
                             this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                            ++noBestMatch;
+                            statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, 1);
                         }
+                        statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, 1);
                         ////////////////////////////////////////////////////////////////////////
 
                         if (classification == null
@@ -223,7 +250,7 @@ public class SamBamPosTableCreator implements Observable {
                 
             }
             if (errorLimit.getSkippedCount()>0) {
-                     this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
+                 this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
             }
             samItor.close();
 
@@ -237,20 +264,15 @@ public class SamBamPosTableCreator implements Observable {
         coverageContainer.setCoveredCommonMatchPositions(this.getCoveredBases(coveredCommonIntervals));
         coverageContainer.setCoveredBestMatchPositions(this.getCoveredBases(coveredBestMatchIntervals));
         coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
-        
-        mappingInfos.put(1, -1); //no of mappings not existent, since we work on existing reads
-        mappingInfos.put(2, noPerfect);
-        mappingInfos.put(3, noBestMatch);
-        mappingInfos.put(4, noUniqueMappings);
-        mappingInfos.put(6, noReads);
 
-        ParsedMappingContainer statsContainer = new ParsedMappingContainer();
-        statsContainer.setMappingInfos(this.mappingInfos);
-        track = new ParsedTrack(trackJob, statsContainer, coverageContainer);
+        track = new ParsedTrack(trackJob, new ParsedMappingContainer(), coverageContainer);
+        statsContainer.increaseValue(StatsContainer.NO_READS, readNameList.size());
+        statsContainer.setReadLengthDistribution(readLengthDistribution);
+        track.setStatsContainer(statsContainer);
         track.setBatchPos(nextBatch);
         this.notifyObservers(track);
-        this.mappingInfos = new HashMap<>();
         this.coverageContainer = new CoverageContainer();
+        readNameList.clear();
         
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamDirectParser.class, "PosTableCreator.Finished", fileName);
@@ -321,6 +343,21 @@ public class SamBamPosTableCreator implements Observable {
         } else { //increase length of first pair (start remains, stop is enlarged)
             coveredIntervals.get(lastIndex).setSecond(stop);
         }
-    }    
+    }   
+    
+    /**
+     * Adds a statistics parser for handling statistics for the extended track.
+     * @param statsContainer  the stats container
+     */
+    public void addStatsContainer(StatsContainer statsContainer) {
+        this.statsContainer = statsContainer;
+    }
+
+    /**
+     * @return The statistics parser for handling statistics for the extended track.
+     */
+    public StatsContainer getStatsContainer() {
+        return statsContainer;
+    }
     
 }

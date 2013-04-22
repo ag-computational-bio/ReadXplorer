@@ -63,8 +63,8 @@ public class ParsedMappingContainer {
      * <br>(1, numberOfMappings);
      * <br>(2, numberOfPerfect); 
      * <br>(3, numberOfBM); 
-     * <br>(4, numUniqueMappings); 
-     * <br>(5, numUniqueSeq); 
+     * <br>(4, numUniqueMappings); = reads that only map to one position in the reference
+     * <br>(5, numUniqueSeq); = reads whose sequence is unique in the data set 
      * <br>(6, numReads); 
      * <br>(7, sumReadLength);
      */

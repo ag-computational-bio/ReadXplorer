@@ -256,9 +256,10 @@ public class JFeature extends JComponent {
                     //add copy option
                     String selFeatureSequence = viewer.getReference().getSequence().substring(feature.getStart() - 1, feature.getStop());
                     popUp.add(menuItemFactory.getCopyItem(selFeatureSequence));
-                    
                     //add copy position option
                     popUp.add(menuItemFactory.getCopyPositionItem(refViewer.getCurrentMousePos()));
+                    //add center current position option
+                    popUp.add(menuItemFactory.getJumpToPosItem(refViewer.getBoundsInformationManager(), refViewer.getCurrentMousePos()));
 
                     //add store as fasta file option
                     popUp.add(menuItemFactory.getStoreFastaItem(selFeatureSequence, feature));

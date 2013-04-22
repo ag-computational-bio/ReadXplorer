@@ -1,5 +1,6 @@
 package de.cebitec.vamp.parser.mappings;
 
+import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.common.ParsingException;
@@ -38,5 +39,12 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
      *      contains all necessary information for a sequence pair import.
      */
     public SeqPairProcessorI getSeqPairProcessor();
+    
+    /**
+     * Sets the given stats container to this parser. Then this parser can
+     * store statistics.
+     * @param statsContainer the stats container to set
+     */
+    public void setStatsContainer(StatsContainer statsContainer);
 
 }

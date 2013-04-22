@@ -9,10 +9,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author rhilker
- * 
  * A BlockPair is a block that contains detailed information about 
  * one sequence pair id = all corresponding mappings in the currently visible interval.
+ * 
+ * @author rhilker
  */
 public class BlockPair implements BlockI {
 
@@ -27,6 +27,7 @@ public class BlockPair implements BlockI {
      * @param absStart start of the block as sequence position (might be larger than start of mapping, when not in visible interval)
      * @param absStop stop of the block as sequence position (might be smaller than stop of mapping, when not in visible interval)
      * @param seqPairs sequence pair whose detailed information is needed
+     * @param singleMappings single mappings of this block
      * @param seqPairId sequence pair id
      */
     public BlockPair(int absStart, int absStop, List<PersistantSequencePair> seqPairs, 
@@ -89,7 +90,7 @@ public class BlockPair implements BlockI {
     
     @Override
     public PersistantObject getPersistantObject() {
-        if (this.seqPairs.size() > 0){
+        if (this.seqPairs.size() > 0) { //TODO: this is not ideal, common mapping can be followed by perfect!
             return this.seqPairs.get(0);
         } else {
             return (PersistantObject) this.singleMappings.get(0);

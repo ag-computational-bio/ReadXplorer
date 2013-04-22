@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +28,8 @@ public class Layout implements LayoutI {
     public Layout(int absStart, int absStop, Collection<PersistantMapping> mappings, List<FeatureType> exclusionList) {
         this.absStart = absStart;
         this.absStop = absStop;
-        this.forwardLayers = new ArrayList<LayerI>();
-        this.reverseLayers = new ArrayList<LayerI>();
+        this.forwardLayers = new ArrayList<>();
+        this.reverseLayers = new ArrayList<>();
         this.forwardBlockContainer = new BlockContainer();
         this.reverseBlockContainer = new BlockContainer();
         this.exclusionList = exclusionList;
@@ -83,19 +83,22 @@ public class Layout implements LayoutI {
             PersistantMapping mapping = mappingIt.next();
             if (!this.inExclusionList(mapping)) {
 
-                // get start position
                 int start = mapping.getStart();
-                // get stop position
                 int stop = mapping.getStop();
                 
-                
                 if (mapping.getTrimmedFromLeft()>0) {
-                    if (mapping.isFwdStrand()) start = start - mapping.getTrimmedFromLeft();
-                    else stop = stop + mapping.getTrimmedFromLeft();
+                    if (mapping.isFwdStrand()) {
+                        start -= mapping.getTrimmedFromLeft();
+                    } else {
+                        stop += mapping.getTrimmedFromLeft();
+                    }
                 }
                 if (mapping.getTrimmedFromRight()>0) {
-                    if (mapping.isFwdStrand()) stop = stop + mapping.getTrimmedFromRight();
-                    else start = start - mapping.getTrimmedFromRight();
+                    if (mapping.isFwdStrand()) {
+                        stop += mapping.getTrimmedFromRight();
+                    } else {
+                        start -= mapping.getTrimmedFromRight();
+                    }
                 }
                 
                 if (start < this.absStart) {

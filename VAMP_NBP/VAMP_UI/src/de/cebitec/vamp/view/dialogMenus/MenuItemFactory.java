@@ -236,16 +236,16 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     
     /**
      * Creates a JMenuItem which updates the navigator bar associated with the given
-     * BoundsInfoManager to the new position, when it is pressed.
+     * BoundsInfoManager to the stop of the first cdsRegion, when it is pressed.
      * @param boundsManager the bounds info manager, whose navigator bar is to be updated
-     * @param cdsRegions the cds regions for which jumping to their start position should be enabled
+     * @param cdsRegions the cds regions for which jumping to their stop position should be enabled
      * @return the JMenuItem with the above described functionality
      */
-    public JMenuItem getJumpToPosItem(final BoundsInfoManager boundsManager, final List<Region> cdsRegions) {
+    public JMenuItem getJumpToStopPosItem(final BoundsInfoManager boundsManager, final List<Region> cdsRegions) {
         
-        final JMenuItem jumpToPosItem = new JMenuItem("Jump to associated stop codon");
+        final JMenuItem jumpToStopPosItem = new JMenuItem("Jump to associated stop codon");
         
-        jumpToPosItem.addActionListener(new ActionListener() {
+        jumpToStopPosItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -256,6 +256,27 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                         boundsManager.navigatorBarUpdated(cdsRegions.get(0).getStart());
                     }
                 }
+            }
+        });
+        return jumpToStopPosItem;
+    }
+    
+    /**
+     * Creates a JMenuItem which centers the navigator bar associated with the
+     * given BoundsInfoManager at the new position, when it is pressed.
+     * @param boundsManager the bounds info manager, whose navigator bar is to
+     * be updated
+     * @param pos the position to center
+     * @return the JMenuItem with the above described functionality
+     */
+    public JMenuItem getJumpToPosItem(final BoundsInfoManager boundsManager, final int pos) {
+
+        final JMenuItem jumpToPosItem = new JMenuItem("Center current position");
+
+        jumpToPosItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boundsManager.navigatorBarUpdated(pos);
             }
         });
         return jumpToPosItem;

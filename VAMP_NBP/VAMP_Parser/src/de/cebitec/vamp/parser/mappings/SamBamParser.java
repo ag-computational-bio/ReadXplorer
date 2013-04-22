@@ -1,17 +1,15 @@
 package de.cebitec.vamp.parser.mappings;
 
+import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
-import de.cebitec.vamp.parser.output.SamBamSorter;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.SamUtils;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.MissingResourceException;
-import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -275,4 +273,9 @@ public class SamBamParser implements MappingParserI {
     public SeqPairProcessorI getSeqPairProcessor() {
         return this.seqPairProcessor;
     }    
+
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        //do nothing right now
+    }
 }

@@ -9,12 +9,12 @@ import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.StatsContainer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.util.Exceptions;
 
 /**
  * Class for handling the data threads for one of the currently started
@@ -123,10 +123,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                         return;
                     }
                     if (track.getId() < trackConnector.getTrackID()) {
-                        numUnneededMappings += connector.getNumOfUniqueMappings();
+                        numUnneededMappings += connector.getTrackStats().getStatsMap().get(StatsContainer.NO_COMMON_MAPPINGS);
                     }
                 }
-                int numInterestingMappings = numUnneededMappings + trackConnector.getNumOfUniqueMappings();
+                int numInterestingMappings = numUnneededMappings + trackConnector.getTrackStats().getStatsMap().get(StatsContainer.NO_COMMON_MAPPINGS);
                 int from = numUnneededMappings;
                 int to = numInterestingMappings - numUnneededMappings > stepSize
                         ? numUnneededMappings + stepSize : numInterestingMappings;

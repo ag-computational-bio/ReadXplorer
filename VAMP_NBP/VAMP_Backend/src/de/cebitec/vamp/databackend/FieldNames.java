@@ -25,7 +25,7 @@ public class FieldNames {
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
     public final static String TABLE_POSITIONS = "POSITIONS";
     public final static String TABLE_STATISTICS = "STATISTICS";  
-    public final static String TABLE_COVERAGE_DISTRIBUTION = "COVERAGE_DISTRIBUTION";
+    public final static String TABLE_COUNT_DISTRIBUTION = "COUNT_DISTRIBUTION";
     public final static String TABLE_OBJECTCACHE = "OBJECT_CACHE"; 
     
     
@@ -156,34 +156,47 @@ public class FieldNames {
 
 
     // statistics table fields
-    public final static String STATISTICS_ID = "ID";
-    public final static String STATISTICS_TRACK_ID = "TRACK_ID";
-    public final static String STATISTICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
-    public final static String STATISTICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
-    public final static String STATISTICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
-//    public final static String STATISTICS_NUMBER_OF_MAPPED_SEQ = "NUMBER_OF_MAPPED_SEQ";
-    public final static String STATISTICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
-    public final static String STATISTICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
-    public final static String STATISTICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
-    public final static String STATISTICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
-    public final static String STATISTICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
-    public final static String STATISTICS_NUMBER_READS = "NUMBER_OF_READS";
-    public final static String STATISTICS_NUM_SEQUENCE_PAIRS = "NUM_SEQPAIRS";
-    public final static String STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS = "NUM_PERFECT_SEQPAIRS";
-    public final static String STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS = "NUM_UNIQUE_SEQPAIRS";
-    public final static String STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS = "NUM_UNIQUE_PERFECT_SEQPAIRS";
+    public static final String STATISTICS_ID = "ID";
+    public static final String STATISTICS_TRACK_ID = "TRACK_ID";
+    public static final String STATISTICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
+    public static final String STATISTICS_NUMBER_UNIQUE_BM_MAPPINGS = "NUMBER_UNIQUE_BM_MAPPINGS";
+    public static final String STATISTICS_NUMBER_UNIQUE_PERFECT_MAPPINGS = "NUMBER_UNIQUE_PERFECT_MAPPINGS";
+    public static final String STATISTICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
+    public static final String STATISTICS_NUMBER_OF_REPEATED_SEQ = "NUMBER_OF_REPEATED_SEQ";
+    public static final String STATISTICS_NUMBER_OF_MAPPINGS = "NUMBER_OF_MAPPINGS";
+    public static final String STATISTICS_NUMBER_OF_PERFECT_MAPPINGS = "NUMBER_OF_PERFECT_MAPPINGS";
+    public static final String STATISTICS_NUMBER_OF_BM_MAPPINGS = "NUMBER_OF_BM_MAPPINGS";
+    public static final String STATISTICS_PERFECT_COVERAGE_OF_GENOME = "PERFECT_COVERAGE_OF_GENOME";
+    public static final String STATISTICS_BM_COVERAGE_OF_GENOME = "BM_COVERAGE_OF_GENOME";
+    public static final String STATISTICS_COMPLETE_COVERAGE_OF_GENOME = "COVERAGE_OF_GENOME";
+    public static final String STATISTICS_NUMBER_READS = "NUMBER_OF_READS";
+    public static final String STATISTICS_NUM_SEQUENCE_PAIRS = "NUM_SEQPAIRS";
+    public static final String STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS = "NUM_UNIQUE_SEQPAIRS";
+    public static final String STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS = "NUM_PERFECT_SEQPAIRS";
+    public static final String STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS = "NUM_UNIQUE_PERFECT_SEQPAIRS";
     public static final String STATISTICS_NUM_SINGLE_MAPPINGS = "NUM_SINGLE_MAPPINGS";
+    public static final String STATISTICS_NUM_SMALL_DIST_PAIRS = "NUM_SMALL_DIST_PAIRS";
+    public static final String STATISTICS_NUM_UNIQ_SMALL_PAIRS = "NUM_UNIQ_SMALL_PAIRS";
+    public static final String STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS = "NUM_SMALL_ORIENT_WRONG_PAIRS";
+    public static final String STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS = "NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS";
+    public static final String STATISTICS_NUM_ORIENT_WRONG_PAIRS = "NUM_ORIENT_WRONG_PAIRS";
+    public static final String STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS = "NUM_UNIQ_ORIENT_WRNG_PAIRS";
+    public static final String STATISTICS_NUM_LARGE_DIST_PAIRS = "NUM_LARGE_DIST_PAIRS";
+    public static final String STATISTICS_NUM_UNIQ_LARGE_PAIRS = "NUM_UNIQ_LARGE_PAIRS";
+    public static final String STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS = "NUM_LARGE_ORIENT_WRONG_PAIRS";
+    public static final String STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS = "NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS";
     public static final String STATISTICS_AVERAGE_READ_LENGTH = "AVERAGE_READ_LENGTH";
     public static final String STATISTICS_AVERAGE_SEQ_PAIR_LENGTH= "AVERAGE_SEQPAIR_LENGTH";
+    
     
     // unique mappings = count all distinct mapping ids
     // unique sequences = num mapped seq = count all distinct seq ids
     // num mappings = count ALL mapping ids
     // num reads = extra calculation: count all reads during import process, also possible later
     
-    public static final String COVERAGE_DISTRIBUTION_TRACK_ID = "TRACK_ID";
-    public static final String COVERAGE_DISTRIBUTION_DISTRIBUTION_TYPE = "DISTRIBUTION_TYPE";
-    public static final String COVERAGE_DISTRIBUTION_COV_INTERVAL_ID = "COV_INTERVAL_ID";
-    public static final String COVERAGE_DISTRIBUTION_INC_COUNT = "INC_COUNT";
+    public static final String COUNT_DISTRIBUTION_TRACK_ID = "TRACK_ID";
+    public static final String COUNT_DISTRIBUTION_DISTRIBUTION_TYPE = "DISTRIBUTION_TYPE";
+    public static final String COUNT_DISTRIBUTION_COV_INTERVAL_ID = "BIN_INDEX";
+    public static final String COUNT_DISTRIBUTION_BIN_COUNT = "BIN_COUNT";
     
 }
