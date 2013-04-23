@@ -102,8 +102,11 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements Simp
     @Override
     public void update(SimpleTestI origin, SimpleTestStatus status) {
         if (status == SimpleTestStatus.FINISHED) {
+            ArrayList<ResultDeAnalysis> tmpRes = new ArrayList<>();
+            tmpRes.add(new ResultDeAnalysis(origin.getResults(), origin.getColumnNames(), origin.getRowNames(), "result"));
+            tmpRes.add(new ResultDeAnalysis(origin.getResultsNormalized(), origin.getColumnNames(), origin.getRowNames(), "normalized result"));
             results = new ArrayList<>();
-            results.add(new ResultDeAnalysis(origin.getResults(), origin.getColumnNames(), origin.getRowNames()));
+            results.addAll(tmpRes);
         }
     }
 

@@ -17,7 +17,7 @@ import java.util.Map;
 public class CollectCoverageData implements Observer {
 
     /**
-     * The whole sete of features for the current genome.
+     * The whole set of features for the current genome.
      */
     private List<PersistantFeature> genomeFeatures;
     /**
@@ -34,7 +34,7 @@ public class CollectCoverageData implements Observer {
      */
     private int startOffset;
     private int stopOffset;
-
+    
     /**
      * Constructor of the class.
      *

@@ -41,6 +41,15 @@ public interface SimpleTestI {
      * @return results of the analysis.
      */
     public Vector<Vector> getResults();
+    
+    /**
+     * Returns the normalized results of a Simple Test differential expression analysis.
+     * The Object array can be handed over directly to a JTable as the rowData
+     * argument.
+     *
+     * @return normalized results of the analysis.
+     */
+    public Vector<Vector> getResultsNormalized();
 
     /**
      * Returns the columnNames fitting the analysis run.
