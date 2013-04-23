@@ -82,7 +82,7 @@ public class CollectCoverageData implements Observer {
                         lastMappingIdx = j;
                         fstFittingMapping = false;
                     }
-                    int value = countData.get(feature) + 1;
+                    int value = countData.get(feature) + mapping.getNbReplicates();
                     countData.put(feature, value);
 
                     //still mappings left, but need next feature

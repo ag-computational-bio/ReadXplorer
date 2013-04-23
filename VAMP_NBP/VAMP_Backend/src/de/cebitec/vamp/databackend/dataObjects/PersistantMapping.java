@@ -55,10 +55,11 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * data. For this only start, stop and direction are needed. Everything else
      * isn't needed and can be left out in order to save some memory
      */
-    public PersistantMapping(int start, int stop, boolean isFwdStrand) {
+    public PersistantMapping(int start, int stop, boolean isFwdStrand, int count) {
         this.start = start;
         this.stop = stop;
         this.isFwdStrand = isFwdStrand;
+        this.count = count;
         this.unique = false;
     }
 

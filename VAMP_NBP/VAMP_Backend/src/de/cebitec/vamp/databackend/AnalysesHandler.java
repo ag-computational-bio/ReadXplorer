@@ -123,10 +123,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                         return;
                     }
                     if (track.getId() < trackConnector.getTrackID()) {
-                        numUnneededMappings += connector.getTrackStats().getStatsMap().get(StatsContainer.NO_COMMON_MAPPINGS);
+                        numUnneededMappings += connector.getTrackStats().getStatsMap().get(StatsContainer.NO_UNIQ_MAPPINGS);
                     }
                 }
-                int numInterestingMappings = numUnneededMappings + trackConnector.getTrackStats().getStatsMap().get(StatsContainer.NO_COMMON_MAPPINGS);
+                int numInterestingMappings = numUnneededMappings + trackConnector.getTrackStats().getStatsMap().get(StatsContainer.NO_UNIQ_MAPPINGS);
                 int from = numUnneededMappings;
                 int to = numInterestingMappings - numUnneededMappings > stepSize
                         ? numUnneededMappings + stepSize : numInterestingMappings;

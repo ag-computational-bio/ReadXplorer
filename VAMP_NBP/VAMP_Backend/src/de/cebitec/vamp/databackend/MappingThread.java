@@ -318,9 +318,10 @@ public class MappingThread extends RequestThread {
                     int start = rs.getInt(FieldNames.MAPPING_START);
                     int stop = rs.getInt(FieldNames.MAPPING_STOP);
                     boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
+                    int numReplicates = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
 
 
-                    PersistantMapping mapping = new PersistantMapping(start, stop, isFwdStrand);
+                    PersistantMapping mapping = new PersistantMapping(start, stop, isFwdStrand, numReplicates);
                     mappings.add(mapping);
                 }
                 rs.close();

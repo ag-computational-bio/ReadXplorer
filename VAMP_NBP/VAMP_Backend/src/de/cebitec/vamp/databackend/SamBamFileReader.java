@@ -92,9 +92,10 @@ public class SamBamFileReader implements Observable {
             int stop;
             boolean isFwdStrand;
             Integer classification;
-            Integer count;
+            Integer numMappingsForRead;
             boolean classify;
             PersistantMapping mapping;
+            int numReplicates = 1;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
@@ -104,7 +105,7 @@ public class SamBamFileReader implements Observable {
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                 isFwdStrand = !record.getReadNegativeStrandFlag();
                 classification = (Integer) record.getAttribute("Yc");
-                count = (Integer) record.getAttribute("Yt");
+                numMappingsForRead = (Integer) record.getAttribute("Yt");
 
                 //find check alignment via cigar string and add diffs to mapping
                 cigar = record.getCigarString();
@@ -114,16 +115,15 @@ public class SamBamFileReader implements Observable {
                     refSubSeq = null;
                 }
 
-                if (classification != null && count != null) { //since both data fields are always written together
+                if (classification != null && numMappingsForRead != null) { //since both data fields are always written together
                     classify = classification == (int) Properties.PERFECT_COVERAGE
                             || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, classify);
+                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, numReplicates, 0, 0, classify);
                 } else {
-                    count = 1;
-                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, count, 0, 0, true);
+                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, numReplicates, 0, 0, true);
                 }
 
-                this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, count,
+                this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, numReplicates,
                         record.getReadString(), refSubSeq, mapping);
                 Object XT = record.getAttribute("XT");
                 String XTasString = null;
@@ -180,7 +180,7 @@ public class SamBamFileReader implements Observable {
                 stop = record.getAlignmentEnd();
 //            start = start < 0 ? 0 : start;
                 isFwdStrand = !record.getReadNegativeStrandFlag();
-                mapping = new PersistantMapping(start, stop, isFwdStrand);
+                mapping = new PersistantMapping(start, stop, isFwdStrand, 1);
                 mappings.add(mapping);
             }
             samRecordIterator.close();
@@ -221,7 +221,7 @@ public class SamBamFileReader implements Observable {
             int stop;
             boolean isFwdStrand;
             Integer classification;
-            Integer count;
+            Integer numMappingsForRead;
             Integer pairId;
             Integer pairType;
             long seqPairId;
@@ -231,6 +231,7 @@ public class SamBamFileReader implements Observable {
             boolean isBestMapping;
             PersistantMapping mapping;
             PersistantSeqPairGroup newGroup;
+            int numReplicates = 1;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
@@ -240,7 +241,7 @@ public class SamBamFileReader implements Observable {
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                 isFwdStrand = !record.getReadNegativeStrandFlag();
                 classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
-                count = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                 pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
                 pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
                 mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
@@ -255,13 +256,12 @@ public class SamBamFileReader implements Observable {
                     refSubSeq = null;
                 }
 
-                if (classification != null && count != null) { //since both data fields are always written together
+                if (classification != null && numMappingsForRead != null) { //since both data fields are always written together
                     isBestMapping = classification == (int) Properties.PERFECT_COVERAGE
                             || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, isBestMapping);
+                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, isBestMapping);
                 } else {
-                    count = 1;
-                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, count, 0, 0, false);
+                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, false);
                 }
                 if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new seqPair if not exists
@@ -276,7 +276,7 @@ public class SamBamFileReader implements Observable {
                 }
 
                 if (diffsAndGapsNeeded) {
-                    this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, count,
+                    this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, numReplicates,
                             record.getReadString(), refSubSeq, mapping);
                 }
 
