@@ -166,6 +166,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
             reset.setEnabled(true);
         }
         lastTable.setModel(newTableModel);
+        lastTable.setRowSorter(GenerateRowSorter.createRowSorter(newTableModel));
     }
 
     private String openPopUp(String message) {

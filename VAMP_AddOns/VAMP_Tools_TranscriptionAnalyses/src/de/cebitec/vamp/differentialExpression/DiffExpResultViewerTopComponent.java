@@ -7,10 +7,10 @@ import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
-import de.cebitec.vamp.differentialExpression.plotting.PlotTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.vamp.util.GenerateRowSorter;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.TableRightClickFilter;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
@@ -21,13 +21,14 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -65,8 +66,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private static final long serialVersionUID = 1L;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
-    private ArrayList<TableModel> tableModels = new ArrayList<>();
-    private ArrayList<TableRowSorter> tableRowSorter = new ArrayList<>();
+    private ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
     private TopComponent GraficsTopComponent;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
@@ -158,54 +158,30 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
-            colNames.add(0, " ");
-            Vector<Vector> tableContents = currentResult.getTableContentsContainingRowNames();
-            TableModel tmpTableModel = new UnchangeableDefaultTableModel(tableContents, colNames);
+            Vector<Vector> tableContents;
+            if (usedTool != SimpleTest) {
+                colNames.add(0, " ");
+                tableContents = currentResult.getTableContentsContainingRowNames();
+            } else {
+                tableContents = currentResult.getTableContents();
+            }
+
+            DefaultTableModel tmpTableModel = new UnchangeableDefaultTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
-            TableRowSorter<TableModel> tmpRowSorter = new TableRowSorter<>(tmpTableModel);
-            Vector firstRow = tableContents.get(0);
-            int columnCounter = 0;
-            for (Iterator it1 = firstRow.iterator(); it1.hasNext(); columnCounter++) {
-                Object object = it1.next();
-                if (object instanceof Double) {
-                    tmpRowSorter.setComparator(columnCounter, new Comparator<Double>() {
-                        @Override
-                        public int compare(Double o1, Double o2) {
-                            if (o1.doubleValue() == o2.doubleValue()) {
-                                return 0;
-                            }
-                            if (o1.doubleValue() > o2.doubleValue()) {
-                                return 1;
-                            } else {
-                                return -1;
-                            }
-                        }
-                    });
-                }
-                if (object instanceof Integer) {
-                    tmpRowSorter.setComparator(columnCounter, new Comparator<Integer>() {
-                        @Override
-                        public int compare(Integer o1, Integer o2) {
-                            if (o1.intValue()== o2.intValue()) {
-                                return 0;
-                            }
-                            if (o1.intValue() > o2.intValue()) {
-                                return 1;
-                            } else {
-                                return -1;
-                            }
-                        }
-                    });
-                }
-
-            }
-            tableRowSorter.add(tmpRowSorter);
         }
 
         resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
-        topCountsTable.setModel(tableModels.get(0));
-        topCountsTable.setRowSorter(tableRowSorter.get(0));
+        DefaultTableModel dtm = tableModels.get(0);
+        topCountsTable.setModel(dtm);
+        TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter(dtm);
+        topCountsTable.setRowSorter(trs);
+        if (usedTool == SimpleTest) {
+            List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+            sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
+            trs.setSortKeys(sortKeys);
+            trs.sort();
+        }
 
         createGraphicsButton.setEnabled(true);
         saveTableButton.setEnabled(true);
@@ -415,8 +391,16 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         int state = e.getStateChange();
         if (state == ItemEvent.SELECTED) {
             rktm.resetOriginalTableModel();
-            topCountsTable.setModel(tableModels.get(resultComboBox.getSelectedIndex()));
-            topCountsTable.setRowSorter(tableRowSorter.get(resultComboBox.getSelectedIndex()));
+            DefaultTableModel dtm = tableModels.get(resultComboBox.getSelectedIndex());
+            topCountsTable.setModel(dtm);
+            TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter(dtm);
+            topCountsTable.setRowSorter(trs);
+            if (usedTool == SimpleTest) {
+                List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
+                trs.setSortKeys(sortKeys);
+                trs.sort();
+            }
         }
     }
 
