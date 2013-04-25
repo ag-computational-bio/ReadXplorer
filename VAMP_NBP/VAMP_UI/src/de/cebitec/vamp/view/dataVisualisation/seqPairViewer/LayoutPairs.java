@@ -3,7 +3,6 @@ package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockContainer;
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.BlockI;
@@ -91,7 +90,7 @@ public class LayoutPairs implements LayoutI {
             start = start == Long.MAX_VALUE ? this.absStart : start;
             stop = stop == Long.MIN_VALUE ? this.absStop : stop;
 
-            BlockI block = new BlockPair((int) start, (int) stop, seqPairs, singleMappings, group.getSeqPairId());
+            BlockI block = new BlockPair((int) start, (int) stop, group);
             this.reverseBlockContainer.addBlock(block);
 
         }

@@ -25,6 +25,7 @@ import org.openide.util.NbBundle;
  */
 public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifier {
 
+    //TODO: identify when pair goes across end of genome but only if circular reference genome
     private TrackJob trackJob;
     private int dist;
     private DiscreteCountingDistribution seqPairSizeDistribution;
@@ -43,7 +44,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
         this.trackJob = seqPairJobContainer.getTrackJob1();
         this.dist = seqPairJobContainer.getDistance();
         int maxDist = this.calculateMinAndMaxDist(dist, seqPairJobContainer.getDeviation());
-        this.seqPairSizeDistribution = new DiscreteCountingDistribution(maxDist * 2);
+        this.seqPairSizeDistribution = new DiscreteCountingDistribution(maxDist * 3);
         seqPairSizeDistribution.setType(Properties.SEQ_PAIR_SIZE_DISTRIBUTION);
     }
 
@@ -78,7 +79,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
                     readNameFull = record.getReadName();
                     pairTag = readNameFull.charAt(readNameFull.length() - 1);
                     
-                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) { //TODO: remove pairTag
+                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) {
                         
                         classobj = record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
                         if (classobj != null) {

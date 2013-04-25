@@ -157,6 +157,11 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
         private ProgressHandle ph;
         private List<Observer> observers;
 
+        /**
+         * The thread carrying out the lengthy SNP detection itself.
+         * @param percent 
+         * @param num
+         */
         SnpThread(int percent, int num) {
             this.observers = new ArrayList<>();
             this.percent = percent;

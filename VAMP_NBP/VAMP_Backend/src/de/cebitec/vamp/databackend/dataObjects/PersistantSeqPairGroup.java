@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Rolf Hilker
- * 
  * Holds all PersistantSequencePairs which belong to one sequence pair id.
  * Since a pair might have more than one mapping in the visible interval
  * and a pair id might not have an ordinary sequence pair, but several mappings
  * of both reads along the genome we need this data structure.
+ *
+ * @author Rolf Hilker
  */
-public class PersistantSeqPairGroup {
+public class PersistantSeqPairGroup implements PersistantObject {
     
     private long seqPairId;
     private List<PersistantSequencePair> seqPairs;
@@ -75,28 +75,21 @@ public class PersistantSeqPairGroup {
      * Adds a new direct access mapping to the group and creates a new 
      * PersistantSequencePair, if necessary.
      * @param mapping the mapping to add to the group
+     * @param mate 
      * @param type type of the sequence pair this mapping is belonging to (
      * @param bothVisible true, if both mappings of the pair are visible
      * @see de.cebitec.vamp.util.Properties)
      */
-    public void addPersistantDirectAccessMapping(PersistantMapping mapping, byte type, boolean bothVisible) {
+    public void addPersistantDirectAccessMapping(PersistantMapping mapping, PersistantMapping mate, byte type, boolean bothVisible) {
 
         boolean stored = false;
         if (type != Properties.TYPE_UNPAIRED_PAIR) {
-            int replicates;
             for (PersistantSequencePair seqPair : this.seqPairs) {
-
-                if (!bothVisible) { //second mapping of this sequence pair = create a new pair
-
-                    replicates = seqPair.getSeqPairReplicates() + 1;
-                    seqPair.setSeqPairReplicates(replicates);
-                    this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping.getId(), -1, type, replicates , mapping));
-                    stored = true;
-                    break;
-
-                } else {
-
-                    // pair already exists, this is the second mapping of that pair = add it
+                
+                if (    seqPair.getVisibleMapping().getStart() == mate.getStart() &&
+                        seqPair.getVisibleMapping2().getStart() == mapping.getStart() &&
+                        seqPair.getVisibleMapping().isFwdStrand() == mate.isFwdStrand()
+                        && seqPair.getVisibleMapping2().isFwdStrand() == mapping.isFwdStrand()) {
                     seqPair.setVisiblemapping2(mapping);
                     stored = true;
                     break;
@@ -104,7 +97,7 @@ public class PersistantSeqPairGroup {
             }
             if (!stored) {
                 // this mapping defines a new sequence pair for this pair id
-                this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping.getId(), -1, type, 1, mapping));
+                this.seqPairs.add(new PersistantSequencePair(this.seqPairId, mapping.getId(), -1, type, 1, mapping, mate));
             }
         } else {
             //this is a single mapping, just add id to the list
@@ -113,11 +106,6 @@ public class PersistantSeqPairGroup {
 
 //            this.hasNewRead = true;
 //            this.notifyObservers();
-    }
-
-    
-    public long getSeqPairId() {
-        return seqPairId;
     }
 
     
@@ -159,6 +147,11 @@ public class PersistantSeqPairGroup {
 
     public void setExcludedFeatureTypes(List<FeatureType> excludedFeatureTypes) {
         this.excludedFeatureTypes = excludedFeatureTypes;
+    }
+
+    @Override
+    public long getId() {
+        return this.seqPairId;
     }
     
 }

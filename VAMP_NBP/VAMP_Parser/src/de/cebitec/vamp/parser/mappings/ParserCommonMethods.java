@@ -4,6 +4,7 @@ import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
 import de.cebitec.vamp.util.Observable;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -553,14 +554,17 @@ public final class ParserCommonMethods {
     
     /**
      * Adds a "1" or "2" at the end of the given records read name, if it is a
-     * paired read.
+     * paired read and does not already contain a paired read ending.
      * @param record the record whose read name should be elongated, if it is a
      * paired read
-     * @return The elongated read name
+     * @return The elongated read name or the original one, if it already had a
+     * paired read ending
      */
     public static String elongatePairedReadName(SAMRecord record) {
         String readName = record.getReadName();
-        if (record.getReadPairedFlag()) {
+        char pairTag = readName.charAt(readName.length() - 1);
+        if (record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
+                                       && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2) {
             readName = readName.concat(record.getFirstOfPairFlag() ? "1" : "2");
         }
         return readName;

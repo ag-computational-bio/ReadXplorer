@@ -8,8 +8,11 @@ package de.cebitec.vamp.transcriptionAnalyses;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.FilteredFeature;
+import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +38,7 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private FilteredFeaturesResult filterFeaturesResult;
     private HashMap<String, Integer> filterStatisticsMap;
+    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     
     public static final String FEATURES_FILTERED = "Total number of filtered features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
@@ -45,6 +49,7 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
      */
     public ResultPanelFilteredFeatures() {
         initComponents();
+        this.filteredFeaturesTable.getTableHeader().addMouseListener(tableFilter);
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put(FEATURES_FILTERED, 0);
         
@@ -53,7 +58,7 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showFilteredAnnoPosition();
+                TableUtils.showPosition(filteredFeaturesTable, 0, bim);
             }
         });
     }
@@ -160,18 +165,6 @@ public class ResultPanelFilteredFeatures extends javax.swing.JPanel {
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
-    /**
-     * Updates the navigator bar of all viewers to the start position of the selected feature.
-     */
-    private void showFilteredAnnoPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.filteredFeaturesTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = this.filteredFeaturesTable.convertRowIndexToModel(selectedView);
-        PersistantFeature feature = (PersistantFeature) this.filteredFeaturesTable.getModel().getValueAt(selectedModel, 0);
-        int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-
-        bim.navigatorBarUpdated(pos);
-    }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;

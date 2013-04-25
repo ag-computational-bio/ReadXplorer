@@ -1,9 +1,9 @@
 package de.cebitec.vamp.util;
 
 /**
- * @author rhilker
- * 
  * Designed for methods handling any kind of position specific functionality.
+ *
+ * @author rhilker
  */
 public class PositionUtils {
 
@@ -14,7 +14,7 @@ public class PositionUtils {
      */
     public static int convertPosition(String posString) {
         if (posString.contains("_")) {
-            posString = posString.substring(0, posString.length() - 2);
+            posString = posString.substring(0, posString.lastIndexOf('_'));
         }
         return Integer.parseInt(posString);
     }

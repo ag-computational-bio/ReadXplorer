@@ -7,7 +7,10 @@ package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +40,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private CoveredFeatureResult coveredFeaturesResult;
     private final Map<String, Integer> coveredStatisticsMap;
+    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     
     
     /**
@@ -46,6 +50,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      */
     public ResultPanelCoveredFeatures() {
         initComponents();
+        this.coveredFeaturesTable.getTableHeader().addMouseListener(tableFilter);
         this.coveredStatisticsMap = new HashMap<>();
         this.coveredStatisticsMap.put(FEATURES_COVERED, 0);
         
@@ -54,7 +59,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showCoveredFeaturePosition();
+                TableUtils.showPosition(coveredFeaturesTable, 0, bim);
             }
         });
     }
@@ -163,18 +168,6 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
-    /**
-     * Updates the navigator bar of all viewers to the start position of the selected feature.
-     */
-    private void showCoveredFeaturePosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.coveredFeaturesTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = this.coveredFeaturesTable.convertRowIndexToModel(selectedView);
-        PersistantFeature feature = (PersistantFeature) this.coveredFeaturesTable.getModel().getValueAt(selectedModel, 0);
-        int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-
-        bim.navigatorBarUpdated(pos);
-    }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;

@@ -13,6 +13,7 @@ import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.GenerateRowSorter;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -42,7 +43,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
 /**
- * Top component which displays something.
+ * Top component which displays the results of differential expression analyses.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.differentialExpression//DiffExpResultViewer//EN",
         autostore = false)
@@ -72,7 +73,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Expression Analysis");
-    private TableRightClickFilter<UnchangeableDefaultTableModel> rktm = new TableRightClickFilter<>(UnchangeableDefaultTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
     private ReferenceFeatureTopComp refComp;
 
     public DiffExpResultViewerTopComponent() {
@@ -83,7 +84,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         this.analysisHandler = handler;
         this.usedTool = usedTool;
 
-        tm = new UnchangeableDefaultTableModel();
+        tm = new UneditableTableModel();
         cbm = new DefaultComboBoxModel<>();
 
         initComponents();
@@ -166,7 +167,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 tableContents = currentResult.getTableContents();
             }
 
-            DefaultTableModel tmpTableModel = new UnchangeableDefaultTableModel(tableContents, colNames);
+            DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
             tableModels.add(tmpTableModel);
         }
@@ -310,7 +311,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
         ExcelExportFileChooser fc = new ExcelExportFileChooser(new String[]{"xls"},
-                "xls", new TableToExcel(resultComboBox.getSelectedItem().toString(), (UnchangeableDefaultTableModel) topCountsTable.getModel()));
+                "xls", new TableToExcel(resultComboBox.getSelectedItem().toString(), (UneditableTableModel) topCountsTable.getModel()));
     }//GEN-LAST:event_saveTableButtonActionPerformed
 
     private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed
@@ -401,38 +402,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 trs.setSortKeys(sortKeys);
                 trs.sort();
             }
-        }
-    }
-
-    public static class UnchangeableDefaultTableModel extends DefaultTableModel {
-
-        public UnchangeableDefaultTableModel() {
-            super();
-        }
-
-        public UnchangeableDefaultTableModel(Object[][] data, Object[] columnNames) {
-            super(data, columnNames);
-        }
-
-        public UnchangeableDefaultTableModel(Object[] columnNames, int rowCount) {
-            super(columnNames, rowCount);
-        }
-
-        public UnchangeableDefaultTableModel(Vector data, Vector columnNames) {
-            super(data, columnNames);
-        }
-
-        public UnchangeableDefaultTableModel(Vector columnNames, int rowCount) {
-            super(columnNames, rowCount);
-        }
-
-        public UnchangeableDefaultTableModel(int rowCount, int columnCount) {
-            super(rowCount, columnCount);
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
         }
     }
 }

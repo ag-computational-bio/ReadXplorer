@@ -14,9 +14,12 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +56,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
     private HashMap<String, Integer> statisticsMap;
+    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     
     
     /**
@@ -61,6 +65,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
      */
     public ResultPanelTranscriptionStart() {
         this.initComponents();
+        this.tSSTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();
        
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
@@ -68,7 +73,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showTSSPosition();
+                TableUtils.showPosition(tSSTable, 0, boundsInfoManager);
             }
         });
     }
@@ -85,19 +90,6 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         statisticsMap.put(TSS_FWD, 0);
         statisticsMap.put(TSS_REV, 0);
         statisticsMap.put(TSS_UNANNOTATED, 0);
-    }
-    
-    /**
-     * Updates the currently shown position of all viewers registered in the BoundInfoManager
-     * to the selected value of the table.
-     */
-    private void showTSSPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = this.tSSTable.convertRowIndexToModel(selectedView);
-        int pos = (Integer) this.tSSTable.getModel().getValueAt(selectedModel, 0);
-
-        boundsInfoManager.navigatorBarUpdated(pos);
     }
 
     /** This method is called from within the constructor to
@@ -292,21 +284,21 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                     detFeatures = tSS.getDetFeatures();
                     feature = detFeatures.getCorrectStartFeature();
                     if (feature != null) {
-                        rowData[7] = PersistantFeature.Utils.getFeatureName(feature);
+                        rowData[7] = feature.toString();
                         ++noCorrectStarts;
                     } else {
                         rowData[7] = "-";
                     }
                     feature = detFeatures.getUpstreamFeature();
                     if (feature != null) {
-                        rowData[8] = PersistantFeature.Utils.getFeatureName(feature);
+                        rowData[8] = feature.toString();
                         ++noUpstreamFeature;
                     } else {
                         rowData[8] = "-";
                     }
                     feature = detFeatures.getDownstreamFeature();
                     if (feature != null) {
-                        rowData[9] = PersistantFeature.Utils.getFeatureName(feature);
+                        rowData[9] = feature.toString();
                         ++noDownstreamFeature;
                     } else {
                         rowData[9] = "-";

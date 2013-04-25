@@ -177,13 +177,26 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     }
 
     /**
-     * @return the locus of this feature, if it is set, otherwise a description
-     * including the start and stop position
+     * Retrieves the best possible string representation of the feature. First 
+     * it checks the feature name, then the locus information, then the EC 
+     * number and if all are not given it returns "Feature with start: x, 
+     * stop: y".
+     * @return the best possible name for the feature.
      */
     @Override
     public String toString(){
-        return this.locus != null && !this.locus.isEmpty() ? 
-                this.locus : "Feature with start: " + this.start + ", stop: " + this.stop;
+        String returnString;
+        if (this.featureName != null && !this.featureName.isEmpty()) {
+            returnString = this.featureName;   
+        } else if (this.locus != null && !this.locus.isEmpty()) {
+            returnString = this.locus;         
+        } else if (this.ecNumber != null && !this.ecNumber.isEmpty()) {
+            returnString = this.ecNumber;           
+        } else {
+            returnString = "Feature with start: " + this.start + ", stop: " + this.stop;
+        }
+        
+        return returnString;
     }
 
     /**
@@ -336,28 +349,6 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
                     } //else we cannot add the child to its parent
                 }
             }
-        }
-
-        /**
-         * Retrieves the best possible name for the feature. First it checks the
-         * gene name, then the locus information and if both are not given it
-         * returns "Feature with start: x, stop: y"
-         * @param feature the feature whose name is wanted
-         * @return the best possible name for the feature or null, if the
-         * feature was null.
-         */
-        public static String getFeatureName(PersistantFeature feature) {
-            String featureName = null;
-            if (feature != null) {
-                if (feature.getFeatureName() != null && !feature.getFeatureName().isEmpty()) {
-                    featureName = feature.getFeatureName();
-                } else if (feature.getLocus() != null && !feature.getLocus().isEmpty()) {
-                    featureName = feature.getLocus();
-                } else {
-                    featureName = "Feature with start: " + feature.getStart() + ", stop: " + feature.getStop();
-                }
-            }
-            return featureName;
         }
     }
 }

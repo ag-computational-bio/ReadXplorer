@@ -80,7 +80,7 @@ public class FilteredFeaturesResult extends ResultTrackAnalysis<ParameterSetFilt
             List<Object> filteredGeneRow = new ArrayList<>();
 
             feat = filteredFeature.getFilteredFeature();
-            filteredGeneRow.add(PersistantFeature.Utils.getFeatureName(feat));
+            filteredGeneRow.add(feat.toString());
             filteredGeneRow.add(this.getTrackMap().get(filteredFeature.getTrackId()));
             filteredGeneRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
             filteredGeneRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());

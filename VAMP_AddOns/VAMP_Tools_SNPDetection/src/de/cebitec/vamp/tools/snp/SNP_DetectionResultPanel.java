@@ -18,9 +18,12 @@ import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.SequenceComparison;
+import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +58,13 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private SnpDetectionResult snpData;
     private PersistantReference reference;
+    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     
 
     /** Creates new form SNP_DetectionResultPanel */
     public SNP_DetectionResultPanel() {
         initComponents();
+        this.snpTable.getTableHeader().addMouseListener(tableFilter);
         
         //ensures number of lines will adapt to number of translations (features) for each snp
         LineWrapCellRenderer cellRenderer = new LineWrapCellRenderer();
@@ -73,7 +78,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showSnpPosition();
+                TableUtils.showPosition(snpTable, 0, bim);
             }
         });
     }
@@ -317,8 +322,11 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 }
 
                 if (codons.isEmpty()) {
-                    aminosRef = aminosRef.isEmpty() ? "No gene" : aminosRef;
-                    aminosSnp = aminosSnp.isEmpty() ? "No gene" : aminosSnp;
+                    aminosRef = "No gene";
+                    aminosSnp = "No gene";
+                    effect = "-";
+                    ids = "-";
+                    
                     ++noIntergenicSnps;
 
                 } else if (effect.contains("E")) {
@@ -351,7 +359,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                     }
                     
                     for (PersistantFeature feature : featuresFound){
-                        ids += (feature.hasFeatureName() ? feature.getFeatureName() : feature.getLocus()) + "\n";
+                        ids += feature.toString() + "\n";
                         snp.addCodon(new CodonSnp("", "", ' ', ' ', type, ids));
                     }
                     rowData[13] = "-";
@@ -362,8 +370,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 } else { //intergenic
                     rowData[13] = "No gene";
                     rowData[14] = "No gene";
-                    rowData[15] = "";
-                    rowData[16] = "";
+                    rowData[15] = "-";
+                    rowData[16] = "-";
                     ++noIntergenicSnps;
                     if (type.equals(SequenceComparison.INSERTION)) {
                         ++noInsertions;
@@ -408,19 +416,6 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     
     public void setReferenceGenome(PersistantReference reference){
         this.reference = reference;
-    }
-
-    /**
-     * Centers the position of the selected SNP in the bounds information manager.
-     * This leads to an update of all viewers, sharing this bim.
-     */
-    private void showSnpPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) snpTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = snpTable.convertRowIndexToModel(selectedView);
-        String pos = (String) snpTable.getModel().getValueAt(selectedModel, 0);
-
-        bim.navigatorBarUpdated(PositionUtils.convertPosition(pos));
     }
 
     /**

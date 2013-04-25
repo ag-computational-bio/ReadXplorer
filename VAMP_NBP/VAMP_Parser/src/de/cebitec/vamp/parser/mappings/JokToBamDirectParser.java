@@ -1,11 +1,11 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.output.JokToBamConverter;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.StatsContainer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

@@ -318,7 +318,7 @@ public class SnpTranslator {
             }
 
             //get feature id
-            String id = feature.hasFeatureName() ? feature.getFeatureName() : feature.getLocus();
+            String id = feature.toString();
 
             //translate string to amino acid and store reference and snp codon
             try {

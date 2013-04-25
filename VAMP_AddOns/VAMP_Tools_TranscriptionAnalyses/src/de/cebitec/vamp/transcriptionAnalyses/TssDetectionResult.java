@@ -215,7 +215,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      */
     private void addFeatureRows(PersistantFeature feature, List<Object> tssRow) {
         if (feature != null) {
-            tssRow.add(PersistantFeature.Utils.getFeatureName(feature));
+            tssRow.add(feature.toString());
             tssRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
             tssRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
         } else {

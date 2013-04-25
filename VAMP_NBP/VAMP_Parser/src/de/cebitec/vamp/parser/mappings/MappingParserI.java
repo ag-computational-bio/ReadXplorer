@@ -1,10 +1,10 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Observable;
+import de.cebitec.vamp.util.StatsContainer;
 
 /**
  * Interface to be implemented for all mapping parsers.

@@ -174,7 +174,7 @@ public class Layout implements LayoutI {
     private boolean inExclusionList(PersistantMapping m) {
         if ((m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_MATCH))
                 || (m.getDifferences() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH)) 
-                || (!m.getUnique() && this.exclusionList.contains(FeatureType.NONUNIQUE))
+                || (!m.isUnique() && this.exclusionList.contains(FeatureType.NONUNIQUE))
                 || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.ORDINARY_MATCH))){
             return true;
         } else {

@@ -333,7 +333,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                             try {
                                 //executes any conversion before other calculations, if the parser supports any
+                                trackJob1.getParser().registerObserver(this);
                                 success = (boolean) trackJob1.getParser().convert(trackJob1, referenceSeq);
+                                trackJob1.getParser().removeObserver(this);
                                 if (!success) {
                                     this.noErrors = false;
                                     this.showMsg("Conversion of " + trackJob1.getName() + " failed!");
@@ -345,7 +347,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 if (isTwoTracks) { //only combine, if data is not already combined
                                     File inputFile2 = trackJob2.getFile();
                                     inputFile2.setReadOnly();
+                                    trackJob2.getParser().registerObserver(this);
                                     success = (boolean) trackJob2.getParser().convert(trackJob2, referenceSeq);
+                                    trackJob2.getParser().removeObserver(this);
                                     File lastWorkFile2 = trackJob2.getFile();
                                     if (!success) {
                                         this.noErrors = false;

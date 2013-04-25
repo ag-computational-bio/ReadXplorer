@@ -276,7 +276,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                                             potPotSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist));
                                         }
                                     } else {//////////////// distance too large //////////////////////////
-                                        //TODO: something to do??
+                                        //currently nothing to do
                                     }
                                 } else { //////////////////////////// inversion of one read ////////////////////////////////
                                     currDist = start1 < start2 ? stop2 - start1 : stop1 - start2;
@@ -296,7 +296,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                                             potUnorSmallPairList.add(new ParsedSeqPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist));
                                         }
                                     } else { //////////////// orientation wrong & distance too large //////////////////////////
-                                        //TODO: something to do??
+                                        //currently nothing to do
                                     }
                                 }
                             }

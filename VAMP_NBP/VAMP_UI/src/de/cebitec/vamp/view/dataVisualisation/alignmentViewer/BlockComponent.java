@@ -91,7 +91,6 @@ public class BlockComponent extends JComponent {
             
             /**
              * Creates the header for the highlighted sequence.
-             *
              * @return the header for the sequence
              */
             private String getHeader() {
@@ -137,7 +136,7 @@ public class BlockComponent extends JComponent {
     }
 
     private String getText() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(150);
         PersistantMapping mapping = ((PersistantMapping) block.getPersistantObject());
 
         sb.append("<html>");
@@ -151,17 +150,20 @@ public class BlockComponent extends JComponent {
         this.appendDiffs(mapping, sb);
         this.appendGaps(mapping, sb);
         
-        if (mapping.getUnique()) {
+        if (mapping.isUnique()) {
             sb.append(createTableRow("Unique", "yes"));
+        } else {
+            sb.append(createTableRow("Unique", "no"));
         }
-        if (mapping.getOriginalSequence()!=null) {
+        sb.append(createTableRow("Number of mappings for read", mapping.getNumMappingsForRead() + ""));
+        if (mapping.getOriginalSequence() != null) {
             sb.append(createTableRow("Original (full) sequence", mapping.getOriginalSequence()));
         }
-        if (mapping.getTrimmedFromLeft()>0) {
-            sb.append(createTableRow("Trimmed chars from left", mapping.getTrimmedFromLeft()+""));
+        if (mapping.getTrimmedFromLeft() > 0) {
+            sb.append(createTableRow("Trimmed chars from left", mapping.getTrimmedFromLeft() + ""));
         }
-        if (mapping.getTrimmedFromRight()>0) {
-            sb.append(createTableRow("Trimmed chars from right", mapping.getTrimmedFromRight()+""));
+        if (mapping.getTrimmedFromRight() > 0) {
+            sb.append(createTableRow("Trimmed chars from right", mapping.getTrimmedFromRight() + ""));
         }
 
         sb.append("</table>");

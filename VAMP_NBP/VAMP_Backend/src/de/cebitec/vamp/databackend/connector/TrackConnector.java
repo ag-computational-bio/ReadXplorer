@@ -3,7 +3,6 @@ package de.cebitec.vamp.databackend.connector;
 import de.cebitec.vamp.databackend.*;
 import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.util.DiscreteCountingDistribution;
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.util.StatsContainer;

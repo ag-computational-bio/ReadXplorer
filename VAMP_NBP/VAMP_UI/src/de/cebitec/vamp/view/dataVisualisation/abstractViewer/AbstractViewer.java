@@ -3,7 +3,6 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.util.FeatureType;
-import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.*;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
@@ -30,6 +29,7 @@ import javax.swing.*;
  * interval from the genome should currently be diplayed and provides getter
  * methods for these values. Tooltips in this viewer are initially shown for 
  * 20 seconds.
+ * 
  * @author ddoppmeier, rhilker
  */
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {

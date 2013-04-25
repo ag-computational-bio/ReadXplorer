@@ -95,7 +95,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         for (CoveredFeature coveredFeature : this.results) {
             List<Object> coveredFeatureRow = new ArrayList<>();
             feature = coveredFeature.getCoveredFeature();
-            coveredFeatureRow.add(PersistantFeature.Utils.getFeatureName(feature));
+            coveredFeatureRow.add(feature.toString());
             coveredFeatureRow.add(this.getTrackMap().get(coveredFeature.getTrackId()));
             coveredFeatureRow.add(feature.isFwdStrandString());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());

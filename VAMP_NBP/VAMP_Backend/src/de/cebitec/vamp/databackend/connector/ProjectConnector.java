@@ -2167,11 +2167,7 @@ public class ProjectConnector extends Observable {
                 if (trackIds.contains(trackId)) {
                     snps.add(new Snp(position, trackId, base, refBase, aRate, cRate, gRate,
                             tRate, nRate, gapRate, coverage, frequency, type));
-                    if (coverage == 0) {
-                        System.out.println("Coverage is zero"); //TODO: remove this
-                    }
                 }
-
             }
         } catch (SQLException ex) {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);

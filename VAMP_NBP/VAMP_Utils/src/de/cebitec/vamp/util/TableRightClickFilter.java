@@ -18,7 +18,11 @@ import javax.swing.table.JTableHeader;
 import org.openide.util.Exceptions;
 
 /**
- *
+ * A MouseAdapter, which offers a filter for the columns of a table. An
+ * instance of this class must be added as a listener to the TableHeader of the
+ * table that should be filtered. Only tables using a model extending
+ * DefaultTableModel can be used!
+ * @param <E> the table model, which has to extend the DefaultTableModel.
  * @author kstaderm
  */
 public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAdapter {
@@ -37,10 +41,11 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     private Class<E> classType;
 
     /**
-     * Offers a filter for the columns of a table. An instance of this class
-     * must be added as an listener to the TableHeader of the Tabel that should
-     * be filtered. Only Tables using a model extending DefaultTableModel can be
-     * used!
+     * A MouseAdapter, which offers a filter for the columns of a table. An
+     * instance of this class must be added as a listener to the TableHeader of
+     * the table that should be filtered. Only tables using a model extending
+     * DefaultTableModel can be used!
+     * @param classType the type of the table model, which has to extend the DefaultTableModel.
      */
     public TableRightClickFilter(Class<E> classType) {
         this.classType = classType;
@@ -56,37 +61,40 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         originalTableModel = null;
     }
 
+    /**
+     * Initializes the filter.
+     */
     private void init() {
-        numberColumnLower = new JMenuItem("Remove values lower as...");
+        numberColumnLower = new JMenuItem("Remove values lower than...");
         numberColumnLower.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String input = openPopUp("Remove values lower as: ");
+                String input = openPopUp("Remove values lower than: ");
                 if (input != null) {
                     input = input.replace(",", ".");
                     try {
                         Double cutoff = Double.parseDouble(input);
-                        E newModel = filterValuesLowerAs(
+                        E newModel = filterValuesLowerThan(
                                 (E) lastTable.getModel(), cutoff, lastSelectedColumn);
                         setNewTableModel(newModel);
                     } catch (NumberFormatException nfe) {
-                        JOptionPane.showMessageDialog(null, "Please insert a valid value.");
+                        JOptionPane.showMessageDialog(null, "Please insert a valid number value.");
                     }
                 }
             }
         });
         popup.add(numberColumnLower);
 
-        numberColumnHigher = new JMenuItem("Remove values higher as...");
+        numberColumnHigher = new JMenuItem("Remove values higher than...");
         numberColumnHigher.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String input = openPopUp("Remove values higher as: ");
+                String input = openPopUp("Remove values higher than: ");
                 if (input != null) {
                     input = input.replace(",", ".");
                     try {
                         Double cutoff = Double.parseDouble(input);
-                        E newModel = filterValuesHigherAs(
+                        E newModel = filterValuesHigherThan(
                                 (E) lastTable.getModel(), cutoff, lastSelectedColumn);
                         setNewTableModel(newModel);
                     } catch (NumberFormatException nfe) {
@@ -176,7 +184,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         return input;
     }
 
-    private E filterValuesHigherAs(E tm, Double cutoff, int column) {
+    private E filterValuesHigherThan(E tm, Double cutoff, int column) {
         boolean noRow = true;
         E ret = prepareNewTableModel(tm);
         Vector dataVector = tm.getDataVector();
@@ -204,7 +212,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         return ret;
     }
 
-    private E filterValuesLowerAs(E tm, Double cutoff, int column) {
+    private E filterValuesLowerThan(E tm, Double cutoff, int column) {
         boolean noRow = true;
         E ret = prepareNewTableModel(tm);
         Vector dataVector = tm.getDataVector();

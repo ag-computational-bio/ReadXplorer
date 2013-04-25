@@ -317,6 +317,14 @@ public class SequencePairViewer extends AbstractViewer {
         return this.trackConnector.getMappingsForSeqPairId(seqPairId);
     }
     
+    /**
+     * @return true, if this viewer shows data completely stored in the DB,
+     * false if the direct access is used
+     */
+    public boolean isDbViewer() {
+        return this.trackConnector.isDbUsed();
+    }
+    
     
 //    private void createFocusListener() {
 //        KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();

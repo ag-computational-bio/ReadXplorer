@@ -28,7 +28,7 @@ public class SeqPairPopup extends JPopupMenu {
     
     private final AbstractViewer parentViewer;
     private final String pairType;
-    private final long seqPairId;
+    private final BlockPair block;
     private final ArrayList<Color> pairColors;
     
     /**
@@ -38,18 +38,18 @@ public class SeqPairPopup extends JPopupMenu {
      * @param parentViewer the parent viewer
      * @param pairType the type of the sequence pair already in user readable string format
      * @param pairColors 
-     * @param seqPairId the id of the sequence pair
+     * @param block the sequence pair block
      */
-    public SeqPairPopup(AbstractViewer parentViewer, String pairType, ArrayList<Color> pairColors, long seqPairId) {
+    public SeqPairPopup(AbstractViewer parentViewer, String pairType, ArrayList<Color> pairColors, BlockPair block) {
         this.parentViewer = parentViewer;
         this.pairType = pairType;
-        this.seqPairId = seqPairId;
+        this.block = block;
         this.pairColors = pairColors;
         this.initDataAndComponents();
     }
     
     private void initDataAndComponents() {
-        PersistantSeqPairGroup seqPairData = this.getSeqPairInfoFromDB(); //TODO: get infos from elswhere
+        PersistantSeqPairGroup seqPairData = this.getSeqPairInfo(); //TODO: get infos from elswhere
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -202,11 +202,17 @@ public class SeqPairPopup extends JPopupMenu {
      * to show in the popup. If the parent viewer ist not a SequencePairViewer
      * <code>null</code> is returned.
      */
-    private PersistantSeqPairGroup getSeqPairInfoFromDB() {
+    private PersistantSeqPairGroup getSeqPairInfo() {
+        PersistantSeqPairGroup seqPairGroup = null;
         if (parentViewer instanceof SequencePairViewer){
-            return ((SequencePairViewer) this.parentViewer).getSeqPairInfoFromDB(this.seqPairId);
+            SequencePairViewer viewer = (SequencePairViewer) this.parentViewer;
+            if (viewer.isDbViewer()) {
+                ((SequencePairViewer) this.parentViewer).getSeqPairInfoFromDB(this.block.getSeqPairId());
+            } else {
+                seqPairGroup = (PersistantSeqPairGroup) this.block.getPersistantObject();
+            }
         }
-        return null;
+        return seqPairGroup;
     }
     
     

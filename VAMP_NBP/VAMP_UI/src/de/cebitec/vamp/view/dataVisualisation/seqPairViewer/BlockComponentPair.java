@@ -1,9 +1,10 @@
 package de.cebitec.vamp.view.dataVisualisation.seqPairViewer;
 
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantSeqPairGroup;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSequencePair;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -118,9 +119,10 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * Calculates the boundaries for each visible mapping and creates the visual
      * content of the BlockComponentPair
      */
-    private void calcMappingBoundaries(){
-        List<PersistantSequencePair> seqPairs = this.block.getSeqPairs();
-        List<PersistantMapping> singleMappings = this.block.getSingleMappings();
+    private void calcMappingBoundaries() {
+        PersistantSeqPairGroup seqPairGroup = (PersistantSeqPairGroup) this.block.getPersistantObject();
+        List<PersistantSequencePair> seqPairs = seqPairGroup.getSequencePairs();
+        List<PersistantMapping> singleMappings = seqPairGroup.getSingleMappings();
 
         Color blockColor;
         PersistantSequencePair seqPair;
@@ -313,7 +315,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     }
 
     public void setSequence() {
-        JTextField j = new JTextField();
+        JTextField j = new JTextField(); //TODO: return read sequence of currently clicked read, not the pair
         int start = (int) ((PersistantSequencePair) block.getPersistantObject()).getStart();
         int stop = (int) ((PersistantSequencePair) block.getPersistantObject()).getStop();
         //string first pos is zero
@@ -328,7 +330,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * and allowing to jump to the position of other mappings of the pair.
      */
     private void createPopup(MouseEvent e) {
-        this.seqPairPopup = new SeqPairPopup(this.parentViewer, this.pairType, this.pairColors, this.block.getSeqPairId());
+        this.seqPairPopup = new SeqPairPopup(this.parentViewer, this.pairType, this.pairColors, this.block);
     }
 
     /**

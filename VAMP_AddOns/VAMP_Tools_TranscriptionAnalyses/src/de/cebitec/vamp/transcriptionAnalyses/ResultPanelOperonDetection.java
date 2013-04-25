@@ -9,10 +9,12 @@ import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
+import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
@@ -41,6 +43,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private OperonDetectionResult operonResult;
     private HashMap<String, Integer> operonDetStats;
+    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
 
     /**
      * This panel is capable of showing a table with detected operons and
@@ -49,6 +52,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
      */
     public ResultPanelOperonDetection(ParameterSetOperonDet operonDetParameters) {
         initComponents();
+        this.operonDetectionTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();        
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
@@ -56,10 +60,11 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showOperonDetectionPosition();
+                TableUtils.showPosition(operonDetectionTable, 4, bim);
             }
         });
     }
+    
     /**
      * Initializes the statistics map.
      */
@@ -227,8 +232,8 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
                     hasInternalReads = false;
 
                     for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
-                        annoName1 += opAdj.getFeature1().getLocus() + "\n";
-                        annoName2 += opAdj.getFeature2().getLocus() + "\n";
+                        annoName1 += opAdj.getFeature1().toString() + "\n";
+                        annoName2 += opAdj.getFeature2().toString() + "\n";
                         startAnno1 += opAdj.getFeature1().getStart() + "\n";
                         startAnno2 += opAdj.getFeature2().getStart() + "\n";
                         readsAnno1 += opAdj.getReadsFeature1() + "\n";
@@ -281,23 +286,6 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
             }
         });
-    }
-
-    /**
-     * Updates the position of the viewers to the currently selected operon 
-     * start position in the table.
-     */
-    private void showOperonDetectionPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = this.operonDetectionTable.convertRowIndexToModel(selectedView);
-        String posString = (String) this.operonDetectionTable.getModel().getValueAt(selectedModel, 4);
-        String[] pos;
-        pos = posString.split("\n");
-           
-        // Get position of first gene in the array
-        bim.navigatorBarUpdated(Integer.parseInt(pos[0])); 
-       
     }
 
     /**

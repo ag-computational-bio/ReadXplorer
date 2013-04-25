@@ -115,32 +115,17 @@ public class SamBamFileReader implements Observable {
                     refSubSeq = null;
                 }
 
-                if (classification != null && numMappingsForRead != null) { //since both data fields are always written together
-                    classify = classification == (int) Properties.PERFECT_COVERAGE
-                            || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, numReplicates, 0, 0, classify);
-                } else {
-                    mapping = new PersistantMapping(id++, start, stop, trackId, isFwdStrand, numReplicates, 0, 0, true);
-                }
+                mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, start, stop, isFwdStrand);
 
                 this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, numReplicates,
-                        record.getReadString(), refSubSeq, mapping);
-                Object XT = record.getAttribute("XT");
-                String XTasString = null;
-                if ((XT!=null)) {
-                    XTasString = XT.toString();
-                    if (XTasString.equals("U")) {
-                        mapping.setUnique(true);
-                    }
-                }
-                
+                        record.getReadString(), refSubSeq, mapping);                
                 
                 Object originalSequence = record.getAttribute("os");
-                if ((originalSequence!=null) && (originalSequence instanceof String)) mapping.setOriginalSequence((String) originalSequence);
+                if ((originalSequence != null) && (originalSequence instanceof String)) { mapping.setOriginalSequence((String) originalSequence); }
                 Object trimmedFromLeft = record.getIntegerAttribute("tl"); 
-                if ((trimmedFromLeft!=null) && (trimmedFromLeft instanceof Integer)) mapping.setTrimmedFromLeft((Integer) trimmedFromLeft);
+                if ((trimmedFromLeft != null) && (trimmedFromLeft instanceof Integer)) { mapping.setTrimmedFromLeft((Integer) trimmedFromLeft); }
                 Object trimmedFromRight = record.getIntegerAttribute("tr");
-                if ((trimmedFromRight!=null) && (trimmedFromRight instanceof Integer)) mapping.setTrimmedFromRight((Integer) trimmedFromRight);
+                if ((trimmedFromRight != null) && (trimmedFromRight instanceof Integer)) { mapping.setTrimmedFromRight((Integer) trimmedFromRight); }
                 mappings.add(mapping);
             }
             samRecordIterator.close();
@@ -161,6 +146,7 @@ public class SamBamFileReader implements Observable {
      * @param to right position of the interval to query
      * @return the reduced mappings for the given interval
      */
+    //TODO: classification and nummappingsforread berücksichtigen, wenn analysen auf classification beruhen
     public Collection<PersistantMapping> getReducedMappingsFromBam(PersistantReference refGenome, int from, int to) {
         Collection<PersistantMapping> mappings = new ArrayList<>();
 
@@ -227,9 +213,10 @@ public class SamBamFileReader implements Observable {
             long seqPairId;
             byte seqPairType;
             int mateStart;
+            int mateStop;
             boolean bothVisible;
-            boolean isBestMapping;
             PersistantMapping mapping;
+            PersistantMapping mate;
             PersistantSeqPairGroup newGroup;
             int numReplicates = 1;
 
@@ -244,7 +231,7 @@ public class SamBamFileReader implements Observable {
                 numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                 pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
                 pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
-                mateStart = record.getMateAlignmentStart(); //TODO: handle somewhere
+                mateStart = record.getMateAlignmentStart();
                 bothVisible = mateStart > from && mateStart < to;
 
 
@@ -256,13 +243,7 @@ public class SamBamFileReader implements Observable {
                     refSubSeq = null;
                 }
 
-                if (classification != null && numMappingsForRead != null) { //since both data fields are always written together
-                    isBestMapping = classification == (int) Properties.PERFECT_COVERAGE
-                            || (classification == (int) Properties.BEST_MATCH_COVERAGE) ? true : false;
-                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, isBestMapping);
-                } else {
-                    mapping = new PersistantMapping(id++, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, false);
-                }
+                mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, startPos, stop, isFwdStrand);
                 if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new seqPair if not exists
                     seqPairId = (long) pairId;
@@ -272,7 +253,8 @@ public class SamBamFileReader implements Observable {
                         newGroup.setSeqPairId(pairId);
                         seqPairs.put(seqPairId, newGroup);
                     } //TODO: check where ids are needed
-                    seqPairs.get(seqPairId).addPersistantMapping(mapping, seqPairType, Long.valueOf(id), -1, 1);
+                    mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, !record.getMateNegativeStrandFlag());
+                    seqPairs.get(seqPairId).addPersistantDirectAccessMapping(mapping, mate, seqPairType, bothVisible);
                 }
 
                 if (diffsAndGapsNeeded) {
@@ -291,12 +273,31 @@ public class SamBamFileReader implements Observable {
 
         return seqPairGroups;
     }
+    
+    /**
+     * Creates a mapping for the given classification and mapping data.
+     * @param classification the classification data
+     * @param numReplicates number of replicates of the mapping
+     * @param id unique id of the mapping
+     * @param startPos start position of the mapping
+     * @param stop stop position of the mapping
+     * @param isFwdStrand true, if the mapping is on the fwd strand
+     * @return A new mapping with classification information, if classification is 
+     * not null. Otherwise isBestMapping is currently always true.
+     */
+    //TODO: change true to false if classification = null, when analyses can choose type of mappings
+    private PersistantMapping getMappingForValues(Integer classification, Integer numMappingsForRead, int numReplicates, int id, 
+            int startPos, int stop, boolean isFwdStrand) {
+        int mappingsForRead = numMappingsForRead != null ? numMappingsForRead : -1;
+        boolean isBestMapping = classification == null  || classification == (int) Properties.PERFECT_COVERAGE
+                                || (classification == (int) Properties.BEST_MATCH_COVERAGE);
+        return new PersistantMapping(id, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, isBestMapping, mappingsForRead);
+    }
 
     /**
      * Retrieves the coverage for the given interval from the bam file set for
      * this data reader and the reference sequence with the given name. If reads
      * become longer than 1000bp the offset in this method has to be enlarged!
-     *
      * @param refGenome the reference genome used in the bam file
      * @param from start of the interval
      * @param to end of the interval
@@ -307,6 +308,7 @@ public class SamBamFileReader implements Observable {
      * of a double track request
      * @return the coverage for the given interval
      */
+    //TODO: add retrival of unique coverage and incorporate it in viewers
     public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, int from, int to,
             boolean diffsAndGapsNeeded, byte trackNeeded) {
         

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
@@ -174,7 +175,7 @@ public class GeneralUtils {
             try {
                 Files.delete(lastWorkFile.toPath());
                 deleted = true;
-                File indexFile = new File(lastWorkFile.getAbsolutePath().concat(".bai"));
+                File indexFile = new File(lastWorkFile.getAbsolutePath().concat(Properties.BAM_INDEX_EXT));
                 if (indexFile.canWrite()) {
                     Files.delete(indexFile.toPath());
                 }

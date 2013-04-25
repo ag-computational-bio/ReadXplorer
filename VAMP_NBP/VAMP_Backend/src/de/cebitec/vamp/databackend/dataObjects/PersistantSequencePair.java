@@ -39,6 +39,29 @@ public class PersistantSequencePair implements PersistantObject {
         this.seqPairReplicates = seqPairReplicates == 0 ? 1 : seqPairReplicates;
         this.visibleMapping = visibleMapping;
     }
+    
+    /**
+     * Creates a new persistant sequence pair. If both mappings of the pair are
+     * visible the second mapping has to be added separately.
+     * @param seqPairID id of the pair, will identify all mappings belonging to
+     * this pair id
+     * @param mapping1ID id of mapping 1 of this pair
+     * @param mapping2ID id of mapping 2 of this pair
+     * @param seqPairType type of the sequence pair (
+     * @see SeqPairClassifier constants with values: 0-6)
+     * @param seqPairReplicates number of replicates of this pair
+     * @param visibleMapping currently visible mapping of the pair
+     * @param mate the mate of the visibleMapping = other read of the pair 
+     */
+    public PersistantSequencePair(long seqPairID, long mapping1ID, long mapping2ID, byte seqPairType,
+            int seqPairReplicates, PersistantMapping visibleMapping, PersistantMapping mate) {
+        this.seqPairID = seqPairID;
+        this.mapping2Id = mapping1ID == visibleMapping.getId() ? mapping2ID : mapping1ID;
+        this.seqPairType = seqPairType;
+        this.seqPairReplicates = seqPairReplicates == 0 ? 1 : seqPairReplicates;
+        this.visibleMapping = visibleMapping;
+        this.visiblemapping2 = mate;
+    }
 
     public long getMapping2Id() {
         return mapping2Id;

@@ -14,13 +14,13 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     private int trackId;
     private int stop;
     private boolean isFwdStrand;
-    private int count;
+    private int numReplicates;
     private Map<Integer, PersistantDiff> diffs;
     private TreeMap<Integer, TreeSet<PersistantReferenceGap>> gaps;
     private int differences;
     private int sequenceID;
     private boolean isBestMatch;
-    private Boolean unique;
+    private int numMappingsForRead;
     private String originalSequence = null;
 
     /**
@@ -30,24 +30,44 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * @param stop
      * @param trackId
      * @param isFwdStrand
-     * @param count
-     * @param errors
+     * @param numReplicates
+     * @param mismatches
      * @param sequenceID
      * @param isBestMapping 
+     * @param numMappingsForRead number of mappings for the read of this mapping
      */
-    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int count, int errors, int sequenceID, boolean isBestMapping){
+    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, 
+            int numReplicates, int mismatches, int sequenceID, boolean isBestMapping, int numMappingsForRead){
         this.id = id;
         this.start = start;
         this.stop = stop;
-        this.count = count;
+        this.numReplicates = numReplicates;
         this.trackId = trackId;
         this.isFwdStrand = isFwdStrand;
         this.diffs = new HashMap<>();
         this.gaps = new TreeMap<>();
-        this.differences = errors;
+        this.differences = mismatches;
         this.sequenceID = sequenceID;
         this.isBestMatch = isBestMapping;
-        this.unique = false;
+        this.numMappingsForRead = numMappingsForRead;
+    }
+    
+    /**
+     * Data structure for storing a mapping on a reference genome, in case no information is 
+     * given about the number of mappings for the read.
+     * @param id
+     * @param start
+     * @param stop
+     * @param trackId
+     * @param isFwdStrand
+     * @param numReplicates
+     * @param mismatches
+     * @param sequenceID
+     * @param isBestMapping 
+     */
+    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, 
+            int numReplicates, int mismatches, int sequenceID, boolean isBestMapping) {
+        this(id, start, stop, trackId, isFwdStrand, numReplicates, mismatches, sequenceID, isBestMapping, -1);
     }
     
     /*
@@ -55,19 +75,18 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * data. For this only start, stop and direction are needed. Everything else
      * isn't needed and can be left out in order to save some memory
      */
-    public PersistantMapping(int start, int stop, boolean isFwdStrand, int count) {
+    public PersistantMapping(int start, int stop, boolean isFwdStrand, int numReplicates) {
         this.start = start;
         this.stop = stop;
         this.isFwdStrand = isFwdStrand;
-        this.count = count;
-        this.unique = false;
+        this.numReplicates = numReplicates;
     }
 
     /**
      * @return The number of replicates of this mapping
      */
     public int getNbReplicates() {
-        return count;
+        return numReplicates;
     }
     
     /**
@@ -99,6 +118,9 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
         return isFwdStrand;
     }
 
+    /**
+     * @return The track id of this mapping.
+     */
     public int getTrackId() {
         return trackId;
     }
@@ -120,7 +142,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     /**
      * @return The number of differences of this mapping to the reference.
      */
-    public int getDifferences(){
+    public int getDifferences() {
         return differences;
     }
 
@@ -135,14 +157,14 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     /**
      * @return The ID for this mapping sequence, not for the mapping itself!
      */
-    public int getSequenceID(){
+    public int getSequenceID() {
         return sequenceID;
     }
 
     /**
      * @return <tt>true</tt>, if this mapping belongs to the best match class
      */
-    public boolean isBestMatch(){
+    public boolean isBestMatch() {
         return isBestMatch;
     }
     
@@ -151,7 +173,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * @return <tt>true</tt>, if reference gaps are stored for the given 
      * position, <tt>false</tt> otherwise
      */
-    public boolean hasGenomeGapAtPosition(int position){
+    public boolean hasGenomeGapAtPosition(int position) {
         return gaps.containsKey(position);
     }
 
@@ -160,7 +182,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * @return A TreeSet containing the reference gaps for the given position.
      * If no gaps are stored for the position <tt>null</tt> is returned
      */
-    public TreeSet<PersistantReferenceGap> getGenomeGapsAtPosition(int position){
+    public TreeSet<PersistantReferenceGap> getGenomeGapsAtPosition(int position) {
         return gaps.get(position);
     }
 
@@ -224,19 +246,11 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     }
     
     /**
-     * sets the unique info of the mapping
-     * @param b true if the mapping is unique
-     */
-    public void setUnique(boolean b) {
-        this.unique = b;
-    }
-    
-    /**
      * is the mapping unique?
      * @return true if the mapping is unique
      */
-    public Boolean getUnique() {
-        return this.unique;
+    public boolean isUnique() {
+        return this.numMappingsForRead == 1;
     }
 
     /**
@@ -284,6 +298,14 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      */
     public void setTrimmedFromRight(int trimmedFromRight) {
         this.trimmedFromRight = trimmedFromRight;
+    }
+
+    /**
+     * @return The number of mappings for the read of this mapping. -1 Means that 
+     * this information is not available.
+     */
+    public int getNumMappingsForRead() {
+        return this.numMappingsForRead;
     }
    
 
