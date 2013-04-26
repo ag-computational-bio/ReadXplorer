@@ -52,6 +52,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         jScrollPane2 = new javax.swing.JScrollPane();
         trackList = new javax.swing.JList(trackListModel);
 
+        referenceList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         referenceList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         referenceList.addListSelectionListener(this);
@@ -104,8 +105,8 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        if (selectedIndex != e.getFirstIndex()) {
-            selectedIndex = e.getFirstIndex();
+        if (selectedIndex != referenceList.getSelectedIndex() && !e.getValueIsAdjusting()) {
+            selectedIndex = referenceList.getSelectedIndex();
             selectedRef = references.get(selectedIndex);
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(selectedRef.getId());
             List<PersistantTrack> tracks = refCon.getAssociatedTracks();
