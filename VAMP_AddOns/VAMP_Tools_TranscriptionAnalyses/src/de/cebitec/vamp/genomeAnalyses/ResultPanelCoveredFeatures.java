@@ -34,7 +34,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     
-    public static final String FEATURES_COVERED = "Total number of filtered features";
+    public static final String FEATURES_COVERED = "Total number of covered features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
 
     private BoundsInfoManager bim;
@@ -138,7 +138,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton))
-            .addComponent(coveredFeaturesPane, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
+            .addComponent(coveredFeaturesPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -219,9 +219,11 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
                 sorter.setModel(model);
 
                 ParameterSetCoveredFeatures parameters = ((ParameterSetCoveredFeatures) coveredFeaturesResult.getParameters());
+                String whateverStrand = parameters.isWhateverStrand() ? "no" : "yes";
+                String coveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
                 parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class,
                         "ResultPanelCoveredFeatures.parametersLabel.text", parameters.getMinCoveredPercent(),
-                        parameters.getMinCoverageCount()));
+                        parameters.getMinCoverageCount(),whateverStrand , coveredFeatures));
             }
         });
     }

@@ -118,10 +118,11 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
      * @param wiz the wizard containing the covered feature detection parameters
      */
     private void startCoveredFeaturesDetection(WizardDescriptor wiz) {
+        boolean getCoveredFeatures = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES);
         int minCoveredPercent = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT);
         int minCoverageCount = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT);
         boolean whateverStrand = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_WHATEVER_STRAND);
-        parameters = new ParameterSetCoveredFeatures(minCoveredPercent, minCoverageCount);
+        parameters = new ParameterSetCoveredFeatures(minCoveredPercent, minCoverageCount, whateverStrand, getCoveredFeatures);
         
         TrackConnector connector;
         for (PersistantTrack track : this.tracks) {
@@ -129,7 +130,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this, 
                     NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
-            AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, minCoveredPercent, minCoverageCount, whateverStrand);
+            AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, getCoveredFeatures, minCoveredPercent, minCoverageCount, whateverStrand);
             covAnalysisHandler.registerObserver(analysisCoveredFeatures);
             covAnalysisHandler.setCoverageNeeded(true);
 
@@ -173,7 +174,13 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 coveredFeaturesResultPanel.addCoveredFeatures(result);
 
                 if (finishedCovAnalyses >= tracks.size()) {
-                    String panelName = "Detected covered features for " + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
+                    String title;
+                    if (this.parameters.isGetCoveredFeatures()) {
+                        title = "Detected covered features for ";
+                    } else {
+                        title = "Detected uncovered features for ";
+                    }
+                    String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
                     this.coveredAnnoAnalysisTopComp.openAnalysisTab(panelName, coveredFeaturesResultPanel);
                 }
             }

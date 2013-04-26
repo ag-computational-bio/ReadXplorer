@@ -21,13 +21,14 @@ import java.util.List;
 public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<CoveredFeature>> {
 
     private TrackConnector trackConnector;
+    private final boolean getCoveredFeatures;
     private int minCoveragePercent;
     private int minCountedCoverage;
     private boolean whateverStrand;
     private int refSeqLength;
     private List<PersistantFeature> genomeFeatures;
     private HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
-    private List<CoveredFeature> coveredFeatures;
+    private List<CoveredFeature> detectedFeatures;
     
     private int lastFeatureIdx;
 
@@ -35,6 +36,8 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * Carries out the logic behind the covered features analysis. Both
      * parameters are mandatory.
      * @param trackViewer the track viewer for which the analyses should be carried out
+     * @param getCoveredFeatures <code>true</code> if the covered features should be
+     * returned, <code>false</code> if the uncovered features should be returned
      * @param minCoveragePercent minimum percentage of an feature which has
      * to be classified as covered, in order to detect it as 'present' in the 
      * analysis
@@ -44,13 +47,15 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      *      this analysis, false, if only mappings on the strand of the 
      *      respective feature should be considered.
      */
-    public AnalysisCoveredFeatures(TrackConnector trackConnector, int minCoveragePercent, int minCountedCoverage, boolean whateverStrand) {
+    public AnalysisCoveredFeatures(TrackConnector trackConnector, boolean getCoveredFeatures, int minCoveragePercent, 
+            int minCountedCoverage, boolean whateverStrand) {
         this.trackConnector = trackConnector;
+        this.getCoveredFeatures = getCoveredFeatures;
         this.minCoveragePercent = minCoveragePercent;
         this.minCountedCoverage = minCountedCoverage;
         this.whateverStrand = whateverStrand;
         
-        this.coveredFeatures = new ArrayList<>();
+        this.detectedFeatures = new ArrayList<>();
         this.coveredFeatureCount = new HashMap<>();
         this.lastFeatureIdx = 0;
         
@@ -153,17 +158,26 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     private void findCoveredFeatures() {
         int percentCovered;
-        for (Integer id : this.coveredFeatureCount.keySet()) {
-            percentCovered = this.coveredFeatureCount.get(id).getPercentCovered();
-            if (percentCovered > this.minCoveragePercent) {
-                this.coveredFeatures.add(this.coveredFeatureCount.get(id));
+        if (getCoveredFeatures) {
+            for (Integer id : this.coveredFeatureCount.keySet()) {
+                percentCovered = this.coveredFeatureCount.get(id).getPercentCovered();
+                if (percentCovered > this.minCoveragePercent) {
+                    this.detectedFeatures.add(this.coveredFeatureCount.get(id));
+                }
+            }
+        } else {
+            for (Integer id : this.coveredFeatureCount.keySet()) {
+                percentCovered = this.coveredFeatureCount.get(id).getPercentCovered();
+                if (percentCovered <= this.minCoveragePercent) {
+                    this.detectedFeatures.add(this.coveredFeatureCount.get(id));
+                }
             }
         }
     }
     
     @Override
     public List<CoveredFeature> getResults() {
-        return this.coveredFeatures;
+        return this.detectedFeatures;
     }
     
     public int getNoGenomeFeatures() {

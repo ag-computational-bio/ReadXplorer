@@ -63,10 +63,14 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
 
     @Override
     public List<List<String>> dataColumnDescriptions() {
+        
+        ParameterSetCoveredFeatures parameters = (ParameterSetCoveredFeatures) this.getParameters();
+        String coveredString = parameters.isGetCoveredFeatures() ? "Covered" : "Uncovered";
+        
         List<List<String>> dataColumnDescriptions = new ArrayList<>();
         List<String> resultDescriptions = new ArrayList<>();
-
-        resultDescriptions.add("Covered Feature");
+        
+        resultDescriptions.add(coveredString + " Feature");
         resultDescriptions.add("Track");
         resultDescriptions.add("Strand");
         resultDescriptions.add("Start");
@@ -79,7 +83,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
 
         //add covered features detection statistic sheet header
         List<String> statisticColumnDescriptions = new ArrayList<>();
-        statisticColumnDescriptions.add("Covered Features Detection Parameter and Statistics Table");
+        statisticColumnDescriptions.add(coveredString + " Features Detection Parameter and Statistics Table");
 
         dataColumnDescriptions.add(statisticColumnDescriptions);
 
@@ -113,21 +117,25 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
 
         //create statistics sheet
         ParameterSetCoveredFeatures parameters = (ParameterSetCoveredFeatures) this.getParameters();
-
+        String coveredString = parameters.isGetCoveredFeatures() ? "Covered" : "Uncovered";
+        
         List<List<Object>> statisticsExportData = new ArrayList<>();
-
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Covered feature detection statistics for tracks:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(coveredString + " feature detection statistics for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Covered feature detection parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " feature detection parameters:"));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum covered percent:", parameters.getMinCoveredPercent()));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
+        String whateverStrand = parameters.isWhateverStrand() ? "no" : "yes";
+        String uncoveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Only count read on feature strand:", whateverStrand));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Detect uncovered instead of covered features:", uncoveredFeatures));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Covered feature statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " feature statistics:"));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of covered features", coveredFeaturesResultList.size()));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of reference features", featureListSize));
 
@@ -140,7 +148,15 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
     @Override
     public List<String> dataSheetNames() {
         List<String> sheetNames = new ArrayList<>();
-        sheetNames.add("Covered Features Table");
+        
+        ParameterSetCoveredFeatures parameters = (ParameterSetCoveredFeatures) this.getParameters();
+        String tableHeader;
+        if (parameters.isGetCoveredFeatures()) {
+            tableHeader = "Covered Features Table";
+        } else {
+            tableHeader = "Uncovered Features Table";
+        }
+        sheetNames.add(tableHeader);
         sheetNames.add("Parameters and Statistics");
         return sheetNames;
     }

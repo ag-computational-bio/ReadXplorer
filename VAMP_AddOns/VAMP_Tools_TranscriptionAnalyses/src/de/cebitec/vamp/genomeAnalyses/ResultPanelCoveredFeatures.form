@@ -23,7 +23,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="coveredFeaturesPane" pref="662" max="32767" attributes="0"/>
+          <Component id="coveredFeaturesPane" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
