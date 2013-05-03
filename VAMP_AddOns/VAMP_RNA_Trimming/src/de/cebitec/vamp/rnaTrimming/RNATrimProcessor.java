@@ -143,10 +143,10 @@ public class RNATrimProcessor  {
             fasta.close();
             fileWriter.close();
             samItor.close();
-            io.getOut().println(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Finish", samfile.getAbsolutePath()));
+            this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Finish", samfile.getAbsolutePath()));
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
-            io.getOut().println(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Failed", samfile.getAbsolutePath()));
+            this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Failed", samfile.getAbsolutePath()));
         }
         ph.finish();
         this.updateChartData();

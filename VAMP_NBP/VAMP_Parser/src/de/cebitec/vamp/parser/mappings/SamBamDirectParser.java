@@ -4,17 +4,17 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
 import de.cebitec.vamp.parser.common.DirectAccessDataContainer;
+import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParsingException;
-import de.cebitec.vamp.parser.output.SamBamSorter;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.StatsContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
@@ -62,7 +62,6 @@ public class SamBamDirectParser implements MappingParserI, Observer {
         this.seqPairProcessor = seqPairProcessor;
     }
 
-    //TODO: think about statistic inclusion in some kind of ParsedMappingContainer?
     @Override
     public String getName() {
         return name;
@@ -92,7 +91,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     }
 
     /**
-     * Sorts the file by read sequence.
+     * Currently does nothing, since no preprocessing is required.
      * @param trackJob the trackjob to preprocess
      * @return true, if the method succeeded, false otherwise
      * @throws ParsingException
@@ -100,10 +99,10 @@ public class SamBamDirectParser implements MappingParserI, Observer {
      */
     @Override
     public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
-        SamBamSorter sorter = new SamBamSorter();
-        sorter.registerObserver(this);
-        boolean success = true; // sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
-        return success;
+//        SamBamSorter sorter = new SamBamSorter();
+//        sorter.registerObserver(this);
+//         sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.readseq, SamUtils.SORT_READSEQ_STRING);
+        return true;
     }
 
     /**
@@ -133,23 +132,24 @@ public class SamBamDirectParser implements MappingParserI, Observer {
 
         int lineno = 0;
 
-        //mapping of read name to number of occurences of the read and the lowest error number
-        Map<String, Pair<Integer, Integer>> classificationMap = new HashMap<>();
+        //mapping of read name to number of occurences of the read and the lowest mismatch count
+        Map<String, ParsedClassification> classificationMap = new HashMap<>();
 
         String refSeq;
         int start;
         int stop;
-        int differences;
+        int mismatches;
         boolean isRevStrand;
         String readSeq;
         String cigar;
         String readName;
-        Pair<Integer, Integer> classificationPair;
+        ParsedClassification classificationData;
         DiffAndGapResult diffGapResult;
         ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+            SAMFileHeader.SortOrder sortOrder = sam.getFileHeader().getSortOrder();
             SAMRecordIterator samItor = sam.iterator();
 
             SAMRecord record;
@@ -181,16 +181,14 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                         //count differences to reference
                         isRevStrand = record.getReadNegativeStrandFlag();
                         diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
-                        differences = diffGapResult.getDifferences();
+                        mismatches = diffGapResult.getDifferences();
                         readName = ParserCommonMethods.elongatePairedReadName(record);
                         if (!classificationMap.containsKey(readName)) {
-                            classificationMap.put(readName, new Pair<>(0, Integer.MAX_VALUE));
+                            classificationMap.put(readName, new ParsedClassification(sortOrder));
                         }
-                        classificationPair = classificationMap.get(readName);
-                        classificationPair.setFirst(classificationPair.getFirst() + 1);
-                        if (classificationPair.getSecond() > differences) {
-                            classificationPair.setSecond(differences);
-                        }
+                        classificationData = classificationMap.get(readName);
+                        classificationData.addReadStart(start);
+                        classificationData.updateMinMismatches(mismatches);
 
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
 

@@ -368,7 +368,7 @@ public class ProjectConnector extends Observable {
                     FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS,
-                FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS, BIGINT_UNSIGNED));
+                    FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
                     FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS, BIGINT_UNSIGNED));
@@ -424,6 +424,9 @@ public class ProjectConnector extends Observable {
         //Drop old PARENT_ID column
         this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_FEATURES, "PARENT_ID"));
+        
+        //Drop unneeded indexes
+        this.runSqlStatement(SQLStatements.DROP_INDEX_INDEXPOS);
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
@@ -2130,7 +2133,7 @@ public class ProjectConnector extends Observable {
      */
     public List<SnpI> findSNPs(int percentageThreshold, int absThreshold, List<Integer> trackIds) {
         List<SnpI> snps = new ArrayList<>();
-        if (trackIds.isEmpty()){
+        if (trackIds.isEmpty()) {
             String msg = NbBundle.getMessage(ProjectConnector.class, "ProjectConnector.NoTracksMsg", 
                         "When no track are opened/chosen, no result can be returned!");
             String header = NbBundle.getMessage(ProjectConnector.class, "ProjectConnector.NoTracksHeader", 
@@ -2138,39 +2141,42 @@ public class ProjectConnector extends Observable {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE);
             return snps;
         }
-        // currently opened tracks
+        // run snp detection for selected tracks
+        int track2Id;
+        for (Integer trackId : trackIds) {
         try {
-            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
+                PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
 //            fetchSNP.setInt(1, trackIds.get(0));
-            fetchSNP.setInt(1, percentageThreshold);
-            fetchSNP.setInt(2, absThreshold);
-            fetchSNP.setInt(3, absThreshold);
-            fetchSNP.setInt(4, absThreshold);
-            fetchSNP.setInt(5, absThreshold);
-            fetchSNP.setInt(6, absThreshold);
-            
-            ResultSet rs = fetchSNP.executeQuery();
-            while (rs.next()) {
-                String position = rs.getString(FieldNames.POSITIONS_POSITION);
-                int trackId = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
-                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
-                char refBase = rs.getString(FieldNames.POSITIONS_REFERENCE_BASE).charAt(0);
-                int aRate = rs.getInt(FieldNames.POSITIONS_A);
-                int cRate = rs.getInt(FieldNames.POSITIONS_C);
-                int gRate = rs.getInt(FieldNames.POSITIONS_G);
-                int tRate = rs.getInt(FieldNames.POSITIONS_T);
-                int nRate = rs.getInt(FieldNames.POSITIONS_N);
-                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
-                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
-                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
-                SequenceComparison type = SequenceComparison.getSequenceComparison(rs.getString(FieldNames.POSITIONS_TYPE).charAt(0));
-                if (trackIds.contains(trackId)) {
+                fetchSNP.setInt(1, trackId);
+                fetchSNP.setInt(2, percentageThreshold);
+                fetchSNP.setInt(3, absThreshold);
+                fetchSNP.setInt(4, absThreshold);
+                fetchSNP.setInt(5, absThreshold);
+                fetchSNP.setInt(6, absThreshold);
+                fetchSNP.setInt(7, absThreshold);
+
+                ResultSet rs = fetchSNP.executeQuery();
+                while (rs.next()) {
+                    String position = rs.getString(FieldNames.POSITIONS_POSITION);
+                    char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
+                    char refBase = rs.getString(FieldNames.POSITIONS_REFERENCE_BASE).charAt(0);
+                    int aRate = rs.getInt(FieldNames.POSITIONS_A);
+                    int cRate = rs.getInt(FieldNames.POSITIONS_C);
+                    int gRate = rs.getInt(FieldNames.POSITIONS_G);
+                    int tRate = rs.getInt(FieldNames.POSITIONS_T);
+                    int nRate = rs.getInt(FieldNames.POSITIONS_N);
+                    int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
+                    int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
+                    int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
+                    SequenceComparison type = SequenceComparison.getSequenceComparison(rs.getString(FieldNames.POSITIONS_TYPE).charAt(0));
+                    track2Id = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
+                    if (trackId != track2Id) { System.out.println("trackids not equal: " + trackId + ", db: " + track2Id); }
                     snps.add(new Snp(position, trackId, base, refBase, aRate, cRate, gRate,
-                            tRate, nRate, gapRate, coverage, frequency, type));
+                                tRate, nRate, gapRate, coverage, frequency, type));
                 }
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return snps;

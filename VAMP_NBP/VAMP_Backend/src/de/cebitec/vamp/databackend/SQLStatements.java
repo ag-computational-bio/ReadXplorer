@@ -15,12 +15,11 @@ public class SQLStatements {
     
     public static String DELETE_OBJECTFROMCACHE = "DELETE FROM "
     + FieldNames.TABLE_OBJECTCACHE + " WHERE "
-    + FieldNames.OBJECTCACHE_FAMILY+"=? AND " + FieldNames.OBJECTCACHE_KEY
-    + "=?";
+    + FieldNames.OBJECTCACHE_FAMILY + " = ? AND " + FieldNames.OBJECTCACHE_KEY + " = ? ";
     
     public static String DELETE_OBJECTFAMILYFROMCACHE = "DELETE FROM "
     + FieldNames.TABLE_OBJECTCACHE + " WHERE "
-    + FieldNames.OBJECTCACHE_FAMILY+"=?";
+    + FieldNames.OBJECTCACHE_FAMILY+ " = ? ";
 
     /**
      * Private constructor so this utility class can not be instantiated.
@@ -103,6 +102,11 @@ public class SQLStatements {
      */
     public static String DROP_TABLE_COVERAGE_DISTRIBUTION = "DROP TABLE IF EXISTS COVERAGE_DISTRIBUTION";
 
+    /** 
+     * Only needed as long as older databases are floating around and did not
+     * already drop this index which is not necessary anymore. 
+     */
+    public static String DROP_INDEX_INDEXPOS = "DROP INDEX IF EXISTS INDEXPOS";
          
          
     //////////////////  statements for data insertion  ////////////////////////
@@ -719,43 +723,6 @@ public class SQLStatements {
             + FieldNames.TABLE_TRACK
             + " WHERE "
             + FieldNames.TRACK_REFERENCE_ID + " = ? ";
-    
-    
-    public final static String FETCH_SNP_DATA_FOR_TRACK_FOR_INTERVAL =
-            "SELECT A." + FieldNames.DIFF_POSITION + ", "
-            + "A." + FieldNames.DIFF_BASE + ", "
-            + "A." + FieldNames.MAPPING_DIRECTION + ", "
-            + "A." + FieldNames.DIFF_TYPE + ", "
-            + "A." + FieldNames.DIFF_GAP_ORDER + ", "
-            + "A.mult_count, "
-            + "C." + FieldNames.COVERAGE_BM_FW_MULT + ", "
-            + "C." + FieldNames.COVERAGE_BM_RV_MULT + " "
-            + "FROM "
-            + "(SELECT "
-            + FieldNames.DIFF_POSITION + ", "
-            + FieldNames.DIFF_BASE + ", "
-            + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_GAP_ORDER + ", "
-            + FieldNames.MAPPING_DIRECTION + ", "
-            + "SUM(" + FieldNames.MAPPING_NUM_OF_REPLICATES + ") as mult_count  "
-            + "FROM "
-            + FieldNames.TABLE_MAPPING + " AS M "
-            + "left join " + FieldNames.TABLE_DIFF + " AS D "
-            + "on D." + FieldNames.DIFF_MAPPING_ID + " = M." + FieldNames.MAPPING_ID + " "
-            + "WHERE "
-            + "M." + FieldNames.MAPPING_TRACK + " = ? and M." + FieldNames.MAPPING_IS_BEST_MAPPING + " = 1 and M."
-            + FieldNames.MAPPING_START + " BETWEEN ? AND ? and D." + FieldNames.DIFF_POSITION + " BETWEEN ? AND ? "
-            + "GROUP BY "
-            + "D." + FieldNames.DIFF_POSITION + ", "
-            + "D." + FieldNames.DIFF_GAP_ORDER + ", "
-            + "D." + FieldNames.DIFF_BASE + ", "
-            + "M." + FieldNames.MAPPING_DIRECTION + " ,"
-            + "D." + FieldNames.DIFF_TYPE + ""
-            + ") as A , "
-            + FieldNames.TABLE_COVERAGE + " AS C "
-            + "WHERE "
-            + "C." + FieldNames.COVERAGE_TRACK + " = ? AND "
-            + "C." + FieldNames.COVERAGE_POSITION + " = A." + FieldNames.DIFF_POSITION;
     
     
     public final static String GET_LATEST_STATISTICS_ID =
@@ -1568,7 +1535,7 @@ public class SQLStatements {
             + "FROM "
             + FieldNames.TABLE_POSITIONS
             + " WHERE ("
-//            + FieldNames.POSITIONS_TRACK_ID + " = ? AND "
+            + FieldNames.POSITIONS_TRACK_ID + " = ? AND "
             + FieldNames.POSITIONS_TYPE + " != 'M' AND "
             + FieldNames.POSITIONS_FREQUENCY + " >= ? AND "
             + "SELECT CASE WHEN "

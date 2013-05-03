@@ -2,11 +2,11 @@ package de.cebitec.vamp.seqPairClassifier;
 
 import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.DiscreteCountingDistribution;
-import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
 import java.util.Map;
 import java.util.logging.Level;
@@ -39,7 +39,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
      * @param classificationMap the classification map of the track - not needed
      * in this parser until now
      */
-    public SamBamDirectSeqPairStatsParser(SeqPairJobContainer seqPairJobContainer, String refSeq, Map<String, Pair<Integer, Integer>> classificationMap) {
+    public SamBamDirectSeqPairStatsParser(SeqPairJobContainer seqPairJobContainer, String refSeq, Map<String, ParsedClassification> classificationMap) {
         super(seqPairJobContainer, refSeq, classificationMap);
         this.trackJob = seqPairJobContainer.getTrackJob1();
         this.dist = seqPairJobContainer.getDistance();

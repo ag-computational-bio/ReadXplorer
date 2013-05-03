@@ -2,7 +2,7 @@ package de.cebitec.vamp.seqPairClassifier;
 
 import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.ParsedMapping;
+import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
@@ -38,7 +38,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     private int maxDist;
     private short orienation; //orientation of the reads: 0 = fr, 1 = rf, 2 = ff/rr
     private SAMFileWriter samBamFileWriter;
-    private Map<String,Pair<Integer,Integer>> classificationMap; 
+    private Map<String,ParsedClassification> classificationMap; 
     private final String refSeq;
     private boolean deleteSortedFile;
     
@@ -59,7 +59,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      *      is needed for the extension of the sam/bam file
      */
     public SamBamDirectSeqPairClassifier(SeqPairJobContainer seqPairJobContainer, String refSeq, 
-            Map<String,Pair<Integer,Integer>> classificationMap) {
+            Map<String,ParsedClassification> classificationMap) {
         this.observers = new ArrayList<>();
         this.trackJob = seqPairJobContainer.getTrackJob1();
         this.dist = seqPairJobContainer.getDistance();
@@ -212,8 +212,8 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         int stop2;
         int currDist;
         boolean pairSize;
-        Pair<Integer, Integer> class1;
-        Pair<Integer, Integer> class2;
+        ParsedClassification class1;
+        ParsedClassification class2;
         int diffs1;
         int diffs2;
 
@@ -347,9 +347,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                         if (currDist <= this.maxDist && currDist >= this.minDist) { //distance fits
                                             ///////////////////////////// found a perfect pair! /////////////////////////////////
                                             seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_PERFECT_PAIR, currDist);
-                                            if (diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //only perfect and best match mappings pass here
-                                                this.addClassificationData(recordA, diffs1);
-                                                this.addClassificationData(recordB, diffs2);
+                                            if (diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches()) { //only perfect and best match mappings pass here
+                                                ParserCommonMethods.addClassificationData(recordA, diffs1, classificationMap);
+                                                ParserCommonMethods.addClassificationData(recordB, diffs2, classificationMap);
                                                 this.addPairedRecord(seqPair);
                                                 omitList.add(recordA);
                                                 omitList.add(recordB);
@@ -359,7 +359,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                                         } else //////////////// distance too small, potential pair //////////////////////////
                                         if (currDist < this.maxDist) {
                                             seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_DIST_SMALL_PAIR, currDist);
-                                            if (largestSmallerDist < currDist && diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //best mappings
+                                            if (largestSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches()) { //best mappings
                                                 largestSmallerDist = currDist;
                                                 potSmallPairList.add(seqPair);
                                             } else if (largestPotSmallerDist < currDist) { //at least one common mapping in potential pair
@@ -375,14 +375,14 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
 
                                         if (currDist <= this.maxDist && currDist >= this.minDist) { ////distance fits, orientation not ///////////
                                             seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_ORIENT_WRONG_PAIR, currDist);
-                                            if (diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //best mappings
+                                            if (diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches()) { //best mappings
                                                 unorPairList.add(seqPair);
                                             } else {
                                                 potUnorPairList.add(seqPair);
                                             }
                                         } else if (currDist < this.maxDist && largestSmallerDist < currDist) {///// orientation wrong & distance too small //////////////////////////////
                                             seqPair = new DirectSeqPair(recordA, recordB, seqPairId, Properties.TYPE_OR_DIST_SMALL_PAIR, currDist);
-                                            if (largestUnorSmallerDist < currDist && diffs1 <= class1.getSecond() && diffs2 <= class2.getSecond()) { //best mappings
+                                            if (largestUnorSmallerDist < currDist && diffs1 <= class1.getMinMismatches() && diffs2 <= class2.getMinMismatches()) { //best mappings
                                                 largestUnorSmallerDist = currDist;
                                                 unorSmallPairList.add(seqPair);
                                             } else if (largestPotUnorSmallerDist < currDist) {
@@ -590,7 +590,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
         Integer mapCount = null;
         String readName = ParserCommonMethods.elongatePairedReadName(record);
         if (this.classificationMap.get(readName) != null) {
-            mapCount = this.classificationMap.get(readName).getFirst();
+            mapCount = this.classificationMap.get(readName).getNumberOccurrences();
         }
         return mapCount;
     }
@@ -624,41 +624,13 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * sequence pair is set.
      * @param dist distance in bases
      * @param deviation deviation in % (1-100)
+     * @return the maximum distance of a mapping pair, which is accepted as valid 
      */
     protected int calculateMinAndMaxDist(final int dist, final int deviation) {
         int devInBP = dist / 100 * deviation;
         this.minDist = dist - devInBP;
         this.maxDist = dist + devInBP;
         return maxDist;
-    }
-
-    /**
-     * Adds the classification data (type and number of mapped positions) to the sam record.
-     * Use this method, if the number of differences is already known.
-     * @param record the sam record to update
-     * @param differences the number of differences the record has to the reference
-     */
-    private void addClassificationData(SAMRecord record,  int differences) {
-        String readName = ParserCommonMethods.elongatePairedReadName(record);
-        if (this.classificationMap.get(readName) != null) {
-            int lowestDiffRate = this.classificationMap.get(readName).getSecond();
-
-            if (differences == 0) { //perfect mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
-
-            } else if (differences == lowestDiffRate) { //best match mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
-
-            } else if (differences > lowestDiffRate) { //common mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
-
-            } else { //meaning: differences < lowestDiffRate
-                this.notifyObservers("Cannot contain less than the lowest diff rate number of errors!");
-            }
-            record.setAttribute(Properties.TAG_MAP_COUNT, this.classificationMap.get(readName).getFirst());
-        } else {
-            //currently no data is added to reads with errors, since they are not contained in the classification map
-        }
     }
     
     /**
@@ -672,7 +644,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 record.getReadString(), 
                 this.refSeq.substring(record.getAlignmentStart() - 1, record.getAlignmentEnd()),
                 record.getReadNegativeStrandFlag());
-        this.addClassificationData(record, differences);
+        ParserCommonMethods.addClassificationData(record, differences, classificationMap);
     }
 
     /**

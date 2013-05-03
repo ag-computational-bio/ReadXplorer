@@ -37,7 +37,7 @@ public class H2SQLStatements {
     
     
     public final static String INDEX_POSITIONS =
-            "CREATE INDEX IF NOT EXISTS INDEXPOS ON " + FieldNames.TABLE_POSITIONS + "(" + FieldNames.POSITIONS_SNP_ID + ", " + FieldNames.POSITIONS_TRACK_ID + ") ";
+            "CREATE INDEX IF NOT EXISTS INDEXPOSTRACKID ON " + FieldNames.TABLE_POSITIONS + "(" + FieldNames.POSITIONS_TRACK_ID + ") ";
     
     
     public final static String SETUP_REFERENCE_GENOME =

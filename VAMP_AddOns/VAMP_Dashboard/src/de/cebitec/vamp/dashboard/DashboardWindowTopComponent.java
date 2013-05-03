@@ -73,6 +73,8 @@ preferredID = "DashboardWindowTopComponent")
 })
 public final class DashboardWindowTopComponent extends TopComponent implements ExplorerManager.Provider {
     
+    private static final long serialVersionUID = 1L;
+    
     private ExplorerManager em = new ExplorerManager();
     private OutlineView ov;
     
@@ -112,7 +114,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
                             List<PersistantTrack> tracks = genomesandtracks.get(genome);
 
                             if (tracks != null) {
-                                List<Item> trackItems = new ArrayList<Item>();
+                                List<Item> trackItems = new ArrayList<>();
                                 for (PersistantTrack track : tracks) {
                                     trackItems.add(new Item(track));
                                 }
@@ -126,6 +128,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
                         }
                     }
 
+                    @Override
                     protected void addNotify() {
                         super.addNotify();
                         this.setKeys(genomesandtracks.keySet());
@@ -284,7 +287,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
      * and return only those with getMark() = true
      */
     private static List<Node> getAllMarkedNodes(List<Node> nodes) {
-        ArrayList<Node> selectedNodes = new ArrayList<Node>(); 
+        ArrayList<Node> selectedNodes = new ArrayList<>(); 
         for(Node n : nodes) {
             ItemNode node = (ItemNode) n;
             Item item = node.getData();
@@ -307,7 +310,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
         // GenomeID -> List<ReferenceID>
         selectedNodes.addAll(Arrays.asList(em.getSelectedNodes()));
         
-        HashMap<Long,HashSet<Long>> genomesandtracks_toopen = new HashMap<Long,HashSet<Long>>();
+        HashMap<Long,HashSet<Long>> genomesandtracks_toopen = new HashMap<>();
         for(Node n : selectedNodes) {
             ItemNode node = (ItemNode) n;
             Item item = node.getData();
@@ -348,9 +351,9 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
             //open tracks for this genome now
             List<PersistantTrack> all_tracks_for_this_genome = genomesAndTracks.get(genome);
             
-            List<PersistantTrack> tracks_to_show = new ArrayList<PersistantTrack>();
+            List<PersistantTrack> tracks_to_show = new ArrayList<>();
             
-            for(PersistantTrack track : all_tracks_for_this_genome) {
+            for (PersistantTrack track : all_tracks_for_this_genome) {
                 if (track_ids.contains(new Long(track.getId()))) {
                     tracks_to_show.add(track);
                 }
