@@ -32,6 +32,7 @@ import net.sf.samtools.SAMFileWriterFactory;
 import net.sf.samtools.SAMFormatException;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
+import org.h2.store.fs.FileUtils;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
@@ -161,6 +162,8 @@ public class RNATrimProcessor  {
         //set path to the fasta file to be created
         File samfile = new File(sampath);
         String newPath = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(samfile)+"_with_originals.sam";
+        
+        this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sourcePath));
         
         //set up the progress handle to indicate progress to the user
         ProgressHandle ph = ProgressHandleFactory.createHandle(
@@ -322,51 +325,53 @@ public class RNATrimProcessor  {
     //private Integer unmappedReads = null;
     
     private void updateChartData() {
-        Platform.runLater(new Runnable() {
-        @Override
-        public void run() {
-            //Integer unmappedReads = allReads;
-            /*if (pieChartData!=null) {
-                pieChartData.clear();
-                if (mappedReads==null) {    
-                    pieChartData.add(new PieChart.Data("all reads", allReads));
-                }
-                else {
-                    unmappedReads -= mappedReads;
-                    pieChartData.add(new PieChart.Data("fully mapped reads", mappedReads));
-                    if (trimmedMappedReads==null) { 
-                        if (trimmedReads!=null) {
-                            unmappedReads -= trimmedReads;
-                            pieChartData.add(new PieChart.Data("trimmed reads", trimmedReads));
-                        }
+        if (this.statisticsWindow!=null) { 
+            Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                //Integer unmappedReads = allReads;
+                /*if (pieChartData!=null) {
+                    pieChartData.clear();
+                    if (mappedReads==null) {    
+                        pieChartData.add(new PieChart.Data("all reads", allReads));
                     }
                     else {
-                        unmappedReads -= trimmedMappedReads;
-                        pieChartData.add(new PieChart.Data("trimmed mapped reads", trimmedMappedReads));
+                        unmappedReads -= mappedReads;
+                        pieChartData.add(new PieChart.Data("fully mapped reads", mappedReads));
+                        if (trimmedMappedReads==null) { 
+                            if (trimmedReads!=null) {
+                                unmappedReads -= trimmedReads;
+                                pieChartData.add(new PieChart.Data("trimmed reads", trimmedReads));
+                            }
+                        }
+                        else {
+                            unmappedReads -= trimmedMappedReads;
+                            pieChartData.add(new PieChart.Data("trimmed mapped reads", trimmedMappedReads));
+                        }
+                        pieChartData.add(new PieChart.Data("unmapped reads", unmappedReads));
                     }
-                    pieChartData.add(new PieChart.Data("unmapped reads", unmappedReads));
-                }
 
 
-            }*/
-            
-            /*
-             * new XYChart.Data<String, Number>(all, mappedReads);
-            series1.getData().add();
-            series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
-            series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
-            series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));
-             */
-            whole_mapped_data.setYValue(mappedReads);
-            whole_unmapped_data.setYValue(allReads-mappedReads);
-            trimmed_mapped_data.setYValue(trimmedMappedReads);
-            trimmed_unmapped_data.setYValue(trimmedReads-trimmedMappedReads);
-            
-            
-        }});
+                }*/
+
+                /*
+                 * new XYChart.Data<String, Number>(all, mappedReads);
+                series1.getData().add();
+                series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
+                series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
+                series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));
+                 */
+                whole_mapped_data.setYValue(mappedReads);
+                whole_unmapped_data.setYValue(allReads-mappedReads);
+                trimmed_mapped_data.setYValue(trimmedMappedReads);
+                trimmed_unmapped_data.setYValue(trimmedReads-trimmedMappedReads);
+
+
+            }});
         
-        statisticsWindow.setVisible(true);
-        statisticsWindow.toFront();
+            statisticsWindow.setVisible(true);
+            statisticsWindow.toFront();
+        }
         
     }
     
@@ -383,83 +388,70 @@ public class RNATrimProcessor  {
     StackedBarChart<String, Number> chart;
     
     public void createStatisticsWindow() throws InterruptedException {       
-        this.statisticsWindow = new JFrame("Read statistics");
-        statisticsWindow.setSize(500, 500);
-        final JFXPanel fxPanel = new JFXPanel();
-        statisticsWindow.add(fxPanel);
+        //SunOS is not supported by JavaFX
+        // in this case an exception will be trown. it is safe to ignore it
+        // and continue without showing stats window to the user
+        try {
+        
+            this.statisticsWindow = new JFrame("Read statistics");
+            statisticsWindow.setSize(500, 500);
+            final JFXPanel fxPanel = new JFXPanel();
+            statisticsWindow.add(fxPanel);
 
-        Platform.runLater(new Runnable() {
-        @Override
-        public void run() {
-            //Stage primaryStage = new Stage();
-            Group root = new Group();
-            fxPanel.setScene(new Scene(root));
-             /*pieChartData = FXCollections.observableArrayList(
+            Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                //Stage primaryStage = new Stage();
+                Group root = new Group();
+                fxPanel.setScene(new Scene(root));
+                 /*pieChartData = FXCollections.observableArrayList(
 
-             );*/
-            CategoryAxis xAxis = new CategoryAxis();
-            NumberAxis yAxis = new NumberAxis(); 
-            yAxis.setAutoRanging(true);
-            chart =
-            new StackedBarChart<String, Number>(xAxis, yAxis);
-            chart.setAnimated(false);
-            series2 = new XYChart.Series<String, Number>();
-            series1 = new XYChart.Series<String, Number>();
-            
-            series1.setName("mapped");
-            series2.setName("unmapped");
-            
-            series1.getData().clear();
-            series1.getData().clear();
-            whole_unmapped_data = new XYChart.Data<String, Number>(all, 1);
-            whole_mapped_data = new XYChart.Data<String, Number>(all, 1);
-            trimmed_unmapped_data = new XYChart.Data<String, Number>(trimmed, 1);
-            trimmed_mapped_data = new XYChart.Data<String, Number>(trimmed, 1);   
-            
-            series1.getData().add(trimmed_mapped_data);
-            series2.getData().add(trimmed_unmapped_data);
-            series1.getData().add(whole_mapped_data);
-            series2.getData().add(whole_unmapped_data);
-            
-            /*series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
-            series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
-            series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));*/
-                        
-            xAxis.setLabel("Data");
-            xAxis.setCategories(FXCollections.<String>observableArrayList(
-                Arrays.asList(all, trimmed)));
-            yAxis.setLabel("Reads");
+                 );*/
+                CategoryAxis xAxis = new CategoryAxis();
+                NumberAxis yAxis = new NumberAxis(); 
+                yAxis.setAutoRanging(true);
+                chart =
+                new StackedBarChart<String, Number>(xAxis, yAxis);
+                chart.setAnimated(false);
+                series2 = new XYChart.Series<String, Number>();
+                series1 = new XYChart.Series<String, Number>();
 
-            chart.setCategoryGap(5);
-            chart.getData().addAll(series2, series1);
-            
-            //chart.setClockwise(false);
-            root.getChildren().add(chart);
+                series1.setName("mapped");
+                series2.setName("unmapped");
 
-        }});
+                series1.getData().clear();
+                series1.getData().clear();
+                whole_unmapped_data = new XYChart.Data<String, Number>(all, 1);
+                whole_mapped_data = new XYChart.Data<String, Number>(all, 1);
+                trimmed_unmapped_data = new XYChart.Data<String, Number>(trimmed, 1);
+                trimmed_mapped_data = new XYChart.Data<String, Number>(trimmed, 1);   
+
+                series1.getData().add(trimmed_mapped_data);
+                series2.getData().add(trimmed_unmapped_data);
+                series1.getData().add(whole_mapped_data);
+                series2.getData().add(whole_unmapped_data);
+
+                /*series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
+                series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
+                series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));*/
+
+                xAxis.setLabel("Data");
+                xAxis.setCategories(FXCollections.<String>observableArrayList(
+                    Arrays.asList(all, trimmed)));
+                yAxis.setLabel("Reads");
+
+                chart.setCategoryGap(5);
+                chart.getData().addAll(series2, series1);
+
+                //chart.setClockwise(false);
+                root.getChildren().add(chart);
+
+            }});
+        } catch(UnsupportedOperationException e) {
+            this.showMsg("Could not intialize statistics window: "+e.getLocalizedMessage());
+            this.statisticsWindow = null;
+        }
     } 
-     
-    /*public void createPieChart() throws InterruptedException {       
-        this.statisticsWindow = new JFrame("Read stats");
-        statisticsWindow.setSize(500, 500);
-        final JFXPanel fxPanel = new JFXPanel();
-        statisticsWindow.add(fxPanel);
-
-        Platform.runLater(new Runnable() {
-        @Override
-        public void run() {
-            //Stage primaryStage = new Stage();
-            Group root = new Group();
-            fxPanel.setScene(new Scene(root));
-             pieChartData = FXCollections.observableArrayList(
-
-             );
-            PieChart chart = new PieChart(pieChartData);
-            chart.setClockwise(false);
-            root.getChildren().add(chart);
-
-        }});
-    }*/
     
     public RNATrimProcessor(final String referencePath, final String sourcePath, final int maximumTrim, final TrimMethod method ) {
         NbBundle.getMessage(RNATrimProcessor.class, "RNATrimProcessor.output.name");
@@ -513,6 +505,7 @@ public class RNATrimProcessor  {
                 try {
                     if (!canceled) sam = MappingApi.mapFastaFile(io, referencePath, fasta);
                     if (!canceled) extractedSam = extractOriginalSequencesInSamFile(sam, true);
+                    if (!canceled) FileUtils.delete(sam);
                     if (!canceled) showMsg("Extraction ready!");
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);

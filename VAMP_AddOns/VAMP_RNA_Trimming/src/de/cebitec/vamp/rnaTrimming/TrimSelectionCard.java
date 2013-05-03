@@ -180,7 +180,7 @@ public class TrimSelectionCard extends javax.swing.JPanel {
 
     private void openSourceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSourceButtonActionPerformed
         File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Filepath",
-                new FileNameExtensionFilter("SAM Sequence Mapping File", "sam"),
+                new FileNameExtensionFilter("SAM/BAM Sequence Mapping File", "sam", "bam"),
                 sourceFileField, TrimSelectionCard.class, this);
         if (file!=null) {
             sourceFile = file;

@@ -39,7 +39,7 @@ id = "de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction")
 @ActionRegistration(
     displayName = "#CTL_CorrelationAnalysisAction")
 @ActionReference(path = "Menu/Tools", position = 3333) 
-@Messages("CTL_CorrelationAnalysisAction=analyse tracks correlation ")
+@Messages("CTL_CorrelationAnalysisAction=Analyse tracks correlation ")
 public final class CorrelationAnalysisAction implements ActionListener {
     public final static String PROP_SELECTED_TRACKS = "PROP_SELECTED_TRACKS";
     public final static String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";

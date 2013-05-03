@@ -42,16 +42,21 @@ public abstract class RequestThread extends Thread {
      * @param request the currently handled request
      * @return true, if the request bounds are identical, false otherwise
      */
-    protected boolean matchesLatestRequestBounds(IntervalRequest request) {
+    protected boolean doesNotMatchLatestRequestBounds(IntervalRequest request) {
         int latestMiddle = calcCenterMiddle(latestRequest);
         int currentMiddle = calcCenterMiddle(request);
-
+        
         // rounding error somewhere....
-        if (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1) {
+        if (
+            (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1) 
+            || (request.getDesiredData()!=latestRequest.getDesiredData())
+            || (request.getSender()!=latestRequest.getSender())
+                ) {
             return true;
         } else {
             return false;
         }
+        //return true;
     }
 
     /**

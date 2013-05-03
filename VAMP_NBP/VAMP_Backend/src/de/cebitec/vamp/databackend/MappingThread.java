@@ -345,7 +345,7 @@ public class MappingThread extends RequestThread {
 
             IntervalRequest request = requestQueue.poll();
             if (request != null) {
-                if (matchesLatestRequestBounds(request)) {
+                if (doesNotMatchLatestRequestBounds(request)) {
                     if (request.getDesiredData() == Properties.MAPPINGS_W_DIFFS) {
                         this.currentMappings = this.loadMappingsWithDiffs(request);
                     } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {

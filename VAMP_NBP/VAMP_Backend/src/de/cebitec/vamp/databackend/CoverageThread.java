@@ -644,7 +644,7 @@ public class CoverageThread extends RequestThread {
                     } else if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo()) 
                             || (currentCov.isDiffsAndGapsUsed() && request instanceof CoverageAndDiffRequest)) {
 //                        requestCounter++;
-                        if (matchesLatestRequestBounds(request)) {
+                        if (doesNotMatchLatestRequestBounds(request)) {
                             if (trackID2 != 0) {
                                 currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
                             } else if (this.trackID != 0) {
@@ -656,13 +656,13 @@ public class CoverageThread extends RequestThread {
                             } else if (this.tracks != null && !this.tracks.isEmpty()) {
                                 currentCov = this.loadCoverageMultiple(request);
                             }
-                        } else {
+                        } /*else {
                             skippedCounter++;
                             request.getSender().notifySkipped();
-                        }
+                        }*/
                     }
                     
-                    if (this.matchesLatestRequestBounds(request)) {
+                    if (this.doesNotMatchLatestRequestBounds(request)) {
                         request.getSender().receiveData(currentCov);
                     }
                     else {

@@ -4,7 +4,6 @@
  */
 package de.cebitec.vamp.correlationAnalysis;
 
-import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -12,7 +11,6 @@ import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -21,8 +19,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 
 /**
  * CorrelationAnalysisProcessor is a process of analysing correlation
@@ -35,6 +31,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private final Integer minCorrelation;
     private final Integer minPeakCoverage;
     private StrangDirection currentDirection;
+    private boolean canceled = false;
 
     private void createProcessHandle(String title) {
         this.ph = ProgressHandleFactory.createHandle(title, new Cancellable() {
@@ -69,23 +66,10 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     public CorrelationAnalysisProcessor(ReferenceViewer referenceViewer, List<PersistantTrack> list, 
             Integer intervalLength, Integer minCorrelation, Integer minPeakCoverage) {
-        /*this.io = IOProvider.getDefault().getIO("CorrelationAnalysis", true);
-        this.io.setOutputVisible(true);
-        this.io.getOut().println("");
-        
-        CentralLookup.getDefault().add(this);
-        try {
-            io.getOut().reset();
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        io.select();*/
         
         this.ready = false;
         this.currentPosition = 1;
         this.currentDirection = StrangDirection.FWD;
-        
-        
         
         ArrayList<TrackConnector> tcl = new ArrayList<TrackConnector>();
         for(PersistantTrack track : list) {
@@ -105,12 +89,6 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         tc.open();
         tc.requestActive();
         resultView = CorrelationResultTopComponent.findInstance().openResultTab(referenceViewer);
-        //resultView.setBoundsInfoManager(referenceViewer.getBoundsInformationManager());
-        
-        /*resultView.open();
-        resultView.requestActive();
-        resultView.setDisplayName("Correlation Analysis");
-        */
         
         requestNextStep();
     }
@@ -216,7 +194,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         
         if (this.currentPosition<this.rightBound-this.intervalLength) { //&& (!wasCanceled)) {
             ph.progress(this.currentPosition);
-            requestNextStep();
+            if (canceled) this.finish(); 
+            else requestNextStep();
         }
         else {
             
@@ -224,31 +203,30 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 ph.finish();
                 this.currentDirection = StrangDirection.REV;
                 this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV"));
+                
                 //compute again from the beginning with another strang direction
                 this.currentPosition=1;
-                //ph.progress(this.currentPosition);
-                //ph.setDisplayName("Analysing correlation.. (Reverse strang direction)"); 
                 requestNextStep();
             }
             else {
-                ph.finish();
-                ready = true;
-                this.resultView.ready();
+                this.finish();
             }
             
         }
     }
     
-    
+    private void finish() {
+        ph.finish();
+        ready = true;
+        this.resultView.ready();
+    }
     
     private ProgressHandle ph;
     
     private void requestNextStep() {
         
                     this.resultList = new ArrayList<CoverageAndDiffResultPersistant> ();
-        
-        
-                    //TrackConnector tc = ProjectConnector.getInstance().getTrackConnector(track);
+       
                     int t = currentStep;
                     if (currentStep % 2 == 0) t = steps - currentStep;
                     
@@ -264,28 +242,13 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                     for(TrackConnector tc : this.trackConnectorList) {
                         tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition+100, this));
                     }
-
-                    
-                    //currentStep++;
-                    //make sure, that we do not show too many steps
-                    //if (currentStep>steps) ;// ph.progress(steps);
-                        //currentStep = steps;
-                    //else ph.progress(currentStep);
-                    
-                    
-                    
-                    
-                    
+     
     }
     
     private boolean handleCancel() {
         this.showMsg("handleCancel");
-        /*if (null == theTask) {
-            return false;
-        }
-
-        return theTask.cancel();*/
-        return false;
+        this.canceled = true;
+        return true;
     }
     
     
