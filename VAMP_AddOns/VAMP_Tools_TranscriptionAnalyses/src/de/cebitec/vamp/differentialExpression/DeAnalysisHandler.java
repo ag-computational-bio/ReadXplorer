@@ -84,12 +84,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
-            CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
-            collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-            AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
-            handler.setReducedMappingsNeeded(true);
-            handler.registerObserver(collCovData);
-            allHandler.add(handler);
+            if (tc != null) {
+                CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
+                collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
+                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
+                handler.setReducedMappingsNeeded(true);
+                handler.registerObserver(collCovData);
+                allHandler.add(handler);
+            }
         }
         for (Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext();) {
             AnalysesHandler handler = it.next();

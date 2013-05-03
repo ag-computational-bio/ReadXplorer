@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.output;
 
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
@@ -22,7 +23,7 @@ import org.openide.util.NbBundle;
  */
 public class SamBamExtender implements ConverterI, ParserI, Observable, Observer {
 
-    private Map<String, Pair<Integer, Integer>> classificationMap;
+    private Map<String, ParsedClassification> classificationMap;
     private TrackJob trackJob;
     private static String name = "Sam/Bam Extender";
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam", "sam", "SAM", "Sam"};
@@ -38,7 +39,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      * coordinate again.
      * @param classificationMap the classification map to store for the reads
      */
-    public SamBamExtender(Map<String, Pair<Integer, Integer>> classificationMap) {
+    public SamBamExtender(Map<String, ParsedClassification> classificationMap) {
         this.classificationMap = classificationMap;
     }
 
@@ -114,14 +115,10 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             SAMRecord record;
             String readSeq;
             String refSeq;
-            int seqMatches;
-            int lowestDiffRate;
             String cigar;
             int start;
             int stop;
             int differences;
-            String readName;
-            Pair<Integer, Integer> data;
    
             while (samBamItor.hasNext()) {
                 ++lineno;
@@ -131,7 +128,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                     if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
-                        readName = ParserCommonMethods.elongatePairedReadName(record);
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         refSeq = this.refGenome.substring(start - 1, stop);
@@ -143,28 +139,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                         //count differences to reference
                         differences = ParserCommonMethods.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
 
-                        data = this.classificationMap.get(readName);
-                        if (data != null) {
-                            seqMatches = data.getFirst(); //number matches for read name
-                            lowestDiffRate = data.getSecond(); //lowest error no for read name
-                        } else {
-                            seqMatches = 1;
-                            lowestDiffRate = differences;
-                        }
-
-                        if (differences == 0) { //perfect mapping
-                            record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
-
-                        } else if (differences == lowestDiffRate) { //best match mapping
-                            record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
-
-                        } else if (differences > lowestDiffRate) { //common mapping
-                            record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
-
-                        } else { //meaning: differences < lowestDiffRate
-                            this.notifyObservers("Cannot contain less than the lowest diff rate number of errors!");
-                        }
-                        record.setAttribute(Properties.TAG_MAP_COUNT, seqMatches);
+                        ParserCommonMethods.addClassificationData(record, differences, classificationMap);
                     }
 
                     samBamFileWriter.addAlignment(record);

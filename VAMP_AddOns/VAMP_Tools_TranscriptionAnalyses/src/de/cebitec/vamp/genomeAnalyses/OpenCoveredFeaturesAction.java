@@ -128,14 +128,16 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         for (PersistantTrack track : this.tracks) {
 
             connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this, 
-                    NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
-            AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, getCoveredFeatures, minCoveredPercent, minCoverageCount, whateverStrand);
-            covAnalysisHandler.registerObserver(analysisCoveredFeatures);
-            covAnalysisHandler.setCoverageNeeded(true);
+            if (connector != null) {
+                AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                        NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
+                AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, getCoveredFeatures, minCoveredPercent, minCoverageCount, whateverStrand);
+                covAnalysisHandler.registerObserver(analysisCoveredFeatures);
+                covAnalysisHandler.setCoverageNeeded(true);
 
-            trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisCoveredFeatures));
-            covAnalysisHandler.startAnalysis();
+                trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisCoveredFeatures));
+                covAnalysisHandler.startAnalysis();
+            }
         }
     }
 

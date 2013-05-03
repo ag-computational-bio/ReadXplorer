@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
+import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
 import de.cebitec.vamp.util.Observable;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
 
 /**
@@ -590,6 +592,53 @@ public final class ParserCommonMethods {
             }
         }
         return isMapped;
+    }
+    /**
+     * Adds the classification data (type and number of mapped positions) to the
+     * sam record. Use this method, if the number of differences is already
+     * known. No data is added to reads, which do not occur in the 
+     * classification map.
+     * @param readName the complete read name
+     * @param record the sam record to update
+     * @param differences the number of differences the record has to the
+     * reference
+     * @param classificationMap the classification map from which the 
+     * classification data has to be retrieved
+     * @throws AssertionError
+     */
+    public static void addClassificationData(SAMRecord record, int differences,
+            Map<String, ParsedClassification> classificationMap) throws AssertionError {
+        
+        String readName = ParserCommonMethods.elongatePairedReadName(record);
+        ParsedClassification classification;
+        int nextMappingPos;
+        if (classificationMap.get(readName) != null) {
+            classification = classificationMap.get(readName);
+            int lowestDiffRate = classification.getMinMismatches();
+
+            nextMappingPos = classification.getNextMappingStart(record.getAlignmentStart());
+
+            if (nextMappingPos > 0) {
+                record.setAttribute(SAMTag.CP.name(), nextMappingPos);
+                record.setAttribute(SAMTag.CC.name(), "=");
+            }
+
+            if (differences == 0) { //perfect mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
+
+            } else if (differences == lowestDiffRate) { //best match mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
+
+            } else if (differences > lowestDiffRate) { //common mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
+
+            } else { //meaning: differences < lowestDiffRate
+                throw new AssertionError("Cannot contain less than the lowest diff rate number of errors!");
+            }
+            record.setAttribute(Properties.TAG_MAP_COUNT, classification.getNumberOccurrences());
+        } else {
+            //currently no data is added to reads with errors, since they are not contained in the classification map
+        }
     }
     
 //    /**

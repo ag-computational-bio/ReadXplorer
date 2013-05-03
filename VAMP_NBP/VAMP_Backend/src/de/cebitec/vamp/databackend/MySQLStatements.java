@@ -37,7 +37,6 @@ public class MySQLStatements {
             + FieldNames.POSITIONS_COVERAGE + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_FREQUENCY + " MEDIUMINT UNSIGNED NOT NULL, "
             + FieldNames.POSITIONS_TYPE + " VARCHAR(1) NOT NULL , "
-            + "INDEX (" + FieldNames.POSITIONS_SNP_ID + "), "
             + "INDEX (" + FieldNames.POSITIONS_TRACK_ID + ") "
             + ")";
     

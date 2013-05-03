@@ -23,7 +23,6 @@ import de.cebitec.vamp.seqPairClassifier.SeqPairClassifier;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.StatsContainer;
 import java.io.File;
 import java.io.IOException;
@@ -309,7 +308,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                          * Algorithm:
                          * start file
                          * if (track not yet imported) {
-                         *      if (isTwoTracks) { combine them unsorted (NEW FILE) }
+                         *      convert file 1 to sam/bam, if necessary
+                         *      if (isTwoTracks) { 
+                         *          convert file 2 to sam/bam, if necessary
+                         *          combine them unsorted (NEW FILE) 
+                         *      }
                          *      sort by readseq (NEW FILE) - if isTwoTracks: deleteOldFile
                          *      parse mappings 
                          *      sort by read name (NEW FILE) - deleteOldFile
@@ -320,7 +323,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                         TrackJob trackJob1 = seqPairJobContainer.getTrackJob1();
                         TrackJob trackJob2 = seqPairJobContainer.getTrackJob2();
-                        Map<String, Pair<Integer, Integer>> classificationMap;
+                        Map<String, ParsedClassification> classificationMap;
                         String referenceSeq = this.getReferenceSeq(trackJob1);
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
@@ -574,7 +577,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         /*
          * Algorithm:
          * if (track not yet imported) {
-         *      sort by readseq (NEW FILE)
+         *      convert to sam/bam, if necessary (NEW FILE)
          *      parse mappings 
          *      extend bam file (NEW FILE) - deleteOldFile
          * }
@@ -597,11 +600,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 //generate classification data in file sorted by read sequence
                 mappingParser.registerObserver(this);
                 Object parsingResult = mappingParser.parseInput(trackJob, referenceSeq);
+                mappingParser.removeObserver(this);
                 GeneralUtils.deleteOldWorkFile(lastWorkFile); //since input file is read only!
                 lastWorkFile = trackJob.getFile();
                 if (parsingResult instanceof DirectAccessDataContainer) {
                     DirectAccessDataContainer dataContainer = (DirectAccessDataContainer) parsingResult;
-                    Map<String, Pair<Integer, Integer>> classificationMap = dataContainer.getClassificationMap();
+                    Map<String, ParsedClassification> classificationMap = dataContainer.getClassificationMap();
 
                     //write new file with classification information
                     success = success ? this.extendSamBamFile(classificationMap, trackJob, referenceSeq) : success;
@@ -754,7 +758,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * @param refSeq the reference sequence
      * @return true, if the extension was successful, false otherwise
      */
-    private boolean extendSamBamFile(Map<String, Pair<Integer, Integer>> classificationMap, TrackJob trackJob, String refSeq) {
+    private boolean extendSamBamFile(Map<String, ParsedClassification> classificationMap, TrackJob trackJob, String refSeq) {
         boolean success;
         try {
             io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.extension", trackJob.getFile().getName()));

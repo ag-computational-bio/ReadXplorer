@@ -38,7 +38,6 @@ public class SaveTrackConnectorFetcherForGUI {
      * Returns the TrackConnector for the given track. If the track is stored in
      * a sam/bam file and the path to this file has changed, the method will
      * open a window and ask for the new file path.
-     *
      * @param track Track the TrackConnector should be received for.
      * @return TrackConnector for the Track handed over
      */
@@ -84,7 +83,9 @@ public class SaveTrackConnectorFetcherForGUI {
                 PersistantTrack track = tracks.get(i);
                 if (!(new File(track.getFilePath())).exists()) {
                     PersistantTrack newTrack = getNewFilePath(track, connector);
-                    tracks.set(i, newTrack);
+                    if (newTrack != null) {
+                        tracks.set(i, newTrack);
+                    }
                 }
             }
             try {

@@ -188,43 +188,45 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             AnalysisTranscriptionStart analysisTSS = null;
             AnalysisFilterFeatures analysisFilteredGenes = null;
             AnalysisOperon analysisOperon = null;
-            
+
             connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
-            AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"));
+            if (connector != null) {
+                AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                        NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
+                AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
+                        NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"));
 
-            if (parametersTss.isPerformTSSAnalysis()) {
+                if (parametersTss.isPerformTSSAnalysis()) {
 
-                if (parametersTss.isPerformUnannotatedTranscriptDet()) {
-                    analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss.getMinTotalIncrease(),
-                            parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
-                            parametersTss.isAutoTssParamEstimation(), parametersTss.getMinTranscriptExtensionCov());
-                } else {
-                    analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss.getMinTotalIncrease(),
-                            parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
-                            parametersTss.isAutoTssParamEstimation());
+                    if (parametersTss.isPerformUnannotatedTranscriptDet()) {
+                        analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss.getMinTotalIncrease(),
+                                parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
+                                parametersTss.isAutoTssParamEstimation(), parametersTss.getMinTranscriptExtensionCov());
+                    } else {
+                        analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss.getMinTotalIncrease(),
+                                parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
+                                parametersTss.isAutoTssParamEstimation());
+                    }
+                    covAnalysisHandler.registerObserver(analysisTSS);
+                    covAnalysisHandler.setCoverageNeeded(true);
                 }
-                covAnalysisHandler.registerObserver(analysisTSS);
-                covAnalysisHandler.setCoverageNeeded(true);
-            }
-            if (parametersFilterFeatures.isPerformFilterAnalysis()) {
-                analysisFilteredGenes = new AnalysisFilterFeatures(connector, parametersFilterFeatures.getMinNumberReads(), parametersFilterFeatures.getMaxNumberReads());
+                if (parametersFilterFeatures.isPerformFilterAnalysis()) {
+                    analysisFilteredGenes = new AnalysisFilterFeatures(connector, parametersFilterFeatures.getMinNumberReads(), parametersFilterFeatures.getMaxNumberReads());
 
-                mappingAnalysisHandler.registerObserver(analysisFilteredGenes);
-                mappingAnalysisHandler.setMappingsNeeded(true);
-            }
-            if (parametersOperonDet.isPerformOperonAnalysis()) {
-                analysisOperon = new AnalysisOperon(connector, parametersOperonDet.getMinSpanningReads(), parametersOperonDet.isAutoOperonParamEstimation());
+                    mappingAnalysisHandler.registerObserver(analysisFilteredGenes);
+                    mappingAnalysisHandler.setMappingsNeeded(true);
+                }
+                if (parametersOperonDet.isPerformOperonAnalysis()) {
+                    analysisOperon = new AnalysisOperon(connector, parametersOperonDet.getMinSpanningReads(), parametersOperonDet.isAutoOperonParamEstimation());
 
-                mappingAnalysisHandler.registerObserver(analysisOperon);
-                mappingAnalysisHandler.setMappingsNeeded(true);
-            }
+                    mappingAnalysisHandler.registerObserver(analysisOperon);
+                    mappingAnalysisHandler.setMappingsNeeded(true);
+                }
 
-            trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisTSS, analysisFilteredGenes, analysisOperon));
-            covAnalysisHandler.startAnalysis();
-            mappingAnalysisHandler.startAnalysis();
+                trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisTSS, analysisFilteredGenes, analysisOperon));
+                covAnalysisHandler.startAnalysis();
+                mappingAnalysisHandler.startAnalysis();
+            }
         }
     }
 

@@ -84,6 +84,7 @@ public class SamBamPosTableCreator implements Observable {
         int differences;
         boolean isRevStrand;
         byte direction;
+        String readName;
         String readSeq;
         String cigar;
         int readClass;
@@ -110,6 +111,7 @@ public class SamBamPosTableCreator implements Observable {
                     ++lineno;
 
                     record = samItor.next();
+                    readName = record.getReadName();
                     if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
 
                         cigar = record.getCigarString();
@@ -123,8 +125,8 @@ public class SamBamPosTableCreator implements Observable {
                         }
 
                         //statistics calculations: count no reads and distinct sequences ////////////
-                        if (!readNameList.contains(record.getReadName())) {
-                            readNameList.add(record.getReadName());
+                        if (!readNameList.contains(readName)) {
+                            readNameList.add(readName);
                         }
                         mappingCount = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                         if (mappingCount != null) {
@@ -234,7 +236,7 @@ public class SamBamPosTableCreator implements Observable {
                         //skip error messages, if too many occur to prevent bug in the output panel
                         if (errorLimit.allowOutput()) {
                             this.notifyObservers(NbBundle.getMessage(SamBamPosTableCreator.class,
-                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                                "Parser.Parsing.CorruptData", lineno, readName));
                         }
                     }
                 } catch (Exception e) {

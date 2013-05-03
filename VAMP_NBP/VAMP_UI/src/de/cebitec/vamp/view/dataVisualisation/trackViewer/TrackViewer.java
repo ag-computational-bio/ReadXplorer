@@ -85,7 +85,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      *      track connector should be combined.
      */
     public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
-            TrackConnector trackCon, boolean combineTracks){
+            TrackConnector trackCon, boolean combineTracks) {
         super(boundsManager, basePanel, refGen);
         
         //read loadingIndicator icon from package resources

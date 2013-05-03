@@ -68,39 +68,43 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(basePanel);
 
         // create track viewer
-        TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);       
-        TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
-        trackV.setName(track.getDescription());
+        TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+        if (tc != null) {
+            TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
+            trackV.setName(track.getDescription());
 
-        // create and set up legend
-        JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
-        MenuLabel legendLabel = new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND);
-        trackV.setupLegend(legendLabel, trackPanelLegend);
+            // create and set up legend
+            JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
+            MenuLabel legendLabel = new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND);
+            trackV.setupLegend(legendLabel, trackPanelLegend);
 
-        // create and set up options (currently normalization)
-        JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
-        MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
-        trackV.setupOptions(optionsLabel, trackPanelOptions);
+            // create and set up options (currently normalization)
+            JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
+            MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
+            trackV.setupOptions(optionsLabel, trackPanelOptions);
 
-        //assign observers to handle visualization correctly
-        legendLabel.registerObserver(optionsLabel);
-        optionsLabel.registerObserver(legendLabel);
+            //assign observers to handle visualization correctly
+            legendLabel.registerObserver(optionsLabel);
+            optionsLabel.registerObserver(legendLabel);
 
-        // create info label
-        CoverageInfoLabel cil = new CoverageInfoLabel();
-        trackV.setTrackInfoPanel(cil);
+            // create info label
+            CoverageInfoLabel cil = new CoverageInfoLabel();
+            trackV.setTrackInfoPanel(cil);
 
-        // create zoom slider
-        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
+            // create zoom slider
+            CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
-        // add panels to basepanel
-        int maxSliderValue = 500;
-        basePanel.setTopInfoPanel(cil);
-        basePanel.setViewer(trackV, slider);
-        basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
-        basePanel.setTitlePanel(this.getTitlePanel(track.getDescription()));
+            // add panels to basepanel
+            int maxSliderValue = 500;
+            basePanel.setTopInfoPanel(cil);
+            basePanel.setViewer(trackV, slider);
+            basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
+            basePanel.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
-        return basePanel;
+            return basePanel;
+        } else {
+            return null;
+        }
     }
 
     /**
