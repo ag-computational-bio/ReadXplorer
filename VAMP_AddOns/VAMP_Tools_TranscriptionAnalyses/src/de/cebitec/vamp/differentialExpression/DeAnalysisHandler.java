@@ -83,14 +83,20 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         List<AnalysesHandler> allHandler = new ArrayList<>();
         for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
-            TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
-            if (tc != null) {
+            try {
+                TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
                 CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
                 AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
                 handler.setReducedMappingsNeeded(true);
                 handler.registerObserver(collCovData);
                 allHandler.add(handler);
+            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                ProcessingLog.getInstance().addProperty("Unresolved track", currentTrack);
+                notifyObservers(AnalysisStatus.ERROR);
+                this.interrupt();
+                return;
             }
         }
         for (Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext();) {

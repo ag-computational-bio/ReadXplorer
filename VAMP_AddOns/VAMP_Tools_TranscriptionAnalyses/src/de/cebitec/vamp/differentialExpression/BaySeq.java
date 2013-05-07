@@ -121,7 +121,7 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Result of group " + j,bseqData));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Result of group " + j, bseqData));
                 resultIndex++;
             }
             for (int j = 1; j <= numberofGroups; j++) {
@@ -130,14 +130,13 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Normalized result of group " + j,bseqData));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Normalized result of group " + j, bseqData));
                 resultIndex++;
             }
             if (saveFile != null) {
                 gnuR.saveDataToFile(saveFile);
             }
-        }
-        //We don't know what errors Gnu R might cause, so we have to catch all.
+        } //We don't know what errors Gnu R might cause, so we have to catch all.
         //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch (Exception e) {
             throw new UnknownGnuRException(e);
@@ -161,8 +160,8 @@ public class BaySeq {
      * should be plotted. SamplesA and samplesB must not be the same!
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
-    public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException, 
-                                                IllegalStateException, PackageNotLoadableException {
+    public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException,
+            IllegalStateException, PackageNotLoadableException {
         if (gnuR == null) {
             throw new IllegalStateException("Shutdown was already called!");
         }
@@ -197,8 +196,8 @@ public class BaySeq {
      * should be plotted. SamplesA and samplesB must not be the same!
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
-    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException, 
-                                                                    IllegalStateException, PackageNotLoadableException {
+    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException,
+            IllegalStateException, PackageNotLoadableException {
         if (gnuR == null) {
             throw new IllegalStateException("Shutdown was already called!");
         }
@@ -276,8 +275,10 @@ public class BaySeq {
      * Releases the Gnu R instance and removes the reference to it.
      */
     public void shutdown() {
-        gnuR.releaseGnuRInstance();
-        gnuR = null;
+        if (gnuR != null) {
+            gnuR.releaseGnuRInstance();
+            gnuR = null;
+        }
     }
 
     /**

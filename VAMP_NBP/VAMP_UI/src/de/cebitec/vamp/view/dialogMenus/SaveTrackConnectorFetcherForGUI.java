@@ -24,6 +24,7 @@ import org.openide.util.NbPreferences;
 
 /**
  * A class for GUI Components to safely fetch a TrackConnector.
+ *
  * @author kstaderm
  */
 public class SaveTrackConnectorFetcherForGUI {
@@ -38,10 +39,12 @@ public class SaveTrackConnectorFetcherForGUI {
      * Returns the TrackConnector for the given track. If the track is stored in
      * a sam/bam file and the path to this file has changed, the method will
      * open a window and ask for the new file path.
+     *
+     * @throws UserCanceledTrackPathUpdateException if the no track path could be resolved.
      * @param track Track the TrackConnector should be received for.
      * @return TrackConnector for the Track handed over
      */
-    public TrackConnector getTrackConnector(PersistantTrack track) {
+    public TrackConnector getTrackConnector(PersistantTrack track) throws UserCanceledTrackPathUpdateException {
         TrackConnector tc = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
@@ -58,7 +61,8 @@ public class SaveTrackConnectorFetcherForGUI {
                             currentTimestamp);
                 }
             } else {
-                return null;
+                //If the new path is not set by the user throw exception notifying about this
+                throw new UserCanceledTrackPathUpdateException();
             }
         }
         return tc;
@@ -69,24 +73,40 @@ public class SaveTrackConnectorFetcherForGUI {
      * stored in a sam/bam file and the path to this file has changed, the
      * method will open a window and ask for the new file path.
      *
+     * @throws UserCanceledTrackPathUpdateException if the no track path could be resolved.
      * @param tracks List of tracks the TrackConnector should be received for.
      * @param combineTracks boolean if the Tracks should be combined or not.
-     * @return TrackConnector for the list of Tracks handed over.
+     * @return TrackConnector for the list of Tracks handed over. 
+     * CAUTION: 
+     * tracks are removed if their path can not be resolved and the
+     * user refuses to set a new one.
      */
-    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) {
+    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) throws UserCanceledTrackPathUpdateException {
         TrackConnector tc = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             tc = connector.getTrackConnector(tracks, combineTracks);
         } catch (FileNotFoundException e) {
-            for (int i = 0; i < tracks.size(); ++i) {
+            //we keep track about the number of tracks with unresolved path errors.
+            int unresolvedTracks = 0;
+            for (int i = 0; i < tracks.size(); ++i) {                
                 PersistantTrack track = tracks.get(i);
                 if (!(new File(track.getFilePath())).exists()) {
                     PersistantTrack newTrack = getNewFilePath(track, connector);
+                    //Everything is fine, path is set correctly
                     if (newTrack != null) {
-                        tracks.set(i, newTrack);
+                        tracks.set(i, newTrack);                   
+                    } else {
+                        //User canceled path update, so put down an unresolved track
+                        unresolvedTracks++;
+                        //And remove the track with wrong path from the list of processed tracks.
+                        tracks.remove(i);
                     }
                 }
+            }
+            //All track path are tested, if no path could be resolved throw an error.
+            if(unresolvedTracks==tracks.size()){
+                throw new UserCanceledTrackPathUpdateException();
             }
             try {
                 tc = connector.getTrackConnector(tracks, combineTracks);
@@ -194,5 +214,16 @@ public class SaveTrackConnectorFetcherForGUI {
             JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
         return newTrack;
+    }
+
+    public static class UserCanceledTrackPathUpdateException extends Exception {
+
+        private static String errorMessage = "The user canceled the track path updated process. A TrackConnector can therefore not be created!";
+        
+        public UserCanceledTrackPathUpdateException() {
+            super(errorMessage);
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: "+errorMessage, currentTimestamp);
+        }
     }
 }

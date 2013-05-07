@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import javax.swing.*;
+import org.openide.util.Exceptions;
 
 /**
  * Factory used to initialize all different kinds of base panels.
@@ -68,7 +69,13 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(basePanel);
 
         // create track viewer
-        TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+        TrackConnector tc;
+        //TODO: Error handling
+        try {
+            tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            return null;
+        }
         if (tc != null) {
             TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
             trackV.setName(track.getDescription());
@@ -125,8 +132,14 @@ public class BasePanelFactory {
             BasePanel basePanel = new BasePanel(boundsManager, viewController);
             viewController.addMousePositionListener(basePanel);
 
-            // get double track connector
-            TrackConnector trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+            // get double track connector           
+            TrackConnector trackCon;
+            //TODO: Error handling
+            try {
+                trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                return null;
+            }
 
             MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, basePanel, refGen, trackCon, combineTracks);
 

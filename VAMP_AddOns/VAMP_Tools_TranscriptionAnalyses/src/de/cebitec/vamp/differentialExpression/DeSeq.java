@@ -234,8 +234,10 @@ public class DeSeq {
      * Releases the Gnu R instance and removes the reference to it.
      */
     public void shutdown() {
-        gnuR.releaseGnuRInstance();
-        gnuR = null;
+        if (gnuR != null) {
+            gnuR.releaseGnuRInstance();
+            gnuR = null;
+        }
     }
 
     public void saveResultsAsCSV(int index, File saveFile) {

@@ -26,6 +26,7 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
@@ -37,11 +38,10 @@ import org.openide.windows.WindowManager;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-
 @ActionID(category = "Tools",
-id = "de.cebitec.vamp.transcriptionAnalyses.OpenTranscriptionAnalysesAction")
+        id = "de.cebitec.vamp.transcriptionAnalyses.OpenTranscriptionAnalysesAction")
 @ActionRegistration(iconBase = "de/cebitec/vamp/transcriptionAnalyses/transcriptionAnalyses.png",
-displayName = "#CTL_OpenTranscriptionAnalysesAction")
+        displayName = "#CTL_OpenTranscriptionAnalysesAction")
 @ActionReferences({
     @ActionReference(path = "Menu/Tools", position = 142, separatorAfter = 150),
     @ActionReference(path = "Toolbars/Tools", position = 187)
@@ -58,13 +58,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private ParameterSetTSS parametersTss;
     private ParameterSetFilteredFeatures parametersFilterFeatures;
     private ParameterSetOperonDet parametersOperonDet;
-    
     private Map<Integer, PersistantTrack> trackMap;
     private Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private ResultPanelFilteredFeatures filteredFeatureResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
-    
     private boolean performTSSAnalysis;
     private boolean performFilterAnalysis;
     private boolean performOperonAnalysis;
@@ -84,8 +82,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      * Action for opening a new transcription analyses frame. It opens a track
      * list containing all tracks of the selected reference and creates a new
      * transcription analyses frame when a track was chosen.
-     * @param context the context of the action: the reference viewer which
-     * is connected with this analysis
+     *
+     * @param context the context of the action: the reference viewer which is
+     * connected with this analysis
      */
     public OpenTranscriptionAnalysesAction(ReferenceViewer context) {
         this.refViewer = context;
@@ -98,7 +97,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      * Carries out the logic behind the transcription analyses action. This
      * means, it opens a configuration wizard and starts the analyses after
      * successfully finishing the wizard.
-     * @param ev the event, which is currently not used 
+     *
+     * @param ev the event, which is currently not used
      */
     @Override
     public void actionPerformed(ActionEvent ev) {
@@ -113,10 +113,10 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 this.trackMap.put(track.getId(), track);
             }
-            
+
             this.transcAnalysesTopComp.open();
             this.runWizardAndTranscriptionAnalysis();
-            
+
         } else {
             String msg = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
                     "No track selected. To start a transcription analysis at least one track has to be selected.");
@@ -127,6 +127,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
     /**
      * Initializes the setup wizard for the transcription analyses.
+     *
      * @param trackIds the list of track ids for which the transcription
      * analyses have to be carried out
      */
@@ -150,15 +151,16 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
     /**
      * Starts the transcription analyses.
+     *
      * @param wiz the wizard containing the transcription analyses parameters
      */
     private void startTransciptionAnalyses(WizardDescriptor wiz) {
-        
+
         //obtain all analysis parameters
         performTSSAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS);
         performFilterAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_FILTER_ANALYSIS);
         performOperonAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS);
-        
+
         if (performTSSAnalysis) { //set values depending on the selected analysis functions (avoiding null pointers)
             autoTssParamEstimation = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS);
             minTotalIncrease = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_TOTAL_INCREASE);
@@ -177,62 +179,65 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             minSpanningReads = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS);
         }
         //create parameter set for each analysis
-        parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet, 
+        parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                 minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov);
         parametersFilterFeatures = new ParameterSetFilteredFeatures(performFilterAnalysis, minNumberReads, maxNumberReads);
         parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation);
 
-        
+
         TrackConnector connector;
         for (PersistantTrack track : this.tracks) {
             AnalysisTranscriptionStart analysisTSS = null;
             AnalysisFilterFeatures analysisFilteredGenes = null;
             AnalysisOperon analysisOperon = null;
-
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-            if (connector != null) {
-                AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
-                        NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
-                AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
-                        NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"));
-
-                if (parametersTss.isPerformTSSAnalysis()) {
-
-                    if (parametersTss.isPerformUnannotatedTranscriptDet()) {
-                        analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss.getMinTotalIncrease(),
-                                parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
-                                parametersTss.isAutoTssParamEstimation(), parametersTss.getMinTranscriptExtensionCov());
-                    } else {
-                        analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss.getMinTotalIncrease(),
-                                parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
-                                parametersTss.isAutoTssParamEstimation());
-                    }
-                    covAnalysisHandler.registerObserver(analysisTSS);
-                    covAnalysisHandler.setCoverageNeeded(true);
-                }
-                if (parametersFilterFeatures.isPerformFilterAnalysis()) {
-                    analysisFilteredGenes = new AnalysisFilterFeatures(connector, parametersFilterFeatures.getMinNumberReads(), parametersFilterFeatures.getMaxNumberReads());
-
-                    mappingAnalysisHandler.registerObserver(analysisFilteredGenes);
-                    mappingAnalysisHandler.setMappingsNeeded(true);
-                }
-                if (parametersOperonDet.isPerformOperonAnalysis()) {
-                    analysisOperon = new AnalysisOperon(connector, parametersOperonDet.getMinSpanningReads(), parametersOperonDet.isAutoOperonParamEstimation());
-
-                    mappingAnalysisHandler.registerObserver(analysisOperon);
-                    mappingAnalysisHandler.setMappingsNeeded(true);
-                }
-
-                trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisTSS, analysisFilteredGenes, analysisOperon));
-                covAnalysisHandler.startAnalysis();
-                mappingAnalysisHandler.startAnalysis();
+            //TODO: Error handling
+            try {
+                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                return;
             }
+            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
+            AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
+                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"));
+
+            if (parametersTss.isPerformTSSAnalysis()) {
+
+                if (parametersTss.isPerformUnannotatedTranscriptDet()) {
+                    analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss.getMinTotalIncrease(),
+                            parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
+                            parametersTss.isAutoTssParamEstimation(), parametersTss.getMinTranscriptExtensionCov());
+                } else {
+                    analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss.getMinTotalIncrease(),
+                            parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
+                            parametersTss.isAutoTssParamEstimation());
+                }
+                covAnalysisHandler.registerObserver(analysisTSS);
+                covAnalysisHandler.setCoverageNeeded(true);
+            }
+            if (parametersFilterFeatures.isPerformFilterAnalysis()) {
+                analysisFilteredGenes = new AnalysisFilterFeatures(connector, parametersFilterFeatures.getMinNumberReads(), parametersFilterFeatures.getMaxNumberReads());
+
+                mappingAnalysisHandler.registerObserver(analysisFilteredGenes);
+                mappingAnalysisHandler.setMappingsNeeded(true);
+            }
+            if (parametersOperonDet.isPerformOperonAnalysis()) {
+                analysisOperon = new AnalysisOperon(connector, parametersOperonDet.getMinSpanningReads(), parametersOperonDet.isAutoOperonParamEstimation());
+
+                mappingAnalysisHandler.registerObserver(analysisOperon);
+                mappingAnalysisHandler.setMappingsNeeded(true);
+            }
+
+            trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisTSS, analysisFilteredGenes, analysisOperon));
+            covAnalysisHandler.startAnalysis();
+            mappingAnalysisHandler.startAnalysis();
         }
     }
 
     /**
      * Visualizes the data handed over to this method as defined by the
      * implementation.
+     *
      * @param dataTypeObject the data object to visualize.
      */
     @Override
@@ -247,11 +252,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             String trackNames;
 
             if (parametersTss.isPerformTSSAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
-                
+
                 ++finishedCovAnalyses;
 
                 //TODO: bp window of neighboring TSS parameter
-                
+
                 AnalysisTranscriptionStart analysisTSS = trackToAnalysisMap.get(trackId).getAnalysisTSS();
                 parametersTss.setMinTotalIncrease(analysisTSS.getIncreaseReadCount()); //if automatic is on, the parameters are different now
                 parametersTss.setMinPercentIncrease(analysisTSS.getIncreaseReadPercent());
@@ -259,11 +264,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                     transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
                     transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
                 }
-                
-                TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap); 
+
+                TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap);
                 tssResult.setParameters(parametersTss);
                 transcriptionStartResultPanel.addTSSs(tssResult);
-                
+
                 if (finishedCovAnalyses >= tracks.size()) {
                     trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
                     String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
@@ -277,7 +282,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
                     AnalysisFilterFeatures filterFeatureAnalysis = trackToAnalysisMap.get(trackId).getAnalysisFilteredFeatures();
                     List<FilteredFeature> filteredGenes = filterFeatureAnalysis.getResults();
-                    
+
 
                     if (filteredFeatureResultPanel == null) {
                         filteredFeatureResultPanel = new ResultPanelFilteredFeatures();
@@ -322,12 +327,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         }
 
     }
-    
+
     /**
      * Container class for all available transcription analyses.
      */
     private class AnalysisContainer {
-        
+
         private final AnalysisTranscriptionStart analysisTSS;
         private final AnalysisFilterFeatures analysisFilteredGenes;
         private final AnalysisOperon analysisOperon;
@@ -342,15 +347,15 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         }
 
         /**
-         * @return The transcription start site analysis stored in this container
+         * @return The transcription start site analysis stored in this
+         * container
          */
         public AnalysisTranscriptionStart getAnalysisTSS() {
             return analysisTSS;
         }
 
         /**
-         * @return The filter features analysis stored in this
-         * container
+         * @return The filter features analysis stored in this container
          */
         public AnalysisFilterFeatures getAnalysisFilteredFeatures() {
             return analysisFilteredGenes;
@@ -361,6 +366,6 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
          */
         public AnalysisOperon getAnalysisOperon() {
             return analysisOperon;
-        }        
+        }
     }
 }
