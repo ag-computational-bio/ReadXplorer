@@ -125,4 +125,11 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
         this.coveredFeaturesTabbedPane.setTabComponentAt(this.coveredFeaturesTabbedPane.getTabCount() - 1, new TabWithCloseX(this.coveredFeaturesTabbedPane));
         this.coveredFeaturesTabbedPane.setSelectedIndex(this.coveredFeaturesTabbedPane.getTabCount() - 1);
     }
+    
+    /**
+     * @return true, if this component already contains other components, false otherwise.
+     */
+    public boolean hasComponents() {
+        return this.coveredFeaturesTabbedPane.getComponentCount() > 0;
+    }
 }

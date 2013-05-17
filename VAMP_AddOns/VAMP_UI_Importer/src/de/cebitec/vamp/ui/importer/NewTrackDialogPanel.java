@@ -334,6 +334,9 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                     for (int i = 0; i < files.length; ++i) {
                         addFile(files[i], mappingFileField);
                         nameField.setText(files[i].getName());
+                        if (!(getCurrentParser() instanceof JokParser)) {
+                            checkSeqDictonary(files[i]);
+                        }
                     }
 
                     mappingFileField.setText(getMappingFiles().size() + " tracks to import");
@@ -345,6 +348,9 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                     File file = this.getSelectedFile();
                     addFile(file, mappingFileField);
                     nameField.setText(file.getName());
+                    if (!(getCurrentParser() instanceof JokParser)) {
+                        checkSeqDictonary(file);
+                    }
                 }
             }
         };
@@ -353,7 +359,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
         fc.setMultiSelectionEnabled(this.useMultipleImport());
         fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
 }//GEN-LAST:event_chooseButtonActionPerformed
-
+    
     private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
         //identification of import method by index
         this.setIsDbUsed(this.importTypeCombo.getSelectedIndex() == 1);

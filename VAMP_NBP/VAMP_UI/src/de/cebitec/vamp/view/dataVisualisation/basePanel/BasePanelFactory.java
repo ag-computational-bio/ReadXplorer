@@ -23,12 +23,11 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import javax.swing.*;
-import org.openide.util.Exceptions;
 
 /**
  * Factory used to initialize all different kinds of base panels.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class BasePanelFactory {
 
@@ -498,7 +497,6 @@ public class BasePanelFactory {
          * with it to to/from the excluded feature list of its associated
          * viewer. Needs an AbstractButton as source, in order to determine if
          * the button was selected or not.
-         *
          * @param featureType the feature type handled by this listener
          * @param viewer the viewer whose excluded feature list should be
          * updated

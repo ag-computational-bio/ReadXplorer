@@ -137,4 +137,12 @@ public final class TranscriptionAnalysesTopComponent extends TopComponent {
             }
         });
     }
+    
+    /**
+     * @return true, if this component already contains other components, false
+     * otherwise.
+     */
+    public boolean hasComponents() {
+        return this.analysesTabbedPane.getComponentCount() > 0;
+    }
 }

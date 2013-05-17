@@ -2,7 +2,6 @@ package de.cebitec.vamp.thumbnail;
 
 import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -28,6 +27,6 @@ public class TrackViewerCompListener extends ComponentAdapter {
         int stopFeature = currentFeature.getStop();
         //currentTrack = (TrackViewer) trackPanel.getViewer();
         ThumbnailCoverageListener covListener = new ThumbnailCoverageListener(trackV);
-        trackV.getTrackCon().addCoverageRequest(new IntervalRequest(startFeature, stopFeature, covListener, Properties.COMPLETE_COVERAGE));
+        trackV.getTrackCon().addCoverageRequest(new IntervalRequest(startFeature, stopFeature, covListener));
     }
 }

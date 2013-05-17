@@ -1,24 +1,15 @@
 package de.cebitec.vamp.tools.snp;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.event.ChangeListener;
+import de.cebitec.vamp.view.dialogMenus.ChangeListeningWizardPanel;
 import org.openide.WizardDescriptor;
-import org.openide.util.ChangeSupport;
-import org.openide.util.HelpCtx;
 
 /**
  * The SNP detection wizard main panel.
  */
-public class SNPWizardPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class SNPWizardPanel extends ChangeListeningWizardPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
     
     public static final String PROP_MIN_PERCENT = "minPercent";
     public static final String PROP_MIN_VARYING_BASES = "minNoBases";
-    public static final String PROP_VALIDATE = "validate";
-    
-    private ChangeSupport changeSupport;
-    
-    private boolean isValidated = true;
     
     /**
      * The visual component that displays this panel. If you need to access the
@@ -31,7 +22,7 @@ public class SNPWizardPanel implements WizardDescriptor.FinishablePanel<WizardDe
      * @param referenceId reference id 
      */
     public SNPWizardPanel() {
-        this.changeSupport = new ChangeSupport(this);
+        super("Please enter valid parameters (only number and percent values)");
     }
     
     
@@ -49,53 +40,8 @@ public class SNPWizardPanel implements WizardDescriptor.FinishablePanel<WizardDe
     }
 
     @Override
-    public HelpCtx getHelp() {
-        // Show no Help button for this panel:
-        return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx("help.key.here");
-    }
-
-    @Override
     public boolean isFinishPanel() {
-        return this.isValidated;
-    }
-
-    @Override
-    public boolean isValid() {
-        // If it is always OK to press Next or Finish, then:
-        return isValidated;
-        // If it depends on some condition (form filled out...) and
-        // this condition changes (last form field filled in...) then
-        // use ChangeSupport to implement add/removeChangeListener below.
-        // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
-    }
-
-    @Override
-    public final void addChangeListener(ChangeListener l) {
-        changeSupport.addChangeListener(l);
-    }
-
-    @Override
-    public final void removeChangeListener(ChangeListener l) {
-        changeSupport.removeChangeListener(l);
-    }
-
-    @Override
-    public void readSettings(final WizardDescriptor wiz) {
-        component.addPropertyChangeListener(SNPWizardPanel.PROP_VALIDATE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                isValidated = (boolean) evt.getNewValue();
-                if (isValidated) {
-                    wiz.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, null);
-                } else {
-                    wiz.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Please enter valid parameters (only number and percent values)");
-                }
-                changeSupport.fireChange();
-            }
-        });
-        
+        return this.isValid();
     }
 
     @Override

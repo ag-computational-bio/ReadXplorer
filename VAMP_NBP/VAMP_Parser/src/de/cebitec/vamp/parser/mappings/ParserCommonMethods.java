@@ -553,6 +553,79 @@ public final class ParserCommonMethods {
         stopPosition = startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
         return stopPosition;
     }
+
+    /**
+     * Returns the read name without the pair tag.
+     * @param readNameFull The read name whose pair tag shall be removed
+     * @return The read name without its pair tag
+     */
+    public static String getReadNameWithoutPairTag(String readNameFull) {
+        String readName;
+        String[] nameParts = readNameFull.split(" ");
+        if (nameParts.length == 2 && (nameParts[1].startsWith("1") || nameParts[1].startsWith("2"))) {
+            readName = nameParts[0];
+        } else {
+            readName = readNameFull.substring(0, readNameFull.length() - 2);
+        }
+
+        return readName;
+    }
+    
+    /**
+     * Calculates the pair tag for a given sam record. It checks the ending of
+     * the read name, the ReadPairedFlag of the sam record and the casava > 1.8
+     * format for an appropriate pair flag until it is found. If no paired read
+     * tag can be found, the pair tag returns a neutral pairTag for single
+     * end mapped reads.
+     * @param record the record to check for a pair tag
+     * @return Either '1' for first read of pair, '2' for second read of pair
+     * or '0' for a single end mapping
+     */
+    public static char getReadPairTag(SAMRecord record) {
+        String readName = record.getReadName();
+        char pairTag = '0';
+        char lastChar = readName.charAt(readName.length() - 1);
+        
+        if (lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1) {
+            pairTag = '1';
+        
+        } else if (lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2) {
+            pairTag = '2';
+            
+        } else if (lastChar != Properties.EXT_A1 && lastChar != Properties.EXT_B1
+                && lastChar != Properties.EXT_A2 && lastChar != Properties.EXT_B2) {
+            
+            //check for casava > 1.8 paired read
+            String[] nameParts = readName.split(" ");
+            if (nameParts.length == 2) {
+                if (nameParts[1].startsWith("1")) {
+                    pairTag = '1';
+                } else if (nameParts[1].startsWith("2")) {
+                    pairTag = '2';
+                }
+            }
+            
+            //if tag is not set yet, but paired read flag is set, we can use it
+            if (pairTag == 0 && record.getReadPairedFlag()) { 
+                pairTag = record.getFirstOfPairFlag() ? '1' : '2';
+            }
+        }
+        return pairTag;
+    }
+    
+    /**
+     * Checks if a read name is written in the casava format > 1.8, in which
+     * the pair tag appears after a blank in the read name.
+     * @param readName read name to check
+     * @return true, if the read is in the casava format > 1.8, false otherwise
+     */
+    public static boolean isCasavaLarger1Dot8Format(String readName) {
+        String[] nameParts = readName.split(" ");
+        if (nameParts.length == 2 && (nameParts[1].startsWith("1") || nameParts[1].startsWith("2"))) {
+            return true;
+        }
+        return false;
+    }
     
     /**
      * Adds a "1" or "2" at the end of the given records read name, if it is a
@@ -566,7 +639,8 @@ public final class ParserCommonMethods {
         String readName = record.getReadName();
         char pairTag = readName.charAt(readName.length() - 1);
         if (record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
-                                       && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2) {
+                                       && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2
+                                       && !isCasavaLarger1Dot8Format(readName)) {
             readName = readName.concat(record.getFirstOfPairFlag() ? "1" : "2");
         }
         return readName;

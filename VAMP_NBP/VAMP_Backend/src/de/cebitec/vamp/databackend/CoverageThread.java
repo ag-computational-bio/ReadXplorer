@@ -132,7 +132,7 @@ public class CoverageThread extends RequestThread {
      */
     private int calcCenterLeft(IntervalRequest request) {
         int centerMiddle = this.calcCenterMiddle(request);
-        int interval = request.getTo() - request.getFrom();
+        //int interval = request.getTo() - request.getFrom();
         //coveredWidth = interval > coveredWidth * 2 ? interval / 2 : coveredWidth;
         //int result = centerMiddle - coveredWidth;
         
@@ -145,7 +145,7 @@ public class CoverageThread extends RequestThread {
     }
     
     /**
-     * calculate the left boundary of the area to be loaded by the request
+     * calculate the right boundary of the area to be loaded by the request
      * the area will be changed to cover more width than requested (preload more data)
      * @param request
      * @return 
@@ -159,22 +159,24 @@ public class CoverageThread extends RequestThread {
         int result = this.calcCenterLeft(request) + MINIMUMINTERVALLENGTH;
         
         //take care of intervals bigger than the minimum length
-        if (result < request.getTo()) { return ((request.getTo() / getMinimumSubIntervalLength())+1) * getMinimumSubIntervalLength(); }
-        else { return result; }
+        if (result < request.getTo()) { 
+            result = ((request.getTo() / getMinimumSubIntervalLength()) + 1) * getMinimumSubIntervalLength();
+        } 
+        return result; 
     }
     
     /**
      * Fetches the coverage and (if desired) also the diffs and gaps for a given
      * interval.
      * @param request the request to carry out
-     * @param from exact left bound of the interval
-     * @param to exact right bound of the interval
+     * @param track the track for which the coverage is requested
      * @return the container with the desired data
      */
-    private CoverageAndDiffResultPersistant getCoverageAndDiffsFromFile(IntervalRequest request, int from, int to, PersistantTrack track) {
+    private CoverageAndDiffResultPersistant getCoverageAndDiffsFromFile(IntervalRequest request, PersistantTrack track) {
         boolean diffsAndGapsNeeded = request instanceof CoverageAndDiffRequest;
-        from = calcCenterLeft(request);
-        to = calcCenterRight(request);
+        int from = calcCenterLeft(request);
+        int to = calcCenterRight(request);
+        IntervalRequest newRequest = new IntervalRequest(from, to, request.getSender(), request.getDesiredData(), request.getReadClassParams());
         File file = new File(track.getFilePath());
         if (this.referenceGenome == null) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
@@ -182,7 +184,7 @@ public class CoverageThread extends RequestThread {
         }
         SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId());
         CoverageAndDiffResultPersistant result = externalDataReader.getCoverageFromBam(
-                this.referenceGenome, from, to, diffsAndGapsNeeded, request.getDesiredData());
+                this.referenceGenome, newRequest, diffsAndGapsNeeded);
         externalDataReader.close();
         return result;
 
@@ -207,7 +209,7 @@ public class CoverageThread extends RequestThread {
         cov.incArraysToIntervalSize();
         
         
-        if (this.isDbUsed) {
+        if (this.isDbUsed) { //NOTE: uniqueness of coverage cannot be obtained from DB!
             
             String cacheFamily = "loadCoverage."+trackID;
             String cacheKey = from + "." + to;
@@ -239,27 +241,33 @@ public class CoverageThread extends RequestThread {
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
                 counter++;
                 //perfect cov
-                cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
-                cov.setPerfectFwdNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
-                cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
-                cov.setPerfectRevNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
+                if (request.getReadClassParams().isPerfectMatchUsed()) {
+                    cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
+                    cov.setPerfectFwdNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
+                    cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
+                    cov.setPerfectRevNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
+                }
                 //best match cov
-                cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
-                cov.setBestMatchFwdNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
-                cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
-                cov.setBestMatchRevNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
+                if (request.getReadClassParams().isBestMatchUsed()) {
+                    cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
+                    cov.setBestMatchFwdNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
+                    cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
+                    cov.setBestMatchRevNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
+                }
                 //complete cov
-                int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
-                int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+                if (request.getReadClassParams().isCommonMatchUsed()) {
+                    int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                    int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
 //                if (pos >= request.getFrom() & pos <= request.getTo()
 //                        && (tmpHighestCov < covNFWMult || tmpHighestCov < covNRevMult)) {
 //                    tmpHighestCov = covNFWMult < covNRevMult ? covNRevMult : covNFWMult;
 //                    cov.setHighestCoverage(tmpHighestCov);
 //                }
-                cov.setCommonFwdMult(pos, covNFWMult);
-                cov.setCommonFwdNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
-                cov.setCommonRevMult(pos, covNRevMult);
-                cov.setCommonRevNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                    cov.setCommonFwdMult(pos, covNFWMult);
+                    cov.setCommonFwdNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
+                    cov.setCommonRevMult(pos, covNRevMult);
+                    cov.setCommonRevNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                }
 
             }
             fetch.close();
@@ -274,54 +282,54 @@ public class CoverageThread extends RequestThread {
             
 
         } else {
-            result = this.getCoverageAndDiffsFromFile(request, from, to, tracks.get(0));
+            result = this.getCoverageAndDiffsFromFile(request, tracks.get(0));
         }
             
         return result;
     }
 
-    /**
-     * Fetches the best match coverage of an interval of a certain track.
-     * @param request the coverage request to carry out
-     * @return the best match coverage of an interval of a certain track.
-     */
-    private CoverageAndDiffResultPersistant loadCoverageBest(IntervalRequest request) throws SQLException {
-        int from = this.calcCenterLeft(request);
-        int to = this.calcCenterRight(request);
-
-        CoverageAndDiffResultPersistant result;
-        PersistantCoverage cov = new PersistantCoverage(from, to);
-        cov.incArraysToIntervalSize();
-        
-        if (this.isDbUsed) {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_BEST_FOR_INTERVAL);
-            fetch.setLong(1, trackID);
-            fetch.setInt(2, from);
-            fetch.setInt(3, to);
-
-            ResultSet rs = fetch.executeQuery();
-
-            while (rs.next()) {
-                int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-                //perfect cov
-                cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
-                cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
-                //best match cov
-                cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
-                cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
-            }
-            
-            fetch.close();
-            rs.close();
-            
-            result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
-        
-        } else {
-            result = this.getCoverageAndDiffsFromFile(request, from, to, tracks.get(0));
-        }
-
-        return result;
-    }
+//    /**
+//     * Fetches the best match coverage of an interval of a certain track.
+//     * @param request the coverage request to carry out
+//     * @return the best match coverage of an interval of a certain track.
+//     */
+//    private CoverageAndDiffResultPersistant loadCoverageBest(IntervalRequest request) throws SQLException {
+//        int from = this.calcCenterLeft(request);
+//        int to = this.calcCenterRight(request);
+//
+//        CoverageAndDiffResultPersistant result;
+//        PersistantCoverage cov = new PersistantCoverage(from, to);
+//        cov.incArraysToIntervalSize();
+//        
+//        if (this.isDbUsed) {
+//            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_BEST_FOR_INTERVAL);
+//            fetch.setLong(1, trackID);
+//            fetch.setInt(2, from);
+//            fetch.setInt(3, to);
+//
+//            ResultSet rs = fetch.executeQuery();
+//
+//            while (rs.next()) {
+//                int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
+//                //perfect cov
+//                cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
+//                cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
+//                //best match cov
+//                cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
+//                cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
+//            }
+//            
+//            fetch.close();
+//            rs.close();
+//            
+//            result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
+//        
+//        } else {
+//            result = this.getCoverageAndDiffsFromFile(request, tracks.get(0));
+//        }
+//
+//        return result;
+//    }
 
     /**
      * Loads the coverage for two tracks, which should not be combined, but
@@ -360,7 +368,7 @@ public class CoverageThread extends RequestThread {
         
         } else {
             IntervalRequest newRequest = new IntervalRequest(request.getFrom(), request.getTo(), request.getSender(), PersistantCoverage.TRACK2);
-            cov = this.getCoverageAndDiffsFromFile(newRequest, from, to, tracks.get(1)).getCoverage();
+            cov = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(1)).getCoverage();
             //TODO: maybe optimize request to only store common coverage information
         }
         
@@ -396,7 +404,7 @@ public class CoverageThread extends RequestThread {
         
         } else {
             IntervalRequest newRequest = new IntervalRequest(request.getFrom(), request.getTo(), request.getSender(), PersistantCoverage.TRACK1);
-            PersistantCoverage intermedCov = this.getCoverageAndDiffsFromFile(newRequest, from, to, tracks.get(0)).getCoverage();
+            PersistantCoverage intermedCov = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(0)).getCoverage();
             cov.setCommonFwdMult(new int[cov.getCommonFwdMultCovTrack2().length]);
             cov.setCommonRevMult(new int[cov.getCommonRevMultCovTrack2().length]);
             for (int i = cov.getLeftBound(); i <= cov.getRightBound(); ++i) {
@@ -464,29 +472,33 @@ public class CoverageThread extends RequestThread {
 
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
                 //perfect cov
-                cov.setPerfectFwdMult(pos, cov.getPerfectFwdMult(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
-                cov.setPerfectFwdNum(pos, cov.getPerfectFwdNum(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
-                cov.setPerfectRevMult(pos, cov.getPerfectRevMult(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
-                cov.setPerfectRevNum(pos, cov.getPerfectRevNum(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
-
+                if (request.getReadClassParams().isPerfectMatchUsed()) {
+                    cov.setPerfectFwdMult(pos, cov.getPerfectFwdMult(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
+                    cov.setPerfectFwdNum(pos, cov.getPerfectFwdNum(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
+                    cov.setPerfectRevMult(pos, cov.getPerfectRevMult(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
+                    cov.setPerfectRevNum(pos, cov.getPerfectRevNum(pos) + rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
+                }
                 //best match cov
-                cov.setBestMatchFwdMult(pos, cov.getBestMatchFwdMult(pos) + rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
-                cov.setBestMatchFwdNum(pos, cov.getBestMatchFwdNum(pos) + rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
-                cov.setBestMatchRevMult(pos, cov.getBestMatchRevMult(pos) + rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
-                cov.setBestMatchRevNum(pos, cov.getBestMatchRevNum(pos) + rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
-
+                if (request.getReadClassParams().isBestMatchUsed()) {
+                    cov.setBestMatchFwdMult(pos, cov.getBestMatchFwdMult(pos) + rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
+                    cov.setBestMatchFwdNum(pos, cov.getBestMatchFwdNum(pos) + rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
+                    cov.setBestMatchRevMult(pos, cov.getBestMatchRevMult(pos) + rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
+                    cov.setBestMatchRevNum(pos, cov.getBestMatchRevNum(pos) + rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
+                }
                 //complete cov and highest coverage in interval calculation
-                int covCommonFwdMult = cov.getCommonFwdMult(pos) + rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
-                int covCommonRevMult = cov.getCommonRevMult(pos) + rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
-//            if (pos >= request.getFrom() && pos <= request.getTo()
-//                    && (tmpHighestCov < covCommonFwdMult || tmpHighestCov < covCommonRevMult)) {
-//                tmpHighestCov = covCommonFwdMult < covCommonRevMult ? covCommonRevMult : covCommonFwdMult;
-//                cov.setHighestCoverage(tmpHighestCov);
-//            }
-                cov.setCommonFwdMult(pos, covCommonFwdMult);
-                cov.setCommonFwdNum(pos, cov.getCommonFwdNum(pos) + rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
-                cov.setCommonRevMult(pos, covCommonRevMult);
-                cov.setCommonRevNum(pos, cov.getCommonRevNum(pos) + rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                if (request.getReadClassParams().isCommonMatchUsed()) {
+                    int covCommonFwdMult = cov.getCommonFwdMult(pos) + rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                    int covCommonRevMult = cov.getCommonRevMult(pos) + rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+//                    if (pos >= request.getFrom() && pos <= request.getTo()
+//                            && (tmpHighestCov < covCommonFwdMult || tmpHighestCov < covCommonRevMult)) {
+//                        tmpHighestCov = covCommonFwdMult < covCommonRevMult ? covCommonRevMult : covCommonFwdMult;
+//                        cov.setHighestCoverage(tmpHighestCov);
+//                    }
+                    cov.setCommonFwdMult(pos, covCommonFwdMult);
+                    cov.setCommonFwdNum(pos, cov.getCommonFwdNum(pos) + rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
+                    cov.setCommonRevMult(pos, covCommonRevMult);
+                    cov.setCommonRevNum(pos, cov.getCommonRevNum(pos) + rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                }
 
             }
             fetch.close();
@@ -497,7 +509,7 @@ public class CoverageThread extends RequestThread {
         cov.incArraysToIntervalSize();
         for (int i = 0; i < this.tracks.size(); ++i) {
             if (!this.tracks.get(i).isDbUsed()) {
-                CoverageAndDiffResultPersistant intermedRes = this.getCoverageAndDiffsFromFile(request, from, to, tracks.get(i));
+                CoverageAndDiffResultPersistant intermedRes = this.getCoverageAndDiffsFromFile(request, tracks.get(i));
                 cov = this.mergeMultCoverages(cov, intermedRes.getCoverage());
             }
         }
@@ -512,6 +524,7 @@ public class CoverageThread extends RequestThread {
      * @return The coverage for multiple tracks separated in different
      * PersistantCoverage objects.
      */
+    //TODO: loadCoverageMutliple2 currently only works for DB tracks
     private PersistantCoverage[] loadCoverageMutliple2(IntervalRequest request) throws SQLException {
         int from = calcCenterLeft(request);
         int to = calcCenterRight(request);
@@ -547,29 +560,33 @@ public class CoverageThread extends RequestThread {
 
                 int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
                 //perfect cov
-                cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
-                cov.setPerfectFwdNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
-                cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
-                cov.setPerfectRevNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
-
+                if (request.getReadClassParams().isPerfectMatchUsed()) {
+                    cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
+                    cov.setPerfectFwdNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_NUM));
+                    cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
+                    cov.setPerfectRevNum(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_NUM));
+                }
                 //best match cov
-                cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
-                cov.setBestMatchFwdNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
-                cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
-                cov.setBestMatchRevNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
-
+                if (request.getReadClassParams().isBestMatchUsed()) {
+                    cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
+                    cov.setBestMatchFwdNum(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_NUM));
+                    cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
+                    cov.setBestMatchRevNum(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_NUM));
+                }
                 //complete cov and highest coverage in interval calculation
-                int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
-                int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
-    //            if (pos >= request.getFrom() && pos <= request.getTo()
-    //                    && (tmpHighestCov < covNFWMult || tmpHighestCov < covNRevMult)) {
-    //                tmpHighestCov = covNFWMult < covNRevMult ? covNRevMult : covNFWMult;
-    //                cov.setHighestCoverage(tmpHighestCov);
-    //            }
-                cov.setCommonFwdMult(pos, covNFWMult);
-                cov.setCommonFwdNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
-                cov.setCommonRevMult(pos, covNRevMult);
-                cov.setCommonRevNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                if (request.getReadClassParams().isCommonMatchUsed()) {
+                    int covNFWMult = rs.getInt(FieldNames.COVERAGE_N_FW_MULT);
+                    int covNRevMult = rs.getInt(FieldNames.COVERAGE_N_RV_MULT);
+                    //            if (pos >= request.getFrom() && pos <= request.getTo()
+                    //                    && (tmpHighestCov < covNFWMult || tmpHighestCov < covNRevMult)) {
+                    //                tmpHighestCov = covNFWMult < covNRevMult ? covNRevMult : covNFWMult;
+                    //                cov.setHighestCoverage(tmpHighestCov);
+                    //            }
+                    cov.setCommonFwdMult(pos, covNFWMult);
+                    cov.setCommonFwdNum(pos, rs.getInt(FieldNames.COVERAGE_N_FW_NUM));
+                    cov.setCommonRevMult(pos, covNRevMult);
+                    cov.setCommonRevNum(pos, rs.getInt(FieldNames.COVERAGE_N_RV_NUM));
+                }
 
             }
             rs.close();
@@ -648,11 +665,11 @@ public class CoverageThread extends RequestThread {
                             if (trackID2 != 0) {
                                 currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
                             } else if (this.trackID != 0) {
-                                if (request.getDesiredData() == Properties.BEST_MATCH_COVERAGE) {
-                                    currentCov = this.loadCoverageBest(request);
-                                } else { 
-                                    currentCov = this.loadCoverage(request);
-                                } //else request.getDesiredData() == Properties.PERFECT_COVERAGE does not exist yet, as it is not needed yet
+//                                if (request.getParameterSet(). == Properties.BEST_MATCH_COVERAGE) {
+//                                    currentCov = this.loadCoverageBest(request);
+//                                } else { 
+                                currentCov = this.loadCoverage(request);
+//                                } //else request.getParameterSet() == Properties.PERFECT_COVERAGE does not exist yet, as it is not needed yet
                             } else if (this.tracks != null && !this.tracks.isEmpty()) {
                                 currentCov = this.loadCoverageMultiple(request);
                             }

@@ -2,6 +2,7 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.api.objects.JobPanel;
 import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.view.dialogMenus.ChangeListeningWizardPanel;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -24,7 +25,6 @@ public final class SNPVisualPanel extends JobPanel {
      */
     public SNPVisualPanel() {
         initComponents();
-        this.isRequiredInfoSet();
         
         this.absNumText.getDocument().addDocumentListener(this.createDocumentListener());
         
@@ -168,7 +168,7 @@ public final class SNPVisualPanel extends JobPanel {
             isValidated = false;
         }
         
-        firePropertyChange(SNPWizardPanel.PROP_VALIDATE, null, isValidated);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;
     }
     

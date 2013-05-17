@@ -1,5 +1,6 @@
 package de.cebitec.vamp.transcriptionAnalyses.wizard;
 
+import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,6 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     //     };
     // }
     
-    public static final String PROP_VALIDATE = "validated";
     public static final String PROP_TSS_ANALYSIS = "tssAnalysis";
     public static final String PROP_FILTER_ANALYSIS = "filterAnalysis";
     public static final String PROP_OPERON_ANALYSIS = "operon";
@@ -54,6 +54,7 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     public static final String PROP_MAX_NUMBER_READS = "maxNumberReads";
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";
     
+    private static final String PROP_WIZARD_NAME = "TransAnalyses";
     private int index;
     private ChangeSupport changeSupport;
     private WizardDescriptor wiz;
@@ -63,10 +64,11 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> currentPanels;
     
-    private TransAnalysesSelectionWizardPanel selectionPanel = new TransAnalysesSelectionWizardPanel();
-    private TransAnalysesTSSWizardPanel tSSPanel = new TransAnalysesTSSWizardPanel();
-    private TransAnalysesFilterWizardPanel filterPanel = new TransAnalysesFilterWizardPanel();
-    private TransAnalysesOperonWizardPanel operonPanel = new TransAnalysesOperonWizardPanel();
+    private TransAnalysesSelectionWizardPanel selectionPanel;
+    private TransAnalysesTSSWizardPanel tSSPanel;
+    private TransAnalysesFilterWizardPanel filterPanel;
+    private TransAnalysesOperonWizardPanel operonPanel;
+    private SelectReadClassWizardPanel readClassPanel;
     
     private Map<WizardDescriptor.Panel<WizardDescriptor>, Integer> panelToStepMap = new HashMap<>();
     
@@ -88,19 +90,22 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             allPanels = new ArrayList<>();
     
             selectionPanel = new TransAnalysesSelectionWizardPanel();
+            readClassPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
             tSSPanel = new TransAnalysesTSSWizardPanel();
             filterPanel = new TransAnalysesFilterWizardPanel();
             operonPanel = new TransAnalysesOperonWizardPanel();
 
             allPanels.add(selectionPanel);
+            allPanels.add(readClassPanel);
             allPanels.add(tSSPanel);
             allPanels.add(filterPanel);
             allPanels.add(operonPanel);
             
             this.panelToStepMap.put(selectionPanel, 0);
-            this.panelToStepMap.put(tSSPanel, 1);
-            this.panelToStepMap.put(filterPanel, 2);
-            this.panelToStepMap.put(operonPanel, 3);
+            this.panelToStepMap.put(readClassPanel, 1);
+            this.panelToStepMap.put(tSSPanel, 2);
+            this.panelToStepMap.put(filterPanel, 3);
+            this.panelToStepMap.put(operonPanel, 4);
             
             this.steps = new String[allPanels.size() + 1];
             for (int i = 0; i < allPanels.size(); i++) {
@@ -117,12 +122,12 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             }
             steps[steps.length - 1] = FINISH_MSG;
             
-            String[] initiallyShownSteps = new String[]{steps[0], "...", steps[steps.length - 1]};
+            String[] initiallyShownSteps = new String[]{steps[0], steps[1], "...", steps[steps.length - 1]};
             selectionPanel.getComponent().putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, initiallyShownSteps);
             
             currentPanels = new ArrayList<>();
             currentPanels.add(selectionPanel);
-            currentPanels.add(tSSPanel);
+            currentPanels.add(readClassPanel);
         }
         return allPanels;
     }
@@ -231,6 +236,23 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
         } else if (currentPanels.contains(analysisPanel)) {
             currentPanels.remove(analysisPanel);
         }
+    }
+
+    /**
+     * @param usingADBTrack true, if the wizard is run on a track stored
+     * completely in the DB, false otherwise.
+     */
+    public void setUsingDBTrack(boolean containsDBTrack) {
+        this.readClassPanel.getComponent().setUsingDBTrack(containsDBTrack);
+    }
+    
+    /**
+     * @return The dynamically generated property name for the read class 
+     * selection for this wizard. Can be used to obtain the corresponding
+     * read class parameters.
+     */
+    public String getReadClassPropForWiz() {
+        return this.readClassPanel.getPropReadClassParams();
     }
 
 }

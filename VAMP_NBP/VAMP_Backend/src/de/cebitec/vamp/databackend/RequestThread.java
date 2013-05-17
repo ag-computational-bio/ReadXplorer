@@ -48,15 +48,14 @@ public abstract class RequestThread extends Thread {
         
         // rounding error somewhere....
         if (
-            (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1) 
-            || (request.getDesiredData()!=latestRequest.getDesiredData())
-            || (request.getSender()!=latestRequest.getSender())
+            (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1)
+                || (request.getDesiredData() != latestRequest.getDesiredData())
+                || (request.getSender() != latestRequest.getSender())
                 ) {
             return true;
         } else {
             return false;
         }
-        //return true;
     }
 
     /**

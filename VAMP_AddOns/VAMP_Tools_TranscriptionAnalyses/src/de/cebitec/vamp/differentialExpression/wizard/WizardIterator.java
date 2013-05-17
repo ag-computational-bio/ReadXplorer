@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.api.cookies.LoginCookie;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
@@ -11,6 +12,7 @@ import de.cebitec.vamp.differentialExpression.Group;
 import de.cebitec.vamp.differentialExpression.ProcessingLog;
 import de.cebitec.vamp.differentialExpression.SimpleTestAnalysisHandler;
 import de.cebitec.vamp.util.FeatureType;
+import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,6 +60,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private String[] simpleTestIndex;
     private DeAnalysisHandler.Tool tool;
     private WizardDescriptor wiz;
+    private SelectReadClassWizardPanel readClassPanel;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -69,6 +72,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
             wiz.setTitle("Differential expression analysis");
             if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+                ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(this.readClassPanel.getPropReadClassParams());
                 List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
                 List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
                 Integer genomeID = (Integer) wiz.getProperty("genomeID");
@@ -81,8 +85,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 DeAnalysisHandler handler = null;
 
                 if (tool == DeAnalysisHandler.Tool.BaySeq) {
-                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, 
-                            genomeID, replicateStructure, saveFile, feature, startOffset, stopOffset);
+                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID,
+                            replicateStructure, saveFile, feature, startOffset, stopOffset, readClassParams);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.DeSeq) {
@@ -96,7 +100,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                     }
                     handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, 
-                            fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature, startOffset, stopOffset);
+                            fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature, startOffset, stopOffset, readClassParams);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.SimpleTest) {
@@ -114,7 +118,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     }
 
                     handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, 
-                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset);
+                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset, readClassParams);
                 }
 
                 DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
@@ -134,6 +138,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
 
     private void initializePanels() {
         if (allPanels == null) {
+            this.readClassPanel = new SelectReadClassWizardPanel("DiffExprWiz");
             allPanels = new ArrayList<>();
             allPanels.add(new ChooseWizardPanel());
             allPanels.add(new DeSeqWizardPanel1());
@@ -144,6 +149,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             allPanels.add(new DeSeqWizardPanelFit());
             allPanels.add(new DeSeqWizardPanelConds());
             allPanels.add(new GeneralSettingsWizardPanel());
+            allPanels.add(readClassPanel);
             allPanels.add(new StartAnalysisWizardPanel());
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
@@ -167,7 +173,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             baySeqPanels.add(allPanels.get(4));
             baySeqPanels.add(allPanels.get(8));
             baySeqPanels.add(allPanels.get(9));
-            baySeqIndex = new String[]{steps[0], steps[2], steps[3], steps[4], steps[8], steps[9]};
+            baySeqPanels.add(allPanels.get(10));
+            baySeqIndex = new String[]{steps[0], steps[2], steps[3], steps[4], steps[8], steps[9], steps[10]};
 
             deSeqIndex = new String[]{steps[0], steps[1], "..."};
 
@@ -178,7 +185,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             deSeqTwoCondsPanels.add(allPanels.get(7));
             deSeqTwoCondsPanels.add(allPanels.get(8));
             deSeqTwoCondsPanels.add(allPanels.get(9));
-            deSeqTwoCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[7], steps[8], steps[9]};
+            deSeqTwoCondsPanels.add(allPanels.get(10));
+            deSeqTwoCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[7], steps[8], steps[9], steps[10]};
 
             deSeqMoreCondsPanels = new ArrayList<>();
             deSeqMoreCondsPanels.add(allPanels.get(0));
@@ -188,7 +196,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             deSeqMoreCondsPanels.add(allPanels.get(6));
             deSeqMoreCondsPanels.add(allPanels.get(8));
             deSeqMoreCondsPanels.add(allPanels.get(9));
-            deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[6], steps[8], steps[9]};
+            deSeqMoreCondsPanels.add(allPanels.get(10));
+            deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[6], steps[8], steps[9], steps[10]};
 
             simpleTestPanels = new ArrayList<>();
             simpleTestPanels.add(allPanels.get(0));
@@ -196,7 +205,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             simpleTestPanels.add(allPanels.get(7));
             simpleTestPanels.add(allPanels.get(8));
             simpleTestPanels.add(allPanels.get(9));
-            simpleTestIndex = new String[]{steps[0], steps[2], steps[7], steps[8], steps[9]};
+            simpleTestPanels.add(allPanels.get(10));
+            simpleTestIndex = new String[]{steps[0], steps[2], steps[7], steps[8], steps[9], steps[10]};
 
             currentPanels = baySeqPanels;
         }
@@ -249,7 +259,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             }
         }
         if ((index == 1) && (tool == DeAnalysisHandler.Tool.DeSeq)) {
-            String[] contentData = null;
+            String[] contentData;
             boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
             if (moreThanTwoConditions) {
                 currentPanels = deSeqMoreCondsPanels;
@@ -271,6 +281,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             throw new NoSuchElementException();
         }
         index--;
+        wiz.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, index);
     }
 
     // If nothing unusual changes in the middle of the wizard, simply:
@@ -285,4 +296,21 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     // the number of allPanels changes in response to user input, then use
     // ChangeSupport to implement add/removeChangeListener and call fireChange
     // when needed
+    
+    /**
+     * @param usingADBTrack true, if the wizard is run on a track stored
+     * completely in the DB, false otherwise.
+     */
+    public void setUsingDBTrack(boolean containsDBTrack) {
+        this.readClassPanel.getComponent().setUsingDBTrack(containsDBTrack);
+    }
+
+    /**
+     * @return The dynamically generated property name for the read class
+     * selection for this wizard. Can be used to obtain the corresponding read
+     * class parameters.
+     */
+    public String getReadClassPropForWiz() {
+        return this.readClassPanel.getPropReadClassParams();
+    }
 }

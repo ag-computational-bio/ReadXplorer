@@ -5,6 +5,7 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParsedSeqPairContainer;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.DiscreteCountingDistribution;
 import de.cebitec.vamp.util.Properties;
@@ -67,7 +68,6 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
             String refName = trackJob.getRefGen().getName();
 
             SAMRecord record;
-            String readNameFull; //read name with pair tag
             char pairTag;
             Object classobj;
             byte pairClass;
@@ -76,10 +76,9 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
                 //separate all mappings of same pair by seq pair tag and hand it over to classification then
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
-                    readNameFull = record.getReadName();
-                    pairTag = readNameFull.charAt(readNameFull.length() - 1);
+                    pairTag = ParserCommonMethods.getReadPairTag(record);
                     
-                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) {
+                    if (pairTag == Properties.EXT_A1) {
                         
                         classobj = record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
                         if (classobj != null) {
@@ -87,7 +86,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
                                 pairClass = Byte.valueOf(classobj.toString());
                                 this.getStatsContainer().incSeqPairStats(pairClass, 1);
                                 insertSize = Math.abs(record.getInferredInsertSize());
-                                if (insertSize != 0) { // 0 n= unpaired/not available
+                                if (insertSize != 0) { // 0 = unpaired/not available
                                     this.seqPairSizeDistribution.increaseDistribution(insertSize);
                                 }
                             }
@@ -96,8 +95,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
                             this.getStatsContainer().incSeqPairStats(Properties.TYPE_UNPAIRED_PAIR, 1);
                         }
                         
-                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2 || 
-                            record.getReadPairedFlag() && record.getSecondOfPairFlag()) {
+                    } else if (pairTag == Properties.EXT_A2) {
                         
                         classobj = record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
                         if (classobj != null && classobj instanceof Byte) {

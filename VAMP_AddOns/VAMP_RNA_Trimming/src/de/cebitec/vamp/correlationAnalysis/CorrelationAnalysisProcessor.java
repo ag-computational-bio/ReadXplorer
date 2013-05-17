@@ -36,6 +36,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private void createProcessHandle(String title) {
         this.ph = ProgressHandleFactory.createHandle(title, new Cancellable() {
 
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }
@@ -71,7 +72,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.currentPosition = 1;
         this.currentDirection = StrangDirection.FWD;
         
-        ArrayList<TrackConnector> tcl = new ArrayList<TrackConnector>();
+        ArrayList<TrackConnector> tcl = new ArrayList<>();
         for(PersistantTrack track : list) {
             tcl.add(ProjectConnector.getInstance().getMultiTrackConnector(track));
         }
@@ -104,8 +105,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     private int getCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position, StrangDirection direction) {
-        if (direction==StrangDirection.REV) return getRevCoverageAt(coverageResult, position);
-        else return getFwdCoverageAt(coverageResult, position);
+        if (direction == StrangDirection.REV) {return getRevCoverageAt(coverageResult, position); }
+        else { return getFwdCoverageAt(coverageResult, position); }
     }
     
     
@@ -113,8 +114,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * contain zero coverage on the current position */
     private boolean allCoverageEqualZero(StrangDirection direction, int position) {
         for (CoverageAndDiffResultPersistant result : this.resultList) {
-            if (getCoverageAt(result, position, direction)!=0)
+            if (getCoverageAt(result, position, direction) != 0) {
                 return false;
+            }
         }
         return true;
     }
@@ -139,7 +141,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     
     private double[] copyCoverage(CoverageAndDiffResultPersistant coverageResult, StrangDirection direction, int from, int to) {
-        if (to<from) throw new IllegalArgumentException("from value must be less than the to value");
+        if (to < from) { throw new IllegalArgumentException("from value must be less than the to value"); }
         double[] result = new double[to-from];
         int writeIndex = 0;
         for(int i=from; i<to; i++ ) {
@@ -194,8 +196,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         
         if (this.currentPosition<this.rightBound-this.intervalLength) { //&& (!wasCanceled)) {
             ph.progress(this.currentPosition);
-            if (canceled) this.finish(); 
-            else requestNextStep();
+            if (canceled) { this.finish(); }
+            else {requestNextStep(); }
         }
         else {
             
@@ -222,27 +224,28 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     private ProgressHandle ph;
-    
+
     private void requestNextStep() {
-        
-                    this.resultList = new ArrayList<CoverageAndDiffResultPersistant> ();
-       
-                    int t = currentStep;
-                    if (currentStep % 2 == 0) t = steps - currentStep;
-                    
-                    //currentPosition = t * (CoverageThread.MINIMUMINTERVALLENGTH / SCANFACTOR) + 100;
-                    this.showMsg("Requesting position=" + currentPosition);
-                    
-                    try {                    
-                        Thread.sleep(50);
-                    } catch (InterruptedException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                    
-                    for(TrackConnector tc : this.trackConnectorList) {
-                        tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition+100, this));
-                    }
-     
+
+        this.resultList = new ArrayList<>();
+
+        int t = currentStep;
+        if (currentStep % 2 == 0) {
+            t = steps - currentStep;
+        }
+
+        //currentPosition = t * (CoverageThread.MINIMUMINTERVALLENGTH / SCANFACTOR) + 100;
+        this.showMsg("Requesting position=" + currentPosition);
+
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
+        for (TrackConnector tc : this.trackConnectorList) {
+            tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + 100, this));
+        }
     }
     
     private boolean handleCancel() {
@@ -257,7 +260,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     public synchronized void receiveData(Object data) {
         if (data instanceof CoverageAndDiffResultPersistant) {
             this.resultList.add((CoverageAndDiffResultPersistant) data);
-            if (this.resultList.size()==this.trackConnectorList.size()) {
+            if (this.resultList.size() == this.trackConnectorList.size()) {
                 this.computeStep(this.currentDirection);
             }
         }

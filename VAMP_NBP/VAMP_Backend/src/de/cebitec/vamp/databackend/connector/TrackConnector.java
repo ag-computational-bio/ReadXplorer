@@ -517,7 +517,6 @@ public class TrackConnector {
 
     /**
      * Fetches all sequence pair mappings for the given interval and typeFlag.
-     *
      * @param from start position of the currently viewed interval
      * @param to stop position of the currently viewed interval
      * @param trackID2 the track id of the second track to which the currently
@@ -678,7 +677,8 @@ public class TrackConnector {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
-                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, from, to, true);
+                IntervalRequest request = new IntervalRequest(from, to, null, new ParametersReadClasses());
+                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, request, true);
             }
         }
 
@@ -881,13 +881,17 @@ public class TrackConnector {
     /**
      * Creates an analysis handler for this track connector, which can handle
      * coverage and mapping requests for analysis functions.
-     * @param visualizer the DataVisualizationI implementation to treat the 
+     * @param visualizer the DataVisualizationI implementation to treat the
      * analysis results
      * @param handlerTitle title of the analysis handler
+     * @param readClassParams The parameter set which contains all parameters
+     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * mapped reads shall be used, or all reads.
      * @return the configurable analysis handler
      */
-    public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer, String handlerTitle) {
-        return new AnalysesHandler(this, visualizer, handlerTitle);
+    public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer, String handlerTitle, 
+            ParametersReadClasses readClassParams) {
+        return new AnalysesHandler(this, visualizer, handlerTitle, readClassParams);
     }
 
     private void openBAM() throws FileNotFoundException {

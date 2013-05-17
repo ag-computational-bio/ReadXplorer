@@ -77,6 +77,9 @@ public class ReferenceJob implements Job {
         return trackswithoutRunjob;
     }
 
+    /**
+     * @return the name of the reference
+     */
     @Override
     public String getName(){
         return name;
@@ -123,6 +126,9 @@ public class ReferenceJob implements Job {
         this.id = id;
     }
 
+    /**
+     * @return reference id, if already available
+     */
     @Override
     public int getID(){
         return id;

@@ -381,6 +381,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 //parser also deletes combined file or other writable input file
                                 mappingParser.setStatsContainer(statsContainer);
                                 Object parsingResult = mappingParser.parseInput(trackJob1, referenceSeq);
+                                mappingParser.removeObserver(this);
                                 if (lastWorkFile != trackJob1.getFile()) { //either combined or write protected orig file
                                     GeneralUtils.deleteOldWorkFile(lastWorkFile); //only delete, if file was changed during parsing
                                     lastWorkFile = trackJob1.getFile();

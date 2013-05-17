@@ -115,14 +115,12 @@ public class PersistantTrack {
         if (o instanceof PersistantTrack) {
             PersistantTrack otrack = (PersistantTrack) o;
             return ( 
-               otrack.description.equals(this.description)
-                && otrack.date.equals(this.date)
-                && (otrack.id==this.id)
-                && (otrack.path.equals(this.path))
-                && (otrack.refGenID==this.refGenID)
-                && (otrack.seqPairId==this.seqPairId)
-               );
-                    
+               otrack.getDescription().equals(this.description)
+                    && otrack.getTimestamp().equals(this.date)
+                    && (otrack.getId() == this.id)
+                    && (otrack.getFilePath().equals(this.path))
+                    && (otrack.getRefGenID() == this.refGenID)
+                    && (otrack.getSeqPairId() == this.seqPairId));
         }
         else { return super.equals(o); }
     }
@@ -138,6 +136,22 @@ public class PersistantTrack {
             trackNameList.add(track.getDescription());
         }
         return trackNameList;
+    }
+    
+    /**
+     * Checks if any of the tracks in the list is a track completely stored in
+     * the DB.
+     * @param tracks the list of tracks to check
+     * @return true, if there is at least one track completely stored in the DB,
+     * false otherwise
+     */
+    public static boolean checkForDBTrack(List<PersistantTrack> tracks) {
+        for (PersistantTrack track : tracks) {
+            if (track.isDbUsed()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

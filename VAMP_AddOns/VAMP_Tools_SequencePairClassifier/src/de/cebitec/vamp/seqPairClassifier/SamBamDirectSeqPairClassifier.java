@@ -136,8 +136,8 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
                     readNameFull = record.getReadName();
-                    pairTag = readNameFull.charAt(readNameFull.length() - 1);
-                    readName = readNameFull.substring(0, readNameFull.length() - 2);
+                    pairTag = ParserCommonMethods.getReadPairTag(record);
+                    readName = ParserCommonMethods.getReadNameWithoutPairTag(readNameFull);
                     
                     if (!readName.equals(lastReadName)) { //meaning: next pair, because sorted by read name
                         // classify sequence pair, because all mappings for this pair are currently stored in list
@@ -147,14 +147,16 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                         ++seqPairId;
                         
                     }
-                    if (pairTag == Properties.EXT_A1 || pairTag == Properties.EXT_B1 || record.getReadPairedFlag() && record.getFirstOfPairFlag()) { //TODO: add new casava tag
+                    if (pairTag == Properties.EXT_A1) {
                         record.setReadPairedFlag(true);
                         record.setFirstOfPairFlag(true);
                         currentRecords1.add(record);
-                    } else if (pairTag == Properties.EXT_A2 || pairTag == Properties.EXT_B2 || record.getReadPairedFlag() && record.getSecondOfPairFlag()) {
+                    } else if (pairTag == Properties.EXT_A2) {
                         record.setReadPairedFlag(true);
                         record.setSecondOfPairFlag(true);
                         currentRecords2.add(record);
+                    } else {
+                        this.addSingleRecord(record, seqPairId, 0, "*");
                     }
                     lastReadName = readName;
                 }

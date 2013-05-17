@@ -1,6 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.AnalysesHandler;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -26,7 +27,6 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
@@ -77,6 +77,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private int maxNumberReads = 0;
     private boolean autoOperonParamEstimation = false;
     private int minSpanningReads = 0;
+    private String readClassPropString;
 
     /**
      * Action for opening a new transcription analyses frame. It opens a track
@@ -134,6 +135,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings("unchecked")
         TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator();
+        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
+        transWizardIterator.setUsingDBTrack(containsDBTrack);
+        this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
         WizardDescriptor wiz = new WizardDescriptor(transWizardIterator);
         transWizardIterator.setWiz(wiz);
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -145,7 +149,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         if (!cancelled) {
             this.startTransciptionAnalyses(wiz);
         } else {
-            this.transcAnalysesTopComp.close();
+            if (!this.transcAnalysesTopComp.hasComponents()) {
+                this.transcAnalysesTopComp.close();
+            }
         }
     }
 
@@ -160,6 +166,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         performTSSAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS);
         performFilterAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_FILTER_ANALYSIS);
         performOperonAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS);
+        ParametersReadClasses readClassesParams = (ParametersReadClasses) wiz.getProperty(readClassPropString);
 
         if (performTSSAnalysis) { //set values depending on the selected analysis functions (avoiding null pointers)
             autoTssParamEstimation = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS);
@@ -197,9 +204,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 return;
             }
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
+                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams); //every track has its own analysis handlers
             AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"));
+                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams);
 
             if (parametersTss.isPerformTSSAnalysis()) {
 

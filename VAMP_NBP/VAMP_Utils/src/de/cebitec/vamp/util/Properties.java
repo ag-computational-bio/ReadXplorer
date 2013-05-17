@@ -62,14 +62,14 @@ public class Properties {
     public static final byte SEQ_PAIRS = 1;
     public static final byte SINGLE_MAPPINGS = 2;
     
+    /** Standard value, if all data is needed (0).*/
+    public static final byte NORMAL = 0;
     /** Perfect coverage value (1).*/
     public static final byte PERFECT_COVERAGE = 1;
     /** Best match coverage value (2). */
     public static final byte BEST_MATCH_COVERAGE = 2;
     /** Common match coverage value (3). */
     public static final byte COMPLETE_COVERAGE = 3;
-    /** Value for count data (4). */
-    public static final byte COUNT_DATA = 4;
     /** Value for diffs (5). */
     public static final byte DIFFS = 5;
     /** Value for mappings with diffs (6). */

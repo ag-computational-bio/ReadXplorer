@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.databackend.AnalysesHandler;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -41,6 +42,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private int startOffset;
     private int stopOffset;
     public static boolean TESTING_MODE = false;
+    private final ParametersReadClasses readClassParams;
 
     public static enum Tool {
 
@@ -63,7 +65,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
@@ -71,6 +73,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.selectedFeatures = selectedFeatures;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
+        this.readClassParams = readClassParams;
     }
 
     private void startAnalysis() {
@@ -87,8 +90,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
                 CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " + currentTrack.getId() + ".");
-                handler.setReducedMappingsNeeded(true);
+                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " 
+                        + currentTrack.getId() + ".", readClassParams);
+                handler.setMappingsNeeded(true);
                 handler.registerObserver(collCovData);
                 allHandler.add(handler);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {

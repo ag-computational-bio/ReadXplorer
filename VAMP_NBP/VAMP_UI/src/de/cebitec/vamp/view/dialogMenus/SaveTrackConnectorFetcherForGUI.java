@@ -78,8 +78,8 @@ public class SaveTrackConnectorFetcherForGUI {
      * @param combineTracks boolean if the Tracks should be combined or not.
      * @return TrackConnector for the list of Tracks handed over. 
      * CAUTION: 
-     * tracks are removed if their path can not be resolved and the
-     * user refuses to set a new one.
+     * tracks are removed if their path cannot be resolved and the user refuses 
+     * to set a new one.
      */
     public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) throws UserCanceledTrackPathUpdateException {
         TrackConnector tc = null;
@@ -97,15 +97,15 @@ public class SaveTrackConnectorFetcherForGUI {
                     if (newTrack != null) {
                         tracks.set(i, newTrack);                   
                     } else {
-                        //User canceled path update, so put down an unresolved track
+                        //User canceled path update, add an unresolved track
                         unresolvedTracks++;
                         //And remove the track with wrong path from the list of processed tracks.
                         tracks.remove(i);
                     }
                 }
             }
-            //All track path are tested, if no path could be resolved throw an error.
-            if(unresolvedTracks==tracks.size()){
+            //All track paths are tested, if no path can be resolved an exception is thrown.
+            if (unresolvedTracks == tracks.size()) {
                 throw new UserCanceledTrackPathUpdateException();
             }
             try {
@@ -127,7 +127,7 @@ public class SaveTrackConnectorFetcherForGUI {
      * <tt>openResetFilePathDialog</tt> method to open a dialog for resetting
      * the file path to the current location of the file.
      *
-     * @author ddoppmeier, rhiler, kstaderm
+     * @author rhilker, kstaderm
      * @param track the track whose path has to be reseted
      * @param connector the connector
      * @return the track connector for the updated track or null, if it did not
@@ -138,11 +138,11 @@ public class SaveTrackConnectorFetcherForGUI {
         Preferences prefs = NbPreferences.forModule(Object.class);
         File oldTrackFile = new File(track.getFilePath());
         String basePath = prefs.get("ResetTrack.Filepath", ".");
-        newTrack = this.checkFileExists(basePath, oldTrackFile, track);
+        newTrack = this.checkFileExists(basePath, oldTrackFile, track, connector);
         if (newTrack == null) {
             prefs = Preferences.userNodeForPackage(LoginProperties.class);
             basePath = new File(prefs.get(LoginProperties.LOGIN_DATABASE_H2, ".")).getParentFile().getAbsolutePath();
-            newTrack = this.checkFileExists(basePath, oldTrackFile, track);
+            newTrack = this.checkFileExists(basePath, oldTrackFile, track, connector);
         }
         if (newTrack == null) {
             newTrack = this.openResetFilePathDialog(track, connector);
@@ -153,20 +153,27 @@ public class SaveTrackConnectorFetcherForGUI {
     /**
      * Checks if a file exists and creates a new track, if it exists.
      *
-     * @author ddoppmeier, rhiler, kstaderm
+     * @author rhilker, kstaderm
      *
      * @param basePath
      * @param oldTrackFile the old track file to replace
      * @param track the old track to replace
      * @return the new track, if the file exists, null otherwise
      */
-    private PersistantTrack checkFileExists(String basePath, File oldTrackFile, PersistantTrack track) {
+    private PersistantTrack checkFileExists(String basePath, File oldTrackFile, PersistantTrack track, ProjectConnector connector) {
         PersistantTrack newTrack = null;
         File newTrackFile = new File(basePath + "/" + oldTrackFile.getName());
         if (newTrackFile.exists()) {
             newTrack = new PersistantTrack(track.getId(),
                     newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
                     track.getRefGenID(), track.getSeqPairId());
+            try {
+                connector.resetTrackPath(newTrack);
+            } catch (StorageException ex) {
+                String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.StorageError");
+                String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
+                JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            }
         }
         return newTrack;
     }
@@ -176,7 +183,7 @@ public class SaveTrackConnectorFetcherForGUI {
      * found this method opens a dialog for resetting the file path to the
      * current location of the file.
      *
-     * @author ddoppmeier, rhiler, kstaderm
+     * @author rhilker, kstaderm
      *
      * @param track the track whose path has to be resetted
      * @param connector the connector
@@ -216,14 +223,23 @@ public class SaveTrackConnectorFetcherForGUI {
         return newTrack;
     }
 
+    /**
+     * Exception which should be thrown if the user cancels the update of a 
+     * missing track file path.
+     */
     public static class UserCanceledTrackPathUpdateException extends Exception {
 
-        private static String errorMessage = "The user canceled the track path updated process. A TrackConnector can therefore not be created!";
+        private static String errorMessage = "The user canceled the track path update. Thus, no TrackConnector can be created!";
+        private static final long serialVersionUID = 1L;
         
+        /**
+         * Exception which should be thrown if the user cancels the update of a
+         * missing track file path.
+         */
         public UserCanceledTrackPathUpdateException() {
             super(errorMessage);
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: "+errorMessage, currentTimestamp);
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: " + errorMessage, currentTimestamp);
         }
     }
 }

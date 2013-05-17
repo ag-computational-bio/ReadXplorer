@@ -5,9 +5,17 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
 import de.cebitec.vamp.util.VisualisationUtils;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.sf.samtools.SAMFileHeader;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMSequenceDictionary;
+import net.sf.samtools.SAMSequenceRecord;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 
 /**
  * A JPanel offering various methods useful for track import panels. E.g. it
@@ -32,7 +40,42 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
     public ImportTrackBasePanel() {
     }
     
-    
+    /**
+     * Checks a given sam/bam file for the currently selected reference and 
+     * displays an error message in case the selected reference does not occur
+     * in the sequence dictionary of the sam/bam file.
+     * @param smaBamFile the sam/bam file to check for the reference 
+     */
+    public void checkSeqDictonary(File smaBamFile) {
+        SAMFileReader samReader = new SAMFileReader(smaBamFile);
+        SAMFileHeader header = samReader.getFileHeader();
+        SAMSequenceRecord refSeq = header.getSequenceDictionary().getSequence(this.getReferenceJob().getName());
+        if (refSeq == null) {
+            String msg = NbBundle.getMessage(ImportTrackBasePanel.class, "MSG_ErrorReference",
+                    this.getReferenceJob().getName(),
+                    smaBamFile.getAbsolutePath(),
+                    this.createRefDictionaryString(header.getSequenceDictionary()));
+            NotifyDescriptor nd = new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE);
+            nd.setTitle(NbBundle.getMessage(ImportTrackBasePanel.class, "TITLE_ErrorReference"));
+            DialogDisplayer.getDefault().notify(nd); //TODO: add to is required info set!
+        }
+    }
+
+    /**
+     * Creates a concatenated string of all reference names contained in the 
+     * given sequence dictionary. All names are separated by a new line (\n).
+     * @param sequenceDictionary The sequence dictionary whose reference names
+     * should be concatenated
+     * @return The concatenated reference names
+     */
+    private String createRefDictionaryString(SAMSequenceDictionary sequenceDictionary) {
+        StringBuilder concatenatedDictionary = new StringBuilder(100);
+        concatenatedDictionary.append("\n");
+        for (SAMSequenceRecord ref : sequenceDictionary.getSequences()) {
+            concatenatedDictionary.append(ref.getSequenceName()).append("\n");
+        }
+        return concatenatedDictionary.toString();
+    }
     
     /**
      * @param jobs list of reference jobs which shall be imported now and thus

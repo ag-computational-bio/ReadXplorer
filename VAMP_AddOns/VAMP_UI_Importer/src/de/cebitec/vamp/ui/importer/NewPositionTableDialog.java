@@ -243,6 +243,9 @@ public class NewPositionTableDialog extends ImportTrackBasePanel implements NewJ
 
                     // file chosen
                     addFile(this.getSelectedFile(), mappingFileField);
+                    if (!(getCurrentParser() instanceof JokParser)) {
+                        checkSeqDictonary(this.getSelectedFile());
+                    }
                 }
             };
             

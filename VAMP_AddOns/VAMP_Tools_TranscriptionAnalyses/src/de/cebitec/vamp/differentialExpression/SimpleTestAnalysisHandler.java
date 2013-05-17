@@ -1,19 +1,18 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
+import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestI;
+import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestObserver;
+import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestStatus;
 import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.openide.util.Exceptions;
-import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestI;
-import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestObserver;
-import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestStatus;
 
 /**
  *
@@ -43,8 +42,8 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements Simp
 
     public SimpleTestAnalysisHandler(List<PersistantTrack> selectedTraks,
             int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
-        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset);
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
         simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(),
                 groupA, groupB, workingWithoutReplicates);
         simpleTestAnalysisData.setSelectedTraks(selectedTraks);

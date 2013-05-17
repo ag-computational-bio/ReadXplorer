@@ -36,12 +36,10 @@ public class MappingThreadAnalyses extends MappingThread {
                     this.currentMappings = this.loadMappingsWithDiffs(request);
                 } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
                     this.currentMappings = this.loadMappingsWithoutDiffs(request);
+                } else if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
+                    this.currentMappings = this.loadReducedMappings(request);
                 } else {
-                    if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
-                        this.currentMappings = this.loadReducedMappings(request);
-                    } else {
-                        this.currentMappings = this.loadMappingsById(request);
-                    }
+                    this.currentMappings = this.loadMappingsById(request);
                 }
                 request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
                 currentMappings = null;

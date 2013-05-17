@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq.SamplesNotValidException;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
@@ -37,9 +38,9 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups,
-            Integer refGenomeID, int[] replicateStructure, File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
-        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset);
+    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
         baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), groups, replicateStructure);
         this.groups=groups;
     }

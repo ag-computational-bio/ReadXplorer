@@ -70,14 +70,14 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
             wiz.putProperty("startOffset", getComponent().getStartOffset());
             wiz.putProperty("stopOffset", getComponent().getStopOffset());
         }
-        if (getComponent().isCheckBoxchecked()) {
+        if (getComponent().isSaveBoxChecked()) {
             //TODO: Input validation
             String path = getComponent().getSavePath();
             File file = new File(path);
             wiz.putProperty("saveFile", file);
         }
 
-        List<FeatureType> usedFeatures = getComponent().getFeatureType();
+        List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         //If all possible features are selected, we use the ANY feature type
         if (usedFeatures.size() == FeatureType.SELECTABLE_FEATURE_TYPES.length) {
             usedFeatures = new ArrayList<>();
@@ -91,7 +91,7 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
         if (!getComponent().verifyInput()) {
             throw new WizardValidationException(null, "Please enter a number greater or equal to zero as start/stop offset.", null);
         }
-        List<FeatureType> usedFeatures = getComponent().getFeatureType();
+        List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         if (usedFeatures.isEmpty()) {
             throw new WizardValidationException(null, "Please select at least one type of annotation.", null);
         } else {

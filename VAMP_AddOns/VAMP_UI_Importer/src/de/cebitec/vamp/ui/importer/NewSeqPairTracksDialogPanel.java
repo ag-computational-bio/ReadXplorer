@@ -484,6 +484,9 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
                     
                     for (int i = 0; i < files.length; ++i) {
                         this.addFile(files[i]);
+                        if (!(getCurrentParser() instanceof JokParser)) {
+                            checkSeqDictonary(files[i]);
+                        }
                     }
 
                     mappingFile1Field.setText(getMappingFiles().size() + " tracks to import");
@@ -496,6 +499,9 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
                 } else {
                     File file = this.getSelectedFile();
                     this.addFile(file);
+                    if (!(getCurrentParser() instanceof JokParser)) {
+                        checkSeqDictonary(file);
+                    }
 
 //                    String path = mappingFiles1 == null ? mappingFiles2.get(mappingFiles2.size() - 1).getAbsolutePath()
 //                            : mappingFiles1.get(mappingFiles1.size() - 1).getAbsolutePath();

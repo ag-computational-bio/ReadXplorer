@@ -175,7 +175,7 @@ public class ExcelExporter {
         
         if (dataLeft) {
             for (int i = 0; i < row; ++i) {
-                exportData.remove(0);
+                sheetData.remove(0);
             }
         }
         

@@ -16,7 +16,9 @@ import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.util.StatsContainer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
@@ -69,6 +71,8 @@ public class SamBamPosTableCreator implements Observable {
         List<ParsedMapping> batchOverlappingMappings = new ArrayList<>();
         ParsedTrack track;
 
+//        int noMappings = 0;
+//        long starti = System.currentTimeMillis();
         final int batchSize = 300000;
         int nextBatch = batchSize;
         int lineno = 0;
@@ -99,7 +103,7 @@ public class SamBamPosTableCreator implements Observable {
         Integer classification;
         Integer mappingCount;
         ErrorLimit errorLimit = new ErrorLimit();
-        List<String> readNameList = new ArrayList<>();
+        Set<String> readNameSet = new HashSet<>();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
@@ -125,9 +129,8 @@ public class SamBamPosTableCreator implements Observable {
                         }
 
                         //statistics calculations: count no reads and distinct sequences ////////////
-                        if (!readNameList.contains(readName)) {
-                            readNameList.add(readName);
-                        }
+                        readNameSet.add(readName);
+                        
                         mappingCount = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                         if (mappingCount != null) {
                             mapCount = mappingCount;
@@ -232,6 +235,13 @@ public class SamBamPosTableCreator implements Observable {
                             nextBatch += batchSize;
                             batchOverlappingMappings.clear();
                         }
+                        
+//                        //can be used for debugging performance
+//                        if (++noMappings % 10000 == 0) {
+//                            long finish = System.currentTimeMillis();
+//                            this.notifyObservers(Benchmark.calculateDuration(starti, finish, noMappings + " mappings processed. "));
+//                            starti = System.currentTimeMillis();
+//                        }
                     } else {
                         //skip error messages, if too many occur to prevent bug in the output panel
                         if (errorLimit.allowOutput()) {
@@ -251,8 +261,8 @@ public class SamBamPosTableCreator implements Observable {
                 }
                 
             }
-            if (errorLimit.getSkippedCount()>0) {
-                 this.notifyObservers( "... "+(errorLimit.getSkippedCount())+" more errors occured");
+            if (errorLimit.getSkippedCount() > 0) {
+                this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occured");
             }
             samItor.close();
 
@@ -268,13 +278,13 @@ public class SamBamPosTableCreator implements Observable {
         coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
 
         track = new ParsedTrack(trackJob, new ParsedMappingContainer(), coverageContainer);
-        statsContainer.increaseValue(StatsContainer.NO_READS, readNameList.size());
+        statsContainer.increaseValue(StatsContainer.NO_READS, readNameSet.size());
         statsContainer.setReadLengthDistribution(readLengthDistribution);
         track.setStatsContainer(statsContainer);
         track.setBatchPos(nextBatch);
         this.notifyObservers(track);
         this.coverageContainer = new CoverageContainer();
-        readNameList.clear();
+        readNameSet.clear();
         
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamDirectParser.class, "PosTableCreator.Finished", fileName);

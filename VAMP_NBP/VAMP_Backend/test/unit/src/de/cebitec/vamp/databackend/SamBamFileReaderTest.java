@@ -59,8 +59,9 @@ public class SamBamFileReaderTest {
         int to = 21100;
         boolean diffsAndGapsNeeded = false;
         byte trackNeeded = 0;
+        IntervalRequest request = new IntervalRequest(from, to, null, trackNeeded, new ParametersReadClasses());
         SamBamFileReader samBamFileReader = new SamBamFileReader(new File("D:\\Programmieren & Studieren\\Pseudomonas aeruginosa Projekt\\SequenceData\\NG-5516_2_2_read_1-F469-with-PAO1.jok_sort.bam"), 1);
-        PersistantCoverage coverage = samBamFileReader.getCoverageFromBam(refGenome, from, to, diffsAndGapsNeeded, trackNeeded).getCoverage();
+        PersistantCoverage coverage = samBamFileReader.getCoverageFromBam(refGenome, request, diffsAndGapsNeeded).getCoverage();
         assertTrue(coverage.getPerfectFwdMult(10000) == 129);
         assertTrue(coverage.getPerfectFwdMult(15000) == 178);
         assertTrue(coverage.getPerfectFwdMult(15001) == 179);

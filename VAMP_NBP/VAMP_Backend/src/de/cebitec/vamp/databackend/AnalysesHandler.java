@@ -39,20 +39,24 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private ArrayList<Observer> observers;
     private boolean coverageNeeded;
     private boolean mappingsNeeded;
-    private boolean reducedMappingsNeeded;
+    private byte desiredData = Properties.NORMAL;
+    private ParametersReadClasses readClassParams;
 
     /**
      * Creates a new analysis handler, ready for extracting mapping and coverage
      * information for the given track. CAUTION: You cannot query coverage and
      * mapping tables with the same AnalysisHandler at the same time. You have
      * to use two separate handlers.
-     *
      * @param trackConnector the track connector for which the analyses are
      * carried out
      * @param parent the parent for visualization of the results
      * @param handlerTitle title of the analysis handler
+     * @param readClassParams The parameter set which contains all parameters
+     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * mapped reads shall be used, or all reads.
      */
-    public AnalysesHandler(TrackConnector trackConnector, DataVisualisationI parent, String handlerTitle) {
+    public AnalysesHandler(TrackConnector trackConnector, DataVisualisationI parent, 
+            String handlerTitle, ParametersReadClasses readClassParams) {
         this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
         this.observers = new ArrayList<>();
         this.parent = parent;
@@ -61,7 +65,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.mappingsNeeded = false;
         this.nbCovRequests = 0;
         this.nbMappingRequests = 0;
-
+        this.readClassParams = readClassParams;
     }
 
     /**
@@ -92,7 +96,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
             while (to < this.refSeqLength) {
-                IntervalRequest coverageRequest = new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE);
+                IntervalRequest coverageRequest = new IntervalRequest(from, to, this, readClassParams);
                 trackConnector.addCoverageAnalysisRequest(coverageRequest);
 
                 from = to + 1;
@@ -101,10 +105,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
             //calc last interval until genomeSize
             to = this.refSeqLength;
-            trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, Properties.BEST_MATCH_COVERAGE));
+            trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
 
 
-        } else if (this.mappingsNeeded || this.reducedMappingsNeeded) {
+        } else if (this.mappingsNeeded) {
 
             int stepSize = 50000;
 
@@ -139,45 +143,30 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
                 while (to < numInterestingMappings) {
-                    if (this.reducedMappingsNeeded) {
-                        trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.REDUCED_MAPPINGS));
-                    } else {
-                        trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this));
-                    }
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
                     from = to + 1;
                     to += stepSize;
                 }
 
                 //calc last interval until genomeSize
                 to = numInterestingMappings;
-                if (this.reducedMappingsNeeded) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.REDUCED_MAPPINGS));
-                } else {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this));
-                }
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
             } else {
+                this.desiredData = Properties.REDUCED_MAPPINGS == desiredData ? desiredData : Properties.MAPPINGS_WO_DIFFS;
                 this.nbRequests = this.refSeqLength / stepSize + 1;
                 this.progressHandle.switchToDeterminate(this.nbRequests);
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
                 int from = 0;
                 int to = stepSize;
                 while (to < this.refSeqLength) {
-                    if (this.reducedMappingsNeeded) {
-                        trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.REDUCED_MAPPINGS));
-                    } else {
-                        trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
-                    }
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
                     from = to + 1;
                     to += stepSize;
                 }
 
                 //calc last interval until genomeSize
                 to = this.refSeqLength;
-                if (this.reducedMappingsNeeded) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.REDUCED_MAPPINGS));
-                } else {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_WO_DIFFS));
-                }
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
             }
         } else {
             this.progressHandle.finish();
@@ -227,7 +216,6 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     /**
      * Set before an anylsis is is started. True, if the analysis works with
      * mappings, false otherwise. By default it is false.
-     *
      * @param mappingsNeeded True, if the analysis works with mappings, false
      * otherwise.
      */
@@ -235,12 +223,18 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.mappingsNeeded = mappingsNeeded;
     }
 
-    public boolean isReducedMappingsNeeded() {
-        return reducedMappingsNeeded;
-    }
-
+    /**
+     * Sets the desired data for this analysis handler to 
+     * Properties.REDUCED_MAPPINGS or back to Properties.NORMAL.
+     * @param reducedMappingsNeeded true, if only reduced mappings are needed,
+     * false otherwise
+     */
     public void setReducedMappingsNeeded(boolean reducedMappingsNeeded) {
-        this.reducedMappingsNeeded = reducedMappingsNeeded;
+        if (reducedMappingsNeeded) {
+            this.desiredData = Properties.REDUCED_MAPPINGS;
+        } else {
+            this.desiredData = Properties.NORMAL;
+        }
     }
 
     @Override

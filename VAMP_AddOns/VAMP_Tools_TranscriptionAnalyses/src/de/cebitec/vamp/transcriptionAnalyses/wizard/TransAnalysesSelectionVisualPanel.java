@@ -1,6 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses.wizard;
 
-import javax.swing.JPanel;
+import de.cebitec.vamp.api.objects.JobPanel;
+import de.cebitec.vamp.view.dialogMenus.ChangeListeningWizardPanel;
 
 /**
  * Panel showing all different kinds of transcription analyses functions and
@@ -8,7 +9,7 @@ import javax.swing.JPanel;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public final class TransAnalysesSelectionVisualPanel extends JPanel {
+public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     
     private static final long serialVersionUID = 1L;
 
@@ -129,15 +130,15 @@ public final class TransAnalysesSelectionVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void transcriptionStartBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartBoxActionPerformed
-        firePropertyChange(TranscriptionAnalysesWizardIterator.PROP_VALIDATE, null, isValidated());
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_transcriptionStartBoxActionPerformed
 
     private void filteredGenesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filteredGenesBoxActionPerformed
-        firePropertyChange(TranscriptionAnalysesWizardIterator.PROP_VALIDATE, null, isValidated());
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_filteredGenesBoxActionPerformed
 
     private void operonDetectionBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionBoxActionPerformed
-        firePropertyChange(TranscriptionAnalysesWizardIterator.PROP_VALIDATE, null, isValidated());
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_operonDetectionBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -176,11 +177,12 @@ public final class TransAnalysesSelectionVisualPanel extends JPanel {
     }
 
     /**
-     * @return true, if the panel is validated, false otherwise
+     * @return true, if the panel contains valid information, false otherwise
      */
-    private boolean isValidated() {
+    @Override
+    public boolean isRequiredInfoSet() {
         return this.transcriptionStartBox.isSelected()
-                 || this.filteredGenesBox.isSelected()
-               || this.operonDetectionBox.isSelected();
+                || this.filteredGenesBox.isSelected()
+                || this.operonDetectionBox.isSelected();
     }
 }
