@@ -160,12 +160,12 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             Vector<Vector> tableContents;
-            if (usedTool != SimpleTest) {
+//            if (usedTool != SimpleTest) {
                 colNames.add(0, " ");
                 tableContents = currentResult.getTableContentsContainingRowNames();
-            } else {
-                tableContents = currentResult.getTableContents();
-            }
+//            } else {
+//                tableContents = currentResult.getTableContents();
+//            }
 
             DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
