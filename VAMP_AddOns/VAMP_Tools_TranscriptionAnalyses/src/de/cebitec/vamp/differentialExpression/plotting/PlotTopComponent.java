@@ -25,6 +25,7 @@ import org.jfree.chart.axis.ValueTick;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.Range;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.text.TextUtilities;
@@ -57,31 +58,32 @@ import org.openide.windows.TopComponent;
     "HINT_PlotTopComponent=This is a Plot window"
 })
 public final class PlotTopComponent extends TopComponent implements Observer {
-
+    
     private DeAnalysisHandler analysisHandler;
-
+    
     public PlotTopComponent() {
     }
-
+    
     public PlotTopComponent(DeAnalysisHandler analysisHandler) {
         initComponents();
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
         this.analysisHandler = analysisHandler;
     }
-
+    
     public void addData(List<Pair<Double, Double>> coordinates) {
         XYSeries series = new XYSeries("DE data");
+        XYSeries infSeries = new XYSeries("DE data Inf");
         double lowerXbound = 0;
         double higherXbound = 0;
         double lowerYbound = 0;
         double higherYbound = 0;
         for (int i = 0; i < coordinates.size(); i++) {
             Pair<Double, Double> pair = coordinates.get(i);
-
+            
             Double x = pair.getSecond();
             Double y = pair.getFirst();
-
+            
             if (!x.isInfinite()) {
                 if (x > higherXbound) {
                     higherXbound = x;
@@ -100,15 +102,23 @@ public final class PlotTopComponent extends TopComponent implements Observer {
             }
             if (!x.isInfinite() && !y.isInfinite()) {
                 series.add(x, y);
+            } else {
+                infSeries.add(x, y);
             }
         }
-        TestAxis domainAxis = new TestAxis("A");
-        domainAxis.setAutoRangeIncludesZero(true);
+        
+        NumberAxis domainAxis = new NumberAxis("A");
+        domainAxis.setAutoRange(false);
+        domainAxis.setLowerBound(lowerXbound);
+        domainAxis.setUpperBound(higherXbound);
         TestAxis rangeAxis = new TestAxis("M");
-        rangeAxis.setAutoRangeIncludesZero(true);
+        rangeAxis.setAutoRange(false);
+        rangeAxis.setLowerBound(lowerYbound);
+        rangeAxis.setUpperBound(higherYbound);
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(false, true);
         XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
         xySeriesCollection.addSeries(series);
+        xySeriesCollection.addSeries(infSeries);
         XYPlot plot = new XYPlot(xySeriesCollection, domainAxis, rangeAxis, renderer);
         plot.setDomainGridlineStroke(new BasicStroke(0f));
         plot.setRangeGridlineStroke(new BasicStroke(0f));
@@ -216,63 +226,80 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     public void componentOpened() {
         // TODO add custom code on component opening
     }
-
+    
     @Override
     public void componentClosed() {
         analysisHandler.removeObserver(this);
     }
-
+    
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
         // TODO store your settings
     }
-
+    
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
-
+    
     @Override
     public void update(Object args) {
     }
-
+    
     public class TestAxis extends NumberAxis {
-
+        
         public TestAxis(String label) {
             super(label);
         }
 
+        /**
+         * Converts a data value to a coordinate in Java2D space, assuming that
+         * the axis runs along one edge of the specified dataArea.
+         * <p>
+         * Note that it is possible for the coordinate to fall outside the
+         * plotArea.
+         *
+         * @param value the data value.
+         * @param area the area for plotting the data.
+         * @param edge the axis location.
+         *
+         * @return The Java2D coordinate.
+         *
+         * @see #java2DToValue(double, Rectangle2D, RectangleEdge)
+         */
         @Override
-        public AxisState draw(Graphics2D g2, double cursor, Rectangle2D plotArea,
-                Rectangle2D dataArea, RectangleEdge edge,
-                PlotRenderingInfo plotState) {
+        public double valueToJava2D(double value, Rectangle2D area,
+                RectangleEdge edge) {
+            double ret;
+            Range range = getRange();
+            double axisMin = range.getLowerBound();
+            double axisMax = range.getUpperBound();
             
-            double x = dataArea.getX();
-            double y = dataArea.getY()+25;
-            double height = dataArea.getHeight()-50;
-            double width = dataArea.getWidth();
-            dataArea.setFrame(x, y, width, height);
-            AxisState state = null;
-            // if the axis is not visible, don't draw it...
-            if (!isVisible()) {
-                state = new AxisState(cursor);
-                // even though the axis is not visible, we need ticks for the
-                // gridlines...
-                List ticks = refreshTicks(g2, state, dataArea, edge);
-                state.setTicks(ticks);
-                return state;
+            double min = 0.0;
+            double max = 0.0;
+            if (RectangleEdge.isTopOrBottom(edge)) {
+                min = area.getX();
+                max = area.getMaxX();
+            } else if (RectangleEdge.isLeftOrRight(edge)) {
+                max = area.getMinY();
+                min = area.getMaxY();
             }
-
-            // draw the tick marks and labels...
-            state = drawTickMarksAndLabels(g2, cursor, plotArea, dataArea, edge);
-
-            // draw the axis label...
-            state = drawLabel(getLabel(), g2, plotArea, dataArea, edge, state);
-            createAndAddEntity(cursor, state, dataArea, edge, plotState);
-            return state;
-
+            if (Double.isInfinite(value)) {
+                if (isInverted()) {
+                    ret = min - 0;
+                } else {
+                    ret = max + 0;
+                }
+            } else {
+                if (isInverted()) {
+                    ret = max - ((value - axisMin) / (axisMax - axisMin)) * (max - min);
+                } else {
+                    ret = min + ((value - axisMin) / (axisMax - axisMin)) * (max - min);
+                }
+            }
+            return ret;
         }
     }
 }

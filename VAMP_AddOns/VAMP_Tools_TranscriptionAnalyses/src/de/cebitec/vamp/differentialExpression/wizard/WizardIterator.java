@@ -82,11 +82,12 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 List<FeatureType> feature = (List<FeatureType>) wiz.getProperty("featureType");
                 Integer startOffset = (Integer) wiz.getProperty("startOffset");
                 Integer stopOffset = (Integer) wiz.getProperty("stopOffset");
+                boolean regardReadOrientation = (boolean) wiz.getProperty("regardReadOrientation");
                 DeAnalysisHandler handler = null;
 
                 if (tool == DeAnalysisHandler.Tool.BaySeq) {
                     handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID,
-                            replicateStructure, saveFile, feature, startOffset, stopOffset, readClassParams);
+                            replicateStructure, saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.DeSeq) {
@@ -100,7 +101,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                     }
                     handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, 
-                            fittingGroupTwo, genomeID, workingWithoutReplicates, saveFile, feature, startOffset, stopOffset, readClassParams);
+                            fittingGroupTwo, genomeID, workingWithoutReplicates, 
+                            saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.SimpleTest) {
@@ -118,7 +120,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     }
 
                     handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, 
-                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset, readClassParams);
+                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset, 
+                            readClassParams, regardReadOrientation);
                 }
 
                 DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);

@@ -9,16 +9,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * Panel displaying general options for the differential expression wizard,
- * such as the annotation selection, start and stop offset selection and if the 
- * R data should be saved to disk.
- * 
+ * Panel displaying general options for the differential expression wizard, such
+ * as the annotation selection, start and stop offset selection and if the R
+ * data should be saved to disk.
+ *
  * @author kstaderm
  */
 public final class GeneralSettingsVisualPanel extends JPanel {
-    
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
     private boolean saveBoxChecked;
 
     /**
@@ -74,6 +73,10 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         return saveBoxChecked;
     }
 
+    public boolean regaredReadOrientation() {
+        return regardReadOrientation.isSelected();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -92,6 +95,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         fileChooserButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         usedAnnotationsList = new javax.swing.JList<>(FeatureType.SELECTABLE_FEATURE_TYPES);
+        regardReadOrientation = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.jLabel1.text")); // NOI18N
 
@@ -123,6 +127,9 @@ public final class GeneralSettingsVisualPanel extends JPanel {
 
         jScrollPane1.setViewportView(usedAnnotationsList);
 
+        regardReadOrientation.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(regardReadOrientation, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.regardReadOrientation.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -138,15 +145,17 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                         .addComponent(fileNameField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fileChooserButton))
-                    .addComponent(saveCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
+                    .addComponent(saveCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(regardReadOrientation)
+                            .addComponent(jLabel3))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -156,7 +165,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
@@ -164,7 +173,9 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+                .addComponent(regardReadOrientation)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(saveCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -195,7 +206,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         };
         fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_fileChooserButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton fileChooserButton;
     private javax.swing.JTextField fileNameField;
@@ -203,6 +213,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JCheckBox regardReadOrientation;
     private javax.swing.JCheckBox saveCheckBox;
     private javax.swing.JTextField startOffset;
     private javax.swing.JTextField stopOffset;
