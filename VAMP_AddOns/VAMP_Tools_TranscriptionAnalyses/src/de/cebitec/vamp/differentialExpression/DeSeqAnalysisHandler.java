@@ -47,8 +47,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, String[]> design, boolean moreThanTwoConditions,
             List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
-        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
                 design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, 
                 workingWithoutReplicates);

@@ -41,6 +41,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private int resultsReceivedBack = 0;
     private int startOffset;
     private int stopOffset;
+    private boolean regardReadOrientation;
     public static boolean TESTING_MODE = false;
     private final ParametersReadClasses readClassParams;
 
@@ -65,7 +66,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
+            ParametersReadClasses readClassParams, boolean regardReadOrientation) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTraks = selectedTraks;
         this.refGenomeID = refGenomeID;
@@ -74,6 +76,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
+        this.regardReadOrientation = regardReadOrientation;
     }
 
     private void startAnalysis() {
@@ -88,7 +91,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             PersistantTrack currentTrack = it.next();
             try {
                 TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
-                CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset);
+                CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset, regardReadOrientation);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
                 AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " 
                         + currentTrack.getId() + ".", readClassParams);

@@ -42,8 +42,9 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements Simp
 
     public SimpleTestAnalysisHandler(List<PersistantTrack> selectedTraks,
             int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
-        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
+            ParametersReadClasses readClassParams, boolean regardReadOrientation) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
         simpleTestAnalysisData = new SimpleTestAnalysisData(selectedTraks.size(),
                 groupA, groupB, workingWithoutReplicates);
         simpleTestAnalysisData.setSelectedTraks(selectedTraks);
