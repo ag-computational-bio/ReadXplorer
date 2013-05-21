@@ -229,7 +229,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
     
 
     /**
-     * Sets the SNP dection parameters to have them connected with the search
+     * Sets the SNP detection parameters to have them connected with the search
      * results.
      * @param percent minimum deviation in percent at a position used for this
      * snp detection

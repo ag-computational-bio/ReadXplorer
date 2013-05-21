@@ -4,8 +4,10 @@
  */
 package de.cebitec.vamp.correlationAnalysis;
 
-import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisProcessor.StrangDirection;
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import java.util.Map.Entry;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
@@ -36,6 +38,8 @@ public class CorrelationResultPanel extends JPanel {
         });
     }
     
+    private CorrelationResult analysisResult;
+    
     /*@Override
     public int getPersistenceType() {
         return PERSISTENCE_NEVER;
@@ -52,6 +56,11 @@ public class CorrelationResultPanel extends JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         correlationTable = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        exportButton = new javax.swing.JToggleButton();
+        jLabel2 = new javax.swing.JLabel();
+        tracksLabel = new javax.swing.JLabel();
+        paramsLabel = new javax.swing.JLabel();
 
         correlationTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -83,17 +92,67 @@ public class CorrelationResultPanel extends JPanel {
         correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
         correlationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title4")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.jLabel1.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(exportButton, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.exportButton.text")); // NOI18N
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.jLabel2.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(tracksLabel, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.tracksLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(paramsLabel, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.paramsLabel.text")); // NOI18N
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel2)
+                                .add(49, 49, 49)
+                                .add(tracksLabel))
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel1)
+                                .add(18, 18, 18)
+                                .add(paramsLabel)))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(0, 0, Short.MAX_VALUE)
+                        .add(exportButton)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 183, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(tracksLabel)
+                    .add(jLabel2))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(paramsLabel))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(exportButton))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+        if (this.getAnalysisResult()!=null) {
+            new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.getAnalysisResult());
+        }
+    }//GEN-LAST:event_exportButtonActionPerformed
 
     /**
      * Centers the position of the selected correlation fragment in the bounds information manager.
@@ -117,17 +176,39 @@ public class CorrelationResultPanel extends JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable correlationTable;
+    private javax.swing.JToggleButton exportButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel paramsLabel;
+    private javax.swing.JLabel tracksLabel;
     // End of variables declaration//GEN-END:variables
 
-    public void addData(StrangDirection direction, int currentPosition, int to, double correlation, double minPeakCoverage) {
+    public void addData(CorrelatedInterval data) {
         DefaultTableModel model = (DefaultTableModel) this.correlationTable.getModel();
-        model.addRow(new Object[] {direction, currentPosition, to, correlation, minPeakCoverage});
+        model.addRow(new Object[] {data.getDirection(), data.getFrom(), data.getTo(), data.getCorrelation(), data.getMinPeakCoverage()});
     }
     
-    public void ready() {
+    public void ready(CorrelationResult analysisResult) {
         //correlationTable.setAutoCreateRowSorter(true);
+        this.setAnalysisResult(analysisResult);
         correlationTable.setRowSorter(new TableRowSorter(this.correlationTable.getModel()));
+    }
+
+    /**
+     * @return the analysisResult
+     */
+    public CorrelationResult getAnalysisResult() {
+        return analysisResult;
+    }
+
+    /**
+     * @param analysisResult the analysisResult to set
+     */
+    public void setAnalysisResult(CorrelationResult analysisResult) {
+        this.analysisResult = analysisResult;
+        this.paramsLabel.setText(GeneralUtils.implodeMap(": ", ", ", analysisResult.getAnalysisParameters()));
+        this.tracksLabel.setText(GeneralUtils.implode(", ", analysisResult.getTrackNameList().toArray()));        
     }
     
     

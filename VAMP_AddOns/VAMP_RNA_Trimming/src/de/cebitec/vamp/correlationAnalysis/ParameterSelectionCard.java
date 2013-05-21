@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.correlationAnalysis;
 
+import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.openide.util.NbBundle;
@@ -40,6 +41,13 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
             }
         });
         
+        this.correlationMethodCombo.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                firePropertyChange(CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT , e.getOldValue(), e.getNewValue());
+            }
+        });
+        
     }
     
     
@@ -59,13 +67,15 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
         minimumCorrelationSlider = new javax.swing.JSlider();
         minimumCorrelationLabel1 = new javax.swing.JLabel();
         minimumPeakCoverageSlider = new javax.swing.JSlider();
+        intervalLengthLabel1 = new javax.swing.JLabel();
+        correlationMethodCombo = new javax.swing.JComboBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(intervalLengthLabel, org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.intervalLengthLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(minimumCorrelationLabel, org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.minimumCorrelationLabel.text")); // NOI18N
 
         intervalLengthSlider.setMajorTickSpacing(500);
-        intervalLengthSlider.setMaximum(2000);
+        intervalLengthSlider.setMaximum(1000);
         intervalLengthSlider.setMinorTickSpacing(50);
         intervalLengthSlider.setPaintLabels(true);
         intervalLengthSlider.setPaintTicks(true);
@@ -79,45 +89,51 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
         minimumCorrelationSlider.setPaintTicks(true);
         minimumCorrelationSlider.setSnapToTicks(true);
         minimumCorrelationSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.minimumCorrelationSlider.toolTipText")); // NOI18N
+        minimumCorrelationSlider.setValue(20);
 
         org.openide.awt.Mnemonics.setLocalizedText(minimumCorrelationLabel1, org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.minimumCorrelationLabel1.text")); // NOI18N
 
         minimumPeakCoverageSlider.setMajorTickSpacing(20);
+        minimumPeakCoverageSlider.setMaximum(200);
         minimumPeakCoverageSlider.setMinorTickSpacing(10);
         minimumPeakCoverageSlider.setPaintLabels(true);
         minimumPeakCoverageSlider.setPaintTicks(true);
         minimumPeakCoverageSlider.setSnapToTicks(true);
         minimumPeakCoverageSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.minimumPeakCoverageSlider.toolTipText")); // NOI18N
-        minimumPeakCoverageSlider.setValue(10);
+        minimumPeakCoverageSlider.setValue(20);
+
+        org.openide.awt.Mnemonics.setLocalizedText(intervalLengthLabel1, org.openide.util.NbBundle.getMessage(ParameterSelectionCard.class, "ParameterSelectionCard.intervalLengthLabel1.text")); // NOI18N
+
+        correlationMethodCombo.setModel(new javax.swing.DefaultComboBoxModel(new CorrelationCoefficient[] { CorrelationCoefficient.PEARSON, CorrelationCoefficient.SPEARMAN }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(intervalLengthLabel)
-                    .addComponent(minimumCorrelationLabel))
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(minimumPeakCoverageSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                     .addComponent(minimumCorrelationSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                     .addComponent(intervalLengthSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(minimumCorrelationLabel1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(minimumCorrelationLabel1)
+                            .addComponent(intervalLengthLabel)
+                            .addComponent(intervalLengthLabel1)
+                            .addComponent(correlationMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(minimumCorrelationLabel))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addComponent(minimumPeakCoverageSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(intervalLengthLabel)
+                .addComponent(intervalLengthLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(intervalLengthSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
+                .addComponent(correlationMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(minimumCorrelationLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(minimumCorrelationSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -125,7 +141,11 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
                 .addComponent(minimumCorrelationLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(minimumPeakCoverageSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(intervalLengthLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(intervalLengthSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(52, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
@@ -144,7 +164,9 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox correlationMethodCombo;
     private javax.swing.JLabel intervalLengthLabel;
+    private javax.swing.JLabel intervalLengthLabel1;
     private javax.swing.JSlider intervalLengthSlider;
     private javax.swing.JLabel minimumCorrelationLabel;
     private javax.swing.JLabel minimumCorrelationLabel1;
@@ -154,5 +176,9 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
 
     public Object getMinimumPeakCoverage() {
         return this.minimumPeakCoverageSlider.getValue();
+    }
+    
+    public Object getCorrelationMethod() {
+        return this.correlationMethodCombo.getSelectedItem();
     }
 }

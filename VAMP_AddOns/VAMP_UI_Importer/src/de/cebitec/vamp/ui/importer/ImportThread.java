@@ -661,6 +661,16 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         // track jobs have to be imported last, because they may depend upon previously imported genomes, runs
         ph.progress(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.track") + "...", workunits);
+        
+        //get system JVM info:
+        Runtime rt = Runtime.getRuntime();
+        
+        this.showMsg("Your current JVM config allows up to "+rt.maxMemory()+" bytes of memory to be allocated.");
+        this.showMsg("Currently the plattform is using "+(rt.totalMemory() - rt.freeMemory())+" bytes of memory.");
+        this.showMsg("Please be aware of that you might need to change the -Xmx value of your JVM to process big imports successfully.");
+        this.showMsg("The value can be configured in the project.properties file of this application."); 
+        this.showMsg("");
+        
         this.processTrackJobs();
         this.processSeqPairJobs();
         this.processPosTableJobs();

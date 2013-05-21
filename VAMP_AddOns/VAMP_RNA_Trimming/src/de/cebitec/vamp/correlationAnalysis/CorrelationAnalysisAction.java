@@ -29,6 +29,9 @@ public final class CorrelationAnalysisAction implements ActionListener {
     public final static String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";
     public final static String PROP_MINCORRELATION = "PROP_MINCORRELATION";
     public final static String PROP_MINPEAKCOVERAGE = "PROP_MINPEAKCOVERAGE";
+    public final static String PROP_CORRELATIONCOEFFICIENT = "PROP_CORRELATIONCOEFFICIENT";
+    
+    public enum CorrelationCoefficient {PEARSON, SPEARMAN};
     
 
     private final static Logger LOG = Logger.getLogger(CorrelationAnalysisAction.class.getName());
@@ -58,7 +61,9 @@ public final class CorrelationAnalysisAction implements ActionListener {
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            new CorrelationAnalysisProcessor(context,    
+            new CorrelationAnalysisProcessor(  
+                (CorrelationCoefficient) wiz.getProperty(CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT),
+                context,
                 (List<PersistantTrack>) wiz.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION),

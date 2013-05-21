@@ -1,5 +1,6 @@
 package de.cebitec.vamp.correlationAnalysis;
 
+import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.Component;
 import java.util.List;
@@ -56,6 +57,7 @@ public class OverviewPanel implements WizardDescriptor.Panel<WizardDescriptor> {
     @SuppressWarnings("unchecked")
     public void readSettings(WizardDescriptor settings) {
         component.showGenereateOverview(
+                (CorrelationCoefficient) settings.getProperty(CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT),
                 (List<PersistantTrack>) settings.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 settings.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH).toString(),
                 settings.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION).toString(),

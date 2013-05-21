@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
@@ -206,5 +208,34 @@ public class GeneralUtils {
         }
         return asImplodedString;
     }
+    
+    /**
+    * Joins a map of elements in a String.
+    * @param valueDelim Delimiter between key and value of an element
+    * @param entryDelim Delimiter between each Entry element
+    * @param map a map of elements
+    * @return String
+    */
+    public static String implodeMap(String valueDelim, String entryDelim, Map map) {
+        String asImplodedString;
+        if ((map==null) || (map.isEmpty())) {
+            asImplodedString = "";
+        }
+        else {
+            StringBuilder sb = new StringBuilder();
+            Boolean firstLine = true;
+            for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
+                if (!firstLine) sb.append(entryDelim);
+                Map.Entry line = (Map.Entry) it.next();
+                sb.append(line.getKey());
+                sb.append(valueDelim);
+                sb.append(line.getValue());
+                firstLine = false;
+            }
+            asImplodedString = sb.toString();
+        }
+        return asImplodedString;
+    }
+    
     
 }

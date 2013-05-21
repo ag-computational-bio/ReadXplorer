@@ -17,35 +17,34 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="intervalLengthLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="minimumCorrelationLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-          </Group>
-          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="minimumPeakCoverageSlider" alignment="0" pref="400" max="32767" attributes="0"/>
                   <Component id="minimumCorrelationSlider" pref="400" max="32767" attributes="0"/>
                   <Component id="intervalLengthSlider" alignment="0" pref="400" max="32767" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="minimumCorrelationLabel1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="minimumCorrelationLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="intervalLengthLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="intervalLengthLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="correlationMethodCombo" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="minimumCorrelationLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="minimumPeakCoverageSlider" alignment="0" pref="412" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="intervalLengthLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="intervalLengthLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="intervalLengthSlider" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+              <Component id="correlationMethodCombo" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="minimumCorrelationLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="minimumCorrelationSlider" min="-2" max="-2" attributes="0"/>
@@ -53,7 +52,11 @@
               <Component id="minimumCorrelationLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="minimumPeakCoverageSlider" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="98" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="intervalLengthLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="intervalLengthSlider" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="52" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -76,7 +79,7 @@
     <Component class="javax.swing.JSlider" name="intervalLengthSlider">
       <Properties>
         <Property name="majorTickSpacing" type="int" value="500"/>
-        <Property name="maximum" type="int" value="2000"/>
+        <Property name="maximum" type="int" value="1000"/>
         <Property name="minorTickSpacing" type="int" value="50"/>
         <Property name="paintLabels" type="boolean" value="true"/>
         <Property name="paintTicks" type="boolean" value="true"/>
@@ -97,6 +100,7 @@
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.minimumCorrelationSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
+        <Property name="value" type="int" value="20"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="minimumCorrelationLabel1">
@@ -109,6 +113,7 @@
     <Component class="javax.swing.JSlider" name="minimumPeakCoverageSlider">
       <Properties>
         <Property name="majorTickSpacing" type="int" value="20"/>
+        <Property name="maximum" type="int" value="200"/>
         <Property name="minorTickSpacing" type="int" value="10"/>
         <Property name="paintLabels" type="boolean" value="true"/>
         <Property name="paintTicks" type="boolean" value="true"/>
@@ -116,7 +121,21 @@
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.minimumPeakCoverageSlider.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
-        <Property name="value" type="int" value="10"/>
+        <Property name="value" type="int" value="20"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="intervalLengthLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.intervalLengthLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="correlationMethodCombo">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new javax.swing.DefaultComboBoxModel(new CorrelationCoefficient[] { CorrelationCoefficient.PEARSON, CorrelationCoefficient.SPEARMAN })" type="code"/>
+        </Property>
       </Properties>
     </Component>
   </SubComponents>

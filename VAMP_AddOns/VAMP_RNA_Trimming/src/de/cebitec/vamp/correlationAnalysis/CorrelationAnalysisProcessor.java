@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.correlationAnalysis;
 
+import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
@@ -12,8 +13,10 @@ import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Cancellable;
@@ -32,6 +35,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private final Integer minPeakCoverage;
     private StrangDirection currentDirection;
     private boolean canceled = false;
+    private final CorrelationCoefficient correlationCoefficient;
+    private CorrelationResult analysisResult;
+    private final ArrayList<CorrelatedInterval> correlationsList;
 
     private void createProcessHandle(String title) {
         this.ph = ProgressHandleFactory.createHandle(title, new Cancellable() {
@@ -65,17 +71,29 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     private CorrelationResultPanel resultView;
     
-    public CorrelationAnalysisProcessor(ReferenceViewer referenceViewer, List<PersistantTrack> list, 
+    public CorrelationAnalysisProcessor(CorrelationAnalysisAction.CorrelationCoefficient cc,
+            ReferenceViewer referenceViewer, List<PersistantTrack> list, 
             Integer intervalLength, Integer minCorrelation, Integer minPeakCoverage) {
         
         this.ready = false;
         this.currentPosition = 1;
         this.currentDirection = StrangDirection.FWD;
+        this.correlationsList = new ArrayList<CorrelatedInterval>();
         
         ArrayList<TrackConnector> tcl = new ArrayList<>();
+        HashMap<Integer, PersistantTrack> trackNamesList = new HashMap<Integer, PersistantTrack> ();
         for(PersistantTrack track : list) {
             tcl.add(ProjectConnector.getInstance().getMultiTrackConnector(track));
+            trackNamesList.put(track.getId(), track);
         }
+        this.analysisResult = new CorrelationResult(this.correlationsList, trackNamesList);
+        HashMap<String,Object> params = new HashMap<String,Object>();
+        params.put("CorrelationCoefficient", cc);
+        params.put("intervalLength", intervalLength);
+        params.put("minCorrelation", minCorrelation);
+        params.put("minPeakCoverage", minPeakCoverage);
+        this.analysisResult.setAnalysisParameters(params);
+        
         this.rightBound = tcl.get(0).getRefSequenceLength();
         
         this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "FWD"));
@@ -84,13 +102,14 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.intervalLength = intervalLength;
         this.minCorrelation = minCorrelation;
         this.minPeakCoverage = minPeakCoverage;
+        this.correlationCoefficient = cc;
         
         
         CorrelationResultTopComponent tc = CorrelationResultTopComponent.findInstance();
         tc.open();
         tc.requestActive();
         resultView = CorrelationResultTopComponent.findInstance().openResultTab(referenceViewer);
-        
+        this.resultView.setAnalysisResult(this.analysisResult);
         requestNextStep();
     }
     
@@ -172,15 +191,22 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 
                 if ((peakCov1>=this.minPeakCoverage) && 
                         (peakCov2>=this.minPeakCoverage)) {
-                
-                    double correlation = new PearsonsCorrelation().correlation(x, y);
+                    
+                    double correlation = 0;
+                    if (this.correlationCoefficient.equals(CorrelationCoefficient.PEARSON)) {
+                        correlation = new PearsonsCorrelation().correlation(x, y);
+                    }
+                    else if (this.correlationCoefficient.equals(CorrelationCoefficient.SPEARMAN)) {
+                        correlation = new SpearmansCorrelation().correlation(x, y);
+                    }
                     double minCorr = ((double) this.minCorrelation) / 100.0;
 
                     if ((correlation>minCorr) || (correlation<(minCorr*(-1)))) {
                         this.showMsg("correlation of interval ["+this.currentPosition+"-"+to+"] is "+correlation+" on "+direction );
-                        this.resultView.addData(direction, this.currentPosition, to, correlation,
-                                Math.min(peakCov1, peakCov2)
-                                );
+                        CorrelatedInterval resultLine = new CorrelatedInterval(direction, this.currentPosition, to, correlation,
+                                Math.min(peakCov1, peakCov2));
+                        this.correlationsList.add(resultLine);
+                        this.resultView.addData(resultLine);
                     }
                     
                 }
@@ -220,7 +246,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private void finish() {
         ph.finish();
         ready = true;
-        this.resultView.ready();
+        this.resultView.ready(this.analysisResult);
     }
     
     private ProgressHandle ph;

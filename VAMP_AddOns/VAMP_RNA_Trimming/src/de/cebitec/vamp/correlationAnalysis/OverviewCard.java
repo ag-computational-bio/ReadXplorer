@@ -1,5 +1,6 @@
 package de.cebitec.vamp.correlationAnalysis;
 
+import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.rnaTrimming.*;
@@ -63,8 +64,11 @@ public class OverviewCard extends javax.swing.JPanel {
 
     }
 
-    void showGenereateOverview(List<PersistantTrack> list, String intervallength, 
+    void showGenereateOverview(CorrelationCoefficient cc, List<PersistantTrack> list, String intervallength, 
             String mincorrelation, String minpeakcoverage) {
+        overviewTextArea.setText("Correlation coefficient:\n");
+        overviewTextArea.append(cc+"\n");
+        
         overviewTextArea.setText("Reference:\n");
         overviewTextArea.append(ProjectConnector.getInstance().getRefGenomeConnector(
                 list.get(0).getRefGenID()).getRefGenome().getName()+"\n"

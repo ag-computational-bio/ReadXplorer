@@ -259,7 +259,9 @@ public class SamBamPosTableCreator implements Observable {
                         }
                     }
                 }
-                
+                if ((lineno % 20000) == 0)  {//output process info only on every XX line
+                    this.notifyObservers(lineno+" reads processed ...");
+                }
             }
             if (errorLimit.getSkippedCount() > 0) {
                 this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occured");
