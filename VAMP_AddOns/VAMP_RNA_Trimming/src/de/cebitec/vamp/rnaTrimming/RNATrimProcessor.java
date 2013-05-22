@@ -86,7 +86,7 @@ public class RNATrimProcessor  {
      */
     private String extractUnmappedReadsAndTrim(File samfile, TrimMethod method) {       
         //set path to the fasta file to be created
-        String fastaPath = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(samfile)+".redo.fastq";
+        String fastaPath = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(samfile)+"_"+method.getShortDescription()+".redo.fastq";
         
         //set up the progress handle to indicate progress to the user
         ProgressHandle ph = ProgressHandleFactory.createHandle(
@@ -316,13 +316,10 @@ public class RNATrimProcessor  {
         this.io.getOut().println(msg);
     }
     
-    //private ObservableList<PieChart.Data> pieChartData = null;
     private Integer allReads = 0;
     private Integer mappedReads = 0;
     private Integer trimmedReads = 0;
     private Integer trimmedMappedReads = 0;
-    //private Integer trimmedMappedReads = null;
-    //private Integer unmappedReads = null;
     
     private void updateChartData() {
         if (this.statisticsWindow!=null) { 
@@ -514,17 +511,6 @@ public class RNATrimProcessor  {
                 showMsg("trimmed reads: " + trimmedReads);
                 showMsg("trimmed mapped reads: " + trimmedMappedReads);
                 
-                /*while((!ready) && (!wasCanceled)) {
-                    try {
-                        LOG.info("Cacher not ready yet...");
-                        Thread.sleep(1000); //throws InterruptedException is the task was cancelled
-                    } catch (InterruptedException ex) {
-                        LOG.info("Track cacher was canceled");
-                        wasCanceled = true;
-                        return;
-                    }
-                }*/
-                //ph.finish();
             }
 
             
