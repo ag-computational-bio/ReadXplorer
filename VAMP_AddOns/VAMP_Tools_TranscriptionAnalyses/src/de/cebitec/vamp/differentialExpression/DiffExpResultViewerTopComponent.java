@@ -141,10 +141,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
         switch (usedTool) {
             case DeSeq:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
                 break;
             case BaySeq:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
+                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
                 break;
             case SimpleTest:
                 feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
@@ -160,12 +160,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             Vector<Vector> tableContents;
-//            if (usedTool != SimpleTest) {
-                colNames.add(0, " ");
+            if (usedTool == SimpleTest) {
+                colNames.add(0, "Feature");
                 tableContents = currentResult.getTableContentsContainingRowNames();
-//            } else {
-//                tableContents = currentResult.getTableContents();
-//            }
+            } else {
+                colNames.remove(0);
+                colNames.add(0, "Feature");
+                tableContents = currentResult.getTableContents();
+            }
 
             DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
