@@ -16,7 +16,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<>();
     private List<Group> createdGroups = new ArrayList<>();
-    private List<PersistantTrack> selectedTraks = null;
+    private List<PersistantTrack> selectedTraks = new ArrayList<>();
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
     private int selectedIndex = -1;
@@ -29,8 +29,13 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     }
 
     public void updateTrackList(List<PersistantTrack> selectedTraks) {
-        if (this.selectedTraks == null) {
+        if (!this.selectedTraks.equals(selectedTraks)) {
             this.selectedTraks = selectedTraks;
+            currentGroupNumber = 1;
+            selectedIndex = -1;
+            currentGroupBeingCreated = null;
+            createdGroups.clear();
+            groupListModel.clear();
             Integer[] defaultGroup = new Integer[selectedTraks.size()];
             StringBuilder strBuilder = new StringBuilder("{");
             for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
@@ -73,13 +78,14 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         trackList = new javax.swing.JList(trackListModel);
         groupCreationField = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        createdGroupsList = new javax.swing.JList(groupListModel);
         jLabel2 = new javax.swing.JLabel();
         addGroupButton = new javax.swing.JButton();
         removeGroupButton = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         infoText = new javax.swing.JTextField();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        createdGroupsList = new javax.swing.JList(groupListModel);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.jLabel1.text")); // NOI18N
 
@@ -94,10 +100,6 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
                 addButtonActionPerformed(evt);
             }
         });
-
-        createdGroupsList.addListSelectionListener(this);
-        createdGroupsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane2.setViewportView(createdGroupsList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.jLabel2.text")); // NOI18N
 
@@ -123,34 +125,44 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         infoText.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.infoText.text")); // NOI18N
         infoText.setBorder(null);
         jScrollPane4.setViewportView(infoText);
+        infoText.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.infoText.AccessibleContext.accessibleDescription")); // NOI18N
+
+        createdGroupsList.addListSelectionListener(this);
+        createdGroupsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane2.setViewportView(createdGroupsList);
+
+        jScrollPane5.setViewportView(jScrollPane2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(addButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(addGroupButton)
-                                        .addGap(18, 18, 18)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(removeGroupButton))
-                                    .addComponent(groupCreationField, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(groupCreationField)))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(11, 11, 11)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2))))))
+                                    .addComponent(jLabel2)
+                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -171,11 +183,11 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -215,6 +227,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         updateTrackList(selectedTraks);
         addButton.setEnabled(true);
         addGroupButton.setEnabled(false);
+        jScrollPane5.updateUI();
     }//GEN-LAST:event_addGroupButtonActionPerformed
 
     private void removeGroupButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeGroupButtonActionPerformed
@@ -236,6 +249,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JButton removeGroupButton;
     private javax.swing.JList trackList;
     // End of variables declaration//GEN-END:variables
