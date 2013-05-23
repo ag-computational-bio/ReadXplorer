@@ -58,6 +58,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private String[] deSeqTwoCondsIndex;
     private String[] deSeqMoreCondsIndex;
     private String[] simpleTestIndex;
+    private String[] initialSteps;
     private DeAnalysisHandler.Tool tool;
     private WizardDescriptor wiz;
     private SelectReadClassWizardPanel readClassPanel;
@@ -100,8 +101,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
                         fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                     }
-                    handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne, 
-                            fittingGroupTwo, genomeID, workingWithoutReplicates, 
+                    handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne,
+                            fittingGroupTwo, genomeID, workingWithoutReplicates,
                             saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
                 }
 
@@ -119,8 +120,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         groupB[i] = groupBList.get(i);
                     }
 
-                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID, 
-                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset, 
+                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID,
+                            workingWithoutReplicates, saveFile, feature, startOffset, stopOffset,
                             readClassParams, regardReadOrientation);
                 }
 
@@ -162,8 +163,8 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 if (c instanceof JComponent) { // assume Swing components
                     JComponent jc = (JComponent) c;
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
-                    String[] initialyShownSteps = new String[]{steps[0], "..."};
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, initialyShownSteps);
+                    initialSteps = new String[]{steps[0], "..."};
+                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, initialSteps);
                     jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
@@ -283,6 +284,16 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
         if (!hasPrevious()) {
             throw new NoSuchElementException();
         }
+        String[] contentData = null;
+        if (index == 1) {
+            contentData = initialSteps;
+        }
+        if ((index == 2) && (tool == DeAnalysisHandler.Tool.DeSeq)) {
+            contentData = deSeqIndex;
+        }
+        if (contentData != null) {
+            wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
+        }
         index--;
         wiz.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, index);
     }
@@ -299,7 +310,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     // the number of allPanels changes in response to user input, then use
     // ChangeSupport to implement add/removeChangeListener and call fireChange
     // when needed
-    
+
     /**
      * @param usingADBTrack true, if the wizard is run on a track stored
      * completely in the DB, false otherwise.

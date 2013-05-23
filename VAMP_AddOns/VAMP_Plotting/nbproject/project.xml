@@ -97,7 +97,19 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>de.cebitec.vamp.plotting</package>
+                <package>de.cebitec.vamp.plotting.api</package>
+                <package>de.cebitec.vamp.plotting.api.dataset</package>
+                <package>de.cebitec.vamp.plotting.api.overlay</package>
+                <package>de.cebitec.vamp.plotting.api.selection</package>
+                <package>de.cebitec.vamp.plotting.overlay.nodes</package>
+                <package>de.cebitec.vamp.plotting.overlay.nodes.action</package>
+                <package>de.cebitec.vamp.plotting.overlay.ui</package>
+                <package>de.cebitec.vamp.plotting.ui</package>
+                <package>org.jfree.chart.axis</package>
+                <package>org.jfree.chart.axis.renderer.xy</package>
+            </public-packages>
         </data>
     </configuration>
 </project>
