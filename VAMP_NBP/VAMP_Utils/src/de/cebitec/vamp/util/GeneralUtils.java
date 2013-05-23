@@ -9,6 +9,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -237,5 +238,22 @@ public class GeneralUtils {
         return asImplodedString;
     }
     
+    /**
+     * format a number to show it to the user
+     * @param number
+     * @return a good readable string representation of the given number
+     */
+    public static String formatNumber(Integer number) {
+        return NumberFormat.getInstance().format( number );
+    }
+    
+    /**
+     * format a number to show it to the user
+     * @param number
+     * @return a good readable string representation of the given number
+     */
+    public static String formatNumber(Long number) {
+        return NumberFormat.getInstance().format( number );
+    }
     
 }

@@ -163,11 +163,11 @@ public class RNATrimProcessor  {
         File samfile = new File(sampath);
         String newPath = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(samfile)+"_with_originals.sam";
         
-        this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sourcePath));
+        this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath));
         
         //set up the progress handle to indicate progress to the user
         ProgressHandle ph = ProgressHandleFactory.createHandle(
-                NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sourcePath), 
+                NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath), 
                 new Cancellable() {
             public boolean cancel() {
                 return handleCancel();
@@ -384,69 +384,74 @@ public class RNATrimProcessor  {
     XYChart.Data<String, Number> trimmed_unmapped_data;
     StackedBarChart<String, Number> chart;
     
+    private boolean plattformIsSupported = true;
+    
     public void createStatisticsWindow() throws InterruptedException {       
-        //SunOS is not supported by JavaFX
-        // in this case an exception will be trown. it is safe to ignore it
-        // and continue without showing stats window to the user
-        try {
-        
-            this.statisticsWindow = new JFrame("Read statistics");
-            statisticsWindow.setSize(500, 500);
-            final JFXPanel fxPanel = new JFXPanel();
-            statisticsWindow.add(fxPanel);
+        if (this.plattformIsSupported) {
+            // SunOS is not supported by JavaFX
+            // in this case an exception will be trown. it is safe to ignore it
+            // and continue without showing stats window to the user
+            try {
 
-            Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                //Stage primaryStage = new Stage();
-                Group root = new Group();
-                fxPanel.setScene(new Scene(root));
-                 /*pieChartData = FXCollections.observableArrayList(
+                this.statisticsWindow = new JFrame("Read statistics");
+                statisticsWindow.setSize(500, 500);
+                final JFXPanel fxPanel = new JFXPanel();
+                statisticsWindow.add(fxPanel);
 
-                 );*/
-                CategoryAxis xAxis = new CategoryAxis();
-                NumberAxis yAxis = new NumberAxis(); 
-                yAxis.setAutoRanging(true);
-                chart =
-                new StackedBarChart<String, Number>(xAxis, yAxis);
-                chart.setAnimated(false);
-                series2 = new XYChart.Series<String, Number>();
-                series1 = new XYChart.Series<String, Number>();
+                Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    //Stage primaryStage = new Stage();
+                    Group root = new Group();
+                    fxPanel.setScene(new Scene(root));
+                     /*pieChartData = FXCollections.observableArrayList(
 
-                series1.setName("mapped");
-                series2.setName("unmapped");
+                     );*/
+                    CategoryAxis xAxis = new CategoryAxis();
+                    NumberAxis yAxis = new NumberAxis(); 
+                    yAxis.setAutoRanging(true);
+                    chart =
+                    new StackedBarChart<String, Number>(xAxis, yAxis);
+                    chart.setAnimated(false);
+                    series2 = new XYChart.Series<String, Number>();
+                    series1 = new XYChart.Series<String, Number>();
 
-                series1.getData().clear();
-                series1.getData().clear();
-                whole_unmapped_data = new XYChart.Data<String, Number>(all, 1);
-                whole_mapped_data = new XYChart.Data<String, Number>(all, 1);
-                trimmed_unmapped_data = new XYChart.Data<String, Number>(trimmed, 1);
-                trimmed_mapped_data = new XYChart.Data<String, Number>(trimmed, 1);   
+                    series1.setName("mapped");
+                    series2.setName("unmapped");
 
-                series1.getData().add(trimmed_mapped_data);
-                series2.getData().add(trimmed_unmapped_data);
-                series1.getData().add(whole_mapped_data);
-                series2.getData().add(whole_unmapped_data);
+                    series1.getData().clear();
+                    series1.getData().clear();
+                    whole_unmapped_data = new XYChart.Data<String, Number>(all, 1);
+                    whole_mapped_data = new XYChart.Data<String, Number>(all, 1);
+                    trimmed_unmapped_data = new XYChart.Data<String, Number>(trimmed, 1);
+                    trimmed_mapped_data = new XYChart.Data<String, Number>(trimmed, 1);   
 
-                /*series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
-                series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
-                series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));*/
+                    series1.getData().add(trimmed_mapped_data);
+                    series2.getData().add(trimmed_unmapped_data);
+                    series1.getData().add(whole_mapped_data);
+                    series2.getData().add(whole_unmapped_data);
 
-                xAxis.setLabel("Data");
-                xAxis.setCategories(FXCollections.<String>observableArrayList(
-                    Arrays.asList(all, trimmed)));
-                yAxis.setLabel("Reads");
+                    /*series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
+                    series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
+                    series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));*/
 
-                chart.setCategoryGap(5);
-                chart.getData().addAll(series2, series1);
+                    xAxis.setLabel("Data");
+                    xAxis.setCategories(FXCollections.<String>observableArrayList(
+                        Arrays.asList(all, trimmed)));
+                    yAxis.setLabel("Reads");
 
-                //chart.setClockwise(false);
-                root.getChildren().add(chart);
+                    chart.setCategoryGap(5);
+                    chart.getData().addAll(series2, series1);
 
-            }});
-        } catch(UnsupportedOperationException e) {
-            this.showMsg("Could not intialize statistics window: "+e.getLocalizedMessage());
-            this.statisticsWindow = null;
+                    //chart.setClockwise(false);
+                    root.getChildren().add(chart);
+
+                }});
+            } catch(UnsupportedOperationException e) {
+                this.showMsg("Could not intialize statistics window: "+e.getLocalizedMessage());
+                this.statisticsWindow = null;
+                this.plattformIsSupported = false;
+            }
         }
     } 
     

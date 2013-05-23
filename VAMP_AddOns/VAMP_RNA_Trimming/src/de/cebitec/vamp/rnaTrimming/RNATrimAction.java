@@ -7,6 +7,7 @@ package de.cebitec.vamp.rnaTrimming;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.correlationAnalysis.CorrelationResultPanel;
+import de.cebitec.vamp.mapping.api.MappingApi;
 import de.cebitec.vamp.rnaTrimming.TrimMethod;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -53,37 +54,40 @@ public final class RNATrimAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(RNATrimAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-            return;
-        }
+        if (MappingApi.checkMapperConfig()) { 
+        
+            if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(RNATrimAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+                return;
+            }
 
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
-        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(RNATrimAction.class, "TTL_RNATrimAction.title"));
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
-        dialog.setVisible(true);
-        dialog.toFront();
-        boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            new RNATrimProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
-                    (String) wizardDescriptor.getProperty(PROP_SOURCEPATH), 
-                    (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
-                    (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD)
-                    );
-            
-             
-            
-            
-            
-            /*List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
-            List<TrackJob> tracks2del = (List<TrackJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
+            WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
+            // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+            wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
+            wizardDescriptor.setTitle(NbBundle.getMessage(RNATrimAction.class, "TTL_RNATrimAction.title"));
+            Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
+            dialog.setVisible(true);
+            dialog.toFront();
+            boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
+            if (!cancelled) {
+                new RNATrimProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
+                        (String) wizardDescriptor.getProperty(PROP_SOURCEPATH), 
+                        (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
+                        (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD)
+                        );
 
-            DeletionThread dt = new DeletionThread(refs2del, tracks2del);
-            RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
-            rp.post(dt);*/
+
+
+
+
+                /*List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
+                List<TrackJob> tracks2del = (List<TrackJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
+
+                DeletionThread dt = new DeletionThread(refs2del, tracks2del);
+                RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
+                rp.post(dt);*/
+            }
         }
     }
     
