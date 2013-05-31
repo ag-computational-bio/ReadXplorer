@@ -27,6 +27,7 @@
  */
 package de.cebitec.vamp.plotting.api.dataset;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import java.awt.geom.Point2D;
 import java.util.List;
 import de.cebitec.vamp.plotting.api.selection.IDisplayPropertiesProvider;
@@ -45,20 +46,17 @@ public class Numeric1DDataset<TARGET> extends ADataset1D<List<Point2D>, TARGET> 
         super(l, new IDisplayPropertiesProvider() {
             @Override
             public String getName(ISelection selection) {
-                Point2D target = (Point2D) selection.getTarget();
-                return "The point at position: " + target.getX() + " " + target.getY();
+                return "";
             }
 
             @Override
             public String getDisplayName(ISelection selection) {
-                Point2D target = (Point2D) selection.getTarget();
-                return "The point at position: " + target.getX() + " " + target.getY();
+              return "";
             }
 
             @Override
             public String getShortDescription(ISelection selection) {
-                Point2D target = (Point2D) selection.getTarget();
-                return "The point at position: " + target.getX() + " " + target.getY() + " of source " + selection.getSource().toString();
+               return "";
             }
 
             @Override

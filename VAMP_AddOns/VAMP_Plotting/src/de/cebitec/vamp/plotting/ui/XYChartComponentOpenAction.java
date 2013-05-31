@@ -40,7 +40,6 @@ import org.jfree.chart.labels.StandardXYToolTipGenerator;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Task;

@@ -22,6 +22,8 @@ public class SimpleTest implements SimpleTestI {
     private Vector rowNames;
     private Vector colNames;
     private Map<Double[], Double> meanCache;
+    private List<Integer> normalizationFeatures;
+    private boolean useHousekeepingGenesForNormalization = false;
 
     public SimpleTest() {
         this.meanCache = new HashMap<>();
@@ -55,8 +57,29 @@ public class SimpleTest implements SimpleTestI {
         }
 
         //Compute mean and variance between the replicates of each group
-        List<Double> meanCountsA = calculateMeanCountsForEachReplicate(groupA);
-        List<Double> meanCountsB = calculateMeanCountsForEachReplicate(groupB);
+        List<Double> meanCountsA;
+        List<Double> meanCountsB;
+        if (useHousekeepingGenesForNormalization) {
+            int[][] houseKeepingA = new int[groupA.length][normalizationFeatures.size()];
+            int[][] houseKeepingB = new int[groupB.length][normalizationFeatures.size()];
+            int j = 0;
+            for (int i = 0; i < regionLength; i++) {
+                if (normalizationFeatures.contains(regionNames[i].getId())) {
+                    for (int k = 0; k < groupA.length; k++) {
+                        houseKeepingA[k][j] = groupA[k][i];
+                    }
+                    for (int k = 0; k < groupB.length; k++) {
+                        houseKeepingB[k][j] = groupB[k][i];
+                    }
+                    j++;
+                }
+            }
+            meanCountsA = calculateMeanCountsForEachReplicate(houseKeepingA);
+            meanCountsB = calculateMeanCountsForEachReplicate(houseKeepingB);           
+        } else {
+            meanCountsA = calculateMeanCountsForEachReplicate(groupA);
+            meanCountsB = calculateMeanCountsForEachReplicate(groupB);
+        }
         Double averageMeanCounts = calculateTotalMeanCount(meanCountsA, meanCountsB);
         Double[] normalizationRatiosA = calculateNormalizationRatios(meanCountsA, averageMeanCounts);
         Double[] normalizationRatiosB = calculateNormalizationRatios(meanCountsB, averageMeanCounts);
@@ -123,6 +146,10 @@ public class SimpleTest implements SimpleTestI {
 
         ProcessingLog log = ProcessingLog.getInstance();
         log.addProperty("Average mean counts", averageMeanCounts);
+        log.addProperty("Use house keeping genes for normalization", useHousekeepingGenesForNormalization);
+        if (useHousekeepingGenesForNormalization) {
+            log.addProperty("Used house keeping genes", normalizationFeatures);
+        }
         log.addProperty("Normalization ratios for group A", normalizationRatiosA);
         log.addProperty("Normalization ratios for group B", normalizationRatiosB);
         notifyObservers(SimpleTestStatus.FINISHED);
@@ -274,6 +301,12 @@ public class SimpleTest implements SimpleTestI {
         }
         confidence = -(Math.log10((((varA / meanA) + (varB / meanB)) / 2)));
         return confidence;
+    }
+
+    @Override
+    public void setNormalizationFeatures(List<Integer> normalizationFeatures) {
+        this.normalizationFeatures = normalizationFeatures;
+        useHousekeepingGenesForNormalization = true;
     }
 
     private static class MeanVarianceGroup {
