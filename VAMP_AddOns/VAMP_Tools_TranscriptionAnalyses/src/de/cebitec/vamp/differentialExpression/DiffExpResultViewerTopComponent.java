@@ -160,14 +160,15 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             Vector<Vector> tableContents;
-            if (usedTool == SimpleTest) {
-                colNames.add(0, "Feature");
-                tableContents = currentResult.getTableContentsContainingRowNames();
-            } else {
+//          Uncomment when using GNU R Version of Simple Test  
+//            if (usedTool == SimpleTest) {
+//                colNames.add(0, "Feature");
+//                tableContents = currentResult.getTableContentsContainingRowNames();
+//            } else {
                 colNames.remove(0);
                 colNames.add(0, "Feature");
                 tableContents = currentResult.getTableContents();
-            }
+//            }
 
             DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
@@ -304,11 +305,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
                 break;
-        }
-//        PlotTopComponent plotTop = new PlotTopComponent(analysisHandler);
-//        analysisHandler.registerObserver(plotTop);
-//        plotTop.open();
-//        plotTop.requestActive();
+        }        
+        InitializePlotting.open(ConvertData.mAplotData(((DefaultTableModel)topCountsTable.getModel()).getDataVector(), usedTool));
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
