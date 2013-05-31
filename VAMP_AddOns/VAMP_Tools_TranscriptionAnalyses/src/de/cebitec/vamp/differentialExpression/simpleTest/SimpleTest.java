@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import javax.swing.JOptionPane;
+import sun.applet.resources.MsgAppletViewer;
 
 /**
  *
@@ -74,8 +76,27 @@ public class SimpleTest implements SimpleTestI {
                     j++;
                 }
             }
+            boolean meanCountContainsZero = false;
             meanCountsA = calculateMeanCountsForEachReplicate(houseKeepingA);
-            meanCountsB = calculateMeanCountsForEachReplicate(houseKeepingB);           
+            meanCountsB = calculateMeanCountsForEachReplicate(houseKeepingB);
+            if (!zeroFreeValues(meanCountsA)) {
+                meanCountContainsZero = true;
+                String msg = "One of the selected house keeping genes has no mapping read under condition A."
+                        + " The default normalization method will be used.";
+                String title = "Unable to normalize using house keeping genes.";
+                JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            }
+            if (!zeroFreeValues(meanCountsB)) {
+                meanCountContainsZero = true;
+                String msg = "One of the selected house keeping genes has no mapping read under condition B."
+                        + " The default normalization method will be used.";
+                String title = "Unable to normalize using house keeping genes.";
+                JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            }
+            if (meanCountContainsZero) {
+                meanCountsA = calculateMeanCountsForEachReplicate(groupA);
+                meanCountsB = calculateMeanCountsForEachReplicate(groupB);
+            }
         } else {
             meanCountsA = calculateMeanCountsForEachReplicate(groupA);
             meanCountsB = calculateMeanCountsForEachReplicate(groupB);
@@ -153,6 +174,16 @@ public class SimpleTest implements SimpleTestI {
         log.addProperty("Normalization ratios for group A", normalizationRatiosA);
         log.addProperty("Normalization ratios for group B", normalizationRatiosB);
         notifyObservers(SimpleTestStatus.FINISHED);
+    }
+
+    private boolean zeroFreeValues(List<Double> list) {
+        for (Iterator<Double> it = list.iterator(); it.hasNext();) {
+            Double double1 = it.next();
+            if (double1 == 0d) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Double[] calculateNormalizationRatios(List<Double> meanCounts, Double totalMeanCount) {
