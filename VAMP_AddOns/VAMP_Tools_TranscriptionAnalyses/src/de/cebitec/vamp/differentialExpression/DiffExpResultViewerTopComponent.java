@@ -300,13 +300,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.requestActive();
                 break;
             case SimpleTest:
-                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
-                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+//                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
+//                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
+//                GraficsTopComponent.open();
+//                GraficsTopComponent.requestActive();
+                  InitializePlotting.open(ConvertData.mAplotData(((DefaultTableModel)topCountsTable.getModel()).getDataVector(), usedTool));
                 break;
         }        
-        InitializePlotting.open(ConvertData.mAplotData(((DefaultTableModel)topCountsTable.getModel()).getDataVector(), usedTool));
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
