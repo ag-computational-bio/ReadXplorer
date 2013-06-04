@@ -160,14 +160,15 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             Vector<Vector> tableContents;
-            if (usedTool == SimpleTest) {
-                colNames.add(0, "Feature");
-                tableContents = currentResult.getTableContentsContainingRowNames();
-            } else {
+//          Uncomment when using GNU R Version of Simple Test  
+//            if (usedTool == SimpleTest) {
+//                colNames.add(0, "Feature");
+//                tableContents = currentResult.getTableContentsContainingRowNames();
+//            } else {
                 colNames.remove(0);
                 colNames.add(0, "Feature");
                 tableContents = currentResult.getTableContents();
-            }
+//            }
 
             DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
@@ -299,16 +300,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.requestActive();
                 break;
             case SimpleTest:
-                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
-                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+//                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
+//                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
+//                GraficsTopComponent.open();
+//                GraficsTopComponent.requestActive();
+                  InitializePlotting.open(ConvertData.mAplotData(((DefaultTableModel)topCountsTable.getModel()).getDataVector(), usedTool));
                 break;
-        }
-//        PlotTopComponent plotTop = new PlotTopComponent(analysisHandler);
-//        analysisHandler.registerObserver(plotTop);
-//        plotTop.open();
-//        plotTop.requestActive();
+        }        
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
