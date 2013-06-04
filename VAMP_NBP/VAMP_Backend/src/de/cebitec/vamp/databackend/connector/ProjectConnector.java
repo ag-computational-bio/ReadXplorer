@@ -913,8 +913,8 @@ public class ProjectConnector extends Observable {
 
         try {
             if (!track.isStepwise() || this.isLastTrack) {
-            // get latest id for track
-            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
+            // get latest id for statistic
+            long latestid = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
 
                 CoverageContainer cov = track.getCoverageContainer();
                 if (cov.getCoveredPerfectPositions() > 0) {
@@ -941,7 +941,7 @@ public class ProjectConnector extends Observable {
                 //calculate average read length
                 int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
                 try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
-                    insertStatistics.setLong(1, id);
+                    insertStatistics.setLong(1, latestid+1);
                     insertStatistics.setLong(2, trackID);
                     insertStatistics.setInt(3, this.numMappings);
                     insertStatistics.setInt(4, this.numPerfectMappings);

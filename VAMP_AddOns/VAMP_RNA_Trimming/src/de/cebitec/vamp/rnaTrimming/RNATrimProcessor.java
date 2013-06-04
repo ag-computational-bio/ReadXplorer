@@ -508,6 +508,7 @@ public class RNATrimProcessor  {
                     if (!canceled) sam = MappingApi.mapFastaFile(io, referencePath, fasta);
                     if (!canceled) extractedSam = extractOriginalSequencesInSamFile(sam, true);
                     if (!canceled) FileUtils.delete(sam);
+                    if (!canceled) FileUtils.delete(fasta);
                     if (!canceled) showMsg("Extraction ready!");
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
