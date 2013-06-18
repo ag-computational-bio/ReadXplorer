@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.RPKMvalue;
@@ -37,6 +33,8 @@ import org.w3c.dom.Document;
  * @author Martin Tötsches
  */
 public class ResultHistogramRPKM extends javax.swing.JPanel implements ComponentListener {
+    
+    private static final long serialVersionUID = 1L;
 
     private JFXPanel fxPanel;
     private AppPanelTopComponent appPanelTopComponent;
@@ -72,45 +70,38 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
             public void run() {
                 border = new BorderPane();
                 scene = new Scene(border, 1200, 600);
-                double maximum = 0;
-                for (RPKMvalue rpkmValue : rpkmValues) {
-                    if (rpkmValue.getRpkm() > maximum) {
-                        maximum = rpkmValue.getRpkm();
+                
+                double max = 0;
+                double min = Integer.MAX_VALUE;
+                for (int j = 0; j < rpkmValues.size(); j++) {
+                    if (rpkmValues.get(j).getRPKM() < min) {
+                        min = rpkmValues.get(j).getRPKM();
+                    }
+                    if (rpkmValues.get(j).getRPKM() >= max) {
+                        max = rpkmValues.get(j).getRPKM();
                     }
                 }
-                NumberAxis lineYAxis =
-                        new NumberAxis(0, 20, 2);
-                lineYAxis.setLabel("RPKM Values");
+                double shift = max / 20;
+                int[] intervals = new int[21];
+                for (int l = 0; l < intervals.length; l++) {
+                    intervals[l] = 0;
+                }
+                for (int k = 0; k < rpkmValues.size(); k++) {
+                    double value = rpkmValues.get(k).getRPKM();
+                    int index = (int) Math.floor(value / shift);
+                    intervals[index]++;
+                }
+                max = rpkmValues.size() / 21;
+                NumberAxis lineYAxis = new NumberAxis(0, max, 2);
+                lineYAxis.setLabel("Number of Features");
                 CategoryAxis lineXAxis = new CategoryAxis();
-                lineXAxis.setLabel("Features");
+                lineXAxis.setLabel("RPKM Values");
                 barChart = new BarChart<>(lineXAxis, lineYAxis);
                 XYChart.Series bar = new XYChart.Series<>();
                 bar.setName("RPKM Values");
-                double max = 0;
-                double min = 100000;
-                for (int j = 0; j < rpkmValues.size(); j++) {
-                    if (rpkmValues.get(j).getRpkm() < min) {
-                        min = rpkmValues.get(j).getRpkm();
-                    }
-                    if (rpkmValues.get(j).getRpkm() >= max) {
-                        max = rpkmValues.get(j).getRpkm();
-                    }
-                }
-                System.out.println("Minimum: " + min);
-                System.out.println("Maximum: " + max);
-                double shift = max / 20;
-                int[] intervalls = new int[21];
-                for (int l = 0; l < intervalls.length; l++) {
-                    intervalls[l] = 0;
-                }
-                for (int k = 0; k < rpkmValues.size(); k++) {
-                    double value = rpkmValues.get(k).getRpkm();
-                    int index = (int) Math.floor(value / shift);
-                    intervalls[index]++;
-                }
                 double start = 0.0;
                 /*for (int i = 0; i < rpkmValues.size(); i++) {
-                    double rpkm = rpkmValues.get(i).getRpkm();
+                    double rpkm = rpkmValues.get(i).getRPKM();
                     String name = rpkmValues.get(i).getFeature().getFeatureName();
                     //bar.getData().add(getData(rpkm, name));
                     XYChart.Data o = getData(rpkm, name);
@@ -124,10 +115,10 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
                     });
                     bar.getData().add(o);
                 }*/
-                for (int i = 1; i < intervalls.length; i++) {
+                for (int i = 0; i < intervals.length; i++) {
                     int end = (int) (start + shift);
                     String name = (int) start + " - " + end;
-                    XYChart.Data o = getData(intervalls[i], name);
+                    XYChart.Data o = getData(intervals[i], name);
                     bar.getData().add(o);
                     start += shift;
                 }

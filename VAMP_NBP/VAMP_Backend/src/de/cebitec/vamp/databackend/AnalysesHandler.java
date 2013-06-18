@@ -96,8 +96,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
             while (to < this.refSeqLength) {
-                IntervalRequest coverageRequest = new IntervalRequest(from, to, this, readClassParams);
-                trackConnector.addCoverageAnalysisRequest(coverageRequest);
+                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
 
                 from = to + 1;
                 to += stepSize;
@@ -128,6 +127,8 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                     }
                     if (track.getId() < trackConnector.getTrackID()) {
                         numUnneededMappings += connector.getTrackStats().getStatsMap().get(StatsContainer.NO_UNIQ_MAPPINGS);
+                    } else {
+                        break;
                     }
                 }
                 int numInterestingMappings = numUnneededMappings + trackConnector.getTrackStats().getStatsMap().get(StatsContainer.NO_UNIQ_MAPPINGS);

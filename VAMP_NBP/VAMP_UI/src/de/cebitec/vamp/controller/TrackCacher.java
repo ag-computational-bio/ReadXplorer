@@ -2,7 +2,6 @@ package de.cebitec.vamp.controller;
 
 
 import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
-import de.cebitec.vamp.databackend.CoverageThread;
 import de.cebitec.vamp.databackend.ObjectCache;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -29,6 +28,12 @@ public final class TrackCacher {
     
     
     private final static int SCANFACTOR = 10;
+    /**
+     * Defines the minimum interval length to be loaded. If the requested
+     * interval is less than this value, it will be extended to this width. This
+     * is used for preloading available data to make rendering faster.
+     */
+    public static final int MINIMUMINTERVALLENGTH = 90000;
     
     private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
     private final static Logger LOG = Logger.getLogger(TrackCacher.class.getName());
@@ -59,7 +64,7 @@ public final class TrackCacher {
                     t = steps - currentStep;
                 }
 
-                currentPosition = t * (CoverageThread.MINIMUMINTERVALLENGTH / SCANFACTOR) + 100;
+                currentPosition = t * (MINIMUMINTERVALLENGTH / SCANFACTOR) + 100;
                 LOG.log(Level.INFO, "Requesting track cache for position={0}", currentPosition);
 
                 try {
@@ -68,7 +73,8 @@ public final class TrackCacher {
                     Exceptions.printStackTrace(ex);
                 }
 
-                tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + 100, tl));
+                
+                tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, tl));
 
 
                 currentStep++;
@@ -106,7 +112,7 @@ public final class TrackCacher {
                     }
                 };
 
-                steps = (int) Math.ceil((double) refLength / (double) CoverageThread.MINIMUMINTERVALLENGTH) * SCANFACTOR;
+                steps = (int) Math.ceil((double) refLength / (double) MINIMUMINTERVALLENGTH) * SCANFACTOR;
                 ph.start(); //we must start the PH before we swith to determinate
                 ph.switchToDeterminate(steps);
 

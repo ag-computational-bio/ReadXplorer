@@ -30,7 +30,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private ReferenceConnector referenceConnector;
     private int genomeSize;
     private List<PersistantFeature> persAnno;
-    private List<PersistantTrack> selectedTraks;
+    private List<PersistantTrack> selectedTracks;
     private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
     private Integer refGenomeID;
     private List<ResultDeAnalysis> results;
@@ -65,11 +65,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         RUNNING, FINISHED, ERROR;
     }
 
-    public DeAnalysisHandler(List<PersistantTrack> selectedTraks, Integer refGenomeID,
+    public DeAnalysisHandler(List<PersistantTrack> selectedTracks, Integer refGenomeID,
             File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
             ParametersReadClasses readClassParams, boolean regardReadOrientation) {
         ProcessingLog.getInstance().resetLog();
-        this.selectedTraks = selectedTraks;
+        this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
         this.selectedFeatures = selectedFeatures;
@@ -87,7 +87,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         genomeSize = referenceConnector.getRefGenome().getSequence().length();
         persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, selectedFeatures);
         List<AnalysesHandler> allHandler = new ArrayList<>();
-        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
             PersistantTrack currentTrack = it.next();
             try {
                 TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
@@ -114,11 +114,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     protected void prepareFeatures(DeAnalysisData analysisData) {
         analysisData.setFeatures(persAnno);
-        analysisData.setSelectedTraks(selectedTraks);
+        analysisData.setSelectedTraks(selectedTracks);
     }
 
     protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<PersistantFeature, Integer>> allCountData) {
-        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
             Integer key = it.next().getId();
             Integer[] data = new Integer[getPersAnno().size()];
             Map<PersistantFeature, Integer> currentTrack = allCountData.get(key);
@@ -178,7 +178,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     public List<PersistantTrack> getSelectedTracks() {
-        return selectedTraks;
+        return selectedTracks;
     }
 
     public List<ResultDeAnalysis> getResults() {

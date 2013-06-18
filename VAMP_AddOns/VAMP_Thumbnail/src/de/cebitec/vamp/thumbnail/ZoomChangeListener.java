@@ -17,7 +17,7 @@ class ZoomChangeListener implements ChangeListener {
     
 
     public ZoomChangeListener() {
-        sliderMap = new HashMap<TrackViewer, CoverageZoomSlider>();
+        sliderMap = new HashMap<>();
     }
 
     public void addMapValue(TrackViewer track, CoverageZoomSlider slider){
@@ -27,7 +27,7 @@ class ZoomChangeListener implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        for(TrackViewer trackViewer:  sliderMap.keySet()){
+        for (TrackViewer trackViewer : sliderMap.keySet()) {
             CoverageZoomSlider source = (CoverageZoomSlider) e.getSource();
             trackViewer.verticalZoomLevelUpdated(source.getValue());
             CoverageZoomSlider change = sliderMap.get(trackViewer);

@@ -1,8 +1,10 @@
 package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,18 +33,18 @@ public class MappingThreadAnalyses extends MappingThread {
         while (!interrupted()) {
 
             IntervalRequest request = requestQueue.poll();
+            List<PersistantMapping> currentMappings;
             if (request != null) {
                 if (request.getDesiredData() == Properties.MAPPINGS_W_DIFFS) {
-                    this.currentMappings = this.loadMappingsWithDiffs(request);
+                    currentMappings = this.loadMappingsWithDiffs(request);
                 } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
-                    this.currentMappings = this.loadMappingsWithoutDiffs(request);
+                    currentMappings = this.loadMappingsWithoutDiffs(request);
                 } else if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
-                    this.currentMappings = this.loadReducedMappings(request);
+                    currentMappings = this.loadReducedMappings(request);
                 } else {
-                    this.currentMappings = this.loadMappingsById(request);
+                    currentMappings = this.loadMappingsById(request);
                 }
                 request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
-                currentMappings = null;
 
             } else {
                 try {

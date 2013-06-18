@@ -47,17 +47,18 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
      * @param smaBamFile the sam/bam file to check for the reference 
      */
     public void checkSeqDictonary(File smaBamFile) {
-        SAMFileReader samReader = new SAMFileReader(smaBamFile);
-        SAMFileHeader header = samReader.getFileHeader();
-        SAMSequenceRecord refSeq = header.getSequenceDictionary().getSequence(this.getReferenceJob().getName());
-        if (refSeq == null) {
-            String msg = NbBundle.getMessage(ImportTrackBasePanel.class, "MSG_ErrorReference",
-                    this.getReferenceJob().getName(),
-                    smaBamFile.getAbsolutePath(),
-                    this.createRefDictionaryString(header.getSequenceDictionary()));
-            NotifyDescriptor nd = new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE);
-            nd.setTitle(NbBundle.getMessage(ImportTrackBasePanel.class, "TITLE_ErrorReference"));
-            DialogDisplayer.getDefault().notify(nd); //TODO: add to is required info set!
+        try (SAMFileReader samReader = new SAMFileReader(smaBamFile)) {
+            SAMFileHeader header = samReader.getFileHeader();
+            SAMSequenceRecord refSeq = header.getSequenceDictionary().getSequence(this.getReferenceJob().getName());
+            if (refSeq == null) {
+                String msg = NbBundle.getMessage(ImportTrackBasePanel.class, "MSG_ErrorReference",
+                        this.getReferenceJob().getName(),
+                        smaBamFile.getAbsolutePath(),
+                        this.createRefDictionaryString(header.getSequenceDictionary()));
+                NotifyDescriptor nd = new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE);
+                nd.setTitle(NbBundle.getMessage(ImportTrackBasePanel.class, "TITLE_ErrorReference"));
+                DialogDisplayer.getDefault().notify(nd); //TODO: add to is required info set!
+            }
         }
     }
 

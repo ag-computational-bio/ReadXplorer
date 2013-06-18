@@ -896,10 +896,19 @@ public class TrackConnector {
 
     private void openBAM() throws FileNotFoundException {
         try {
-        File file = new File(this.associatedTracks.get(0).getFilePath());
-        this.externalDataReader = new SamBamFileReader(file, this.trackID);
-        } catch (RuntimeIOException e){
+            File file = new File(this.associatedTracks.get(0).getFilePath());
+            this.externalDataReader = new SamBamFileReader(file, this.trackID);
+        } catch (RuntimeIOException e) {
             throw new FileNotFoundException(e.getMessage());
         }
+    }
+    
+    /**
+     * Releases resources which are not needed after closing the track connector.
+     */
+    public void close() {
+        this.mappingThread.close();
+        this.mappingThreadAnalyses.close();
+        this.externalDataReader.close();
     }
 }

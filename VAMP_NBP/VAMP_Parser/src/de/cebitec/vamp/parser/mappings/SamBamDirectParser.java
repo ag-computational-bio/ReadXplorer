@@ -215,6 +215,8 @@ public class SamBamDirectParser implements MappingParserI, Observer {
             samItor.close();
         } catch (RuntimeEOFException e) {
             this.notifyObservers("Last read in the file is incomplete, ignoring it.");
+        } catch (Exception e) {
+            this.notifyObservers(e.getMessage());
         }
 
         long finish = System.currentTimeMillis();

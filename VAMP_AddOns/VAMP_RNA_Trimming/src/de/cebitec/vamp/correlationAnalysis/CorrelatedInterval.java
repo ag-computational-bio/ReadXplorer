@@ -6,7 +6,7 @@ package de.cebitec.vamp.correlationAnalysis;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class CorrelatedInterval {
-    private CorrelationAnalysisProcessor.StrangDirection direction;
+    private CorrelationAnalysisProcessor.StrandDirection direction;
     
     private int from; 
     
@@ -16,7 +16,7 @@ public class CorrelatedInterval {
     
     private double minPeakCoverage;
     
-    public CorrelatedInterval(CorrelationAnalysisProcessor.StrangDirection direction,
+    public CorrelatedInterval(CorrelationAnalysisProcessor.StrandDirection direction,
             int from, int to, double correlation, double minPeakCoverage) {
         this.direction = direction;
         this.from = from;
@@ -28,14 +28,14 @@ public class CorrelatedInterval {
     /**
      * @return the direction
      */
-    public CorrelationAnalysisProcessor.StrangDirection getDirection() {
+    public CorrelationAnalysisProcessor.StrandDirection getDirection() {
         return direction;
     }
 
     /**
      * @param direction the direction to set
      */
-    public void setDirection(CorrelationAnalysisProcessor.StrangDirection direction) {
+    public void setDirection(CorrelationAnalysisProcessor.StrandDirection direction) {
         this.direction = direction;
     }
 

@@ -26,6 +26,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
     public List<Operon> getResults() {
         return detectedOperons;
     }
+    
     @Override
     public List<List<String>> dataColumnDescriptions() {
         List<List<String>> allSheetDescriptions = new ArrayList<>();

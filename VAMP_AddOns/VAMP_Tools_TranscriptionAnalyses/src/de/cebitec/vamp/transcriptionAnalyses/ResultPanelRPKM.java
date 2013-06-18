@@ -6,10 +6,9 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -29,8 +28,7 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private BoundsInfoManager bim;
-    private List<RPKMvalue> rpkmValues;
-    private final ParameterSetRPKM rpkmParameters;
+    private RPKMAnalysisResult rpkmCalcResult;
     private ResultHistogramRPKM hist;
     private PersistantFeature feature;
     private boolean statistics = false;
@@ -38,12 +36,9 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
     /**
      * Panel showing a result of an analysis filtering for features with a
      * min and max certain readcount.
-     * @param filterFeaturesParameters parameter set used for this feature filtering
      */
-    public ResultPanelRPKM(ParameterSetRPKM rpkmParameters) {
+    public ResultPanelRPKM() {
         initComponents();
-        this.rpkmParameters = rpkmParameters;
-        this.rpkmValues = new ArrayList<>();
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -70,6 +65,7 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         rpkmTable = new javax.swing.JTable();
         exitStatisticsButton = new javax.swing.JButton();
+        exportButton = new javax.swing.JButton();
 
         snapshotButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.snapshotButton.text")); // NOI18N
         snapshotButton.addActionListener(new java.awt.event.ActionListener() {
@@ -92,12 +88,19 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Feature", "Start", "Stop", "RPKM value"
+                "Feature", "Strand", "Start", "Stop", "RPKM"
             }
         ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Long.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -105,14 +108,22 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(rpkmTable);
         rpkmTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title0")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title3")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title4")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title3")); // NOI18N
 
         exitStatisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exitStatisticsButton.text")); // NOI18N
         exitStatisticsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exitStatisticsButtonActionPerformed(evt);
+            }
+        });
+
+        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exportButton.text")); // NOI18N
+        exportButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportButtonActionPerformed(evt);
             }
         });
 
@@ -127,7 +138,9 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(snapshotButton))
+                .addComponent(snapshotButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(exportButton))
             .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
@@ -139,7 +152,8 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
                     .addComponent(snapshotButton)
                     .addComponent(statisticsButton)
                     .addComponent(parametersLabel)
-                    .addComponent(exitStatisticsButton)))
+                    .addComponent(exitStatisticsButton)
+                    .addComponent(exportButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -150,7 +164,7 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
             this.hist.takeSnapshot();
         } else {
             try {
-                hist = new ResultHistogramRPKM(this.rpkmValues);
+                hist = new ResultHistogramRPKM(this.rpkmCalcResult.getResults());
                 this.statistics = true;
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
@@ -162,7 +176,7 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
         if (!statistics) {
             try {
-                hist = new ResultHistogramRPKM(this.rpkmValues);
+                hist = new ResultHistogramRPKM(this.rpkmCalcResult.getResults());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -173,8 +187,13 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
         hist.close();
     }//GEN-LAST:event_exitStatisticsButtonActionPerformed
 
+    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", rpkmCalcResult);
+    }//GEN-LAST:event_exportButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitStatisticsButton;
+    private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel parametersLabel;
     private javax.swing.JTable rpkmTable;
@@ -201,20 +220,27 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
 
     /**
      * Adds a list of filtered features to this panel.
-     * @param filteredFeatures 
+     * @param rpkmCalcResultNew 
      */
-    public void addRPKMvalues(List<RPKMvalue> rpkmValues) {
-        final int nbColumns = 4;
-        this.rpkmValues.addAll(rpkmValues);
+    public void addRPKMvalues(RPKMAnalysisResult rpkmCalcResultNew) {
+        final int nbColumns = 5;
+
+        if (this.rpkmCalcResult == null) {
+            this.rpkmCalcResult = rpkmCalcResultNew;
+//            this.filterStatisticsMap.put(FEATURES_TOTAL, filterFeaturesResultNew.getNoGenomeFeatures());
+        } else {
+            this.rpkmCalcResult.getResults().addAll(rpkmCalcResultNew.getResults());
+        }
         DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();        
 
-        for (RPKMvalue rpkm : rpkmValues) {
+        for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
             
             Object[] rowData = new Object[nbColumns];
             rowData[0] = rpkm.getFeature();
-            rowData[1] = rpkm.getFeature().getStart();
-            rowData[2] = rpkm.getFeature().getStop();
-            rowData[3] = rpkm.getRpkm();
+            rowData[1] = rpkm.getFeature().isFwdStrandString();
+            rowData[2] = rpkm.getFeature().getStart();
+            rowData[3] = rpkm.getFeature().getStop();
+            rowData[4] = rpkm.getRPKM();
 
             model.addRow(rowData);
         }
@@ -223,14 +249,15 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
         this.rpkmTable.setRowSorter(sorter);
         sorter.setModel(model);
         
-        //this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-        //        "ResultPanelFilteredFeatures.parametersLabel.text", 1, 1);
+        ParameterSetRPKM rpkmParams = (ParameterSetRPKM) rpkmCalcResult.getParameters();
+        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class,
+                "ResultPanelRPKM.parametersLabel.text", rpkmParams.getMinRPKM(), rpkmParams.getMaxRPKM()));
     }
     
     /**
      * @return the number of features filtered during the associated analysis
      */
     public int getResultSize() {
-        return this.rpkmValues.size();
+        return this.rpkmCalcResult.getResults().size();
     }
 }

@@ -6,11 +6,13 @@ import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Contains all data belonging to a SNP analysis data set. Also has the
@@ -24,6 +26,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
     private List<SnpI> snpList;
     private int num;
     private int percent;
+    private final Set<FeatureType> featTypes;
 
     
     /**
@@ -31,9 +34,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
      * @param snpList list of snps of the analysis
      * @param trackNames hashmap of track ids to track names used in the analysis
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames) {//, PersistantTrack currentTrack) {
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames, Set<FeatureType> featTypes) {//, PersistantTrack currentTrack) {
         super(trackNames);
         this.snpList = snpList;
+        this.featTypes = featTypes;
     }
     
     /**
@@ -255,6 +259,13 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
      */
     public int getMinPercentDeviation() {
         return this.percent;
+    }
+
+    /**
+     * @return The feature types selected for this SNP detection.
+     */
+    public Set<FeatureType> getSelectedFeatTypes() {
+        return this.featTypes;
     }
     
 }

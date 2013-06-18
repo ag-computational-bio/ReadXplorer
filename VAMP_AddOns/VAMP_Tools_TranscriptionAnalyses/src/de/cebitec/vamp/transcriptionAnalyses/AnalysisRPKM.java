@@ -27,7 +27,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     private List<PersistantFeature> genomeFeatures;
     private HashMap<Integer, FilteredFeature> featureReadCount;
     private List<FilteredFeature> filteredFeatures;
-    private int totalExonReads = 0;
+    private int totalMappedReads = 0;
     private int minNumberReads;
     private int maxNumberReads;
     
@@ -75,12 +75,12 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished
             this.calculateRPKMvalues();
-            for (RPKMvalue rpkm : rpkmValues) {
-                if (rpkm.getRpkm() != 0) {
-                System.out.println("Feature: " + rpkm.getFeature().getFeatureName());
-                System.out.println("RPKM: " + rpkm.getRpkm());
-                }
-            }
+//            for (RPKMvalue rpkm : rpkmValues) {
+//                if (rpkm.getRPKM() != 0) {
+//                System.out.println("Feature: " + rpkm.getFeature().getFeatureName());
+//                System.out.println("RPKM: " + rpkm.getRPKM());
+//                }
+//            }
         }
     }
 
@@ -121,7 +121,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
 
                 //store filtered features
                 this.featureReadCount.get(feature.getId()).setReadCount(this.featureReadCount.get(feature.getId()).getReadCount() + this.currentCount);
-                this.totalExonReads += this.featureReadCount.get(feature.getId()).getReadCount();
+                this.totalMappedReads += this.featureReadCount.get(feature.getId()).getReadCount();
                 this.currentCount = 0;
             }
             //TODO: solution for more than one feature overlapping mapping request boundaries
@@ -129,23 +129,23 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     
     public void calculateRPKMvalues() {
         for (Integer id : this.featureReadCount.keySet()) {
-            System.out.println("READCOUNT: " + this.featureReadCount.get(id).getReadCount());
-            System.out.println("MIN: " + this.minNumberReads);
-            System.out.println("MAX: " + this.maxNumberReads);
+//            System.out.println("READCOUNT: " + this.featureReadCount.get(id).getReadCount());
+//            System.out.println("MIN: " + this.minNumberReads);
+//            System.out.println("MAX: " + this.maxNumberReads);
             if (this.featureReadCount.get(id).getReadCount() >= this.minNumberReads && this.featureReadCount.get(id).getReadCount() <= this.maxNumberReads) {
                 PersistantFeature feature = this.featureReadCount.get(id).getFilteredFeature();
                 int start = this.featureReadCount.get(id).getFilteredFeature().getStart();
                 int stop = this.featureReadCount.get(id).getFilteredFeature().getStop();
-                double exonLength = (double) (((double) stop - (double) start)/ (double) 1000);
-                System.out.println("EL: " + exonLength);
-                double mappedReads = (double) (this.featureReadCount.get(id).getReadCount());
-                System.out.println("MR: " + mappedReads);
-                System.out.println("TL: " + this.totalExonReads);
+                double exonLength = ((double) stop - (double) start) / (double) 1000; //exon length in KB
+//                System.out.println("EL: " + exonLength);
+                double noExonReads = (double) (this.featureReadCount.get(id).getReadCount());
+//                System.out.println("MR: " + mappedReads);
+//                System.out.println("TL: " + this.totalExonReads);
                 double rpkm = 0;
-                if (mappedReads != 0) {
-                    rpkm = ((double) (this.totalExonReads / 1000)) / (mappedReads * exonLength);
+                if (noExonReads != 0) {
+                    rpkm = noExonReads / ((this.totalMappedReads / 100000) * exonLength);
                 }
-                this.rpkmValues.add(new RPKMvalue(feature, rpkm));
+                this.rpkmValues.add(new RPKMvalue(feature, rpkm, trackConnector.getTrackID()));
             }
         }
     }

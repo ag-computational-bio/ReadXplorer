@@ -1,22 +1,21 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.transcriptionAnalyses;
+
+import de.cebitec.vamp.databackend.ParameterSetI;
 
 /**
  *
  * @author Martin Tötsches
  */
-public class ParameterSetRPKM {
-    private boolean performRPKMAnalysis;
-    private int minReads;
-    private int maxReads;
+public class ParameterSetRPKM implements ParameterSetI<ParameterSetRPKM> {
     
-    public ParameterSetRPKM(boolean performRPKMAnalysis, int minReads, int maxReads) {
+    private boolean performRPKMAnalysis;
+    private int minRPRM;
+    private int maxRPKM;
+    
+    public ParameterSetRPKM(boolean performRPKMAnalysis, int minRPKM, int maxRPKM) {
         this.performRPKMAnalysis = performRPKMAnalysis;
-        this.minReads = minReads;
-        this.maxReads = maxReads;
+        this.minRPRM = minRPKM;
+        this.maxRPKM = maxRPKM;
     }
 
     public boolean isPerformRPKMAnalysis() {
@@ -24,30 +23,30 @@ public class ParameterSetRPKM {
     }
 
     /**
-     * @return the minReads
+     * @return the minRPKM
      */
-    public int getMinReads() {
-        return minReads;
+    public int getMinRPKM() {
+        return minRPRM;
     }
 
     /**
-     * @return the maxReads
+     * @return the maxRPKM
      */
-    public int getMaxReads() {
-        return maxReads;
+    public int getMaxRPKM() {
+        return maxRPKM;
     }
 
     /**
-     * @param minReads the minReads to set
+     * @param minRPKM the minRPKM to set
      */
-    public void setMinReads(int minReads) {
-        this.minReads = minReads;
+    public void setMinRPKM(int minRPKM) {
+        this.minRPRM = minRPKM;
     }
 
     /**
-     * @param maxReads the maxReads to set
+     * @param maxRPKM the maxRPKM to set
      */
-    public void setMaxReads(int maxReads) {
-        this.maxReads = maxReads;
+    public void setMaxRPKM(int maxRPKM) {
+        this.maxRPKM = maxRPKM;
     }
 }

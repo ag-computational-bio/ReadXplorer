@@ -5,13 +5,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.netbeans.api.visual.widget.BirdViewController;
 import org.netbeans.api.visual.widget.Scene;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * TopComponent to display a Scene for the Track-Widgets.
@@ -19,6 +19,8 @@ import org.openide.util.Lookup;
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.thumbnail//ThumbNailView//EN",
 autostore = false)
 public final class ThumbNailViewTopComponent extends TopComponent implements MouseListener {
+    
+    private static final long serialVersionUID = 1L;
 
     private JComponent myView;
     private Scene scene;

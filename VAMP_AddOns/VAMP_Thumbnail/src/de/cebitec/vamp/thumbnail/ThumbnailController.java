@@ -23,6 +23,7 @@ import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -47,6 +47,7 @@ import javax.swing.JTable;
 import org.netbeans.api.visual.action.ActionFactory;
 import org.netbeans.api.visual.action.ResizeProvider.ControlPoint;
 import org.netbeans.api.visual.action.ResizeStrategy;
+import org.netbeans.api.visual.border.BorderFactory;
 import org.netbeans.api.visual.layout.LayoutFactory;
 import org.netbeans.api.visual.widget.ComponentWidget;
 import org.netbeans.api.visual.widget.Scene;
@@ -67,7 +68,7 @@ import org.openide.windows.WindowManager;
  * ServiceProvider for IThumbnailView.
  * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
  *
- * @author denis
+ * @author denis, rhilker
  */
 @ServiceProvider(service = IThumbnailView.class)
 public class ThumbnailController extends MouseAdapter implements IThumbnailView, Lookup.Provider {
@@ -271,10 +272,10 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         MultiTrackConnector tc = ProjectConnector.getInstance().getMultiTrackConnector(track);
 
         final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
-        int featureCenter = (currentFeature.getStop() - currentFeature.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureCenter);
-
         trackV.setName(track.getDescription());
+        trackV.setUseMinimalIntervalLength(false);
+        trackV.setIsPanModeOn(false);
+        trackV.setCanZoom(false);
 
         CoverageInfoLabel cil = new CoverageInfoLabel();
         trackV.setTrackInfoPanel(cil);
@@ -282,13 +283,13 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //own ComponentListener for TrackViewer
         trackV.addComponentListener(new TrackViewerCompListener(currentFeature, trackV));
 
-
         // create zoom slider
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         //Set initial Slider-value based on Coverage if autoSlider is true
         if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(new IntervalRequest(currentFeature.getStart(), currentFeature.getStop(), null));
+            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(new IntervalRequest(
+                    currentFeature.getStart(), currentFeature.getStop(), null));
             int max = 0;
             int cnt = 0;
             int avg = 0;
@@ -313,11 +314,6 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         b.setMinimumSize(new Dimension(200, 150));
         b.setPreferredSize(new Dimension(200, 150));
         
-        //show data in viewer
-//        trackV.updateLogicalBounds(new BoundsInfo(currentFeature.getStart(), currentFeature.getStop(), 
-//                currentFeature.getStart() + featureCenter, 1, featureCenter * 2));
-        trackV.boundsChangedHook();
-        
         return b;
     }
 
@@ -334,13 +330,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         // get double track connector
         MultiTrackConnector trackCon = ProjectConnector.getInstance().getMultiTrackConnector(tracks);
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
-
-        int featureWidth = (feature.getStop() - feature.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
+        trackV.setUseMinimalIntervalLength(false);
+        trackV.setIsPanModeOn(false);
+        trackV.setCanZoom(false);
  
         //eigener ComponentListener für TrackV
         trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
-
 
         // create info panel
         CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -480,7 +475,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             sliderSynchronisation(true);
         }
         ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), bp);
-        compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
+        compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
         compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
 
             @Override
@@ -670,7 +665,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             trackPanel.getViewer().addMouseMotionListener(this);
             //Put TrackPanel into ComponentWidget for Scene
             ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), trackPanel);
-            compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
+            compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
             compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
 
                 @Override
@@ -682,9 +677,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                     return suggestedBounds;
                 }
             }, ActionFactory.createDefaultResizeProvider()));
-
+            
             layoutWidg.addChild(compWidg);
-            layoutWidg.setBorder(BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
+            layoutWidg.setBorder(javax.swing.BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
         }
         this.featureToTrackpanelList.put(currentFeature, bps);
         activeTopComp.getScene().addChild(layoutWidg);

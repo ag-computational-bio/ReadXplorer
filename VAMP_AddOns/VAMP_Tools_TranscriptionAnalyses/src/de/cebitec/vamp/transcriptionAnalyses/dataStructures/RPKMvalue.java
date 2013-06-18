@@ -1,17 +1,19 @@
 package de.cebitec.vamp.transcriptionAnalyses.dataStructures;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.TrackResultEntry;
 
 /**
  *
  * @author Martin Tötsches
  */
-public class RPKMvalue {
+public class RPKMvalue extends TrackResultEntry {
     
     private PersistantFeature feature;
     private double rpkm;
     
-    public RPKMvalue(PersistantFeature feature, double rpkm) {
+    public RPKMvalue(PersistantFeature feature, double rpkm, int trackId) {
+        super(trackId);
         this.feature = feature;
         this.rpkm = rpkm;
     }
@@ -19,7 +21,7 @@ public class RPKMvalue {
     /**
      * @return the rpkm
      */
-    public double getRpkm() {
+    public double getRPKM() {
         return rpkm;
     }
 

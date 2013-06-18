@@ -81,7 +81,7 @@ public class SamBamFileReader implements Observable {
         try {
             this.checkIndex();
             
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), request.getFrom(), request.getTo(), false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), request.getTotalFrom(), request.getTotalTo(), false);
             String refSeq = refGenome.getSequence().toUpperCase();
             String refSubSeq;
             int id = 0;
@@ -157,8 +157,8 @@ public class SamBamFileReader implements Observable {
      * @return the reduced mappings for the given interval
      */
     public Collection<PersistantMapping> getReducedMappingsFromBam(PersistantReference refGenome, IntervalRequest request) {
-        int from = request.getFrom();
-        int to = request.getTo();
+        int from = request.getTotalFrom();
+        int to = request.getTotalTo();
         Collection<PersistantMapping> mappings = new ArrayList<>();
 
         try {
@@ -212,8 +212,8 @@ public class SamBamFileReader implements Observable {
         HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
         Collection<PersistantSeqPairGroup> seqPairGroups = new ArrayList<>();
         
-        int from = request.getFrom();
-        int to = request.getTo();
+        int from = request.getTotalFrom();
+        int to = request.getTotalTo();
         
         try {
             this.checkIndex();
@@ -336,8 +336,8 @@ public class SamBamFileReader implements Observable {
             boolean diffsAndGapsNeeded) {
         
         byte trackNeeded = request.getDesiredData();
-        int from = request.getFrom();
-        int to = request.getTo();
+        int from = request.getTotalFrom();
+        int to = request.getTotalTo();
         
         int[] perfectCoverageFwd = new int[0];
         int[] perfectCoverageRev = new int[0];
@@ -406,13 +406,22 @@ public class SamBamFileReader implements Observable {
                         //only the arrays, which are allowed to be updated are added to the coverage array list
 
                         if (classification != null) {
-                            if (classification == Properties.PERFECT_COVERAGE
-                                    && request.getReadClassParams().isPerfectMatchUsed()) {
+                            if (classification == Properties.PERFECT_COVERAGE) {
 
                                 if (isFwdStrand) {
-                                    coverageArrays.add(perfectCoverageFwd);
+                                    if (request.getReadClassParams().isPerfectMatchUsed()) {
+                                        coverageArrays.add(perfectCoverageFwd);
+                                    }
+                                    if (request.getReadClassParams().isBestMatchUsed()) {
+                                        coverageArrays.add(bestMatchCoverageFwd);
+                                    }
                                 } else {
-                                    coverageArrays.add(perfectCoverageRev);
+                                    if (request.getReadClassParams().isPerfectMatchUsed()) {
+                                        coverageArrays.add(perfectCoverageRev);
+                                    }
+                                    if (request.getReadClassParams().isBestMatchUsed()) {
+                                        coverageArrays.add(bestMatchCoverageRev);
+                                    }
                                 }
                             }
 
@@ -554,41 +563,46 @@ public class SamBamFileReader implements Observable {
             op = charCigar[i];
             currentCount = Integer.valueOf(num[i - 1]);
             
-            if (op.equals("=")) { //only increase position for matches
+            if (op.equals("M")) { //check, count and add diffs for deviating Ms
+                bases = readSeq.substring(readPos, readPos + currentCount);
+                for (int j = 0; j < bases.length(); ++j) {
+                    diffPos = refPos + j;
+                    base = bases.charAt(j);
+                    if (base != refSeq.charAt(diffPos)) {
+                        ++differences;
+                        if (!isFwdStrand) {
+                            base = SequenceUtils.getDnaComplement(base);
+                        }
+                        PersistantDiff d = new PersistantDiff(diffPos + start, base, isFwdStrand, nbReplicates);
+                        this.addDiff(mapping, diffs, d);
+                    }
+                }
+                refPos += currentCount;
+                readPos += currentCount;
+
+            } else if (op.equals("=")) { //only increase position for matches
                 refPos += currentCount;
                 readPos += currentCount;
                
-            } else if (op.equals("N") || op.equals("P")) {
-                refPos += Integer.valueOf(num[i - 1]);
-
             } else if (op.equals("X")) { //count and create diffs for mismatches
                 differences += currentCount;
                 for (int j = 0; j < currentCount; ++j) {
-                    diffPos = readPos + j;
-                    base = readSeq.charAt(diffPos);
+                    base = readSeq.charAt(readPos + j);
                     if (!isFwdStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    PersistantDiff d = new PersistantDiff(diffPos + start, base, isFwdStrand, nbReplicates);
-                    if (mapping != null) {
-                        mapping.addDiff(d);
-                    } else {
-                        diffs.add(d);
-                    }
+                    PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates);
+                    this.addDiff(mapping, diffs, d);
                     
                 }
                 refPos += currentCount;
                 readPos += currentCount;
 
-            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
+            } else if (op.equals("D")) { // count and add diff gaps for deletions in reference
                 differences += currentCount;
                 for (int j = 0; j < currentCount; ++j) {
                     PersistantDiff d = new PersistantDiff(refPos + j + start, '_', isFwdStrand, nbReplicates);
-                    if (mapping != null) {
-                        mapping.addDiff(d);
-                    } else {
-                        diffs.add(d);
-                    }
+                    this.addDiff(mapping, diffs, d);
                 }
                 refPos += currentCount;
                 // readPos remains the same
@@ -600,39 +614,26 @@ public class SamBamFileReader implements Observable {
                     if (!isFwdStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    gaps.add(new PersistantReferenceGap(refPos + start, base, ParserCommonMethods.getOrderForGap(
-                            refPos + start, gapOrderIndex), isFwdStrand, nbReplicates));
+                    PersistantReferenceGap gap = new PersistantReferenceGap(refPos + start, base, 
+                            ParserCommonMethods.getOrderForGap(refPos + start, gapOrderIndex), isFwdStrand, nbReplicates);
+                    if (mapping != null) {
+                        mapping.addGenomeGap(gap);
+                    } else {
+                        gaps.add(gap);
+        }
                 }
                 //refPos remains the same
                 readPos += currentCount;
 
-            } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                bases = readSeq.substring(readPos, readPos + currentCount);
-                for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = refPos + j;
-                    base = bases.charAt(j);
-                    if (base != refSeq.charAt(diffPos)) {
-                        ++differences;
-                        if (!isFwdStrand) {
-                            base = SequenceUtils.getDnaComplement(base);
-                        }
-                        PersistantDiff d = new PersistantDiff(diffPos + start, base, isFwdStrand, nbReplicates);
-                        if (mapping != null) {
-                            mapping.addDiff(d);
-                        } else {
-                            diffs.add(d);
-                        }
-                    }
-                }
+            } else if (op.equals("N") || op.equals("P")) { //increase ref position for padded and skipped reference bases
                 refPos += currentCount;
-                readPos += currentCount;
+                //readPos remains the same
 
-            } else if (op.equals("S")) {
+            } else if (op.equals("S")) { //increase read position for soft clipped bases which are present in the read
                 //refPos remains the same
                 readPos += currentCount;
             }
-            
-            //P, S and H = padding, soft and hard clipping do not contribute to differences
+            //H = hard clipping does not contribute to differences
         }
 
         if (mapping != null) {
@@ -640,6 +641,20 @@ public class SamBamFileReader implements Observable {
         }
 
         return new PersistantDiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
+    }
+
+    /**
+     * Adds a diff either to the mapping, if it is not null, or to the diffs.
+     * @param mapping the mapping to which the diff shall be added or <cc>null</cc>.
+     * @param diffs the diffs list to which the diff shall be added.
+     * @param diff the diff to add
+     */
+    private void addDiff(PersistantMapping mapping, List<PersistantDiff> diffs, PersistantDiff diff) {
+        if (mapping != null) {
+            mapping.addDiff(diff);
+        } else {
+            diffs.add(diff);
+        }
     }
     
     /**

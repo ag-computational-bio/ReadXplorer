@@ -38,12 +38,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     // logical coordinates for genome interval
     private BoundsInfo bounds;
     private boolean isPanning = false;
+    private boolean canPan = true;
     // correlation factor to compute physical position from logical position
     private double correlationFactor;
     // gap at the sides of panel
     private int horizontalMargin;
     private int verticalMargin;
     private int zoom = 1;
+    private boolean canZoom = true;
     private double basewidth;
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
@@ -231,7 +233,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
 
-                if ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) {
+                if (canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) 
+                            || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0))) {
                     int oldZoom = zoom;
                     zoom += e.getUnitsToScroll();
                     if (zoom > 500) {
@@ -252,7 +255,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                setPanMode(e.getX());
+                setPanPosition(e.getX());
             }
 
             @Override
@@ -281,8 +284,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             public void mousePressed(MouseEvent e) {
 
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    isPanning = true;
-                    AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    if (canPan) {
+                        isPanning = true;
+                        AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    }
                 }
                 if (SwingUtilities.isRightMouseButton(e)) {
                     JPopupMenu popUp = new JPopupMenu();
@@ -317,12 +322,47 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     }
 
-    private void setPanMode(int position) {
-        if (isPanning) {
+    /**
+     * Sets the current mouse position as the navigator bar center position, if
+     * panning is allowed and panning is currently active
+     * @param position 
+     */
+    private void setPanPosition(int position) {
+        if (isPanning && canPan) {
             int logi = transformToLogicalCoordForPannig(position);
             //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
             boundsManager.navigatorBarUpdated(logi);
         }
+    }
+    
+    /**
+     * @return true, if panning is allowed, false otherwise
+     */
+    public boolean isPanModeOn() {
+        return canPan;
+    }
+
+    /**
+     * @param canPan true, if panning is allowed, false otherwise
+     */
+    public void setIsPanModeOn(boolean canPan) {
+        this.canPan = canPan;
+    }
+
+    /**
+     * @return <cc>true</cc> if this viewer is allowed to zoom via the mouse
+     * wheel, <cc>false</cc> otherwise.
+     */
+    public boolean isCanZoom() {
+        return canZoom;
+    }
+
+    /**
+     * @param canZoom <cc>true</cc> if this viewer is allowed to zoom via the 
+     * mouse wheel, <cc>false</cc> otherwise.
+     */
+    public void setCanZoom(boolean canZoom) {
+        this.canZoom = canZoom;
     }
 
     public abstract void changeToolTipText(int logPos);

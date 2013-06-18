@@ -39,8 +39,10 @@ import org.openide.util.NbPreferences;
  */
 public class TrackViewer extends AbstractViewer implements ThreadListener {
 
-    private NormalizationSettings normSetting = null;
     private static final long serialVersionUID = 572406471;
+    private static final int MININTERVALLENGTH = 25000;
+    
+    private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
     private List<Integer> trackIDs ;
     private PersistantCoverage cov;
@@ -51,6 +53,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = false;
+    private boolean useMinimalIntervalLength = true;
     
     private JSlider verticalSlider = null;
  
@@ -229,8 +232,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
             g.setColor(fillcolor);
-            if (this.loadingIndicator!=null)
-            g.drawImage(this.loadingIndicator, this.getWidth()-60-loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            if (this.loadingIndicator != null) {
+                g.drawImage(this.loadingIndicator, this.getWidth() - 60 - loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            }
             //g.fillRect(0, 0, this.getHeight()/4, this.getHeight()/4); //this.getWidth(), this.getHeight()/3);
         }
 
@@ -249,8 +253,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
     }
 
-    
-    private double getCoverageValue(boolean isForwardStrand, int covType, int absPos) {
+    /**
+     * Returns the coverage value for the given strand, coverage type and position.
+     * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
+     * @param covType the mapping classification type of the coverage path handled here
+     * @param absPos the reference position for which the coverage should be obtained
+     * @return the coverage value for the given strand, coverage type and position.
+     */
+    private double getCoverageValue(boolean isForwardStrand, byte covType, int absPos) {
         double value = 0;
 
         if (!this.twoTracks || this.twoTracks && this.combineTracks) {
@@ -359,7 +369,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param covType the type of the coverage path handled here
      * @return GeneralPath representing the coverage of a certain type
      */
-    private GeneralPath getCoveragePath(boolean isForwardStrand, int covType) {
+    private GeneralPath getCoveragePath(boolean isForwardStrand, byte covType) {
         GeneralPath covPath = new GeneralPath();
         int orientation = (isForwardStrand ? -1 : 1);
 
@@ -417,8 +427,17 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private void requestCoverage() {
         covLoaded = false;
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        trackCon.addCoverageRequest(new IntervalRequest(getBoundsInfo().getLogLeft(),
-                getBoundsInfo().getLogRight(), this));
+        int totalFrom = getBoundsInfo().getLogLeft();
+        int totalTo = getBoundsInfo().getLogRight();
+        if (this.useMinimalIntervalLength) {
+            totalFrom -= MININTERVALLENGTH;
+            totalTo += MININTERVALLENGTH;
+        }
+        trackCon.addCoverageRequest(new IntervalRequest(
+                getBoundsInfo().getLogLeft(), 
+                getBoundsInfo().getLogRight(), 
+                totalFrom ,
+                totalTo , this));
     }
 
     @Override
@@ -973,6 +992,25 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     @Override
     public void notifySkipped() {
         //do nothing
+    }
+
+    /**
+     * @return <cc>true</cc> if the queried interval length should be extended
+     * to the <cc>MININTERVALLENGTH</cc>, <cc>false</cc> if the original 
+     * bounds should be used for the coverage queries.
+     */
+    public boolean isUseMinimalIntervalLength() {
+        return useMinimalIntervalLength;
+    }
+
+    /**
+     * @param useMinimalIntervalLength <cc>true</cc> if the queried interval
+     * length should be extended to the <cc>MININTERVALLENGTH</cc>,
+     * <cc>false</cc> if the original bounds should be used for the coverage 
+     * queries.
+     */
+    public void setUseMinimalIntervalLength(boolean useMinimalIntervalLength) {
+        this.useMinimalIntervalLength = useMinimalIntervalLength;
     }
 
 }

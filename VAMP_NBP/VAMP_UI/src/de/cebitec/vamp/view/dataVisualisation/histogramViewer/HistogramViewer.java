@@ -6,6 +6,7 @@ import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.util.Properties; 
+import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -18,8 +19,6 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 //import org.openide.util.NbBundle;
@@ -35,6 +34,7 @@ import javax.swing.SwingUtilities;
 public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
+    private static final int MININTERVALLENGTH = 3000;
 //    private InputOutput io;
     private static int height = 500;
     private TrackConnector trackConnector;
@@ -111,9 +111,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             // logo data manager has no information about gaps, so we have to shift positions right here
             if (gapManager != null) {
                 relPos += gapManager.getNumOfGapsSmaller(logPos);
-                // if there is a gap at logPos, logo data manager would provide us with gap information, which we do not wand
+                // if there is a gap at logPos, logo data manager would provide us with gap information, which we do not want
                 if (gapManager.hasGapAt(logPos)) {
-                    relPos++;
+                    relPos += gapManager.getNumOfGapsAt(logPos);
                 }
             }
 
@@ -129,11 +129,15 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
             if (gapManager != null && gapManager.hasGapAt(logPos)) {
                 int tmp = logPos + gapManager.getNumOfGapsSmaller(logPos);
-                complete = cov.getCommonFwdMult(logPos);
-                appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
+                for (int i = 0; i < gapManager.getNumOfGapsAt(logPos); ++i) {
+                    sb.append("<tr><td align=\"left\"><b>Gap position ").append(logPos).append("_").append(i+1).append("</b></td></tr>");
+                    complete = cov.getCommonFwdMult(logPos);
+                    appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
 
-                complete = cov.getCommonFwdMult(logPos);
-                appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
+                    complete = cov.getCommonFwdMult(logPos);
+                    appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
+                    ++tmp;
+                }
             }
 
             sb.append("</html>");
@@ -205,10 +209,14 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * Requests the data to show from the DB.
      */
     private void requestData() {
+        int from = lowerBound;
+        int to = upperBound;
+        int totalFrom = lowerBound - MININTERVALLENGTH;
+        int totalTo = upperBound + MININTERVALLENGTH;
         if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
             this.coverageLoaded = true;
             //we need to load the diffs seperately for tracks completely stored in the db
-            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this, Properties.DIFFS));
+            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS));
             if (this.diffsLoaded) {
                 this.setupData();
             }
@@ -216,8 +224,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.coverageLoaded = false;
             this.diffsLoaded = false;
-            trackConnector.addCoverageRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this));
-            trackConnector.addDiffRequest(new CoverageAndDiffRequest(lowerBound, upperBound, this, Properties.DIFFS));
+            trackConnector.addCoverageRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this));
+            trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS));
         }
     }
 
@@ -415,94 +423,90 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * @param x
      * @param heightPerCoverageUnit
      * @param isForwardStrand true, if bars for fwd strand should be painted
-     * @param setIsColored true, if the histogram should be colored
+     * @param isColored true, if the histogram should be colored
      */
     @SuppressWarnings("fallthrough")
     private void cycleBases(int absPos, int relPos, int x, double heightPerCoverageUnit, boolean isForwardStrand, boolean isColored) {
         double value;
-        int featureHeight;
         Color c;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-        char base = refGen.getSequence().charAt(absPos-1);
-        PhysicalBaseBounds bounds;
+        char base = refGen.getSequence().charAt(absPos - 1);
+        PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
+        
+        value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
+        if (value > 0) {
+            if (!isColored) {
+                c = ColorProperties.LOGO_MATCH;
+            } else {
+                if (!isForwardStrand) {
+                    base = SequenceUtils.getDnaComplement(base);
+                }
+                switch (base) {
+                    case 'a':   c = ColorProperties.LOGO_A;             break;
+                    case 't':   c = ColorProperties.LOGO_T;             break;
+                    case 'c':   c = ColorProperties.LOGO_C;             break;
+                    case 'g':   c = ColorProperties.LOGO_G;             break;
+                    case 'n':   c = ColorProperties.LOGO_N;             break;
+                    case '-':   c = ColorProperties.LOGO_READGAP;       break;
+                    default:    c = ColorProperties.LOGO_BASE_UNDEF;    break;
+                }
+            }
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, c, x, y);
+        }
+        value = logoData.getNumOfAAt(relPos, isForwardStrand);
+        if (value > 0) {
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_A, x, y);
+        }
+        value = logoData.getNumOfCAt(relPos, isForwardStrand);
+        if (value > 0) {
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_C, x, y);
+        }
+        value = logoData.getNumOfGAt(relPos, isForwardStrand);
+        if (value > 0) {
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_G, x, y);
+        }
+        value = logoData.getNumOfTAt(relPos, isForwardStrand);
+        if (value > 0) {
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_T, x, y);
+        }
+        value = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
+        if (value > 0) {
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_READGAP, x, y);
+        }
+        value = logoData.getNumOfNAt(relPos, isForwardStrand);
+        if (value > 0) {
+            y = this.createBlockForValue(value, isForwardStrand, heightPerCoverageUnit, bounds, ColorProperties.LOGO_N, x, y);
+        }
+    }
+    
+    /**
+     * Creates a histogram block (BarComponent) for the given value at the given positon.
+     * @param value the height value of the current histogram bar
+     * @param isForwardStrand true, if this bar is on the fwd strand, false otherwise
+     * @param heightPerCoverageUnit the height of each coverage unit in the current viewer
+     * @param bounds the bounds of the viewer
+     * @param color the color to paint the current histogram bar with
+     * @param x the x start coordinate of the histogram bar
+     * @param y the y start coordinate of the histogram bar
+     * @return the new y value to use for other bases histogram bars at the same
+     * position
+     */
+    private int createBlockForValue(double value, boolean isForwardStrand, double heightPerCoverageUnit, 
+                PhysicalBaseBounds bounds, Color color, int x, int y) {
         BarComponent block;
         
-        for (Bases type : Bases.values()) {
-                switch (type) {
-                    case m:
-                        value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
-                        if (!isColored) {
-                            c = ColorProperties.LOGO_MATCH;
-                        } else {
-                            switch (base) {
-                                case 'a':
-                                    c = isForwardStrand ? ColorProperties.LOGO_A : ColorProperties.LOGO_T;
-                                    break;
-                                case 't':
-                                    c = isForwardStrand ? ColorProperties.LOGO_T : ColorProperties.LOGO_A;
-                                    break;
-                                case 'c':
-                                    c = isForwardStrand ? ColorProperties.LOGO_C : ColorProperties.LOGO_G;
-                                    break;
-                                case 'g':
-                                    c = isForwardStrand ? ColorProperties.LOGO_G : ColorProperties.LOGO_C;
-                                    break;
-                                case 'n':
-                                    c = ColorProperties.LOGO_N;
-                                    break;
-                                case '-':
-                                    c = ColorProperties.LOGO_READGAP;
-                                    break;
-                                default:
-                                    c = ColorProperties.LOGO_BASE_UNDEF;
-                                    break;
-                            }
-                        }
-                        break;
-                    case a:
-                        value = logoData.getNumOfAAt(relPos, isForwardStrand);
-                        c = ColorProperties.LOGO_A;
-                        break;
-                    case c:
-                        value = logoData.getNumOfCAt(relPos, isForwardStrand);
-                        c = ColorProperties.LOGO_C;
-                        break;
-                    case g:
-                        value = logoData.getNumOfGAt(relPos, isForwardStrand);
-                        c = ColorProperties.LOGO_G;
-                        break;
-                    case t:
-                        value = logoData.getNumOfTAt(relPos, isForwardStrand);
-                        c = ColorProperties.LOGO_T;
-                        break;
-                    case _:
-                        value = logoData.getNumOfReadGapsAt(relPos, isForwardStrand);
-                        c = ColorProperties.LOGO_READGAP;
-                        break;
-                    case n:
-                        value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                        c = ColorProperties.LOGO_N;
-                        break;
-                    default:
-                        c = ColorProperties.LOGO_BASE_UNDEF;
-                        value = logoData.getNumOfNAt(relPos, isForwardStrand);
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown base {0}!", type);
-                        break;
-                }
+        int featureHeight = (int) (value * heightPerCoverageUnit);
 
-            featureHeight = (int) (value * heightPerCoverageUnit);
-
-            bounds = getPhysBoundariesForLogPos(absPos);
-            block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), c);
-            if (isForwardStrand) {
-                y -= featureHeight;
-                block.setBounds(x, y, (int) bounds.getPhysWidth(), featureHeight);
-            } else {
-                block.setBounds(x, y + 1, (int) bounds.getPhysWidth(), featureHeight);
-                y += featureHeight;
-            }
-            this.add(block);
+        block = new BarComponent(featureHeight, (int) bounds.getPhysWidth(), color);
+        if (isForwardStrand) {
+            y -= featureHeight;
+            block.setBounds(x, y, (int) bounds.getPhysWidth(), featureHeight);
+        } else {
+            block.setBounds(x, y + 1, (int) bounds.getPhysWidth(), featureHeight);
+            y += featureHeight;
         }
+        this.add(block);
+        return y;
     }
 
     /**
@@ -520,12 +524,16 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             widthCount++; // current position needs 1 base space in visual alignment
             widthCount += num; // if gaps occured at current position, they need some space, too
             gapNo += num;
+            if (widthCount > tmpWidth) { gapNo -= (widthCount - tmpWidth); } //otherwise we miss positions which should be visible, since too many gaps are accounted for
             i++;
         }
         upperBound -= gapNo;
         this.getBoundsInfo().correctLogRight(upperBound);
     }
 
+    /**
+     * Fills the gap manager managing reference gaps.
+     */
     private void fillGapManager() {
         HashMap<Integer, Integer> positionToNum = new HashMap<>();
         PersistantReferenceGap gap;
@@ -555,9 +563,14 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         }
     }
 
+    /**
+     * Sets up the histogram bars for the visual bases.
+     */
     private void setUpLogoData() {
-        logoData = new LogoDataManager(lowerBound, width);
-
+        logoData = new LogoDataManager(lowerBound, width
+                 + gapManager.getNumOfGapsSmaller(upperBound)
+                 + gapManager.getNumOfGapsAt(upperBound)) ;
+        
         // store coverage information in logo data
         int relPos;
         for (int i = lowerBound; i <= upperBound; i++) {
@@ -569,14 +582,15 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
         // store diff information from the reference genome in logo data
         PersistantDiff d;
-        int position;
+        int position; //TODO: runs over all diffs for 25000 pos = can be 600.000 = improve performance!
         for (Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext();) {
             d = it.next();
-            position = d.getPosition() + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
+            position = d.getPosition();
             if (position > lowerBound && position < upperBound) {
-                logoData.addExtendedPersistantDiff(d, position);
+                relPos = position + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
+                logoData.addExtendedPersistantDiff(d, relPos);
             } else if (position > upperBound) {
-                break; //TODO: store last index to speed up clac
+                break;
             }
         }
 

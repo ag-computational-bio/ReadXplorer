@@ -71,47 +71,46 @@ public final class ParserCommonMethods {
             refSeq = refSeq.toUpperCase();
         }
 
-        for (int i = 0; i < charCigar.length; ++i) {
+        for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
+            currentCount = Integer.valueOf(num[i - 1]);
 
-            if (op.equals("=")) { //increase position for matches, skipped regions (N) and padded regions (P)
-                currentCount = Integer.valueOf(num[i - 1]);
-                refPos += currentCount;
-                readPos += currentCount;
-
-            } else if (op.equals("N") || op.equals("P")) {
-                refPos += Integer.valueOf(num[i - 1]);
-                
-            } else if (op.equals("X")) { //count and create diffs for mismatches
-                currentCount = Integer.valueOf(num[i - 1]);
-                differences += currentCount;
-                refPos += currentCount;
-                readPos += currentCount;
-
-            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
-                currentCount = Integer.valueOf(num[i - 1]);
-                differences += currentCount;
-                refPos += currentCount;
-
-            } else if (op.equals("I")) { // count and add reference gaps for insertions
-                currentCount = Integer.valueOf(num[i - 1]);
-                differences += currentCount;
-                readPos += currentCount;
-                // refPos remains the same
-
-            } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                currentCount = Integer.valueOf(num[i - 1]);
+            if (op.equals("M")) { //check, count and add diffs for deviating Ms
                 bases = readSeq.substring(readPos, readPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = refPos + j;
-                    if (bases.charAt(j) != refSeq.charAt(diffPos)) {
+                    if (bases.charAt(j) != refSeq.charAt(refPos + j)) {
                         ++differences;
                     }
                 }
                 refPos += currentCount;
                 readPos += currentCount;
 
-            } //H and S = hard and soft clipped bases are not present in the read string and pos in record, so don't inc. absPos
+            } else if (op.equals("=")) { //increase position for matches, skipped regions (N) and padded regions (P)
+                refPos += currentCount;
+                readPos += currentCount;
+ 
+            } else if (op.equals("X")) { //count and create diffs for mismatches
+                differences += currentCount;
+                refPos += currentCount;
+                readPos += currentCount;
+
+            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
+                differences += currentCount;
+                refPos += currentCount;
+
+            } else if (op.equals("I")) { // count and add reference gaps for insertions
+                differences += currentCount;
+                readPos += currentCount;
+                // refPos remains the same
+
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += currentCount;
+                //readPos remains the same
+               
+            } else if (op.equals("S")) {
+                readPos += currentCount;
+                //refPos remains the same
+            }//H = hard bases are not present in the read string and pos in record, so don't inc. absPos
         }
 
         return differences;
@@ -180,12 +179,11 @@ public final class ParserCommonMethods {
             } else if (op.equals("X")) { //count and create diffs for mismatches
                 differences += currentCount;
                 for (int j = 0; j < currentCount; ++j) {
-                    diffPos = readPos + j;
-                    base = readSeq.charAt(diffPos);
+                    base = readSeq.charAt(readPos + j);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    diffs.add(new ParsedDiff(diffPos + start, base));
+                    diffs.add(new ParsedDiff(refPos + j + start, base));
                 }
                 refPos += currentCount;
                 readPos += currentCount;
@@ -210,14 +208,14 @@ public final class ParserCommonMethods {
                 //refPos remains the same
                 readPos += currentCount;
 
-            } else if (op.equals("N")) {
+            } else if (op.equals("N") || op.equals("P")) { //increase position for padded and skipped reference bases
                 refPos += currentCount;
                 //readPos remains the same
 
-            } else if (op.equals("S")) {
+            } else if (op.equals("S")) { //increase read position for soft clipped bases which are present in the read
                 //refPos remains the same
                 readPos += currentCount;
-            } //P, S and H = padding, soft and hard clipping do not contribute to differences
+            } //H = hard clipping does not contribute to differences
         }
 
         return new DiffAndGapResult(diffs, gaps, differences);
