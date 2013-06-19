@@ -7,6 +7,7 @@ import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
+import de.cebitec.vamp.differentialExpression.plot.PlotTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -304,7 +305,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 //                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
 //                GraficsTopComponent.open();
 //                GraficsTopComponent.requestActive();
-                  InitializePlotting.open(ConvertData.mAplotData(((DefaultTableModel)topCountsTable.getModel()).getDataVector(), usedTool));
+                PlotTopComponent ptc = new PlotTopComponent(analysisHandler,usedTool);
+                analysisHandler.registerObserver(ptc);
+                ptc.open();
+                ptc.requestActive();
                 break;
         }        
     }//GEN-LAST:event_createGraphicsButtonActionPerformed

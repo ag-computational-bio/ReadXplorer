@@ -7,7 +7,7 @@
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.databackend</code-name-base>
+                    <code-name-base>de.cebitec.vamp.libs</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.vamp.libs</code-name-base>
+                    <code-name-base>de.cebitec.vamp.util</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -32,52 +32,11 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.spi.navigator</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <implementation-version/>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.swing.outline</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.23.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
                     <code-name-base>org.openide.awt</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>7.55.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.explorer</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.50.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.modules</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.35.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.nodes</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.33.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -107,16 +66,6 @@
             </module-dependencies>
             <public-packages>
                 <package>de.cebitec.vamp.plotting</package>
-                <package>de.cebitec.vamp.plotting.api</package>
-                <package>de.cebitec.vamp.plotting.api.dataset</package>
-                <package>de.cebitec.vamp.plotting.api.overlay</package>
-                <package>de.cebitec.vamp.plotting.api.selection</package>
-                <package>de.cebitec.vamp.plotting.overlay.nodes</package>
-                <package>de.cebitec.vamp.plotting.overlay.nodes.action</package>
-                <package>de.cebitec.vamp.plotting.overlay.ui</package>
-                <package>de.cebitec.vamp.plotting.ui</package>
-                <package>org.jfree.chart.axis</package>
-                <package>org.jfree.chart.axis.renderer.xy</package>
             </public-packages>
         </data>
     </configuration>

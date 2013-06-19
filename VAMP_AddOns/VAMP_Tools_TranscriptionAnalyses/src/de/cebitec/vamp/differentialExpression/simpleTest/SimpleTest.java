@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JOptionPane;
-import sun.applet.resources.MsgAppletViewer;
 
 /**
  *
@@ -329,6 +328,12 @@ public class SimpleTest implements SimpleTestI {
         }
         if (meanB == 0) {
             meanB = 1d;
+        }
+        if(varA == 0){
+            varA = 1d;
+        }
+        if(varB == 0){
+            varB = 1d;
         }
         confidence = -(Math.log10((((varA / meanA) + (varB / meanB)) / 2)));
         return confidence;
