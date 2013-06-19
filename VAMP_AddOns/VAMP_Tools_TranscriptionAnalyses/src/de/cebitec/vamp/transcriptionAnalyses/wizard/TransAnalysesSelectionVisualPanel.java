@@ -36,13 +36,16 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
 
         transcriptionStartBox = new javax.swing.JCheckBox();
         filteredGenesBox = new javax.swing.JCheckBox();
-        operonDetectionBox = new javax.swing.JCheckBox();
+        rpkmValuesBox = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tssTextArea = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         filterFeaturesTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
-        opeonTextArea = new javax.swing.JTextArea();
+        rpkmTextArea = new javax.swing.JTextArea();
+        operonDetectionBox = new javax.swing.JCheckBox();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        operonTextArea = new javax.swing.JTextArea();
 
         org.openide.awt.Mnemonics.setLocalizedText(transcriptionStartBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.transcriptionStartBox.text")); // NOI18N
         transcriptionStartBox.addActionListener(new java.awt.event.ActionListener() {
@@ -58,10 +61,10 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(operonDetectionBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.operonDetectionBox.text")); // NOI18N
-        operonDetectionBox.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(rpkmValuesBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.rpkmValuesBox.text")); // NOI18N
+        rpkmValuesBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                operonDetectionBoxActionPerformed(evt);
+                rpkmValuesBoxActionPerformed(evt);
             }
         });
 
@@ -85,15 +88,32 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         filterFeaturesTextArea.setWrapStyleWord(true);
         jScrollPane2.setViewportView(filterFeaturesTextArea);
 
-        opeonTextArea.setEditable(false);
-        opeonTextArea.setBackground(new java.awt.Color(240, 240, 240));
-        opeonTextArea.setColumns(20);
-        opeonTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        opeonTextArea.setLineWrap(true);
-        opeonTextArea.setRows(2);
-        opeonTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.opeonTextArea.text")); // NOI18N
-        opeonTextArea.setWrapStyleWord(true);
-        jScrollPane3.setViewportView(opeonTextArea);
+        rpkmTextArea.setEditable(false);
+        rpkmTextArea.setBackground(new java.awt.Color(240, 240, 240));
+        rpkmTextArea.setColumns(20);
+        rpkmTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        rpkmTextArea.setLineWrap(true);
+        rpkmTextArea.setRows(2);
+        rpkmTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.rpkmTextArea.text")); // NOI18N
+        rpkmTextArea.setWrapStyleWord(true);
+        jScrollPane3.setViewportView(rpkmTextArea);
+
+        org.openide.awt.Mnemonics.setLocalizedText(operonDetectionBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.operonDetectionBox.text")); // NOI18N
+        operonDetectionBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                operonDetectionBoxActionPerformed(evt);
+            }
+        });
+
+        operonTextArea.setEditable(false);
+        operonTextArea.setBackground(new java.awt.Color(240, 240, 240));
+        operonTextArea.setColumns(20);
+        operonTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        operonTextArea.setLineWrap(true);
+        operonTextArea.setRows(2);
+        operonTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.operonTextArea.text")); // NOI18N
+        operonTextArea.setWrapStyleWord(true);
+        jScrollPane5.setViewportView(operonTextArea);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -101,16 +121,21 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(transcriptionStartBox)
-                    .addComponent(filteredGenesBox)
-                    .addComponent(operonDetectionBox)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(transcriptionStartBox)
+                            .addComponent(filteredGenesBox)
+                            .addComponent(rpkmValuesBox)
+                            .addComponent(operonDetectionBox))
+                        .addGap(0, 140, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(21, 21, 21)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                            .addComponent(jScrollPane5)
                             .addComponent(jScrollPane2)
                             .addComponent(jScrollPane1))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,9 +148,14 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rpkmValuesBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(operonDetectionBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -137,6 +167,10 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_filteredGenesBoxActionPerformed
 
+    private void rpkmValuesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rpkmValuesBoxActionPerformed
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
+    }//GEN-LAST:event_rpkmValuesBoxActionPerformed
+
     private void operonDetectionBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionBoxActionPerformed
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_operonDetectionBoxActionPerformed
@@ -147,8 +181,11 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea opeonTextArea;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JCheckBox operonDetectionBox;
+    private javax.swing.JTextArea operonTextArea;
+    private javax.swing.JTextArea rpkmTextArea;
+    private javax.swing.JCheckBox rpkmValuesBox;
     private javax.swing.JCheckBox transcriptionStartBox;
     private javax.swing.JTextArea tssTextArea;
     // End of variables declaration//GEN-END:variables
@@ -175,6 +212,14 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     public boolean isOperonAnalysisSelected() {
         return this.operonDetectionBox.isSelected();
     }
+    
+    /**
+     * @return true, if the rpkm analysis is selected, false
+     * otherwise
+     */
+    public boolean isRPKMAnalysisSelected() {
+        return this.rpkmValuesBox.isSelected();
+    }
 
     /**
      * @return true, if the panel contains valid information, false otherwise
@@ -182,7 +227,8 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         return this.transcriptionStartBox.isSelected()
-                || this.filteredGenesBox.isSelected()
-                || this.operonDetectionBox.isSelected();
+                 || this.filteredGenesBox.isSelected()
+               || this.operonDetectionBox.isSelected()
+                || this.rpkmValuesBox.isSelected();
     }
 }

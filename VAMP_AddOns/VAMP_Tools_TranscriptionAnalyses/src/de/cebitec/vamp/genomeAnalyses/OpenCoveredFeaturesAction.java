@@ -5,7 +5,6 @@ import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.transcriptionAnalyses.OpenTranscriptionAnalysesAction;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.VisualisationUtils;
@@ -31,6 +30,7 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.cookies.OpenCookie;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
@@ -88,18 +88,23 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     @Override
     public void actionPerformed(ActionEvent ev) {
         OpenTrackPanelList otp = new OpenTrackPanelList(referenceId);
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTrackList"));
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenTrackList"));
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openRefGenDialog.setVisible(true);
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             this.tracks = otp.getSelectedTracks();
             this.trackMap = new HashMap<>();
+            this.trackToAnalysisMap = new HashMap<>();
+            this.finishedCovAnalyses = 0;
+            this.coveredFeaturesResultPanel = null;
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 this.trackMap.put(track.getId(), track);
             }
 
-            this.coveredAnnoAnalysisTopComp = (CoveredFeaturesAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoveredFeaturesAnalysisTopComponent");
+            if (this.coveredAnnoAnalysisTopComp == null) {
+                this.coveredAnnoAnalysisTopComp = (CoveredFeaturesAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoveredFeaturesAnalysisTopComponent");
+            }
             this.coveredAnnoAnalysisTopComp.open();
             this.runWizarAndCoveredAnnoAnalsysis();
 
@@ -164,6 +169,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             try {
                 connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                System.out.println("Track could not be fetched: " + ex);
                 return;
             }
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
@@ -192,17 +198,6 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             String dataType = dataTypePair.getSecond();
 
             if (dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
-                //get track name(s) for tab descriptions
-                String trackNames = "";
-                if (tracks != null && !tracks.isEmpty()) {
-                    for (PersistantTrack track : tracks) {
-                        trackNames = trackNames.concat(track.getDescription()).concat(" and ");
-                    }
-                    trackNames = trackNames.substring(0, trackNames.length() - 5);
-                    if (trackNames.length() > 120) {
-                        trackNames = trackNames.substring(0, 120).concat("...");
-                    }
-                }
 
                 ++finishedCovAnalyses;
 
@@ -218,6 +213,19 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 coveredFeaturesResultPanel.addCoveredFeatures(result);
 
                 if (finishedCovAnalyses >= tracks.size()) {
+                    
+                    //get track name(s) for tab descriptions
+                    String trackNames = "";
+                    if (tracks != null && !tracks.isEmpty()) {
+                        for (PersistantTrack track : tracks) {
+                            trackNames = trackNames.concat(track.getDescription()).concat(" and ");
+                        }
+                        trackNames = trackNames.substring(0, trackNames.length() - 5);
+                        if (trackNames.length() > 120) {
+                            trackNames = trackNames.substring(0, 120).concat("...");
+                        }
+                    }
+                    
                     String title;
                     if (this.parameters.isGetCoveredFeatures()) {
                         title = "Detected covered features for ";

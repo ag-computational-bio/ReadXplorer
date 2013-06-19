@@ -11,6 +11,8 @@ import java.io.Serializable;
  */
 public class PersistantCoverage implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+    
     //2 for fwd (mult = all & num = without duplicates), and 2 rev
     
     private int leftBound;
@@ -32,19 +34,6 @@ public class PersistantCoverage implements Serializable {
     private int[] commonRevNumCov;
     
     private int internalPos = 0;
-    
-//    private HashMap<Integer, Integer> perfectFwdMult;
-//    private HashMap<Integer, Integer> perfectFwdNum;
-//    private HashMap<Integer, Integer> perfectRevMult;
-//    private HashMap<Integer, Integer> perfectRevNum;
-//    private HashMap<Integer, Integer> bestMatchFwdMult;
-//    private HashMap<Integer, Integer> bestMatchFwdNum;
-//    private HashMap<Integer, Integer> bestMatchRevMult;
-//    private HashMap<Integer, Integer> bestMatchRevNum;
-//    private HashMap<Integer, Integer> commonFwdMult;
-//    private HashMap<Integer, Integer> commonFwdNum;
-//    private HashMap<Integer, Integer> commonRevMult;
-//    private HashMap<Integer, Integer> commonRevNum;
     
     private int highestCoverage;
     
@@ -645,6 +634,7 @@ public class PersistantCoverage implements Serializable {
 
     /**
      * Getter for the highest coverage for automatic scaling.
+     * @return The highest coverage value in this coverage object
      */
     public int getHighestCoverage() {
         return highestCoverage;
@@ -652,6 +642,7 @@ public class PersistantCoverage implements Serializable {
 
     /**
      * Setter for the highest coverage for automatic scaling.
+     * @param highestCoverage the highest coverage value in this coverage object
      */
     public void setHighestCoverage(int highestCoverage) {
         this.highestCoverage = highestCoverage;
@@ -765,7 +756,7 @@ public class PersistantCoverage implements Serializable {
      * already stored in this coverage object.
      */
     public void incDoubleTrackArraysToIntervalSize() {
-        int size = this.rightBound - this.leftBound + 1;
+        int size = this.rightBound > this.leftBound ? this.rightBound - this.leftBound + 1 : 0;
         if (this.commonFwdMultCovTrack1.length == 0) {
             commonFwdMultCovTrack1 = new int[size];
         }

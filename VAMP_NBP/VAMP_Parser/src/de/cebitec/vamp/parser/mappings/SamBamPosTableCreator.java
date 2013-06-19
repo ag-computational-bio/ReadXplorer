@@ -104,6 +104,9 @@ public class SamBamPosTableCreator implements Observable {
         Integer mappingCount;
         ErrorLimit errorLimit = new ErrorLimit();
         Set<String> readNameSet = new HashSet<>();
+        
+//        String[] nameArray;
+//        String shortReadName;
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
@@ -129,6 +132,12 @@ public class SamBamPosTableCreator implements Observable {
                         }
 
                         //statistics calculations: count no reads and distinct sequences ////////////
+                        //illumina read hack to reduce memory footprint
+//                        nameArray = readName.split(":");
+//                        shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
+//                        nameArray = shortReadName.split("#");
+//                        shortReadName = nameArray[0] + "/" + nameArray[1].split("/")[1];
+//                        readNameSet.add(shortReadName);
                         readNameSet.add(readName);
                         
                         mappingCount = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
@@ -259,8 +268,8 @@ public class SamBamPosTableCreator implements Observable {
                         }
                     }
                 }
-                if ((lineno % 20000) == 0)  {//output process info only on every XX line
-                    this.notifyObservers(lineno+" reads processed ...");
+                if ((lineno % 500000) == 0)  {//output process info only on every XX line
+                    this.notifyObservers(lineno + " mappings processed ...");
                 }
             }
             if (errorLimit.getSkippedCount() > 0) {

@@ -1272,7 +1272,7 @@ public class SQLStatements {
             "SELECT * FROM "
             + FieldNames.TABLE_STATISTICS
             + " WHERE "
-            + FieldNames.TRACK_ID + " = ?";
+            + FieldNames.STATISTICS_TRACK_ID + " = ?";
     
     
 //    public static String FETCH_NUM_SINGLE_MAPPINGS_FOR_TRACK =

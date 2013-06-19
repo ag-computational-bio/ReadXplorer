@@ -265,7 +265,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
         List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForClosedInterval(0, reference.getRefLength());
         
-        SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, reference);
+        SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, reference, snpData.getSelectedFeatTypes());
         
         Snp snp;
         Object[] rowData;

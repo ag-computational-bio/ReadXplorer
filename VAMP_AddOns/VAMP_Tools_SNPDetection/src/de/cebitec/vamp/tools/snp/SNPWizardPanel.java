@@ -6,7 +6,7 @@ import org.openide.WizardDescriptor;
 /**
  * The SNP detection wizard main panel.
  */
-public class SNPWizardPanel extends ChangeListeningWizardPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class SNPWizardPanel extends ChangeListeningWizardPanel {
     
     public static final String PROP_MIN_PERCENT = "minPercent";
     public static final String PROP_MIN_VARYING_BASES = "minNoBases";
@@ -40,13 +40,8 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel implements Wizard
     }
 
     @Override
-    public boolean isFinishPanel() {
-        return this.isValid();
-    }
-
-    @Override
     public void storeSettings(WizardDescriptor wiz) {
-        if (isFinishPanel()) {
+        if (this.isValid()) {
             wiz.putProperty(PROP_MIN_PERCENT, this.component.getMinPercentage());
             wiz.putProperty(PROP_MIN_VARYING_BASES, this.component.getMinVaryingBases());
         }

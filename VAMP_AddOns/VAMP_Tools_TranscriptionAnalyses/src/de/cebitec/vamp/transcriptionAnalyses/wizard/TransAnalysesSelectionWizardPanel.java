@@ -46,6 +46,9 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
             wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected());
             wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_FILTER_ANALYSIS, this.component.isFilterGenesAnalysisSelected());
             wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected());
+            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected());
+            //changeSupport.fireChange();
+            this.readSettings(wiz);
         }
     }
 }

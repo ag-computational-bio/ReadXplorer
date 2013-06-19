@@ -8,6 +8,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
@@ -15,6 +16,7 @@ import de.cebitec.vamp.util.SequenceUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import org.openide.util.NbPreferences;
@@ -36,11 +38,12 @@ public class SnpTranslator {
     private final Preferences pref;
     private final String refSeq;
     private int refLength;
-    private final List<PersistantFeature> genomicFeatures;
+    private List<PersistantFeature> genomicFeatures;
     private GeneticCode code;
     private int lastIndex;
     private int lastPos;
     private int pos;
+    private final Set<FeatureType> selectedFeatureTypes;
 
     /**
      * Generates all translations possible for a given snp for the given genomic features
@@ -53,8 +56,10 @@ public class SnpTranslator {
      * @param genomicFeatures all features of the reference genome
      * @param refSeq the reference sequence
      */
-    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantReference reference) {
+    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantReference reference, Set<FeatureType> selectedFeatureTypes) {
+        this.selectedFeatureTypes = selectedFeatureTypes;
         this.genomicFeatures = genomicFeatures;
+        this.filterFeatureTypes();
         this.refSeq = reference.getSequence();
         this.refLength = reference.getRefLength();
         lastIndex = 0;
@@ -79,22 +84,26 @@ public class SnpTranslator {
         //find feature/s which cover current snp position
         List<PersistantFeature> featuresFound = new ArrayList<>();
 
+        int stopIndex = 0;
         pos = PositionUtils.convertPosition(position);
         if (lastPos > pos) {
             lastIndex = 0;
         } //since positions in table cannot be sorted completely, because they are strings
 
         while (lastIndex < this.genomicFeatures.size()) {
-
+            
             PersistantFeature feature = this.genomicFeatures.get(lastIndex++);
             if (feature.getStart() <= pos && feature.getStop() >= pos) {
                 //found hit, also try next index
                 featuresFound.add(feature);
+                stopIndex = stopIndex > 0 ? stopIndex : lastIndex - 1;
             } else if (feature.getStop() < pos) {
                 //do nothing
-            } else { //for your information: if (feature.getStop() > pos && feature.getStart() > pos){
-                lastIndex -= featuresFound.size() + 1;
+            } else if (feature.getStop() > pos && feature.getStart() > pos) {
+                lastIndex = stopIndex > 0 ? stopIndex : lastIndex - (featuresFound.size() + 1);
                 break; //stop
+            } else if (feature.getStop() > pos) {
+                stopIndex = lastIndex - 1;
             }
         }
         
@@ -121,8 +130,9 @@ public class SnpTranslator {
         List<PersistantFeature> featuresFound = new ArrayList<>();
 //        List<PersistantSubfeature> subfeaturesFound = new ArrayList<PersistantSubfeature>();
 
+        int stopIndex = 0;
         this.pos = PositionUtils.convertPosition(snp.getPosition());
-        this.lastIndex = this.lastPos > this.pos ? 0 : this.lastIndex;
+        this.lastIndex = lastPos > pos ? 0 : lastIndex;
         //since positions in table are sorted alphabetically, because they are strings
 
         while (lastIndex < this.genomicFeatures.size()) {
@@ -131,11 +141,14 @@ public class SnpTranslator {
             if (feature.getStart() <= pos && feature.getStop() >= pos) {
                 //found hit, also try next index
                 featuresFound.add(feature);
+                stopIndex = stopIndex > 0 ? stopIndex : lastIndex - 1;
             } else if (feature.getStart() < pos) {
                 //do nothing
-            } else { //for your information: if (feature.getStop() > pos && feature.getStart() > pos){
-                this.lastIndex -= (featuresFound.size() + 1);
+            } else if (feature.getStop() > pos && feature.getStart() > pos) {
+                lastIndex = stopIndex > 0 ? stopIndex : lastIndex - (featuresFound.size() + 1);
                 break; //stop
+            } else if (feature.getStop ()> pos) {
+                stopIndex = lastIndex - 1;
             }
         }
         lastIndex -= (featuresFound.size() + 1);
@@ -341,5 +354,20 @@ public class SnpTranslator {
             }
         }
         return codonSnpList;
+    }
+
+    /**
+     * Creates a new array list of the genomic features, which are among the
+     * allowed feature types. All features, whose feature type is not in the 
+     * <cc>selectedFeatureTypes</cc> list is dismissed.
+     */
+    private void filterFeatureTypes() {
+        List<PersistantFeature> newFeatures = new ArrayList<>();
+        for (PersistantFeature feature : this.genomicFeatures) {
+            if (this.selectedFeatureTypes.contains(feature.getType())) {
+                newFeatures.add(feature);
+            }
+        }
+        this.genomicFeatures = newFeatures;
     }
 }

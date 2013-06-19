@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.correlationAnalysis;
 
 import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
@@ -29,16 +25,19 @@ import org.openide.util.NbBundle;
  * @author Evgeny Anisiforov
  */
 public class CorrelationAnalysisProcessor implements ThreadListener {
+    
+    private static final int MINIMUMINTERVALLENGTH = 90000;
+    
     //private final InputOutput io;
     private Integer rightBound;
     private final Integer minCorrelation;
     private final Integer minPeakCoverage;
-    private StrangDirection currentDirection;
+    private StrandDirection currentDirection;
     private boolean canceled = false;
     private final CorrelationCoefficient correlationCoefficient;
     private CorrelationResult analysisResult;
     private final ArrayList<CorrelatedInterval> correlationsList;
-
+    
     private void createProcessHandle(String title) {
         this.ph = ProgressHandleFactory.createHandle(title, new Cancellable() {
 
@@ -51,7 +50,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         ph.switchToDeterminate(this.rightBound);
     }
     
-    public enum StrangDirection { FWD, REV };
+    public enum StrandDirection { FWD, REV };
     
     private int steps;
     private int currentStep = 0;
@@ -77,17 +76,17 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         
         this.ready = false;
         this.currentPosition = 1;
-        this.currentDirection = StrangDirection.FWD;
-        this.correlationsList = new ArrayList<CorrelatedInterval>();
+        this.currentDirection = StrandDirection.FWD;
+        this.correlationsList = new ArrayList<>();
         
         ArrayList<TrackConnector> tcl = new ArrayList<>();
-        HashMap<Integer, PersistantTrack> trackNamesList = new HashMap<Integer, PersistantTrack> ();
+        HashMap<Integer, PersistantTrack> trackNamesList = new HashMap<> ();
         for(PersistantTrack track : list) {
             tcl.add(ProjectConnector.getInstance().getMultiTrackConnector(track));
             trackNamesList.put(track.getId(), track);
         }
         this.analysisResult = new CorrelationResult(this.correlationsList, trackNamesList);
-        HashMap<String,Object> params = new HashMap<String,Object>();
+        HashMap<String,Object> params = new HashMap<>();
         params.put("CorrelationCoefficient", cc);
         params.put("intervalLength", intervalLength);
         params.put("minCorrelation", minCorrelation);
@@ -123,15 +122,15 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 + coverageResult.getCoverage().getPerfectRevMult(position);
     }
     
-    private int getCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position, StrangDirection direction) {
-        if (direction == StrangDirection.REV) {return getRevCoverageAt(coverageResult, position); }
+    private int getCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position, StrandDirection direction) {
+        if (direction == StrandDirection.REV) {return getRevCoverageAt(coverageResult, position); }
         else { return getFwdCoverageAt(coverageResult, position); }
     }
     
     
     /** checks if all coverage results in the currently loaded result list
      * contain zero coverage on the current position */
-    private boolean allCoverageEqualZero(StrangDirection direction, int position) {
+    private boolean allCoverageEqualZero(StrandDirection direction, int position) {
         for (CoverageAndDiffResultPersistant result : this.resultList) {
             if (getCoverageAt(result, position, direction) != 0) {
                 return false;
@@ -141,7 +140,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     /** computes the maximum peak covage from the currently loaded result list */
-    private int getPeakCoverage(StrangDirection direction, int position) {
+    private int getPeakCoverage(StrandDirection direction, int position) {
         int peakCoverage = 0;
         for (CoverageAndDiffResultPersistant result : this.resultList) {
             peakCoverage = Math.max(peakCoverage, getCoverageAt(result, position, direction));
@@ -159,7 +158,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     
-    private double[] copyCoverage(CoverageAndDiffResultPersistant coverageResult, StrangDirection direction, int from, int to) {
+    private double[] copyCoverage(CoverageAndDiffResultPersistant coverageResult, StrandDirection direction, int from, int to) {
         if (to < from) { throw new IllegalArgumentException("from value must be less than the to value"); }
         double[] result = new double[to-from];
         int writeIndex = 0;
@@ -170,7 +169,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         return result;
     }
     
-    private void computeStep(StrangDirection direction) {
+    private void computeStep(StrandDirection direction) {
         int maximumCoveredPosition = this.resultList.get(0).getCoverage().getRightBound();
         while (this.currentPosition<maximumCoveredPosition-this.intervalLength) {
             //ignore areas containing zeros
@@ -227,9 +226,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
         else {
             
-            if (direction.equals(StrangDirection.FWD)) {
+            if (direction.equals(StrandDirection.FWD)) {
                 ph.finish();
-                this.currentDirection = StrangDirection.REV;
+                this.currentDirection = StrandDirection.REV;
                 this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV"));
                 
                 //compute again from the beginning with another strang direction
@@ -270,7 +269,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
 
         for (TrackConnector tc : this.trackConnectorList) {
-            tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + 100, this));
+            tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, this));
         }
     }
     

@@ -29,7 +29,7 @@ import org.openide.util.NbBundle.Messages;
 id = "de.cebitec.vamp.mapping.MappingAction")
 @ActionRegistration(
     displayName = "#CTL_MappingAction")
-@ActionReference(path = "Menu/Tools", position = 155)
+@ActionReference(path = "Menu/Tools", position = 154)
 @Messages("CTL_MappingAction=Map reads")
 public final class MappingAction implements ActionListener {
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";

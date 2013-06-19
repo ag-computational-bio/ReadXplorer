@@ -72,7 +72,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         this.seqPairJobs = seqPairJobs;
         this.posTableJobs = posTableJobs;
         this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.name"));
-        this.workunits = refJobs.size() + 2 * trackJobs.size() + 2 * seqPairJobs.size() + 2 * posTableJobs.size();
+        this.workunits = refJobs.size() + 2 * trackJobs.size() + 3 * seqPairJobs.size() + 2 * posTableJobs.size();
     }
 
     private ParsedReference parseRefJob(ReferenceJob refGenJob) throws ParsingException, OutOfMemoryError {
@@ -386,6 +386,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                     GeneralUtils.deleteOldWorkFile(lastWorkFile); //only delete, if file was changed during parsing
                                     lastWorkFile = trackJob1.getFile();
                                 }
+                                ph.progress(workunits++);
                                 if (parsingResult instanceof DirectAccessDataContainer) {
                                     DirectAccessDataContainer dataContainer = (DirectAccessDataContainer) parsingResult;
                                     classificationMap = dataContainer.getClassificationMap();
@@ -417,6 +418,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             }
                         } else { //else case with 2 already imported tracks is prohibited
                             //we have to calculate the stats
+                            ph.progress(workunits++);
                             SamBamDirectSeqPairStatsParser statsParser = new SamBamDirectSeqPairStatsParser(seqPairJobContainer, referenceSeq, null);
                             statsParser.setStatsContainer(statsContainer);
                             try {
@@ -434,6 +436,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             }
                         }
 
+                        ph.progress(workunits++);
                         //create position table
                         SamBamPosTableCreator posTableCreator = new SamBamPosTableCreator();
                         posTableCreator.addStatsContainer(statsContainer);
@@ -604,6 +607,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 mappingParser.removeObserver(this);
                 GeneralUtils.deleteOldWorkFile(lastWorkFile); //since input file is read only!
                 lastWorkFile = trackJob.getFile();
+                ph.progress(workunits++);
                 if (parsingResult instanceof DirectAccessDataContainer) {
                     DirectAccessDataContainer dataContainer = (DirectAccessDataContainer) parsingResult;
                     Map<String, ParsedClassification> classificationMap = dataContainer.getClassificationMap(); 
@@ -667,8 +671,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
          
         this.showMsg("Your current JVM config allows up to "+GeneralUtils.formatNumber(rt.maxMemory())+" bytes of memory to be allocated.");
         this.showMsg("Currently the plattform is using "+GeneralUtils.formatNumber(rt.totalMemory() - rt.freeMemory())+" bytes of memory.");
-        this.showMsg("Please be aware of that you might need to change the -Xmx value of your JVM to process big imports successfully.");
-        this.showMsg("The value can be configured in the project.properties file of this application."); 
+        this.showMsg("Please be aware of that you might need to change the -J-Xmx value of your JVM to process large imports successfully.");
+        this.showMsg("The value can be configured in the ../vamp/etc/vamp.conf file of this application."); 
         this.showMsg("");
         
         this.processTrackJobs();

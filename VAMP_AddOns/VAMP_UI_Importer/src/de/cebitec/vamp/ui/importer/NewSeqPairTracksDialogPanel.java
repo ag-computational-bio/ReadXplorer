@@ -484,7 +484,7 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
                     
                     for (int i = 0; i < files.length; ++i) {
                         this.addFile(files[i]);
-                        if (!(getCurrentParser() instanceof JokParser)) {
+                        if (!(getCurrentParser() instanceof JokToBamDirectParser)) {
                             checkSeqDictonary(files[i]);
                         }
                     }
@@ -499,7 +499,7 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
                 } else {
                     File file = this.getSelectedFile();
                     this.addFile(file);
-                    if (!(getCurrentParser() instanceof JokParser)) {
+                    if (!(getCurrentParser() instanceof JokToBamDirectParser)) {
                         checkSeqDictonary(file);
                     }
 

@@ -231,7 +231,7 @@ public class CoverageContainer {
                 positionInt = diff.getPosition();
                 position = String.valueOf(positionInt);
                 base = diff.getBase();
-                if (mapping.getDirection() == -1) {
+                if (mapping.getDirection() == SequenceUtils.STRAND_REV) {
                     base = SequenceUtils.getDnaComplement(base);
                 }
                 // init positionTable if not done yet 

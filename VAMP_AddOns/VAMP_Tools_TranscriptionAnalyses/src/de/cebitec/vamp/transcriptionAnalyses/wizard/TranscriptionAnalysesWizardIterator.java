@@ -42,6 +42,7 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     public static final String PROP_TSS_ANALYSIS = "tssAnalysis";
     public static final String PROP_FILTER_ANALYSIS = "filterAnalysis";
     public static final String PROP_OPERON_ANALYSIS = "operon";
+    public static final String PROP_RPKM_ANALYSIS = "rpkm";
     public static final String PROP_UNANNOTATED_TRANSCRIPT_DET = "unannotatedTranscriptDetection";
     public static final String PROP_AUTO_TSS_PARAMS = "automaticsTSSParameterEstimation";
     public static final String PROP_AUTO_OPERON_PARAMS = "automaticOperonParameterEstimation";
@@ -53,6 +54,8 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     public static final String PROP_MIN_NUMBER_READS = "minNumberReads";
     public static final String PROP_MAX_NUMBER_READS = "maxNumberReads";
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";
+    public static final String PROP_MIN_RPKM = "minRPKM";
+    public static final String PROP_MAX_RPKM = "maxRPKM";
     
     private static final String PROP_WIZARD_NAME = "TransAnalyses";
     private int index;
@@ -64,10 +67,11 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> currentPanels;
     
-    private TransAnalysesSelectionWizardPanel selectionPanel;
-    private TransAnalysesTSSWizardPanel tSSPanel;
-    private TransAnalysesFilterWizardPanel filterPanel;
-    private TransAnalysesOperonWizardPanel operonPanel;
+    private TransAnalysesSelectionWizardPanel selectionPanel = new TransAnalysesSelectionWizardPanel();
+    private TransAnalysesTSSWizardPanel tSSPanel = new TransAnalysesTSSWizardPanel();
+    private TransAnalysesFilterWizardPanel filterPanel = new TransAnalysesFilterWizardPanel();
+    private TransAnalysesOperonWizardPanel operonPanel = new TransAnalysesOperonWizardPanel();
+    private TransAnalysesRPKMWizardPanel rpkmPanel = new TransAnalysesRPKMWizardPanel();
     private SelectReadClassWizardPanel readClassPanel;
     
     private Map<WizardDescriptor.Panel<WizardDescriptor>, Integer> panelToStepMap = new HashMap<>();
@@ -94,19 +98,22 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             tSSPanel = new TransAnalysesTSSWizardPanel();
             filterPanel = new TransAnalysesFilterWizardPanel();
             operonPanel = new TransAnalysesOperonWizardPanel();
+            rpkmPanel = new TransAnalysesRPKMWizardPanel();
 
             allPanels.add(selectionPanel);
             allPanels.add(readClassPanel);
             allPanels.add(tSSPanel);
             allPanels.add(filterPanel);
             allPanels.add(operonPanel);
+            allPanels.add(rpkmPanel);
             
             this.panelToStepMap.put(selectionPanel, 0);
             this.panelToStepMap.put(readClassPanel, 1);
             this.panelToStepMap.put(tSSPanel, 2);
             this.panelToStepMap.put(filterPanel, 3);
             this.panelToStepMap.put(operonPanel, 4);
-            
+            this.panelToStepMap.put(rpkmPanel, 5);
+
             this.steps = new String[allPanels.size() + 1];
             for (int i = 0; i < allPanels.size(); i++) {
                 Component c = allPanels.get(i).getComponent();
@@ -161,7 +168,8 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             this.updatePanelList(selectionPanel.getComponent().isTSSAnalysisSelected(), tSSPanel);
             this.updatePanelList(selectionPanel.getComponent().isFilterGenesAnalysisSelected(), filterPanel);
             this.updatePanelList(selectionPanel.getComponent().isOperonAnalysisSelected(), operonPanel);
-
+            this.updatePanelList(selectionPanel.getComponent().isRPKMAnalysisSelected(), rpkmPanel);
+            
             String[] newStepArray = new String[0];
             List<String> newSteps = new ArrayList<>();
             for (Panel<WizardDescriptor> panel : currentPanels) {

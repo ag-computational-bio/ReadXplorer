@@ -4,19 +4,23 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -58,6 +62,8 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
     private List<Integer> trackIds;
     private Map<Integer, PersistantTrack> trackList;
     private SNP_DetectionTopComponent snpDetectionTopComp;
+    private SelectFeatureTypeWizardPanel featureTypePanel;
+    private Set<FeatureType> selFeatureTypes;
 
     /**
      * Action for opening a new snp detection. It opens a track list containing
@@ -114,7 +120,9 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
         
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        featureTypePanel = new SelectFeatureTypeWizardPanel("SNP_Wizard");
         panels.add(new SNPWizardPanel());
+        panels.add(featureTypePanel);
         WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
@@ -133,9 +141,11 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
      * Starts the SNP detection.
      * @param wiz the wizard containing the SNP detection parameters
      */
+    @SuppressWarnings("unchecked")
     private void startSNPDetection(final WizardDescriptor wiz) {
         int minVaryingBases = (int) wiz.getProperty(SNPWizardPanel.PROP_MIN_VARYING_BASES);
         int minPercentage = (int) wiz.getProperty(SNPWizardPanel.PROP_MIN_PERCENT);
+        this.selFeatureTypes = (Set<FeatureType>) wiz.getProperty(featureTypePanel.getPropSelectedFeatTypes());
 
         SnpThread snpThread = new SnpThread(minPercentage, minVaryingBases);
         snpThread.registerObserver(this);
@@ -175,7 +185,7 @@ public final class OpenSnpDetectionAction implements ActionListener, Observer {
 
             ph.start();
             List<SnpI> snps = proCon.findSNPs(percent, num, trackIds);
-            snpData = new SnpDetectionResult(snps, trackList);
+            snpData = new SnpDetectionResult(snps, trackList, selFeatureTypes);
             snpData.setSearchParameters(percent, num);
             CentralLookup.getDefault().remove(this);
             this.notifyObservers(snpData);

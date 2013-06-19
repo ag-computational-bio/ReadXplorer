@@ -75,7 +75,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
                 ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(this.readClassPanel.getPropReadClassParams());
                 List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
-                List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
+                List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
                 Integer genomeID = (Integer) wiz.getProperty("genomeID");
                 int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
                 File saveFile = (File) wiz.getProperty("saveFile");
@@ -87,7 +87,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 DeAnalysisHandler handler = null;
 
                 if (tool == DeAnalysisHandler.Tool.BaySeq) {
-                    handler = new BaySeqAnalysisHandler(selectedTraks, createdGroups, genomeID,
+                    handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
                             replicateStructure, saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
                 }
 
@@ -101,7 +101,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
                         fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                     }
-                    handler = new DeSeqAnalysisHandler(selectedTraks, design, moreThanTwoConditions, fittingGroupOne,
+                    handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne, 
                             fittingGroupTwo, genomeID, workingWithoutReplicates,
                             saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
                 }
@@ -126,7 +126,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                         normalizationFeatures = (List<Integer>) wiz.getProperty("normalizationFeatures");
                     }
 
-                    handler = new SimpleTestAnalysisHandler(selectedTraks, groupA, groupB, genomeID,
+                    handler = new SimpleTestAnalysisHandler(selectedTracks, groupA, groupB, genomeID,
                             workingWithoutReplicates, saveFile, feature, startOffset, stopOffset,
                             readClassParams, regardReadOrientation, normalizationFeatures);
                 }

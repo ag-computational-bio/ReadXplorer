@@ -28,7 +28,7 @@ public class LogoDataManager {
     private static final int N = 5;
     private static final int READGAP = 6;
     
-    private Integer[][] counts; //array for the positions in the interval and all 7 base types (fwd and rev = 14)
+    private int[][] counts; //array for the positions in the interval and all 7 base types (fwd and rev = 14)
     private int absStart;
     private int stop;
     private int width;
@@ -55,76 +55,53 @@ public class LogoDataManager {
         this.upperCutoff = this.stop;
         this.maxFoundCoverage = 0;
 
-        counts = new Integer[this.width][NO_BASE_FIELDS];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < NO_BASE_FIELDS; j++) {
-                counts[i][j] = 0;
-            }
+        counts = new int[this.width][NO_BASE_FIELDS];
+    }
+    
+    /**
+     * Retrieves the count for the given base (row) at the given position for
+     * the given strand for the interval stored in this logo data manager.
+     * @param position the position whose base count is needed
+     * @param forwardStrand true, if the base is on the fwd strand, false otherwise
+     * @param row the row value for the needed base at the given position
+     * @return the coverage value for the given row (base) at the given position
+     * and strand
+     */
+    private int getCountForPos(int position, boolean forwardStrand, int row) {
+        if (!forwardStrand) {
+            row += NO_BASE_TYPES;
         }
+        position -= absStart;
+        return counts[position][row];
     }
 
     
     public int getNumOfMatchesAt(int position, boolean forwardStrand) {
-        int row = MATCH;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, MATCH);
     }
 
     public int getNumOfAAt(int position, boolean forwardStrand) {
-        int row = A;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, A);
     }
 
     public int getNumOfCAt(int position, boolean forwardStrand) {
-        int row = C;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, C);
     }
 
     public int getNumOfGAt(int position, boolean forwardStrand) {
-        int row = G;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, G);
     }
 
     public int getNumOfTAt(int position, boolean forwardStrand) {
-        int row = T;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, T);
     }
 
     public int getNumOfNAt(int position, boolean forwardStrand) {
-        int row = N;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, N);
     }
 
     public int getNumOfReadGapsAt(int position, boolean forwardStrand) {
-        int row = READGAP;
-        if (!forwardStrand) {
-            row += NO_BASE_TYPES;
-        }
-        position -= absStart;
-        return counts[position][row];
+        return getCountForPos(position, forwardStrand, READGAP);
     }
 
     /**
@@ -146,7 +123,8 @@ public class LogoDataManager {
     /**
      * If a base differs from the reference genome, add it to this manager.
      * @param diff diff to add
-     * @param position position at which the diff occurs
+     * @param position relative position at which the diff occurs, taking into
+     * account previous gaps and insertions
      */
     public void addExtendedPersistantDiff(PersistantDiff diff, int position) {
         char base = diff.getBase();
@@ -195,6 +173,11 @@ public class LogoDataManager {
         return sb.toString();
     }
 
+    /**
+     * Add all gaps for the currently viewed interval.
+     * @param gaps the collection of gaps to add
+     * @param gapManager the genome gap manager for the given gaps
+     */
     public void addGaps(Collection<PersistantReferenceGap> gaps, GenomeGapManager gapManager) {
         for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
             PersistantReferenceGap gap = it.next();
@@ -238,6 +221,10 @@ public class LogoDataManager {
         }
     }
 
+    /**
+     * @return The highest coverage observed in the interval stored in this
+     * logo data manager.
+     */
     public int getMaxFoundCoverage() {
         return maxFoundCoverage;
     }

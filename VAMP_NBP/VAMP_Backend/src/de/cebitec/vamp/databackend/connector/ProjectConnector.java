@@ -37,8 +37,8 @@ public class ProjectConnector extends Observable {
     private String password;
     private String adapter;
     private HashMap<Integer, TrackConnector> trackConnectors;
-//    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
-    private List<MultiTrackConnector> multiTrackConnectors;
+    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
+//    private List<MultiTrackConnector> multiTrackConnectors;
     private HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
     private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
@@ -85,8 +85,8 @@ public class ProjectConnector extends Observable {
      */
     private ProjectConnector() {
         trackConnectors = new HashMap<>();
-//        multiTrackConnectors = new HashMap<Integer, MultiTrackConnector>();
-        multiTrackConnectors = new ArrayList<>();
+        multiTrackConnectors = new HashMap<>();
+//        multiTrackConnectors = new ArrayList<>();
         refConnectors = new HashMap<>();
     }
 
@@ -94,6 +94,10 @@ public class ProjectConnector extends Observable {
      * Clears all track an reference connector lists of this ProjectConnector.
      */
     private void cleanUp() {
+        Iterator<Integer> trackConIt = trackConnectors.keySet().iterator();
+        while (trackConIt.hasNext()) {
+            trackConnectors.get(trackConIt.next()).close();
+        }
         trackConnectors.clear();
         refConnectors.clear();
     }
@@ -913,8 +917,8 @@ public class ProjectConnector extends Observable {
 
         try {
             if (!track.isStepwise() || this.isLastTrack) {
-            // get latest id for track
-            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
+            // get latest id for statistic
+            long latestid = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
 
                 CoverageContainer cov = track.getCoverageContainer();
                 if (cov.getCoveredPerfectPositions() > 0) {
@@ -941,7 +945,7 @@ public class ProjectConnector extends Observable {
                 //calculate average read length
                 int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
                 try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
-                    insertStatistics.setLong(1, id);
+                    insertStatistics.setLong(1, latestid+1);
                     insertStatistics.setLong(2, trackID);
                     insertStatistics.setInt(3, this.numMappings);
                     insertStatistics.setInt(4, this.numPerfectMappings);
@@ -1515,14 +1519,19 @@ public class ProjectConnector extends Observable {
     
     
     public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) {
-        // makes sure the track id is not already used
-        int id = 9999;
-        for (PersistantTrack track : tracks) {
-            id += track.getId();
+        try {
+            // makes sure the track id is not already used
+            int id = 9999;
+            for (PersistantTrack track : tracks) {
+                id += track.getId();
+            }
+            // only return new object, if no suitable connector was created before
+            multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
+            return multiTrackConnectors.get(id);
+        } catch (FileNotFoundException ex) { //cannot occur, since tracks were already opened
+            Exceptions.printStackTrace(ex);
+            return null;
         }
-        // only return new object, if no suitable connector was created before
-//        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
-        return multiTrackConnectors.get(id);
     }
     
     /**

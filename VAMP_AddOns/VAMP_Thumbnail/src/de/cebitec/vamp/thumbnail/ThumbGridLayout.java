@@ -55,10 +55,10 @@ public class ThumbGridLayout implements Layout {
                 child.resolveBounds(new Point(lx, ly), new Rectangle(x, y, 0, 0));
             }
             col++;
-            if(col == columns){
+            if (col == columns) {
                 col = 0;
                 posX = 0;
-                posY +=maxHeight;
+                posY += maxHeight;
             }
         }
     }

@@ -40,7 +40,7 @@ public class MappingThread extends RequestThread {
     private int trackId;
     private Connection con;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
-    List<PersistantMapping> currentMappings;
+    private List<PersistantMapping> currentMappings;
     private boolean isDbUsed;
     private final PersistantReference refGenome;
     private SamBamFileReader externalDataReader;
@@ -405,4 +405,13 @@ public class MappingThread extends RequestThread {
     public int getTrackId() {
         return trackId;
     }
+
+    /**
+     * Releases unneeded resources.
+     */
+    public void close() {
+        if (externalDataReader != null) {
+            this.externalDataReader.close();
+        }
+    }    
 }

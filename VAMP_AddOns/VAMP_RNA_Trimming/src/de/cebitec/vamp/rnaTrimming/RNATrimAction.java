@@ -6,15 +6,12 @@ package de.cebitec.vamp.rnaTrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
-import de.cebitec.vamp.correlationAnalysis.CorrelationResultPanel;
 import de.cebitec.vamp.mapping.api.MappingApi;
-import de.cebitec.vamp.rnaTrimming.TrimMethod;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
@@ -25,7 +22,6 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.RequestProcessor;
 
 
 
@@ -34,7 +30,7 @@ import org.openide.util.RequestProcessor;
 id = "de.cebitec.vamp.rnaTrimming.RNATrimAction")
 @ActionRegistration(
     displayName = "#CTL_RNATrimAction")
-@ActionReference(path = "Menu/Tools", position = 154)
+@ActionReference(path = "Menu/Tools", position = 155)
 @Messages("CTL_RNATrimAction=Trim upmapped RNA reads in a file")
 public final class RNATrimAction implements ActionListener {
     static String PROP_TRIMMETHOD = "PROP_TRIMMETHOD";

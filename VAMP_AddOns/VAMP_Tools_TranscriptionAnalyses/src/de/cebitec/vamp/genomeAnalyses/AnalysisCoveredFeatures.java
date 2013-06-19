@@ -186,18 +186,15 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
     private boolean checkCanIncreaseBothStrands(PersistantCoverage coverage, int j) {
         boolean canIncrease = false;
         ParametersReadClasses readClassParams = analysisParams.getReadClassesParams();
-        if (readClassParams.isCommonMatchUsed()) {
-            if (coverage.getCommonFwdMult(j) + coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount()) {
+        if (readClassParams.isCommonMatchUsed() &&
+            coverage.getCommonFwdMult(j) + coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
-            }
-        } else if (readClassParams.isBestMatchUsed()) {
-            if (coverage.getBestMatchFwdMult(j) + coverage.getBestMatchRevMult(j) >= analysisParams.getMinCoverageCount()) {
+        } else if (readClassParams.isBestMatchUsed() &&
+            coverage.getBestMatchFwdMult(j) + coverage.getBestMatchRevMult(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
-            }
-        } else if (readClassParams.isPerfectMatchUsed()) {
-            if (coverage.getPerfectFwdMult(j) + coverage.getPerfectRevMult(j) >= analysisParams.getMinCoverageCount()) {
+        } else if (readClassParams.isPerfectMatchUsed() &&
+            coverage.getPerfectFwdMult(j) + coverage.getPerfectRevMult(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
-            }
         }
         return canIncrease;
     }
@@ -211,22 +208,20 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
     private boolean checkCanIncreaseOneStrand(PersistantCoverage coverage, int j, boolean isFwdStrand) {
         boolean canIncrease = false;
         ParametersReadClasses readClassParams = analysisParams.getReadClassesParams();
-        if (readClassParams.isCommonMatchUsed()) {
-            
-            if (    isFwdStrand && coverage.getCommonFwdMult(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount()) {
+        if (readClassParams.isCommonMatchUsed() &&
+            (isFwdStrand && coverage.getCommonFwdMult(j) >= analysisParams.getMinCoverageCount()
+                || !isFwdStrand && coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount())) {
                 canIncrease = true;
-            }
-        } else if (readClassParams.isBestMatchUsed()) {
-            if (    isFwdStrand && coverage.getBestMatchFwdMult(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getBestMatchRevMult(j) >= analysisParams.getMinCoverageCount()) {
+                
+        } else if (readClassParams.isBestMatchUsed() &&
+            (isFwdStrand && coverage.getBestMatchFwdMult(j) >= analysisParams.getMinCoverageCount()
+                || !isFwdStrand && coverage.getBestMatchRevMult(j) >= analysisParams.getMinCoverageCount())) {
                 canIncrease = true;
-            }
-        } else if (readClassParams.isPerfectMatchUsed()) {
-            if (    isFwdStrand && coverage.getPerfectFwdMult(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getPerfectRevMult(j) >= analysisParams.getMinCoverageCount()) {
+                
+        } else if (readClassParams.isPerfectMatchUsed() &&
+            (isFwdStrand && coverage.getPerfectFwdMult(j) >= analysisParams.getMinCoverageCount()
+                || !isFwdStrand && coverage.getPerfectRevMult(j) >= analysisParams.getMinCoverageCount())) {
                 canIncrease = true;
-            }
         }
         return canIncrease;
     }

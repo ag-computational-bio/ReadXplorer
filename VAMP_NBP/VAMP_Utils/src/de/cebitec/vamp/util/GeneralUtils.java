@@ -219,14 +219,14 @@ public class GeneralUtils {
     */
     public static String implodeMap(String valueDelim, String entryDelim, Map map) {
         String asImplodedString;
-        if ((map==null) || (map.isEmpty())) {
+        if ((map == null) || (map.isEmpty())) {
             asImplodedString = "";
         }
         else {
             StringBuilder sb = new StringBuilder();
             Boolean firstLine = true;
             for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
-                if (!firstLine) sb.append(entryDelim);
+                if (!firstLine) { sb.append(entryDelim); }
                 Map.Entry line = (Map.Entry) it.next();
                 sb.append(line.getKey());
                 sb.append(valueDelim);
@@ -254,6 +254,32 @@ public class GeneralUtils {
      */
     public static String formatNumber(Long number) {
         return NumberFormat.getInstance().format( number );
+    }
+    
+    /**
+     * Preliminary method for enshorting an Illumina based read name from single
+     * or paired end to a still unique name, which can save memory. 
+     * Use with care!
+     * @param readName the read name to enshorten
+     * @return the short read name, if it was possible to shorten it. Otherwise
+     * the original read name is returned
+     */
+    public static String enshortenReadName(String readName) {
+        String shortReadName = readName;
+        String[] nameArray;
+        if (readName.startsWith("@")) {
+            nameArray = readName.split(":");
+            if (nameArray.length == 5) {
+                shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
+                if (shortReadName.contains("#")) {
+                    nameArray = shortReadName.split("#");
+                    shortReadName = nameArray[0] + nameArray[1].split("/")[1];
+                }
+            } else if (nameArray.length == 10) {
+                shortReadName = nameArray[4] + nameArray[5] + nameArray[6];
+            }
+        }
+        return shortReadName;
     }
     
 }

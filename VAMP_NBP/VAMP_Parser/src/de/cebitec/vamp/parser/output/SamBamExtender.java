@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import net.sf.samtools.*;
 import net.sf.samtools.util.RuntimeEOFException;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -149,18 +150,23 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                     if (!e.getMessage().contains("MAPQ should be 0")) {
                         this.notifyObservers(e.getMessage());
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                } catch (Exception e) {
+                    this.notifyObservers(e.getMessage());
+                    Exceptions.printStackTrace(e);
                 }
             }
             
             samBamItor.close();
             samBamFileWriter.close();
         }
-
-        SAMFileReader samReaderNew = new SAMFileReader(outputFile);
-        samReaderNew.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
-        SamUtils utils = new SamUtils();
-        utils.registerObserver(this);
-        boolean success = utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
+        
+        boolean success = false;
+        try (SAMFileReader samReaderNew = new SAMFileReader(outputFile)) {
+            samReaderNew.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+            SamUtils utils = new SamUtils();
+            utils.registerObserver(this);
+            success = utils.createIndex(samReaderNew, new File(outputFile + Properties.BAM_INDEX_EXT));
+        }
 
         return success;
     }

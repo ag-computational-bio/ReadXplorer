@@ -22,8 +22,8 @@ import org.openide.util.NbBundle.Messages;
 id = "de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction")
 @ActionRegistration(
     displayName = "#CTL_CorrelationAnalysisAction")
-@ActionReference(path = "Menu/Tools", position = 3333) 
-@Messages("CTL_CorrelationAnalysisAction=Analyse tracks correlation ")
+@ActionReference(path = "Menu/Tools", position = 156) 
+@Messages("CTL_CorrelationAnalysisAction=Correlation analysis")
 public final class CorrelationAnalysisAction implements ActionListener {
     public final static String PROP_SELECTED_TRACKS = "PROP_SELECTED_TRACKS";
     public final static String PROP_INTERVALLENGTH = "PROP_INTERVALLENGTH";

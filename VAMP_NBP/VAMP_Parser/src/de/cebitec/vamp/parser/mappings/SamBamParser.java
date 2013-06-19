@@ -214,6 +214,7 @@ public class SamBamParser implements MappingParserI {
 
         this.seqToIDMap = null; //release resources
         this.readnames = null;
+        sam.close();
         
         if (mappingContainer.getMappedSequenceIDs().isEmpty()) { //if track does not contain any reads
             throw new ParsingException(NbBundle.getMessage(SamBamParser.class, "Parser.Empty.Track.Error"));
