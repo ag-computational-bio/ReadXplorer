@@ -19,16 +19,6 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="trimMaximumSlider" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="trimMaximumLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="trimMethodLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="trimMethodCombo" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="sourceFileLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="0" pref="151" max="32767" attributes="0"/>
-                  </Group>
                   <Group type="102" attributes="0">
                       <Component id="sourceFileLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="275" max="32767" attributes="0"/>
@@ -43,6 +33,18 @@
                           <Component id="openReferenceButton" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="openSourceButton" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
+                  </Group>
+                  <Component id="mappingParamField" alignment="0" pref="406" max="32767" attributes="0"/>
+                  <Component id="trimMaximumSlider" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="sourceFileLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="mappingParamLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="trimMaximumLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="trimMethodLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="trimMethodCombo" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -65,7 +67,11 @@
                   <Component id="sourceFileField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openSourceButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="mappingParamLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="mappingParamField" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="trimMaximumLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="trimMaximumSlider" min="-2" max="-2" attributes="0"/>
@@ -73,7 +79,7 @@
               <Component id="trimMethodLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="trimMethodCombo" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="111" max="32767" attributes="0"/>
+              <EmptySpace pref="60" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -114,11 +120,11 @@
       <Properties>
         <Property name="majorTickSpacing" type="int" value="10"/>
         <Property name="maximum" type="int" value="35"/>
-        <Property name="minorTickSpacing" type="int" value="1"/>
+        <Property name="minorTickSpacing" type="int" value="2"/>
         <Property name="paintLabels" type="boolean" value="true"/>
         <Property name="paintTicks" type="boolean" value="true"/>
         <Property name="snapToTicks" type="boolean" value="true"/>
-        <Property name="value" type="int" value="5"/>
+        <Property name="value" type="int" value="8"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="trimMethodLabel">
@@ -161,6 +167,20 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openReferenceButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="mappingParamLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/rnaTrimming/Bundle.properties" key="TrimSelectionCard.mappingParamLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="mappingParamField">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/rnaTrimming/Bundle.properties" key="TrimSelectionCard.mappingParamField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

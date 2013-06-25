@@ -34,6 +34,7 @@ id = "de.cebitec.vamp.mapping.MappingAction")
 public final class MappingAction implements ActionListener {
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
     static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
+    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
     
     
     private final LoginCookie context;
@@ -62,7 +63,8 @@ public final class MappingAction implements ActionListener {
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
             new MappingProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
-                    (String) wizardDescriptor.getProperty(PROP_SOURCEPATH)
+                    (String) wizardDescriptor.getProperty(PROP_SOURCEPATH),
+                    (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
                     );
         }
     }

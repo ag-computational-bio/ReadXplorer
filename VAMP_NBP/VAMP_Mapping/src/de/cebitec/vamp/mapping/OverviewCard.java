@@ -55,12 +55,15 @@ public class OverviewCard extends javax.swing.JPanel {
     private javax.swing.JTextArea overviewTextArea;
     // End of variables declaration//GEN-END:variables
 
-    void showGenereateOverview(String reference, String source) {
+    void showGenereateOverview(String reference, String source, String mappingParam) {
         overviewTextArea.setText("Reference file:\n");
         overviewTextArea.append(reference+"\n"+"\n");
         
         overviewTextArea.append("Reads file:\n");
         overviewTextArea.append(source+"\n"+"\n");
+        
+        overviewTextArea.append("Mapping parameters:\n");
+        overviewTextArea.append(mappingParam+"\n"+"\n");
         
     }
 

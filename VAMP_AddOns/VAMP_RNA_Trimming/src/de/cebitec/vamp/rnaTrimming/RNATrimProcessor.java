@@ -455,7 +455,8 @@ public class RNATrimProcessor  {
         }
     } 
     
-    public RNATrimProcessor(final String referencePath, final String sourcePath, final int maximumTrim, final TrimMethod method ) {
+    public RNATrimProcessor(final String referencePath, final String sourcePath, 
+            final int maximumTrim, final TrimMethod method, final String mappingParam) {
         NbBundle.getMessage(RNATrimProcessor.class, "RNATrimProcessor.output.name");
         this.io = IOProvider.getDefault().getIO("RNATrimProcessor", true);
         this.io.setOutputVisible(true);
@@ -505,7 +506,7 @@ public class RNATrimProcessor  {
                 String sam = null;
                 String extractedSam = null;
                 try {
-                    if (!canceled) sam = MappingApi.mapFastaFile(io, referencePath, fasta);
+                    if (!canceled) sam = MappingApi.mapFastaFile(io, referencePath, fasta, mappingParam);
                     if (!canceled) extractedSam = extractOriginalSequencesInSamFile(sam, true);
                     if (!canceled) FileUtils.delete(sam);
                     if (!canceled) FileUtils.delete(fasta);

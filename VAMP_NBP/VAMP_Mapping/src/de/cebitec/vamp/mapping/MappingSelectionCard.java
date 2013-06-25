@@ -69,6 +69,8 @@ public class MappingSelectionCard extends javax.swing.JPanel {
         sourceFileLabel1 = new javax.swing.JLabel();
         referenceFileField = new javax.swing.JTextField();
         openReferenceButton = new javax.swing.JButton();
+        mappingParamLabel = new javax.swing.JLabel();
+        mappingParamField = new javax.swing.JTextField();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -99,6 +101,10 @@ public class MappingSelectionCard extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(mappingParamLabel, org.openide.util.NbBundle.getMessage(MappingSelectionCard.class, "MappingSelectionCard.mappingParamLabel.text")); // NOI18N
+
+        mappingParamField.setText(org.openide.util.NbBundle.getMessage(MappingSelectionCard.class, "MappingSelectionCard.mappingParamField.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -106,9 +112,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(sourceFileLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(sourceFileLabel)
                         .addContainerGap(562, Short.MAX_VALUE))
@@ -119,7 +122,13 @@ public class MappingSelectionCard extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(openReferenceButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(openSourceButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(openSourceButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(mappingParamField, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sourceFileLabel1)
+                            .addComponent(mappingParamLabel))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -136,7 +145,11 @@ public class MappingSelectionCard extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sourceFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(openSourceButton))
-                .addContainerGap(251, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mappingParamLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mappingParamField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(195, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -155,6 +168,10 @@ public class MappingSelectionCard extends javax.swing.JPanel {
     
     public String getReferencePath() {
         return this.referenceFileField.getText();
+    }
+    
+    public String getMappingParam() {
+        return this.mappingParamField.getText();
     }
     
     
@@ -178,6 +195,8 @@ public class MappingSelectionCard extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JTextField mappingParamField;
+    private javax.swing.JLabel mappingParamLabel;
     private javax.swing.JButton openReferenceButton;
     private javax.swing.JButton openSourceButton;
     private javax.swing.JTextField referenceFileField;
@@ -185,4 +204,8 @@ public class MappingSelectionCard extends javax.swing.JPanel {
     private javax.swing.JLabel sourceFileLabel;
     private javax.swing.JLabel sourceFileLabel1;
     // End of variables declaration//GEN-END:variables
+
+    public void setMappingParam(String lastMappingParams) {
+        this.mappingParamField.setText(lastMappingParams);
+    }
 }
