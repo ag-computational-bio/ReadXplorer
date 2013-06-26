@@ -191,8 +191,10 @@ public class ExcelExporter {
         if (entry instanceof Integer || entry instanceof Byte || entry instanceof Long) {
             return "INTEGER";
         } else if (entry instanceof String || entry instanceof Character
-                || entry instanceof CharSequence || entry instanceof Double) {
+                || entry instanceof CharSequence) {
             return "STRING";
+        } else if (entry instanceof Double) {
+            return "DOUBLE";
         } else if (entry instanceof Float) {
             return "FLOAT";
         } else {
@@ -232,7 +234,11 @@ public class ExcelExporter {
             Double value = Double.parseDouble(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);
             sheet.addCell(number);
-        } else if (celltype.equals("FLOAT")) {
+        } else if (celltype.equals("DOUBLE")) {
+            Double value = Double.parseDouble(cellvalue.toString());
+            Number number = new Number(column, row, value);
+            sheet.addCell(number);
+        }else if (celltype.equals("FLOAT")) {
             WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.FLOAT);
             Float value = Float.parseFloat(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);
