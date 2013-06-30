@@ -132,4 +132,5 @@ public class Properties {
     
     /** '-1' For reference features, which do not have a parent. */
     public static final String NO_PARENT_STRING = "-1";
+    public static String MAPPER_PARAMS = "MAPPER_PARAMS";
 }

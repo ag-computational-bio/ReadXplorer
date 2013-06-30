@@ -43,7 +43,7 @@ public class MappingProcessor  {
         this.io.getOut().println(msg);
     }
     
-    public MappingProcessor(final String referencePath, final String sourcePath) {
+    public MappingProcessor(final String referencePath, final String sourcePath, final String mappingParam) {
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(MappingProcessor.class, "MappingProcessor.output.name"), true);
         this.io.setOutputVisible(true);
         this.io.getOut().println("");
@@ -71,7 +71,7 @@ public class MappingProcessor  {
                 String sam = null;
                 String extractedSam = null;
                 try {
-                    sam = MappingApi.mapFastaFile(io, referencePath, sourcePath);
+                    sam = MappingApi.mapFastaFile(io, referencePath, sourcePath, mappingParam);
                     showMsg("Extraction ready!");
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);

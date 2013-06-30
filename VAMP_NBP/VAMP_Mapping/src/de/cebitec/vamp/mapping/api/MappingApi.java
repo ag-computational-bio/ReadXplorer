@@ -28,8 +28,19 @@ public class MappingApi {
         return NbPreferences.forModule(Object.class).get(Properties.MAPPER_PATH, "/dev/null");
     }
     
-    public static String mapFastaFile(InputOutput io, String reference, String fasta) throws IOException {     
+    public static String getLastMappingParams() {
+        return NbPreferences.forModule(Object.class).get(Properties.MAPPER_PARAMS, "");
+    }
+    
+    public static void setLastMappingParams(String params) { 
+        NbPreferences.forModule(Object.class).put(Properties.MAPPER_PARAMS, params);
+    }
+    
+    public static String mapFastaFile(InputOutput io, String reference, String fasta, String mappingParameters) throws IOException {     
         if (MappingApi.checkMapperConfig()) {
+            //remember mapping params for future executions
+            setLastMappingParams(mappingParameters);
+            
             ProgressHandle ph = ProgressHandleFactory.createHandle(
                     NbBundle.getMessage(MappingProcessor.class, "MSG_MappingApi.mapFastaFile.Start", "mapFastaFile"));
             ph.start();
@@ -37,7 +48,7 @@ public class MappingApi {
             String basename = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(fasta);
             File fastafile = new File(basename);
             basename = fastafile.getName();
-            new CommandLineUtils(io).runCommandAndWaitUntilEnded(MappingApi.getMapperPath(), reference, fasta, basename);
+            new CommandLineUtils(io).runCommandAndWaitUntilEnded(MappingApi.getMapperPath(), reference, fasta, basename, mappingParameters);
 
             ph.finish();
             return fastafile.getAbsolutePath()+".sam";

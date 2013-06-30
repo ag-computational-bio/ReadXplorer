@@ -37,6 +37,7 @@ public final class RNATrimAction implements ActionListener {
     static String PROP_TRIMMAXIMUM = "PROP_TRIMMAXIMUM";
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
     static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
+    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
     
     
     private final LoginCookie context;
@@ -70,7 +71,8 @@ public final class RNATrimAction implements ActionListener {
                 new RNATrimProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
                         (String) wizardDescriptor.getProperty(PROP_SOURCEPATH), 
                         (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
-                        (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD)
+                        (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD),
+                        (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
                         );
 
 

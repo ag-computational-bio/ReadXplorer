@@ -55,7 +55,8 @@ public class MappingOverviewPanel implements WizardDescriptor.Panel<WizardDescri
     public void readSettings(WizardDescriptor settings) {
         component.showGenereateOverview(
                 settings.getProperty(MappingAction.PROP_REFERENCEPATH).toString(),
-                settings.getProperty(MappingAction.PROP_SOURCEPATH).toString()
+                settings.getProperty(MappingAction.PROP_SOURCEPATH).toString(),
+                settings.getProperty(MappingAction.PROP_MAPPINGPARAM).toString()
                 );
     }
 

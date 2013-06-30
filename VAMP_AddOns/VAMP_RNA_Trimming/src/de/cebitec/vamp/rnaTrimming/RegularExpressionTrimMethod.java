@@ -79,14 +79,14 @@ public class RegularExpressionTrimMethod extends TrimMethod {
         else if (t.equals(Type.VARIABLE_LEFT)) 
             return new RegularExpressionTrimMethod("^(A{0,%X%})(.*?)$", 2, 1, GROUPNUMBER_UNUSED, "trim poly-A from 5' end (left to right) by variable length", "v_l");
         else if (t.equals(Type.VARIABLE_BOTH)) 
-            return new RegularExpressionTrimMethod("^(A{0,%X%})(.*?)(A{0,%X%})$", 2, 1, 3, "trim poly-A from 3' and from 5' end by variable length", "v_lr");
+            return new HalfedLengthTrimMethod("^(A{0,%X%})(.*?)(A{0,%X%})$", 2, 1, 3, "trim poly-A from 3' and from 5' end by variable length", "v_lr");
         else if (t.equals(Type.FIXED_RIGHT)) 
             return new RegularExpressionTrimMethod("^(.*?)(.{%X%})$", 1, GROUPNUMBER_UNUSED, 2, "trim all nucleotides from 3' end (right to left) by fixed length", "f_r");
         else if (t.equals(Type.FIXED_LEFT)) 
             return new RegularExpressionTrimMethod("^(.{%X%})(.*?)$", 2, 1, GROUPNUMBER_UNUSED, "trim all nucleotides from 5' end (left to right) by fixed length", "f_l");
         else if (t.equals(Type.FIXED_BOTH)) 
-            return new RegularExpressionTrimMethod("^(.{%X%})(.*?)(.{%X%})$", 2, 1, 3, "trim all nucleotides from 3' and from 5' end by fixed length", "f_lr");
+            return new HalfedLengthTrimMethod("^(.{%X%})(.*?)(.{%X%})$", 2, 1, 3, "trim all nucleotides from 3' and from 5' end by fixed length", "f_lr");
         
-        else return new RegularExpressionTrimMethod("^(.{%X%})(.*?)(.{%X%})$", 2, 1, 3, "UNKNOWN", "unkn");
+        else return new HalfedLengthTrimMethod("^(.{%X%})(.*?)(.{%X%})$", 2, 1, 3, "UNKNOWN", "unkn");
     }
 }
