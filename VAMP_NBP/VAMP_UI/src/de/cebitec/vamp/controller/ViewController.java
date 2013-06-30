@@ -5,6 +5,7 @@ import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManagerFactory;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
@@ -43,15 +44,19 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
         trackToPanel = new HashMap<>();
         registerInLookup();
+        this.boundsinfomanagerfactory = new BoundsInfoManagerFactory();
     }
     
     private void registerInLookup(){
         CentralLookup.getDefault().add(this);
     }
     
+    private BoundsInfoManagerFactory boundsinfomanagerfactory;
+    
     public void openGenome(PersistantReference genome) {
         currentRefGen = genome;
-        boundsManager = new BoundsInfoManager(currentRefGen);
+        
+        boundsManager = this.boundsinfomanagerfactory.get(currentRefGen);
         basePanelFac = new BasePanelFactory(boundsManager, this);
         genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
         getApp().showRefGenPanel(genomeViewer);
