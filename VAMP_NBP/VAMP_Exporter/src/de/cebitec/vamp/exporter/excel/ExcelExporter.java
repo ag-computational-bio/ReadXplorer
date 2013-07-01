@@ -231,7 +231,7 @@ public class ExcelExporter {
             sheet.addCell(label);
         } else if (celltype.equals("INTEGER")) {
             WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.INTEGER);
-            Double value = Double.parseDouble(cellvalue.toString());
+            Integer value = Integer.parseInt(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);
             sheet.addCell(number);
         } else if (celltype.equals("DOUBLE")) {

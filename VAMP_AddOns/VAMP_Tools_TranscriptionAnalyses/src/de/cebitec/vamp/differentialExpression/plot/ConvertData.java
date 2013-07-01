@@ -1,14 +1,15 @@
 package de.cebitec.vamp.differentialExpression.plot;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.util.Pair;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -17,34 +18,36 @@ import java.util.Vector;
  */
 public class ConvertData {
 
-    public static List<Pair<Double, Double>> ratioABagainstConfidence(ResultDeAnalysis result) {
-        List<Pair<Double, Double>> ret = new ArrayList<>();
+    public static Map<PersistantFeature, Pair<Double, Double>> ratioABagainstConfidence(ResultDeAnalysis result) {
+        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         Vector resultTable = result.getTableContents();
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();
+            PersistantFeature key = (PersistantFeature) row.get(0);
             Double X = (Double) row.get(7);
             Double Y = (Double) row.get(9);
             Pair<Double, Double> values = new Pair<>(X, Y);
-            ret.add(values);
+            ret.put(key, values);
         }
         return ret;
     }
 
-    public static List<Pair<Double, Double>> ratioBAagainstConfidence(ResultDeAnalysis result) {
-        List<Pair<Double, Double>> ret = new ArrayList<>();
+    public static Map<PersistantFeature, Pair<Double, Double>> ratioBAagainstConfidence(ResultDeAnalysis result) {
+        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         Vector resultTable = result.getTableContents();
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();
+            PersistantFeature key = (PersistantFeature) row.get(0);
             Double X = (Double) row.get(8);
             Double Y = (Double) row.get(9);
             Pair<Double, Double> values = new Pair<>(X, Y);
-            ret.add(values);
+            ret.put(key, values);
         }
         return ret;
     }
 
-    public static List<Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool) {
-        List<Pair<Double, Double>> input = new ArrayList<>();
+    public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool) {
+        Map<PersistantFeature, Pair<Double, Double>> input = new HashMap<>();
         switch (usedTool) {
             case BaySeq:
                 input = convertBaySeqResults(result.getTableContents());
@@ -56,9 +59,10 @@ public class ConvertData {
                 input = convertSimpleTestResults(result.getTableContents());
                 break;
         }
-        List<Pair<Double, Double>> ret = new ArrayList<>();
-        for (Iterator<Pair<Double, Double>> it = input.iterator(); it.hasNext();) {
-            Pair<Double, Double> pair = it.next();
+        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
+        for (Iterator<PersistantFeature> it = input.keySet().iterator(); it.hasNext();) {
+            PersistantFeature key = it.next();
+            Pair<Double, Double> pair = input.get(key);
             Double R = (Double) pair.getFirst();
             Double G = (Double) pair.getSecond();
             Double M = (Math.log(R) / Math.log(2)) - (Math.log(G) / Math.log(2));
@@ -77,28 +81,29 @@ public class ConvertData {
             //this point the values are in correct order for plotting, meaning that 
             //the value corresponding to the X-Axis is the first and the one corresponding
             //to the Y-Axis is the secound one.
-            ret.add(new Pair<>(A, M));
+            ret.put(key, new Pair<>(A, M));
         }
         return ret;
     }
 
-    private static List<Pair<Double, Double>> convertBaySeqResults(Vector<Vector> resultTable) {
+    private static Map<PersistantFeature, Pair<Double, Double>> convertBaySeqResults(Vector<Vector> resultTable) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private static List<Pair<Double, Double>> convertDESeqResults(Vector<Vector> resultTable) {
+    private static Map<PersistantFeature, Pair<Double, Double>> convertDESeqResults(Vector<Vector> resultTable) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private static List<Pair<Double, Double>> convertSimpleTestResults(Vector<Vector> resultTable) {
-        List<Pair<Double, Double>> ret = new ArrayList<>();
+    private static Map<PersistantFeature, Pair<Double, Double>> convertSimpleTestResults(Vector<Vector> resultTable) {
+        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         //For GNU R Version:
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();
+            PersistantFeature key = (PersistantFeature) row.get(0);
             Double X = (Double) row.get(3);
             Double Y = (Double) row.get(5);
             Pair<Double, Double> values = new Pair<>(X, Y);
-            ret.add(values);
+            ret.put(key, values);
         }
         return ret;
     }

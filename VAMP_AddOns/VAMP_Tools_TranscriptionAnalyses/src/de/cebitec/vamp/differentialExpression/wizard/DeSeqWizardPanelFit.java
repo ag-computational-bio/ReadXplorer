@@ -4,8 +4,6 @@
  */
 package de.cebitec.vamp.differentialExpression.wizard;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.util.List;
 import java.util.Map;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;

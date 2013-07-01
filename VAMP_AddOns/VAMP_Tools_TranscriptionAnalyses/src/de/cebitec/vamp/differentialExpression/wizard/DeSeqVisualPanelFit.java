@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 public final class DeSeqVisualPanelFit extends JPanel {
 
     private DefaultListModel<String> allConditionGroupsModel = new DefaultListModel<>();
-    private DefaultListModel<String> FittingOneModel = new DefaultListModel<>();
-    private DefaultListModel<String> FittingTwoModel = new DefaultListModel<>();
+    private DefaultListModel<String> fittingOneModel = new DefaultListModel<>();
+    private DefaultListModel<String> fittingTwoModel = new DefaultListModel<>();
     private List<String> fittingGroupOne = new ArrayList<>();
     private List<String> fittingGroupTwo = new ArrayList<>();
 
@@ -23,10 +23,24 @@ public final class DeSeqVisualPanelFit extends JPanel {
     }
 
     public void updateConditionGroupsList(Set<String> conditionGroups) {
-        allConditionGroupsModel.clear();
+        boolean newDataSet = false;
         for (Iterator<String> it = conditionGroups.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            allConditionGroupsModel.addElement(currentGroup);
+            if (!allConditionGroupsModel.contains(currentGroup) 
+                    && !fittingOneModel.contains(currentGroup) 
+                    && !fittingTwoModel.contains(currentGroup)) {
+                newDataSet = true;
+                break;
+            }
+        }
+        if (newDataSet) {
+            allConditionGroupsModel.clear();
+            fittingOneModel.clear();
+            fittingTwoModel.clear();
+            for (Iterator<String> it = conditionGroups.iterator(); it.hasNext();) {
+                String currentGroup = it.next();
+                allConditionGroupsModel.addElement(currentGroup);
+            }
         }
     }
 
@@ -100,10 +114,10 @@ public final class DeSeqVisualPanelFit extends JPanel {
             }
         });
 
-        fittingTwoList.setModel(FittingTwoModel);
+        fittingTwoList.setModel(fittingTwoModel);
         jScrollPane3.setViewportView(fittingTwoList);
 
-        fittingOneList.setModel(FittingOneModel);
+        fittingOneList.setModel(fittingOneModel);
         jScrollPane2.setViewportView(fittingOneList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel3.text")); // NOI18N
@@ -174,7 +188,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
             allConditionGroupsModel.removeElement(currentGroup);
-            FittingOneModel.addElement(currentGroup);
+            fittingOneModel.addElement(currentGroup);
             fittingGroupOne.add(currentGroup);
         }
     }//GEN-LAST:event_addToFittingOneActionPerformed
@@ -183,7 +197,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
         List<String> tracks = fittingOneList.getSelectedValuesList();
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            FittingOneModel.removeElement(currentGroup);
+            fittingOneModel.removeElement(currentGroup);
             allConditionGroupsModel.addElement(currentGroup);
             fittingGroupOne.remove(currentGroup);
         }
@@ -194,7 +208,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
             allConditionGroupsModel.removeElement(currentGroup);
-            FittingTwoModel.addElement(currentGroup);
+            fittingTwoModel.addElement(currentGroup);
             fittingGroupTwo.add(currentGroup);
         }
     }//GEN-LAST:event_addToFittingTwoActionPerformed
@@ -203,7 +217,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
         List<String> tracks = fittingTwoList.getSelectedValuesList();
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            FittingTwoModel.removeElement(currentGroup);
+            fittingTwoModel.removeElement(currentGroup);
             allConditionGroupsModel.addElement(currentGroup);
             fittingGroupTwo.remove(currentGroup);
         }
