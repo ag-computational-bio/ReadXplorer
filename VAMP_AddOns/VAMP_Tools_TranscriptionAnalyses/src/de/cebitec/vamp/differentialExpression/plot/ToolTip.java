@@ -24,7 +24,6 @@ public class ToolTip implements XYToolTipGenerator {
         sb.append("Start: ").append(feature.getStart()).append("<br>");
         sb.append("Stop: ").append(feature.getStop()).append("<br>");
         sb.append("EC number: ").append(feature.getEcNumber()).append("</html>");
-        System.out.println(sb.toString());
         return sb.toString();
     }
 }

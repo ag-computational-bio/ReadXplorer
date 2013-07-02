@@ -3,7 +3,7 @@ package de.cebitec.vamp.plotting;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.Pair;
 import java.awt.Graphics2D;
-import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +18,7 @@ import org.jfree.chart.axis.NumberTick;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYShapeRenderer;
@@ -26,15 +27,12 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.TextAnchor;
-import org.jfree.util.ShapeUtilities;
 
 /**
  *
  * @author kstaderm
  */
 public class CreatePlots {
-    
-    private final static Shape cross = ShapeUtilities.createDiagonalCross(3, 1);
 
     public synchronized static ChartPanel createPlot(Map<PersistantFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
         XYSeriesCollection normal = new XYSeriesCollection();
@@ -44,20 +42,23 @@ public class CreatePlots {
             Pair<Double, Double> pair = data.get(key);
             Double X = pair.getFirst();
             Double Y = pair.getSecond();
-                nor.add(new PlotDataItem(key, X, Y));
+            nor.add(new PlotDataItem(key, X, Y));
         }
         normal.addSeries(nor);
         // create subplot 1...
         final XYItemRenderer renderer1 = new XYShapeRenderer();
-        renderer1.setSeriesShape(0, cross);
         renderer1.setBaseToolTipGenerator(toolTip);
         final NumberAxis domainAxis1 = new NumberAxis(xName);
         final NumberAxis rangeAxis1 = new NumberAxis(yName);
         final XYPlot subplot1 = new XYPlot(normal, domainAxis1, rangeAxis1, renderer1);
         JFreeChart chart = new JFreeChart(subplot1);
         chart.removeLegend();
-        final ChartPanel panel = new ChartPanel(chart, true, true, true, true, true);
+        ChartPanel panel = new ChartPanel(chart, true, true, true, true, true);
         panel.setInitialDelay(0);
+        panel.setMaximumDrawHeight(1080);
+        panel.setMaximumDrawWidth(1920);
+        panel.setMouseWheelEnabled(true);
+        panel.setMouseZoomable(true);
         return panel;
     }
 
@@ -91,19 +92,22 @@ public class CreatePlots {
         negInf.addSeries(neg);
         JFreeChart chart = createCombinedChart(normal, posInf, negInf, xName, yName, toolTip);
         chart.removeLegend();
-        final ChartPanel panel = new ChartPanel(chart, true, true, true, true, true);
+        ChartPanel panel = new ChartPanel(chart, true, true, true, true, true);
         panel.setInitialDelay(0);
+        panel.setMaximumDrawHeight(1080);
+        panel.setMaximumDrawWidth(1920);
+        panel.setMouseWheelEnabled(true);
+        panel.setMouseZoomable(true);
         return panel;
     }
 
     private synchronized static JFreeChart createCombinedChart(XYSeriesCollection normal,
-            XYSeriesCollection posInf, XYSeriesCollection negInf, String xName, String yName, XYToolTipGenerator toolTip) {       
+            XYSeriesCollection posInf, XYSeriesCollection negInf, String xName, String yName, XYToolTipGenerator toolTip) {
 
         // create subplot 1...
         final XYDataset data1 = normal;
         final XYItemRenderer renderer1 = new XYShapeRenderer();
         renderer1.setBaseToolTipGenerator(toolTip);
-        renderer1.setSeriesShape(0, cross);
         final NumberAxis rangeAxis1 = new NumberAxis(yName);
         final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer1);
         subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -112,7 +116,6 @@ public class CreatePlots {
         final XYDataset data2 = negInf;
         final XYItemRenderer renderer2 = new XYShapeRenderer();
         renderer2.setBaseToolTipGenerator(toolTip);
-        renderer2.setSeriesShape(0, cross);
         final NumberAxis rangeAxis2 = new NumberAxis() {
             @Override
             public List refreshTicks(Graphics2D g2, AxisState state,
@@ -130,7 +133,6 @@ public class CreatePlots {
         final XYDataset data3 = posInf;
         final XYItemRenderer renderer3 = new XYShapeRenderer();
         renderer3.setBaseToolTipGenerator(toolTip);
-        renderer3.setSeriesShape(0, cross);
         final NumberAxis rangeAxis3 = new NumberAxis() {
             @Override
             public List refreshTicks(Graphics2D g2, AxisState state,

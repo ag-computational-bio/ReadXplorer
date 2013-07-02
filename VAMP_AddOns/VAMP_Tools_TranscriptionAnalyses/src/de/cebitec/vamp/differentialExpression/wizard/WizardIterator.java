@@ -64,8 +64,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private SelectReadClassWizardPanel readClassPanel;
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
+    public void actionPerformed(ActionEvent e) {        
             initializePanels();
             wiz = new WizardDescriptor(this);
             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
@@ -138,12 +137,6 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 ProcessingLog.getInstance().setProperties(wiz.getProperties());
                 handler.start();
             }
-        } else {
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: JRI native library can't be found in the PATH. Please add it to the PATH and try again.", currentTimestamp);
-            JOptionPane.showMessageDialog(null, "JRI native library can't be found in the PATH. Please add it to the PATH and try again.",
-                    "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-        }
     }
 
     private void initializePanels() {

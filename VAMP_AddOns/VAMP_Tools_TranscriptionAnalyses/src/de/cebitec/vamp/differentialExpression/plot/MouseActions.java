@@ -20,7 +20,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class MouseActions implements ChartMouseListener {
     
     private ReferenceFeatureTopComp refComp;
-
+    
     public MouseActions() {
         refComp = ReferenceFeatureTopComp.findInstance();
     }
@@ -36,12 +36,12 @@ public class MouseActions implements ChartMouseListener {
             showPosition(clickedItem.getFeature());
         }
     }
-
+    
     @Override
     public void chartMouseMoved(ChartMouseEvent cme) {
     }
     
-        private void showPosition(PersistantFeature feature) {
+    private void showPosition(PersistantFeature feature) {
         if (feature != null) {
             int pos = feature.getStart();
             Collection<ViewController> viewControllers;

@@ -58,6 +58,16 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         public String toString() {
             return stringRep;
         }
+        
+        public static Tool[] usableTools(){
+            if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
+                return Tool.values();
+            } else {
+                Tool[] ret = new Tool[1];
+                ret[0] = SimpleTest;
+                return ret;
+            }
+        }
     }
 
     public static enum AnalysisStatus {
@@ -66,7 +76,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     public DeAnalysisHandler(List<PersistantTrack> selectedTracks, Integer refGenomeID,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset,
             ParametersReadClasses readClassParams, boolean regardReadOrientation) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTracks = selectedTracks;
@@ -93,7 +103,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
                 CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset, regardReadOrientation);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number " 
+                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number "
                         + currentTrack.getId() + ".", readClassParams);
                 handler.setMappingsNeeded(true);
                 handler.registerObserver(collCovData);
