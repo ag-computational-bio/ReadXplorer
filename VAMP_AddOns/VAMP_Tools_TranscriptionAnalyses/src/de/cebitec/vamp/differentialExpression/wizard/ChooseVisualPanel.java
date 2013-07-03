@@ -2,19 +2,23 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool;
+import de.cebitec.vamp.differentialExpression.GnuR;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
 public final class ChooseVisualPanel extends JPanel {
     
-    private ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.values());
+    private ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.usableTools());
 
     /**
      * Creates new form ChooseVisualPanel
      */
     public ChooseVisualPanel() {
-        initComponents();       
+        initComponents();
+        if(!GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()){
+            jriErrorText.setText("JRI native library can't be found in the PATH.\nPlease add it to the PATH and try again.\nOnly the SimpleTest can be used as long as no GNU R is installed.");
+        }
     }
     
     public DeAnalysisHandler.Tool getSelectedTool(){
@@ -38,6 +42,8 @@ public final class ChooseVisualPanel extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jComboBox1 = new javax.swing.JComboBox(cbm);
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jriErrorText = new javax.swing.JTextArea();
 
         setPreferredSize(new java.awt.Dimension(420, 320));
 
@@ -50,6 +56,12 @@ public final class ChooseVisualPanel extends JPanel {
         jTextArea1.setBorder(null);
         jScrollPane1.setViewportView(jTextArea1);
 
+        jriErrorText.setEditable(false);
+        jriErrorText.setBackground(new java.awt.Color(240, 240, 240));
+        jriErrorText.setColumns(20);
+        jriErrorText.setRows(5);
+        jScrollPane2.setViewportView(jriErrorText);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -58,22 +70,27 @@ public final class ChooseVisualPanel extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(105, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jriErrorText;
     // End of variables declaration//GEN-END:variables
 }

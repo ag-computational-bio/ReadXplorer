@@ -6,6 +6,7 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -21,7 +22,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
      * component from this class, just use getComponent().
      */
     private DeSeqVisualPanelDesign component;
-    private List<PersistantTrack> tracks;
+    private List<PersistantTrack> tracks = null;
     private Map<String, String[]> design;
 
     // Get the visual component for the panel. In this template, the component
@@ -64,8 +65,23 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        tracks = (List<PersistantTrack>) wiz.getProperty("tracks");
-        getComponent().setTracks(tracks);
+        List<PersistantTrack> tmpTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        boolean newTracks = false;
+        if (tracks == null) {
+            newTracks = true;
+        } else {
+            for (Iterator<PersistantTrack> it = tmpTracks.iterator(); it.hasNext();) {
+                PersistantTrack persistantTrack = it.next();
+                if (!tracks.contains(persistantTrack)) {
+                    newTracks = true;
+                    break;
+                }
+            }
+        }
+        if (newTracks) {
+            tracks = tmpTracks;
+            getComponent().setTracks(tracks);
+        }
     }
 
     @Override

@@ -61,7 +61,7 @@
                   <Component id="clearPlotsButton" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="plotPanel" pref="208" max="32767" attributes="0"/>
+              <Component id="plotPanel" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>

@@ -41,7 +41,6 @@ public class RNATrimProcessor  {
     private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
     private final static Logger LOG = Logger.getLogger(RNATrimProcessor.class.getName());
     private RequestProcessor.Task theTask = null;
-    //private InputOutput io;
     private String sourcePath;
     private boolean canceled = false;
     private final TrimProcessResult trimProcessResult;
@@ -227,69 +226,6 @@ public class RNATrimProcessor  {
         this.updateChartData();
         return newPath;  
     }
-    
-    /**
-     * Compute the histogram values and write them to the SAM file
-     * @param samfile the sam file containing the reads
-     * @param method the trim method to be used
-     */
-    /*private String extractOriginalSequencesInSamFile(String sampath) {  
-        //set path to the fasta file to be created
-        File samfile = new File(sampath);
-        String newPath = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(samfile)+"_with_histogram.sam";
-        
-        //set up the progress handle to indicate progress to the user
-        ProgressHandle ph = ProgressHandleFactory.createHandle(
-                NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sourcePath), 
-                new Cancellable() {
-            public boolean cancel() {
-                return handleCancel();
-            }
-        });
-        ph.start();
-        
-        //count the number of lines in the samfile, to estimate the progress
-        int lines = de.cebitec.vamp.util.FileUtils.countLinesInFile(samfile);
-        ph.switchToDeterminate(lines);
-        
-        int currentline = 0;
-        try (SAMFileReader samBamReader = new SAMFileReader(samfile)) { 
-            SAMRecordIterator samItor = samBamReader.iterator();
-            
-            SAMFileHeader header = samBamReader.getFileHeader();
-            SAMFileWriterFactory factory = new SAMFileWriterFactory();
-            File outputFile = new File(newPath);
-            SAMFileWriter writer = factory.makeSAMWriter(header, false, outputFile);
-            
-            while (samItor.hasNext() && (!this.canceled)) {
-                currentline++;
-                ph.progress(currentline);
-                
-                try {
-                    SAMRecord record = samItor.next();
-                    // the readname field will have the form
-                    // name:original:fullsequence
-                    // so try to split it into two parts 
-                    String[] parts = record.getReadName().split(":original:");
-                    if (parts.length==2) {
-                        record.setReadName(parts[0]);
-                        record.setAttribute("os", parts[1]); // os = original sequence
-                    }
-                    writer.addAlignment(record);
-                } catch(SAMFormatException e) {
-                    this.showMsg("Cought SAMFormatException for a record in your SAM file: "+e.getMessage());
-                }
-            }
-            writer.close();
-            samItor.close();
-            io.getOut().println(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Finish", samfile.getAbsolutePath()));
-        } catch (Exception e) {
-            Exceptions.printStackTrace(e);
-            io.getOut().println(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Failed", samfile.getAbsolutePath()));
-        }
-        ph.finish();
-        return newPath;  
-    }  */
     
     
     

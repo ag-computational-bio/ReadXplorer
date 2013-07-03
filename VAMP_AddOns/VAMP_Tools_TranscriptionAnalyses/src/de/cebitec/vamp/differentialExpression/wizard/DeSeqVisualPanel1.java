@@ -74,7 +74,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(twoConditionsRB)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
                         .addComponent(moreConditionsRB)))
                 .addContainerGap())
         );
@@ -90,6 +90,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
                 .addGap(91, 91, 91))
         );
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;

@@ -1,14 +1,17 @@
 package de.cebitec.vamp.differentialExpression.plot;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observer;
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import de.cebitec.vamp.util.Pair;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import javax.swing.DefaultComboBoxModel;
 import org.jfree.chart.ChartPanel;
@@ -30,7 +33,7 @@ import org.openide.util.NbBundle.Messages;
         persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.plot.PlotTopComponent")
-//@ActionReference(path = "Menu/Tools" /*, position = 333 */)
+@ActionReference(path = "Menu/Window")
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_PlotAction",
         preferredID = "PlotTopComponent")
@@ -46,13 +49,16 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     private DeAnalysisHandler analysisHandler;
     private List<ResultDeAnalysis> results;
     private DeAnalysisHandler.Tool usedTool;
+    private MouseActions mouseAction = new MouseActions();
 
     public PlotTopComponent() {
+        cbmDataSet = new DefaultComboBoxModel<>();
         initComponents();
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
-        ChartPanel panel = CreatePlots.createInfPlot(createSamplePoints(5000),"X","Y");
-        plotPanel.add(panel, BorderLayout.CENTER);
+        ChartPanel panel = CreatePlots.createInfPlot(createSamplePoints(500), "X", "Y", new ToolTip());
+        panel.addChartMouseListener(mouseAction);
+        plotPanel.add(panel);
         plotPanel.updateUI();
 
     }
@@ -72,20 +78,23 @@ public final class PlotTopComponent extends TopComponent implements Observer {
         setToolTipText(Bundle.HINT_PlotTopComponent());
     }
 
-    public List<Pair<Double, Double>> createSamplePoints(int n) {
+    public Map<PersistantFeature, Pair<Double, Double>> createSamplePoints(int n) {
         Random r = new Random(System.nanoTime());
-        List<Pair<Double, Double>> points = new ArrayList<>();
+        Map<PersistantFeature, Pair<Double, Double>> points = new HashMap<>();
         for (int i = 0; i < n; i++) {
+            PersistantFeature dummyFeature = new PersistantFeature(0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
             double random = Math.random();
             if (random > 0.95) {
-                points.add(new Pair<>(r.nextDouble() * 256.0d, Double.POSITIVE_INFINITY));
-                points.add(new Pair<>(r.nextDouble() * 256.0d, Double.NEGATIVE_INFINITY));
+                points.put(dummyFeature, new Pair<>(r.nextDouble() * 256.0d, Double.POSITIVE_INFINITY));
+                points.put(dummyFeature, new Pair<>(r.nextDouble() * 256.0d, Double.NEGATIVE_INFINITY));
             } else {
-                points.add(new Pair<>(2 * i + (r.nextGaussian() - 0.5d), r.nextDouble() * 256.0d));
+                points.put(dummyFeature, new Pair<>(2 * i + (r.nextGaussian() - 0.5d), r.nextDouble() * 256.0d));
             }
         }
-        points.add(new Pair<>(200d, 300d));
-        points.add(new Pair<>(100d, Double.POSITIVE_INFINITY));
+        PersistantFeature dummyFeature = new PersistantFeature(0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
+        points.put(dummyFeature, new Pair<>(200d, 300d));
+        dummyFeature = new PersistantFeature(0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
+        points.put(dummyFeature, new Pair<>(100d, Double.POSITIVE_INFINITY));
         return points;
     }
 
@@ -168,7 +177,7 @@ public final class PlotTopComponent extends TopComponent implements Observer {
                         .addComponent(jLabel2))
                     .addComponent(clearPlotsButton))
                 .addGap(18, 18, 18)
-                .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -180,17 +189,20 @@ public final class PlotTopComponent extends TopComponent implements Observer {
         ChartPanel panel;
         switch (type) {
             case MA_Plot:
-                panel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool),"A","M");
+                panel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool), "A", "M", new ToolTip());
+                panel.addChartMouseListener(mouseAction);
                 plotPanel.add(panel);
                 plotPanel.updateUI();
                 break;
             case RatioAB_Confidence:
-                panel = CreatePlots.createPlot(ConvertData.ratioABagainstConfidence(result),"ratioAB","Confidence");
+                panel = CreatePlots.createPlot(ConvertData.ratioABagainstConfidence(result), "ratioAB", "Confidence", new ToolTip());
+                panel.addChartMouseListener(mouseAction);
                 plotPanel.add(panel);
                 plotPanel.updateUI();
                 break;
             case RatioBA_Confidence:
-                panel = CreatePlots.createPlot(ConvertData.ratioBAagainstConfidence(result),"ratioBA","Confidence");
+                panel = CreatePlots.createPlot(ConvertData.ratioBAagainstConfidence(result), "ratioBA", "Confidence", new ToolTip());
+                panel.addChartMouseListener(mouseAction);
                 plotPanel.add(panel);
                 plotPanel.updateUI();
                 break;
