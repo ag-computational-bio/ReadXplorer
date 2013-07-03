@@ -7,24 +7,15 @@ package de.cebitec.vamp.rnaTrimming;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.mapping.api.MappingApi;
+import de.cebitec.vamp.util.SimpleOutput;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.StackedBarChart;
-import javafx.scene.chart.XYChart;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFileWriter;
@@ -39,8 +30,6 @@ import org.openide.util.Cancellable;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
-import org.openide.windows.IOProvider;
-import org.openide.windows.InputOutput;
 
 /**
  * SamTrimmer allows to filter unmapped entries in SAM file
@@ -52,9 +41,10 @@ public class RNATrimProcessor  {
     private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
     private final static Logger LOG = Logger.getLogger(RNATrimProcessor.class.getName());
     private RequestProcessor.Task theTask = null;
-    private InputOutput io;
+    //private InputOutput io;
     private String sourcePath;
     private boolean canceled = false;
+    private final TrimProcessResult trimProcessResult;
     
     
     private Map<String, Integer> computeMappingHistogram(SAMFileReader samBamReader) {
@@ -104,17 +94,17 @@ public class RNATrimProcessor  {
         
         //int allReads = 0;
         //int mapped = 0;
-        this.mappedReads = 0;
+        this.trimProcessResult.setMappedReads(0);
         int currentline = 0;
         try (SAMFileReader samBamReader = new SAMFileReader(samfile)) { 
             SAMRecordIterator samItor = samBamReader.iterator();
 
             FileWriter fileWriter = new FileWriter(new File(fastaPath));
             BufferedWriter fasta = new BufferedWriter(fileWriter);
-            this.trimmedReads = 0;
+            this.trimProcessResult.setTrimmedReads(0);
             while (samItor.hasNext() && (!this.canceled)) {
                 currentline++;
-                this.allReads = currentline;
+                this.trimProcessResult.setAllReads(currentline);
                 ph.progress(currentline);
                 
                 //update chart after every 1000 lines
@@ -124,15 +114,15 @@ public class RNATrimProcessor  {
                     SAMRecord record = samItor.next();
                     String separator = ":os:";
                     if (record.getReadUnmappedFlag()) {
-                        TrimResult trimResult = method.trim(record.getReadString());
+                        TrimMethodResult trimResult = method.trim(record.getReadString());
                         fasta.write(">"+record.getReadName()+separator+record.getReadString()
                           +separator+trimResult.getTrimmedCharsFromLeft()
                           +separator+trimResult.getTrimmedCharsFromRight()+"\n");
                         fasta.write(trimResult.getSequence()+"\n"); 
-                        this.trimmedReads++;
+                        this.trimProcessResult.incrementTrimmedReads();
                     }
                     else {
-                        this.mappedReads++;
+                        this.trimProcessResult.incrementMappedReads();
                     }
                     
                 } catch(SAMFormatException e) {
@@ -187,7 +177,7 @@ public class RNATrimProcessor  {
             SAMFileWriterFactory factory = new SAMFileWriterFactory();
             File outputFile = new File(newPath);
             SAMFileWriter writer = factory.makeSAMWriter(header, false, outputFile);
-            this.trimmedMappedReads = 0;
+            this.trimProcessResult.setTrimmedMappedReads(0);
             while (samItor.hasNext() && (!this.canceled)) {
                 currentline++;
                 ph.progress(currentline);
@@ -218,7 +208,7 @@ public class RNATrimProcessor  {
                     }
                     
                     if (!record.getReadUnmappedFlag()) {
-                       this.trimmedMappedReads++; 
+                       this.trimProcessResult.incrementTrimmedMappedReads(); 
                     }
                     
                 } catch(SAMFormatException e) {
@@ -228,10 +218,10 @@ public class RNATrimProcessor  {
             writer.close();
             samItor.close();
             
-            io.getOut().println(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Finish", samfile.getAbsolutePath()));
+            this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Finish", samfile.getAbsolutePath()));
         } catch (Exception e) {
             Exceptions.printStackTrace(e);
-            io.getOut().println(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Failed", samfile.getAbsolutePath()));
+            this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Failed", samfile.getAbsolutePath()));
         }
         ph.finish();
         this.updateChartData();
@@ -312,155 +302,37 @@ public class RNATrimProcessor  {
      * @param msg the msg to print
      */
     private void showMsg(String msg) {
-       
-        this.io.getOut().println(msg);
+       this.panelOutput.println(msg);
     }
     
-    private Integer allReads = 0;
-    private Integer mappedReads = 0;
-    private Integer trimmedReads = 0;
-    private Integer trimmedMappedReads = 0;
+    private PrintStream panelOutput;
     
-    private void updateChartData() {
-        if (this.statisticsWindow!=null) { 
-            Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                //Integer unmappedReads = allReads;
-                /*if (pieChartData!=null) {
-                    pieChartData.clear();
-                    if (mappedReads==null) {    
-                        pieChartData.add(new PieChart.Data("all reads", allReads));
-                    }
-                    else {
-                        unmappedReads -= mappedReads;
-                        pieChartData.add(new PieChart.Data("fully mapped reads", mappedReads));
-                        if (trimmedMappedReads==null) { 
-                            if (trimmedReads!=null) {
-                                unmappedReads -= trimmedReads;
-                                pieChartData.add(new PieChart.Data("trimmed reads", trimmedReads));
-                            }
-                        }
-                        else {
-                            unmappedReads -= trimmedMappedReads;
-                            pieChartData.add(new PieChart.Data("trimmed mapped reads", trimmedMappedReads));
-                        }
-                        pieChartData.add(new PieChart.Data("unmapped reads", unmappedReads));
-                    }
-
-
-                }*/
-
-                /*
-                 * new XYChart.Data<String, Number>(all, mappedReads);
-                series1.getData().add();
-                series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
-                series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
-                series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));
-                 */
-                whole_mapped_data.setYValue(mappedReads);
-                whole_unmapped_data.setYValue(allReads-mappedReads);
-                trimmed_mapped_data.setYValue(trimmedMappedReads);
-                trimmed_unmapped_data.setYValue(trimmedReads-trimmedMappedReads);
-
-
-            }});
-        
-            statisticsWindow.setVisible(true);
-            statisticsWindow.toFront();
-        }
-        
-    }
     
-    private JFrame statisticsWindow; 
-    XYChart.Series<String, Number> series1;
-    XYChart.Series<String, Number> series2;
-    String all = "source";
-    String trimmed = "trimmed";
-    
-    XYChart.Data<String, Number> whole_mapped_data;
-    XYChart.Data<String, Number> whole_unmapped_data;
-    XYChart.Data<String, Number> trimmed_mapped_data;
-    XYChart.Data<String, Number> trimmed_unmapped_data;
-    StackedBarChart<String, Number> chart;
-    
-    private boolean plattformIsSupported = true;
-    
-    public void createStatisticsWindow() throws InterruptedException {       
-        if (this.plattformIsSupported) {
-            // SunOS is not supported by JavaFX
-            // in this case an exception will be trown. it is safe to ignore it
-            // and continue without showing stats window to the user
-            try {
-
-                this.statisticsWindow = new JFrame("Read statistics");
-                statisticsWindow.setSize(500, 500);
-                final JFXPanel fxPanel = new JFXPanel();
-                statisticsWindow.add(fxPanel);
-
-                Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    //Stage primaryStage = new Stage();
-                    Group root = new Group();
-                    fxPanel.setScene(new Scene(root));
-                     /*pieChartData = FXCollections.observableArrayList(
-
-                     );*/
-                    CategoryAxis xAxis = new CategoryAxis();
-                    NumberAxis yAxis = new NumberAxis(); 
-                    yAxis.setAutoRanging(true);
-                    chart =
-                    new StackedBarChart<String, Number>(xAxis, yAxis);
-                    chart.setAnimated(false);
-                    series2 = new XYChart.Series<String, Number>();
-                    series1 = new XYChart.Series<String, Number>();
-
-                    series1.setName("mapped");
-                    series2.setName("unmapped");
-
-                    series1.getData().clear();
-                    series1.getData().clear();
-                    whole_unmapped_data = new XYChart.Data<String, Number>(all, 1);
-                    whole_mapped_data = new XYChart.Data<String, Number>(all, 1);
-                    trimmed_unmapped_data = new XYChart.Data<String, Number>(trimmed, 1);
-                    trimmed_mapped_data = new XYChart.Data<String, Number>(trimmed, 1);   
-
-                    series1.getData().add(trimmed_mapped_data);
-                    series2.getData().add(trimmed_unmapped_data);
-                    series1.getData().add(whole_mapped_data);
-                    series2.getData().add(whole_unmapped_data);
-
-                    /*series2.getData().add(new XYChart.Data<String, Number>(all, allReads-mappedReads));
-                    series1.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedMappedReads));
-                    series2.getData().add(new XYChart.Data<String, Number>(trimmed, trimmedReads-trimmedMappedReads));*/
-
-                    xAxis.setLabel("Data");
-                    xAxis.setCategories(FXCollections.<String>observableArrayList(
-                        Arrays.asList(all, trimmed)));
-                    yAxis.setLabel("Reads");
-
-                    chart.setCategoryGap(5);
-                    chart.getData().addAll(series2, series1);
-
-                    //chart.setClockwise(false);
-                    root.getChildren().add(chart);
-
-                }});
-            } catch(UnsupportedOperationException e) {
-                this.showMsg("Could not intialize statistics window: "+e.getLocalizedMessage());
-                this.statisticsWindow = null;
-                this.plattformIsSupported = false;
-            }
-        }
-    } 
     
     public RNATrimProcessor(final String referencePath, final String sourcePath, 
             final int maximumTrim, final TrimMethod method, final String mappingParam) {
         NbBundle.getMessage(RNATrimProcessor.class, "RNATrimProcessor.output.name");
-        this.io = IOProvider.getDefault().getIO("RNATrimProcessor", true);
-        this.io.setOutputVisible(true);
-        this.io.getOut().println("");
+        //this.io = IOProvider.getDefault().getIO("RNATrimProcessor", true);
+        //this.io.setOutputVisible(true);
+        //this.io.getOut().println("");
+        String shortFileName = FileUtils.getName(sourcePath);
+        
+        TrimResultTopComponent tc = TrimResultTopComponent.findInstance();
+        tc.open();
+        tc.requestActive();
+        final TrimResultPanel resultView = tc.openResultTab(shortFileName);
+        this.trimProcessResult = new TrimProcessResult();
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("referencePath", referencePath);
+        params.put("sourcePath", sourcePath);
+        params.put("maximumTrim", maximumTrim);
+        params.put("method", method);
+        params.put("mappingParam", mappingParam);
+        this.trimProcessResult.setAnalysisParameters(params);
+        resultView.setAnalysisResult(this.trimProcessResult);
+        final PrintStream output = resultView.getOutput(); 
+        this.panelOutput = output;
+        
         this.sourcePath = sourcePath;
         method.setMaximumTrimLength(maximumTrim);
         
@@ -473,12 +345,12 @@ public class RNATrimProcessor  {
             
         });
         CentralLookup.getDefault().add(this);
-        try {
+        /*try {
             io.getOut().reset();
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        io.select();
+        io.select();*/
         
         //the trim processor will:
         // 1. open source sam file
@@ -506,7 +378,18 @@ public class RNATrimProcessor  {
                 String sam = null;
                 String extractedSam = null;
                 try {
-                    if (!canceled) sam = MappingApi.mapFastaFile(io, referencePath, fasta, mappingParam);
+                    if (!canceled) sam = MappingApi.mapFastaFile(new SimpleOutput() {
+
+                    @Override
+                    public void showMessage(String s) {
+                         showMsg(s);
+                    }
+
+                    @Override
+                    public void showError(String s) {
+                        showMsg(s);
+                    }
+                }, referencePath, fasta, mappingParam);
                     if (!canceled) extractedSam = extractOriginalSequencesInSamFile(sam, true);
                     if (!canceled) FileUtils.delete(sam);
                     if (!canceled) FileUtils.delete(fasta);
@@ -514,9 +397,11 @@ public class RNATrimProcessor  {
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
+                trimProcessResult.ready();
+                resultView.ready();
                 
-                showMsg("trimmed reads: " + trimmedReads);
-                showMsg("trimmed mapped reads: " + trimmedMappedReads);
+                showMsg("trimmed reads: " + trimProcessResult.getTrimmedReads());
+                showMsg("trimmed mapped reads: " + trimProcessResult.getTrimmedMappedReads());
                 
             }
 
@@ -528,7 +413,7 @@ public class RNATrimProcessor  {
         theTask.schedule(1*1000); //start the task with a delay of 1 seconds
         
         
-        SwingUtilities.invokeLater(new Runnable() {
+        /*SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
                     createStatisticsWindow();
@@ -537,7 +422,7 @@ public class RNATrimProcessor  {
                 }
             }
         });
-        
+        */
         
                  
         
@@ -548,5 +433,9 @@ public class RNATrimProcessor  {
          this.canceled = true;
          this.showMsg(NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.cancel", sourcePath));
          return true;
+    }
+
+    private void updateChartData() {
+        this.trimProcessResult.notifyChanged();
     }
 }

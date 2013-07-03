@@ -8,12 +8,12 @@ package de.cebitec.vamp.rnaTrimming;
  * TrimResult is produced by the execution of a TrimMethod
  * @author Evgeny Anisiforov
  */
-public class TrimResult {
+public class TrimMethodResult {
     private String sequence;
     private int trimmedCharsFromLeft;
     private int trimmedCharsFromRight;
     
-    public TrimResult(String sequence, int trimmedCharsFromLeft, int trimmedCharsFromRight) {
+    public TrimMethodResult(String sequence, int trimmedCharsFromLeft, int trimmedCharsFromRight) {
         setSequence(sequence);
         setTrimmedCharsFromLeft(trimmedCharsFromLeft);
         setTrimmedCharsFromRight(trimmedCharsFromRight);

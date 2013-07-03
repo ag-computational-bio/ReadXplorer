@@ -43,9 +43,9 @@ public class RegularExpressionTrimMethod extends TrimMethod {
     }
     
     @Override
-    public TrimResult trim(String sequence) {
+    public TrimMethodResult trim(String sequence) {
         Matcher matcher = regularexpression.matcher(sequence);
-        TrimResult result = new TrimResult(sequence, 0, 0);
+        TrimMethodResult result = new TrimMethodResult(sequence, 0, 0);
         if (matcher.find()) {
             result.setSequence(matcher.group(this.groupnumber_main));
             if (this.groupnumber_trimLeft>0) {

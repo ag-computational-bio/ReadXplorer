@@ -8,7 +8,7 @@ import de.cebitec.vamp.mapping.MappingProcessor;
 import de.cebitec.vamp.util.CommandLineUtils;
 import de.cebitec.vamp.util.FileUtils;
 import de.cebitec.vamp.util.Properties;
-import java.awt.Component;
+import de.cebitec.vamp.util.SimpleOutput;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -16,7 +16,6 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import org.openide.windows.InputOutput;
 
 /**
  * MappingAPI provides functions that can be accessed from outside this package
@@ -36,7 +35,7 @@ public class MappingApi {
         NbPreferences.forModule(Object.class).put(Properties.MAPPER_PARAMS, params);
     }
     
-    public static String mapFastaFile(InputOutput io, String reference, String fasta, String mappingParameters) throws IOException {     
+    public static String mapFastaFile(SimpleOutput out, String reference, String fasta, String mappingParameters) throws IOException {     
         if (MappingApi.checkMapperConfig()) {
             //remember mapping params for future executions
             setLastMappingParams(mappingParameters);
@@ -48,7 +47,7 @@ public class MappingApi {
             String basename = de.cebitec.vamp.util.FileUtils.getFilePathWithoutExtension(fasta);
             File fastafile = new File(basename);
             basename = fastafile.getName();
-            new CommandLineUtils(io).runCommandAndWaitUntilEnded(MappingApi.getMapperPath(), reference, fasta, basename, mappingParameters);
+            new CommandLineUtils(out).runCommandAndWaitUntilEnded(MappingApi.getMapperPath(), reference, fasta, basename, mappingParameters);
 
             ph.finish();
             return fastafile.getAbsolutePath()+".sam";

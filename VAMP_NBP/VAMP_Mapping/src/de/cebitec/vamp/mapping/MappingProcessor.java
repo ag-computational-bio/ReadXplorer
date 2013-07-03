@@ -8,6 +8,8 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.mapping.api.MappingApi;
 import de.cebitec.vamp.util.CommandLineUtils;
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.SimpleIO;
+import de.cebitec.vamp.util.SimpleOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -71,7 +73,7 @@ public class MappingProcessor  {
                 String sam = null;
                 String extractedSam = null;
                 try {
-                    sam = MappingApi.mapFastaFile(io, referencePath, sourcePath, mappingParam);
+                    sam = MappingApi.mapFastaFile(new SimpleIO(io), referencePath, sourcePath, mappingParam);
                     showMsg("Extraction ready!");
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
