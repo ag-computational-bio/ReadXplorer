@@ -28,7 +28,7 @@ public abstract class TrimMethod {
         this.maximumTrimLength = maximumTrimLength;
     }
     
-    public abstract TrimResult trim(String sequence);
+    public abstract TrimMethodResult trim(String sequence);
 
     /**
      * the shortname is filename-safe (i.e. alphanumeric, no spaces)

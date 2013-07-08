@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml3;
 
 /**
  * Contains general use utilities.
@@ -280,6 +281,10 @@ public class GeneralUtils {
             }
         }
         return shortReadName;
+    }
+    
+    public static String escapeHtml(String s) {
+        return escapeHtml3(s);
     }
     
 }

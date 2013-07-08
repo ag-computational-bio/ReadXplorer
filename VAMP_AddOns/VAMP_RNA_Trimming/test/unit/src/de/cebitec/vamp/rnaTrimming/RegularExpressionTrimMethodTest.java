@@ -52,7 +52,7 @@ public class RegularExpressionTrimMethodTest {
         
         method = RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.VARIABLE_BOTH);
         method.setMaximumTrimLength(6);
-        TrimResult r = method.trim(sequence);
+        TrimMethodResult r = method.trim(sequence);
         assertEquals("GGGCTTGCT", r.getSequence());
         assertEquals(3, r.getTrimmedCharsFromLeft());
         assertEquals(5, r.getTrimmedCharsFromRight());
