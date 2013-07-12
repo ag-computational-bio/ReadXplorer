@@ -6,7 +6,7 @@ package de.cebitec.vamp.rnaTrimming;
 
 /**
  * TrimResult is produced by the execution of a TrimMethod
- * @author Evgeny Anisiforov
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class TrimMethodResult {
     private String sequence;

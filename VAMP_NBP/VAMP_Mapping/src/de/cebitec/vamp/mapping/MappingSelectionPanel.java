@@ -17,8 +17,9 @@ import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
 /**
- *
- * @author jeff
+ * This is the gui part of the card for the selection of parameters of the mapping process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class MappingSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 

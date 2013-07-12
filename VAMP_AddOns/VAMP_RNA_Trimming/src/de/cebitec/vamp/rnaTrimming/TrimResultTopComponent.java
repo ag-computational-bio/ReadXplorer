@@ -6,7 +6,6 @@ package de.cebitec.vamp.rnaTrimming;
 
 import de.cebitec.vamp.correlationAnalysis.*;
 import de.cebitec.vamp.util.TabWithCloseX;
-import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.logging.Logger;
@@ -18,7 +17,9 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays something.
+ * This top component displays multiple tabs with results of a rna trimming process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
     dtd = "-//de.cebitec.vamp.correlationAnalysis//TrimResult//EN",

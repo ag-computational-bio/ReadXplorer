@@ -2,6 +2,7 @@ package de.cebitec.vamp.mapping;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -53,19 +54,21 @@ public final class MappingAction implements ActionListener {
             DialogDisplayer.getDefault().notify(nd);
             return;
         }
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
-        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(MappingAction.class, "CTL_MappingAction"));
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
-        dialog.setVisible(true);
-        dialog.toFront();
-        boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            new MappingProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
-                    (String) wizardDescriptor.getProperty(PROP_SOURCEPATH),
-                    (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
-                    );
+        if (MappingApi.checkMapperConfig()) { 
+            WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
+            // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+            wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
+            wizardDescriptor.setTitle(NbBundle.getMessage(MappingAction.class, "CTL_MappingAction"));
+            Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
+            dialog.setVisible(true);
+            dialog.toFront();
+            boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
+            if (!cancelled) {
+                new MappingProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
+                        (String) wizardDescriptor.getProperty(PROP_SOURCEPATH),
+                        (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
+                        );
+            }
         }
     }
     

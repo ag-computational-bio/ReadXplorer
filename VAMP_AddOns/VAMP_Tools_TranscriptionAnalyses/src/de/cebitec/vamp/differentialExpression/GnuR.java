@@ -99,7 +99,7 @@ public class GnuR extends Rengine {
     public void loadPackage(String packageName) throws PackageNotLoadableException {
         REXP result = this.eval("library(" + packageName + ")");
         if (result == null) {
-            this.eval("install.packages(\""+packageName+"\")");
+            this.eval("install.packages(\"" + packageName + "\")");
             result = this.eval("library(" + packageName + ")");
             if (result == null) {
                 throw new PackageNotLoadableException(packageName);
@@ -120,12 +120,84 @@ public class GnuR extends Rengine {
             super("JRI native library can't be found in the PATH. Please add it to the PATH and try again.");
         }
     }
-    
+
     public static class UnknownGnuRException extends Exception {
-        public UnknownGnuRException(Exception e){
+
+        public UnknownGnuRException(Exception e) {
             super("An unknown exception occurred in GNU R while processing your data. "
-                    + "This caused an "+e.getClass().getName()+" on the Java side of the programm.", e);
+                    + "This caused an " + e.getClass().getName() + " on the Java side of the programm.", e);
         }
+    }
+
+    @Override
+    public synchronized REXP eval(String string) {
+        return eval(string, true);
+    }
+
+    @Override
+    public synchronized REXP eval(String string, boolean bln) {
+        ProcessingLog.getInstance().logGNURoutput("> " + string + "\n");
+        return super.eval(string, bln);
+    }
+
+    @Override
+    public boolean assign(String string, String string1) {
+        ProcessingLog.getInstance().logGNURoutput("> assign: \"" + string1 + "\" to variable \"" + string + "\"\n");
+        return super.assign(string, string1);
+    }
+
+    @Override
+    public boolean assign(String string, REXP rexp) {
+        ProcessingLog.getInstance().logGNURoutput("> assign: \"" + rexp.asString() + "\" to variable \"" + string + "\"\n");
+        return super.assign(string, rexp);
+    }
+
+    @Override
+    public boolean assign(String string, double[] doubles) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < doubles.length; i++) {
+            sb.append(doubles[i]).append(";");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        ProcessingLog.getInstance().logGNURoutput("> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n");
+        return super.assign(string, doubles);
+    }
+
+    @Override
+    public boolean assign(String string, int[] ints) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < ints.length; i++) {
+            sb.append(ints[i]).append(";");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        ProcessingLog.getInstance().logGNURoutput("> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n");
+        return super.assign(string, ints);
+    }
+
+    @Override
+    public boolean assign(String string, boolean[] blns) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < blns.length; i++) {
+            sb.append(blns[i]).append(";");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        ProcessingLog.getInstance().logGNURoutput("> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n");
+        return super.assign(string, blns);
+    }
+
+    @Override
+    public boolean assign(String string, String[] strings) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < strings.length; i++) {
+            sb.append(strings[i]).append(";");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        ProcessingLog.getInstance().logGNURoutput("> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n");
+        return super.assign(string, strings);
     }
 
     private static class Callback implements RMainLoopCallbacks {
@@ -146,6 +218,7 @@ public class GnuR extends Rengine {
 
         @Override
         public void rShowMessage(Rengine rngn, String string) {
+            ProcessingLog.getInstance().logGNURoutput(string);
         }
 
         @Override
