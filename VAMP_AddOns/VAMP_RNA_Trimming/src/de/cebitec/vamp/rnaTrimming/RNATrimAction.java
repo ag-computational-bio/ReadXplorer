@@ -24,7 +24,10 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
 
-
+/**
+ * Creates a menu item for RNA Trimming
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 @ActionID(
     category = "Tools",
 id = "de.cebitec.vamp.rnaTrimming.RNATrimAction")
@@ -37,13 +40,10 @@ public final class RNATrimAction implements ActionListener {
     static String PROP_TRIMMAXIMUM = "PROP_TRIMMAXIMUM";
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
     static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
-    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
-    
+    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";    
     
     private final LoginCookie context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
-    
-    
     
     public RNATrimAction(LoginCookie context) {
         this.context = context;
@@ -68,23 +68,13 @@ public final class RNATrimAction implements ActionListener {
             dialog.toFront();
             boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
             if (!cancelled) {
+                //the actual trimming will be done in RNATrimProcessor 
                 new RNATrimProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
                         (String) wizardDescriptor.getProperty(PROP_SOURCEPATH), 
                         (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
                         (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD),
                         (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
                         );
-
-
-
-
-
-                /*List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
-                List<TrackJob> tracks2del = (List<TrackJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
-
-                DeletionThread dt = new DeletionThread(refs2del, tracks2del);
-                RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
-                rp.post(dt);*/
             }
         }
     }

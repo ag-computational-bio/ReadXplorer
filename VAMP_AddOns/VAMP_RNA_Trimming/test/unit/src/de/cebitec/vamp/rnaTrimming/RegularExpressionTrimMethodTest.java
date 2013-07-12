@@ -29,18 +29,23 @@ public class RegularExpressionTrimMethodTest {
     @Test
     public void testTrim() {
         RegularExpressionTrimMethod method;
-        String sequence = "AAAGGGCTTGCTAAAAA";        
+        String sequence = "AAAGGGCTTGCTAAAAA";  
+        TrimMethodResult r;
         method = RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_LEFT);
         method.setMaximumTrimLength(3);
-        assertEquals("GGGCTTGCTAAAAA", method.trim(sequence).getSequence());
+        r = method.trim(sequence);
+        assertEquals("GGGCTTGCTAAAAA", r.getSequence());
+        assertEquals("AAA@", r.getOsField());
         
         method = RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_RIGHT);
         method.setMaximumTrimLength(6);
-        assertEquals("AAAGGGCTTGC", method.trim(sequence).getSequence());
+        r = method.trim(sequence);
+        assertEquals("AAAGGGCTTGC", r.getSequence());
+        assertEquals("@TAAAAA", r.getOsField());
         
         method = RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_BOTH);
-        method.setMaximumTrimLength(3);
-        assertEquals("GGGCTTGCTAA", method.trim(sequence).getSequence());
+        method.setMaximumTrimLength(4);
+        assertEquals("AGGGCTTGCTAAA", method.trim(sequence).getSequence());
         
         method = RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.VARIABLE_LEFT);
         method.setMaximumTrimLength(3);
@@ -52,10 +57,11 @@ public class RegularExpressionTrimMethodTest {
         
         method = RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.VARIABLE_BOTH);
         method.setMaximumTrimLength(6);
-        TrimMethodResult r = method.trim(sequence);
-        assertEquals("GGGCTTGCT", r.getSequence());
+        r = method.trim(sequence);
+        assertEquals("GGGCTTGCTAA", r.getSequence());
+        assertEquals("AAA@AAA", r.getOsField());
         assertEquals(3, r.getTrimmedCharsFromLeft());
-        assertEquals(5, r.getTrimmedCharsFromRight());
+        assertEquals(3, r.getTrimmedCharsFromRight());
         
     }
 }

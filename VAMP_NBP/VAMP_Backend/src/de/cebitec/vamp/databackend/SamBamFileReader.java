@@ -124,7 +124,9 @@ public class SamBamFileReader implements Observable {
 
                     Object originalSequence = record.getAttribute("os");
                     if ((originalSequence != null) && (originalSequence instanceof String)) {
-                        mapping.setOriginalSequence((String) originalSequence);
+                        String ors = (String) originalSequence;
+                        ors = ors.replace("@", record.getReadString());
+                        mapping.setOriginalSequence(ors);
                     }
                     Object trimmedFromLeft = record.getIntegerAttribute("tl");
                     if ((trimmedFromLeft != null) && (trimmedFromLeft instanceof Integer)) {

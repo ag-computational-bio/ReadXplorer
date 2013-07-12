@@ -13,7 +13,7 @@ import org.openide.util.HelpCtx;
 
 /**
  * Panel for the parameter selection as part of the correlation analysis wizard 
- * @author Evgeny Anisiforov 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class ParameterSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 

@@ -19,7 +19,7 @@ package de.cebitec.vamp.rnaTrimming;
  * will result in --AAGGGAA-- (shortened 4 nucleotides in whole)
  * 
  * 
- * @author Evgeny Anisiforov
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class HalfedLengthTrimMethod extends RegularExpressionTrimMethod {
     public HalfedLengthTrimMethod(String regularexpression, int groupnumber_main, int groupnumber_trimLeft, int groupnumber_trimRight, String name, String shortName) {

@@ -21,14 +21,13 @@ import org.openide.util.NbBundle;
 
 /**
  * CorrelationAnalysisProcessor is a process of analysing correlation
- * of multiple (at least two) tracks
+ * of two tracks
  * @author Evgeny Anisiforov
  */
 public class CorrelationAnalysisProcessor implements ThreadListener {
     
     private static final int MINIMUMINTERVALLENGTH = 90000;
     
-    //private final InputOutput io;
     private Integer rightBound;
     private final Integer minCorrelation;
     private final Integer minPeakCoverage;
@@ -70,6 +69,15 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     private CorrelationResultPanel resultView;
     
+    /** creates a new CorrelationAnalysisProcessor and starts computing the 
+     *  correlation analysis 
+     * @param cc
+     * @param referenceViewer
+     * @param list
+     * @param intervalLength
+     * @param minCorrelation
+     * @param minPeakCoverage 
+     */ 
     public CorrelationAnalysisProcessor(CorrelationAnalysisAction.CorrelationCoefficient cc,
             ReferenceViewer referenceViewer, List<PersistantTrack> list, 
             Integer intervalLength, Integer minCorrelation, Integer minPeakCoverage) {
@@ -102,7 +110,6 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.minCorrelation = minCorrelation;
         this.minPeakCoverage = minPeakCoverage;
         this.correlationCoefficient = cc;
-        
         
         CorrelationResultTopComponent tc = CorrelationResultTopComponent.findInstance();
         tc.open();
@@ -157,7 +164,15 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         return peakCoverage;
     }
     
-    
+    /**
+     * copy coverage from the coverageResult to a double-Array to be 
+     * passed to the statistics package
+     * @param coverageResult
+     * @param direction
+     * @param from
+     * @param to
+     * @return 
+     */
     private double[] copyCoverage(CoverageAndDiffResultPersistant coverageResult, StrandDirection direction, int from, int to) {
         if (to < from) { throw new IllegalArgumentException("from value must be less than the to value"); }
         double[] result = new double[to-from];
@@ -169,6 +184,11 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         return result;
     }
     
+    /**
+     * computeStep is called, after the data of all track for the current step 
+     * has been received.
+     * @param direction 
+     */
     private void computeStep(StrandDirection direction) {
         int maximumCoveredPosition = this.resultList.get(0).getCoverage().getRightBound();
         while (this.currentPosition<maximumCoveredPosition-this.intervalLength) {
@@ -219,7 +239,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
         
         
-        if (this.currentPosition<this.rightBound-this.intervalLength) { //&& (!wasCanceled)) {
+        if (this.currentPosition<this.rightBound-this.intervalLength) { 
             ph.progress(this.currentPosition);
             if (canceled) { this.finish(); }
             else {requestNextStep(); }
@@ -242,6 +262,11 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
     }
     
+    /** 
+     *  This method is called to indicate that the analysis execution 
+     *  is finished. The resultView will be notified to display an 
+     *  appropriate message.
+     */
     private void finish() {
         ph.finish();
         ready = true;
@@ -249,17 +274,17 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     private ProgressHandle ph;
-
+    
+    /**
+     * this method is called to request the coverage for the next step
+     */
     private void requestNextStep() {
-
         this.resultList = new ArrayList<>();
-
         int t = currentStep;
         if (currentStep % 2 == 0) {
             t = steps - currentStep;
         }
 
-        //currentPosition = t * (CoverageThread.MINIMUMINTERVALLENGTH / SCANFACTOR) + 100;
         this.showMsg("Requesting position=" + currentPosition);
 
         try {
@@ -273,6 +298,11 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
     }
     
+    /**
+     * this method is called, if the user clicks on the cancel button
+     * to stop the execution of this analysis
+     * @return 
+     */
     private boolean handleCancel() {
         this.showMsg("handleCancel");
         this.canceled = true;
@@ -280,7 +310,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     }
     
     
-    /* receive data from CoverageThread and save it. Wait until the data for all tracks has arrived */
+    /** Receive data from CoverageThread and save it. 
+     * Wait until the data for all tracks has arrived */
     @Override
     public synchronized void receiveData(Object data) {
         if (data instanceof CoverageAndDiffResultPersistant) {
@@ -293,7 +324,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
     @Override
     public void notifySkipped() {
-        //throw new UnsupportedOperationException("Not supported yet.");
+        
     }
     
     

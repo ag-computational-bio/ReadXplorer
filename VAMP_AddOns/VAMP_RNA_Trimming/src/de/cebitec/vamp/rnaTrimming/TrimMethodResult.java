@@ -10,13 +10,15 @@ package de.cebitec.vamp.rnaTrimming;
  */
 public class TrimMethodResult {
     private String sequence;
+    private String originalSequence;
     private int trimmedCharsFromLeft;
     private int trimmedCharsFromRight;
     
-    public TrimMethodResult(String sequence, int trimmedCharsFromLeft, int trimmedCharsFromRight) {
+    public TrimMethodResult(String sequence, String originalSequence, int trimmedCharsFromLeft, int trimmedCharsFromRight) {
         setSequence(sequence);
         setTrimmedCharsFromLeft(trimmedCharsFromLeft);
         setTrimmedCharsFromRight(trimmedCharsFromRight);
+        setOriginalSequence(originalSequence);
     }
     
     /**
@@ -59,5 +61,31 @@ public class TrimMethodResult {
      */
     public void setTrimmedCharsFromRight(int trimmedCharsFromRight) {
         this.trimmedCharsFromRight = trimmedCharsFromRight;
+    }
+    
+    /** 
+     * the os field will contain the trimmed chars of the original
+     * sequence with the new sequence marked as @
+     * Example: AACGCCCA shortened by 2 nucleotides from left and right side will give
+     * os: AA@CA
+     */
+    public String getOsField() {
+        return originalSequence.substring(0, this.getTrimmedCharsFromLeft())
+           +"@"+originalSequence.substring(originalSequence.length()-this.getTrimmedCharsFromRight(), 
+                originalSequence.length());      
+    }
+
+    /**
+     * @return the originalSequence
+     */
+    public String getOriginalSequence() {
+        return originalSequence;
+    }
+
+    /**
+     * @param originalSequence the originalSequence to set
+     */
+    public void setOriginalSequence(String originalSequence) {
+        this.originalSequence = originalSequence;
     }
 }

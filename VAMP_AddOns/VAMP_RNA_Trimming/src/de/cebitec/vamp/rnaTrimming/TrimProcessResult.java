@@ -8,8 +8,11 @@ import java.util.Map;
 import java.util.Observable;
 
 /**
- *
- * @author Evgeny Anisiforov
+ * TrimProcessResult contains important data of a trimming process.
+ * The data of this object will be changed while processing the data.
+ * Interested objects can subscribe to those changes by using addObserver()-Method.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class TrimProcessResult extends Observable {
     private Integer allReads = 0;
@@ -21,6 +24,7 @@ class TrimProcessResult extends Observable {
   
     
     public TrimProcessResult() {
+        
     }
     
     /**

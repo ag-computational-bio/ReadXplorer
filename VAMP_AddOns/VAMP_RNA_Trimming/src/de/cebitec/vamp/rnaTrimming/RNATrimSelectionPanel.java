@@ -18,8 +18,8 @@ import org.openide.WizardDescriptor.Panel;
 import org.openide.util.HelpCtx;
 
 /**
- *
- * @author jeff
+ * This panel displays the card to select parameters for rna trimming process.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 

@@ -14,6 +14,7 @@ import org.openide.util.HelpCtx;
 
 /**
  * TrackListPanel displays a list of tracks for a certain reference
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class TrackListPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
     
@@ -33,17 +34,13 @@ public class TrackListPanel implements WizardDescriptor.FinishablePanel<WizardDe
     
 
     /**
-     * The SNP detection wizard main panel.
+     * Creates a new track list panel.
      * @param referenceId reference id 
      */
     public TrackListPanel(int referenceId) {
         this.changeSupport = new ChangeSupport(this);
         this.setReferenceId(referenceId);
     }
-    
-    
-    
-    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created

@@ -5,8 +5,8 @@ import java.util.List;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author evgeny
+ * Displayes an overview of selected trimming parameters.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class OverviewCard extends javax.swing.JPanel {
     

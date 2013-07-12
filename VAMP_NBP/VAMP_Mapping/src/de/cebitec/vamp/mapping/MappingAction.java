@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.mapping;
 
 import de.cebitec.centrallookup.CentralLookup;
@@ -23,7 +19,11 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
 
-
+/**
+ * MappingAction adds a menu item to start the mapping of a sequencing data set.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 @ActionID(
     category = "Tools",
 id = "de.cebitec.vamp.mapping.MappingAction")

@@ -161,7 +161,6 @@ public final class TrimResultTopComponent extends TopComponent {
      */
     public TrimResultPanel openResultTab(String title) {
         TrimResultPanel resultView = new TrimResultPanel();
-        //String title = "Trim RNA Reads";
         resultTabs.addTab(title, resultView);
         resultTabs.setTabComponentAt(resultTabs.getTabCount() - 1, new TabWithCloseX(resultTabs));
         return resultView;

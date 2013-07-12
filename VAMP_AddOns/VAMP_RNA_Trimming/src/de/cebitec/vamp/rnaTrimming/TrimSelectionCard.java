@@ -12,8 +12,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author jeff
+ * The card for the selection of parameters for a rna trimming process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class TrimSelectionCard extends javax.swing.JPanel {
     private File sourceFile;

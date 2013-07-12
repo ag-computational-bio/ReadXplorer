@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * RegularExpressionTrimMethod will trim a sequence based on the given 
- * regular expression
+ * RegularExpressionTrimMethod trims a sequence based on the given 
+ * regular expression.
  * @author Evgeny Anisiforov
  */
 public class RegularExpressionTrimMethod extends TrimMethod {
@@ -45,7 +45,7 @@ public class RegularExpressionTrimMethod extends TrimMethod {
     @Override
     public TrimMethodResult trim(String sequence) {
         Matcher matcher = regularexpression.matcher(sequence);
-        TrimMethodResult result = new TrimMethodResult(sequence, 0, 0);
+        TrimMethodResult result = new TrimMethodResult(sequence, sequence, 0, 0);
         if (matcher.find()) {
             result.setSequence(matcher.group(this.groupnumber_main));
             if (this.groupnumber_trimLeft>0) {
@@ -55,10 +55,8 @@ public class RegularExpressionTrimMethod extends TrimMethod {
                 result.setTrimmedCharsFromRight(matcher.group(this.groupnumber_trimRight).length());
             }
         }
-        //else {
         //if the pattern does not match, just return the full string
         return result;
-        //}
     }
     
     @Override
@@ -73,6 +71,9 @@ public class RegularExpressionTrimMethod extends TrimMethod {
     
     public final static int GROUPNUMBER_UNUSED = -1; 
     
+    /*
+     * a list of default instances is provided here
+     */
     public static RegularExpressionTrimMethod createNewInstance(Type t) {
         if (t.equals(Type.VARIABLE_RIGHT)) 
             return new RegularExpressionTrimMethod("^(.*?)(A{0,%X%})$", 1, GROUPNUMBER_UNUSED, 2, "trim poly-A from 3' end (right to left) by variable length", "v_r");

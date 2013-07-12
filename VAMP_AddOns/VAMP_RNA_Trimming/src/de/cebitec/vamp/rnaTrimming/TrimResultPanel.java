@@ -9,7 +9,6 @@ import de.cebitec.vamp.util.TextAreaOutputStream;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Label;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Observable;
@@ -25,7 +24,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -33,9 +31,9 @@ import org.openide.util.Exceptions;
 
 /**
  * The Panel that shows results for a correlation analysis of two tracks in a table
- * @author Evgeny Anisiforov
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-//@TopComponent.Registration(mode = "output", openAtStartup = false)
 public class TrimResultPanel extends JPanel implements Observer {
 
     /**
@@ -52,16 +50,10 @@ public class TrimResultPanel extends JPanel implements Observer {
                 }
             }
         });
-        //this.paramsLabel.setPreferredSize(new Dimension(1024,150));
     }
     
     private TrimProcessResult analysisResult;
-    
-    /*@Override
-    public int getPersistenceType() {
-        return PERSISTENCE_NEVER;
-    }*/
-    
+ 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -282,21 +274,16 @@ public class TrimResultPanel extends JPanel implements Observer {
     
     private void updateChartData() {
         if (this.plattformIsSupported) {
+            //the changes have to be run on the javafx thread 
             Platform.runLater(new Runnable() {
             @Override
             public void run() {
-
                 whole_mapped_data.setYValue(analysisResult.getMappedReads());
                 whole_unmapped_data.setYValue(analysisResult.getAllReads()-analysisResult.getMappedReads());
                 trimmed_mapped_data.setYValue(analysisResult.getTrimmedMappedReads());
                 trimmed_unmapped_data.setYValue(analysisResult.getTrimmedReads()-analysisResult.getTrimmedMappedReads());
-
-
             }});
-        
-            
         }
-        
     }
     
     /**
@@ -306,13 +293,11 @@ public class TrimResultPanel extends JPanel implements Observer {
      * @param msg the msg to print
      */
     private void showMsg(String msg) {
-       
         this.getOutput().println(msg);
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        //this.showMsg("got notify");
         this.updateChartData();
     }
 }

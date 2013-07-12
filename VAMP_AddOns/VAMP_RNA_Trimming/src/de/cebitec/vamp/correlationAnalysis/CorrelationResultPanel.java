@@ -40,11 +40,6 @@ public class CorrelationResultPanel extends JPanel {
     
     private CorrelationResult analysisResult;
     
-    /*@Override
-    public int getPersistenceType() {
-        return PERSISTENCE_NEVER;
-    }*/
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

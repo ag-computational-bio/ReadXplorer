@@ -35,7 +35,7 @@ import org.openide.util.RequestProcessor;
  * SamTrimmer allows to filter unmapped entries in SAM file
  * and trim them using a trim method.
  * The user will see a progress info.
- * @author jeff
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class RNATrimProcessor  {
     private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
@@ -112,9 +112,12 @@ public class RNATrimProcessor  {
                 try {
                     SAMRecord record = samItor.next();
                     String separator = ":os:";
+                    //String fullSequence = record.getReadString();
+                    
+
                     if (record.getReadUnmappedFlag()) {
                         TrimMethodResult trimResult = method.trim(record.getReadString());
-                        fasta.write(">"+record.getReadName()+separator+record.getReadString()
+                        fasta.write(">"+record.getReadName()+separator+trimResult.getOsField()
                           +separator+trimResult.getTrimmedCharsFromLeft()
                           +separator+trimResult.getTrimmedCharsFromRight()+"\n");
                         fasta.write(trimResult.getSequence()+"\n"); 
@@ -248,9 +251,6 @@ public class RNATrimProcessor  {
     public RNATrimProcessor(final String referencePath, final String sourcePath, 
             final int maximumTrim, final TrimMethod method, final String mappingParam) {
         NbBundle.getMessage(RNATrimProcessor.class, "RNATrimProcessor.output.name");
-        //this.io = IOProvider.getDefault().getIO("RNATrimProcessor", true);
-        //this.io.setOutputVisible(true);
-        //this.io.getOut().println("");
         String shortFileName = FileUtils.getName(sourcePath);
         
         TrimResultTopComponent tc = TrimResultTopComponent.findInstance();
@@ -281,12 +281,6 @@ public class RNATrimProcessor  {
             
         });
         CentralLookup.getDefault().add(this);
-        /*try {
-            io.getOut().reset();
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        io.select();*/
         
         //the trim processor will:
         // 1. open source sam file
@@ -347,21 +341,6 @@ public class RNATrimProcessor  {
         };
         theTask = RP.create(runnable); //the task is not started yet
         theTask.schedule(1*1000); //start the task with a delay of 1 seconds
-        
-        
-        /*SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    createStatisticsWindow();
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-        });
-        */
-        
-                 
-        
         
     }
     

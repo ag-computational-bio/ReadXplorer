@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.mapping;
 
 import java.beans.PropertyChangeListener;
@@ -11,11 +7,14 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
-/*@OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_ObjectCache",  
-
-keywords = "#OptionsCategory_Keywords_ObjectCache",
-keywordsCategory = "ObjectCache")
-*/
+/**
+ * MapperOptionsPanelController is an options panel to select the mapping script. 
+ * The mapping script is a bash script that encapsulates the mapper 
+ * functionality (which is often divided into multiple commands) 
+ * into a single script.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 @OptionsPanelController.TopLevelRegistration( 
         categoryName = "#OptionsCategory_Name_Mapper", 
         iconBase = "de/cebitec/vamp/mapping/mapper.png",

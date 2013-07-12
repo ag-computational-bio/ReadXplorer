@@ -5,8 +5,11 @@ import java.util.List;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author evgeny
+ * Display an overview of the selected paramets before the actual start of
+ * the mapping process. The user will be able to return to the parameters
+ * by clicking the "back" button.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class OverviewCard extends javax.swing.JPanel {
     

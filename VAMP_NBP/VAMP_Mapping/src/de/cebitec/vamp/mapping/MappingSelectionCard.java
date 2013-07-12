@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.mapping;
 
 import de.cebitec.vamp.util.FileUtils;
@@ -12,8 +8,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author jeff
+ * Displays a card for the selection of parameters of the mapping process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MappingSelectionCard extends javax.swing.JPanel {
     private File sourceFile;

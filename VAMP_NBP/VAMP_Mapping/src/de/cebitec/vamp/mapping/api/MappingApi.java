@@ -20,7 +20,8 @@ import org.openide.util.NbPreferences;
 /**
  * MappingAPI provides functions that can be accessed from outside this package
  * to use mapping fuctions
- * @author Evgeny Anisiforov
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MappingApi {
     private static String getMapperPath() {

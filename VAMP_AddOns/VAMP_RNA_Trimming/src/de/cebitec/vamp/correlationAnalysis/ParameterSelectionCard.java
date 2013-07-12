@@ -11,7 +11,7 @@ import org.openide.util.NbBundle;
 
 /**
  * GUI Card for selection of the parameters for the correlation analysis
- * @author Evgeny Anisiforov
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class ParameterSelectionCard extends javax.swing.JPanel {
     /** 
@@ -174,7 +174,7 @@ public class ParameterSelectionCard extends javax.swing.JPanel {
     private javax.swing.JSlider minimumPeakCoverageSlider;
     // End of variables declaration//GEN-END:variables
 
-    public Object getMinimumPeakCoverage() {
+    public Integer getMinimumPeakCoverage() {
         return this.minimumPeakCoverageSlider.getValue();
     }
     

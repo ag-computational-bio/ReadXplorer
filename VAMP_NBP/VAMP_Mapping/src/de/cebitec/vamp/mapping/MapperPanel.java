@@ -11,6 +11,14 @@ import java.util.prefs.Preferences;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
 
+/**
+ * MapperPanel is the gui part of the options panel to select the mapping script. 
+ * The mapping script is a bash script that encapsulates the mapper 
+ * functionality (which is often divided into multiple commands) 
+ * into a single script.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 final class MapperPanel extends javax.swing.JPanel {
 
     private final MapperOptionsPanelController controller;
@@ -79,9 +87,6 @@ final class MapperPanel extends javax.swing.JPanel {
         File file = FileUtils.showFileOpenDialogAndChangePrefs(Properties.MAPPER_PATH,
                 new FileNameExtensionFilter("Mapper Script File", "sh"),
                 mapperTextField, MapperPanel.class, this);
-        /*if (file!=null) {
-            sourceFile = file;
-        }*/
     }//GEN-LAST:event_openButtonActionPerformed
 
     void load() {

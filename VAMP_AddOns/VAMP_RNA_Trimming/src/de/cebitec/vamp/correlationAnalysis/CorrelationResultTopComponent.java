@@ -1,17 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.correlationAnalysis;
 
-import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.TabWithCloseX;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import java.awt.BorderLayout;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.logging.Logger;
-import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -20,7 +13,8 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays something.
+ * Top component which displays a result of the correlation analysis.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
     dtd = "-//de.cebitec.vamp.correlationAnalysis//CorrelationResult//EN",

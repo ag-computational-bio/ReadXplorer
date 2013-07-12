@@ -17,6 +17,10 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
+/**
+ * This action creates an menu item to start the correlation analysis
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 @ActionID(
     category = "Tools",
 id = "de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction")
@@ -70,7 +74,7 @@ public final class CorrelationAnalysisAction implements ActionListener {
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE)
                     );
         } else {
-            //this.snpDetectionTopComp.close();
+            //do nothing
         }
     }
     
