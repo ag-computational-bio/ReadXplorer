@@ -104,7 +104,12 @@ public class RNATrimProcessor  {
             while (samItor.hasNext() && (!this.canceled)) {
                 currentline++;
                 this.trimProcessResult.setAllReads(currentline);
-                ph.progress(currentline);
+                
+                //when reading a BAM file, there could be more entries than newlines
+                //in this case we would get lots of INFO messages on the console
+                //workaround: do not output the progress, if the current value is bigger
+                // than the whole lines count (stays at 100%)
+                if (lines>=currentline) ph.progress(currentline);
                 
                 //update chart after every 1000 lines
                 if (currentline % 1000 == 1) this.updateChartData();
