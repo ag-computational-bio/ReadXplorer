@@ -21,6 +21,6 @@ public interface SnpI {
     /**
      * @return The position of this snp.
      */
-    public String getPosition();
+    public int getPosition();
     
 }

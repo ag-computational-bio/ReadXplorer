@@ -61,7 +61,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
     public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException,
             IllegalStateException, PackageNotLoadableException {
-        File file = File.createTempFile("VAMP_Plot_", ".svg");
+        File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {
             baySeq.plotMACD(file, samplesA, samplesB);

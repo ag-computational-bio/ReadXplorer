@@ -180,7 +180,7 @@ public class SamUtils implements Observable {
     }
 
     /**
-     * Removes a file ending used by VAMP from the end of a file name. Note:
+     * Removes a file ending used by ReadXplorer from the end of a file name. Note:
      * This is not the file extension!
      * @param fileEnding the file ending to remove
      * @param filePath the file path to chech for the ending

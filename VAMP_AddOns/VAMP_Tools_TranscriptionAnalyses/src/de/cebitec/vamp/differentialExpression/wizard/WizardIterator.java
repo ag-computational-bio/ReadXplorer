@@ -37,7 +37,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 
 @ActionID(category = "Tools", id = "de.cebitec.vamp.differentialExpression.DiffExpWizardAction")
-@ActionRegistration(displayName = "Differential expression analysis")
+@ActionRegistration(displayName = "Differential gene expression analysis")
 @ActionReference(path = "Menu/Tools")
 public final class WizardIterator implements WizardDescriptor.Iterator<WizardDescriptor>, ActionListener {
 
@@ -70,7 +70,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
             // {1} will be replaced by WizardDescriptor.Iterator.name()
             wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-            wiz.setTitle("Differential expression analysis");
+            wiz.setTitle("Differential gene expression analysis");
             if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
                 ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(this.readClassPanel.getPropReadClassParams());
                 List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");

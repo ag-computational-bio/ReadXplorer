@@ -55,9 +55,7 @@ public class TrackConnector {
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGenome();
         this.refSeqLength = this.refGenome.getRefLength();
-        if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
-            openBAM();
-        }
+        this.openBAM();
 
         this.startDataThreads(false);
     }
@@ -84,9 +82,7 @@ public class TrackConnector {
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGenome();
         this.refSeqLength = this.refGenome.getRefLength();
-        if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
-            openBAM();
-        }
+        this.openBAM();
         
         this.startDataThreads(combineTracks);
     }
@@ -150,19 +146,6 @@ public class TrackConnector {
             return false;
         }
         return true;
-    }
-    
-    /**
-     * Handles a coverage and diff request. This means the request containig the
-     * sender of the request (the object that wants to receive the coverage) is
-     * handed over to the CoverageThread, who will carry out the request as soon
-     * as possible. Afterwards the result is handed over to the receiver. For
-     * database tracks the diffs are fetched from the db in a second statement.
-     * @param request the coverage and diff request including the receiving object
-     */
-    public void addCoverageAndDiffRequest(IntervalRequest request) {
-        this.coverageThread.addRequest(request);
-
     }
     
     /**
@@ -395,7 +378,7 @@ public class TrackConnector {
 //            int numUniquePerfectSeqPairs, int numSingleMappings) {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
 //        
-//        try (PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.ADD_SEQPAIR_STATISTICS);
+//        try (PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.INSERT_SEQPAIR_STATISTICS);
 //             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID)) {
 //            
 //            // get latest id for track
@@ -885,7 +868,7 @@ public class TrackConnector {
      * analysis results
      * @param handlerTitle title of the analysis handler
      * @param readClassParams The parameter set which contains all parameters
-     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      * @return the configurable analysis handler
      */
@@ -895,11 +878,13 @@ public class TrackConnector {
     }
 
     private void openBAM() throws FileNotFoundException {
-        try {
-            File file = new File(this.associatedTracks.get(0).getFilePath());
-            this.externalDataReader = new SamBamFileReader(file, this.trackID);
-        } catch (RuntimeIOException e) {
-            throw new FileNotFoundException(e.getMessage());
+        if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
+            try {
+                File file = new File(this.associatedTracks.get(0).getFilePath());
+                this.externalDataReader = new SamBamFileReader(file, this.trackID);
+            } catch (RuntimeIOException e) {
+                throw new FileNotFoundException(e.getMessage());
+            }
         }
     }
     
@@ -909,6 +894,12 @@ public class TrackConnector {
     public void close() {
         this.mappingThread.close();
         this.mappingThreadAnalyses.close();
-        this.externalDataReader.close();
+        if (this.externalDataReader != null) {
+            this.externalDataReader.close();
+        }
+    }
+
+    public File getTrackPath() {
+        return new File(this.associatedTracks.get(0).getFilePath());
     }
 }

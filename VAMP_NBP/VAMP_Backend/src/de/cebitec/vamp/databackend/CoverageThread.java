@@ -598,7 +598,7 @@ public class CoverageThread extends RequestThread {
 
                     //otherwise load the appropriate coverage (and diffs)
                     } else if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo()) 
-                            || (currentCov.isDiffsAndGapsUsed() && request instanceof CoverageAndDiffRequest)) {
+                            || (!currentCov.isDiffsAndGapsUsed() && request instanceof CoverageAndDiffRequest)) {
 //                        requestCounter++;
                         if (doesNotMatchLatestRequestBounds(request)) {
                             if (trackID2 != 0) {
@@ -618,7 +618,7 @@ public class CoverageThread extends RequestThread {
                         request.getSender().receiveData(currentCov);
                     }
                     else {
-                       request.getSender().notifySkipped(); 
+                        request.getSender().notifySkipped(); 
                     }
                 } else {
                     try {

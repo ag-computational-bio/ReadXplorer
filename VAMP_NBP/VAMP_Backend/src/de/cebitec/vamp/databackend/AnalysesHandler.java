@@ -37,6 +37,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private int nbCarriedOutRequests;
     private String queryType;
     private ArrayList<Observer> observers;
+    private boolean diffsAndGapsNeeded;
     private boolean coverageNeeded;
     private boolean mappingsNeeded;
     private byte desiredData = Properties.NORMAL;
@@ -52,7 +53,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * @param parent the parent for visualization of the results
      * @param handlerTitle title of the analysis handler
      * @param readClassParams The parameter set which contains all parameters
-     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
     public AnalysesHandler(TrackConnector trackConnector, DataVisualisationI parent, 
@@ -61,6 +62,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.observers = new ArrayList<>();
         this.parent = parent;
         this.trackConnector = trackConnector;
+        this.diffsAndGapsNeeded = false;
         this.coverageNeeded = false;
         this.mappingsNeeded = false;
         this.nbCovRequests = 0;
@@ -76,7 +78,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      * handler by the {@link receiveData()} method.
      */
     public void startAnalysis() {
-
+        
         this.queryType = this.coverageNeeded ? DATA_TYPE_COVERAGE : DATA_TYPE_MAPPINGS;
         this.nbRequests = 0;
         this.progressHandle.start();
@@ -96,7 +98,12 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
             while (to < this.refSeqLength) {
-                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
+                if (diffsAndGapsNeeded) {
+                    trackConnector.addCoverageAnalysisRequest(new CoverageAndDiffRequest(from, to, this, readClassParams));
+                } else {
+                    trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
+                }
+
 
                 from = to + 1;
                 to += stepSize;
@@ -104,7 +111,11 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
             //calc last interval until genomeSize
             to = this.refSeqLength;
-            trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
+            if (diffsAndGapsNeeded) {
+                trackConnector.addCoverageAnalysisRequest(new CoverageAndDiffRequest(from, to, this, readClassParams));
+            } else {
+                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
+            }
 
 
         } else if (this.mappingsNeeded) {
@@ -182,8 +193,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
         //when the last request is finished signalize the parent to collect the data
         if (this.nbCarriedOutRequests >= this.nbRequests) {
-            String dataType = this.coverageNeeded ? DATA_TYPE_COVERAGE : DATA_TYPE_MAPPINGS;
-            this.parent.showData(new Pair<>(trackConnector.getTrackID(), dataType));
+            this.parent.showData(new Pair<>(trackConnector.getTrackID(), this.queryType));
             this.nbCarriedOutRequests = 0;
             this.progressHandle.finish();
         }
@@ -223,6 +233,24 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     public void setMappingsNeeded(boolean mappingsNeeded) {
         this.mappingsNeeded = mappingsNeeded;
     }
+    
+    /**
+     * @return True, if the analysis works with diffs and gaps, false otherwise.
+     */
+    public boolean isDiffsAndGapsNeeded() {
+        return diffsAndGapsNeeded;
+    }
+    
+    /**
+     * Set before an anylsis is is started. True, if the analysis works with
+     * diffs and gaps, false otherwise. By default it is false.
+     * @param diffsAndGapsNeeded True, if the analysis works with diffs and gaps, false
+     * otherwise.
+     */
+    public void setDiffsAndGapsNeeded(boolean diffsAndGapsNeeded) {
+        this.diffsAndGapsNeeded = diffsAndGapsNeeded;
+    }
+    
 
     /**
      * Sets the desired data for this analysis handler to 

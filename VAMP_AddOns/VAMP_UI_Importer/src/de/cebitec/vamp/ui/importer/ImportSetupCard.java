@@ -5,8 +5,6 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.mappings.SamBamStepParser;
-import de.cebitec.vamp.parser.mappings.SeqPairClassifierI;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import de.cebitec.vamp.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
@@ -45,7 +43,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
         refJobView.addPropertyChangeListener(this.getJobPropListener());
         trackJobView.addPropertyChangeListener(this.getJobPropListener());
         seqPairTrackJobsView.addPropertyChangeListener(this.getJobPropListener());
-        positionTableJobView.addPropertyChangeListener(this.getJobPropListener());
         trackID = ProjectConnector.getInstance().getLatestTrackId();
     }
 
@@ -87,10 +84,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
     public List<SeqPairJobContainer> getSeqPairTrackJobList() {
         return seqPairTrackJobsView.getJobs();
     }
-    
-    public List<TrackJob> getPositionTableJobs(){
-        return this.positionTableJobView.getJobs();
-    }
 
     @Override
     public String getName() {
@@ -110,7 +103,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
         refJobView = new de.cebitec.vamp.ui.importer.RefJobView();
         trackJobView = new de.cebitec.vamp.ui.importer.TrackJobView();
         seqPairTrackJobsView = new de.cebitec.vamp.ui.importer.SeqPairJobView();
-        positionTableJobView = new de.cebitec.vamp.ui.importer.PositionTableJobView();
         addJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
@@ -122,11 +114,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
         jTabbedPane1.addTab("References", refJobView);
         jTabbedPane1.addTab("Tracks", trackJobView);
 
-        final SeqPairClassifierI seqPairCalculator = Lookup.getDefault().lookup(SeqPairClassifierI.class);
+        final de.cebitec.vamp.parser.mappings.SeqPairClassifierI seqPairCalculator = Lookup.getDefault().lookup(de.cebitec.vamp.parser.mappings.SeqPairClassifierI.class);
         if (seqPairCalculator != null) {
-            jTabbedPane1.addTab("Sequence Pair Tracks", seqPairTrackJobsView);
+            jTabbedPane1.addTab("Read Pair Tracks", seqPairTrackJobsView);
         }
-        jTabbedPane1.addTab("Position Table for Track", positionTableJobView);
 
         addJob.setText(org.openide.util.NbBundle.getMessage(ImportSetupCard.class, "ImportSetupCard.button.newJob")); // NOI18N
         addJob.addActionListener(new java.awt.event.ActionListener() {
@@ -189,9 +180,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
                 title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.track");
                 dialogPane = new NewTrackDialogPanel();
                 ((NewTrackDialogPanel) dialogPane).setReferenceJobs(this.refJobView.getJobs());
-            } else if (c instanceof PositionTableJobView) {
-                title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.posTable");
-                dialogPane = new NewPositionTableDialog();
             } else {
                 title = null;
                 dialogPane = null;
@@ -244,9 +232,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
                     for (File mappingFile : newTrackPanel.getMappingFiles()) {
 
                         TrackJob trackJob = this.createTrackJob(newTrackPanel, mappingFile);
-
-                        trackJob.setIsStepwise((newTrackPanel.getCurrentParser() instanceof SamBamStepParser));
-                        trackJob.setStepSize(newTrackPanel.getStepSize());
                         trackJob.setIsSorted(newTrackPanel.isFileSorted());
                         trackJobView.add(trackJob);
                     }
@@ -264,10 +249,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
                             true, 
                             new Timestamp(System.currentTimeMillis()));
                     
-                    trackJob.setIsStepwise((posTableDialog.getCurrentParser() instanceof SamBamStepParser));
-                    trackJob.setStepSize(posTableDialog.getStepSize());
                     refJob.registerTrackWithoutRunJob(trackJob);
-                    this.positionTableJobView.add(trackJob);
                 }
 
             }
@@ -291,8 +273,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
             seqPairTrackJobsView.remove(seqPairTrackJobsView.getSelectedItem());
         } else if (c instanceof TrackJobView) {
             trackJobView.remove(trackJobView.getSelectedItem());
-        } else if (c instanceof PositionTableJobView) {
-            positionTableJobView.remove(positionTableJobView.getSelectedItem());
         }
     }//GEN-LAST:event_removeJobActionPerformed
 
@@ -311,10 +291,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
             if (trackJobView.IsRowSelected()) {
                 isSelected = true;
             }
-        } else if (c instanceof PositionTableJobView) {
-            if (positionTableJobView.IsRowSelected()){
-                isSelected = true;
-            }
         }
 
         if (isSelected) {
@@ -322,11 +298,11 @@ public class ImportSetupCard extends javax.swing.JPanel {
         } else {
             setRemoveButtonEnabled(false);
         }
-}//GEN-LAST:event_jTabbedPane1StateChanged
+    }//GEN-LAST:event_jTabbedPane1StateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addJob;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private de.cebitec.vamp.ui.importer.PositionTableJobView positionTableJobView;
     private de.cebitec.vamp.ui.importer.RefJobView refJobView;
     private javax.swing.JButton removeJob;
     private de.cebitec.vamp.ui.importer.SeqPairJobView seqPairTrackJobsView;

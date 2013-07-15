@@ -11,9 +11,11 @@ import org.openide.util.NbBundle;
 
 /**
  * The parser to use for parsing a track to store in the DB.
+ * @deprecated Storing of data sets in the DB is not allowed anymore
  *
  * @author ddoppmeier
  */
+@Deprecated
 public class TrackParser implements TrackParserI {
  
     CoverageContainer coverageContainer ;
@@ -61,7 +63,7 @@ public class TrackParser implements TrackParserI {
         System.gc();
         
         long finish = System.currentTimeMillis();
-        String msg = NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully", trackJob.getFile().getName());
+        String msg = NbBundle.getMessage(TrackParser.class, "Parser.Parsing.Successfully", trackJob.getFile().getName());
         observer.update(Benchmark.calculateDuration(start, finish, msg));
 
         return track;

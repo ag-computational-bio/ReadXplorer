@@ -30,9 +30,7 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
     private static final long serialVersionUID = 776435254;
     private List<File> mappingFiles2;
     private ReferenceJob[] refGenJobs;
-    private final JokParser jokParser;
     private final JokToBamDirectParser jokToBamDirectParser;
-    private final SamBamParser samBamParser;
     private final SamBamDirectParser samBamDirectParser;
     private MappingParserI[] parsers;
     private int distance; //distance of the sequences in a sequence pair in bp
@@ -43,9 +41,7 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
     public NewSeqPairTracksDialogPanel() {
         this.refGenJobs = getReferenceJobs();
         // choose the default parser. first entry is shown in combobox by default
-        this.jokParser = new JokParser(new SeqPairDBProcessor());
         this.jokToBamDirectParser = new JokToBamDirectParser();
-        this.samBamParser = new SamBamParser(new SeqPairDBProcessor());
         this.samBamDirectParser = new SamBamDirectParser();
         this.parsers = new MappingParserI[] { this.samBamDirectParser , jokToBamDirectParser };
         this.setCurrentParser(parsers[0]);
@@ -87,8 +83,6 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
         orientation1Button = new javax.swing.JRadioButton();
         orientation3Button = new javax.swing.JRadioButton();
         orientation2Button = new javax.swing.JRadioButton();
-        importTypeLabel = new javax.swing.JLabel();
-        importTypeCombo = new javax.swing.JComboBox<>();
         alreadyImportedBox = new javax.swing.JCheckBox();
         multipleImportCheckBox = new javax.swing.JCheckBox();
         multiTrackScrollPane = new javax.swing.JScrollPane();
@@ -192,26 +186,6 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
             }
         });
 
-        importTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.importTypeLabel.text")); // NOI18N
-
-        importTypeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Database", "Direct File Access" }));
-        importTypeCombo.setSelectedIndex(1);
-        importTypeCombo.setRenderer(new DefaultListCellRenderer(){
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus){
-                if(value instanceof ParserI){
-                    return super.getListCellRendererComponent(list, ((ParserI) value).getName(), index, isSelected, cellHasFocus);
-                } else {
-                    return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                }
-            }
-        });
-        importTypeCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importTypeComboActionPerformed(evt);
-            }
-        });
-
         alreadyImportedBox.setText(org.openide.util.NbBundle.getMessage(NewSeqPairTracksDialogPanel.class, "NewSeqPairTracksDialogPanel.alreadyImportedBox.text")); // NOI18N
         alreadyImportedBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -243,11 +217,9 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
                             .addComponent(nameLabel)
                             .addComponent(preferencesLabel)
                             .addComponent(mappingFile2Label)
-                            .addComponent(mappingFile1Label)
-                            .addComponent(importTypeLabel))
+                            .addComponent(mappingFile1Label))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(importTypeCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(parserComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(nameField)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -300,10 +272,6 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(importTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(importTypeLabel))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(parserComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -343,9 +311,11 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
                 .addComponent(multipleImportCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(multiTrackListLabel))
-                .addContainerGap(103, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(multiTrackListLabel)
+                        .addGap(0, 96, Short.MAX_VALUE))
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -398,21 +368,6 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
     private void orientation2ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_orientation2ButtonActionPerformed
         this.setOrientation("rf");
     }//GEN-LAST:event_orientation2ButtonActionPerformed
-
-    private void importTypeComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importTypeComboActionPerformed
-        this.setIsDbUsed(this.importTypeCombo.getSelectedIndex() == 0);
-        this.alreadyImportedBox.setVisible(!this.isDbUsed());
-        this.parserComboBox.removeAllItems();
-        if (!this.isDbUsed()) {
-            //update the parsers to only display the bam parser.
-            this.parserComboBox.addItem(this.samBamDirectParser);
-            this.parserComboBox.addItem(this.jokToBamDirectParser);
-        } else {
-            this.parserComboBox.addItem(this.samBamParser);
-            this.parserComboBox.addItem(this.jokParser);
-            this.chooseButton2.setEnabled(true);
-        }
-    }//GEN-LAST:event_importTypeComboActionPerformed
 
     private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
         this.setIsAlreadyImported(this.alreadyImportedBox.isSelected());
@@ -544,8 +499,6 @@ public class NewSeqPairTracksDialogPanel extends ImportTrackBasePanel implements
     private javax.swing.JLabel deviationLabel;
     private javax.swing.JTextField distanceField;
     private javax.swing.JLabel distanceLabel;
-    private javax.swing.JComboBox<String> importTypeCombo;
-    private javax.swing.JLabel importTypeLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField mappingFile1Field;

@@ -8,9 +8,11 @@ import java.util.HashMap;
  * A SeqPairDBProcessor stores a mapping between sequence id
  * and readname. This mapping is needed to connect the 2 reads belonging 
  * to a sequence pair sequencing run.
+ * @deprecated Storing of data sets in the DB is not allowed anymore
  *
  * @author Rolf Hilker
  */
+@Deprecated
 public class SeqPairDBProcessor implements SeqPairProcessorI {
     
     private HashMap<String, Integer> seqIDToReadNameMap1;

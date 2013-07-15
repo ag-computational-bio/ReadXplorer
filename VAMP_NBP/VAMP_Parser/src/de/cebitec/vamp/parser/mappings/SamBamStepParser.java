@@ -1,6 +1,5 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.parser.output.SamBamSorter;
@@ -8,6 +7,7 @@ import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SamUtils;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.StatsContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +19,11 @@ import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
 
 /**
+ * @deprecated Storing of data sets in the DB is not allowed anymore
  *
  * @author jstraube
  */
+@Deprecated
 public class SamBamStepParser implements MappingParserI, Observer {
 
     private static String name = "SAM/BAM Stepwise Parser";
@@ -131,7 +133,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
         mappingContainer.setFirstMappingContainer(trackJob.isFirstJob());
 
-        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Start", filename));
+        this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,"Parser.Parsing.Start", filename));
 
         if (itorAll == null) {
             SAMFileReader sam = new SAMFileReader(trackJob.getFile());
@@ -251,7 +253,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
                 //skip error messages, if too many occur to prevent bug in the output panel
                 if (!e.getMessage().contains("MAPQ should be 0")) {
                     if (errorLimit.allowOutput()) {
-                        this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                        this.notifyObservers(NbBundle.getMessage(SamBamStepParser.class,
                         "Parser.Parsing.CorruptData", lineno, e.toString()));
                     }
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
@@ -266,8 +268,7 @@ public class SamBamStepParser implements MappingParserI, Observer {
 
         this.seqToIDMap = null; //release resources
 
-        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Finished", filename));
-        this.sendMsg(NbBundle.getMessage(JokParser.class,"Parser.Parsing.Successfully"));
+        this.sendMsg(NbBundle.getMessage(SamBamStepParser.class,"Parser.Parsing.Successfully", filename));
 
         return mappingContainer;
 

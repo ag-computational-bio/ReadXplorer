@@ -19,7 +19,7 @@ import net.sf.samtools.*;
 import org.openide.util.NbBundle;
 
 /**
- * Sam/Bam sequence pair classifier for a direct file access track. This means
+ * Sam/Bam read pair classifier for a direct file access track. This means
  * the classification of the seq pairs has to be carried out. Besides the 
  * classification this class also acts as extender for the given sam/bam file
  * and thus creates an extended copy of the original file after the
@@ -46,15 +46,15 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     private DiscreteCountingDistribution seqPairSizeDistribution;
     
     /**
-     * Sam/Bam sequence pair classifier for a direct file access track. This
+     * Sam/Bam read pair classifier for a direct file access track. This
      * means the classification of the seq pairs has to be carried out. Besides
      * the classification this class also acts as extender for the given sam/bam
      * file and thus creates an extended copy of the original file after the
      * classification. The reads are sorted by read name for efficient
      * classification. Note for multichromosomal mappings: The classification 
      * works, no matter on which chromosome the reads were mapped!
-     * @param seqPairJobContainer the sequence pair job container to classify
-     * @param refSeq the reference sequence belonging to the sequence pair job
+     * @param seqPairJobContainer the read pair job container to classify
+     * @param refSeq the reference sequence belonging to the read pair job
      * @param classificationMap the ordinary classification map of the reads. It
      *      is needed for the extension of the sam/bam file
      */
@@ -140,7 +140,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                     readName = ParserCommonMethods.getReadNameWithoutPairTag(readNameFull);
                     
                     if (!readName.equals(lastReadName)) { //meaning: next pair, because sorted by read name
-                        // classify sequence pair, because all mappings for this pair are currently stored in list
+                        // classify read pair, because all mappings for this pair are currently stored in list
                         this.performClassification(currentRecords1, currentRecords2, seqPairId);
                         currentRecords1.clear();
                         currentRecords2.clear();
@@ -198,7 +198,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     }
 
     /**
-     * Actually performs the classification of the sequence pairs.
+     * Actually performs the classification of the read pairs.
      * @param currentRecords1 all records of the same read pair
      * @return 
      */
@@ -246,7 +246,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
          */
       
         if (!currentRecords2.isEmpty()) {
-            //both sides of the sequence pair have been mapped
+            //both sides of the read pair have been mapped
             
             pairSize = currentRecords1.size() == 1 && currentRecords2.size() == 1;
 
@@ -469,7 +469,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
                 }
             }
 
-        } else { //only one side of the sequence pair could be mapped
+        } else { //only one side of the read pair could be mapped
             for (SAMRecord record : currentRecords1) { //pos and direction can deviate
                 this.addSingleRecord(record, seqPairId, 0, "*");
             }
@@ -478,11 +478,11 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     
     
     /**
-     * Adds a new sequence pair mapping object to the list and sets necessary
+     * Adds a new read pair mapping object to the list and sets necessary
      * sam flags for both records.
      * @param mapping1 mapping 1 of the read pair to add
      * @param mapping2 mapping 2 of the read pair to add
-     * @param seqPairId id of the sequence pair to add
+     * @param seqPairId id of the read pair to add
      * @param type type of the pair 0 = perfect, 1 = dist too large, 2 = dist
      * too small, 3 = orient wrong 4 = orient wrong and dist too large, 5 =
      * orient wrong and dist too small
@@ -521,9 +521,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     }
     
     /**
-     * Adds a new sequence pair mapping to the writer, if one of the records
+     * Adds a new read pair mapping to the writer, if one of the records
      * is not already contained in the omit list. Also takes care that the
-     * classification and sequence pair tags are set into the contained sam 
+     * classification and read pair tags are set into the contained sam 
      * records. Note that the ordinary classification data is not set here!
      * @param potPair the potential pair to add to the sam/bam writer
      * @param omitList the omit list containing records, which where already added
@@ -544,7 +544,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
      * Adds a single mapping (sam record) to the file writer and sets its seq 
      * pair and classification attributes.
      * @param record the unpaired record to write
-     * @param seqPairId the sequence pair id of this single record
+     * @param seqPairId the read pair id of this single record
      * @param mateUnmapped true, if the mate of this mapping is unmapped, false
      * if it is mapped, but does not form a pair with this record
      */
@@ -561,9 +561,9 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     }
 
     /**
-     * Updated the sequence pair for a given sequence pair. If both reads are
-     * only mapped once, the corresponding unique sequence pair type is chosen.
-     * @param seqPair the sequence pair to update in case it is unique
+     * Updated the read pair for a given read pair. If both reads are
+     * only mapped once, the corresponding unique read pair type is chosen.
+     * @param seqPair the read pair to update in case it is unique
      */
     private void setSeqPairForType(DirectSeqPair seqPair) {
         Integer mapCount1 = this.getMapCount(seqPair.getRecord1());
@@ -623,7 +623,7 @@ public class SamBamDirectSeqPairClassifier implements SeqPairClassifierI, Observ
     
     /**
      * Depending on deviation the min and max values of the distance between a
-     * sequence pair is set.
+     * read pair is set.
      * @param dist distance in bases
      * @param deviation deviation in % (1-100)
      * @return the maximum distance of a mapping pair, which is accepted as valid 

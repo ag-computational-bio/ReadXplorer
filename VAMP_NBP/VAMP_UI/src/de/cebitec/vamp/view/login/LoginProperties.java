@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.login;
 
 /**
- * Class containing the login properties for VAMP.
+ * Class containing the login properties for ReadXplorer.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */

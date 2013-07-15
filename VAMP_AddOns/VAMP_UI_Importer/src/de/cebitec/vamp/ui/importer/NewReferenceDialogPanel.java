@@ -34,7 +34,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 
 /**
- * Panel displaying the options for importing new references into VAMP.
+ * Panel displaying the options for importing new references into ReadXplorer.
  *
  * @author jwinneba, rhilker
  */
@@ -49,7 +49,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
             new BioJavaParser(BioJavaParser.GENBANK), new BioJavaGff3Parser(), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
-    /** Panel displaying the options for importing new references into VAMP. */
+    /** Panel displaying the options for importing new references into ReadXplorer. */
     public NewReferenceDialogPanel() {
         this.currentParser = this.availableParsers[0];
         this.initComponents();

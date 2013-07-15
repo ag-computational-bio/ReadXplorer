@@ -52,7 +52,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *  RNAStructML,Commandline interface support added by
  *  Jan krueger <jkrueger@techfak.uni-bielefeld.de>
  *
- * Functionality limited for VAMP (commented out main method, export and RNAStructML parts)
+ * Functionality limited for ReadXplorer (commented out main method, export and RNAStructML parts)
  * by Rolf Hilker. Also fixed some warnings.
  *
  */

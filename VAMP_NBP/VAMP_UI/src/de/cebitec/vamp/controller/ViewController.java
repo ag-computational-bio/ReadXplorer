@@ -11,13 +11,17 @@ import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dialogMenus.OpenRefGenPanel;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.util.*;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 
 /**
  * Controls the view for one <code>ApplicationFrameI</code>
@@ -134,6 +138,43 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
                     "No track selected. To open a track, at least one track has to be selected.");
             String title = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfoTitle", "Info");
             JOptionPane.showMessageDialog(genomeViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    /**
+     * Opens a dialog with all available tracks for the current reference genome.
+     * After selecting tqo or more tracks, the associated multi or double track viewer is opened.
+     */
+    public void openMultiTrack() {
+        OpenTrackPanelList otp = new OpenTrackPanelList(currentRefGen.getId());
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        JCheckBox optionBox = new JCheckBox("Combine multiple tracks");
+        optionBox.setToolTipText("When checked, more than two tracks can be chosen and the coverage of all tracks is combined"
+                + " and looks like the ordinary track viewer for one track.");
+        contentPanel.add(otp, BorderLayout.CENTER);
+        contentPanel.add(optionBox, BorderLayout.SOUTH);
+        
+
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(contentPanel, "Open Multiple Tracks");
+        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+        openRefGenDialog.setVisible(true);
+
+        // check if two tracks were selected
+        boolean okSelected = false;
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && (otp.getSelectedTracks().size() == 2 || 
+                optionBox.isSelected() && otp.getSelectedTracks().size() > 1)) {
+            okSelected = true;
+        } else 
+        if (!  (dialogDescriptor.getValue().equals(DialogDescriptor.CANCEL_OPTION) || 
+                dialogDescriptor.getValue().equals(DialogDescriptor.CLOSED_OPTION))) {
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks in standard mode or at least two track in combined mode!", 
+                    NotifyDescriptor.INFORMATION_MESSAGE));
+            this.openMultiTrack();
+        }
+        if (okSelected) {
+            ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
+            BasePanelFactory factory = viewCon.getBasePanelFac();
+            factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, optionBox.isSelected());
         }
     }
     

@@ -42,14 +42,14 @@ import de.cebitec.vamp.tools.rnaFolder.rnamovies.util.ExportAccessory;
 import java.util.logging.Logger;
 
 /*
- * In this version for VAMP all unused code is commented out, but the original 
+ * In this version for ReadXplorer all unused code is commented out, but the original 
  * version can easily be restored.
  */
 
 /**
  * Export (extending the MovieAction class is the ExportFilter
  * class of RNAMovies2. Currently for different formats are supported :
- * SVG, JPG, PNG (and (animated) GIF, not here in VAMP).
+ * SVG, JPG, PNG (and (animated) GIF, not here in ReadXplorer).
  *  *
  * @author Alexander Kaiser <akaiser@techfak.uni-bielefeld.de>,
  *         Jan Krueger <jkrueger@techfak.uni-bielefeld.de> (JavaDoc and (animated) Gif);

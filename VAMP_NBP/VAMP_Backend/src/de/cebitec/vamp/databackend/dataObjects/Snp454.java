@@ -43,8 +43,8 @@ public class Snp454 implements SnpI {
     }
 
     @Override
-    public String getPosition() {
-        return String.valueOf(position);
+    public int getPosition() {
+        return position;
     }
 
     public int getVariationPercentag() {

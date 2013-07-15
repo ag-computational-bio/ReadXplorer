@@ -5,8 +5,8 @@ and open the template in the editor.
 -->
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
-    <tocitem text="VAMP's SNP detection">
-        <tocitem text="About VAMP's SNP detection" target="de.cebitec.vamp.tools.snp.about"/>
+    <tocitem text="ReadXplorer's SNP detection">
+        <tocitem text="About ReadXplorer's SNP detection" target="de.cebitec.vamp.tools.snp.about"/>
         <tocitem text="SNP table model" target="de.cebitec.vamp.tools.snp.snptable"/>
     </tocitem>
 </toc>

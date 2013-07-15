@@ -21,11 +21,9 @@ import java.util.Set;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> {
+public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     
     private List<SnpI> snpList;
-    private int num;
-    private int percent;
     private final Set<FeatureType> featTypes;
 
     
@@ -71,9 +69,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
             snp = (Snp) snpi; 
             
             snpExport.add(snp.getPosition());
+            snpExport.add(snp.getGapOrderIndex());
             snpExport.add(this.getTrackMap().get(snp.getTrackId()));
-            snpExport.add(snp.getBase().toUpperCase());
-            snpExport.add(snp.getRefBase().toUpperCase());
+            snpExport.add(snp.getBase());
+            snpExport.add(snp.getRefBase());
             snpExport.add(snp.getARate());
             snpExport.add(snp.getCRate());
             snpExport.add(snp.getGRate());
@@ -147,8 +146,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         allData.add(snpExportData);
         
         //create statistics sheet
+        ParameterSetSNPs params = (ParameterSetSNPs) this.getParameters();
+        
         List<List<Object>> statisticsExportData = new ArrayList<>();
-        List<Object> statisticsExport;
         
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("SNP detection for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
@@ -156,8 +156,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("SNP detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum percentage of variation:", percent));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of varying bases:", num));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum percentage of variation:", params.getMinPercentage()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of varying bases:", params.getMinVaryingBases()));
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
         
@@ -166,7 +166,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_INTERGENEIC));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_SYNONYMOUS));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL));
-        statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_MISSSENSE));
+        statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF));
+        statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_STOPS));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_AA_INSERTIONS));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_AA_DELETIONS));
         
@@ -192,6 +193,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         
         List<String> dataColumnDescriptions = new ArrayList<>();
         dataColumnDescriptions.add("Position");
+        dataColumnDescriptions.add("Gap Index");
         dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Base");
         dataColumnDescriptions.add("Reference");
@@ -229,36 +231,6 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         sheetNames.add("SNP Table");
         sheetNames.add("SNP Statistics");
         return sheetNames;
-    }
-    
-
-    /**
-     * Sets the SNP detection parameters to have them connected with the search
-     * results.
-     * @param percent minimum deviation in percent at a position used for this
-     * snp detection
-     * @param num minimum number of deviating coverage at a position used for
-     * this snp detection
-     */
-    public void setSearchParameters(int percent, int num) {
-        this.percent = percent;
-        this.num = num;
-    }
-
-    /**
-     * @return get minimum number of deviating coverage at a position used for
-     * this snp detection
-     */
-    public int getMinNoDeviatingCoverage() {
-        return this.num;
-    }
-
-    /**
-     * @return get the minimum deviation in percent at a position used for this
-     * snp detection
-     */
-    public int getMinPercentDeviation() {
-        return this.percent;
     }
 
     /**

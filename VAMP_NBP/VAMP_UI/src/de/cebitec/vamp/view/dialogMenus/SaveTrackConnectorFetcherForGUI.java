@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view.dialogMenus;
 
+import de.cebitec.vamp.databackend.connector.MultiTrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -221,6 +222,78 @@ public class SaveTrackConnectorFetcherForGUI {
             JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
         return newTrack;
+    }
+
+    public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) throws UserCanceledTrackPathUpdateException {
+        MultiTrackConnector mtc = null;
+        ProjectConnector connector = ProjectConnector.getInstance();
+        try {
+            mtc = connector.getMultiTrackConnector(track);
+        } catch (FileNotFoundException e) {
+            PersistantTrack newTrack = getNewFilePath(track, connector);
+            if (newTrack != null) {
+                try {
+                    mtc = connector.getMultiTrackConnector(newTrack);
+                } catch (FileNotFoundException ex) {
+                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,
+                            "{0}: Unable to open data associated with track: " + track.getId(),
+                            currentTimestamp);
+                }
+            } else {
+                //If the new path is not set by the user throw exception notifying about this
+                throw new UserCanceledTrackPathUpdateException();
+            }
+        }
+        return mtc;
+    }
+    
+    /**
+     * Returns the TrackConnector for multiple given tracks. If the tracks are
+     * stored in a sam/bam file and the path to this file has changed, the
+     * method will open a window and ask for the new file path.
+     * @throws UserCanceledTrackPathUpdateException if the no track path could
+     * be resolved.
+     * @param tracks List of tracks the TrackConnector should be received for.
+     * @return  
+     */
+    public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) throws UserCanceledTrackPathUpdateException {
+        MultiTrackConnector mtc = null;
+        ProjectConnector connector = ProjectConnector.getInstance();
+        try {
+            mtc = connector.getMultiTrackConnector(tracks);
+        } catch (FileNotFoundException e) {
+            //we keep track about the number of tracks with unresolved path errors.
+            int unresolvedTracks = 0;
+            for (int i = 0; i < tracks.size(); ++i) {
+                PersistantTrack track = tracks.get(i);
+                if (!(new File(track.getFilePath())).exists()) {
+                    PersistantTrack newTrack = getNewFilePath(track, connector);
+                    //Everything is fine, path is set correctly
+                    if (newTrack != null) {
+                        tracks.set(i, newTrack);
+                    } else {
+                        //User canceled path update, add an unresolved track
+                        unresolvedTracks++;
+                        //And remove the track with wrong path from the list of processed tracks.
+                        tracks.remove(i);
+                    }
+                }
+            }
+            //All track paths are tested, if no path can be resolved an exception is thrown.
+            if (unresolvedTracks == tracks.size()) {
+                throw new UserCanceledTrackPathUpdateException();
+            }
+            try {
+                mtc = connector.getMultiTrackConnector(tracks);
+            } catch (FileNotFoundException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,
+                        "{0}: Unable to open data associated with track: " + tracks.toString(),
+                        currentTimestamp);
+            }
+        }
+        return mtc;
     }
 
     /**

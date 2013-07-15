@@ -60,8 +60,8 @@ import org.openide.windows.TopComponent;
         preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
-    "CTL_DiffExpResultViewerTopComponent=Differential expression analysis - results",
-    "HINT_DiffExpResultViewerTopComponent=This is a DiffExpResultViewer window"
+    "CTL_DiffExpResultViewerTopComponent=Differential gene expression analysis - results",
+    "HINT_DiffExpResultViewerTopComponent=This is a Differential Gene Expression Result Window"
 })
 public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
 
@@ -73,7 +73,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Expression Analysis");
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Gene Expression Analysis");
     private TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
     private ReferenceFeatureTopComp refComp;
 

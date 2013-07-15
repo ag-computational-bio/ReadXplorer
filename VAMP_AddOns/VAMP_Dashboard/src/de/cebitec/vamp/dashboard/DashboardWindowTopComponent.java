@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.dashboard;
   
 import de.cebitec.vamp.controller.ViewController;
@@ -89,7 +85,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
              * 1. Open a database
              * 2. Import data
             */
-            String  sText  = "<html><img src=\""+DashboardWindowTopComponent.class.getResource("splash.png")+"\" /><h2>Visualization and Analysis of MapPed sequences: Quick Start</h2> <p>1. Open a database <br/> "
+            String  sText  = "<html><img src=\""+DashboardWindowTopComponent.class.getResource("splash.png")+"\" /><h2>ReadXplorer - Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open a database <br/> "
                     +"2. Import a reference genome <br /> 3. Import a track <br /> 4. Explore your reference genome and tracks <br />"
                     + "5. Run an analysis on your data </p></html>";
             jLabel1.setText (sText);
@@ -142,7 +138,7 @@ public final class DashboardWindowTopComponent extends TopComponent implements E
                 ov.setDefaultActionAllowed(false);
                 //using the name of the property 
                 //followed by the text to be displayed in the column header: 
-                ov.setPropertyColumns("description", "Description", "timestamp", "Date", "mark", "Mark for action");
+                ov.setPropertyColumns("description", "Description", "timestamp", "Import Date", "mark", "Mark for action");
                 //Hide the root node, since we only care about the children: 
                 ov.getOutline().setRootVisible(false); //Add the OutlineView to the TopComponent: 
                 ov.getOutline().setDefaultRenderer(Node.Property.class,

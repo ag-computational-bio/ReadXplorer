@@ -120,6 +120,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                 .addGap(7, 7, 7))
         );
 
+        unannotatedTranscriptsBox.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(unannotatedTranscriptsBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.unannotatedTranscriptsBox.text")); // NOI18N
         unannotatedTranscriptsBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

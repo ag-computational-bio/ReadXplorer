@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.4" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -33,10 +33,10 @@
                       <Component id="alignmentButton" alignment="0" max="32767" attributes="1"/>
                       <Component id="sequencePairButton" alignment="0" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace pref="54" max="32767" attributes="0"/>
+                  <EmptySpace pref="74" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="colorHistogramBox" pref="119" max="32767" attributes="0"/>
+                  <Component id="colorHistogramBox" pref="121" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
               </Group>
           </Group>

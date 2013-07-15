@@ -36,11 +36,11 @@ public abstract class RequestThread extends Thread {
      * Checks whether the bounds of the current request match the bounds of the
      * latest request (e.g. the latest request added to the request queue. This 
      * helps to ensure that only the results of the latestRequest are returned
-     * and if the VAMP user scrolled further and a new request was started already,
+     * and if the ReadXplorer user scrolled further and a new request was started already,
      * then the results of the current request are discarded, as they are not 
      * needed anymore).
      * @param request the currently handled request
-     * @return true, if the request bounds are identical, false otherwise
+     * @return true, if the request bounds are different, false otherwise
      */
     protected boolean doesNotMatchLatestRequestBounds(IntervalRequest request) {
         int latestMiddle = calcCenterMiddle(latestRequest);

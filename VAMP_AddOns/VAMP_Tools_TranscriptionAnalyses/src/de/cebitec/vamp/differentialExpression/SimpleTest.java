@@ -42,7 +42,7 @@ public class SimpleTest {
             //Load an R image containing the calculation functions
             try {
                 InputStream jarPath = DeSeq.class.getResourceAsStream("/de/cebitec/vamp/differentialExpression/simpleTest.rdata");
-                File to = File.createTempFile("VAMP_", ".rdata");
+                File to = File.createTempFile("ReadXplorer_", ".rdata");
                 to.deleteOnExit();
                 Files.copy(jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 String tmpPath = to.getAbsolutePath();

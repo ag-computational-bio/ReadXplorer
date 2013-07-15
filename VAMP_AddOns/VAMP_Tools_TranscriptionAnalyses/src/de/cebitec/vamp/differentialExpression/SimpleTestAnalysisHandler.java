@@ -128,7 +128,7 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements Simp
 
     public File plot(SimpleTestAnalysisHandler.Plot plot) throws IOException,
             IllegalStateException, PackageNotLoadableException {
-        File file = File.createTempFile("VAMP_Plot_", ".svg");
+        File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == SimpleTestAnalysisHandler.Plot.ABvsConf) {
             simpleTest.plotAB(file);

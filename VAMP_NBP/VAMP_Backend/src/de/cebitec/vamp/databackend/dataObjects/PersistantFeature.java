@@ -27,7 +27,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     private boolean isFwdStrand;
     private FeatureType type;
     private String featureName;
-    private List<PersistantSubFeature> subFeatures;
+//    private List<PersistantSubFeature> subFeatures;
     private List<Integer> parentIds;
     private int frame;
 
@@ -49,7 +49,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     public PersistantFeature(int id, String parentIds, String ecnum, String locus, String product, 
                 int start, int stop, boolean isFwdStrand, FeatureType type, String featureName) {
         super(type, null);
-        this.subFeatures = new ArrayList<>();
+//        this.subFeatures = new ArrayList<>();
         this.id = id;
         this.parentIds = this.separateParentIds(parentIds);
         this.ecNumber = ecnum;
@@ -213,21 +213,21 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
         return frame;
     }
 
-    /**
-     * @return the list of sub features (e.g. exons) of this feature
-     * or an empty list if there are no sub features.
-     */
-    public List<PersistantSubFeature> getSubFeatures() {
-        return subFeatures;
-    }
-
-    /**
-     * Adds a sub feature to the list of sub features (e.g. an exon to a gene).
-     * @param parsedSubFeature the sub feature to add.
-     */
-    public void addSubFeature(PersistantSubFeature parsedSubFeature) {
-        this.subFeatures.add(parsedSubFeature);
-    }
+//    /**
+//     * @return the list of sub features (e.g. exons) of this feature
+//     * or an empty list if there are no sub features.
+//     */
+//    public List<PersistantSubFeature> getSubFeatures() {
+//        return subFeatures;
+//    }
+//
+//    /**
+//     * Adds a sub feature to the list of sub features (e.g. an exon to a gene).
+//     * @param parsedSubFeature the sub feature to add.
+//     */
+//    public void addSubFeature(PersistantSubFeature parsedSubFeature) {
+//        this.subFeatures.add(parsedSubFeature);
+//    }
 
     /**
      * Compares two PersistantFeature based on their start position. '0' is returned for
@@ -268,25 +268,25 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
             return featureMap;
         }
 
-        /**
-         * Utility method for adding a list of sub features to their parent
-         * features list.
-         * @param features the list of features, to which the subfeatures are
-         * added
-         * @param subFeaturesSorted the sorted list of subfeatures by increasing
-         * start position
-         */
-        public static void addSubFeatures(Map<Integer, PersistantFeature> features,
-                List<PersistantSubFeature> subFeaturesSorted) {
-
-            int id;
-            for (PersistantSubFeature subFeature : subFeaturesSorted) {
-                id = subFeature.getParentId();
-                if (features.containsKey(id)) { //just to be on the save side; should not occur
-                    features.get(id).addSubFeature(subFeature);
-                }
-            }
-        }
+//        /**
+//         * Utility method for adding a list of sub features to their parent
+//         * features list.
+//         * @param features the list of features, to which the subfeatures are
+//         * added
+//         * @param subFeaturesSorted the sorted list of subfeatures by increasing
+//         * start position
+//         */
+//        public static void addSubFeatures(Map<Integer, PersistantFeature> features,
+//                List<PersistantSubFeature> subFeaturesSorted) {
+//
+//            int id;
+//            for (PersistantSubFeature subFeature : subFeaturesSorted) {
+//                id = subFeature.getParentId();
+//                if (features.containsKey(id)) { //just to be on the save side; should not occur
+//                    features.get(id).addSubFeature(subFeature);
+//                }
+//            }
+//        }
 
         /**
          * Creates a list of polytree structures from a list of features. In a

@@ -81,7 +81,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
     }
 
     public File plot(Plot plot) throws IOException, IllegalStateException, PackageNotLoadableException {
-        File file = File.createTempFile("VAMP_Plot_", ".svg");
+        File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.DE) {
             deSeq.plotDE(file);

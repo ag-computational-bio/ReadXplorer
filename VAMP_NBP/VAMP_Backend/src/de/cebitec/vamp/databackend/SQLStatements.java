@@ -128,26 +128,6 @@ public class SQLStatements {
             + "VALUES (?,?,?)"
             ;
     
-    public final static String INSERT_POSITION =
-            "INSERT INTO " + FieldNames.TABLE_POSITIONS + " "
-            + "("
-            + FieldNames.POSITIONS_SNP_ID + ", "
-            + FieldNames.POSITIONS_TRACK_ID + ", "
-            + FieldNames.POSITIONS_POSITION + ", "
-            + FieldNames.POSITIONS_BASE + ", "
-            + FieldNames.POSITIONS_REFERENCE_BASE + ", "
-            + FieldNames.POSITIONS_A + ", "
-            + FieldNames.POSITIONS_C + ", "
-            + FieldNames.POSITIONS_G + ", "
-            + FieldNames.POSITIONS_T + ", "
-            + FieldNames.POSITIONS_N + ", "
-            + FieldNames.POSITIONS_GAP + ", "
-            + FieldNames.POSITIONS_COVERAGE + ", "
-            + FieldNames.POSITIONS_FREQUENCY + ", "
-            + FieldNames.POSITIONS_TYPE + " "
-            + ") "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    
     
     public final static String INSERT_REFGENOME =
             "INSERT INTO " + FieldNames.TABLE_REFERENCE + " "
@@ -191,7 +171,7 @@ public class SQLStatements {
             + "VALUES (?,?,?,?,?)";
     
     
-    public static final String RESET_TRACK = 
+    public static final String RESET_TRACK_PATH = 
             "UPDATE " + FieldNames.TABLE_TRACK 
             + " SET " + FieldNames.TRACK_PATH + " = ? " 
             + "WHERE " + FieldNames.TRACK_ID + " = ?;";
@@ -205,101 +185,119 @@ public class SQLStatements {
             "UPDATE " + FieldNames.TABLE_TRACK
             + " SET " + FieldNames.TRACK_SEQUENCE_PAIR_ID + " = ? "
             + " WHERE " + FieldNames.TRACK_ID + " = ? ";
-    
-    
-    public final static String INSERT_MAPPING =
-            "INSERT INTO " + FieldNames.TABLE_MAPPING
-            + " ("
-            + FieldNames.MAPPING_ID + ", "
-            + FieldNames.MAPPING_START + ", "
-            + FieldNames.MAPPING_STOP + ", "
-            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
-            + FieldNames.MAPPING_NUM_OF_REPLICATES + ", "
-            + FieldNames.MAPPING_DIRECTION + ", "
-            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
-            + FieldNames.MAPPING_SEQUENCE_ID + ", "
-            + FieldNames.MAPPING_TRACK + " "
-            + ") "
-            + "VALUES (?,?,?,?,?,?,?,?,?)";
-    
-    
-    public final static String INSERT_DIFF =
-            "INSERT INTO " + FieldNames.TABLE_DIFF + " "
-            + "("
-            + FieldNames.DIFF_ID + ", "
-            + FieldNames.DIFF_MAPPING_ID + ", "
-            + FieldNames.DIFF_BASE + ", "
-            + FieldNames.DIFF_POSITION + ", "
-            + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_GAP_ORDER + " "
-            + ") "
-            + "VALUES (?,?,?,?,?, null)";
-    
-    
-    public final static String INSERT_GAP =
-            "INSERT INTO " + FieldNames.TABLE_DIFF + " "
-            + "("
-            + FieldNames.DIFF_ID + ", "
-            + FieldNames.DIFF_MAPPING_ID + ", "
-            + FieldNames.DIFF_BASE + ", "
-            + FieldNames.DIFF_POSITION + ", "
-            + FieldNames.DIFF_TYPE + ", "
-            + FieldNames.DIFF_GAP_ORDER + " "
-            + ") "
-            + "VALUES (?,?,?,?,?,?)";
-    
-    
-    public final static String INSERT_COVERAGE =
-            "INSERT INTO " + FieldNames.TABLE_COVERAGE + " "
-            + "("
-            + FieldNames.COVERAGE_ID + ", "
-            + FieldNames.COVERAGE_TRACK + ", "
-            + FieldNames.COVERAGE_POSITION + ", "
-            + FieldNames.COVERAGE_BM_FW_MULT + ", "
-            + FieldNames.COVERAGE_BM_FW_NUM + ", "
-            + FieldNames.COVERAGE_BM_RV_MULT + ", "
-            + FieldNames.COVERAGE_BM_RV_NUM + ", "
-            + FieldNames.COVERAGE_ZERO_FW_MULT + ", "
-            + FieldNames.COVERAGE_ZERO_FW_NUM + ", "
-            + FieldNames.COVERAGE_ZERO_RV_MULT + ", "
-            + FieldNames.COVERAGE_ZERO_RV_NUM + ", "
-            + FieldNames.COVERAGE_N_FW_MULT + ", "
-            + FieldNames.COVERAGE_N_FW_NUM + ", "
-            + FieldNames.COVERAGE_N_RV_MULT + ", "
-            + FieldNames.COVERAGE_N_RV_NUM + " "
-            + ") "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-         
-    
-    public static final String INSERT_SEQ_PAIR =
-            "INSERT INTO " + FieldNames.TABLE_SEQ_PAIRS
-            + " ("
-            + FieldNames.SEQ_PAIR_ID + ", "
-            + FieldNames.SEQ_PAIR_PAIR_ID + ", "
-            + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
-            + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
-            + FieldNames.SEQ_PAIR_TYPE 
-            + " ) "
-            + "VALUES (?,?,?,?,?) ";
-         
-    
-    public static final String INSERT_SEQ_PAIR_REPLICATE =
-            "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
-            + " ("
-            + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID + ", "
-            + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES
-            + " ) "
-            + "VALUES (?,?) ";
-         
-    
-    public static final String INSERT_SEQ_PAIR_PIVOT =
-            "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_PIVOT
-            + " ("
-            + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + ", "
-            + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID
-            + " ) "
-            + "VALUES (?, ?) ";
-    
+
+    //    public final static String INSERT_POSITION =
+//            "INSERT INTO " + FieldNames.TABLE_POSITIONS + " "
+//            + "("
+//            + FieldNames.POSITIONS_SNP_ID + ", "
+//            + FieldNames.POSITIONS_TRACK_ID + ", "
+//            + FieldNames.POSITIONS_POSITION + ", "
+//            + FieldNames.POSITIONS_BASE + ", "
+//            + FieldNames.POSITIONS_REFERENCE_BASE + ", "
+//            + FieldNames.POSITIONS_A + ", "
+//            + FieldNames.POSITIONS_C + ", "
+//            + FieldNames.POSITIONS_G + ", "
+//            + FieldNames.POSITIONS_T + ", "
+//            + FieldNames.POSITIONS_N + ", "
+//            + FieldNames.POSITIONS_GAP + ", "
+//            + FieldNames.POSITIONS_COVERAGE + ", "
+//            + FieldNames.POSITIONS_FREQUENCY + ", "
+//            + FieldNames.POSITIONS_TYPE + " "
+//            + ") "
+//            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+//    
+//    public final static String INSERT_MAPPING =
+//            "INSERT INTO " + FieldNames.TABLE_MAPPING
+//            + " ("
+//            + FieldNames.MAPPING_ID + ", "
+//            + FieldNames.MAPPING_START + ", "
+//            + FieldNames.MAPPING_STOP + ", "
+//            + FieldNames.MAPPING_IS_BEST_MAPPING + ", "
+//            + FieldNames.MAPPING_NUM_OF_REPLICATES + ", "
+//            + FieldNames.MAPPING_DIRECTION + ", "
+//            + FieldNames.MAPPING_NUM_OF_ERRORS + ", "
+//            + FieldNames.MAPPING_SEQUENCE_ID + ", "
+//            + FieldNames.MAPPING_TRACK + " "
+//            + ") "
+//            + "VALUES (?,?,?,?,?,?,?,?,?)";
+//    
+//    
+//    public final static String INSERT_DIFF =
+//            "INSERT INTO " + FieldNames.TABLE_DIFF + " "
+//            + "("
+//            + FieldNames.DIFF_ID + ", "
+//            + FieldNames.DIFF_MAPPING_ID + ", "
+//            + FieldNames.DIFF_BASE + ", "
+//            + FieldNames.DIFF_POSITION + ", "
+//            + FieldNames.DIFF_TYPE + ", "
+//            + FieldNames.DIFF_GAP_ORDER + " "
+//            + ") "
+//            + "VALUES (?,?,?,?,?, null)";
+//    
+//    
+//    public final static String INSERT_GAP =
+//            "INSERT INTO " + FieldNames.TABLE_DIFF + " "
+//            + "("
+//            + FieldNames.DIFF_ID + ", "
+//            + FieldNames.DIFF_MAPPING_ID + ", "
+//            + FieldNames.DIFF_BASE + ", "
+//            + FieldNames.DIFF_POSITION + ", "
+//            + FieldNames.DIFF_TYPE + ", "
+//            + FieldNames.DIFF_GAP_ORDER + " "
+//            + ") "
+//            + "VALUES (?,?,?,?,?,?)";
+//    
+//    
+//    public final static String INSERT_COVERAGE =
+//            "INSERT INTO " + FieldNames.TABLE_COVERAGE + " "
+//            + "("
+//            + FieldNames.COVERAGE_ID + ", "
+//            + FieldNames.COVERAGE_TRACK + ", "
+//            + FieldNames.COVERAGE_POSITION + ", "
+//            + FieldNames.COVERAGE_BM_FW_MULT + ", "
+//            + FieldNames.COVERAGE_BM_FW_NUM + ", "
+//            + FieldNames.COVERAGE_BM_RV_MULT + ", "
+//            + FieldNames.COVERAGE_BM_RV_NUM + ", "
+//            + FieldNames.COVERAGE_ZERO_FW_MULT + ", "
+//            + FieldNames.COVERAGE_ZERO_FW_NUM + ", "
+//            + FieldNames.COVERAGE_ZERO_RV_MULT + ", "
+//            + FieldNames.COVERAGE_ZERO_RV_NUM + ", "
+//            + FieldNames.COVERAGE_N_FW_MULT + ", "
+//            + FieldNames.COVERAGE_N_FW_NUM + ", "
+//            + FieldNames.COVERAGE_N_RV_MULT + ", "
+//            + FieldNames.COVERAGE_N_RV_NUM + " "
+//            + ") "
+//            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+//         
+//    
+//    public static final String INSERT_SEQ_PAIR =
+//            "INSERT INTO " + FieldNames.TABLE_SEQ_PAIRS
+//            + " ("
+//            + FieldNames.SEQ_PAIR_ID + ", "
+//            + FieldNames.SEQ_PAIR_PAIR_ID + ", "
+//            + FieldNames.SEQ_PAIR_MAPPING1_ID + ", "
+//            + FieldNames.SEQ_PAIR_MAPPING2_ID + ", "
+//            + FieldNames.SEQ_PAIR_TYPE 
+//            + " ) "
+//            + "VALUES (?,?,?,?,?) ";
+//         
+//    
+//    public static final String INSERT_SEQ_PAIR_REPLICATE =
+//            "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_REPLICATES
+//            + " ("
+//            + FieldNames.SEQ_PAIR_REPLICATE_PAIR_ID + ", "
+//            + FieldNames.SEQ_PAIR_NUM_OF_REPLICATES
+//            + " ) "
+//            + "VALUES (?,?) ";
+//         
+//    
+//    public static final String INSERT_SEQ_PAIR_PIVOT =
+//            "INSERT INTO " + FieldNames.TABLE_SEQ_PAIR_PIVOT
+//            + " ("
+//            + FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID + ", "
+//            + FieldNames.SEQ_PAIR_PIVOT_SEQ_PAIR_ID
+//            + " ) "
+//            + "VALUES (?, ?) ";  
     
     /**
      * Insert statistics data of one track into statistics table.
@@ -344,7 +342,7 @@ public class SQLStatements {
     /**
      * Update exisiting row of track statistics with sequence pair statistics
      */
-    public static String ADD_SEQPAIR_STATISTICS =
+    public static String INSERT_SEQPAIR_STATISTICS =
             "UPDATE " + FieldNames.TABLE_STATISTICS
             + " SET "
             + FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS + " = ?, "
@@ -364,7 +362,7 @@ public class SQLStatements {
             + FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS + " = ?, "
             + FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH + " = ? "
             + " WHERE "
-            + FieldNames.STATISTICS_ID + " = ? ";
+            + FieldNames.STATISTICS_TRACK_ID + " = ? ";
     
     /**
      * Insert a new coverage distribution for a track with all 35 distribution

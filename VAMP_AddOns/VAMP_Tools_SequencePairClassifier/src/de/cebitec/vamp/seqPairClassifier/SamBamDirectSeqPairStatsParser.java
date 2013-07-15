@@ -18,9 +18,9 @@ import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
 
 /**
- * A parser only responsible for parsing sequence pair statistics for a track.
+ * A parser only responsible for parsing read pair statistics for a track.
  * This parser is mainly used for track, which have already been imported into
- * another VAMP DB and are now reimported.
+ * another ReadXplorer DB and are now reimported.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -32,9 +32,9 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
     private DiscreteCountingDistribution seqPairSizeDistribution;
 
     /**
-     * A parser only responsible for parsing sequence pair statistics for a
+     * A parser only responsible for parsing read pair statistics for a
      * track. This parser is mainly used for track, which have already been
-     * imported into another VAMP DB and are now reimported.
+     * imported into another ReadXplorer DB and are now reimported.
      * @param seqPairJobContainer container with both track jobs of this pair
      * @param refSeq the complete reference sequence
      * @param classificationMap the classification map of the track - not needed
@@ -50,7 +50,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
     }
 
     /**
-     * Carries out the statistics parsing for the sequence pair job.
+     * Carries out the statistics parsing for the read pair job.
      * @return an empty container
      * @throws ParsingException
      * @throws OutOfMemoryError 
@@ -60,7 +60,7 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
 
         try (SAMFileReader samBamReader = new SAMFileReader(trackJob.getFile())) {
             long start = System.currentTimeMillis();
-            this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Start"));
+            this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "SeqPairStatsParser.Start"));
 
             samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samItor = samBamReader.iterator();
@@ -113,13 +113,13 @@ public class SamBamDirectSeqPairStatsParser extends SamBamDirectSeqPairClassifie
             samItor.close();
 
             long finish = System.currentTimeMillis();
-            String msg = NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Classification.Finish");
+            String msg = NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "SeqPairStatsParser.Finish");
             this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
 
             this.getStatsContainer().setSeqPairDistribution(this.seqPairSizeDistribution);
 
         } catch (Exception e) {
-            this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "Classifier.Error", e.getMessage()));
+            this.notifyObservers(NbBundle.getMessage(SamBamDirectSeqPairClassifier.class, "SeqPairStatsParser.Error", e.getMessage()));
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, e.getMessage());
         }
 

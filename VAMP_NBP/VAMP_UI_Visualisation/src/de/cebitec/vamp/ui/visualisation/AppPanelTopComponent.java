@@ -49,7 +49,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 /**
- * Top component which displays the main work area of VAMP, which contains the
+ * Top component which displays the main work area of ReadXplorer, which contains the
  * reference and track viewers.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.view//AppPanel//EN", autostore = false)
@@ -70,11 +70,12 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
     private JPanel tracksPanel;
 
     /**
-     * Top component which displays the main work area of VAMP, which contains
+     * Top component which displays the main work area of ReadXplorer, which contains
      * the reference and track viewers.
      */
     public AppPanelTopComponent() {
         initComponents();
+        Snapshot.setVisible(false);
         setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
         setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));

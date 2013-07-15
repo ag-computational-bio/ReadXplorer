@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class Snp implements SnpI {
     
-    private String position;
+    private int position;
     private int trackId;
     private char base;
     private char refBase;
@@ -25,6 +25,7 @@ public class Snp implements SnpI {
     private SequenceComparison type;
     List<CodonSnp> codons;
     private SequenceComparison effect;
+    private int gapOrderIndex;
 
     /**
      * 
@@ -43,9 +44,34 @@ public class Snp implements SnpI {
      * @param type type can be among S = substitution, I = insertion, D = deletion, M = match according to
      *  Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
      */
-    public Snp(String position,int trackId, char base, char refBase, int aRate, int cRate, 
+    public Snp(int position,int trackId, char base, char refBase, int aRate, int cRate, 
                     int gRate, int tRate, int nRate, int gapRate, int coverage,
-                    int frequency, SequenceComparison type){
+                    int frequency, SequenceComparison type) {
+        this(position, trackId, base, refBase, aRate, cRate, gRate, tRate, nRate, gapRate, coverage, frequency, type, 0);
+    }
+
+    /**
+     * 
+     * @param position
+     * @param trackId
+     * @param base
+     * @param refBase
+     * @param aRate
+     * @param cRate
+     * @param gRate
+     * @param tRate
+     * @param nRate
+     * @param gapRate
+     * @param coverage
+     * @param frequency
+     * @param type type can be among S = substitution, I = insertion, D = deletion, M = match according to
+     *  Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
+     * @param gapOrderIndex 
+     */
+    public Snp(int position, int trackId, char base, char refBase, int aRate, int cRate,
+            int gRate, int tRate, int nRate, int gapRate, int coverage,
+            int frequency, SequenceComparison type, int gapOrderIndex) {
+        
         this.position = position;
         this.trackId = trackId;
         this.base = base;
@@ -59,12 +85,13 @@ public class Snp implements SnpI {
         this.coverage = coverage;
         this.frequency = frequency;
         this.type = type;
-        this.codons = new ArrayList<CodonSnp>();
+        this.codons = new ArrayList<>();
+        this.gapOrderIndex = gapOrderIndex;
     }
 
     
     @Override
-    public String getPosition() {
+    public int getPosition() {
         return position;
     }
     
@@ -162,7 +189,23 @@ public class Snp implements SnpI {
     public void setEffect(SequenceComparison effect) {
         this.effect = effect;
     }
-    
+
+    /**
+     * @return The index of the gap at the given reference position. For diffs
+     * this value is 0.
+     */
+    public int getGapOrderIndex() {
+        return gapOrderIndex;
+    }
+
+    /**
+     * Set the gapOrderIndex.
+     * @param gapOrderIndex The index of the gap at the given reference
+     * position. For diffs this value is 0.
+     */
+    public void setGapOrderIndex(int gapOrderIndex) {
+        this.gapOrderIndex = gapOrderIndex;
+    }
 
     @Override
     public String toString(){

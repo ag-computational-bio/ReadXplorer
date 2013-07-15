@@ -30,7 +30,6 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
-import org.openide.cookies.OpenCookie;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
@@ -60,7 +59,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     private int referenceId;
     private List<PersistantTrack> tracks;
     private CoveredFeaturesAnalysisTopComponent coveredAnnoAnalysisTopComp;
-    private Map<Integer, AnalysisContainer> trackToAnalysisMap;
+    private Map<Integer, AnalysisCoveredFeatures> trackToAnalysisMap;
     private int finishedCovAnalyses = 0;
     private ResultPanelCoveredFeatures coveredFeaturesResultPanel;
     ParameterSetCoveredFeatures parameters;
@@ -165,12 +164,11 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         TrackConnector connector;
         for (PersistantTrack track : this.tracks) {
-            //TODO: Error handling
             try {
                 connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                System.out.println("Track could not be fetched: " + ex);
-                return;
+                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                continue;
             }
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
                     NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams); //every track has its own analysis handlers
@@ -178,7 +176,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             covAnalysisHandler.registerObserver(analysisCoveredFeatures);
             covAnalysisHandler.setCoverageNeeded(true);
 
-            trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisCoveredFeatures));
+            trackToAnalysisMap.put(track.getId(), analysisCoveredFeatures);
             covAnalysisHandler.startAnalysis();
         }
     }
@@ -201,7 +199,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
                 ++finishedCovAnalyses;
 
-                AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId).getAnalysisCoveredFeatures();
+                AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
                 CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap);
                 result.setParameters(parameters);
                 result.setFeatureListSize(analysisCoveredFeatures.getNoGenomeFeatures());
@@ -239,26 +237,6 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         } catch (ClassCastException e) {
             //do nothing, we dont handle other data in this class
-        }
-    }
-
-    private static class AnalysisContainer { //TODO:even if there is only one analysis here, we can abstract this better later
-
-        private final AnalysisCoveredFeatures analysisCoveredFeatures;
-
-        /**
-         * Container class for all available transcription analyses.
-         */
-        public AnalysisContainer(AnalysisCoveredFeatures analysisCoveredFeatures) {
-            this.analysisCoveredFeatures = analysisCoveredFeatures;
-        }
-
-        /**
-         * @return The transcription start site analysis stored in this
-         * container
-         */
-        public AnalysisCoveredFeatures getAnalysisCoveredFeatures() {
-            return analysisCoveredFeatures;
         }
     }
 }

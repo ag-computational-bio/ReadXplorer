@@ -129,6 +129,10 @@ public class PersistantCoverage implements Serializable {
         return leftBound;
     }
 
+    /**
+     * @return The right bound of the stored coverage interval. The borders are
+     * inclusive in the data structures.
+     */
     public int getRightBound() {
         return rightBound;
     }
@@ -332,7 +336,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchFwdMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchFwdMultCov.length && this.internalPos >= 0) {
             return bestMatchFwdMultCov[this.internalPos];
         } else {
             return 0;
@@ -345,7 +349,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchFwdNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchFwdNumCov.length && this.internalPos >= 0) {
             return bestMatchFwdNumCov[this.internalPos];
         } else {
             return 0;
@@ -358,7 +362,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchRevMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchRevMultCov.length && this.internalPos >= 0) {
             return bestMatchRevMultCov[this.internalPos];
         } else {
             return 0;
@@ -371,7 +375,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchRevNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchRevNumCov.length && this.internalPos >= 0) {
             return bestMatchRevNumCov[this.internalPos];
         } else {
             return 0;
@@ -384,7 +388,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdMultCov.length && this.internalPos >= 0) {
             return commonFwdMultCov[this.internalPos];
         } else {
             return 0;
@@ -397,7 +401,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdNumCov.length && this.internalPos >= 0) {
             return commonFwdNumCov[this.internalPos];
         } else {
             return 0;
@@ -410,7 +414,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevMultCov.length && this.internalPos >= 0) {
             return commonRevMultCov[this.internalPos];
         } else {
             return 0;
@@ -423,7 +427,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevNumCov.length && this.internalPos >= 0) {
             return commonRevNumCov[this.internalPos];
         } else {
             return 0;
@@ -437,7 +441,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectFwdMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectFwdMultCov.length && this.internalPos >= 0) {
             return perfectFwdMultCov[this.internalPos];
         } else {
             return 0;
@@ -450,7 +454,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectFwdNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectFwdNumCov.length && this.internalPos >= 0) {
             return perfectFwdNumCov[this.internalPos];
         } else {
             return 0;
@@ -463,7 +467,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectRevMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectRevMultCov.length && this.internalPos >= 0) {
             return perfectRevMultCov[this.internalPos];
         } else {
             return 0;
@@ -476,7 +480,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectRevNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectRevNumCov.length && this.internalPos >= 0) {
             return perfectRevNumCov[this.internalPos];
         } else {
             return 0;
@@ -490,7 +494,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdMultTrack1(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCovTrack1.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdMultCovTrack1.length && this.internalPos >= 0) {
             return commonFwdMultCovTrack1[this.internalPos];
         } else {
             return 0;
@@ -504,7 +508,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevMultTrack1(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCovTrack1.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevMultCovTrack1.length && this.internalPos >= 0) {
             return commonRevMultCovTrack1[this.internalPos];
         } else {
             return 0;
@@ -518,7 +522,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdMultTrack2(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCovTrack2.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdMultCovTrack2.length && this.internalPos >= 0) {
             return commonFwdMultCovTrack2[this.internalPos];
         } else {
             return 0;
@@ -532,7 +536,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevMultTrack2(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCovTrack2.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevMultCovTrack2.length && this.internalPos >= 0) {
             return commonRevMultCovTrack2[this.internalPos];
         } else {
             return 0;
@@ -609,7 +613,7 @@ public class PersistantCoverage implements Serializable {
      * and false otherwise
      */
     public boolean isInBounds(int posToCheck) {
-        if (posToCheck < leftBound || posToCheck > rightBound && this.internalPos > 0) {
+        if (posToCheck < leftBound || posToCheck > rightBound && this.internalPos >= 0) {
             return false;
         } else {
             return true;

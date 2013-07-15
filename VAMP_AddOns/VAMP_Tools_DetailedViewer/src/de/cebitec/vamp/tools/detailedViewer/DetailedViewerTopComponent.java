@@ -40,12 +40,20 @@ public final class DetailedViewerTopComponent extends TopComponent {
     private static String SEQPAIRCARD = "sequencePair";
     
     private String selectedViewer;
+    private ViewController viewCon;
 
     public DetailedViewerTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent"));
         setToolTipText(NbBundle.getMessage(DetailedViewerTopComponent.class, "HINT_DetailedViewerTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        this.viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
+    }
+    
+    public DetailedViewerTopComponent(ViewController viewCon) {
+        this();
+        this.viewCon = viewCon;
+        
     }
 
     /** This method is called from within the constructor to
@@ -80,7 +88,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
             }
         });
 
-        colorHistogramBox.setFont(new java.awt.Font("Dialog", 1, 10));
+        colorHistogramBox.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(colorHistogramBox, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.colorHistogramBox.text")); // NOI18N
         colorHistogramBox.setMinimumSize(new java.awt.Dimension(50, 22));
         colorHistogramBox.setPreferredSize(new java.awt.Dimension(100, 22));
@@ -107,9 +115,9 @@ public final class DetailedViewerTopComponent extends TopComponent {
                     .addComponent(histogramButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(alignmentButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(sequencePairButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(74, Short.MAX_VALUE))
             .addGroup(switchPanelLayout.createSequentialGroup()
-                .addComponent(colorHistogramBox, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                .addComponent(colorHistogramBox, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
                 .addGap(46, 46, 46))
         );
         switchPanelLayout.setVerticalGroup(
@@ -219,7 +227,6 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
 
     @Override
     public void componentOpened() {
-        ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
         if (this.trackConnector.isSeqPairTrack()) {

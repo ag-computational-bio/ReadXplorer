@@ -133,9 +133,6 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
     /**
      * Initializes the setup wizard for the transcription analyses.
-     *
-     * @param trackIds the list of track ids for which the transcription
-     * analyses have to be carried out
      */
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings("unchecked")
@@ -215,7 +212,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             try {
                 connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                return;
+                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                continue;
             }
 
             AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
@@ -226,13 +224,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             if (parametersTss.isPerformTSSAnalysis()) {
 
                 if (parametersTss.isPerformUnannotatedTranscriptDet()) {
-                    analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss.getMinTotalIncrease(),
-                            parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
-                            parametersTss.isAutoTssParamEstimation(), parametersTss.getMinTranscriptExtensionCov());
+                    analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss);
                 } else {
-                    analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss.getMinTotalIncrease(),
-                            parametersTss.getMinPercentIncrease(), parametersTss.getMaxLowCovInitCount(), parametersTss.getMinLowCovIncrease(),
-                            parametersTss.isAutoTssParamEstimation());
+                    analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss);
                 }
                 covAnalysisHandler.registerObserver(analysisTSS);
                 covAnalysisHandler.setCoverageNeeded(true);
@@ -286,8 +280,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 //TODO: bp window of neighboring TSS parameter
 
                 AnalysisTranscriptionStart analysisTSS = trackToAnalysisMap.get(trackId).getAnalysisTSS();
-                parametersTss.setMinTotalIncrease(analysisTSS.getIncreaseReadCount()); //if automatic is on, the parameters are different now
-                parametersTss.setMinPercentIncrease(analysisTSS.getIncreaseReadPercent());
+                parametersTss = analysisTSS.getParametersTSS(); //if automatic is on, the parameters are different now
                 if (transcriptionStartResultPanel == null) {
                     transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
                     transcriptionStartResultPanel.setReferenceViewer(this.refViewer);

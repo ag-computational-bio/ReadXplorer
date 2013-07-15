@@ -5,7 +5,7 @@ and open the template in the editor.
 -->
 <!DOCTYPE helpset PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN" "http://java.sun.com/products/javahelp/helpset_2_0.dtd">
 <helpset version="2.0">
-    <title>VAMP Data Export Help</title>
+    <title>ReadXplorer Data Export Help</title>
     <maps>
         <homeID>de.cebitec.vamp.exporter.about</homeID>
         <mapref location="exporter-map.xml"/>

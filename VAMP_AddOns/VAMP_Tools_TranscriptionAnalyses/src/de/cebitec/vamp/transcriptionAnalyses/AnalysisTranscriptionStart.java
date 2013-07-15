@@ -41,17 +41,13 @@ import java.util.List;
 public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<TranscriptionStart>> {
 
     private TrackConnector trackConnector;
+    private final ParameterSetTSS parametersTSS;
     private int refSeqLength;
-    private int increaseReadCount;
-    private int increaseReadPercent;
-    private int maxInitialReadCount;
-    private int increaseReadCount2;
     private List<PersistantFeature> genomeFeatures;
     protected List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
     private DiscreteCountingDistribution covIncreaseDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
     private boolean calcCoverageDistributions;
-    private boolean tssAutomatic;
     
     //varibles for transcription start site detection
     private int covLastFwdPos;
@@ -76,26 +72,11 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
      * 
      * @param trackConnector the track viewer for which the analyses should be carried out
-     * @param increaseReadCount minimum increase of read counts for two neighboring
-     *          positions. Only when the increase is bigger, a transcription start site is predicted
-     * @param increaseReadPercent minimum increase of read counts for two neighboring
-     *          positions in percent. Only when the increase in percent is bigger, a transcription 
-     *          start site is predicted
-     * @param maxInitialReadCount maximum number of reads at the left position in 
-     *          a pair of tho neighboring positions. Gene starts are only predicted,
-     *          if this maximum is not exceeded AND increaseReadCount2 is satisfied
-     * @param increaseReadCount2 minimum increase of read counts for two neighboring
-     *          positions. Only when the increase is bigger, a transcription start site is predicted
-     * @param tssAutomatic  true, if the parameters should be estimated automatically, false otherwise
+     * @param parametersTSS the parameter set for this TSS analysis
      */
-    public AnalysisTranscriptionStart(TrackConnector trackConnector, int increaseReadCount, int increaseReadPercent, 
-            int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic) {
+    public AnalysisTranscriptionStart(TrackConnector trackConnector, ParameterSetTSS parametersTSS) {
         this.trackConnector = trackConnector;
-        this.increaseReadCount = increaseReadCount;
-        this.increaseReadPercent = increaseReadPercent;
-        this.maxInitialReadCount = maxInitialReadCount;
-        this.increaseReadCount2 = increaseReadCount2;
-        this.tssAutomatic = tssAutomatic;
+        this.parametersTSS = parametersTSS;
         
         this.detectedStarts = new ArrayList<>();
         this.covLastFwdPos = 0;
@@ -119,20 +100,20 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.covIncPercentDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
         this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
         
-        if (this.tssAutomatic) {
-            this.maxInitialReadCount = 0; //set these values as default for the transcription start site automatic
-            this.increaseReadCount2 = 0; //avoids loosing smaller, low coverage increases
+        if (this.parametersTSS.isAutoTssParamEstimation()) {
+            this.parametersTSS.setMaxLowCovInitCount(0); //set these values as default for the transcription start site automatic
+            this.parametersTSS.setMinLowCovIncrease(0); //avoids loosing smaller, low coverage increases
             if (!this.calcCoverageDistributions) {
-                this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0); //+ 0,05%
-                this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);// (int) (this.genomeSize / 1000)); //0,1%
+                this.parametersTSS.setMinTotalIncrease(this.estimateCutoff(this.covIncreaseDistribution, 0)); //+ 0,05%
+                this.parametersTSS.setMinPercentIncrease(this.estimateCutoff(this.covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
             } else {
-                this.increaseReadCount = 10; //lowest default values for new data sets without an inital distribution
-                this.increaseReadPercent = 30; //in the database
+                this.parametersTSS.setMinTotalIncrease(10); //lowest default values for new data sets without an inital distribution
+                this.parametersTSS.setMinPercentIncrease(30); //in the database
             }
         }
         
         //the minimal increase is initially set to 10%, if the coverage distributions were not calculated yet
-        this.increaseReadPercent = this.calcCoverageDistributions ? 10 : this.increaseReadPercent;
+        parametersTSS.setMinPercentIncrease(calcCoverageDistributions ? 10 : parametersTSS.getMinPercentIncrease());
     }
     
     /**
@@ -159,7 +140,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     public void finish() {
         //when the last request is finished signalize the parent to collect the data
         this.storeDistributions();
-        if (this.tssAutomatic) {
+        if (parametersTSS.isAutoTssParamEstimation()) {
             this.correctResult();
         }
     }
@@ -251,22 +232,22 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private void detectStart(int pos, int fwdCov1, int fwdCov2, int revCov1, int revCov2, 
                              int diffFwd, int diffRev, int percentDiffFwd, int percentDiffRev) {
 
-        if (this.increaseReadCount2 > 0) { //if low coverage read count is calculated separately
-            if (diffFwd > this.increaseReadCount 
-                    && percentDiffFwd > this.increaseReadPercent 
-                    && fwdCov1 > this.maxInitialReadCount
-                    || fwdCov1 <= this.maxInitialReadCount 
-                    && diffFwd > this.increaseReadCount2) {
+        if (this.parametersTSS.getMinLowCovIncrease() > 0) { //if low coverage read count is calculated separately
+            if (diffFwd > parametersTSS.getMinTotalIncrease()
+                    && percentDiffFwd > parametersTSS.getMinPercentIncrease()
+                    && fwdCov1 > parametersTSS.getMaxLowCovInitCount()
+                    || fwdCov1 <= parametersTSS.getMaxLowCovInitCount()
+                    && diffFwd > this.parametersTSS.getMinLowCovIncrease()) {
 
                 DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
                 this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, 
                         fwdCov1, fwdCov2, detFeatures, trackConnector.getTrackID()));
             }
-            if (diffRev > this.increaseReadCount 
-                    && percentDiffRev > this.increaseReadPercent 
-                    && revCov2 > this.maxInitialReadCount
-                    || revCov2 <= this.maxInitialReadCount 
-                    && diffRev > this.increaseReadCount2) {
+            if (diffRev > parametersTSS.getMinTotalIncrease()
+                    && percentDiffRev > parametersTSS.getMinPercentIncrease()
+                    && revCov2 > parametersTSS.getMaxLowCovInitCount()
+                    || revCov2 <= parametersTSS.getMaxLowCovInitCount()
+                    && diffRev > this.parametersTSS.getMinLowCovIncrease()) {
 
                 DetectedFeatures detFeatures = this.findNextFeature(pos, false);
                 this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, 
@@ -274,12 +255,12 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
 
         } else {
-            if (diffFwd > this.increaseReadCount && percentDiffFwd > this.increaseReadPercent) {
+            if (diffFwd > parametersTSS.getMinTotalIncrease() && percentDiffFwd > parametersTSS.getMinPercentIncrease()) {
                 DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
                 this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, 
                         fwdCov1, fwdCov2, detFeatures, trackConnector.getTrackID()));
             }
-            if (diffRev > this.increaseReadCount && percentDiffRev > this.increaseReadPercent) {
+            if (diffRev > parametersTSS.getMinTotalIncrease() && percentDiffRev > parametersTSS.getMinPercentIncrease()) {
                 DetectedFeatures detFeatures = this.findNextFeature(pos, false);
                 this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, 
                         revCov2, revCov1, detFeatures, trackConnector.getTrackID()));
@@ -287,12 +268,12 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             
         }
         
-        if (this.tssAutomatic) {
+        if (this.parametersTSS.isAutoTssParamEstimation()) {
             //add values to exact counting data structures to refine threshold
-            this.increaseDistribution(this.exactCovIncreaseDist, diffFwd, this.increaseReadCount);
-            this.increaseDistribution(this.exactCovIncreaseDist, diffRev, this.increaseReadCount);
-            this.increaseDistribution(this.exactCovIncPercDist, percentDiffFwd, this.increaseReadPercent);
-            this.increaseDistribution(this.exactCovIncPercDist, percentDiffRev, this.increaseReadPercent);
+            this.increaseDistribution(this.exactCovIncreaseDist, diffFwd, parametersTSS.getMinTotalIncrease());
+            this.increaseDistribution(this.exactCovIncreaseDist, diffRev, parametersTSS.getMinTotalIncrease());
+            this.increaseDistribution(this.exactCovIncPercDist, percentDiffFwd, parametersTSS.getMinPercentIncrease());
+            this.increaseDistribution(this.exactCovIncPercDist, percentDiffRev, parametersTSS.getMinPercentIncrease());
         }
     }
 
@@ -566,9 +547,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         if (this.calcCoverageDistributions) { //if it was calculated, also store it
             ProjectConnector.getInstance().insertCountDistribution(covIncreaseDistribution, this.trackConnector.getTrackID());
             ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
-            if (this.tssAutomatic) {
-                this.increaseReadCount = this.estimateCutoff(this.covIncreaseDistribution, 0);//(int) (this.genomeSize * 0.0005));
-                this.increaseReadPercent = this.estimateCutoff(this.covIncPercentDistribution, 0);//(int) (this.genomeSize * 0.0005));
+            if (this.parametersTSS.isAutoTssParamEstimation()) {
+                parametersTSS.setMinTotalIncrease(this.estimateCutoff(this.covIncreaseDistribution, 0));//(int) (this.genomeSize * 0.0005));
+                parametersTSS.setMinPercentIncrease(this.estimateCutoff(this.covIncPercentDistribution, 0));//(int) (this.genomeSize * 0.0005));
                 this.correctTSSList();
             }
         }
@@ -584,8 +565,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         for (int i = 0; i < this.detectedStarts.size(); ++i) {
             tss = this.detectedStarts.get(i);
             percentDiff = (int) (((double) tss.getStartCoverage() / (double) tss.getInitialCoverage()) * 100.0) - 100;
-            if (tss.getStartCoverage() - tss.getInitialCoverage() < this.increaseReadCount
-                    || percentDiff < this.increaseReadPercent) {
+            if (tss.getStartCoverage() - tss.getInitialCoverage() < parametersTSS.getMinTotalIncrease()
+                    || percentDiff < parametersTSS.getMinPercentIncrease()) {
                 this.detectedStarts.remove(tss);
             }
         }
@@ -601,10 +582,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private void correctResult() {
         
         //estimate exact cutoff for readcount increase of 0,25%
-        System.out.println("old threshold read count: " + this.increaseReadCount);
-        System.out.println("old threshold percent: " + this.increaseReadPercent);
-        this.increaseReadCount = this.getNewThreshold(this.exactCovIncreaseDist, 0);//(int) (this.genomeSize * 0.0005));
-        this.increaseReadPercent = this.getNewThreshold(this.exactCovIncPercDist, 0);//(int) (this.genomeSize * 0.0005));
+        System.out.println("old threshold read count: " + parametersTSS.getMinTotalIncrease());
+        System.out.println("old threshold percent: " + parametersTSS.getMinPercentIncrease());
+        parametersTSS.setMinTotalIncrease(this.getNewThreshold(this.exactCovIncreaseDist, 0));//(int) (this.genomeSize * 0.0005));
+        parametersTSS.setMinPercentIncrease(this.getNewThreshold(this.exactCovIncPercDist, 0));//(int) (this.genomeSize * 0.0005));
         
         //remove detected starts with too low coverage increases
         List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>(this.detectedStarts);
@@ -613,9 +594,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         for (TranscriptionStart tss : this.detectedStarts) {
             increase = tss.getStartCoverage() - tss.getInitialCoverage();
             percentage = GeneralUtils.calculatePercentageIncrease(tss.getInitialCoverage(), tss.getStartCoverage());
-            if ((   increase < this.increaseReadCount ||
-                    percentage < this.increaseReadPercent) &&
-                    tss.getInitialCoverage() > this.maxInitialReadCount) {
+            if ((   increase < parametersTSS.getMinTotalIncrease() ||
+                    percentage < parametersTSS.getMinPercentIncrease()) &&
+                    tss.getInitialCoverage() > parametersTSS.getMaxLowCovInitCount()) {
                 copiedDetectedStarts.remove(tss);
             }
         }
@@ -650,20 +631,12 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         }
     }
 
-    public int getIncreaseReadCount() {
-        return increaseReadCount;
-    }
-
-    public int getIncreaseReadCount2() {
-        return increaseReadCount2;
-    }
-
-    public int getIncreaseReadPercent() {
-        return increaseReadPercent;
-    }
-
-    public int getMaxInitialReadCount() {
-        return maxInitialReadCount;
+    /**
+     * @return An updated set of the current parameters. It can be updated,
+     * because this analysis contains an automatic parameter erstimation.
+     */
+    public ParameterSetTSS getParametersTSS() {
+        return this.parametersTSS;
     }
 
     @Override

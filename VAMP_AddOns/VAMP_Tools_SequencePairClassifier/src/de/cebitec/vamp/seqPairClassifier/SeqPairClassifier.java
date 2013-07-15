@@ -16,10 +16,10 @@ import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
- * Main class of the sequence pair identifier. For two given files (one file
+ * Main class of the read pair identifier. For two given files (one file
  * with all reads from one side and the other with all reads from the other
- * side) it calculates the different combinations of each sequence pair mapping
- * and returns which sequence pairs could be mapped successfully, which do not
+ * side) it calculates the different combinations of each read pair mapping
+ * and returns which read pairs could be mapped successfully, which do not
  * have a sequence in the correct distance or/and orientation and which cannot
  * be assigned to at least one position. Thus it covers all possible pairing
  * cases.
@@ -181,7 +181,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
             mappingGroup1 = mappings1.getParsedMappingGroupBySeqID(seqID1).getMappings();
             
             if (idToNameMap2.containsKey(currReadname)) {
-                //both sides of the sequence pair have been mapped
+                //both sides of the read pair have been mapped
                 seqID2 = idToNameMap2.get(currReadname);
                 mappingGroup2 = mappings2.getParsedMappingGroupBySeqID(seqID2).getMappings();
                 
@@ -361,7 +361,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
                     omitIdList.clear();
                 }
                 
-            } else { //only one side of the sequence pair could be mapped
+            } else { //only one side of the read pair could be mapped
                 for (ParsedMapping parsedMapping : mappingGroup1) { //pos and direction can deviate
                     this.seqPairContainer.addMappingToPairId(new Pair<>(parsedMapping.getID(), interimSeqPairId));
                 }
@@ -376,7 +376,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
             seqID2 = idToNameMap2.get(currReadname);
             mappingGroup2 = mappings2.getParsedMappingGroupBySeqID(seqID2).getMappings();
             
-            if (!idToNameMap1.containsKey(currReadname)) { //only scnd side of the sequence pair could be mapped
+            if (!idToNameMap1.containsKey(currReadname)) { //only scnd side of the read pair could be mapped
 
                 for (ParsedMapping parsedMapping : mappingGroup2) { //pos and direction can deviate
                     this.seqPairContainer.addMappingToPairId(new Pair<>(parsedMapping.getID(), interimSeqPairId));
@@ -399,21 +399,20 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
     }
 
     /**
-     * Either adds a new sequence pair mapping object to the list or increases
-     * the number of replicates if the current sequence pair mapping contains
-     * identical data to an already existing sequence pair mapping object.
-     *
-     * @param interimID id for this sequence pair mapping. Interim, because it
+     * Either adds a new read pair mapping object to the list or increases
+     * the number of replicates if the current read pair mapping contains
+     * identical data to an already existing read pair mapping object.
+     * @param interimID id for this read pair mapping. Interim, because it
      * has to be shifted when inserting into database to guarantee uniqueness
      * @param interimMatepairID interimMatepairID id for mappings belonging to
-     * same sequence pair. Interim, because it has to be shifted when inserting
+     * same read pair. Interim, because it has to be shifted when inserting
      * into database to guarantee uniqueness
      * @param mappingId1
      * @param mappingId2
      * @param type type of the pair 0 = perfect, 1 = dist too large, 2 = dist
      * too small, 3 = orient wrong 4 = orient wrong and dist too large, 5 =
      * orient wrong and dist too small
-     * @param the sequence pair distance
+     * @param the read pair distance
      */
     private void addPairedMapping(long mappingId1, long mappingId2, long seqPairId, byte type, int distance) {
         
@@ -460,8 +459,7 @@ public class SeqPairClassifier implements SeqPairClassifierI, Observer, Observab
 
     /**
      * Depending on deviation the min and max values of the distance between a
-     * sequence pair is set.
-     *
+     * read pair is set.
      * @param dist distance in bases
      * @param deviation deviation in % (1-100)
      */

@@ -62,23 +62,20 @@ public final class ParserCommonMethods {
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
+        String refBases; //bases of the reference corresponding to the read interval under investigation
         int currentCount;
         int refPos = 0;
         int readPos = 0;
-        int diffPos;
-        if (!refSeq.isEmpty()) {
-            readSeq = readSeq.toUpperCase();
-            refSeq = refSeq.toUpperCase();
-        }
 
         for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
             currentCount = Integer.valueOf(num[i - 1]);
 
             if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                bases = readSeq.substring(readPos, readPos + currentCount);
+                bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount).toUpperCase();
                 for (int j = 0; j < bases.length(); ++j) {
-                    if (bases.charAt(j) != refSeq.charAt(refPos + j)) {
+                    if (bases.charAt(j) != refBases.charAt(j)) {
                         ++differences;
                     }
                 }
@@ -143,30 +140,26 @@ public final class ParserCommonMethods {
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
+        String refBases; //bases of the reference belonging to the read interval under investigation
         int currentCount;
         int refPos = 0;
         int readPos = 0;
-        int diffPos;
         char base;
-        if (!refSeq.isEmpty()) {
-            readSeq = readSeq.toUpperCase();
-            refSeq = refSeq.toUpperCase();
-        }
         
         for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
             currentCount = Integer.valueOf(num[i - 1]);
             if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                bases = readSeq.substring(readPos, readPos + currentCount);
+                bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount).toUpperCase();
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = refPos + j;
                     base = bases.charAt(j);
-                    if (base != refSeq.charAt(diffPos)) {
+                    if (base != refBases.charAt(j)) {
                         ++differences;
                         if (isRevStrand) {
                             base = SequenceUtils.getDnaComplement(base);
                         }
-                        diffs.add(new ParsedDiff(diffPos + start, base));
+                        diffs.add(new ParsedDiff(refPos + j + start, base));
                     }
                 }
                 refPos += currentCount;
@@ -277,7 +270,7 @@ public final class ParserCommonMethods {
      * @param gapPos position of the gap
      * @param gapOrderIndex the gap order index for the current gap (larger the more gaps
      *      in a row
-     * @return the new gap order index for the gap
+     * @return the new gap order index for the gap (starting with 0)
      */
     public static int getOrderForGap(int gapPos, Map<Integer, Integer> gapOrderIndex) {
         if (!gapOrderIndex.containsKey(gapPos)) {

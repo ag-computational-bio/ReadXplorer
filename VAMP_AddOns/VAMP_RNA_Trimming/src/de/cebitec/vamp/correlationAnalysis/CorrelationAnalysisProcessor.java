@@ -3,14 +3,16 @@ package de.cebitec.vamp.correlationAnalysis;
 import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.netbeans.api.progress.ProgressHandle;
@@ -88,9 +90,15 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.correlationsList = new ArrayList<>();
         
         ArrayList<TrackConnector> tcl = new ArrayList<>();
-        HashMap<Integer, PersistantTrack> trackNamesList = new HashMap<> ();
-        for(PersistantTrack track : list) {
-            tcl.add(ProjectConnector.getInstance().getMultiTrackConnector(track));
+        HashMap<Integer, PersistantTrack> trackNamesList = new HashMap<>();
+        SaveTrackConnectorFetcherForGUI fetcher = new SaveTrackConnectorFetcherForGUI();
+        for (PersistantTrack track : list) {
+            try {
+                tcl.add(fetcher.getMultiTrackConnector(track));
+            } catch (UserCanceledTrackPathUpdateException ex) {
+                JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                continue;
+            }
             trackNamesList.put(track.getId(), track);
         }
         this.analysisResult = new CorrelationResult(this.correlationsList, trackNamesList);

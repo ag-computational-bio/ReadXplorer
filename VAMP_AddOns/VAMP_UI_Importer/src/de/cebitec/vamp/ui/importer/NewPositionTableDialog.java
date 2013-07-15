@@ -25,9 +25,11 @@ import javax.swing.text.NumberFormatter;
 
 /**
  * The dialog panel for importing only position tables for an existing track.
+ * @deprecated Storing of data sets in the DB is not allowed anymore
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
+@Deprecated
 public class NewPositionTableDialog extends ImportTrackBasePanel implements NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;

@@ -21,6 +21,14 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     
     /**
      * Data storage for all parameters associated with a transcription analysis.
+     * @param performTSSAnalysis
+     * @param autoTssParamEstimation
+     * @param performUnannotatedTranscriptDet
+     * @param minTotalIncrease
+     * @param minPercentIncrease
+     * @param maxLowCovInitCount
+     * @param minLowCovIncrease
+     * @param minTranscriptExtensionCov 
      */
     ParameterSetTSS(boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet, 
             int minTotalIncrease, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease, 

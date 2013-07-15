@@ -37,8 +37,8 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 preferredID = "DiffExpLogTopComponent")
 @Messages({
     "CTL_DiffExpLogAction=DiffExpLog",
-    "CTL_DiffExpLogTopComponent=Differential Expression Analysis Log",
-    "HINT_DiffExpLogTopComponent=Shows the log for the last run of the differential expression analysis."
+    "CTL_DiffExpLogTopComponent=Differential Gene Expression Analysis Log",
+    "HINT_DiffExpLogTopComponent=Shows the log for the last run of the differential gene expression analysis."
 })
 public final class DiffExpLogTopComponent extends TopComponent implements Observer {
 

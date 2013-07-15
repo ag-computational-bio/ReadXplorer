@@ -7,7 +7,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
 
 /**
- * Provides some basic table utils for VAMP.
+ * Provides some basic table utils for ReadXplorer.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */

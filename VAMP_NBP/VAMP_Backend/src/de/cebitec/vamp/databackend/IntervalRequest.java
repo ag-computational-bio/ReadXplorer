@@ -39,7 +39,7 @@ public class IntervalRequest {
      * double track request or ParameterSetMapping.NORMAL, if this is an 
      * ordinary track request.
      * @param readClassParams A parameter set which contains all parameters
-     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
@@ -90,7 +90,7 @@ public class IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param readClassParams A parameter set which contains all parameters
-     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads. 
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, ParametersReadClasses readClassParams) {
@@ -130,7 +130,7 @@ public class IntervalRequest {
      * double track request or ParameterSetMapping.NORMAL, if this is a ordinary
      * track request.
      * @param readClassParams A parameter set which contains all parameters
-     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
     public IntervalRequest(int from, int to, ThreadListener sender, byte desiredData, ParametersReadClasses readClassParams) {
@@ -166,7 +166,7 @@ public class IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param readClassParams A parameter set which contains all parameters
-     * concerning the usage of VAMP's coverage classes and if only uniquely
+     * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads. 
      */
     public IntervalRequest(int from, int to, ThreadListener sender, ParametersReadClasses readClassParams) {
@@ -237,7 +237,7 @@ public class IntervalRequest {
 
     /**
      * @return A parameter set which contains all parameters concerning the
-     * usage of VAMP's coverage classes and if only uniquely mapped reads shall
+     * usage of ReadXplorer's coverage classes and if only uniquely mapped reads shall
      * be used, or all reads.
      */
     public ParametersReadClasses getReadClassParams() {

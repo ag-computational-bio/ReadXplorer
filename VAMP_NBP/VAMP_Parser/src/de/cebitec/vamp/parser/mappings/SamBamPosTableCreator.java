@@ -27,12 +27,15 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
- * Creates and stores the position table for a sam or bam file, which needs
- * to be sorted by position. The data to store is directly forwarded to the 
- * observer, which should then further process it (store it in the db).
+ * Creates and stores the position table for a sam or bam file, which needs to
+ * be sorted by position and creates most of its statistics. The data to store
+ * is directly forwarded to the observer, which should then further process it
+ * (store it in the db).
+ * @deprecated Storing of position table in the db not needed anymore
  *
  * @author -Rolf Hilker-
  */
+@Deprecated
 public class SamBamPosTableCreator implements Observable {
 
     private List<Observer> observers;
@@ -42,8 +45,9 @@ public class SamBamPosTableCreator implements Observable {
     
     /**
      * Creates and stores the position table for a sam or bam file, which needs
-     * to be sorted by position. The data to store is directly forwarded to the 
-     * observer, which should then further process it (store it in the db).
+     * to be sorted by position and creates most of its statistics. The data to
+     * store is directly forwarded to the observer, which should then further
+     * process it (store it in the db).
      */
     public SamBamPosTableCreator() {
         this.observers = new ArrayList<>();
@@ -54,8 +58,9 @@ public class SamBamPosTableCreator implements Observable {
     
     /**
      * Creates the position table for the given track job, which needs to be
-     * sorted by position. The data to store is directly forwarded to the
-     * observer, which should then further process it (store it in the db).
+     * sorted by position and creates most of its statistics. The data to store
+     * is directly forwarded to the observer, which should then further process
+     * it (store it in the db).
      * @param trackJob track job whose position table needs to be created
      * @param refSeqWhole reference genome sequence
      * @return  
@@ -138,7 +143,9 @@ public class SamBamPosTableCreator implements Observable {
 //                        nameArray = shortReadName.split("#");
 //                        shortReadName = nameArray[0] + "/" + nameArray[1].split("/")[1];
 //                        readNameSet.add(shortReadName);
-                        readNameSet.add(readName);
+                        if (statsContainer.getStatsMap().get(StatsContainer.NO_READS) <= 0) {
+                            readNameSet.add(readName);
+                        }
                         
                         mappingCount = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                         if (mappingCount != null) {

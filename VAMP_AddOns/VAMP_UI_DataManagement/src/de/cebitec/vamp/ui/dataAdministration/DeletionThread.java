@@ -21,7 +21,7 @@ import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
 /**
- * Thread for the deletion of tracks and references from the VAMP DB.
+ * Thread for the deletion of tracks and references from the ReadXplorer DB.
  *
  * @author ddoppmeier
  */
@@ -35,7 +35,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
     private int workunits;
 
     /**
-     * Thread for the deletion of tracks and references from the VAMP DB.
+     * Thread for the deletion of tracks and references from the ReadXplorer DB.
      * @param references the list of references to delete
      * @param tracks the list of tracks to delete
      */

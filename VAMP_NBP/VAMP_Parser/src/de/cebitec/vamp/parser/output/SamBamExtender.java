@@ -16,7 +16,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
- * Extends a SAM/BAM file !!sorted by read sequence!! with VAMP classification
+ * Extends a SAM/BAM file !!sorted by read sequence!! with ReadXplorer classification
  * information (perfect, best and common match classes), adds the number of for
  * occurrences of each mapping and sorts the whole file by coordinate again.
  *
@@ -34,7 +34,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private int refSeqLength;
 
     /**
-     * Extends a SAM/BAM file !!sorted by read sequence!! with VAMP
+     * Extends a SAM/BAM file !!sorted by read sequence!! with ReadXplorer
      * classification information (perfect, best and common match classes), adds
      * the number of for occurences of each mapping and sorts the whole file by
      * coordinate again.

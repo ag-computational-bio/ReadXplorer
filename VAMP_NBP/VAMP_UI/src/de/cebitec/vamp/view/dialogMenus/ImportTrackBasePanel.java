@@ -20,7 +20,7 @@ import org.openide.util.NbBundle;
 /**
  * A JPanel offering various methods useful for track import panels. E.g. it
  * allows to get the list of references present in the currently
- * opened VAMP DB. 
+ * opened ReadXplorer DB. 
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -34,7 +34,7 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
 
     /**
      * A JPanel offering various methods useful for track import panels. E.g. it
-     * allows to get the list of references present in the currently opened VAMP
+     * allows to get the list of references present in the currently opened ReadXplorer
      * DB.
      */
     public ImportTrackBasePanel() {

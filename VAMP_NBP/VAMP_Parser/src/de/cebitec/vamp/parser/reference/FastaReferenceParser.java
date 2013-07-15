@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
-    private static String parsername = "Fasta Reference Parser";
+    private static String parsername = "Fasta file";
     private static String[] fileExtension = new String[]{"fas", "fasta", "fna", "fa"};
     private static String fileDescription = "Fasta File";
     private ArrayList<Observer> observers = new ArrayList<>();

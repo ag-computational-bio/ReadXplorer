@@ -249,8 +249,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                         diffsLoaded = true;
                     }
                     if (coverageLoaded && diffsLoaded) {
-                            setupData();
-                            repaint();
+                        setupData();
+                        repaint();
                     }
                 }
             });

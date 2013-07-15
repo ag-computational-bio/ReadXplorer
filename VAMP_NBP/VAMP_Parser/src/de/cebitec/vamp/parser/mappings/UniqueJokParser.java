@@ -1,9 +1,9 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.StatsContainer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -19,8 +19,11 @@ import java.util.logging.Logger;
  * duplicate read was filtered BEFORE the mapping and the abundance of this read
  * is encoded in the readname by adding #x to the readname, with x being the
  * number of equal sequences found during the filtering step.
+ * @deprecated Storing of data sets in the DB is not allowed anymore
+ * 
  * @author ddoppmeier
  */
+@Deprecated
 public class UniqueJokParser implements MappingParserI {
 
     private static String name = "Unique Reads Jok Output Parser";

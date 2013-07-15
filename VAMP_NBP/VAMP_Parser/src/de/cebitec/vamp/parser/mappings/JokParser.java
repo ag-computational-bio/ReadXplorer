@@ -1,10 +1,10 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.StatsContainer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,9 +15,11 @@ import org.openide.util.NbBundle;
 
 /**
  * Parser for parsing jok data files for vamp.
+ * @deprecated Storing of data sets in the DB is not allowed anymore
  *
  * @author ddoppmeier
  */
+@Deprecated
 public class JokParser implements MappingParserI {
 
     private static String name = "Jok Output Parser";

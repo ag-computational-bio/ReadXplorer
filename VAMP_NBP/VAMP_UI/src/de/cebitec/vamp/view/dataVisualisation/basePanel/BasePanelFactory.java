@@ -69,10 +69,10 @@ public class BasePanelFactory {
 
         // create track viewer
         TrackConnector tc;
-        //TODO: Error handling
         try {
             tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
             return null;
         }
         if (tc != null) {
@@ -114,10 +114,8 @@ public class BasePanelFactory {
     }
 
     /**
-     * Method to get one
-     * <code>BasePanel</code> for multiple tracks. Only 2 tracks at once are
-     * currently supported.
-     *
+     * Method to get one <code>BasePanel</code> for multiple tracks. Only 2 
+     * tracks at once are currently supported for the double track viewer.
      * @param tracks to visualize on this <code>BasePanel</code>.
      * @param refGen reference the tracks belong to.
      * @param combineTracks true, if the coverage of two or more tracks should
@@ -133,10 +131,10 @@ public class BasePanelFactory {
 
             // get double track connector           
             TrackConnector trackCon;
-            //TODO: Error handling
             try {
                 trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
                 return null;
             }
 

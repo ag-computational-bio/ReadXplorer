@@ -9,6 +9,8 @@ import java.io.Serializable;
  * @author ddoppmei
  */
 public class PersistantDiff implements Comparable<PersistantDiff>, Serializable {
+    
+    private static final long serialVersionUID = 1L;
 
     private char base;
     private int position;
@@ -18,6 +20,10 @@ public class PersistantDiff implements Comparable<PersistantDiff>, Serializable 
     /**
      * Depicts a difference in a mapping to the reference genome. Therefore, it
      * contains base, position, number of replicates and strand information.
+     * @param position
+     * @param base the base already converted to the correct strand and upper case
+     * @param isForwardStrand
+     * @param count  
      */
     public PersistantDiff(int position, char base, boolean isForwardStrand, int count) {
         this.position = position;
@@ -27,7 +33,8 @@ public class PersistantDiff implements Comparable<PersistantDiff>, Serializable 
     }
 
     /**
-     * @return the associated with the diff (mainly bases and gaps)
+     * @return The associated base of the diff, already converted to the correct 
+     * strand and upper case.
      */
     public char getBase() {
         return base;
