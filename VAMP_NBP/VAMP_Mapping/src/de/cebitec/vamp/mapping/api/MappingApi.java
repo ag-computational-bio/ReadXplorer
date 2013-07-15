@@ -14,6 +14,7 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
@@ -24,18 +25,55 @@ import org.openide.util.NbPreferences;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MappingApi {
-    private static String getMapperPath() {
-        return NbPreferences.forModule(Object.class).get(Properties.MAPPER_PATH, "/dev/null");
+    
+    /**
+     * Load the path to the mapper script from Netbeans preferences.
+     * If there is no preference available, try to use the Mapper-Script from 
+     * the release-Directory, which will be available in the installation directory
+     * @return the full path to the mapping script
+     */
+    public static String getMapperPath() {
+        String path = NbPreferences.forModule(Object.class).get(Properties.MAPPER_PATH, "");
+        
+        //try to locate bwa_mapper.sh, if we are not on windows (bwa_mapper.sh works only on unix systems)
+        if ((path.equals("")) && (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0))  ) {
+            File result = InstalledFileLocator.getDefault().locate("Mapper/bwa_mapper.sh", "VAMP_Mapping", false);
+            if (result!=null) {
+                //try to set executable permission, if we are the owner
+                result.setExecutable(true, false);
+                
+                path = result.getAbsolutePath();
+            }
+        }
+        
+        return path;
     }
     
+    /**
+     * get last mapping params
+     * @return 
+     */
     public static String getLastMappingParams() {
         return NbPreferences.forModule(Object.class).get(Properties.MAPPER_PARAMS, "");
     }
     
+    /**
+     * set last mapping params
+     * @param params 
+     */
     public static void setLastMappingParams(String params) { 
         NbPreferences.forModule(Object.class).put(Properties.MAPPER_PARAMS, params);
     }
     
+    /**
+     * start a mapping of a fasta file 
+     * @param out a SimpleOutput to be used for the output of the mapping script
+     * @param reference the reference sequence
+     * @param fasta the reads in fasta format
+     * @param mappingParameters additional mapping paramters
+     * @return
+     * @throws IOException 
+     */
     public static String mapFastaFile(SimpleOutput out, String reference, String fasta, String mappingParameters) throws IOException {     
         if (MappingApi.checkMapperConfig()) {
             //remember mapping params for future executions
@@ -58,14 +96,26 @@ public class MappingApi {
         }
     }
     
+    /**
+     * check that the mapping script is configured properly
+     * @return true, if everything is fine
+     * @throws a message dialog, if a problem in the config is detected
+     */
     public static boolean checkMapperConfig() {
         if (!FileUtils.fileExistsAndIsExecutable(MappingApi.getMapperPath())) {
-
-            JOptionPane.showMessageDialog( null, 
-                    "Please check your mapper configuration and provide a correct path to a mapping script!", 
-                    "Warning", JOptionPane.INFORMATION_MESSAGE);
-            return false;
-        }
+            if (!FileUtils.fileExists(MappingApi.getMapperPath())) {
+                JOptionPane.showMessageDialog( null, 
+                        "Please check your mapper configuration and provide a correct path to a mapping script!", 
+                        "Warning", JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            } else {
+                JOptionPane.showMessageDialog( null, 
+                        "Please check your mapper configuration and permissions on the mapping script!\n"
+                        +"For Unix systems: try executing chmod u+rx,g+rx,a+rx bwa_mapper.sh to set execution permissions!", 
+                        "Warning", JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
+        }   
         else return true;
         
     }

@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.mapping;
 
+import de.cebitec.vamp.mapping.api.MappingApi;
 import de.cebitec.vamp.util.FileUtils;
 import de.cebitec.vamp.util.Properties;
 import java.io.File;
@@ -65,10 +66,10 @@ final class MapperPanel extends javax.swing.JPanel {
                         .addComponent(jLabel1)
                         .addGap(0, 1, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(mapperTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(mapperTextField)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(openButton)))
-                .addContainerGap(8, Short.MAX_VALUE))
+                .addGap(8, 8, 8))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -90,7 +91,7 @@ final class MapperPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_openButtonActionPerformed
 
     void load() {
-        mapperTextField.setText(pref.get(Properties.MAPPER_PATH, ""));
+        mapperTextField.setText(MappingApi.getMapperPath());
     }
     
     void store() {
