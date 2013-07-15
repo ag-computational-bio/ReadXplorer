@@ -11,6 +11,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -260,8 +261,8 @@ public final class LoginVisualPanel extends JPanel {
 
     private void dbChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbChooseButtonActionPerformed
         JFileChooser fc = new JFileChooser(NbPreferences.forModule(Object.class).get(Properties.VAMP_DATABASE_DIRECTORY, null));
-        int result = fc.showOpenDialog(this);
-
+        //fc.setFileFilter(new FileNameExtensionFilter("h2", "h2"));
+        
         Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel.class);
         String db = dbTypeBox.getSelectedItem().toString();
         if (db.equalsIgnoreCase("h2")) {
@@ -276,18 +277,23 @@ public final class LoginVisualPanel extends JPanel {
             }
         }
         File file = null;
+        
+        int result = fc.showOpenDialog(this);
 
-        if (result == 0) {
+        if (result == JFileChooser.APPROVE_OPTION) { //0
             // file chosen
             file = fc.getSelectedFile();
+            
             try { //store current directory
                 NbPreferences.forModule(Object.class).put(Properties.VAMP_DATABASE_DIRECTORY, fc.getCurrentDirectory().getCanonicalPath());
             } catch (IOException ex) {
                 // do nothing, path is not stored in properties...
             }
             
-            if(!file.exists()){
-                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", file.getAbsolutePath()), NotifyDescriptor.WARNING_MESSAGE);
+            if((file==null) || (!file.exists())){
+                String filepath = "";
+                if (file!=null) file.getAbsolutePath();
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", filepath), NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notify(nd);
             }
             databaseField.setText(file.getAbsolutePath());
