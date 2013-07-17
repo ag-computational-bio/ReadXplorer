@@ -6,10 +6,14 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -88,20 +92,29 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
     public void storeSettings(WizardDescriptor wiz) {
         wiz.putProperty("design", design);
         //TODO: Check this and set boolean appropiatly
-        wiz.putProperty("workingWithoutReplicates", true);
+        wiz.putProperty("workingWithoutReplicates", false);
     }
 
     @Override
     public void validate() throws WizardValidationException {
         design = new HashMap<>();
+        Set<String> usedKeys = new HashSet<>();
         Vector tableData = getComponent().getTableData();
-        if (tableData.size() < 3) {
-            throw new WizardValidationException(null, "At least three design elements must be specified.", null);
+        if (tableData.size() < 2) {
+            throw new WizardValidationException(null, "At least two design elements must be specified.", null);
         }
         for (int j = 0; j < tableData.size(); j++) {
             Vector row = (Vector) tableData.elementAt(j);
             String[] rowAsStringArray = new String[tracks.size()];
             String key = (String) row.elementAt(0);
+            Pattern p = Pattern.compile("\\d+");
+            Matcher m = p.matcher(key);
+            if(m.find()){
+                throw new WizardValidationException(null, "Numbers are not allowed in group names.", null);
+            }
+            if(!usedKeys.add(key)){
+                throw new WizardValidationException(null, "Groups must have individual names.", null);
+            }
             boolean differentCondsUsed = false;
             String stringBefore = "";
             for (int i = 1; i < tracks.size() + 1; i++) {
@@ -109,7 +122,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
                 if (currentCell == null) {
                     throw new WizardValidationException(null, "Please fill out the complete row or remove it.", null);
                 }
-                if (!currentCell.equals(stringBefore)) {
+                if (!stringBefore.equals("") && !currentCell.equals(stringBefore)) {
                     differentCondsUsed = true;
                 }
                 rowAsStringArray[i - 1] = currentCell;
@@ -118,7 +131,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
             if (differentCondsUsed) {
                 design.put(key, rowAsStringArray);
             } else {
-                throw new WizardValidationException(null, "Each row must have at lead two different identifier in it.", null);
+                throw new WizardValidationException(null, "Each row must have at least two different identifier in it.", null);
             }
 
         }

@@ -70,6 +70,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private ComboBoxModel<Object> cbm;
     private ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
     private TopComponent GraficsTopComponent;
+    private PlotTopComponent ptc;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
@@ -161,15 +162,9 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
             ResultDeAnalysis currentResult = it.next();
             Vector colNames = new Vector(currentResult.getColnames());
             Vector<Vector> tableContents;
-//          Uncomment when using GNU R Version of Simple Test  
-//            if (usedTool == SimpleTest) {
-//                colNames.add(0, "Feature");
-//                tableContents = currentResult.getTableContentsContainingRowNames();
-//            } else {
-                colNames.remove(0);
-                colNames.add(0, "Feature");
-                tableContents = currentResult.getTableContents();
-//            }
+            colNames.remove(0);
+            colNames.add(0, "Feature");
+            tableContents = currentResult.getTableContents();
 
             DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
             descriptions.add(currentResult.getDescription());
@@ -293,24 +288,30 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
+                //For testing:
+                ptc = new PlotTopComponent(analysisHandler, usedTool);
+                analysisHandler.registerObserver(ptc);
+                ptc.open();
+                ptc.requestActive();
                 break;
             case BaySeq:
                 GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
                 analysisHandler.registerObserver((DiffExpGraficsTopComponent) GraficsTopComponent);
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
-                break;
-            case SimpleTest:
-//                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
-//                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
-//                GraficsTopComponent.open();
-//                GraficsTopComponent.requestActive();
-                PlotTopComponent ptc = new PlotTopComponent(analysisHandler,usedTool);
+                //For testing:
+                ptc = new PlotTopComponent(analysisHandler, usedTool);
                 analysisHandler.registerObserver(ptc);
                 ptc.open();
                 ptc.requestActive();
                 break;
-        }        
+            case SimpleTest:
+                ptc = new PlotTopComponent(analysisHandler, usedTool);
+                analysisHandler.registerObserver(ptc);
+                ptc.open();
+                ptc.requestActive();
+                break;
+        }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed

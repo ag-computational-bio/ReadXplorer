@@ -113,25 +113,39 @@ public class DeSeq {
                 //We estimate the size factor
                 gnuR.eval("cD <- estimateSizeFactors(cD)");
 
-                if (analysisData.isWorkingWithoutReplicates()) {
-                    // If there are no replicates for each condition we need to tell
-                    // the function to ignore this fact.
-                    REXP res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
-                    //For some reasons the above computation fails on some data sets.
-                    //In those cases the following computation should do the trick.
+                //For multi condition testing estimateDispersions does not converge most of the
+                //times. So we relax the settings in every step a little more.
+                if (analysisData.moreThanTwoConditions()) {
+                    REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
                     if (res == null) {
-                        gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
+                        res = gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
+                        if (res == null) {
+                            res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                            if (res == null) {
+                                gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
+                            }
+                        }
                     }
                 } else {
-                    //The dispersion is estimated
-                    REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
-                    //For some reasons the above computation fails on some data sets.
-                    //In those cases the following computation should do the trick.
-                    if (res == null) {
-                        gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
+                    if (analysisData.isWorkingWithoutReplicates()) {
+                        // If there are no replicates for each condition we need to tell
+                        // the function to ignore this fact.
+                        REXP res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                        //For some reasons the above computation fails on some data sets.
+                        //In those cases the following computation should do the trick.
+                        if (res == null) {
+                            gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
+                        }
+                    } else {
+                        //The dispersion is estimated
+                        REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
+                        //For some reasons the above computation fails on some data sets.
+                        //In those cases the following computation should do the trick.
+                        if (res == null) {
+                            gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
+                        }
                     }
                 }
-
 
                 if (analysisData.moreThanTwoConditions()) {
                     //Handing over the first fitting group to Gnu R...
@@ -161,9 +175,6 @@ public class DeSeq {
                     //Perform the normal test.
                     String[] levels = analysisData.getLevels();
                     gnuR.eval("res <- nbinomTest( cD,\"" + levels[0] + "\",\"" + levels[1] + "\")");
-                    //Filter for significant genes, given a threshold for the FDR.
-                    //TODO: Make threshold user adjustable.
-//                  gnuR.eval("resSig <- res[res$padj < "+analysisData.getCutOff().toString()+", ]");
                 }
             } else {
                 if (analysisData.moreThanTwoConditions()) {
@@ -173,14 +184,16 @@ public class DeSeq {
                 }
             }
             if (analysisData.moreThanTwoConditions()) {
-                gnuR.eval("res0 <- data.frame(fit1,pvalsGLM,padjGLM)");
+                gnuR.eval("tmp0 <- data.frame(fit1,pvalsGLM,padjGLM)");
+                gnuR.eval("res0 <- data.frame(rownames(tmp0),tmp0)");
                 REXP currentResult1 = gnuR.eval("res0");
                 RVector tableContents1 = currentResult1.asVector();
                 REXP colNames1 = gnuR.eval("colnames(res0)");
                 REXP rowNames1 = gnuR.eval("rownames(res0)");
                 results.add(new ResultDeAnalysis(tableContents1, colNames1, rowNames1, "Fitting Group One", analysisData));
 
-                gnuR.eval("res1 <- data.frame(fit0,pvalsGLM,padjGLM)");
+                gnuR.eval("tmp1 <- data.frame(fit0,pvalsGLM,padjGLM)");
+                gnuR.eval("res1 <- data.frame(rownames(tmp1),tmp1)");
                 REXP currentResult0 = gnuR.eval("res1");
                 RVector tableContents0 = currentResult0.asVector();
                 REXP colNames0 = gnuR.eval("colnames(res1)");

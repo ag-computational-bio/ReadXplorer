@@ -91,12 +91,20 @@ public class ConvertData {
     }
 
     private static Map<PersistantFeature, Pair<Double, Double>> convertDESeqResults(Vector<Vector> resultTable) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
+        for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
+            Vector row = it.next();
+            PersistantFeature key = (PersistantFeature) row.get(0);
+            Double X = (Double) row.get(2);
+            Double Y = (Double) row.get(3);
+            Pair<Double, Double> values = new Pair<>(X, Y);
+            ret.put(key, values);
+        }
+        return ret;
     }
 
     private static Map<PersistantFeature, Pair<Double, Double>> convertSimpleTestResults(Vector<Vector> resultTable) {
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
-        //For GNU R Version:
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();
             PersistantFeature key = (PersistantFeature) row.get(0);

@@ -34,9 +34,8 @@ public class CollectCoverageData implements Observer {
      */
     private int startOffset;
     private int stopOffset;
-    
     private boolean regardReadOrientation;
-    
+
     /**
      * Constructor of the class.
      *
@@ -50,6 +49,7 @@ public class CollectCoverageData implements Observer {
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.regardReadOrientation = regardReadOrientation;
+        Collections.sort(genomeFeatures);
     }
 
     /**
@@ -59,7 +59,6 @@ public class CollectCoverageData implements Observer {
      */
     private void updateReadCountForFeatures(List<PersistantMapping> mappings) {
         Collections.sort(mappings);
-        Collections.sort(genomeFeatures);
         int lastMappingIdx = 0;
         PersistantFeature feature;
         boolean fstFittingMapping;
@@ -73,16 +72,16 @@ public class CollectCoverageData implements Observer {
             //writing down a count of zero for this feature.
             if (!countData.containsKey(feature)) {
                 countData.put(feature, 0);
-                }
+            }
             for (int j = lastMappingIdx; j < mappings.size(); ++j) {
                 PersistantMapping mapping = mappings.get(j);
 
                 //If the orientation of the read does not matter this one is always true.
                 boolean onSameStrand = true;
                 //If orientation should be taken into account, this is done here.
-                if(regardReadOrientation){
-                   onSameStrand =  feature.isFwdStrand() == mapping.isFwdStrand();
-                }             
+                if (regardReadOrientation) {
+                    onSameStrand = feature.isFwdStrand() == mapping.isFwdStrand();
+                }
                 //mappings identified within a feature
                 if (mapping.getStop() > featStart && onSameStrand
                         && mapping.getStart() < featStop) {
