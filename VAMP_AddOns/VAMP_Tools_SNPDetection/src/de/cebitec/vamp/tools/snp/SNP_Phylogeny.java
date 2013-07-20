@@ -57,14 +57,6 @@ public class SNP_Phylogeny {
             if (!trackIdsWithSnps.contains(snp.getTrackId())) {
                 trackIdsWithSnps.add(snp.getTrackId());
             }
-//            if (snp.getTrackId() > numberOfTracks) {
-//                numberOfTracks = snp.getTrackId();
-//            }
-
-//            String positionString = snp.getPosition();
-//            if (positionString.contains("_")) {
-//                positionString = positionString.substring(0, positionString.length() - 2);
-//            }
 
             int position = snp.getPosition();
 

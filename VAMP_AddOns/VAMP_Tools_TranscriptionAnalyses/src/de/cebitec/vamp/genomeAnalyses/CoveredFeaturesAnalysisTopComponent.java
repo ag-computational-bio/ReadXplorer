@@ -12,8 +12,8 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * TopComponent for displaying all gui elements belonging to the covered feature
- * detection.
+ * TopComponent for displaying all gui elements belonging to the feature coverage 
+ * analysis.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -29,20 +29,20 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
     displayName = "#CTL_CoveredFeaturesAnalysisAction",
-preferredID = "CoveredFeaturesAnalysisTopComponent")
+preferredID = "FeatureCoverageAnalysisTopComponent")
 @Messages({
-    "CTL_CoveredFeaturesAnalysisAction=CoveredFeaturesAnalysis",
-    "CTL_CoveredFeaturesAnalysisTopComponent=Covered Features Analysis Window",
-    "HINT_CoveredFeaturesAnalysisTopComponent=This is a Covered Features Analysis window"
+    "CTL_CoveredFeaturesAnalysisAction=FeatureCoverageAnalysis",
+    "CTL_CoveredFeaturesAnalysisTopComponent=Feature Coverage Analysis Window",
+    "HINT_CoveredFeaturesAnalysisTopComponent=This is a Feature Coverage Analysis window"
 })
 public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
     
-    public static final String PREFERRED_ID = "CoveredFeaturesAnalysisTopComponent";
+    public static final String PREFERRED_ID = "FeatureCoverageAnalysisTopComponent";
     private static final long serialVersionUID = 1L;
 
     /**
-     * TopComponent for displaying all gui elements belonging to the covered
-     * feature detection.
+     * TopComponent for displaying all gui elements belonging to the feature 
+     * coverage analysis.
      */
     public CoveredFeaturesAnalysisTopComponent() {
         initComponents();

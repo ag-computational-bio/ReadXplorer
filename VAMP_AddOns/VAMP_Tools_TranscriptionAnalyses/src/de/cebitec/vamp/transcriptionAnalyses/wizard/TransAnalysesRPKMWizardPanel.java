@@ -33,8 +33,8 @@ public class TransAnalysesRPKMWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
-            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_RPKM, this.component.getMinRPKMValue());
-            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_RPKM, this.component.getMaxRPKMValue());
+            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS, this.component.getMinReadCount());
+            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS, this.component.getMaxReadCount());
         }
     }
     

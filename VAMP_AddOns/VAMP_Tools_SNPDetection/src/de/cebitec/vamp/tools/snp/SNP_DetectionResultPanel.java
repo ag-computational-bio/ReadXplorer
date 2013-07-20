@@ -23,6 +23,7 @@ import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.vamp.view.tableVisualization.TableUtils;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,14 +107,14 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Pos", "Gap Index", "Track", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "Amino SNP", "Amino Ref", "Effect on AA", "Feature"
+                "Pos", "Gap Index", "Track", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "Amino SNP", "Amino Ref", "Triplet SNP", "Triplet Ref", "Effect on AA", "Feature"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -143,8 +144,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         snpTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title12")); // NOI18N
         snpTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title13")); // NOI18N
         snpTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title14")); // NOI18N
-        snpTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title15")); // NOI18N
-        snpTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title16")); // NOI18N
+        snpTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title18")); // NOI18N
+        snpTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title19")); // NOI18N
+        snpTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title15")); // NOI18N
+        snpTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title16")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.text")); // NOI18N
         exportButton.setActionCommand(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.actionCommand")); // NOI18N
@@ -258,9 +261,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         int noDeletions = 0;
         
 
-        final int snpDataSize = 18;
+        final int snpDataSize = 20;
         this.snpData = snpData;
         List<SnpI> snps = this.snpData.getSnpList();
+        Collections.sort(snps);
         Map<Integer, PersistantTrack> trackNames = this.snpData.getTrackMap();
         DefaultTableModel model = (DefaultTableModel) snpTable.getModel();        
 
@@ -268,12 +272,14 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
         List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForClosedInterval(0, reference.getRefLength());
         
-        SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, reference, snpData.getSelectedFeatTypes());
+        SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, reference, ((ParameterSetSNPs) snpData.getParameters()).getSelFeatureTypes());
         
         Snp snp;
         Object[] rowData;
         String aminosSnp;
         String aminosRef;
+        String tripletsSnp;
+        String tripletsRef;
         String effect;
         String ids;
         char aminoAcid;
@@ -281,7 +287,6 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         SequenceComparison type;
         
         for (SnpI snpi : snps) {
-            
             
             snp = (Snp) snpi;
             type = snp.getType();
@@ -308,6 +313,8 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                        
                 aminosSnp = "";
                 aminosRef = "";
+                tripletsSnp = "";
+                tripletsRef = "";
                 effect = "";
                 ids = "";
                 
@@ -320,13 +327,17 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                     aminosSnp += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
                     aminoAcid = codon.getAminoRef();
                     aminosRef += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                    tripletsSnp += codon.getTripletSnp() + "\n";
+                    tripletsRef += codon.getTripletRef() + "\n";
                     effect += codon.getEffect().getType() + "\n";
-                    ids += codon.getGeneId() + "\n";
+                    ids += codon.getFeature() + "\n";
                 }
 
                 if (codons.isEmpty()) {
                     aminosRef = "No gene";
                     aminosSnp = "No gene";
+                    tripletsSnp = "-";
+                    tripletsRef = "-";
                     effect = "-";
                     ids = "-";
                     
@@ -345,8 +356,10 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 
                 rowData[14] = aminosSnp;
                 rowData[15] = aminosRef;
-                rowData[16] = effect;
-                rowData[17] = ids;
+                rowData[16] = tripletsSnp;
+                rowData[17] = tripletsRef;
+                rowData[18] = effect;
+                rowData[19] = ids;
 
             } else {
                 featuresFound = snpTranslator.checkCoveredByFeature(snp.getPosition());
@@ -365,19 +378,23 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                     }
                     
                     for (PersistantFeature feature : featuresFound){
-                        ids += feature.toString() + "\n";
-                        snp.addCodon(new CodonSnp("", "", ' ', ' ', type, ids));
+                        ids += feature + "\n";
+                        snp.addCodon(new CodonSnp("", "", ' ', ' ', type, feature));
                     }
                     rowData[14] = "-";
                     rowData[15] = "-";
-                    rowData[16] = String.valueOf(type.getType());
-                    rowData[17] = ids;
+                    rowData[16] = "-";
+                    rowData[17] = "-";
+                    rowData[18] = String.valueOf(type.getType());
+                    rowData[19] = ids;
                     
                 } else { //intergenic
                     rowData[14] = "No gene";
                     rowData[15] = "No gene";
                     rowData[16] = "-";
                     rowData[17] = "-";
+                    rowData[18] = "-";
+                    rowData[19] = "-";
                     ++noIntergenicSnps;
                     if (type.equals(SequenceComparison.INSERTION)) {
                         ++noInsertions;
@@ -412,8 +429,9 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
         this.snpData.setStatsMap(snpStatsMap);
         
         ParameterSetSNPs params = (ParameterSetSNPs) snpData.getParameters();
+        String useMainBaseString = params.isUseMainBase() ? "yes" : "no";
         this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, 
-                "SNP_DetectionResultPanel.parametersLabel.text", params.getMinPercentage(), params.getMinVaryingBases()));
+                "SNP_DetectionResultPanel.parametersLabel.text", params.getMinPercentage(), params.getMinMismatchingBases(), useMainBaseString));
         
     }
 

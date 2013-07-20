@@ -17,7 +17,8 @@ import org.biojava.ontology.Ontology;
 import org.biojava.utils.ParserException;
 
 /**
- *
+ * Parser to fetch all available sequence identifiers from a GFF 3 file.
+ * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class BioJavaGffIdParser implements Observable {

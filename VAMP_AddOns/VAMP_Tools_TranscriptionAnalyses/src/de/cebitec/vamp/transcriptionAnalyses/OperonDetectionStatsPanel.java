@@ -95,8 +95,8 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
                         String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS))}
                 },
                 new String[]{
-                    NbBundle.getMessage(FilterFeaturesStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0"),
-                    NbBundle.getMessage(FilterFeaturesStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title1")
+                    NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0"),
+                    NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title1")
                 }) {
             private static final long serialVersionUID = 1L;
             Class[] types = new Class[]{

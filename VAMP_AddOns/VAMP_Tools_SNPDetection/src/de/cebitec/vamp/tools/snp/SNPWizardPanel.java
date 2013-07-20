@@ -10,6 +10,7 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
     
     public static final String PROP_MIN_PERCENT = "minPercent";
     public static final String PROP_MIN_VARYING_BASES = "minNoBases";
+    public static final String PROP_USE_MAIN_BASE = "useMainBase";
     
     /**
      * The visual component that displays this panel. If you need to access the
@@ -43,7 +44,8 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
     public void storeSettings(WizardDescriptor wiz) {
         if (this.isValid()) {
             wiz.putProperty(PROP_MIN_PERCENT, this.component.getMinPercentage());
-            wiz.putProperty(PROP_MIN_VARYING_BASES, this.component.getMinVaryingBases());
+            wiz.putProperty(PROP_MIN_VARYING_BASES, this.component.getMinMismatchingBases());
+            wiz.putProperty(PROP_USE_MAIN_BASE, this.component.isUseMainBase());
         }
     }
 }

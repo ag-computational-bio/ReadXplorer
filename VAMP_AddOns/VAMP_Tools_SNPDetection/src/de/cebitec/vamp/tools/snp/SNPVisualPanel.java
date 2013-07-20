@@ -18,7 +18,8 @@ public final class SNPVisualPanel extends JobPanel {
     
     private static final long serialVersionUID = 1L;
     private Object minPercentage = 90;
-    private int minVaryingBases = 15;
+    private int minMismatchBases = 15;
+    private boolean useMainBase = true;
 
     /**
      * Panel displaying all options for a SNP detection.
@@ -66,6 +67,7 @@ public final class SNPVisualPanel extends JobPanel {
         jLabel3 = new javax.swing.JLabel();
         absNumText = new javax.swing.JTextField();
         percentSpinner = new javax.swing.JSpinner(new SpinnerNumberModel());
+        useMainBaseBox = new javax.swing.JCheckBox();
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -81,7 +83,7 @@ public final class SNPVisualPanel extends JobPanel {
 
         absNumText.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         absNumText.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        absNumText.setText(String.valueOf(minVaryingBases));
+        absNumText.setText(String.valueOf(minMismatchBases));
 
         percentSpinner.setValue(minPercentage);
         percentSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -89,6 +91,9 @@ public final class SNPVisualPanel extends JobPanel {
                 percentSpinnerStateChanged(evt);
             }
         });
+
+        useMainBaseBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(useMainBaseBox, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.useMainBaseBox.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -99,14 +104,17 @@ public final class SNPVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 54, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel2))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(percentSpinner)
-                            .addComponent(absNumText, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 83, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel2))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(percentSpinner)
+                                    .addComponent(absNumText, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(useMainBaseBox, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -122,7 +130,9 @@ public final class SNPVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(absNumText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(useMainBaseBox)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -139,14 +149,31 @@ public final class SNPVisualPanel extends JobPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JSpinner percentSpinner;
+    private javax.swing.JCheckBox useMainBaseBox;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * @return the minimum percentage of mismatches at a SNP position
+     */
     public Object getMinPercentage() {
         return this.minPercentage;
     }
 
-    public int getMinVaryingBases() {
-        return this.minVaryingBases;
+    /**
+     * @return the minimum number of mismatches at a SNP position
+     */
+    public int getMinMismatchingBases() {
+        return this.minMismatchBases;
+    }
+
+    /**
+     * @return <cc>true</cc>, if the minMismatchBases count corresponds to the
+     * count of the most frequent base at the current position. <cc>false</cc>,
+     * if the minMismatchBases count corresponds to the overall mismatch count at
+     * the current position.
+     */
+    public boolean isUseMainBase() {
+        return this.useMainBase;
     }
     
     /**
@@ -156,7 +183,7 @@ public final class SNPVisualPanel extends JobPanel {
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
         if (GeneralUtils.isValidPositiveNumberInput(absNumText.getText())) {
-            this.minVaryingBases = Integer.parseInt(absNumText.getText());
+            this.minMismatchBases = Integer.parseInt(absNumText.getText());
         } else {
             isValidated = false;
         }
@@ -167,6 +194,7 @@ public final class SNPVisualPanel extends JobPanel {
         } else {
             isValidated = false;
         }
+        this.useMainBase = this.useMainBaseBox.isSelected();
         
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;

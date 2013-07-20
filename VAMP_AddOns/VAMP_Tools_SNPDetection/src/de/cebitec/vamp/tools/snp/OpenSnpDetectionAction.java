@@ -2,7 +2,6 @@ package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.databackend.AnalysesHandler;
 import de.cebitec.vamp.databackend.ParametersReadClasses;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -37,11 +36,11 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
 /**
- * Action for opening a new snp detection. It opens a track list containing all
- * tracks of the selected reference and creates a new snp detection setup top component
- * when tracks were selected.
+ * Action for opening a new SNP and DIP detection. It opens a track list
+ * containing all tracks of the selected reference and creates a new snp
+ * detection setup top component when tracks were selected.
  * 
- * @author rhilker
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID(category = "Tools",
 id = "de.cebitec.vamp.tools.snp.OpenSnpDetectionAction")
@@ -59,8 +58,6 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
     
     private final ReferenceViewer context;
     
-    private ProjectConnector proCon;
-    private SnpDetectionResult snpData;
     private int referenceId;
     private List<PersistantTrack> tracks;
     private Map<Integer, PersistantTrack> trackMap;
@@ -81,7 +78,6 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
      */
     public OpenSnpDetectionAction(ReferenceViewer context) {
         this.context = context;
-        this.proCon = ProjectConnector.getInstance();
         this.referenceId = this.context.getReference().getId();
     }
 
@@ -164,10 +160,11 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
     private void startSNPDetection(final WizardDescriptor wiz) {
         int minVaryingBases = (int) wiz.getProperty(SNPWizardPanel.PROP_MIN_VARYING_BASES);
         int minPercentage = (int) wiz.getProperty(SNPWizardPanel.PROP_MIN_PERCENT);
+        boolean useMainBase = (boolean) wiz.getProperty(SNPWizardPanel.PROP_USE_MAIN_BASE);
         this.selFeatureTypes = (Set<FeatureType>) wiz.getProperty(featureTypePanel.getPropSelectedFeatTypes());
         ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(readClassWizPanel.getPropReadClassParams());
         
-        this.parametersSNPs = new ParameterSetSNPs(minVaryingBases, minPercentage, selFeatureTypes, readClassParams);
+        this.parametersSNPs = new ParameterSetSNPs(minVaryingBases, minPercentage, useMainBase, selFeatureTypes, readClassParams);
         TrackConnector connector;
         for (PersistantTrack track : tracks) {
             try {
@@ -201,7 +198,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 ++finishedCovAnalyses;
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
-                SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap, selFeatureTypes);
+                SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap);
                 result.setParameters(parametersSNPs);
 
                 if (snpDetectionResultPanel == null) {

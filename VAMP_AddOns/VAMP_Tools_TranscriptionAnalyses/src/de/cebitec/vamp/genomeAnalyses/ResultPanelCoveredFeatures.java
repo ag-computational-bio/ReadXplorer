@@ -157,7 +157,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog(this, new CoveredFeatureStatsPanel(coveredStatisticsMap), "Covered Feature Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, new CoveredFeatureStatsPanel(coveredStatisticsMap), "Feature Coverage Analysis Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

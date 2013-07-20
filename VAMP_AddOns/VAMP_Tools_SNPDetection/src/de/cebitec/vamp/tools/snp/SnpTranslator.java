@@ -6,12 +6,13 @@ import de.cebitec.common.sequencetools.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceComparison;
 import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.util.polyTree.Node;
+import de.cebitec.vamp.util.polyTree.NodeVisitor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +41,20 @@ public class SnpTranslator {
     private int refLength;
     private List<PersistantFeature> genomicFeatures;
     private GeneticCode code;
-    private int lastIndex;
-    private int lastPos;
-    private int pos;
+    private int index;
+    private int subPos; //summed up bases in subfeatures up to the snp position regarding the strand of the feature
     private final Set<FeatureType> selectedFeatureTypes;
+    private boolean posDirectAtLeftChromBorder;
+    private boolean posAtLeftChromBorder;
+    private boolean posAtRightChromBorder;
+    private boolean posDirectAtRightChromBorder;
+    private boolean posAtLeftSubBorder;
+    private boolean posAtRightSubBorder;
+    private boolean snpInSubfeature; //if not and we have subfeatures, then this snp will not be translated
+    private PersistantFeature borderSubfeat;
+    private PersistantFeature subfeatBefore; //only set if pos is at borders
+    private PersistantFeature subfeatAfter;
+    private boolean subFeatureFound;
 
     /**
      * Generates all translations possible for a given snp for the given genomic features
@@ -59,13 +70,11 @@ public class SnpTranslator {
      */
     public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantReference reference, Set<FeatureType> selectedFeatureTypes) {
         this.selectedFeatureTypes = selectedFeatureTypes;
-        this.genomicFeatures = genomicFeatures;
-        this.filterFeatureTypes();
+        PersistantFeature.Utils.addParentFeatures(genomicFeatures);
+        this.genomicFeatures = PersistantFeature.filterFeatureTypes(genomicFeatures, this.selectedFeatureTypes);
         this.refSeq = reference.getSequence();
         this.refLength = reference.getRefLength();
-        lastIndex = 0;
-        lastPos = Integer.MAX_VALUE;
-        pos = -1;
+        index = 0;
         this.pref = NbPreferences.forModule(Object.class);
         try {
             GeneticCodeFactory.initGeneticCodes();
@@ -84,31 +93,26 @@ public class SnpTranslator {
 
         //find feature/s which cover current snp position
         List<PersistantFeature> featuresFound = new ArrayList<>();
+        int stopIndex = index;
+        boolean fstFoundFeat = true;
 
-        int stopIndex = 0;
-        pos = position;
-        if (lastPos > pos) {
-            lastIndex = 0;
-        } //since positions in table cannot be sorted completely, because they are strings
-
-        while (lastIndex < this.genomicFeatures.size()) {
+        while (index < this.genomicFeatures.size()) {
             
-            PersistantFeature feature = this.genomicFeatures.get(lastIndex++);
-            if (feature.getStart() <= pos && feature.getStop() >= pos) {
+            PersistantFeature feature = this.genomicFeatures.get(index++);
+            if (feature.getStart() <= position && feature.getStop() >= position) {
                 //found hit, also try next index
                 featuresFound.add(feature);
-                stopIndex = stopIndex > 0 ? stopIndex : lastIndex - 1;
-            } else if (feature.getStop() < pos) {
+                if (fstFoundFeat) {
+                    stopIndex = index - 1;
+                    fstFoundFeat = false;
+                }
+            } else if (feature.getStop() < position) {
                 //do nothing
-            } else if (feature.getStop() > pos && feature.getStart() > pos) {
-                lastIndex = stopIndex > 0 ? stopIndex : lastIndex - (featuresFound.size() + 1);
+            } else if (feature.getStop() > position && feature.getStart() > position) {
                 break; //stop
-            } else if (feature.getStop() > pos) {
-                stopIndex = lastIndex - 1;
             }
         }
-        
-        lastPos = pos;
+        index = stopIndex < 0 ? 0 : stopIndex; //to always ensure not to forget about the last visited features
         
         return featuresFound;
 
@@ -128,59 +132,14 @@ public class SnpTranslator {
     public void checkForFeature(Snp snp) {
 
         //find feature/s which cover current snp position
-        List<PersistantFeature> featuresFound = new ArrayList<>();
-//        List<PersistantSubfeature> subfeaturesFound = new ArrayList<PersistantSubfeature>();
-
-        int stopIndex = 0;
-        this.pos = snp.getPosition();
-        this.lastIndex = lastPos > pos ? 0 : lastIndex;
-        //since positions in table are sorted alphabetically, because they are strings
-
-        while (lastIndex < this.genomicFeatures.size()) {
-
-            PersistantFeature feature = this.genomicFeatures.get(this.lastIndex++);
-            if (feature.getStart() <= pos && feature.getStop() >= pos) {
-                //found hit, also try next index
-                featuresFound.add(feature);
-                stopIndex = stopIndex > 0 ? stopIndex : lastIndex - 1;
-            } else if (feature.getStart() < pos) {
-                //do nothing
-            } else if (feature.getStop() > pos && feature.getStart() > pos) {
-                lastIndex = stopIndex > 0 ? stopIndex : lastIndex;
-                break; //stop
-            } else if (feature.getStop ()> pos) {
-                stopIndex = lastIndex - 1;
-            }
-        }
-        lastIndex -= (featuresFound.size() + 1);
-        lastIndex = lastIndex < 0 ? 0 : lastIndex; //to always ensure not to forget about the last visited features
+        List<PersistantFeature> featuresFound = this.checkCoveredByFeature(snp.getPosition());
 
         //amino acid substitution calculations
         List<CodonSnp> codonSnpList = this.calcSnpList(featuresFound, snp);
         for (CodonSnp codon : codonSnpList) {
             snp.addCodon(codon);
         }
-        
-        lastPos = pos;
     }
-
-//    /**
-//     * Checks if the position of the handed in snp is covered by a subfeature (exon)
-//     * and returns the subfeature.
-//     * @param feature the feature whose subfeatures are checked
-//     * @param snp the snp object to check
-//     * @return the subfeature covering the current position or null, if no subfeature covers
-//     *          this position
-//     */
-//    private PersistantSubFeature checkForSubfeature(PersistantFeature feature, int pos) {
-//        for (PersistantSubFeature subfeature : feature.getSubFeatures()){
-//            if (subfeature.getStart() <= pos && subfeature.getStop() >= pos) {
-//                //found hit
-//                return subfeature;
-//            }
-//        }
-//        return null;
-//    }
 
     /**
      * Calculates the list of snp codons belonging to a single snp. This list is larger than one
@@ -194,20 +153,24 @@ public class SnpTranslator {
      */
     private List<CodonSnp> calcSnpList(List<PersistantFeature> featuresFound, Snp snp) {
         
-        boolean posDirectAtLeftBorder = this.pos < 2; //pos is never smaller than 1, 1 is min
-        boolean posAtLeftBorder = this.pos < 3; 
-        boolean posAtRightBorder = this.pos + 2 > this.refLength;
-        boolean posDirectAtRightBorder = this.pos + 1 > this.refLength;
+        int pos = snp.getPosition();
+        posDirectAtLeftChromBorder = pos < 2; //pos is never smaller than 1, 1 is min
+        posAtLeftChromBorder = pos < 3; 
+        posAtRightChromBorder = pos + 2 > this.refLength;
+        posDirectAtRightChromBorder = pos + 1 > this.refLength;
                 
         //handle feature knowledge:
         //get each strand and triplet for correct reading frame for translation
         List<CodonSnp> codonSnpList = new ArrayList<>();
         for (PersistantFeature feature : featuresFound) {
-            int featureStart;
-            int mod;
+            int mod; //fwdStrand: 1 = left base, 2 = middle base, 0 = right base / revStrand: 1 = left base, 2 = middle base, 0 = right base
             String tripletRef = "";
             String tripletSnp = "";
-            int subPos = 0;
+            subPos = 0;
+            
+            if (pos == 17768 || pos == 19403 || pos == 19430) {
+                System.out.println("la");
+            }
             
             /* 
              * Check for subfeatures and calculate length of spliced mRNA and snp position on this mRNA.
@@ -216,111 +179,96 @@ public class SnpTranslator {
              * the distance along all subfeatures up to our snp position.
              */
             boolean fwdStrand = feature.isFwdStrand();
-//            boolean posAtLeftSubBorder = false;
-//            boolean posAtRightSubBorder = false;
-//            boolean snpInSubfeature = false; //if not and we have subfeatures, then this snp will not be translated
-//            PersistantSubFeature subfeatBefore = null;
-//            PersistantSubFeature borderSubfeat = null; //only set if pos is at borders
-//            PersistantSubFeature subfeatAfter = null;
-//            for (PersistantSubFeature subfeature : feature.getSubFeatures()) {
-//                    
-//                int featureStartOnStrand = fwdStrand ? subfeature.getStart() : subfeature.getStop();
-//                featureStart = subfeature.getStart();
-//
-//                if (subfeature.getStop() >= this.pos && featureStart <= this.pos) {
-//                    subPos += (Math.abs(this.pos - featureStartOnStrand)+1);
-//                    //only set subfeatAtPos, if position is at a border of the subfeature
-//                    posAtLeftSubBorder = this.pos - 2 < featureStart;
-//                    posAtRightSubBorder = this.pos + 2 > subfeature.getStop();
-//                    borderSubfeat = !posAtLeftSubBorder && !posAtRightSubBorder ? null : subfeature;
-//                    snpInSubfeature = true;
-//                } else if (featureStart < this.pos) {
-//                    //get distance in feature and left neighbor subfeature of subfeature with position
-//                    if (fwdStrand) { subPos += (subfeature.getStop() - (featureStart-1)); }
-//                    if (subfeatBefore == null || subfeatBefore.getStart() < subfeature.getStart()) {
-//                        subfeatBefore = subfeature;
-//                    }
-//                } else if (featureStart > this.pos) {
-//                    if (!fwdStrand) { subPos += (featureStartOnStrand - (subfeature.getStart()-1)); }
-//                    //get right neighbor subfeature of subfeature with position
-//                    if (subfeatAfter == null || subfeatAfter.getStart() > subfeature.getStart()) {
-//                        subfeatAfter = subfeature;
-//                    }
-//                }
-//            }
-//            
-//            if (!feature.getSubFeatures().isEmpty() && !snpInSubfeature){ 
-//                continue; // we have subfeatures, but the snp is not in them, so we skip it!
-//            }
-           
+            
+            if (       feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA
+                    || feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA) {
+                this.calcFeatureData(feature, pos, FeatureType.CDS);
+                if (!subFeatureFound) {
+                    this.calcFeatureData(feature, pos, FeatureType.EXON);
+                }
+            }
+            if (!subFeatureFound && feature.getType() == FeatureType.GENE) {
+                this.calcFeatureData(feature, pos, FeatureType.MRNA);
+                if (!subFeatureFound) { //if the gene has a rRNA or tRNA instead of an mRNA, we have to check this, too
+                    this.calcFeatureData(feature, pos, FeatureType.RRNA);
+                }
+                if (!subFeatureFound) {
+                    this.calcFeatureData(feature, pos, FeatureType.TRNA);
+                }
+            }
+            
+            if (subFeatureFound && !snpInSubfeature) {
+                continue; // we have subfeatures, but the snp is not in them, so we do not translate it!
+            }
+
             try { //we need to catch, if any of the positions is out of bounds!
 
-                if (subPos <= 1) { //|| borderSubfeat == null) { //there are no subfeatures, or pos is not at border in subfeature
+                if (subPos <= 0 || borderSubfeat == null) { //there are no subfeatures, or pos is not at border in subfeature
 
                     int featureStartOnStrand = fwdStrand ? feature.getStart() : feature.getStop();
                     
-                    if (subPos == 0) {
-                        mod = (this.pos - featureStartOnStrand+1) % 3;
-                    } else {
+                    if (subPos == 0) { //feature without subfeatures
+                        mod = (Math.abs(pos - featureStartOnStrand) + 1) % 3;
+                    } else { //feature with subfeatures, we just have to get the mod
                         mod = subPos % 3;
                     }
 
-                    if (!posAtRightBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left base of triplet, get pos to pos+2
-                        tripletRef = refSeq.substring(this.pos - 1, this.pos + 2);
+                    if (!posAtRightChromBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left base of triplet, get pos to pos+2
+                        tripletRef = refSeq.substring(pos - 1, pos + 2);
                         tripletSnp = snp.getBase().concat(tripletRef.substring(1));
-                    } else if (mod == 2 && !posDirectAtLeftBorder && !posDirectAtRightBorder) { //middle base of triplet, get pos-1, pos and pos+1
-                        tripletRef = refSeq.substring(this.pos - 2, this.pos + 1);
+                    } else if (mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder) { //middle base of triplet, get pos-1, pos and pos+1
+                        tripletRef = refSeq.substring(pos - 2, pos + 1);
                         tripletSnp = tripletRef.charAt(0) + snp.getBase() + tripletRef.charAt(2);
-                    } else if (!posAtLeftBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
-                        tripletRef = refSeq.substring(this.pos - 3, this.pos);
+                    } else if (!posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
+                        tripletRef = refSeq.substring(pos - 3, pos);
                         tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase());
                     }
-//                } else { //snp is located in a subfeature (exon) and at a border of a subfeature
-//
-//                    mod = subPos % 3;
-//                    boolean posDirectAtLeftSubBorder = this.pos - 1 < borderSubfeat.getStart();
-//                    boolean posDirectAtRightSubBorder = this.pos + 1 > borderSubfeat.getStop();
-//
-//                    if (!posAtRightBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left base of triplet, get pos to pos+2
-//
-//                        if (posAtRightSubBorder) {
-//                            if (posDirectAtRightSubBorder) { //get only last base from other subfeature
-//                                tripletRef = refSeq.substring(pos - 1, pos) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart() + 1);
-//                            } else { //get last two bases from other feature
-//                                tripletRef = refSeq.substring(pos - 1, pos + 1) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
-//                            }
-//                        } else {
-//                            tripletRef = refSeq.substring(this.pos - 1, this.pos + 2);
-//                        }
-//                        tripletSnp = snp.getBase().concat(tripletRef.substring(1));
-//
-//                    } else if (mod == 2 && !posDirectAtLeftBorder && !posDirectAtRightBorder) { //middle base of triplet, get pos-1, pos and pos+1
-//
-//                        if (posDirectAtLeftSubBorder) { //get one base from left subfeature and one from right subfeature
-//                            tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
-//                        } else {
-//                            tripletRef = refSeq.substring(this.pos - 2, this.pos);
-//                        }
-//                        if (posDirectAtRightSubBorder) {
-//                            tripletRef += refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
-//                        } else {
-//                            tripletRef += refSeq.substring(this.pos, this.pos + 1);
-//                        }
-//                        tripletSnp = tripletRef.charAt(0) + snp.getBase() + tripletRef.charAt(2);
-//
-//                    } else if (!posAtLeftBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
-//
-//                        if (posAtLeftSubBorder) {
-//                            if (posDirectAtLeftSubBorder) { //get both left bases from other subfeature
-//                                tripletRef = refSeq.substring(subfeatBefore.getStop() - 2, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
-//                            } else { //get last base from other feature
-//                                tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 2, pos);
-//                            }
-//                        } else {
-//                            tripletRef = refSeq.substring(this.pos - 3, this.pos);
-//                        }
-//                        tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase());
-//                    }
+                } else { //snp is located in a subfeature (exon) and at a border of a subfeature
+
+                    mod = subPos % 3;
+                    boolean posDirectAtLeftSubBorder = pos - 1 < borderSubfeat.getStart();
+                    boolean posDirectAtRightSubBorder = pos + 1 > borderSubfeat.getStop();
+
+                    if (!posAtRightChromBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left (fwd) or right (rev) base of triplet, get pos to pos+2
+
+                        if (posAtRightSubBorder) {
+                            if (posDirectAtRightSubBorder) { //get only last base from current subfeature and two from next subfeature
+                                tripletRef = refSeq.substring(pos - 1, pos) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart() + 1);
+                            } else { //get last two bases from current subfeature and first base of next subfeature
+                                tripletRef = refSeq.substring(pos - 1, pos + 1) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
+                            }
+                        } else {
+                            tripletRef = refSeq.substring(pos - 1, pos + 2);
+                        }
+                        tripletSnp = snp.getBase().concat(tripletRef.substring(1));
+
+                    } else if (mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder) { //middle base of triplet, get pos-1, pos and pos+1
+
+                        if (posDirectAtLeftSubBorder) { //get one base from left subfeature and one from right subfeature, adding last base later
+                            tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
+                        } else {
+                            tripletRef = refSeq.substring(pos - 2, pos);
+                        }
+                        if (posDirectAtRightSubBorder) {
+                            tripletRef += refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
+                        } else {
+                            tripletRef += refSeq.substring(pos, pos + 1);
+                        }
+                        tripletSnp = tripletRef.charAt(0) + snp.getBase() + tripletRef.charAt(2);
+
+                    } else if (!posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
+
+                        if (posAtLeftSubBorder) {
+                            if (posDirectAtLeftSubBorder) { //get both left bases from other subfeature
+                                tripletRef = refSeq.substring(subfeatBefore.getStop() - 2, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
+                            } else { //get last base from feature before
+                                tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 2, pos);
+                            }
+                        } else {
+                            tripletRef = refSeq.substring(pos - 3, pos);
+                        }
+                        tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase());
+                    }
                 }
 
                 if (!fwdStrand) {
@@ -330,9 +278,6 @@ public class SnpTranslator {
             } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
                 continue;
             }
-
-            //get feature id
-            String id = feature.toString();
 
             //translate string to amino acid and store reference and snp codon
             try {
@@ -349,26 +294,62 @@ public class SnpTranslator {
                     }
                 }
 
-                codonSnpList.add(new CodonSnp(tripletRef, tripletSnp, aminoRef, aminoSnp, type, id));
+                codonSnpList.add(new CodonSnp(tripletRef, tripletSnp, aminoRef, aminoSnp, type, feature));
             } catch (NullPointerException e) {
                 continue; //ignore translations with N's or gaps
             }
         }
         return codonSnpList;
     }
-
+    
     /**
-     * Creates a new array list of the genomic features, which are among the
-     * allowed feature types. All features, whose feature type is not in the 
-     * <cc>selectedFeatureTypes</cc> list is dismissed.
+     * Calculates the feature type length of the given feature type for all
+     * features downward in the feature tree hierarchy (top-down fashion).
+     * @param feature the feature whose subfeature length and readcount is needed
+     * @param type the feature type for which the length sum and total read count
+     * is needed
      */
-    private void filterFeatureTypes() {
-        List<PersistantFeature> newFeatures = new ArrayList<>();
-        for (PersistantFeature feature : this.genomicFeatures) {
-            if (this.selectedFeatureTypes.contains(feature.getType())) {
-                newFeatures.add(feature);
+    private void calcFeatureData(final PersistantFeature feature, final int pos, final FeatureType type) {
+        //calc length of all exons of the mRNA and number of reads mapped to exon regions
+        subfeatAfter = null;
+        subfeatBefore = null;
+        snpInSubfeature = false;
+        subPos = 0;
+        subFeatureFound = false;
+        feature.topDown(new NodeVisitor() {
+            
+            @Override
+            public void visit(Node node) {
+                
+                PersistantFeature subFeature = (PersistantFeature) node;
+                final boolean fwdStrand = feature.isFwdStrand();
+                if (subFeature.getType() == type) {
+                    subFeatureFound = true;
+                    int featureStartOnStrand = fwdStrand ? subFeature.getStart() : subFeature.getStop();
+                    int featureStart = subFeature.getStart();
+                    
+                    if (subFeature.getStop() >= pos && featureStart <= pos) {
+                        subPos += (Math.abs(pos - featureStartOnStrand) + 1);
+                        //only set subfeatAtPos, if position is at a border of the subFeature
+                        posAtLeftSubBorder = pos - 2 < featureStart;
+                        posAtRightSubBorder = pos + 2 > subFeature.getStop();
+                        borderSubfeat = !posAtLeftSubBorder && !posAtRightSubBorder ? null : subFeature;
+                        snpInSubfeature = true;
+                    } else if (featureStart < pos) {
+                        //get distance in feature and left neighbor subFeature of subFeature with position
+                        if (fwdStrand) { subPos += (subFeature.getStop() - (featureStart - 1)); }
+                        if (subfeatBefore == null || subfeatBefore.getStart() < subFeature.getStart()) {
+                            subfeatBefore = subFeature;
+                        }
+                    } else if (featureStart > pos) {
+                        if (!fwdStrand) { subPos += (featureStartOnStrand - (subFeature.getStart() - 1)); }
+                        //get right neighbor subFeature of subFeature with position
+                        if (subfeatAfter == null || subfeatAfter.getStart() > subFeature.getStart()) {
+                            subfeatAfter = subFeature;
+                        }
+                    }
+                }
             }
-        }
-        this.genomicFeatures = newFeatures;
+        });
     }
 }

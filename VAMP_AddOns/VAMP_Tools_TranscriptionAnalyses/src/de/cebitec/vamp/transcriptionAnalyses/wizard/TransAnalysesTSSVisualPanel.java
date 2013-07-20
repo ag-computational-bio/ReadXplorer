@@ -19,7 +19,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private int maxLowCovInitialCount;
     private int minLowCovIncrease;
     private int minTranscriptExtensionCov;
-    private boolean detectUnannotatedTranscripts = false;
+    private boolean detectUnannotatedTranscripts = true;
     private boolean tssAutomatic = false;
 
     /**

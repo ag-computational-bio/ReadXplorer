@@ -60,6 +60,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     /**
      * Initializes the initial data structures needed for an operon detection analysis.
      * This includes the detection of all neighboring features before the actual analysis.
+     * CDS and exons are excluded from the operon detection.
      */
     private void initDatastructures() {
         Map<String, Integer> statsMap = trackConnector.getTrackStats().getStatsMap();
@@ -77,22 +78,25 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
             PersistantFeature feature1 = this.genomeFeatures.get(i);
             PersistantFeature feature2 = this.genomeFeatures.get(i + 1);
-            //we currently only exclude exons from the detection 
-            if (feature1.getType() != FeatureType.EXON) {
-                if (feature1.isFwdStrand() == feature2.isFwdStrand() && feature2.getType() != FeatureType.EXON) {
+            //we currently only exclude exons and CDS from the detection 
+            if (feature1.getType() != FeatureType.EXON && feature1.getType() != FeatureType.CDS) {
+                if (    feature1.isFwdStrand() == feature2.isFwdStrand() && 
+                        feature2.getType() != FeatureType.EXON && 
+                        feature2.getType() != FeatureType.CDS) {
                     if (feature2.getStart() + 20 <= feature1.getStop()) { //features may overlap at the ends, happens quite often
                         //do nothing
                     } else {
                         this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2));
                     }
-                } else { // check next features until one on the same strand is found which is not an exon.
+                } else { // check next features until one on the same strand is found which is not an exon or CDS.
                     /*
                      * We keep all neighboring features on the same strand,
                      * even if their distance is not larger than 1000bp.
                      */
                     int featureIndex = i + 2;
                     while ((feature1.isFwdStrand() != feature2.isFwdStrand() || 
-                            feature2.getType() == FeatureType.EXON) && 
+                            feature2.getType() == FeatureType.EXON ||
+                            feature2.getType() == FeatureType.CDS) && 
                             featureIndex < this.genomeFeatures.size() - 1) {
                         
                         feature2 = this.genomeFeatures.get(featureIndex++);
@@ -255,7 +259,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
             // TODO: check if parameter ok or new parameter
             } else if (feature2.getStart() - feature1.getStop() > averageReadLength &&
                     internalReads > minNumberReads) {
-                //create operon
+                //TODO: think about creating an operon
                 System.out.println("found case " + ++count);
             }
         }

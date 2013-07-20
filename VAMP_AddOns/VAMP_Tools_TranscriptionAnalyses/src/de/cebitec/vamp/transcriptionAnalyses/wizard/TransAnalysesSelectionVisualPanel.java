@@ -35,12 +35,9 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     private void initComponents() {
 
         transcriptionStartBox = new javax.swing.JCheckBox();
-        filteredGenesBox = new javax.swing.JCheckBox();
         rpkmValuesBox = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tssTextArea = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        filterFeaturesTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         rpkmTextArea = new javax.swing.JTextArea();
         operonDetectionBox = new javax.swing.JCheckBox();
@@ -51,13 +48,6 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         transcriptionStartBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 transcriptionStartBoxActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(filteredGenesBox, org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.filteredGenesBox.text")); // NOI18N
-        filteredGenesBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filteredGenesBoxActionPerformed(evt);
             }
         });
 
@@ -77,16 +67,6 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         tssTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.tssTextArea.text")); // NOI18N
         tssTextArea.setWrapStyleWord(true);
         jScrollPane1.setViewportView(tssTextArea);
-
-        filterFeaturesTextArea.setEditable(false);
-        filterFeaturesTextArea.setBackground(new java.awt.Color(240, 240, 240));
-        filterFeaturesTextArea.setColumns(20);
-        filterFeaturesTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-        filterFeaturesTextArea.setLineWrap(true);
-        filterFeaturesTextArea.setRows(1);
-        filterFeaturesTextArea.setText(org.openide.util.NbBundle.getMessage(TransAnalysesSelectionVisualPanel.class, "TransAnalysesSelectionVisualPanel.filterFeaturesTextArea.text")); // NOI18N
-        filterFeaturesTextArea.setWrapStyleWord(true);
-        jScrollPane2.setViewportView(filterFeaturesTextArea);
 
         rpkmTextArea.setEditable(false);
         rpkmTextArea.setBackground(new java.awt.Color(240, 240, 240));
@@ -124,17 +104,15 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(transcriptionStartBox)
-                            .addComponent(filteredGenesBox)
                             .addComponent(rpkmValuesBox)
                             .addComponent(operonDetectionBox))
-                        .addGap(0, 140, Short.MAX_VALUE))
+                        .addGap(0, 27, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(21, 21, 21)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
-                            .addComponent(jScrollPane5)
-                            .addComponent(jScrollPane2)
-                            .addComponent(jScrollPane1))))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3)
+                            .addComponent(jScrollPane5))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -143,10 +121,6 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                 .addComponent(transcriptionStartBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filteredGenesBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rpkmValuesBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -163,10 +137,6 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_transcriptionStartBoxActionPerformed
 
-    private void filteredGenesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filteredGenesBoxActionPerformed
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
-    }//GEN-LAST:event_filteredGenesBoxActionPerformed
-
     private void rpkmValuesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rpkmValuesBoxActionPerformed
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
     }//GEN-LAST:event_rpkmValuesBoxActionPerformed
@@ -176,10 +146,7 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     }//GEN-LAST:event_operonDetectionBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea filterFeaturesTextArea;
-    private javax.swing.JCheckBox filteredGenesBox;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JCheckBox operonDetectionBox;
@@ -195,14 +162,6 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
      */
     public boolean isTSSAnalysisSelected() {
         return this.transcriptionStartBox.isSelected();
-    }
-    
-    /**
-     * @return true, if the filter genes analysis is selected, false
-     * otherwise
-     */
-    public boolean isFilterGenesAnalysisSelected() {
-        return this.filteredGenesBox.isSelected();
     }
     
     /**
@@ -227,7 +186,6 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         return this.transcriptionStartBox.isSelected()
-                 || this.filteredGenesBox.isSelected()
                || this.operonDetectionBox.isSelected()
                 || this.rpkmValuesBox.isSelected();
     }

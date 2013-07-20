@@ -182,7 +182,6 @@ public class ReferenceConnector {
     /**
      * Fetches all features which are completely located within a given region
      * of the reference.
-     *
      * @param left start position of the region of interest
      * @param right end position of the region of interest
      * @return the list of all features found in the interval of interest

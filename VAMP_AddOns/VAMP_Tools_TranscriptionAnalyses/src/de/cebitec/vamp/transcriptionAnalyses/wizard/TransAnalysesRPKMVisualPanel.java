@@ -43,6 +43,11 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
         maxRPKMValueLabel = new javax.swing.JLabel();
 
         minRPKMValueField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesRPKMVisualPanel.class, "TransAnalysesRPKMVisualPanel.minRPKMValueField.text")); // NOI18N
+        minRPKMValueField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minRPKMValueFieldActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(minRPKMValueLabel, org.openide.util.NbBundle.getMessage(TransAnalysesRPKMVisualPanel.class, "TransAnalysesRPKMVisualPanel.minRPKMValueLabel.text")); // NOI18N
 
@@ -56,16 +61,17 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(minRPKMValueField)
+                    .addComponent(maxRPKMValueField, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(minRPKMValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(11, 11, 11)
                         .addComponent(minRPKMValueLabel))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(maxRPKMValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(maxRPKMValueLabel)))
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -78,9 +84,14 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(maxRPKMValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(maxRPKMValueLabel))
-                .addContainerGap(243, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void minRPKMValueFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minRPKMValueFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_minRPKMValueFieldActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField maxRPKMValueField;
     private javax.swing.JLabel maxRPKMValueLabel;
@@ -118,11 +129,11 @@ public class TransAnalysesRPKMVisualPanel extends JobPanel {
         return isValidated;
     }
 
-    public int getMaxRPKMValue() {
+    public int getMaxReadCount() {
         return maxRPKMValue;
     }
 
-    public int getMinRPKMValue() {
+    public int getMinReadCount() {
         return minRPKMValue;
     }
 }

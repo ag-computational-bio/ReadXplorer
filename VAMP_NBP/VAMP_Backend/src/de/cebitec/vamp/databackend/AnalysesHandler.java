@@ -5,6 +5,7 @@ import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
@@ -42,6 +43,8 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private boolean mappingsNeeded;
     private byte desiredData = Properties.NORMAL;
     private ParametersReadClasses readClassParams;
+    
+    private long start;
 
     /**
      * Creates a new analysis handler, ready for extracting mapping and coverage
@@ -82,6 +85,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.queryType = this.coverageNeeded ? DATA_TYPE_COVERAGE : DATA_TYPE_MAPPINGS;
         this.nbRequests = 0;
         this.progressHandle.start();
+        this.start = System.currentTimeMillis();
 
         this.refSeqLength = trackConnector.getRefSequenceLength();
 
@@ -187,8 +191,10 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
     @Override
     public void receiveData(Object data) {
+        long finish = System.currentTimeMillis();
+        String benchmark = Benchmark.calculateDuration(start, finish, ". Duration: ");
         this.progressHandle.progress(this.queryType + " request "
-                + (nbCarriedOutRequests + 1) + " of " + nbRequests, ++nbCarriedOutRequests);
+                + (nbCarriedOutRequests + 1) + " of " + nbRequests + benchmark, ++nbCarriedOutRequests);
         this.notifyObservers(data);
 
         //when the last request is finished signalize the parent to collect the data

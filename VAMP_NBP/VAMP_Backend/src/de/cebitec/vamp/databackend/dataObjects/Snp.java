@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A SNP. The data structure for storing a basic SNP.
  *
  * @author ddoppmeier, jhess, rhilker
  */
@@ -28,7 +29,7 @@ public class Snp implements SnpI {
     private int gapOrderIndex;
 
     /**
-     * 
+     * A SNP. The data structure for storing a basic SNP.
      * @param position
      * @param trackId
      * @param base
@@ -51,7 +52,7 @@ public class Snp implements SnpI {
     }
 
     /**
-     * 
+     * A SNP. The data structure for storing a basic SNP.
      * @param position
      * @param trackId
      * @param base
@@ -212,6 +213,19 @@ public class Snp implements SnpI {
         return "position: "+position+"\tbase: "+base+"\trefBase: "+refBase+"\taRate: "+aRate+"\tcRate: "
                 +cRate+"\tgRate: "+gRate+ "\ttRate: "+tRate+"\tnRate: "+nRate+"\tgapRate: "
                 +gapRate+"\tcoverage: "+coverage+"\tfrequency: "+frequency+"%\ttype: "+type;
+    }
+
+    @Override
+    public int compareTo(SnpI other) {
+        int value = 0;
+        if (this.getPosition() < other.getPosition()) {
+            value = -1;
+        } else if (this.getPosition() > other.getPosition()) {
+            value = 1;
+        } else { //pos are equal
+            value = 0;
+        }
+        return value;
     }
 
     

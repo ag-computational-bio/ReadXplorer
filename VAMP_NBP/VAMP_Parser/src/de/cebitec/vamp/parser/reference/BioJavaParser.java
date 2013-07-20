@@ -35,6 +35,8 @@ import org.biojavax.bio.seq.io.RichSequenceFormat;
 import org.biojavax.bio.seq.io.RichStreamReader;
 
 /**
+ * A biojava parser can be initialized to parse embl or genbank files and parses
+ * them into a ParsedReference object.
  *
  * @author ddopmeier, rhilker
  */

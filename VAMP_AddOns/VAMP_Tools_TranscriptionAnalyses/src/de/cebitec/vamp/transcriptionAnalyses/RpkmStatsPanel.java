@@ -8,18 +8,18 @@ import org.openide.util.NbBundle;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class FilterFeaturesStatsPanel extends javax.swing.JPanel {
+public class RpkmStatsPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
     
-    private HashMap<String, Integer> filteredFeaturesStatsMap;
+    private HashMap<String, Integer> returnedFeaturesStatsMap;
 
     /**
-     * Creates new form FilterFeaturesStatsPanel
-     * @param filteredFeaturesStatsMap statistics to display
+     * Creates new form RpkmStatsPanel
+     * @param returnedFeaturesStatsMap statistics to display
      */
-    public FilterFeaturesStatsPanel(HashMap<String, Integer> filteredFeaturesStatsMap) {
-        this.filteredFeaturesStatsMap = filteredFeaturesStatsMap;
+    public RpkmStatsPanel(HashMap<String, Integer> returnedFeaturesStatsMap) {
+        this.returnedFeaturesStatsMap = returnedFeaturesStatsMap;
         this.initComponents();
         this.initAdditionalComponents();
     }
@@ -33,28 +33,28 @@ public class FilterFeaturesStatsPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        filterFeatureStatsScrollpane = new javax.swing.JScrollPane();
-        filterFeatureStatsTable = new javax.swing.JTable();
+        returnedFeatureStatsScrollpane = new javax.swing.JScrollPane();
+        returnedFeatureStatsTable = new javax.swing.JTable();
 
-        filterFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
+        returnedFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null},
-                {null},
-                {null},
-                {null},
-                {null},
-                {null},
-                {null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                ""
+                "Count Type", "Count"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class
+                java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false
+                false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -65,34 +65,35 @@ public class FilterFeaturesStatsPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        filterFeatureStatsScrollpane.setViewportView(filterFeatureStatsTable);
-        filterFeatureStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(FilterFeaturesStatsPanel.class, "FilterFeaturesStatsPanel.filterFeatureStatsTable.columnModel.title0")); // NOI18N
+        returnedFeatureStatsScrollpane.setViewportView(returnedFeatureStatsTable);
+        returnedFeatureStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title0")); // NOI18N
+        returnedFeatureStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title1")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterFeatureStatsScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+            .addComponent(returnedFeatureStatsScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterFeatureStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(returnedFeatureStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane filterFeatureStatsScrollpane;
-    private javax.swing.JTable filterFeatureStatsTable;
+    private javax.swing.JScrollPane returnedFeatureStatsScrollpane;
+    private javax.swing.JTable returnedFeatureStatsTable;
     // End of variables declaration//GEN-END:variables
     
     private void initAdditionalComponents() {
-        filterFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
+        returnedFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    {ResultPanelFilteredFeatures.FEATURES_FILTERED, this.filteredFeaturesStatsMap.get(ResultPanelFilteredFeatures.FEATURES_FILTERED)},
-                    {ResultPanelFilteredFeatures.FEATURES_TOTAL, this.filteredFeaturesStatsMap.get(ResultPanelFilteredFeatures.FEATURES_TOTAL)}
+                    {ResultPanelRPKM.RETURNED_FEATURES, this.returnedFeaturesStatsMap.get(ResultPanelRPKM.RETURNED_FEATURES)},
+                    {ResultPanelRPKM.FEATURES_TOTAL, this.returnedFeaturesStatsMap.get(ResultPanelRPKM.FEATURES_TOTAL)}
                 },
                 new String[]{
-                    NbBundle.getMessage(FilterFeaturesStatsPanel.class, "FilterFeaturesStatsPanel.filterFeatureStatsTable.columnModel.title0"),
-                    NbBundle.getMessage(FilterFeaturesStatsPanel.class, "FilterFeaturesStatsPanel.filterFeatureStatsTable.columnModel.title1")
+                    NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title0"),
+                    NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title1")
                 }) {
             private static final long serialVersionUID = 1L;
             Class[] types = new Class[]{

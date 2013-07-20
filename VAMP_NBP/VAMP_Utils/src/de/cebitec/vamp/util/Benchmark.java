@@ -46,7 +46,20 @@ public class Benchmark {
 
         millis = (int) diff; //milliseconds
 
-        return message + "It took " + hours + " h, " + minutes + " min, " + seconds + " s, " + millis + " millis";
+        String benchmark = message + "It took ";
+        if (hours > 0) {
+            benchmark = benchmark.concat(hours + " h ");
+        }
+        if (minutes > 0) {
+            benchmark = benchmark.concat(minutes + " min ");
+        }
+        if (seconds > 0) {
+            benchmark = benchmark.concat(seconds + " s ");
+        }
+        if (millis > 0) {
+            benchmark = benchmark.concat(millis + " millis");
+        }
+        return benchmark;
     }
 
 }

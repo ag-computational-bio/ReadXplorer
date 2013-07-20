@@ -335,6 +335,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 
     private void referenceBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceBoxActionPerformed
         this.referenceName = (String) this.referenceBox.getSelectedItem();
+        this.nameField.setText(this.referenceName);
     }//GEN-LAST:event_referenceBoxActionPerformed
 
     private void nameFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_nameFieldPropertyChange
@@ -388,7 +389,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     }
 
     /**
-     * Fetches all sequence identifiers avaiable in the currently set GFF 3 file
+     * Fetches all sequence identifiers available in the currently set GFF 3 file
      * and adds them to the reference selection box.
      */
     private void retrieveSequenceIds() {
@@ -409,6 +410,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 //                        public void run() {
             referenceBox.setModel(new DefaultComboBoxModel<>(refSeqIds));
             referenceName = referenceBox.getSelectedItem().toString();
+            this.nameField.setText(referenceName);
 //                        }
 //                    });
         } catch (ParsingException ex) {

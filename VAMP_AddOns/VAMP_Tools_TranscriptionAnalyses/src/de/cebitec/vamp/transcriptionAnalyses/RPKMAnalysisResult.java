@@ -10,20 +10,34 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Container for all data belonging to an RPKM and read count analysis result.
+ * Also converts the list of returned features into the format readable for the
+ * ExcelExporter. Generates all three, the sheet names, headers and data to
+ * write.
+ * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
 
     private List<RPKMvalue> rpkmResults;
+    private int noGenomeFeatures;
     
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackList, List<RPKMvalue> rpkmResults) {
-        super(trackList);
+    /**
+     * Container for all data belonging to an RPKM and read count analysis
+     * result. Also converts the list of returned features into the format
+     * readable for the ExcelExporter. Generates all three, the sheet names,
+     * headers and data to write.
+     * @param trackMap the map of track ids to the PersistantTrack used for this
+     * analysis
+     * @param rpkmResults The result list of RPKM values and read counts
+     */
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults) {
+        super(trackMap);
         this.rpkmResults = rpkmResults;
     }
     
     /**
-     * @return The result list of RPKM values.
+     * @return The result list of RPKM values and read counts.
      */
     public List<RPKMvalue> getResults() {
         return rpkmResults;
@@ -32,7 +46,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
     @Override
     public List<String> dataSheetNames() {
         List<String> sheetNames = new ArrayList<>();
-        sheetNames.add("RPKM Calculation Table");
+        sheetNames.add("RPKM and Read Count Calculation Table");
         sheetNames.add("Parameters and Statistics");
         return sheetNames;
         
@@ -45,16 +59,19 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
 
         dataColumnDescriptions.add("Feature");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Feature Type");
         dataColumnDescriptions.add("Start");
         dataColumnDescriptions.add("Stop");
+        dataColumnDescriptions.add("Length");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("RPKM Value");
+        dataColumnDescriptions.add("Raw Read Count");
 
         allSheetDescriptions.add(dataColumnDescriptions);
 
         //add tss detection statistic sheet header
         List<String> statisticColumnDescriptions = new ArrayList<>();
-        statisticColumnDescriptions.add("RPKM Calculation Parameters and Statistics");
+        statisticColumnDescriptions.add("RPKM and Read Count Calculation Parameters and Statistics");
 
         allSheetDescriptions.add(statisticColumnDescriptions);
 
@@ -73,10 +90,13 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
             feat = rpkmValue.getFeature();
             rpkmRow.add(feat);
             rpkmRow.add(this.getTrackMap().get(rpkmValue.getTrackId()));
+            rpkmRow.add(feat.getType());
             rpkmRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
             rpkmRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
+            rpkmRow.add(feat.getStop() - feat.getStart());
             rpkmRow.add(feat.isFwdStrandString());
             rpkmRow.add(rpkmValue.getRPKM());
+            rpkmRow.add(rpkmValue.getReadCount());
 
             rpkmResultRows.add(rpkmRow);
         }
@@ -87,31 +107,42 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
         ParameterSetRPKM rpkmCalculationParameters = (ParameterSetRPKM) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("RPKM calculation for tracks:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("RPKM and raw read count calculation for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM calculation parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum RPKM value:", 
-                rpkmCalculationParameters.getMinRPKM()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Maximum RPKM value:", 
-                rpkmCalculationParameters.getMaxRPKM()));
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Min read count value of a feature to be shown in the results:", 
+                rpkmCalculationParameters.getMinReadCount()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Max read count value of a feature to be shown in the results:", 
+                rpkmCalculationParameters.getMaxReadCount()));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM calculation statistics:"));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_TOTAL, 
-//                this.getStatsMap().get(ResultPanelOperonDetection.OPERONS_TOTAL)));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS, 
-//                this.getStatsMap().get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS)));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS, 
-//                this.getStatsMap().get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS)));
-        //TODO: Statistics
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelRPKM.RETURNED_FEATURES,
+                this.getStatsMap().get(ResultPanelRPKM.RETURNED_FEATURES)));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelRPKM.FEATURES_TOTAL, 
+                this.getStatsMap().get(ResultPanelRPKM.FEATURES_TOTAL)));
 
         exportData.add(statisticsExportData);
 
         return exportData;
+    }
+
+    /**
+     * @param noGenomeFeatures The number of features of the reference genome.
+     */
+    public void setNoGenomeFeatures(int noGenomeFeatures) {
+        this.noGenomeFeatures = noGenomeFeatures;
+    }
+
+    /**
+     * @return The number of features of the reference genome.
+     */
+    public int getNoGenomeFeatures() {
+        return this.noGenomeFeatures;
     }
     
 }

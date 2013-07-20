@@ -6,13 +6,11 @@ import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.SequenceComparison;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Contains all data belonging to a SNP analysis data set. Also has the
@@ -24,7 +22,6 @@ import java.util.Set;
 public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     
     private List<SnpI> snpList;
-    private final Set<FeatureType> featTypes;
 
     
     /**
@@ -32,10 +29,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * @param snpList list of snps of the analysis
      * @param trackNames hashmap of track ids to track names used in the analysis
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames, Set<FeatureType> featTypes) {//, PersistantTrack currentTrack) {
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames) {
         super(trackNames);
         this.snpList = snpList;
-        this.featTypes = featTypes;
     }
     
     /**
@@ -62,6 +58,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         List<CodonSnp> codons;
         char aminoSnp;
         char aminoRef;
+        String tripletsSNP;
+        String tripletsRef;
         String ids;
         
         for (SnpI snpi : this.snpList) {
@@ -87,6 +85,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             noGene = "No gene";
             aminoAcidsSnp = "";
             aminoAcidsRef = "";
+            tripletsSNP = "";
+            tripletsRef = "";
             effect = "";
             geneId = "";
             //determine amino acid substitutions among snp substitutions
@@ -102,10 +102,12 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                 for (CodonSnp codon : codons) {
                     aminoSnp = codon.getAminoSnp();
                     aminoRef = codon.getAminoRef();
+                    tripletsSNP += codon.getTripletSnp() + "\n";
+                    tripletsRef += codon.getTripletRef() + "\n";
                     aminoAcidsSnp += aminoSnp + " (" + AminoAcidProperties.getPropertyForAA(aminoSnp) + ")\n";
                     aminoAcidsRef += aminoRef + " (" + AminoAcidProperties.getPropertyForAA(aminoRef) + ")\n";
                     effect += codon.getEffect().getType() + "\n";
-                    geneId += codon.getGeneId() + "\n";
+                    geneId += codon.getFeature() + "\n";
                 }
             } else {
                 codons = snp.getCodons();
@@ -122,12 +124,16 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                     }
 
                     for (CodonSnp codon : codons) {
-                        ids += codon.getGeneId() + "\n";
+                        ids += codon.getFeature() + "\n";
                     }
                     geneId = ids;
+                    tripletsSNP = "-";
+                    tripletsRef = "-";
                     aminoAcidsSnp = "-";
                     aminoAcidsRef = "-";
                 } else {
+                    tripletsSNP = "-";
+                    tripletsRef = "-";
                     aminoAcidsSnp = "No gene";
                     aminoAcidsRef = "No gene";
                     effect = "";
@@ -137,6 +143,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
 
             snpExport.add(aminoAcidsSnp);
             snpExport.add(aminoAcidsRef);
+            snpExport.add(tripletsSNP);
+            snpExport.add(tripletsRef);
             snpExport.add(effect);
             snpExport.add(geneId);
             
@@ -157,7 +165,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("SNP detection parameters:"));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum percentage of variation:", params.getMinPercentage()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of varying bases:", params.getMinVaryingBases()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of varying bases:", params.getMinMismatchingBases()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Correspond varying bases to most frequent base:", params.isUseMainBase() ? "yes" : "no"));
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
         
@@ -208,6 +217,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         dataColumnDescriptions.add("Type");
         dataColumnDescriptions.add("Amino Snp");
         dataColumnDescriptions.add("Amino Ref");
+        dataColumnDescriptions.add("Triplet Snp");
+        dataColumnDescriptions.add("Triplet Ref");
         dataColumnDescriptions.add("Effect on AA");
         dataColumnDescriptions.add("Features");
         
@@ -231,13 +242,5 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         sheetNames.add("SNP Table");
         sheetNames.add("SNP Statistics");
         return sheetNames;
-    }
-
-    /**
-     * @return The feature types selected for this SNP detection.
-     */
-    public Set<FeatureType> getSelectedFeatTypes() {
-        return this.featTypes;
-    }
-    
+    }    
 }

@@ -50,7 +50,7 @@ import org.openide.windows.WindowManager;
     @ActionReference(path = "Menu/Tools", position = 146),
     @ActionReference(path = "Toolbars/Tools", position = 231)
 })
-@Messages("CTL_OpenCoveredFeaturesAction=Covered Feature Analysis")
+@Messages("CTL_OpenCoveredFeaturesAction=Feature Coverage Analysis")
 public final class OpenCoveredFeaturesAction implements ActionListener, DataVisualisationI {
 
     private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
@@ -78,7 +78,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     }
 
     /**
-     * Carries out the logic behind the covered feature analysis action. This
+     * Carries out the logic behind the feature coverage analysis action. This
      * means, it opens a configuration wizard and starts the analysis after
      * successfully finishing the wizard.
      *
@@ -109,7 +109,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
             String msg = NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfo",
-                    "No track selected. To start a covered feature detection at least one track has to be selected.");
+                    "No track selected. To start a feature coverage analysis at least one track has to be selected.");
             String title = NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfoTitle", "Info");
             JOptionPane.showMessageDialog(this.context, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
@@ -147,8 +147,8 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     }
 
     /**
-     * Starts the covered feature detection.
-     * @param wiz the wizard containing the covered feature detection parameters
+     * Starts the feature coverage analysis.
+     * @param wiz the wizard containing the feature coverage analysis parameters
      */
     private void startCoveredFeaturesDetection(WizardDescriptor wiz) {
         //get parameters

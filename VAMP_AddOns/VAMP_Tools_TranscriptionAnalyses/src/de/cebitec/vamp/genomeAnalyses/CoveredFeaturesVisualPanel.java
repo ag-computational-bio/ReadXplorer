@@ -21,7 +21,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
 
     @Override
     public String getName() {
-        return "Covered Feature Detection Parameters";
+        return "Feature Coverage Analysis Parameters";
     }
 
     /**
