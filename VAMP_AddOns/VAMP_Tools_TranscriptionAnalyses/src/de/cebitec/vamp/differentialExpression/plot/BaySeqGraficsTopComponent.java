@@ -1,6 +1,13 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.plot;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.differentialExpression.BaySeq;
+import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.GnuR;
+import de.cebitec.vamp.differentialExpression.Group;
+import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
+import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
@@ -26,6 +33,7 @@ import javax.swing.JOptionPane;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
+import org.jfree.chart.ChartPanel;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -39,20 +47,20 @@ import org.openide.windows.TopComponent;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.differentialExpression//DiffExpGrafics//EN",
-autostore = false)
+        autostore = false)
 @TopComponent.Description(preferredID = "DiffExpGraficsTopComponent",
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpGraficsTopComponent")
 @ActionReference(path = "Menu/Window")
 @TopComponent.OpenActionRegistration(displayName = "#CTL_DiffExpGraficsAction",
-preferredID = "DiffExpGraficsTopComponent")
+        preferredID = "DiffExpGraficsTopComponent")
 @Messages({
     "CTL_DiffExpGraficsAction=DiffExpGrafics",
     "CTL_DiffExpGraficsTopComponent=Create graphics",
     "HINT_DiffExpGraficsTopComponent=This is a DiffExpGrafics window"
 })
-public final class DiffExpGraficsTopComponent extends TopComponent implements Observer, ItemListener {
+public final class BaySeqGraficsTopComponent extends TopComponent implements Observer, ItemListener {
 
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
@@ -61,12 +69,18 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("creating plot");
+    private ResultDeAnalysis result;
+    private ChartPanel chartPanel;
+    private boolean SVGCanvasActive;
+    private MouseActions mouseAction = new MouseActions();
 
-    public DiffExpGraficsTopComponent() {
+    public BaySeqGraficsTopComponent() {
     }
 
-    public DiffExpGraficsTopComponent(DeAnalysisHandler handler) {
+    public BaySeqGraficsTopComponent(DeAnalysisHandler handler) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
+        List<ResultDeAnalysis> results = handler.getResults();
+        this.result = results.get(results.size()-1);
         cbm = new DefaultComboBoxModel(BaySeqAnalysisHandler.Plot.values());
         initComponents();
         setName(Bundle.CTL_DiffExpGraficsTopComponent());
@@ -97,7 +111,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                 messages.setText("Could not load SVG file. Please try again.");
             }
         });
-
+        SVGCanvasActive = true;
     }
 
     private void addResults() {
@@ -134,19 +148,19 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         samplesBList = new javax.swing.JList(samplesB);
         saveButton = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.jLabel1.text")); // NOI18N
 
         plotTypeComboBox.addItemListener(this);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.jLabel2.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(samplesALabel, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.samplesALabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(samplesALabel, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.samplesALabel.text")); // NOI18N
         samplesALabel.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(samplesBLabel, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.samplesBLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(samplesBLabel, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.samplesBLabel.text")); // NOI18N
         samplesBLabel.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.plotButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.plotButton.text")); // NOI18N
         plotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotButtonActionPerformed(evt);
@@ -156,7 +170,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         jPanel1.setBorder(new javax.swing.border.MatteBorder(null));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.messages.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.messages.text")); // NOI18N
 
         samplesAList.setEnabled(false);
         jScrollPane1.setViewportView(samplesAList);
@@ -164,7 +178,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         samplesBList.setEnabled(false);
         jScrollPane2.setViewportView(samplesBList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.saveButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.saveButton.text")); // NOI18N
         saveButton.setEnabled(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -185,6 +199,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, 2, Short.MAX_VALUE)
                         .addGap(938, 938, 938))
+                    .addComponent(groupComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
@@ -198,9 +213,8 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(samplesBLabel)
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(groupComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(10, 10, 10)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -233,10 +247,10 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
                                 .addComponent(plotButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(saveButton)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(240, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -267,29 +281,45 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
-
-        try {
-            messages.setText("");
-            plotButton.setEnabled(false);
-            saveButton.setEnabled(false);
-            currentlyDisplayed = baySeqAnalysisHandler.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
-            svgCanvas.setURI(currentlyDisplayed.toURI().toString());
-            svgCanvas.setVisible(true);
-            svgCanvas.repaint();
-        } catch (IOException ex) {
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-            JOptionPane.showMessageDialog(null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-        } catch (BaySeq.SamplesNotValidException ex) {
-            messages.setText("Samples A and B must not be the same!");
+        if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
+            chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, samplA, samplB), "A", "M", new ToolTip());
+            chartPanel.addChartMouseListener(mouseAction);
+            if (SVGCanvasActive) {
+                jPanel1.remove(svgCanvas);
+                SVGCanvasActive = false;
+            }
+            jPanel1.add(chartPanel, BorderLayout.CENTER);
+            jPanel1.updateUI();
             plotButton.setEnabled(true);
-        } catch (GnuR.PackageNotLoadableException ex) {
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+        } else {
+            if (!SVGCanvasActive) {
+                jPanel1.remove(chartPanel);
+                jPanel1.add(svgCanvas, BorderLayout.CENTER);
+                jPanel1.updateUI();
+                SVGCanvasActive = true;
+            }
+            try {
+                messages.setText("");
+                plotButton.setEnabled(false);
+                saveButton.setEnabled(false);
+                currentlyDisplayed = baySeqAnalysisHandler.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
+                svgCanvas.setURI(currentlyDisplayed.toURI().toString());
+                svgCanvas.setVisible(true);
+                svgCanvas.repaint();
+            } catch (IOException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                JOptionPane.showMessageDialog(null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+            } catch (BaySeq.SamplesNotValidException ex) {
+                messages.setText("Samples A and B must not be the same!");
+                plotButton.setEnabled(true);
+            } catch (GnuR.PackageNotLoadableException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+            }
         }
     }//GEN-LAST:event_plotButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox groupComboBox;
     private javax.swing.JLabel jLabel1;

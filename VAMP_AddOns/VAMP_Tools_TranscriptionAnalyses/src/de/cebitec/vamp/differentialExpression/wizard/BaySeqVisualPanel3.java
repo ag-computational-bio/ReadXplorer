@@ -61,7 +61,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
 
     @Override
     public String getName() {
-        return "Create groups";
+        return "Create models";
     }
 
     /**

@@ -189,7 +189,7 @@ public final class PlotTopComponent extends TopComponent implements Observer {
         ChartPanel panel;
         switch (type) {
             case MA_Plot:
-                panel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool), "A", "M", new ToolTip());
+                panel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A", "M", new ToolTip());
                 panel.addChartMouseListener(mouseAction);
                 plotPanel.add(panel);
                 plotPanel.updateUI();
