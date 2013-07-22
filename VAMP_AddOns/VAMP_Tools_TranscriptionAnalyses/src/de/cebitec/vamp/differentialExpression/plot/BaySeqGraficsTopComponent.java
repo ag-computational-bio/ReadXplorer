@@ -1,8 +1,12 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.plot;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.differentialExpression.plot.ConvertData;
-import de.cebitec.vamp.differentialExpression.plot.ToolTip;
+import de.cebitec.vamp.differentialExpression.BaySeq;
+import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.GnuR;
+import de.cebitec.vamp.differentialExpression.Group;
+import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
@@ -56,7 +60,7 @@ import org.openide.windows.TopComponent;
     "CTL_DiffExpGraficsTopComponent=Create graphics",
     "HINT_DiffExpGraficsTopComponent=This is a DiffExpGrafics window"
 })
-public final class DiffExpGraficsTopComponent extends TopComponent implements Observer, ItemListener {
+public final class BaySeqGraficsTopComponent extends TopComponent implements Observer, ItemListener {
 
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
@@ -68,11 +72,12 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
     private ResultDeAnalysis result;
     private ChartPanel chartPanel;
     private boolean SVGCanvasActive;
+    private MouseActions mouseAction = new MouseActions();
 
-    public DiffExpGraficsTopComponent() {
+    public BaySeqGraficsTopComponent() {
     }
 
-    public DiffExpGraficsTopComponent(DeAnalysisHandler handler) {
+    public BaySeqGraficsTopComponent(DeAnalysisHandler handler) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         List<ResultDeAnalysis> results = handler.getResults();
         this.result = results.get(results.size()-1);
@@ -143,19 +148,19 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         samplesBList = new javax.swing.JList(samplesB);
         saveButton = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.jLabel1.text")); // NOI18N
 
         plotTypeComboBox.addItemListener(this);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.jLabel2.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(samplesALabel, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.samplesALabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(samplesALabel, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.samplesALabel.text")); // NOI18N
         samplesALabel.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(samplesBLabel, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.samplesBLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(samplesBLabel, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.samplesBLabel.text")); // NOI18N
         samplesBLabel.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.plotButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.plotButton.text")); // NOI18N
         plotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotButtonActionPerformed(evt);
@@ -165,7 +170,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         jPanel1.setBorder(new javax.swing.border.MatteBorder(null));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.messages.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.messages.text")); // NOI18N
 
         samplesAList.setEnabled(false);
         jScrollPane1.setViewportView(samplesAList);
@@ -173,7 +178,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         samplesBList.setEnabled(false);
         jScrollPane2.setViewportView(samplesBList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(DiffExpGraficsTopComponent.class, "DiffExpGraficsTopComponent.saveButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.saveButton.text")); // NOI18N
         saveButton.setEnabled(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -278,6 +283,7 @@ public final class DiffExpGraficsTopComponent extends TopComponent implements Ob
         int[] samplB = samplesBList.getSelectedIndices();
         if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
             chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, samplA, samplB), "A", "M", new ToolTip());
+            chartPanel.addChartMouseListener(mouseAction);
             if (SVGCanvasActive) {
                 jPanel1.remove(svgCanvas);
                 SVGCanvasActive = false;

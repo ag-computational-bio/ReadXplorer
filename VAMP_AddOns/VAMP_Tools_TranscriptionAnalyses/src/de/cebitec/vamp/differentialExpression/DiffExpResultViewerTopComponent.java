@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.differentialExpression.plot.DeSeqGraficsTopComponent;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
@@ -7,6 +8,7 @@ import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
+import de.cebitec.vamp.differentialExpression.plot.BaySeqGraficsTopComponent;
 import de.cebitec.vamp.differentialExpression.plot.PlotTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
@@ -290,15 +292,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.requestActive();
                 break;
             case BaySeq:
-                GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
-                analysisHandler.registerObserver((DiffExpGraficsTopComponent) GraficsTopComponent);
+                GraficsTopComponent = new BaySeqGraficsTopComponent(analysisHandler);
+                analysisHandler.registerObserver((BaySeqGraficsTopComponent) GraficsTopComponent);
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
-                //For testing:
-//                ptc = new PlotTopComponent(analysisHandler, usedTool);
-//                analysisHandler.registerObserver(ptc);
-//                ptc.open();
-//                ptc.requestActive();
                 break;
             case SimpleTest:
                 ptc = new PlotTopComponent(analysisHandler, usedTool);

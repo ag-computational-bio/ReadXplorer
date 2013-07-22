@@ -1,7 +1,9 @@
-package de.cebitec.vamp.differentialExpression;
+package de.cebitec.vamp.differentialExpression.plot;
 
-import de.cebitec.vamp.differentialExpression.plot.ConvertData;
-import de.cebitec.vamp.differentialExpression.plot.ToolTip;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.GnuR;
+import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
@@ -60,6 +62,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
     private boolean SVGCanvasActive;
+    private MouseActions mouseAction = new MouseActions();
 
     public DeSeqGraficsTopComponent() {
     }
@@ -160,7 +163,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
             DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
             if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
                 chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A", "M", new ToolTip());
-//                panel.addChartMouseListener(mouseAction);
+                chartPanel.addChartMouseListener(mouseAction);
                 if (SVGCanvasActive) {
                     jPanel1.remove(svgCanvas);
                     SVGCanvasActive = false;
