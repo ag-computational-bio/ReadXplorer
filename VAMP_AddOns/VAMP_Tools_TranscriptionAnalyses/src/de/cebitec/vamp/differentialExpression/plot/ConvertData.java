@@ -18,6 +18,8 @@ import java.util.Vector;
  */
 public class ConvertData {
 
+    private static final int BAY_SEQ_OFFSET = 3;
+
     public static Map<PersistantFeature, Pair<Double, Double>> ratioABagainstConfidence(ResultDeAnalysis result) {
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         Vector resultTable = result.getTableContents();
@@ -46,11 +48,11 @@ public class ConvertData {
         return ret;
     }
 
-    public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool) {
+    public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool, int[] sampleA, int[] sampleB) {
         Map<PersistantFeature, Pair<Double, Double>> input = new HashMap<>();
         switch (usedTool) {
             case BaySeq:
-                input = convertBaySeqResults(result.getTableContents());
+                input = convertBaySeqResults(result.getTableContents(), sampleA, sampleB);
                 break;
             case DeSeq:
                 input = convertDESeqResults(result.getTableContents());
@@ -86,8 +88,27 @@ public class ConvertData {
         return ret;
     }
 
-    private static Map<PersistantFeature, Pair<Double, Double>> convertBaySeqResults(Vector<Vector> resultTable) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private static Map<PersistantFeature, Pair<Double, Double>> convertBaySeqResults(Vector<Vector> resultTable, int[] sampleA, int[] sampleB) {
+        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
+        for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
+            Vector row = it.next();
+            PersistantFeature key = (PersistantFeature) row.get(0);
+            Double X = 0d;
+            for (int i = 0; i < sampleA.length; i++) {
+                int index = sampleA[i] + BAY_SEQ_OFFSET;
+                X = X + (Double) row.get(index);
+            }
+            X = X /sampleA.length;
+            Double Y = 0d;
+            for (int i = 0; i < sampleB.length; i++) {
+                int index = sampleB[i] + BAY_SEQ_OFFSET;
+                Y = Y + (Double) row.get(index);
+            }
+            Y = Y / sampleB.length;
+            Pair<Double, Double> values = new Pair<>(X, Y);
+            ret.put(key, values);
+        }
+        return ret;
     }
 
     private static Map<PersistantFeature, Pair<Double, Double>> convertDESeqResults(Vector<Vector> resultTable) {

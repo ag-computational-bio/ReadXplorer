@@ -1,5 +1,8 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.differentialExpression.plot.ConvertData;
+import de.cebitec.vamp.differentialExpression.plot.ToolTip;
+import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
@@ -20,6 +23,7 @@ import javax.swing.JOptionPane;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
+import org.jfree.chart.ChartPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -30,18 +34,18 @@ import org.openide.windows.TopComponent;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.vamp.differentialExpression//DeSeqGrafics//EN",
-autostore = false)
+        dtd = "-//de.cebitec.vamp.differentialExpression//DeSeqGrafics//EN",
+        autostore = false)
 @TopComponent.Description(
-    preferredID = "DeSeqGraficsTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        preferredID = "DeSeqGraficsTopComponent",
+        //iconBase="SET/PATH/TO/ICON/HERE", 
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DeSeqGraficsTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_DeSeqGraficsAction",
-preferredID = "DeSeqGraficsTopComponent")
+        displayName = "#CTL_DeSeqGraficsAction",
+        preferredID = "DeSeqGraficsTopComponent")
 @Messages({
     "CTL_DeSeqGraficsAction=DeSeqGrafics",
     "CTL_DeSeqGraficsTopComponent=Create graphics",
@@ -51,24 +55,18 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
+    private ChartPanel chartPanel;
     private ComboBoxModel cbm;
     private File currentlyDisplayed;
-    private DeAnalysisHandler.Tool tool;
+    private ResultDeAnalysis result;
+    private boolean SVGCanvasActive;
 
     public DeSeqGraficsTopComponent() {
     }
 
-    public DeSeqGraficsTopComponent(DeAnalysisHandler handler, DeAnalysisHandler.Tool tool) {
+    public DeSeqGraficsTopComponent(DeAnalysisHandler handler, boolean moreThanTwoConditions) {
         analysisHandler = handler;
-        this.tool = tool;
-        cbm = new DefaultComboBoxModel(SimpleTestAnalysisHandler.Plot.values());
-        initComponents();
-        setupGrafics();
-    }
-
-    public DeSeqGraficsTopComponent(DeAnalysisHandler handler, boolean moreThanTwoConditions, DeAnalysisHandler.Tool tool) {
-        analysisHandler = handler;
-        this.tool = tool;
+        this.result = handler.getResults().get(0);
         cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
         initComponents();
         setupGrafics();
@@ -159,16 +157,29 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
             messages.setText("");
             plotButton.setEnabled(false);
             saveButton.setEnabled(false);
-            if (tool == DeAnalysisHandler.Tool.DeSeq) {
-                DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
-                currentlyDisplayed = ((DeSeqAnalysisHandler) analysisHandler).plot(selectedPlot);
+            DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
+            if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
+                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A", "M", new ToolTip());
+//                panel.addChartMouseListener(mouseAction);
+                if (SVGCanvasActive) {
+                    jPanel1.remove(svgCanvas);
+                    SVGCanvasActive = false;
+                }
+                jPanel1.add(chartPanel, BorderLayout.CENTER);
+                jPanel1.updateUI();
+                plotButton.setEnabled(true);
             } else {
-                SimpleTestAnalysisHandler.Plot selectedPlot = (SimpleTestAnalysisHandler.Plot) plotType.getSelectedItem();
-                currentlyDisplayed = ((SimpleTestAnalysisHandler) analysisHandler).plot(selectedPlot);
+                if(!SVGCanvasActive){
+                    jPanel1.remove(chartPanel);
+                    jPanel1.add(svgCanvas, BorderLayout.CENTER);
+                    jPanel1.updateUI();
+                    SVGCanvasActive = true;
+                }
+                currentlyDisplayed = ((DeSeqAnalysisHandler) analysisHandler).plot(selectedPlot);
+                svgCanvas.setURI(currentlyDisplayed.toURI().toString());
+                svgCanvas.setVisible(true);
+                svgCanvas.repaint();
             }
-            svgCanvas.setURI(currentlyDisplayed.toURI().toString());
-            svgCanvas.setVisible(true);
-            svgCanvas.repaint();
         } catch (IOException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
@@ -241,6 +252,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         setToolTipText(Bundle.HINT_DeSeqGraficsTopComponent());
         svgCanvas = new JSVGCanvas();
         jPanel1.add(svgCanvas, BorderLayout.CENTER);
+        SVGCanvasActive = true;
         svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted(SVGDocumentLoaderEvent e) {

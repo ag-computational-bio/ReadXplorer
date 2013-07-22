@@ -24,7 +24,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
         DispEsts("Per gene estimates against normalized mean expression"),
         DE("Log2 fold change against base means"),
-        HIST("Histogram of p values");
+        HIST("Histogram of p values"),
+        MAplot("MA Plot");
         String representation;
 
         Plot(String representation) {
@@ -40,7 +41,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
             if (moreThanTwoConditions) {
                 return new Plot[]{DispEsts};
             } else {
-                return new Plot[]{DispEsts, DE, HIST};
+                return new Plot[]{DispEsts, DE, HIST, MAplot};
             }
         }
     }

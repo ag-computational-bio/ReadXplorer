@@ -284,15 +284,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         switch (usedTool) {
             case DeSeq:
                 GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
-                        ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq(), usedTool);
+                        ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq());
                 analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
-                //For testing:
-                ptc = new PlotTopComponent(analysisHandler, usedTool);
-                analysisHandler.registerObserver(ptc);
-                ptc.open();
-                ptc.requestActive();
                 break;
             case BaySeq:
                 GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
@@ -300,10 +295,10 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.open();
                 GraficsTopComponent.requestActive();
                 //For testing:
-                ptc = new PlotTopComponent(analysisHandler, usedTool);
-                analysisHandler.registerObserver(ptc);
-                ptc.open();
-                ptc.requestActive();
+//                ptc = new PlotTopComponent(analysisHandler, usedTool);
+//                analysisHandler.registerObserver(ptc);
+//                ptc.open();
+//                ptc.requestActive();
                 break;
             case SimpleTest:
                 ptc = new PlotTopComponent(analysisHandler, usedTool);
