@@ -49,7 +49,7 @@ import org.openide.windows.TopComponent;
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.differentialExpression//DiffExpGrafics//EN",
         autostore = false)
 @TopComponent.Description(preferredID = "DiffExpGraficsTopComponent",
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpGraficsTopComponent")
 @ActionReference(path = "Menu/Window")

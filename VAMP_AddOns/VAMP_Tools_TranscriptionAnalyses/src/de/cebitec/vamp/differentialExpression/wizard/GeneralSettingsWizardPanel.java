@@ -2,6 +2,7 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
      */
     private GeneralSettingsVisualPanel component;
     private Integer genomeID;
+    private Tool tool;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -61,6 +63,12 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
     @Override
     public void readSettings(WizardDescriptor wiz) {
         genomeID = (Integer) wiz.getProperty("genomeID");
+        tool = (Tool) wiz.getProperty("tool");
+        if (tool == Tool.SimpleTest) {
+            getComponent().enableSaveOptions(false);
+        } else {
+            getComponent().enableSaveOptions(true);
+        }
     }
 
     @Override

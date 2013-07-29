@@ -28,7 +28,7 @@ autostore = false)
 @TopComponent.Description(
     preferredID = "DiffExpLogTopComponent",
 //iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "output", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpLogTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)

@@ -52,7 +52,7 @@ import org.openide.windows.TopComponent;
         autostore = false)
 @TopComponent.Description(preferredID = "DiffExpResultViewerTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent")
 @ActionReference(path = "Menu/Window" /*

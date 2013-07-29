@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
@@ -29,6 +30,12 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         initComponents();
         this.saveBoxChecked = this.saveCheckBox.isSelected();
         fileNameField.setText(System.getProperty("user.home") + File.separator + "DiffExpResult.rdata");
+        int[] selectedIndex = {0,1};
+        usedAnnotationsList.setSelectedIndices(selectedIndex);
+    }
+
+    public void enableSaveOptions(boolean bool) {
+        saveCheckBox.setEnabled(bool);
     }
 
     public boolean verifyInput() {

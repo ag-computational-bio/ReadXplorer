@@ -41,7 +41,7 @@ import org.openide.windows.TopComponent;
 @TopComponent.Description(
         preferredID = "DeSeqGraficsTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DeSeqGraficsTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
