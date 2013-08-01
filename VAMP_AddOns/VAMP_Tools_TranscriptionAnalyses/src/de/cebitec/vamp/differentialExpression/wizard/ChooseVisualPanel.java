@@ -19,6 +19,9 @@ public final class ChooseVisualPanel extends JPanel {
         if(!GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()){
             jriErrorText.setText("JRI native library can't be found in the PATH.\nPlease add it to the PATH and try again.\nOnly the SimpleTest can be used as long as no GNU R is installed.");
         }
+        if(!GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()){
+            jriErrorText.setText("GNU R instance is already in use.\nOnly the SimpleTest can be used as long as an other GNU R based test is opened.");
+        }
     }
     
     public DeAnalysisHandler.Tool getSelectedTool(){

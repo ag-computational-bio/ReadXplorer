@@ -5,15 +5,22 @@ import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
+import de.cebitec.vamp.plotting.PlottingUtils;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,15 +29,21 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 /**
  * Top component which displays something.
@@ -89,7 +102,8 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         plotButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         progressBar = new javax.swing.JProgressBar();
-        messages = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        messages = new javax.swing.JTextArea();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -113,7 +127,16 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(DeSeqGraficsTopComponent.class, "DeSeqGraficsTopComponent.messages.text")); // NOI18N
+        jScrollPane1.setBorder(null);
+
+        messages.setEditable(false);
+        messages.setBackground(new java.awt.Color(240, 240, 240));
+        messages.setColumns(20);
+        messages.setLineWrap(true);
+        messages.setRows(5);
+        messages.setWrapStyleWord(true);
+        messages.setBorder(null);
+        jScrollPane1.setViewportView(messages);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -127,7 +150,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                     .addComponent(plotButton)
                     .addComponent(saveButton)
                     .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                    .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                 .addContainerGap())
@@ -148,8 +171,8 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                         .addGap(18, 18, 18)
                         .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 332, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 263, Short.MAX_VALUE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -171,8 +194,9 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                 jPanel1.add(chartPanel, BorderLayout.CENTER);
                 jPanel1.updateUI();
                 plotButton.setEnabled(true);
+                saveButton.setEnabled(true);
             } else {
-                if(!SVGCanvasActive){
+                if (!SVGCanvasActive) {
                     jPanel1.remove(chartPanel);
                     jPanel1.add(svgCanvas, BorderLayout.CENTER);
                     jPanel1.updateUI();
@@ -200,15 +224,27 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
 
             @Override
             public void save(String fileLocation) {
-                Path from = currentlyDisplayed.toPath();
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
-                try {
-                    Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-                    messages.setText("SVG image saved to " + outputFile.toString());
-                } catch (IOException ex) {
-                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
+                if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
+                    try {
+                        PlottingUtils.exportChartAsSVG(to, chartPanel.getChart());
+                        messages.setText("SVG image saved to " + to.toString());
+                    } catch (IOException ex) {
+                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                    }
+                } else {
+                    Path from = currentlyDisplayed.toPath();
+                    try {
+                        Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+                        messages.setText("SVG image saved to " + outputFile.toString());
+                    } catch (IOException ex) {
+                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             }
 
@@ -221,7 +257,8 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel messages;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea messages;
     private javax.swing.JButton plotButton;
     private javax.swing.JComboBox plotType;
     private javax.swing.JProgressBar progressBar;

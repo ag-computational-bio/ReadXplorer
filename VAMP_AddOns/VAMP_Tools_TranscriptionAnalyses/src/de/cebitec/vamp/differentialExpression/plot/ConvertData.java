@@ -48,7 +48,7 @@ public class ConvertData {
         return ret;
     }
 
-    public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool, int[] sampleA, int[] sampleB) {
+    public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool, Integer[] sampleA, Integer[] sampleB) {
         Map<PersistantFeature, Pair<Double, Double>> input = new HashMap<>();
         switch (usedTool) {
             case BaySeq:
@@ -88,7 +88,7 @@ public class ConvertData {
         return ret;
     }
 
-    private static Map<PersistantFeature, Pair<Double, Double>> convertBaySeqResults(Vector<Vector> resultTable, int[] sampleA, int[] sampleB) {
+    private static Map<PersistantFeature, Pair<Double, Double>> convertBaySeqResults(Vector<Vector> resultTable, Integer[] sampleA, Integer[] sampleB) {
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();

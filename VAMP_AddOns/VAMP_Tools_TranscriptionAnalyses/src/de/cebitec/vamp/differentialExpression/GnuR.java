@@ -241,7 +241,7 @@ public class GnuR extends Rengine {
 
     public static class SecureGnuRInitiliser {
 
-        public static GnuR getGnuRinstance() throws JRILibraryNotInPathException, IllegalStateException {
+        public static synchronized GnuR getGnuRinstance() throws JRILibraryNotInPathException, IllegalStateException {
             if (!isGnuRSetUpCorrect()) {
                 throw new JRILibraryNotInPathException();
             }
@@ -252,6 +252,14 @@ public class GnuR extends Rengine {
         public static boolean isGnuRSetUpCorrect() {
             String libraryPath = System.getProperty("java.library.path");
             return libraryPath.contains("jri");
+        }
+        
+        public static boolean isGnuRInstanceFree(){
+            if(sem.availablePermits()>0){
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

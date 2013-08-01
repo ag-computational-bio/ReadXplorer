@@ -4,10 +4,12 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq;
 import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
+import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.Group;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
+import de.cebitec.vamp.plotting.PlottingUtils;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
@@ -20,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -70,6 +73,7 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
     private File currentlyDisplayed;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("creating plot");
     private ResultDeAnalysis result;
+    private List<Group> groups;
     private ChartPanel chartPanel;
     private boolean SVGCanvasActive;
     private MouseActions mouseAction = new MouseActions();
@@ -80,7 +84,8 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
     public BaySeqGraficsTopComponent(DeAnalysisHandler handler) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         List<ResultDeAnalysis> results = handler.getResults();
-        this.result = results.get(results.size()-1);
+        this.result = results.get(results.size() - 1);
+        groups = baySeqAnalysisHandler.getGroups();
         cbm = new DefaultComboBoxModel(BaySeqAnalysisHandler.Plot.values());
         initComponents();
         setName(Bundle.CTL_DiffExpGraficsTopComponent());
@@ -141,12 +146,13 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
         samplesBLabel = new javax.swing.JLabel();
         plotButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        messages = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         samplesAList = new javax.swing.JList(samplesA);
         jScrollPane2 = new javax.swing.JScrollPane();
         samplesBList = new javax.swing.JList(samplesB);
         saveButton = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        messages = new javax.swing.JTextArea();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.jLabel1.text")); // NOI18N
 
@@ -170,8 +176,6 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
         jPanel1.setBorder(new javax.swing.border.MatteBorder(null));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(messages, org.openide.util.NbBundle.getMessage(BaySeqGraficsTopComponent.class, "BaySeqGraficsTopComponent.messages.text")); // NOI18N
-
         samplesAList.setEnabled(false);
         jScrollPane1.setViewportView(samplesAList);
 
@@ -186,25 +190,31 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
             }
         });
 
+        jScrollPane3.setBorder(null);
+
+        messages.setEditable(false);
+        messages.setBackground(new java.awt.Color(240, 240, 240));
+        messages.setColumns(20);
+        messages.setLineWrap(true);
+        messages.setRows(5);
+        messages.setWrapStyleWord(true);
+        messages.setBorder(null);
+        jScrollPane3.setViewportView(messages);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(plotButton)
-                            .addComponent(saveButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, 2, Short.MAX_VALUE)
-                        .addGap(938, 938, 938))
+                    .addComponent(plotButton)
+                    .addComponent(saveButton)
                     .addComponent(groupComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel2)
                             .addComponent(jLabel1)
-                            .addComponent(plotTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(plotTypeComboBox, 0, 232, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -212,9 +222,10 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(samplesBLabel)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jScrollPane3))
                         .addGap(10, 10, 10)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -238,19 +249,15 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(plotButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(saveButton)))
-                        .addContainerGap(240, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(plotButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(115, 115, 115))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -260,13 +267,27 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
 
             @Override
             public void save(String fileLocation) {
-                Path from = currentlyDisplayed.toPath();
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
-                try {
-                    Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-                    messages.setText("SVG image saved to " + outputFile.toString());
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
+                if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
+                    try {
+                        PlottingUtils.exportChartAsSVG(to, chartPanel.getChart());
+                        messages.setText("SVG image saved to " + to.toString());
+                    } catch (IOException ex) {
+                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                    }
+                } else {
+                    Path from = currentlyDisplayed.toPath();
+                    try {
+                        Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+                        messages.setText("SVG image saved to " + outputFile.toString());
+                    } catch (IOException ex) {
+                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             }
 
@@ -279,18 +300,51 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
         BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
+        messages.setText("");
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
         if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
-            chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, samplA, samplB), "A", "M", new ToolTip());
-            chartPanel.addChartMouseListener(mouseAction);
-            if (SVGCanvasActive) {
-                jPanel1.remove(svgCanvas);
-                SVGCanvasActive = false;
+            List<Integer> sampleA = new ArrayList<>();
+            List<Integer> sampleB = new ArrayList<>();
+            Group selectedGroup = groups.get(groupComboBox.getSelectedIndex());
+            Integer[] integerRep = selectedGroup.getIntegerRepresentation();
+            Integer integerGroupA = integerRep[0];
+            Integer integerGroupB = null;
+            sampleA.add(0);
+            for (int i = 1; i < integerRep.length; i++) {
+                Integer currentInteger = integerRep[i];
+                if (currentInteger == integerGroupA) {
+                    sampleA.add(i);
+                } else {
+                    if (integerGroupB == null) {
+                        integerGroupB = currentInteger;
+                        sampleB.add(i);
+                    } else {
+                        if (integerGroupB == currentInteger) {
+                            sampleB.add(i);
+                        } else {
+                            messages.setText("Select a model with exactly two groups to create a MA-Plot.");
+                            break;
+                        }
+                    }
+                }
             }
-            jPanel1.add(chartPanel, BorderLayout.CENTER);
-            jPanel1.updateUI();
-            plotButton.setEnabled(true);
+            if (sampleB.isEmpty() || (sampleA.size() + sampleB.size()) != integerRep.length) {
+                messages.setText("Select a model with exactly two groups to create a MA-Plot.");
+            } else {
+                chartPanel = CreatePlots.createInfPlot(
+                        ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray(new Integer[sampleA.size()]),
+                        sampleB.toArray(new Integer[sampleB.size()])), "A", "M", new ToolTip());
+                chartPanel.addChartMouseListener(mouseAction);
+                if (SVGCanvasActive) {
+                    jPanel1.remove(svgCanvas);
+                    SVGCanvasActive = false;
+                }
+                jPanel1.add(chartPanel, BorderLayout.CENTER);
+                jPanel1.updateUI();
+                plotButton.setEnabled(true);
+                saveButton.setEnabled(true);
+            }
         } else {
             if (!SVGCanvasActive) {
                 jPanel1.remove(chartPanel);
@@ -327,7 +381,8 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel messages;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea messages;
     private javax.swing.JButton plotButton;
     private javax.swing.JComboBox plotTypeComboBox;
     private javax.swing.JLabel samplesALabel;
@@ -368,11 +423,11 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
     public void itemStateChanged(ItemEvent e) {
         BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
         if (item == BaySeqAnalysisHandler.Plot.MACD) {
-            samplesAList.setEnabled(true);
-            samplesALabel.setEnabled(true);
-            samplesBList.setEnabled(true);
-            samplesBLabel.setEnabled(true);
-            groupComboBox.setEnabled(false);
+            samplesAList.setEnabled(false);
+            samplesALabel.setEnabled(false);
+            samplesBList.setEnabled(false);
+            samplesBLabel.setEnabled(false);
+            groupComboBox.setEnabled(true);
         }
         if (item == BaySeqAnalysisHandler.Plot.Posteriors) {
             samplesAList.setEnabled(true);

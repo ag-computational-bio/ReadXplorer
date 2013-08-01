@@ -32,8 +32,10 @@ import org.openide.util.NbBundle.Messages;
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Tools", id = "de.cebitec.vamp.differentialExpression.plot.PlotTopComponent")
-@ActionReference(path = "Menu/Tools")
+//@ActionID(category = "Tools", id = "de.cebitec.vamp.differentialExpression.plot.PlotTopComponent")
+//@ActionReference(path = "Menu/Tools")
+@ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.plot.PlotTopComponent")
+@ActionReference(path = "Menu/Window")
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_PlotAction",
         preferredID = "PlotTopComponent")

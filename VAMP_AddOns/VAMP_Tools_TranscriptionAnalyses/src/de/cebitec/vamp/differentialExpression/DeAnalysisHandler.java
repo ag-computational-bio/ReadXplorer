@@ -60,7 +60,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         }
         
         public static Tool[] usableTools(){
-            if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
+            if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
                 return Tool.values();
             } else {
                 Tool[] ret = new Tool[1];
