@@ -105,7 +105,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 if (diffsAndGapsNeeded) {
                     trackConnector.addCoverageAnalysisRequest(new CoverageAndDiffRequest(from, to, this, readClassParams));
                 } else {
-                    trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
+                    trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
                 }
 
 
@@ -118,13 +118,13 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             if (diffsAndGapsNeeded) {
                 trackConnector.addCoverageAnalysisRequest(new CoverageAndDiffRequest(from, to, this, readClassParams));
             } else {
-                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, readClassParams));
+                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
             }
 
 
         } else if (this.mappingsNeeded) {
 
-            int stepSize = 50000;
+            int stepSize = 100000;
 
             if (trackConnector.isDbUsed()) {
                 //calculate which mappings are needed from the db
@@ -257,19 +257,14 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.diffsAndGapsNeeded = diffsAndGapsNeeded;
     }
     
-
     /**
      * Sets the desired data for this analysis handler to 
      * Properties.REDUCED_MAPPINGS or back to Properties.NORMAL.
-     * @param reducedMappingsNeeded true, if only reduced mappings are needed,
-     * false otherwise
+     * @param desiredData the byte value of the desired data. Currently among
+     * Properties.REDUCED_MAPPINGS, Properties.NORMAL or Properties.READ_STARTS.
      */
-    public void setReducedMappingsNeeded(boolean reducedMappingsNeeded) {
-        if (reducedMappingsNeeded) {
-            this.desiredData = Properties.REDUCED_MAPPINGS;
-        } else {
-            this.desiredData = Properties.NORMAL;
-        }
+    public void setDesiredData(byte desiredData) {
+        this.desiredData = desiredData;
     }
 
     @Override

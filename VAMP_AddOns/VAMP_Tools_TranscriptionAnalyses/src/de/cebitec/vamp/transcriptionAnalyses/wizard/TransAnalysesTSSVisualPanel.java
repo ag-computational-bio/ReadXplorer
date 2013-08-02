@@ -81,6 +81,11 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         org.openide.awt.Mnemonics.setLocalizedText(maxInitialCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxInitialCountLabel.text")); // NOI18N
 
         minLowCovCountField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountField.text")); // NOI18N
+        minLowCovCountField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minLowCovCountFieldActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(minLowCovCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountLabel.text")); // NOI18N
 
@@ -204,6 +209,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
             this.transcriptExtensionField.setEnabled(false);
         }
     }//GEN-LAST:event_unannotatedTranscriptsBoxActionPerformed
+
+    private void minLowCovCountFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minLowCovCountFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_minLowCovCountFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel addRestrictionLabel;

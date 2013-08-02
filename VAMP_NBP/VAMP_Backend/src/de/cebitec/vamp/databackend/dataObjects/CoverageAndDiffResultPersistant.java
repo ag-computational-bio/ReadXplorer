@@ -17,6 +17,7 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
     public static final long serialVersionUID = 42L;
     
     private PersistantCoverage coverage;
+    private PersistantCoverage readStarts;
     private List<PersistantDiff> diffs;
     private List<PersistantReferenceGap> gaps;
     private boolean diffsAndGapsUsed;
@@ -37,6 +38,7 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
             boolean diffsAndGapsUsed, int lowerBound, int upperBound) {
         super(lowerBound, upperBound);
         this.coverage = coverage;
+        this.readStarts = null;
         this.diffs = diffs;
         this.gaps = gaps;
         this.diffsAndGapsUsed = diffsAndGapsUsed;
@@ -77,6 +79,21 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
             return new PersistantCoverage(0, 0);
         }
     }
+
+    /**
+     * @return the coverage object containing only the read start counts.
+     */
+    public PersistantCoverage getReadStarts() {
+        return readStarts;
+    }
+
+    /**
+     * @param readStarts The coverage object containing only the read start counts.
+     */
+    public void setReadStarts(PersistantCoverage readStarts) {
+        this.readStarts = readStarts;
+    }
+    
 
     /**
      * @return true, if diffs and gaps were querried, false, if not

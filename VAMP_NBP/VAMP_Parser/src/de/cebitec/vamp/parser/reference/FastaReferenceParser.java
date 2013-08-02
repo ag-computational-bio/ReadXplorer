@@ -50,7 +50,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             }
             in.close();
 
-            refGenome.setSequence(sBuilder.substring(0).toLowerCase());
+            refGenome.setSequence(sBuilder.substring(0).toUpperCase());
 
         } catch (Exception ex) {
             this.sendErrorMsg(ex.getMessage());

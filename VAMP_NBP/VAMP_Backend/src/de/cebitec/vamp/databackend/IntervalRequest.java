@@ -17,6 +17,7 @@ public class IntervalRequest {
     private int totalFrom;
     private int totalTo;
     private ThreadListener sender;
+    private byte whichTrackNeeded;
     private byte desiredData;
     private final ParametersReadClasses readClassParams;
 
@@ -34,22 +35,24 @@ public class IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param desiredData Can be any byte value representing a filter flag for
-     * the results. Can be a byte value representing one of the two flags
+     * the results e.g. Properties.READ_STARTS.
+     * @param whichTrackNeeded A byte value representing one of the two flags
      * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
-     * double track request or ParameterSetMapping.NORMAL, if this is an 
+     * double track request or ParameterSetMapping.NORMAL, if this is an
      * ordinary track request.
      * @param readClassParams A parameter set which contains all parameters
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
-            byte desiredData, ParametersReadClasses readClassParams) {
+            byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams) {
         this.from = from;
         this.to = to;
         this.totalFrom = totalFrom;
         this.totalTo = totalTo;
         this.sender = sender;
         this.desiredData = desiredData;
+        this.whichTrackNeeded = whichTrackNeeded;
         this.readClassParams = readClassParams;
     }
     
@@ -72,8 +75,8 @@ public class IntervalRequest {
      * double track request or Properties.NORMAL, if this is an ordinary
      * track request.
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData) {
-        this(from, to, totalFrom, totalTo, sender, desiredData, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData, byte trackNeeded) {
+        this(from, to, totalFrom, totalTo, sender, desiredData, trackNeeded, new ParametersReadClasses());
     }
     
     /**
@@ -94,7 +97,7 @@ public class IntervalRequest {
      * mapped reads shall be used, or all reads. 
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, ParametersReadClasses readClassParams) {
-        this(from, to, totalFrom, totalTo, sender, Properties.NORMAL, readClassParams);
+        this(from, to, totalFrom, totalTo, sender, Properties.NORMAL, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -112,7 +115,7 @@ public class IntervalRequest {
      * request
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender) {
-        this(from, to, totalFrom, totalTo, sender, Properties.NORMAL, new ParametersReadClasses());
+        this(from, to, totalFrom, totalTo, sender, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
     }    
     
     /**
@@ -125,16 +128,13 @@ public class IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param desiredData Can be any byte value representing a filter flag for
-     * the results. Can be a byte value representing one of the two flags
-     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
-     * double track request or ParameterSetMapping.NORMAL, if this is a ordinary
-     * track request.
+     * the results.
      * @param readClassParams A parameter set which contains all parameters
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
     public IntervalRequest(int from, int to, ThreadListener sender, byte desiredData, ParametersReadClasses readClassParams) {
-        this(from, to, from, to, sender, desiredData, readClassParams);
+        this(from, to, from, to, sender, desiredData, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -147,13 +147,10 @@ public class IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param desiredData Can be any byte value representing a filter flag for
-     * the results. Can be a byte value representing one of the two flags
-     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
-     * double track request or Properties.NORMAL, if this is an ordinary
-     * track request.
+     * the results.
      */
     public IntervalRequest(int from, int to, ThreadListener sender, byte desiredData) {
-        this(from, to, from, to, sender, desiredData, new ParametersReadClasses());
+        this(from, to, from, to, sender, desiredData, Properties.NORMAL, new ParametersReadClasses());
     }
     
     /**
@@ -170,7 +167,7 @@ public class IntervalRequest {
      * mapped reads shall be used, or all reads. 
      */
     public IntervalRequest(int from, int to, ThreadListener sender, ParametersReadClasses readClassParams) {
-        this(from, to, from, to, sender, Properties.NORMAL, readClassParams);
+        this(from, to, from, to, sender, Properties.NORMAL, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -184,7 +181,7 @@ public class IntervalRequest {
      * request
      */
     public IntervalRequest(int from, int to, ThreadListener sender) {
-        this(from, to, from, to, sender, Properties.NORMAL, new ParametersReadClasses());
+        this(from, to, from, to, sender, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
     }
 
     /**
@@ -226,14 +223,21 @@ public class IntervalRequest {
 
     /**
      * @return Can be any byte value representing a filter flag for the results.
-     * Can be a byte value representing one of the two flags
-     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
-     * double track request or Properties.NORMAL, if this is a ordinary track
-     * request.
+     * E.g. Properties.READ_STARTS
      */
     public byte getDesiredData() {
         return this.desiredData;
     } 
+
+    /**
+     * @return A byte value representing one of the two flags
+     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
+     * double track request or Properties.NORMAL, if this is a ordinary track
+     * request.
+     */
+    public byte getWhichTrackNeeded() {
+        return whichTrackNeeded;
+    }
 
     /**
      * @return A parameter set which contains all parameters concerning the

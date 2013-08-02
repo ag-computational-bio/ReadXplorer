@@ -45,17 +45,24 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private int refSeqLength;
     private List<PersistantFeature> genomeFeatures;
     protected List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
-    private DiscreteCountingDistribution covIncreaseDistribution;
+    private DiscreteCountingDistribution readStartDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
     private boolean calcCoverageDistributions;
     
     //varibles for transcription start site detection
-    private int covLastFwdPos;
-    private int covLastRevPos;
+    private int perfectCovLastFwdPos;
+    private int perfectCovLastRevPos;
+    private int bmCovLastFwdPos;
+    private int bmCovLastRevPos;
+    private int commonCovLastFwdPos;
+    private int commonCovLastRevPos;
+    private int perfectReadStartsLastRevPos;
+    private int bmReadStartsLastRevPos;
+    private int commonReadStartsLastRevPos;
     private int lastFeatureIdxGenStartsFwd;
     private int lastFeatureIdxGenStartsRev;
     
-    private HashMap<Integer, Integer> exactCovIncreaseDist = new HashMap<>(); //exact coverage increase distribution
+    private HashMap<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact coverage increase distribution
     private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
     
     protected PersistantCoverage currentCoverage;
@@ -79,8 +86,15 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.parametersTSS = parametersTSS;
         
         this.detectedStarts = new ArrayList<>();
-        this.covLastFwdPos = 0;
-        this.covLastRevPos = 0;
+        this.perfectCovLastFwdPos = 0;
+        this.perfectCovLastRevPos = 0;
+        this.bmCovLastFwdPos = 0;
+        this.bmCovLastRevPos = 0;
+        this.commonCovLastFwdPos = 0;
+        this.commonCovLastRevPos = 0;
+        this.perfectReadStartsLastRevPos = 0;
+        this.bmReadStartsLastRevPos = 0;
+        this.commonReadStartsLastRevPos = 0;
         this.lastFeatureIdxGenStartsFwd = 0;
         this.lastFeatureIdxGenStartsRev = 0;
         
@@ -96,18 +110,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.refSeqLength = trackConnector.getRefSequenceLength();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);   
         
-        this.covIncreaseDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INCREASE_DISTRIBUTION);
+        this.readStartDistribution = trackConnector.getCountDistribution(Properties.READ_START_DISTRIBUTION);
         this.covIncPercentDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
-        this.calcCoverageDistributions = this.covIncreaseDistribution.isEmpty();
+        this.calcCoverageDistributions = this.readStartDistribution.isEmpty();
         
         if (this.parametersTSS.isAutoTssParamEstimation()) {
             this.parametersTSS.setMaxLowCovInitCount(0); //set these values as default for the transcription start site automatic
-            this.parametersTSS.setMinLowCovIncrease(0); //avoids loosing smaller, low coverage increases
+            this.parametersTSS.setMinLowCovIncrease(0); //avoids loosing smaller, low coverage increases, can only be set by the user
             if (!this.calcCoverageDistributions) {
-                this.parametersTSS.setMinTotalIncrease(this.estimateCutoff(this.covIncreaseDistribution, 0)); //+ 0,05%
+                this.parametersTSS.setMinNoReadStarts(this.estimateCutoff(this.readStartDistribution, 0)); //+ 0,05%
                 this.parametersTSS.setMinPercentIncrease(this.estimateCutoff(this.covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
             } else {
-                this.parametersTSS.setMinTotalIncrease(10); //lowest default values for new data sets without an inital distribution
+                this.parametersTSS.setMinNoReadStarts(10); //lowest default values for new data sets without an inital distribution
                 this.parametersTSS.setMinPercentIncrease(30); //in the database
             }
         }
@@ -123,10 +137,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     @Override
     public void update(Object data) {
         if (data instanceof CoverageAndDiffResultPersistant) {
-            PersistantCoverage coverage = ((CoverageAndDiffResultPersistant) data).getCoverage();
-            this.detectTSSs(coverage);
-
-            //TODO: feature finden/ändern
+            CoverageAndDiffResultPersistant result = ((CoverageAndDiffResultPersistant) data);
+            this.detectTSSs(result);
         } else 
         if (data instanceof Byte && ((Byte) data) == 1) {
             this.finish();
@@ -147,10 +159,13 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
 
     /**
      * Carries out the detection of predicted transcription start sites.
-     * @param coverage the coverage for predicting the transcription start sites.
+     * @param result the coverage and diff result for predicting the 
+     * transcription start sites.
      */
-    public void detectTSSs(PersistantCoverage coverage) {
+    public void detectTSSs(CoverageAndDiffResultPersistant result) {
         
+        PersistantCoverage coverage = result.getCoverage();
+        PersistantCoverage readStarts = result.getReadStarts();
         this.currentCoverage = coverage;
         
         int leftBound = coverage.getLeftBound();
@@ -160,61 +175,108 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int revCov1;
         int fwdCov2;
         int revCov2;
-        int diffFwd;
-        int diffRev;
-        int percentDiffFwd;
-        int percentDiffRev;
+        int increaseFwd;
+        int increaseRev;
+        int readStartsFwd;
+        int readStartsRev;
+        int percentIncFwd;
+        int percentIncRev;
         
-        coverage.setLeftBound(fixedLeftBound);
-        int[] fwdMultCov = coverage.getBestMatchFwdMult();
-        int[] revMultCov = coverage.getBestMatchRevMult();
-        int[] newFwdMultCov = new int[fwdMultCov.length + 1];
-        int[] newRevMultCov = new int[revMultCov.length + 1];
-        newFwdMultCov[0] = this.covLastFwdPos;
-        newRevMultCov[0] = this.covLastRevPos;
-        System.arraycopy(fwdMultCov, 0, newFwdMultCov, 1, fwdMultCov.length);
-        System.arraycopy(revMultCov, 0, newRevMultCov, 1, revMultCov.length);
-        coverage.setBestMatchFwdMult(newFwdMultCov);
-        coverage.setBestMatchRevMult(newRevMultCov);
+        coverage.setLeftBound(fixedLeftBound); //add left coverage value from last request (or 0) to left
+        readStarts.setLeftBound(fixedLeftBound); //of all coverage arrays.
+        coverage.setPerfectFwdMult(this.fixLeftCoverageBound(coverage.getPerfectFwdMult(), perfectCovLastFwdPos));
+        coverage.setPerfectRevMult(this.fixLeftCoverageBound(coverage.getPerfectRevMult(), perfectCovLastRevPos));
+        coverage.setBestMatchFwdMult(this.fixLeftCoverageBound(coverage.getBestMatchFwdMult(), bmCovLastFwdPos));
+        coverage.setBestMatchRevMult(this.fixLeftCoverageBound(coverage.getBestMatchRevMult(), bmCovLastRevPos));
+        coverage.setCommonFwdMult(this.fixLeftCoverageBound(coverage.getCommonFwdMult(), commonCovLastFwdPos));
+        coverage.setCommonRevMult(this.fixLeftCoverageBound(coverage.getCommonRevMult(), commonCovLastRevPos));
+        readStarts.setPerfectFwdMult(this.fixLeftCoverageBound(readStarts.getPerfectFwdMult(), 0)); //for read starts the left pos is not important
+        readStarts.setPerfectRevMult(this.fixLeftCoverageBound(readStarts.getPerfectRevMult(), perfectReadStartsLastRevPos)); //on fwd strand
+        readStarts.setBestMatchFwdMult(this.fixLeftCoverageBound(readStarts.getBestMatchFwdMult(), 0));
+        readStarts.setBestMatchRevMult(this.fixLeftCoverageBound(readStarts.getBestMatchRevMult(), bmReadStartsLastRevPos));
+        readStarts.setCommonFwdMult(this.fixLeftCoverageBound(readStarts.getCommonFwdMult(), 0));
+        readStarts.setCommonRevMult(this.fixLeftCoverageBound(readStarts.getCommonRevMult(), commonReadStartsLastRevPos));
         
         if (this.calcCoverageDistributions) { //this way code is duplicated, but if clause only evaluated once
             for (int i = fixedLeftBound; i < rightBound; ++i) {
+                if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
+                    fwdCov1 = coverage.getCommonFwdMult(i);
+                    revCov1 = coverage.getCommonRevMult(i);
+                    fwdCov2 = coverage.getCommonFwdMult(i + 1);
+                    revCov2 = coverage.getCommonRevMult(i + 1);
+                    readStartsFwd = readStarts.getCommonFwdMult(i + 1);
+                    readStartsRev = readStarts.getCommonRevMult(i);
+                } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
+                    fwdCov1 = coverage.getBestMatchFwdMult(i);
+                    revCov1 = coverage.getBestMatchRevMult(i);
+                    fwdCov2 = coverage.getBestMatchFwdMult(i + 1);
+                    revCov2 = coverage.getBestMatchRevMult(i + 1);  
+                    readStartsFwd = readStarts.getBestMatchFwdMult(i + 1);
+                    readStartsRev = readStarts.getBestMatchRevMult(i);
+                } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
+                    fwdCov1 = coverage.getPerfectFwdMult(i);
+                    revCov1 = coverage.getPerfectRevMult(i);
+                    fwdCov2 = coverage.getPerfectFwdMult(i + 1);
+                    revCov2 = coverage.getPerfectRevMult(i + 1);
+                    readStartsFwd = readStarts.getPerfectFwdMult(i + 1);
+                    readStartsRev = readStarts.getPerfectRevMult(i);
+                }
+                increaseFwd = fwdCov2 - fwdCov1;
+                increaseRev = revCov1 - revCov2;
                 
-                fwdCov1 = coverage.getBestMatchFwdMult(i); //coverage.getPerfectFwdMult(i) + 
-                revCov1 = coverage.getBestMatchRevMult(i); //coverage.getPerfectRevMult(i) + 
-                fwdCov2 = coverage.getBestMatchFwdMult(i + 1); //coverage.getPerfectFwdMult(i + 1) + 
-                revCov2 = coverage.getBestMatchRevMult(i + 1); //coverage.getPerfectRevMult(i + 1) + 
-                diffFwd = fwdCov2 - fwdCov1;
-                diffRev = revCov1 - revCov2;
+                percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
+                percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
                 
-                percentDiffFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
-                percentDiffRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
+                this.readStartDistribution.increaseDistribution(readStartsFwd);
+                this.readStartDistribution.increaseDistribution(readStartsRev);
+                this.covIncPercentDistribution.increaseDistribution(percentIncFwd);
+                this.covIncPercentDistribution.increaseDistribution(percentIncRev);
                 
-                this.covIncreaseDistribution.increaseDistribution(diffFwd);
-                this.covIncreaseDistribution.increaseDistribution(diffRev);
-                this.covIncPercentDistribution.increaseDistribution(percentDiffFwd);
-                this.covIncPercentDistribution.increaseDistribution(percentDiffRev);
-                
-                this.detectStart(i, fwdCov1, fwdCov2, revCov1, revCov2, diffFwd, diffRev, percentDiffFwd, percentDiffRev);
+                this.detectStart(i, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
             }
         } else {
             for (int i = fixedLeftBound; i < rightBound; ++i) {
-                fwdCov1 = coverage.getBestMatchFwdMult(i); //coverage.getPerfectFwdMult(i) + 
-                revCov1 = coverage.getBestMatchRevMult(i); //coverage.getPerfectRevMult(i) + 
-                fwdCov2 = coverage.getBestMatchFwdMult(i + 1); //coverage.getPerfectFwdMult(i + 1) + 
-                revCov2 = coverage.getBestMatchRevMult(i + 1); //coverage.getPerfectRevMult(i + 1) + 
-                diffFwd = fwdCov2 - fwdCov1;
-                diffRev = revCov1 - revCov2;
+                if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
+                    fwdCov1 = coverage.getCommonFwdMult(i);
+                    revCov1 = coverage.getCommonRevMult(i);
+                    fwdCov2 = coverage.getCommonFwdMult(i + 1);
+                    revCov2 = coverage.getCommonRevMult(i + 1);
+                    readStartsFwd = readStarts.getCommonFwdMult(i + 1);
+                    readStartsRev = readStarts.getCommonRevMult(i);
+                } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
+                    fwdCov1 = coverage.getBestMatchFwdMult(i);
+                    revCov1 = coverage.getBestMatchRevMult(i);
+                    fwdCov2 = coverage.getBestMatchFwdMult(i + 1);
+                    revCov2 = coverage.getBestMatchRevMult(i + 1);
+                    readStartsFwd = readStarts.getBestMatchFwdMult(i + 1);
+                    readStartsRev = readStarts.getBestMatchRevMult(i);
+                } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
+                    fwdCov1 = coverage.getPerfectFwdMult(i);
+                    revCov1 = coverage.getPerfectRevMult(i);
+                    fwdCov2 = coverage.getPerfectFwdMult(i + 1);
+                    revCov2 = coverage.getPerfectRevMult(i + 1);
+                    readStartsFwd = readStarts.getPerfectFwdMult(i + 1);
+                    readStartsRev = readStarts.getPerfectRevMult(i);
+                }
+                increaseFwd = fwdCov2 - fwdCov1;
+                increaseRev = revCov1 - revCov2;
                 
-                percentDiffFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
-                percentDiffRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
+                percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
+                percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
                 
-                this.detectStart(i, fwdCov1, fwdCov2, revCov1, revCov2, diffFwd, diffRev, percentDiffFwd, percentDiffRev);
+                this.detectStart(i, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
             }
         }
 
-        covLastFwdPos = coverage.getBestMatchFwdMult(rightBound); //coverage.getPerfectFwdMult(rightBound) + 
-        covLastRevPos = coverage.getBestMatchRevMult(rightBound); //coverage.getPerfectRevMult(rightBound) + 
+        perfectCovLastFwdPos = coverage.getPerfectFwdMult(rightBound);
+        perfectCovLastRevPos = coverage.getPerfectRevMult(rightBound);
+        bmCovLastFwdPos = coverage.getBestMatchFwdMult(rightBound);
+        bmCovLastRevPos = coverage.getBestMatchRevMult(rightBound);
+        commonCovLastFwdPos = coverage.getCommonFwdMult(rightBound);
+        commonCovLastRevPos = coverage.getCommonRevMult(rightBound);
+        perfectReadStartsLastRevPos = readStarts.getPerfectRevMult(rightBound);
+        bmReadStartsLastRevPos = readStarts.getBestMatchRevMult(rightBound);
+        commonReadStartsLastRevPos = readStarts.getCommonRevMult(rightBound);
     }
     
     /**
@@ -222,73 +284,58 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * detecting a transcription start site, if the parameters are satisfied.
      * @param coverage the PersistantCoverage container
      * @param pos the position defining the pair to analyse: pos and (pos + 1)
-     * @param fwdCov1 
-     * @param fwdCov2 
+     * on the fwd strand the TSS pos is "pos+1" and on the reverse strand the TSS
+     * position is "pos"
+     * @param readStartsFwd 
+     * @param readStartsRev 
      * @param revCov1 
      * @param revCov2 
      * @param diffFwd 
      * @param diffRev 
      */
-    private void detectStart(int pos, int fwdCov1, int fwdCov2, int revCov1, int revCov2, 
-                             int diffFwd, int diffRev, int percentDiffFwd, int percentDiffRev) {
+    private void detectStart(int pos, int readStartsFwd, int readStartsRev, int increaseFwd, int increaseRev,
+                             int percentIncreaseFwd, int percentIncreaseRev) {
 
-        if (this.parametersTSS.getMinLowCovIncrease() > 0) { //if low coverage read count is calculated separately
-            if (diffFwd > parametersTSS.getMinTotalIncrease()
-                    && percentDiffFwd > parametersTSS.getMinPercentIncrease()
-                    && fwdCov1 > parametersTSS.getMaxLowCovInitCount()
-                    || fwdCov1 <= parametersTSS.getMaxLowCovInitCount()
-                    && diffFwd > this.parametersTSS.getMinLowCovIncrease()) {
-
-                DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, 
-                        fwdCov1, fwdCov2, detFeatures, trackConnector.getTrackID()));
-            }
-            if (diffRev > parametersTSS.getMinTotalIncrease()
-                    && percentDiffRev > parametersTSS.getMinPercentIncrease()
-                    && revCov2 > parametersTSS.getMaxLowCovInitCount()
-                    || revCov2 <= parametersTSS.getMaxLowCovInitCount()
-                    && diffRev > this.parametersTSS.getMinLowCovIncrease()) {
-
-                DetectedFeatures detFeatures = this.findNextFeature(pos, false);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, 
-                        revCov2, revCov1, detFeatures, trackConnector.getTrackID()));
-            }
-
-        } else {
-            if (diffFwd > parametersTSS.getMinTotalIncrease() && percentDiffFwd > parametersTSS.getMinPercentIncrease()) {
-                DetectedFeatures detFeatures = this.findNextFeature(pos + 1, true);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true, 
-                        fwdCov1, fwdCov2, detFeatures, trackConnector.getTrackID()));
-            }
-            if (diffRev > parametersTSS.getMinTotalIncrease() && percentDiffRev > parametersTSS.getMinPercentIncrease()) {
-                DetectedFeatures detFeatures = this.findNextFeature(pos, false);
-                this.checkAndAddDetectedStart(new TranscriptionStart(pos, false, 
-                        revCov2, revCov1, detFeatures, trackConnector.getTrackID()));
-            }
+        if ( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts())
+            || readStartsFwd >  parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts())
+                && percentIncreaseFwd > parametersTSS.getMinPercentIncrease()) {
             
+            DetectedFeatures detFeatures = this.findNextFeatures(pos + 1, true);
+            this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true,
+                    readStartsFwd, percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID()));
         }
-        
+        if ( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts())
+            || readStartsRev >  parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts())
+                 && percentIncreaseRev > parametersTSS.getMinPercentIncrease()) {
+            
+            DetectedFeatures detFeatures = this.findNextFeatures(pos, false);
+            this.checkAndAddDetectedStart(new TranscriptionStart(pos, false,
+                    readStartsRev, percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID()));
+        }
+
         if (this.parametersTSS.isAutoTssParamEstimation()) {
             //add values to exact counting data structures to refine threshold
-            this.increaseDistribution(this.exactCovIncreaseDist, diffFwd, parametersTSS.getMinTotalIncrease());
-            this.increaseDistribution(this.exactCovIncreaseDist, diffRev, parametersTSS.getMinTotalIncrease());
-            this.increaseDistribution(this.exactCovIncPercDist, percentDiffFwd, parametersTSS.getMinPercentIncrease());
-            this.increaseDistribution(this.exactCovIncPercDist, percentDiffRev, parametersTSS.getMinPercentIncrease());
+            this.increaseDistribution(this.exactReadStartDist, readStartsFwd, parametersTSS.getMinNoReadStarts());
+            this.increaseDistribution(this.exactReadStartDist, readStartsRev, parametersTSS.getMinNoReadStarts());
+            this.increaseDistribution(this.exactCovIncPercDist, percentIncreaseFwd, parametersTSS.getMinPercentIncrease());
+            this.increaseDistribution(this.exactCovIncPercDist, percentIncreaseRev, parametersTSS.getMinPercentIncrease());
         }
     }
 
     /**
      * Detects and returns the genomic features, which can be associated to the
-     * given transcription start site and strand. This can be eiter an feature starting at the
-     * predicted transcription start site, which would be a correct start, or it will contain
-     * the maximal two closest features found in a vicinity of 500bp up- or 
-     * downstream of the transcription start site.
+     * given transcription start site and strand. This can be eiter a feature
+     * starting at the predicted transcription start site, which would be a
+     * correct start, or it will contain the maximal two closest features found
+     * in a vicinity of 1000bp up- or downstream of the transcription start site.
+     * If more than one feature start at the detected TSS position, only the
+     * last fitting feature is returned as correct start.
      * @param tssPos the predicted transcription start site position
      * @param isFwdStrand the strand, on which the transcription start site is located
      * @return the genomic features, which can be associated to the
      * given transcription start site and strand.
      */
-    private DetectedFeatures findNextFeature(int tssPos, boolean isFwdStrand) {
+    private DetectedFeatures findNextFeatures(int tssPos, boolean isFwdStrand) {
         final int maxDeviation = 1000;
         int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
         int maxStartPos = tssPos + maxDeviation > this.refSeqLength ? refSeqLength : tssPos + maxDeviation;
@@ -453,10 +500,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
             
             if (lastDetectedStart.getPos() + 19 >= tss.getPos() && lastDetectedStart.isFwdStrand() == tss.isFwdStrand()) {
-                int covIncreaseLastStart = lastDetectedStart.getStartCoverage() - lastDetectedStart.getInitialCoverage();
-                int covIncreaseTSS = tss.getStartCoverage() - tss.getInitialCoverage();
+                int noReadStartsLastStart = lastDetectedStart.getReadStartsAtPos();
+                int noReadStartsTSS = tss.getReadStartsAtPos();
                 
-                if (covIncreaseLastStart < covIncreaseTSS) {
+                if (noReadStartsLastStart < noReadStartsTSS) {
                     this.detectedStarts.remove(this.detectedStarts.size() - 1);
                     this.addDetectStart(tss);
                 }
@@ -545,10 +592,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void storeDistributions() {
         if (this.calcCoverageDistributions) { //if it was calculated, also store it
-            ProjectConnector.getInstance().insertCountDistribution(covIncreaseDistribution, this.trackConnector.getTrackID());
+            ProjectConnector.getInstance().insertCountDistribution(readStartDistribution, this.trackConnector.getTrackID());
             ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
             if (this.parametersTSS.isAutoTssParamEstimation()) {
-                parametersTSS.setMinTotalIncrease(this.estimateCutoff(this.covIncreaseDistribution, 0));//(int) (this.genomeSize * 0.0005));
+                parametersTSS.setMinNoReadStarts(this.estimateCutoff(this.readStartDistribution, 0));//(int) (this.genomeSize * 0.0005));
                 parametersTSS.setMinPercentIncrease(this.estimateCutoff(this.covIncPercentDistribution, 0));//(int) (this.genomeSize * 0.0005));
                 this.correctTSSList();
             }
@@ -560,13 +607,11 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * the increaseReadCount was changed after calculating the list of detectedGenes.
      */
     private void correctTSSList() {
-        int percentDiff;
         TranscriptionStart tss;
         for (int i = 0; i < this.detectedStarts.size(); ++i) {
             tss = this.detectedStarts.get(i);
-            percentDiff = (int) (((double) tss.getStartCoverage() / (double) tss.getInitialCoverage()) * 100.0) - 100;
-            if (tss.getStartCoverage() - tss.getInitialCoverage() < parametersTSS.getMinTotalIncrease()
-                    || percentDiff < parametersTSS.getMinPercentIncrease()) {
+            if (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
+                    || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) {
                 this.detectedStarts.remove(tss);
             }
         }
@@ -582,21 +627,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private void correctResult() {
         
         //estimate exact cutoff for readcount increase of 0,25%
-        System.out.println("old threshold read count: " + parametersTSS.getMinTotalIncrease());
+        System.out.println("old threshold read count: " + parametersTSS.getMinNoReadStarts());
         System.out.println("old threshold percent: " + parametersTSS.getMinPercentIncrease());
-        parametersTSS.setMinTotalIncrease(this.getNewThreshold(this.exactCovIncreaseDist, 0));//(int) (this.genomeSize * 0.0005));
+        parametersTSS.setMinNoReadStarts(this.getNewThreshold(this.exactReadStartDist, 0));//(int) (this.genomeSize * 0.0005));
         parametersTSS.setMinPercentIncrease(this.getNewThreshold(this.exactCovIncPercDist, 0));//(int) (this.genomeSize * 0.0005));
         
         //remove detected starts with too low coverage increases
         List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>(this.detectedStarts);
-        int increase;
-        int percentage;
         for (TranscriptionStart tss : this.detectedStarts) {
-            increase = tss.getStartCoverage() - tss.getInitialCoverage();
-            percentage = GeneralUtils.calculatePercentageIncrease(tss.getInitialCoverage(), tss.getStartCoverage());
-            if ((   increase < parametersTSS.getMinTotalIncrease() ||
-                    percentage < parametersTSS.getMinPercentIncrease()) &&
-                    tss.getInitialCoverage() > parametersTSS.getMaxLowCovInitCount()) {
+            if ((   tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts() ||
+                    tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) 
+//                    && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
+                    ) {
                 copiedDetectedStarts.remove(tss);
             }
         }
@@ -642,5 +684,19 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     @Override
     public List<TranscriptionStart> getResults() {
         return this.detectedStarts;
+    }
+
+    /**
+     * Adds the coverage of the "lastFwdPos" to the beginning of the given
+     * coverage array - resulting array length = oldLength + 1.
+     * @param covArray the coverage array to which a new left bound shall be added
+     * @param lastCov the last coverage value of the previous request or 0
+     * @return the new coverage array including the added coverage value
+     */
+    private int[] fixLeftCoverageBound(int[] covArray, int lastCov) {
+        int[] newCovArray = new int[covArray.length + 1];
+        newCovArray[0] = lastCov;
+        System.arraycopy(covArray, 0, newCovArray, 1, covArray.length);
+        return newCovArray;
     }
 }

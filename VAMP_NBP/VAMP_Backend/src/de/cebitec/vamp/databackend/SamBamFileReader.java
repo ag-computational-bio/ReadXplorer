@@ -17,7 +17,7 @@ import net.sf.samtools.util.RuntimeIOException;
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
  *
- * @author -Rolf Hilker-
+ * @author -Rolf Hilker- <rhilker@cebitec.uni-bielefeld.de>
  */
 public class SamBamFileReader implements Observable {
 
@@ -329,6 +329,155 @@ public class SamBamFileReader implements Observable {
                                 || (classification == (int) Properties.BEST_MATCH_COVERAGE));
         return new PersistantMapping(id, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, isBestMapping, mappingsForRead);
     }
+    
+    /**
+     * Retrieves the coverage for the given interval from the bam file set for
+     * this data reader and the reference sequence with the given name. If reads
+     * become longer than 1000bp the offset in this method has to be enlarged!
+     * @param refGenome the reference genome used in the bam file
+     * @param request the request to carry out
+     * @return the coverage for the given interval
+     */
+    public CoverageAndDiffResultPersistant getReadStartsFromBam(PersistantReference refGenome, IntervalRequest request) {
+
+        byte trackNeeded = request.getWhichTrackNeeded();
+        int from = request.getTotalFrom();
+        int to = request.getTotalTo();
+
+        PersistantCoverage coverage = new PersistantCoverage(from, to);
+        if (trackNeeded == 0) {
+            coverage.incArraysToIntervalSize();
+        } else if (trackNeeded == PersistantCoverage.TRACK1 || trackNeeded == PersistantCoverage.TRACK2) {
+            coverage.incDoubleTrackArraysToIntervalSize();
+        }
+
+        List<PersistantDiff> diffs = new ArrayList<>(); //both empty for read starts
+        List<PersistantReferenceGap> gaps = new ArrayList<>();
+
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false, from, to);
+        try {
+            this.checkIndex();
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+
+            SAMRecord record;
+            boolean isFwdStrand;
+            Integer classification;
+            Integer numMappingsForRead;
+            int startPos; //in the genome, to get the index: -1
+            while (samRecordIterator.hasNext()) {
+                record = samRecordIterator.next();
+
+                if (!record.getReadUnmappedFlag()) {
+                    numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+
+                    if (!request.getReadClassParams().isOnlyUniqueReads()
+                            || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+                        
+                        isFwdStrand = !record.getReadNegativeStrandFlag();
+                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                        startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
+                        
+                        this.increaseCoverage(request, numMappingsForRead, classification, 
+                                trackNeeded, isFwdStrand, startPos, startPos, coverage);
+                    }
+                }
+            }
+            samRecordIterator.close();
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false, from, to);
+
+        } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
+            this.notifyObservers(e);
+        }
+
+        return result;
+    }
+    /**
+     * Retrieves the coverage for the given interval from the bam file set for
+     * this data reader and the reference sequence with the given name. If reads
+     * become longer than 1000bp the offset in this method has to be enlarged!
+     * @param refGenome the reference genome used in the bam file
+     * @param request the request to carry out
+     * @param diffsAndGapsNeeded true, if the diffs and gaps are needed, false
+     * otherwise
+     * @return the coverage for the given interval
+     */
+    public CoverageAndDiffResultPersistant getCoverageAndReadStartsFromBam(PersistantReference refGenome, 
+            IntervalRequest request, boolean diffsAndGapsNeeded) {
+
+        byte trackNeeded = request.getWhichTrackNeeded();
+        int from = request.getTotalFrom();
+        int to = request.getTotalTo();
+
+        PersistantCoverage coverage = new PersistantCoverage(from, to);
+        PersistantCoverage readStarts = new PersistantCoverage(from, to);
+        if (trackNeeded == 0) {
+            coverage.incArraysToIntervalSize();
+            readStarts.incArraysToIntervalSize();
+        } else if (trackNeeded == PersistantCoverage.TRACK1 || trackNeeded == PersistantCoverage.TRACK2) {
+            coverage.incDoubleTrackArraysToIntervalSize();
+            readStarts.incDoubleTrackArraysToIntervalSize();
+        }
+
+        List<PersistantDiff> diffs = new ArrayList<>();
+        List<PersistantReferenceGap> gaps = new ArrayList<>();
+        PersistantDiffAndGapResult diffsAndGaps;
+        String refSeq = "";
+
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
+        if (diffsAndGapsNeeded) {
+            refSeq = refGenome.getSequence();
+        }
+        try {
+            this.checkIndex();
+
+            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+
+            SAMRecord record;
+            boolean isFwdStrand;
+            Integer classification;
+            Integer numMappingsForRead;
+            int startPos; //in the genome, to get the index: -1
+            int stop;
+            while (samRecordIterator.hasNext()) {
+                record = samRecordIterator.next();
+
+                if (!record.getReadUnmappedFlag()) {
+                    numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+
+                    if (!request.getReadClassParams().isOnlyUniqueReads()
+                            || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+
+                        isFwdStrand = !record.getReadNegativeStrandFlag();
+                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                        startPos = record.getAlignmentStart();
+                        stop = record.getAlignmentEnd();
+                        
+                        this.increaseCoverage(request, numMappingsForRead, classification, 
+                                trackNeeded, isFwdStrand, startPos, stop, coverage);
+                        this.increaseCoverage(request, numMappingsForRead, classification, 
+                                trackNeeded, isFwdStrand, startPos, startPos, readStarts);
+
+                        if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE
+                                && request.getReadClassParams().isClassificationAllowed(classification)) {
+                            diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
+                                    startPos, isFwdStrand, 1, record.getReadString(),
+                                    refSeq.substring(startPos - 1, stop), null);
+                            diffs.addAll(diffsAndGaps.getDiffs());
+                            gaps.addAll(diffsAndGaps.getGaps());
+                        }
+                    }
+                }
+            }
+            samRecordIterator.close();
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
+            result.setReadStarts(readStarts);
+
+        } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
+            this.notifyObservers(e);
+        }
+
+        return result;
+    }
 
     /**
      * Retrieves the coverage for the given interval from the bam file set for
@@ -340,44 +489,20 @@ public class SamBamFileReader implements Observable {
      * otherwise
      * @return the coverage for the given interval
      */
-    //TODO: incorporate unique coverage selectable in viewers
     public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, IntervalRequest request,
             boolean diffsAndGapsNeeded) {
         
-        byte trackNeeded = request.getDesiredData();
+        byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         
-        int[] perfectCoverageFwd = new int[0];
-        int[] perfectCoverageRev = new int[0];
-        int[] bestMatchCoverageFwd = new int[0];
-        int[] bestMatchCoverageRev = new int[0];
-        int[] commonCoverageFwd = new int[0];
-        int[] commonCoverageRev = new int[0];
-        int[] commonCoverageFwdTrack1 = new int[0];
-        int[] commonCoverageRevTrack1 = new int[0];
-        int[] commonCoverageFwdTrack2 = new int[0];
-        int[] commonCoverageRevTrack2 = new int[0];
-        int intervalSize = to - from + 1;
-
+        PersistantCoverage coverage = new PersistantCoverage(from, to);
         if (trackNeeded == 0) {
-            perfectCoverageFwd = new int[intervalSize];
-            perfectCoverageRev = new int[intervalSize];
-            bestMatchCoverageFwd = new int[intervalSize];
-            bestMatchCoverageRev = new int[intervalSize];
-            commonCoverageFwd = new int[intervalSize];
-            commonCoverageRev = new int[intervalSize];
-
-        } else if (trackNeeded == PersistantCoverage.TRACK1) {
-            commonCoverageFwdTrack1 = new int[intervalSize];
-            commonCoverageRevTrack1 = new int[intervalSize];
-
-        } else if (trackNeeded == PersistantCoverage.TRACK2) {
-            commonCoverageFwdTrack2 = new int[intervalSize];
-            commonCoverageRevTrack2 = new int[intervalSize];
+            coverage.incArraysToIntervalSize();
+        } else if (trackNeeded == PersistantCoverage.TRACK1 || trackNeeded == PersistantCoverage.TRACK2) {
+            coverage.incDoubleTrackArraysToIntervalSize();
         }
 
-        PersistantCoverage coverage = new PersistantCoverage(from, to);
         List<PersistantDiff> diffs = new ArrayList<>();
         List<PersistantReferenceGap> gaps = new ArrayList<>();
         PersistantDiffAndGapResult diffsAndGaps;
@@ -398,77 +523,22 @@ public class SamBamFileReader implements Observable {
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
             int stop;
-            List<int[]> coverageArrays;
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
                 
                 if (!record.getReadUnmappedFlag()) {
-                    isFwdStrand = !record.getReadNegativeStrandFlag();
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
-                    startPos = record.getAlignmentStart();
-                    stop = record.getAlignmentEnd();
-                    coverageArrays = new ArrayList<>();
 
                     if (!request.getReadClassParams().isOnlyUniqueReads()
                             || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
 
-                        if (trackNeeded == 0) {
-                            //only the arrays, which are allowed to be updated are added to the coverage array list
-
-                            if (classification != null) {
-                                if (classification == Properties.PERFECT_COVERAGE) {
-
-                                    if (isFwdStrand) {
-                                        if (request.getReadClassParams().isPerfectMatchUsed()) {
-                                            coverageArrays.add(perfectCoverageFwd);
-                                        }
-                                        if (request.getReadClassParams().isBestMatchUsed()) {
-                                            coverageArrays.add(bestMatchCoverageFwd);
-                                        }
-                                    } else {
-                                        if (request.getReadClassParams().isPerfectMatchUsed()) {
-                                            coverageArrays.add(perfectCoverageRev);
-                                        }
-                                        if (request.getReadClassParams().isBestMatchUsed()) {
-                                            coverageArrays.add(bestMatchCoverageRev);
-                                        }
-                                    }
-                                }
-
-                                if ((classification == Properties.BEST_MATCH_COVERAGE)
-                                        && request.getReadClassParams().isBestMatchUsed()) {
-
-                                    if (isFwdStrand) {
-                                        coverageArrays.add(bestMatchCoverageFwd);
-                                    } else {
-                                        coverageArrays.add(bestMatchCoverageRev);
-                                    }
-                                }
-                            }
-
-                            if (request.getReadClassParams().isCommonMatchUsed()) {
-                                if (isFwdStrand) {
-                                    coverageArrays.add(commonCoverageFwd);
-                                } else {
-                                    coverageArrays.add(commonCoverageRev);
-                                }
-                            }
-
-                        } else if (trackNeeded == PersistantCoverage.TRACK1) {
-                            if (isFwdStrand) {
-                                coverageArrays.add(commonCoverageFwdTrack1);
-                            } else {
-                                coverageArrays.add(commonCoverageRevTrack1);
-                            }
-                        } else if (trackNeeded == PersistantCoverage.TRACK2) {
-                            if (isFwdStrand) {
-                                coverageArrays.add(commonCoverageFwdTrack2);
-                            } else {
-                                coverageArrays.add(commonCoverageRevTrack2);
-                            }
-                        }
-                        this.increaseCoverage(startPos, stop, from, to, coverageArrays);
+                        isFwdStrand = !record.getReadNegativeStrandFlag();
+                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                        startPos = record.getAlignmentStart();
+                        stop = record.getAlignmentEnd();
+                        
+                        this.increaseCoverage(request, numMappingsForRead, classification, trackNeeded, 
+                                isFwdStrand, startPos, stop, coverage);
 
                         if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE && 
                                 request.getReadClassParams().isClassificationAllowed(classification)) {
@@ -482,24 +552,6 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-
-            if (trackNeeded == 0) {
-                coverage.setPerfectFwdMult(perfectCoverageFwd);
-                coverage.setPerfectRevMult(perfectCoverageRev);
-                coverage.setBestMatchFwdMult(bestMatchCoverageFwd);
-                coverage.setBestMatchRevMult(bestMatchCoverageRev);
-                coverage.setCommonFwdMult(commonCoverageFwd);
-                coverage.setCommonRevMult(commonCoverageRev);
-
-            } else if (trackNeeded == PersistantCoverage.TRACK1) {
-                coverage.setCommonFwdMultTrack1(commonCoverageFwdTrack1);
-                coverage.setCommonRevMultTrack1(commonCoverageRevTrack1);
-
-            } else if (trackNeeded == PersistantCoverage.TRACK2) {
-                coverage.setCommonFwdMultTrack2(commonCoverageFwdTrack2);
-                coverage.setCommonRevMultTrack2(commonCoverageRevTrack2);
-            }
-
             result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
@@ -510,10 +562,89 @@ public class SamBamFileReader implements Observable {
     }
     
     /**
+     * Increases the coverage between the given start and stop position for all
+     * mappings, that fulfill the wanted parameters and adds the coverage to
+     * the needed arrays (indicated by the "trackNeeded" parameter).
+     * @param request
+     * @param numMappingsForRead
+     * @param classification
+     * @param trackNeeded
+     * @param isFwdStrand
+     * @param startPos
+     * @param stopPos 
+     */
+    private void increaseCoverage(IntervalRequest request, Integer numMappingsForRead, Integer classification, 
+            byte trackNeeded, boolean isFwdStrand, int startPos, int stopPos, PersistantCoverage coverage) {
+        
+        List<int[]> coverageArrays = new ArrayList<>();
+        
+        if (!request.getReadClassParams().isOnlyUniqueReads()
+                || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+
+            if (trackNeeded == 0) {
+                //only the arrays, which are allowed to be updated are added to the coverage array list
+
+                if (classification != null) {
+                    if (classification == Properties.PERFECT_COVERAGE) {
+
+                        if (isFwdStrand) {
+                            if (request.getReadClassParams().isPerfectMatchUsed()) {
+                                coverageArrays.add(coverage.getPerfectFwdMult());
+                            }
+                            if (request.getReadClassParams().isBestMatchUsed()) {
+                                coverageArrays.add(coverage.getBestMatchFwdMult());
+                            }
+                        } else {
+                            if (request.getReadClassParams().isPerfectMatchUsed()) {
+                                coverageArrays.add(coverage.getPerfectRevMult());
+                            }
+                            if (request.getReadClassParams().isBestMatchUsed()) {
+                                coverageArrays.add(coverage.getBestMatchRevMult());
+                            }
+                        }
+                    }
+
+                    if ((classification == Properties.BEST_MATCH_COVERAGE)
+                            && request.getReadClassParams().isBestMatchUsed()) {
+
+                        if (isFwdStrand) {
+                            coverageArrays.add(coverage.getBestMatchFwdMult());
+                        } else {
+                            coverageArrays.add(coverage.getBestMatchRevMult());
+                        }
+                    }
+                }
+
+                if (request.getReadClassParams().isCommonMatchUsed()) {
+                    if (isFwdStrand) {
+                        coverageArrays.add(coverage.getCommonFwdMult());
+                    } else {
+                        coverageArrays.add(coverage.getCommonRevMult());
+                    }
+                }
+
+            } else if (trackNeeded == PersistantCoverage.TRACK1) {
+                if (isFwdStrand) {
+                    coverageArrays.add(coverage.getCommonFwdMultCovTrack1());
+                } else {
+                    coverageArrays.add(coverage.getCommonRevMultCovTrack1());
+                }
+            } else if (trackNeeded == PersistantCoverage.TRACK2) {
+                if (isFwdStrand) {
+                    coverageArrays.add(coverage.getCommonFwdMultCovTrack2());
+                } else {
+                    coverageArrays.add(coverage.getCommonRevMultCovTrack2());
+                }
+            }
+            this.increaseCoverage(startPos, stopPos, request.getTotalFrom(), request.getTotalTo(), coverageArrays);
+        }
+    }
+    
+    /**
      * Increases the coverage of the coverage arrays in the given list by one. 
      * In these arrays 0 is included.
-     * @param startPos the start pos of the current read
-     * @param stop the stop pos of the current read
+     * @param startPos the start pos of the current read, inclusive
+     * @param stop the stop pos of the current read, inclusive
      * @param from the start of the currently needed genome interval
      * @param to the stop of the currently needed genome interval
      * @param coverageArrays the coverage arrays whose positions should be 
@@ -575,7 +706,7 @@ public class SamBamFileReader implements Observable {
             
             if (op.equals("M")) { //check, count and add diffs for deviating Ms
                 bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
-                refBases = refSeq.substring(refPos, refPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
                     base = bases.charAt(j);
                     if (base != refBases.charAt(j)) {

@@ -6,6 +6,7 @@ import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -17,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -125,6 +127,104 @@ public class CoverageThread extends RequestThread {
         return result;
 
     }
+    
+    /**
+     * Fetches the read starts and the coverage either from the DB or a bam file
+     * of the first track.
+     * @param request the request for which the read starts are needed
+     * @return the coverage and diff result containing the read starts, the
+     * coverage and no diffs and gaps
+     */
+    CoverageAndDiffResultPersistant getCoverageAndReadStartsFromFile(IntervalRequest request) {
+        CoverageAndDiffResultPersistant result;
+        PersistantTrack track = tracks.get(0);
+        File file = new File(track.getFilePath());
+        if (this.referenceGenome == null) {
+            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
+            this.referenceGenome = refConnector.getRefGenome();
+        }
+
+        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId());
+        result = externalDataReader.getCoverageAndReadStartsFromBam(
+                referenceGenome, request, false);
+        externalDataReader.close();
+        return result;
+    }
+    
+    CoverageAndDiffResultPersistant loadReadStartsAndCoverage(IntervalRequest request) throws SQLException {
+        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        
+        CoverageAndDiffResultPersistant result;
+        int from = request.getTotalFrom();
+        int to = request.getTotalTo();
+        PersistantCoverage readStarts = new PersistantCoverage(from, to);
+        readStarts.incArraysToIntervalSize();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
+
+        if (this.isDbUsed) { //Note: uniqueness of mappings cannot be querried from db!!!
+
+            result = loadCoverage(request);
+            
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
+            try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_READ_STARTS_BY_TRACK_ID_AND_REF_INTERVAL)) {
+                fetch.setLong(1, trackID);
+                fetch.setLong(2, from);
+                fetch.setLong(3, to);
+
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+
+                    int mismatches = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+
+                    //only add desired mappings to mappings
+                    if (readClassParams.isPerfectMatchUsed() && mismatches == 0
+                            || readClassParams.isBestMatchUsed() && isBestMapping
+                            || readClassParams.isCommonMatchUsed() && !isBestMapping) {
+
+                        int start = rs.getInt(FieldNames.MAPPING_START);
+                        int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                        boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
+                        int numReplicates = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
+                        
+                        if (request.getReadClassParams().isPerfectMatchUsed()) {//perfect match readStarts
+                            if (isFwdStrand) {
+                                readStarts.setPerfectFwdMult(start, readStarts.getPerfectFwdMult(start) + numReplicates);
+                            } else if (stop <= readStarts.getRightBound()) {
+                                readStarts.setPerfectRevMult(stop, readStarts.getPerfectRevMult(stop) + numReplicates);
+                            }
+                        }
+                        if (request.getReadClassParams().isBestMatchUsed()) {//best match readStarts
+                            if (isFwdStrand) {
+                                readStarts.setBestMatchFwdMult(start, readStarts.getBestMatchFwdMult(start) + numReplicates);
+                            } else if (stop <= readStarts.getRightBound()) {
+                                readStarts.setBestMatchRevMult(stop, readStarts.getBestMatchRevMult(stop) + numReplicates);
+                            }
+                        }
+                        if (request.getReadClassParams().isCommonMatchUsed()) {//complete readStarts
+                            if (isFwdStrand) {
+                                readStarts.setCommonFwdMult(start, readStarts.getCommonFwdMult(start) + numReplicates);
+                            } else if (stop <= readStarts.getRightBound()) {
+                                readStarts.setCommonFwdMult(stop, readStarts.getCommonRevMult(stop) + numReplicates);
+                            }
+                        }
+                    }
+                }
+                rs.close();
+                result.setReadStarts(readStarts);
+
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
+
+            } catch (SQLException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+        } else { //handle retrieving of data from other source than a DB
+            result = this.getCoverageAndReadStartsFromFile(request);
+        }
+
+        return result;
+    }
 
     /**
      * Loads the fwd and rev coverage combined for one single track. Meaning, it
@@ -218,49 +318,6 @@ public class CoverageThread extends RequestThread {
         return result;
     }
 
-//    /**
-//     * Fetches the best match coverage of an interval of a certain track.
-//     * @param request the coverage request to carry out
-//     * @return the best match coverage of an interval of a certain track.
-//     */
-//    private CoverageAndDiffResultPersistant loadCoverageBest(IntervalRequest request) throws SQLException {
-//        int from = this.calcCenterLeft(request);
-//        int to = this.calcCenterRight(request);
-//
-//        CoverageAndDiffResultPersistant result;
-//        PersistantCoverage cov = new PersistantCoverage(from, to);
-//        cov.incArraysToIntervalSize();
-//        
-//        if (this.isDbUsed) {
-//            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_BEST_FOR_INTERVAL);
-//            fetch.setLong(1, trackID);
-//            fetch.setInt(2, from);
-//            fetch.setInt(3, to);
-//
-//            ResultSet rs = fetch.executeQuery();
-//
-//            while (rs.next()) {
-//                int pos = rs.getInt(FieldNames.COVERAGE_POSITION);
-//                //perfect cov
-//                cov.setPerfectFwdMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_FW_MULT));
-//                cov.setPerfectRevMult(pos, rs.getInt(FieldNames.COVERAGE_ZERO_RV_MULT));
-//                //best match cov
-//                cov.setBestMatchFwdMult(pos, rs.getInt(FieldNames.COVERAGE_BM_FW_MULT));
-//                cov.setBestMatchRevMult(pos, rs.getInt(FieldNames.COVERAGE_BM_RV_MULT));
-//            }
-//            
-//            fetch.close();
-//            rs.close();
-//            
-//            result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
-//        
-//        } else {
-//            result = this.getCoverageAndDiffsFromFile(request, tracks.get(0));
-//        }
-//
-//        return result;
-//    }
-
     /**
      * Loads the coverage for two tracks, which should not be combined, but
      * viewed as two data sets like in the DoubleTrackViewer. The returned
@@ -302,7 +359,7 @@ public class CoverageThread extends RequestThread {
                     request.getTo(), 
                     request.getTotalFrom(), 
                     request.getTotalTo(), 
-                    request.getSender(), PersistantCoverage.TRACK2);
+                    request.getSender(), Properties.NORMAL, PersistantCoverage.TRACK2);
             cov = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(1)).getCoverage();
         }
         
@@ -342,7 +399,7 @@ public class CoverageThread extends RequestThread {
                     request.getTo(),
                     request.getTotalFrom(),
                     request.getTotalTo(), 
-                    request.getSender(), PersistantCoverage.TRACK1);
+                    request.getSender(), Properties.NORMAL, PersistantCoverage.TRACK1);
             PersistantCoverage intermedCov = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(0)).getCoverage();
             cov.setCommonFwdMult(new int[cov.getCommonFwdMultCovTrack2().length]);
             cov.setCommonRevMult(new int[cov.getCommonRevMultCovTrack2().length]);

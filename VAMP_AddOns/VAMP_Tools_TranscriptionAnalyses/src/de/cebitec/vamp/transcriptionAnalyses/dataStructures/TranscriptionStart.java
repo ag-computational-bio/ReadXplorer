@@ -13,25 +13,30 @@ public class TranscriptionStart extends TrackResultEntry {
     
     private int pos;
     private boolean isFwdStrand;
-    private int initialCoverage;
-    private int startCoverage;
+    private int readStarts;
     private DetectedFeatures detFeatures;
+    private int percentIncrease;
+    private int coverageIncrease;
     
     /**
      * Data structure for storing a gene start.
      * @param pos The position at which the gene start was detected
      * @param isFwdStrand true, if the transcript start was detected on the fwd strand, false otherwise.
-     * @param initialCoverage The coverage directly before the detected gene start
-     * @param startCoverage The coverage at the detected gene start position (getPos()).
+     * @param readStarts The number of read starts at the detected tss position
+     * @param percentIncrease The coverage at the detected gene start position
+     * (getPos()).
+     * @param coverageIncrease the coverage increase from the position before
+     * the TSS to the detected TSS position
      * @param detFeatures object containing the features associated to this predicted gene start
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int initialCoverage, 
-            int startCoverage, DetectedFeatures detFeatures, int trackId) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, int percentIncrease,
+            int coverageIncrease, DetectedFeatures detFeatures, int trackId) {
         super(trackId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
-        this.initialCoverage = initialCoverage;
-        this.startCoverage = startCoverage;
+        this.readStarts = readStarts;
+        this.percentIncrease = percentIncrease;
+        this.coverageIncrease = coverageIncrease;
         this.detFeatures = detFeatures;
     }
 
@@ -50,17 +55,10 @@ public class TranscriptionStart extends TrackResultEntry {
     }
 
     /**
-     * @return The coverage directly before the detected gene start
+     * @return The number of read starts at the detected gene start
      */
-    public int getInitialCoverage() {
-        return this.initialCoverage;
-    }
-
-    /**
-     * @return The coverage at the detected gene start position (getPos()).
-     */
-    public int getStartCoverage() {
-        return this.startCoverage;
+    public int getReadStartsAtPos() {
+        return this.readStarts;
     }
 
     /**
@@ -68,5 +66,21 @@ public class TranscriptionStart extends TrackResultEntry {
      */
     public DetectedFeatures getDetFeatures() {
         return this.detFeatures;
+    }
+
+    /**
+     * @return The coverage at the detected gene start position
+     * (getPos()).
+     */
+    public int getPercentIncrease() {
+        return this.percentIncrease;
+    }
+
+    /**
+     * @return The coverage increase from the position before
+     * the TSS to the detected TSS position
+     */
+    public int getCoverageIncrease() {
+        return this.coverageIncrease;
     }
 }

@@ -75,7 +75,7 @@ public class PersistantReference {
      * @return The genome sequence of the reference.
      */
     public String getSequence() {
-        if (this.sequence.isEmpty()) {
+        if (sequence == null || sequence.isEmpty()) {
             this.sequence = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefSequence();
         }
         return sequence;

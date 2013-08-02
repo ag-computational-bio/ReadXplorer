@@ -262,7 +262,7 @@ public class JFeature extends JComponent {
                     popUp.add(menuItemFactory.getJumpToPosItem(refViewer.getBoundsInformationManager(), refViewer.getCurrentMousePos()));
 
                     //add store as fasta file option
-                    popUp.add(menuItemFactory.getStoreFastaItem(selFeatureSequence, feature));
+                    popUp.add(menuItemFactory.getStoreFastaItem(selFeatureSequence, refViewer.getReference().getName(), feature));
 
                     popUp.show(e.getComponent(), e.getX(), e.getY());
                 }

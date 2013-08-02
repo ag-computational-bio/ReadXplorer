@@ -216,7 +216,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
             this.coverageLoaded = true;
             //we need to load the diffs seperately for tracks completely stored in the db
-            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS));
+            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS, Properties.NORMAL));
             if (this.diffsLoaded) {
                 this.setupData();
             }
@@ -225,7 +225,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             this.coverageLoaded = false;
             this.diffsLoaded = false;
             trackConnector.addCoverageRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this));
-            trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS));
+            trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS, Properties.NORMAL));
         }
     }
 
@@ -442,11 +442,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                     base = SequenceUtils.getDnaComplement(base);
                 }
                 switch (base) {
-                    case 'a':   c = ColorProperties.LOGO_A;             break;
-                    case 't':   c = ColorProperties.LOGO_T;             break;
-                    case 'c':   c = ColorProperties.LOGO_C;             break;
-                    case 'g':   c = ColorProperties.LOGO_G;             break;
-                    case 'n':   c = ColorProperties.LOGO_N;             break;
+                    case 'A':   c = ColorProperties.LOGO_A;             break;
+                    case 'T':   c = ColorProperties.LOGO_T;             break;
+                    case 'C':   c = ColorProperties.LOGO_C;             break;
+                    case 'G':   c = ColorProperties.LOGO_G;             break;
+                    case 'N':   c = ColorProperties.LOGO_N;             break;
                     case '-':   c = ColorProperties.LOGO_READGAP;       break;
                     default:    c = ColorProperties.LOGO_BASE_UNDEF;    break;
                 }

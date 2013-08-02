@@ -76,13 +76,15 @@ public class Properties {
     public static final byte MAPPINGS_W_DIFFS = 6;
     /** Value for mappings without diffs (7). */
     public static final byte MAPPINGS_WO_DIFFS = 7;
-    /**kasterm: Value for all reduced mappings*/
+    /** kasterm: Value for all reduced mappings*/
     public static final byte REDUCED_MAPPINGS  = 8;
+    /** Value for obtaining read starts instead of coverage. */
+    public static byte READ_STARTS = 9;
     
-    /** Value for coverage increase distribution = 1. */
-    public static final byte COVERAGE_INCREASE_DISTRIBUTION = 1;
-    /** Value for coverage increase in percent distribution = 2. */
-    public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 2;
+    /** Value for read start distribution = 5. */
+    public static final byte READ_START_DISTRIBUTION = 5;
+    /** Value for coverage increase in percent distribution = 6. */
+    public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 6;
     /** Value for read length distribution = 3. */
     public static final byte READ_LENGTH_DISTRIBUTION = 3;
     /** Value for seq pair size distribution = 4. */

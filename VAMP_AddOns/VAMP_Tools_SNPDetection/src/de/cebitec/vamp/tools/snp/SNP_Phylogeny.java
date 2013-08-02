@@ -62,7 +62,7 @@ public class SNP_Phylogeny {
 
             // save reference base
             if (!refBases.containsKey(position)) {
-                refBases.put(position, snp.getRefBase().toUpperCase());
+                refBases.put(position, snp.getRefBase());
             }
 
             // save bases per track in a hashmap again hashed to their position

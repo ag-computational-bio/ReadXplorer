@@ -44,11 +44,14 @@ public class CoverageThreadAnalyses extends CoverageThread {
                 IntervalRequest request = requestQueue.poll();
                 CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(null, null, null, false, 0, 0);
                 if (request != null) {
+                    if (request.getDesiredData() == Properties.READ_STARTS) {
+                        currentCov = this.loadReadStartsAndCoverage(request);
+                    } else
                     if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo())) {
                         if (trackID2 != 0) {
                             currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
                         } else {
-                            if (request.getDesiredData() == Properties.NORMAL) {
+                            if (request.getWhichTrackNeeded() == Properties.NORMAL) {
                                 currentCov = this.loadCoverage(request);
                             }
                         }

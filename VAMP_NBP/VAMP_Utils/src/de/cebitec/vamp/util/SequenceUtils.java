@@ -49,16 +49,16 @@ public final class SequenceUtils {
             currChar = sequence.charAt(i);
 
             switch (currChar){
-                case 'c': complement.append('g'); break;
-                case 'g': complement.append('c'); break;
-                case 't': complement.append('a'); break;
-                case 'a': complement.append('t'); break;
-                case 'u': complement.append('a'); break;
                 case 'C': complement.append('G'); break;
                 case 'G': complement.append('C'); break;
                 case 'T': complement.append('A'); break;
                 case 'A': complement.append('T'); break;
                 case 'U': complement.append('A'); break; 
+                case 'c': complement.append('g'); break;
+                case 'g': complement.append('c'); break;
+                case 't': complement.append('a'); break;
+                case 'a': complement.append('t'); break;
+                case 'u': complement.append('a'); break;
                 default : complement.append(currChar);
             }
         }

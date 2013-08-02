@@ -296,7 +296,7 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             rowData[1] = snp.getGapOrderIndex();
             rowData[2] = trackNames.get(snp.getTrackId());
             rowData[3] = snp.getBase().toUpperCase();
-            rowData[4] = snp.getRefBase().toUpperCase();
+            rowData[4] = snp.getRefBase();
             rowData[5] = snp.getARate();
             rowData[6] = snp.getCRate();
             rowData[7] = snp.getGRate();

@@ -14,10 +14,17 @@ import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -106,6 +113,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number "
                         + currentTrack.getId() + ".", readClassParams);
                 handler.setMappingsNeeded(true);
+                handler.setDesiredData(Properties.REDUCED_MAPPINGS);
                 handler.registerObserver(collCovData);
                 allHandler.add(handler);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {

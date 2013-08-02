@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import org.openide.util.NbBundle;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml3;
+import org.openide.util.NbBundle;
 
 /**
  * Contains general use utilities.
@@ -38,7 +38,7 @@ public class GeneralUtils {
             int absoluteDiff = value2 - value1;
             percentDiff = (int) (absoluteDiff * 1.5); //weight factor
         } else {
-            percentDiff = (int) (((double) value2 / (double) value1) * 100.0) - 100;
+            percentDiff = (int) Math.ceil(((double) value2 / (double) value1) * 100.0) - 100;
         }
         return percentDiff;
     }
