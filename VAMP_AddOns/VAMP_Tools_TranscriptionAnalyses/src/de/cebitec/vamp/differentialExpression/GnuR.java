@@ -5,7 +5,7 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.Semaphore;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbPreferences;
@@ -29,13 +29,15 @@ public class GnuR extends Rengine {
      */
     private String cranMirror;
     /**
-     * Keeps track over the requested number of instances and allows only one.
-     * There can only be one instance which should only be used by one other
-     * class at a time. If not you might get strange results because two classes
-     * are working with one Gnu R instance an the same time sharing memory and
-     * all variables. Side effects are likely to accure in this case.
+     * Keeps track over the one and only allowed instance of this class. There
+     * can only be one instance that should only be used by one other class at a
+     * time. If not you might get strange results because two classes are
+     * working with one Gnu R instance an the same time sharing memory and all
+     * variables. Side effects are likely to accure in this case. If more than
+     * one Gnu R instance is created, the Java VM will crash. This key is null
+     * if the class is free.
      */
-    private static Semaphore sem = new Semaphore(1, true);
+    private static UUID KEY = null;
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
@@ -46,23 +48,36 @@ public class GnuR extends Rengine {
         setDefaultCranMirror();
     }
 
-    private static synchronized GnuR getInstance() throws IllegalStateException {
-        if (sem.tryAcquire()) {
+    private static synchronized GnuR getInstance(UUID key) throws IllegalStateException {
+        if (key == KEY) {
             if (instance == null) {
                 String[] args = new String[]{"--vanilla", "--slave"};
                 instance = new GnuR(args);
             }
             return instance;
         } else {
-            throw new IllegalStateException("The instance of Gnu R is currently used");
+            throw new IllegalStateException("The instance of Gnu R is currently reserved by another instance.");
         }
     }
 
-    public void releaseGnuRInstance() {
-        this.clearGnuR();
-        sem.release();
-        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Current Gnu R instace was released.", currentTimestamp);
+    private static synchronized UUID reserveInstance() {
+        if (KEY == null) {
+            KEY = UUID.randomUUID();
+            return KEY;
+        } else {
+            throw new IllegalStateException("The instance of Gnu R is currently used.");
+        }
+    }
+
+    public void releaseGnuRInstance(UUID key) {
+        if (key == KEY) {
+            this.clearGnuR();
+            KEY = null;
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Current Gnu R instace was released.", currentTimestamp);
+        } else {
+            throw new IllegalStateException("The instance of Gnu R is currently reserved by another instance.");
+        }
     }
 
     /**
@@ -241,21 +256,50 @@ public class GnuR extends Rengine {
 
     public static class SecureGnuRInitiliser {
 
-        public static synchronized GnuR getGnuRinstance() throws JRILibraryNotInPathException, IllegalStateException {
-            if (!isGnuRSetUpCorrect()) {
-                throw new JRILibraryNotInPathException();
-            }
-            GnuR ret = getInstance();
+        /**
+         * Reserves the GNU R for later usage.
+         *
+         * @return The key needed to get the actual instance.
+         * @throws IllegalStateException if GNU R is already used.
+         */
+        public static synchronized UUID reserveGnuRinstance() throws IllegalStateException {
+            UUID ret = reserveInstance();
             return ret;
         }
 
+        /**
+         * Returns the one and only instance of GNU R. reserveGnuRinstance() has
+         * to be called first in order to acquire the key.
+         *
+         * @param key The UUID acquired by calling reserveGnuRinstance()
+         * @return The one and only instance of GNU R.
+         * @throws IllegalStateException if the key is not correct.
+         */
+        public static synchronized GnuR getGnuRinstance(UUID key) throws IllegalStateException {
+            GnuR ret = getInstance(key);
+            return ret;
+        }
+
+        /**
+         * Checks if all the libraries needed to use GNU R are included in the java.library.path.
+         * @return true if the needed libraries are included, else false.
+         */
         public static boolean isGnuRSetUpCorrect() {
             String libraryPath = System.getProperty("java.library.path");
             return libraryPath.contains("jri");
         }
-        
-        public static boolean isGnuRInstanceFree(){
-            if(sem.availablePermits()>0){
+
+        /**
+         * Checks if the GNU R instance is available.
+         * This is just an informal check that will not reserve the instance if it
+         * is available. You have to call reserveGnuRinstance() later if you want to do so. Note
+         * that it might be possible that even if you call reserveGnuRinstance() directly 
+         * after calling this method the GNU R instance is reserved in between by
+         * another thread.
+         * @return true if the GNU R instance is available, else false.
+         */
+        public static boolean isGnuRInstanceFree() {
+            if (KEY == null) {
                 return true;
             } else {
                 return false;

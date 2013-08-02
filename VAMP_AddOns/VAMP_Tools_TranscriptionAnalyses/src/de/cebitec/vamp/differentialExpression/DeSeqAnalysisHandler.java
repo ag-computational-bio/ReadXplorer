@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  *
@@ -19,6 +20,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     private DeSeq deSeq = new DeSeq();
     private DeSeqAnalysisData deSeqAnalysisData;
+    private UUID key;
 
     public static enum Plot {
 
@@ -48,8 +50,9 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, String[]> design, boolean moreThanTwoConditions,
             List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation) {
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation, UUID key) {
         super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
+        this.key = key;
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
                 design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, 
                 workingWithoutReplicates);
@@ -60,7 +63,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         List<ResultDeAnalysis> results;
         prepareFeatures(deSeqAnalysisData);
         prepareCountData(deSeqAnalysisData, getAllCountData());
-        results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key);
         return results;
 
     }
@@ -71,14 +74,8 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     @Override
     public void endAnalysis() {
-        deSeq.shutdown();
+        deSeq.shutdown(key);
         deSeq = null;
-    }
-
-    @Override
-    public void saveResultsAsCSV(int selectedIndex, String path) {
-        File saveFile = new File(path);
-        deSeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
     public File plot(Plot plot) throws IOException, IllegalStateException, PackageNotLoadableException {

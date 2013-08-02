@@ -27,10 +27,10 @@ public class DeSeq {
     }
 
     public List<ResultDeAnalysis> process(DeSeqAnalysisData analysisData,
-            int numberOfFeatures, int numberOfTracks, File saveFile)
+            int numberOfFeatures, int numberOfTracks, File saveFile, UUID key)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
             IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
+        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance(key);
         gnuR.clearGnuR();
         int numberOfSubDesigns;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -246,9 +246,9 @@ public class DeSeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown() {
+    public void shutdown(UUID key) {
         if (gnuR != null) {
-            gnuR.releaseGnuRInstance();
+            gnuR.releaseGnuRInstance(key);
             gnuR = null;
         }
     }

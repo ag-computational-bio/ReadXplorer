@@ -10,6 +10,7 @@ import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -20,6 +21,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     private List<Group> groups;
     private BaySeq baySeq = new BaySeq();
     private BaySeqAnalysisData baySeqAnalysisData;
+    private UUID key;
 
     public static enum Plot {
 
@@ -39,15 +41,16 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     }
 
     public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation) {
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation, UUID key) {
         super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
         baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), groups, replicateStructure);
         this.groups=groups;
+        this.key = key;
     }
 
     @Override
     public void endAnalysis() {
-        baySeq.shutdown();
+        baySeq.shutdown(key);
         baySeq = null;
     }
 
@@ -55,7 +58,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         prepareFeatures(baySeqAnalysisData);
         prepareCountData(baySeqAnalysisData, getAllCountData());
-        List<ResultDeAnalysis> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        List<ResultDeAnalysis> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key);
         return results;
     }
 
@@ -73,12 +76,6 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
             baySeq.plotPriors(file, group);
         }
         return file;
-    }
-
-    @Override
-    public void saveResultsAsCSV(int selectedIndex, String path) {
-        File saveFile = new File(path);
-        baySeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
     public List<Group> getGroups() {

@@ -7,6 +7,7 @@ import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent;
+import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.Group;
 import de.cebitec.vamp.differentialExpression.ProcessingLog;
 import de.cebitec.vamp.differentialExpression.SimpleTestAnalysisHandler;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import org.openide.DialogDisplayer;
@@ -57,7 +59,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private SelectReadClassWizardPanel readClassPanel;
 
     @Override
-    public void actionPerformed(ActionEvent e) {        
+    public void actionPerformed(ActionEvent e) {
             initializePanels();
             wiz = new WizardDescriptor(this);
             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
@@ -79,11 +81,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 DeAnalysisHandler handler = null;
 
                 if (tool == DeAnalysisHandler.Tool.BaySeq) {
+                    UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                     handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
-                            replicateStructure, saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
+                            replicateStructure, saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.DeSeq) {
+                    UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                     boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
                     boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
 
@@ -95,7 +99,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     }
                     handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne, 
                             fittingGroupTwo, genomeID, workingWithoutReplicates,
-                            saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation);
+                            saveFile, feature, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
                 }
 
                 if (tool == DeAnalysisHandler.Tool.SimpleTest) {

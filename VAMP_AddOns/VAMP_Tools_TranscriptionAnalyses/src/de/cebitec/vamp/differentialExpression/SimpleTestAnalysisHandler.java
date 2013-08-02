@@ -11,7 +11,6 @@ import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestObserver;
 import de.cebitec.vamp.differentialExpression.simpleTest.SimpleTestStatus;
 import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.openide.util.Exceptions;
@@ -22,7 +21,6 @@ import org.openide.util.Exceptions;
  */
 public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements SimpleTestObserver {
 
-    private SimpleTest simpleTest = new SimpleTest();
     private SimpleTestAnalysisData simpleTestAnalysisData;
     private List<ResultDeAnalysis> results;
 
@@ -56,7 +54,6 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements Simp
     protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         prepareFeatures(simpleTestAnalysisData);
         prepareCountData(simpleTestAnalysisData, getAllCountData());
-//        results = simpleTest.process(simpleTestAnalysisData, getPersAnno().size(), getSaveFile());
 
         SimpleTestI st = new de.cebitec.vamp.differentialExpression.simpleTest.SimpleTest();
 
@@ -117,25 +114,7 @@ public class SimpleTestAnalysisHandler extends DeAnalysisHandler implements Simp
 
     @Override
     public void endAnalysis() {
-        simpleTest.shutdown();
-    }
-
-    @Override
-    public void saveResultsAsCSV(int selectedIndex, String path) {
-        File saveFile = new File(path);
-        simpleTest.saveResultsAsCSV(selectedIndex, saveFile);
-    }
-
-    public File plot(SimpleTestAnalysisHandler.Plot plot) throws IOException,
-            IllegalStateException, PackageNotLoadableException {
-        File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
-        file.deleteOnExit();
-        if (plot == SimpleTestAnalysisHandler.Plot.ABvsConf) {
-            simpleTest.plotAB(file);
-        }
-        if (plot == SimpleTestAnalysisHandler.Plot.BAvsConf) {
-            simpleTest.plotBA(file);
-        }
-        return file;
+        simpleTestAnalysisData = null;
+        results = null;
     }
 }

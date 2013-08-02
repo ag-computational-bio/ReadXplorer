@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
@@ -52,10 +53,10 @@ public class BaySeq {
      * not normalised results and then all the normalised ones.
      */
     public List<ResultDeAnalysis> process(BaySeqAnalysisData bseqData,
-            int numberOfFeatures, int numberOfTracks, File saveFile)
+            int numberOfFeatures, int numberOfTracks, File saveFile, UUID key)
             throws JRILibraryNotInPathException, PackageNotLoadableException,
             IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
+        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance(key);
         int numberofGroups;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
@@ -274,9 +275,9 @@ public class BaySeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown() {
+    public void shutdown(UUID key) {
         if (gnuR != null) {
-            gnuR.releaseGnuRInstance();
+            gnuR.releaseGnuRInstance(key);
             gnuR = null;
         }
     }

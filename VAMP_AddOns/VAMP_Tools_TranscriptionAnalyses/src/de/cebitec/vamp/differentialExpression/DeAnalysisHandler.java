@@ -161,8 +161,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      */
     public abstract void endAnalysis();
 
-    public abstract void saveResultsAsCSV(int selectedIndex, String path);
-
     public void setResults(List<ResultDeAnalysis> results) {
         this.results = results;
     }
