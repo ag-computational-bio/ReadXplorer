@@ -4,20 +4,37 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
+import de.cebitec.vamp.plotting.ChartExporter;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FAILED;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FINISHED;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observer;
 import java.util.ArrayList;
 import java.util.List;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
 import org.jfree.chart.ChartPanel;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 
@@ -44,7 +61,7 @@ import org.openide.util.NbBundle.Messages;
     "CTL_PlotTopComponent=Create graphics",
     "HINT_PlotTopComponent=This is a Plot window"
 })
-public final class PlotTopComponent extends TopComponent implements Observer {
+public final class SimpleTestGraficsTopComponent extends TopComponent implements Observer {
 
     private DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>(PlotTypes.values());
     private DefaultComboBoxModel<String> cbmDataSet;
@@ -52,8 +69,11 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     private List<ResultDeAnalysis> results;
     private DeAnalysisHandler.Tool usedTool;
     private MouseActions mouseAction = new MouseActions();
+    private ChartPanel chartPanel;
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+    private ProgressHandle svgExportProgressHandle;
 
-    public PlotTopComponent() {
+    public SimpleTestGraficsTopComponent() {
         cbmDataSet = new DefaultComboBoxModel<>();
         initComponents();
         setName(Bundle.CTL_PlotTopComponent());
@@ -65,7 +85,7 @@ public final class PlotTopComponent extends TopComponent implements Observer {
 
     }
 
-    public PlotTopComponent(DeAnalysisHandler analysisHandler, DeAnalysisHandler.Tool usedTool) {
+    public SimpleTestGraficsTopComponent(DeAnalysisHandler analysisHandler, DeAnalysisHandler.Tool usedTool) {
         this.analysisHandler = analysisHandler;
         this.usedTool = usedTool;
         results = analysisHandler.getResults();
@@ -113,54 +133,68 @@ public final class PlotTopComponent extends TopComponent implements Observer {
         dataSetComboBox = new javax.swing.JComboBox();
         plotTypeComboBox = new javax.swing.JComboBox();
         createPlotButton = new javax.swing.JButton();
-        clearPlotsButton = new javax.swing.JButton();
         plotPanel = new javax.swing.JPanel();
+        saveButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        messages = new javax.swing.JTextArea();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SimpleTestGraficsTopComponent.class, "SimpleTestGraficsTopComponent.jLabel1.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SimpleTestGraficsTopComponent.class, "SimpleTestGraficsTopComponent.jLabel2.text")); // NOI18N
 
         dataSetComboBox.setModel(cbmDataSet);
 
         plotTypeComboBox.setModel(cbmPlotType);
 
-        org.openide.awt.Mnemonics.setLocalizedText(createPlotButton, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.createPlotButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(createPlotButton, org.openide.util.NbBundle.getMessage(SimpleTestGraficsTopComponent.class, "SimpleTestGraficsTopComponent.createPlotButton.text")); // NOI18N
         createPlotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createPlotButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(clearPlotsButton, org.openide.util.NbBundle.getMessage(PlotTopComponent.class, "PlotTopComponent.clearPlotsButton.text")); // NOI18N
-        clearPlotsButton.setEnabled(false);
-        clearPlotsButton.addActionListener(new java.awt.event.ActionListener() {
+        plotPanel.setLayout(new javax.swing.BoxLayout(plotPanel, javax.swing.BoxLayout.LINE_AXIS));
+
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(SimpleTestGraficsTopComponent.class, "SimpleTestGraficsTopComponent.saveButton.text")); // NOI18N
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearPlotsButtonActionPerformed(evt);
+                saveButtonActionPerformed(evt);
             }
         });
 
-        plotPanel.setLayout(new javax.swing.BoxLayout(plotPanel, javax.swing.BoxLayout.LINE_AXIS));
+        jScrollPane1.setBorder(null);
+
+        messages.setEditable(false);
+        messages.setBackground(new java.awt.Color(240, 240, 240));
+        messages.setColumns(20);
+        messages.setLineWrap(true);
+        messages.setRows(2);
+        messages.setWrapStyleWord(true);
+        messages.setBorder(null);
+        jScrollPane1.setViewportView(messages);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel2))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(dataSetComboBox, 0, 211, Short.MAX_VALUE)
-                            .addComponent(plotTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(dataSetComboBox, 0, 1, Short.MAX_VALUE)
+                            .addComponent(plotTypeComboBox, 0, 1, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(clearPlotsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(createPlotButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(createPlotButton, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
+                            .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -173,11 +207,12 @@ public final class PlotTopComponent extends TopComponent implements Observer {
                         .addComponent(dataSetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(createPlotButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(plotTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2))
-                    .addComponent(clearPlotsButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(plotTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(saveButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(plotPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -185,46 +220,63 @@ public final class PlotTopComponent extends TopComponent implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void createPlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPlotButtonActionPerformed
+        progressHandle.start();
+        progressHandle.switchToIndeterminate();
+        plotPanel.removeAll();
+        messages.setText("");
         PlotTypes type = (PlotTypes) cbmPlotType.getSelectedItem();
         int index = dataSetComboBox.getSelectedIndex();
-        ResultDeAnalysis result = results.get(index);
-        ChartPanel panel;
+        final ResultDeAnalysis result = results.get(index);
         switch (type) {
             case MA_Plot:
-                panel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A", "M", new ToolTip());
-                panel.addChartMouseListener(mouseAction);
-                plotPanel.add(panel);
+                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A", "M", new ToolTip());
+                chartPanel.addChartMouseListener(mouseAction);
+                plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;
             case RatioAB_Confidence:
-                panel = CreatePlots.createPlot(ConvertData.ratioABagainstConfidence(result), "ratioAB", "Confidence", new ToolTip());
-                panel.addChartMouseListener(mouseAction);
-                plotPanel.add(panel);
+                chartPanel = CreatePlots.createPlot(ConvertData.ratioABagainstConfidence(result), "ratioAB", "Confidence", new ToolTip());
+                chartPanel.addChartMouseListener(mouseAction);
+                plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;
             case RatioBA_Confidence:
-                panel = CreatePlots.createPlot(ConvertData.ratioBAagainstConfidence(result), "ratioBA", "Confidence", new ToolTip());
-                panel.addChartMouseListener(mouseAction);
-                plotPanel.add(panel);
+                chartPanel = CreatePlots.createPlot(ConvertData.ratioBAagainstConfidence(result), "ratioBA", "Confidence", new ToolTip());
+                chartPanel.addChartMouseListener(mouseAction);
+                plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;
         }
-        clearPlotsButton.setEnabled(true);
+        saveButton.setEnabled(true);
+        progressHandle.switchToDeterminate(100);
+        progressHandle.finish();
     }//GEN-LAST:event_createPlotButtonActionPerformed
 
-    private void clearPlotsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearPlotsButtonActionPerformed
-        clearPlotsButton.setEnabled(false);
-        plotPanel.removeAll();
-        plotPanel.updateUI();
-    }//GEN-LAST:event_clearPlotsButtonActionPerformed
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        VampFileChooser fc = new VampFileChooser(new String[]{"svg"}, "svg") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void save(String fileLocation) {
+                saveToSVG(fileLocation);
+            }
+
+            @Override
+            public void open(String fileLocation) {
+            }
+        };
+        fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
+    }//GEN-LAST:event_saveButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton clearPlotsButton;
     private javax.swing.JButton createPlotButton;
     private javax.swing.JComboBox dataSetComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea messages;
     private javax.swing.JPanel plotPanel;
     private javax.swing.JComboBox plotTypeComboBox;
+    private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -251,8 +303,44 @@ public final class PlotTopComponent extends TopComponent implements Observer {
         // TODO read your settings according to their version
     }
 
+    private void saveToSVG(String fileLocation) {
+        svgExportProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
+        Path to = FileSystems.getDefault().getPath(fileLocation, "");
+        ChartExporter exporter = new ChartExporter(to, chartPanel.getChart());
+        exporter.registerObserver(this);
+        new Thread(exporter).start();
+
+    }
+
     @Override
     public void update(Object args) {
+        if (args instanceof ChartExporter.ChartExportStatus) {
+            final ChartExporter.ChartExportStatus status = (ChartExporter.ChartExportStatus) args;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {                
+                        switch (status) {
+                            case RUNNING:
+                                saveButton.setEnabled(false);
+                                svgExportProgressHandle.start();
+                                svgExportProgressHandle.switchToIndeterminate();
+                                break;
+                            case FAILED:
+                                messages.setText("The export of the plot failed.");
+                            case FINISHED:
+                                messages.setText("SVG image saved.");
+                                svgExportProgressHandle.switchToDeterminate(100);
+                                svgExportProgressHandle.finish();
+                                break;
+                        }
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException ex) {
+                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, ex.getMessage(), currentTimestamp);
+            }
+        }
     }
 
     public static enum PlotTypes {

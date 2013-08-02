@@ -4,12 +4,14 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq;
 import de.cebitec.vamp.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
-import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.Group;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
-import de.cebitec.vamp.plotting.PlottingUtils;
+import de.cebitec.vamp.plotting.ChartExporter;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FAILED;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FINISHED;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
@@ -17,6 +19,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +36,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
@@ -42,7 +46,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
@@ -71,12 +74,13 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
     private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<>();
     private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("creating plot");
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ResultDeAnalysis result;
     private List<Group> groups;
     private ChartPanel chartPanel;
     private boolean SVGCanvasActive;
     private MouseActions mouseAction = new MouseActions();
+    private ProgressHandle svgExportProgressHandle;
 
     public BaySeqGraficsTopComponent() {
     }
@@ -207,24 +211,28 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(plotButton)
                     .addComponent(saveButton)
                     .addComponent(groupComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1)
-                            .addComponent(plotTypeComboBox, 0, 232, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(samplesALabel))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(samplesBLabel)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jScrollPane3))
-                        .addGap(10, 10, 10)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel1)
+                                    .addComponent(plotTypeComboBox, 0, 232, Short.MAX_VALUE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(samplesALabel))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(samplesBLabel)
+                                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jScrollPane3))
+                                .addGap(10, 10, 10))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(plotButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(173, 173, 173)))
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 771, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -270,14 +278,7 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
                 BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
                 if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
-                    try {
-                        PlottingUtils.exportChartAsSVG(to, chartPanel.getChart());
-                        messages.setText("SVG image saved to " + to.toString());
-                    } catch (IOException ex) {
-                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
-                    }
+                    saveToSVG(fileLocation);
                 } else {
                     Path from = currentlyDisplayed.toPath();
                     try {
@@ -304,6 +305,8 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
         if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
+            progressHandle.start();
+            progressHandle.switchToIndeterminate();
             List<Integer> sampleA = new ArrayList<>();
             List<Integer> sampleB = new ArrayList<>();
             Group selectedGroup = groups.get(groupComboBox.getSelectedIndex());
@@ -345,6 +348,8 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
                 plotButton.setEnabled(true);
                 saveButton.setEnabled(true);
             }
+            progressHandle.switchToDeterminate(100);
+            progressHandle.finish();
         } else {
             if (!SVGCanvasActive) {
                 jPanel1.remove(chartPanel);
@@ -414,9 +419,46 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
         // TODO read your settings according to their version
     }
 
+    private void saveToSVG(String fileLocation) {
+        svgExportProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
+        Path to = FileSystems.getDefault().getPath(fileLocation, "");
+        ChartExporter exporter = new ChartExporter(to, chartPanel.getChart());
+        exporter.registerObserver(this);
+        new Thread(exporter).start();
+
+    }
+
     @Override
     public void update(Object args) {
-        addResults();
+        if (args instanceof ChartExporter.ChartExportStatus) {
+            final ChartExporter.ChartExportStatus status = (ChartExporter.ChartExportStatus) args;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        switch (status) {
+                            case RUNNING:
+                                saveButton.setEnabled(false);
+                                svgExportProgressHandle.start();
+                                svgExportProgressHandle.switchToIndeterminate();
+                                break;
+                            case FAILED:
+                                messages.setText("The export of the plot failed.");
+                            case FINISHED:
+                                messages.setText("SVG image saved.");
+                                svgExportProgressHandle.switchToDeterminate(100);
+                                svgExportProgressHandle.finish();
+                                break;
+                        }
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, ex.getMessage(), currentTimestamp);
+            }
+        } else {
+            addResults();
+        }
     }
 
     @Override

@@ -3,7 +3,6 @@ package de.cebitec.vamp.plotting;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.Pair;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,7 +30,7 @@ import org.jfree.ui.TextAnchor;
  *
  * @author kstaderm
  */
-public class CreatePlots {
+public class CreatePlots{
 
     public synchronized static ChartPanel createPlot(Map<PersistantFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
         XYSeriesCollection normal = new XYSeriesCollection();

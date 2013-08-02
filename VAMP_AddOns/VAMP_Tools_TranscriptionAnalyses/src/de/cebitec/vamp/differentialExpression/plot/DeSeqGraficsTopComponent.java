@@ -5,22 +5,20 @@ import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
 import de.cebitec.vamp.plotting.CreatePlots;
-import de.cebitec.vamp.plotting.PlottingUtils;
+import de.cebitec.vamp.plotting.ChartExporter;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FAILED;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FINISHED;
+import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
-import java.awt.Rectangle;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,21 +27,18 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
+import javax.swing.SwingUtilities;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 /**
  * Top component which displays something.
@@ -53,7 +48,7 @@ import org.w3c.dom.Document;
         autostore = false)
 @TopComponent.Description(
         preferredID = "DeSeqGraficsTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
+        //iconBase="SET/PATH/TO/ICON/HERE",
         persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DeSeqGraficsTopComponent")
@@ -76,6 +71,8 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
     private ResultDeAnalysis result;
     private boolean SVGCanvasActive;
     private MouseActions mouseAction = new MouseActions();
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+    private ProgressHandle svgExportProgressHandle;
 
     public DeSeqGraficsTopComponent() {
     }
@@ -101,7 +98,6 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         plotType = new javax.swing.JComboBox();
         plotButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
-        progressBar = new javax.swing.JProgressBar();
         jScrollPane1 = new javax.swing.JScrollPane();
         messages = new javax.swing.JTextArea();
 
@@ -147,10 +143,10 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1)
                     .addComponent(plotType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(plotButton)
-                    .addComponent(saveButton)
-                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(plotButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(saveButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                 .addContainerGap())
@@ -166,13 +162,11 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                         .addComponent(plotType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(plotButton)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(saveButton)
                         .addGap(18, 18, 18)
-                        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 263, Short.MAX_VALUE))
+                        .addGap(0, 307, Short.MAX_VALUE))
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -185,6 +179,8 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
             saveButton.setEnabled(false);
             DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
             if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
+                progressHandle.start();
+                progressHandle.switchToIndeterminate();
                 chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A", "M", new ToolTip());
                 chartPanel.addChartMouseListener(mouseAction);
                 if (SVGCanvasActive) {
@@ -195,6 +191,8 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                 jPanel1.updateUI();
                 plotButton.setEnabled(true);
                 saveButton.setEnabled(true);
+                progressHandle.switchToDeterminate(100);
+                progressHandle.finish();
             } else {
                 if (!SVGCanvasActive) {
                     jPanel1.remove(chartPanel);
@@ -224,17 +222,11 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
 
             @Override
             public void save(String fileLocation) {
+                ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
                 DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
                 if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
-                    try {
-                        PlottingUtils.exportChartAsSVG(to, chartPanel.getChart());
-                        messages.setText("SVG image saved to " + to.toString());
-                    } catch (IOException ex) {
-                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
-                    }
+                    saveToSVG(fileLocation);
                 } else {
                     Path from = currentlyDisplayed.toPath();
                     try {
@@ -244,6 +236,9 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                    } finally {
+                        progressHandle.switchToDeterminate(100);
+                        progressHandle.finish();
                     }
                 }
             }
@@ -261,7 +256,6 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
     private javax.swing.JTextArea messages;
     private javax.swing.JButton plotButton;
     private javax.swing.JComboBox plotType;
-    private javax.swing.JProgressBar progressBar;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
@@ -296,13 +290,14 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
-                progressBar.setIndeterminate(true);
+                progressHandle.start();
+                progressHandle.switchToIndeterminate();
             }
 
             @Override
             public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(100);
+                progressHandle.switchToDeterminate(100);
+                progressHandle.finish();
                 saveButton.setEnabled(true);
                 plotButton.setEnabled(true);
             }
@@ -318,7 +313,43 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         });
     }
 
+    private void saveToSVG(String fileLocation) {
+        svgExportProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
+        Path to = FileSystems.getDefault().getPath(fileLocation, "");
+        ChartExporter exporter = new ChartExporter(to, chartPanel.getChart());
+        exporter.registerObserver(this);
+        new Thread(exporter).start();
+
+    }
+
     @Override
     public void update(Object args) {
+        if (args instanceof ChartExporter.ChartExportStatus) {
+            final ChartExporter.ChartExportStatus status = (ChartExporter.ChartExportStatus) args;
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        switch (status) {
+                            case RUNNING:
+                                saveButton.setEnabled(false);
+                                svgExportProgressHandle.start();
+                                svgExportProgressHandle.switchToIndeterminate();
+                                break;
+                            case FAILED:
+                                messages.setText("The export of the plot failed.");
+                            case FINISHED:
+                                messages.setText("SVG image saved.");
+                                svgExportProgressHandle.switchToDeterminate(100);
+                                svgExportProgressHandle.finish();
+                                break;
+                        }
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, ex.getMessage(), currentTimestamp);
+            }
+        }
     }
 }

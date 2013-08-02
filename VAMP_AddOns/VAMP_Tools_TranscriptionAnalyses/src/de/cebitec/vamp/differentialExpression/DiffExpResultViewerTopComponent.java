@@ -9,7 +9,7 @@ import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BayS
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
 import de.cebitec.vamp.differentialExpression.plot.BaySeqGraficsTopComponent;
-import de.cebitec.vamp.differentialExpression.plot.PlotTopComponent;
+import de.cebitec.vamp.differentialExpression.plot.SimpleTestGraficsTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -72,7 +72,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private ComboBoxModel<Object> cbm;
     private ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
     private TopComponent GraficsTopComponent;
-    private PlotTopComponent ptc;
+    private SimpleTestGraficsTopComponent ptc;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
@@ -298,7 +298,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
                 GraficsTopComponent.requestActive();
                 break;
             case SimpleTest:
-                ptc = new PlotTopComponent(analysisHandler, usedTool);
+                ptc = new SimpleTestGraficsTopComponent(analysisHandler, usedTool);
                 analysisHandler.registerObserver(ptc);
                 ptc.open();
                 ptc.requestActive();
