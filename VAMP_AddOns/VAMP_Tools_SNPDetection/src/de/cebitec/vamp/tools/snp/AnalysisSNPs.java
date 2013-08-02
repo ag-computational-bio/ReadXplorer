@@ -214,7 +214,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
 
                 if (frequency >= analysisParams.getMinPercentage()) {
-                    refBase = Character.toUpperCase(refSeq.charAt(absPos - 1));
+                    refBase = refSeq.charAt(absPos - 1);
                     refBaseIdx = getBaseInt(refBase);
                     //determine SNP type, can still be match, if match coverage is largest
                     baseCounts[refBaseIdx] = cov - diffCount;

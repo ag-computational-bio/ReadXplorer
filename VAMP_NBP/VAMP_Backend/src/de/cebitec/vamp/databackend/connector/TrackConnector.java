@@ -810,7 +810,7 @@ public class TrackConnector {
     /**
      * Fetches a {@link DiscreteCountingDistribution} for this track.
      * @param type the type of distribution either
-     * Properties.COVERAGE_INCREASE_DISTRIBUTION or
+     * Properties.READ_START_DISTRIBUTION or
      * Properties.COVERAGE_INC_PERCENT_DISTRIBUTION
      * @return a {@link DiscreteCountingDistribution} for this track.
      */

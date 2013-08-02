@@ -77,12 +77,13 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for storing a sequence in fasta format.
      * The sequence to store has to be known, when the method is called.
      * @param sequence the sequence to store as fasta
+     * @param refName name of the reference
      * @param feature the feature whose sequence is to be converted to fasta
      *                it contains the header information, but not the sequence
      * @return jmenuitem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final PersistantFeature feature){
-        return this.initStoreFastaItem(sequence, feature, -1, -1);
+    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final PersistantFeature feature){
+        return this.initStoreFastaItem(sequence, refName, feature, -1, -1);
 
     }
 
@@ -90,12 +91,13 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * Returns a JMenuItem for storing a sequence in fasta format.
      * The sequence to store has to be known, when the method is called.
      * @param sequence the sequence to store as fasta
+     * @param refName 
      * @param seqStart the startpoint of the sequence
      * @param seqStop the endpoint of the sequence
      * @return jmenuitem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final int seqStart, final int seqStop){
-        return this.initStoreFastaItem(sequence, null, seqStart, seqStop);
+    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final int seqStart, final int seqStop){
+        return this.initStoreFastaItem(sequence, refName, null, seqStart, seqStop);
     }
 
     /**
@@ -107,7 +109,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @param seqEnd the endpoint of the sequence (-1 if feature is used!)
      * @return a menu item capable of storing a sequence in fasta format
      */
-    private JMenuItem initStoreFastaItem(final String sequence, final PersistantFeature feature,
+    private JMenuItem initStoreFastaItem(final String sequence, final String refName, final PersistantFeature feature,
             final int seqStart, final int seqEnd) {
 
         JMenuItem storeFastaItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta"));
@@ -119,7 +121,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                 if (feature != null) {
                     output = this.generateFastaFromFeature();
                 } else {
-                    String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ").concat(String.valueOf(seqEnd));
+                    String header = "Copied sequence from:" + seqStart + " to " + seqEnd;
                     output = OutputParser.generateFasta(sequence, header);
                 }
                 new FastaFileChooser(new String[]{"fasta"}, "fasta", output);

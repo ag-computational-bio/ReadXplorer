@@ -9,6 +9,7 @@ import de.cebitec.vamp.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardI
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Pair;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
@@ -192,7 +193,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         }
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
-                minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov);
+                minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov, readClassesParams);
         parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation);
         parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selFeatureTypes);
 
@@ -203,7 +204,6 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             AnalysisOperon analysisOperon = null;
             AnalysisRPKM analysisRPKM = null;
             
-            //TODO: Error handling
             try {
                 connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -225,6 +225,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 }
                 covAnalysisHandler.registerObserver(analysisTSS);
                 covAnalysisHandler.setCoverageNeeded(true);
+                covAnalysisHandler.setDesiredData(Properties.READ_STARTS);
             }
             if (parametersOperonDet.isPerformOperonAnalysis()) {
                 analysisOperon = new AnalysisOperon(connector, parametersOperonDet.getMinSpanningReads(), parametersOperonDet.isAutoOperonParamEstimation());

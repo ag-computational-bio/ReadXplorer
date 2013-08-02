@@ -84,7 +84,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void initAdditionalComponents() {
-        int noUnannotatedTrans = this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_UNANNOTATED);
+        int noUnannotatedTrans = this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_NOVEL);
         String unannotatedTransValue = noUnannotatedTrans == 
                 ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE ? "-" : String.valueOf(noUnannotatedTrans);
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -95,7 +95,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                 {ResultPanelTranscriptionStart.TSS_DOWNSTREAM, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_DOWNSTREAM))},
                 {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
                 {ResultPanelTranscriptionStart.TSS_REV, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_REV))},
-                {ResultPanelTranscriptionStart.TSS_UNANNOTATED, unannotatedTransValue}
+                {ResultPanelTranscriptionStart.TSS_NOVEL, unannotatedTransValue}
             },
             new String [] {
                 NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"), 

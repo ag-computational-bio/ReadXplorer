@@ -15,14 +15,16 @@ public class TransStartUnannotated extends TranscriptionStart {
      * data fields for storage of unannotated gene information.
      * @param pos The position at which the gene start was detected
      * @param isFwdStrand true, if the gene start was detected on the fwd strand, false otherwise.
-     * @param initialCoverage The coverage directly before the detected gene start
-     * @param startCoverage The coverage at the detected gene start position (getPos()).
+     * @param readStarts The number of read starts at the detected tss position
+     * @param percentIncrease The coverage at the detected gene start position (getPos()).
+     * @param coverageIncrease the coverage increase from the position before the TSS to
+     * the detected TSS position
      * @param detFeatures object containing the features associated to this predicted gene start
      * @param detectedStop The stop position of the predicted unannotated transcript
      */
-    public TransStartUnannotated(int pos, boolean isFwdStrand, int initialCoverage, int startCoverage, 
-            DetectedFeatures detFeatures, int detectedStop, int trackId) {
-        super(pos, isFwdStrand, initialCoverage, startCoverage, detFeatures, trackId);
+    public TransStartUnannotated(int pos, boolean isFwdStrand, int readStarts, int percentIncrease,
+            int coverageIncrease, DetectedFeatures detFeatures, int detectedStop, int trackId) {
+        super(pos, isFwdStrand, readStarts, percentIncrease, coverageIncrease, detFeatures, trackId);
         this.detectedStop = detectedStop;
     }
 

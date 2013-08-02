@@ -48,7 +48,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
     public static final String TSS_DOWNSTREAM = "TSS with downstream feature";
     public static final String TSS_FWD = "TSS on fwd strand";
     public static final String TSS_REV = "TSS on rev strand";
-    public static final String TSS_UNANNOTATED = "Unannotated Transcripts";
+    public static final String TSS_NOVEL = "Novel Transcripts";
     public static final int UNUSED_STATISTICS_VALUE = -1;
     
     private BoundsInfoManager boundsInfoManager;
@@ -89,7 +89,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         statisticsMap.put(TSS_DOWNSTREAM, 0);
         statisticsMap.put(TSS_FWD, 0);
         statisticsMap.put(TSS_REV, 0);
-        statisticsMap.put(TSS_UNANNOTATED, 0);
+        statisticsMap.put(TSS_NOVEL, 0);
     }
 
     /** This method is called from within the constructor to
@@ -112,14 +112,14 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Position", "Track", "Strand", "Initial Coverage", "Start Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Next Downstream Feature", "Unannotated Transcript", "Transcript Stop"
+                "Position", "Track", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Next Downstream Feature", "Unannotated Transcript", "Transcript Stop"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -135,14 +135,13 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         tSSTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title11")); // NOI18N
         tSSTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title1")); // NOI18N
         tSSTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title2")); // NOI18N
-        tSSTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title3")); // NOI18N
-        tSSTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title4")); // NOI18N
-        tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title5")); // NOI18N
-        tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title6")); // NOI18N
-        tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title7")); // NOI18N
-        tSSTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title8")); // NOI18N
-        tSSTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9")); // NOI18N
-        tSSTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10")); // NOI18N
+        tSSTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title4")); // NOI18N
+        tSSTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title5")); // NOI18N
+        tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title6")); // NOI18N
+        tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title7")); // NOI18N
+        tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title8")); // NOI18N
+        tSSTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9")); // NOI18N
+        tSSTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -165,7 +164,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 484, Short.MAX_VALUE)
+                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 664, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -175,7 +174,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(tssScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+                .addComponent(tssScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exportButton)
@@ -243,7 +242,7 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
             @Override
             public void run() {
 
-                final int nbColumns = 12;
+                final int nbColumns = 11;
 
                 int noCorrectStarts = 0;
                 int noUpstreamFeature = 0;
@@ -272,42 +271,37 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                     rowData[0] = tSS.getPos();
                     rowData[1] = tssResultNew.getTrackMap().get(tSS.getTrackId());
                     rowData[2] = strand;
-                    rowData[3] = tSS.getInitialCoverage();
-                    rowData[4] = tSS.getStartCoverage();
-                    rowData[5] = tSS.getStartCoverage() - tSS.getInitialCoverage();
-                    if (tSS.getInitialCoverage() > 0) {
-                        rowData[6] = (int) (((double) tSS.getStartCoverage() / (double) tSS.getInitialCoverage()) * 100.0) - 100;
-                    } else {
-                        rowData[6] = Integer.MAX_VALUE;
-                    }
+                    rowData[3] = tSS.getReadStartsAtPos();
+                    rowData[4] = tSS.getCoverageIncrease();
+                    rowData[5] = tSS.getPercentIncrease();
 
                     detFeatures = tSS.getDetFeatures();
                     feature = detFeatures.getCorrectStartFeature();
                     if (feature != null) {
-                        rowData[7] = feature.toString();
+                        rowData[6] = feature.toString();
                         ++noCorrectStarts;
                     } else {
-                        rowData[7] = "-";
+                        rowData[6] = "-";
                     }
                     feature = detFeatures.getUpstreamFeature();
                     if (feature != null) {
-                        rowData[8] = feature.toString();
+                        rowData[7] = feature.toString();
                         ++noUpstreamFeature;
                     } else {
-                        rowData[8] = "-";
+                        rowData[7] = "-";
                     }
                     feature = detFeatures.getDownstreamFeature();
                     if (feature != null) {
-                        rowData[9] = feature.toString();
+                        rowData[8] = feature.toString();
                         ++noDownstreamFeature;
                     } else {
-                        rowData[9] = "-";
+                        rowData[8] = "-";
                     }
 
                     if (tSS instanceof TransStartUnannotated) {
                         tSSU = (TransStartUnannotated) tSS;
-                        rowData[10] = true;
-                        rowData[11] = tSSU.getDetectedStop();
+                        rowData[9] = true;
+                        rowData[10] = tSSU.getDetectedStop();
                         ++noUnannotatedTranscripts;
                     } else {
                     }
@@ -324,9 +318,9 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
                 statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_FWD) + noFwdFeatures);
                 statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
                 if (tssParameters.isPerformUnannotatedTranscriptDet()) {
-                    statisticsMap.put(TSS_UNANNOTATED, statisticsMap.get(TSS_UNANNOTATED) + noUnannotatedTranscripts);
+                    statisticsMap.put(TSS_NOVEL, statisticsMap.get(TSS_NOVEL) + noUnannotatedTranscripts);
                 } else {
-                    statisticsMap.put(TSS_UNANNOTATED, ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE);
+                    statisticsMap.put(TSS_NOVEL, ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE);
                 }
                 tssResultNew.setStatsMap(statisticsMap);
 
@@ -337,8 +331,8 @@ public class ResultPanelTranscriptionStart extends javax.swing.JPanel {
 
                 String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
                 parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-                        "ResultPanelTranscriptionStart.parametersLabel.text", tssParameters.getMinTotalIncrease(), tssParameters.getMinPercentIncrease(),
-                        tssParameters.getMaxLowCovInitCount(), tssParameters.getMinLowCovIncrease(), unannotatedTranscriptDet,
+                        "ResultPanelTranscriptionStart.parametersLabel.text", tssParameters.getMinNoReadStarts(), tssParameters.getMinPercentIncrease(),
+                        tssParameters.getMaxLowCovReadStarts(), tssParameters.getMinLowCovReadStarts(), unannotatedTranscriptDet,
                         tssParameters.getMinTranscriptExtensionCov()));
 
             }

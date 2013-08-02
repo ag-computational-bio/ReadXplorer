@@ -2,6 +2,7 @@ package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.Properties;
 import java.io.File;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -59,7 +60,7 @@ public class SamBamFileReaderTest {
         int to = 21100;
         boolean diffsAndGapsNeeded = false;
         byte trackNeeded = 0;
-        IntervalRequest request = new IntervalRequest(from, to, null, trackNeeded, new ParametersReadClasses());
+        IntervalRequest request = new IntervalRequest(from, to, from, to, null, Properties.NORMAL, trackNeeded, new ParametersReadClasses());
         SamBamFileReader samBamFileReader = new SamBamFileReader(new File("D:\\Programmieren & Studieren\\Pseudomonas aeruginosa Projekt\\SequenceData\\NG-5516_2_2_read_1-F469-with-PAO1.jok_sort.bam"), 1);
         PersistantCoverage coverage = samBamFileReader.getCoverageFromBam(refGenome, request, diffsAndGapsNeeded).getCoverage();
         assertTrue(coverage.getPerfectFwdMult(10000) == 129);

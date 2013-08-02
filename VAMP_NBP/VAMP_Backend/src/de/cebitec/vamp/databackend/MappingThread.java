@@ -136,8 +136,6 @@ public class MappingThread extends RequestThread {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp);
         }
 
-        
-
         return mappings;
     }
 
@@ -330,7 +328,7 @@ public class MappingThread extends RequestThread {
         ParametersReadClasses readClassParams = request.getReadClassParams();
         if (this.isDbUsed) {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
-            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_REDUCED_MAPPINGS_BY_TRACK_ID_AND_INTERVAL)) {
+            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.FETCH_REDUCED_MAPPINGS_BY_TRACK_ID_AND_MAP_ID_INTERVAL)) {
                 fetch.setLong(1, trackId);
                 fetch.setLong(2, request.getFrom());
                 fetch.setLong(3, request.getTo());

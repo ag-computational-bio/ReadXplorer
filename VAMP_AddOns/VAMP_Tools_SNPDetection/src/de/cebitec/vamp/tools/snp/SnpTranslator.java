@@ -168,10 +168,6 @@ public class SnpTranslator {
             String tripletSnp = "";
             subPos = 0;
             
-            if (pos == 17768 || pos == 19403 || pos == 19430) {
-                System.out.println("la");
-            }
-            
             /* 
              * Check for subfeatures and calculate length of spliced mRNA and snp position on this mRNA.
              * Also need to check, if the current position is at a border of its subfeature. Then we need
@@ -215,13 +211,13 @@ public class SnpTranslator {
 
                     if (!posAtRightChromBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left base of triplet, get pos to pos+2
                         tripletRef = refSeq.substring(pos - 1, pos + 2);
-                        tripletSnp = snp.getBase().concat(tripletRef.substring(1));
+                        tripletSnp = snp.getBase().toLowerCase().concat(tripletRef.substring(1));
                     } else if (mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder) { //middle base of triplet, get pos-1, pos and pos+1
                         tripletRef = refSeq.substring(pos - 2, pos + 1);
-                        tripletSnp = tripletRef.charAt(0) + snp.getBase() + tripletRef.charAt(2);
+                        tripletSnp = tripletRef.charAt(0) + snp.getBase().toLowerCase() + tripletRef.charAt(2);
                     } else if (!posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
                         tripletRef = refSeq.substring(pos - 3, pos);
-                        tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase());
+                        tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase().toLowerCase());
                     }
                 } else { //snp is located in a subfeature (exon) and at a border of a subfeature
 
@@ -240,7 +236,7 @@ public class SnpTranslator {
                         } else {
                             tripletRef = refSeq.substring(pos - 1, pos + 2);
                         }
-                        tripletSnp = snp.getBase().concat(tripletRef.substring(1));
+                        tripletSnp = snp.getBase().toLowerCase().concat(tripletRef.substring(1));
 
                     } else if (mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder) { //middle base of triplet, get pos-1, pos and pos+1
 
@@ -254,7 +250,7 @@ public class SnpTranslator {
                         } else {
                             tripletRef += refSeq.substring(pos, pos + 1);
                         }
-                        tripletSnp = tripletRef.charAt(0) + snp.getBase() + tripletRef.charAt(2);
+                        tripletSnp = tripletRef.charAt(0) + snp.getBase().toLowerCase() + tripletRef.charAt(2);
 
                     } else if (!posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
 
@@ -267,7 +263,7 @@ public class SnpTranslator {
                         } else {
                             tripletRef = refSeq.substring(pos - 3, pos);
                         }
-                        tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase());
+                        tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase().toLowerCase());
                     }
                 }
 

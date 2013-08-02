@@ -35,17 +35,17 @@ public class BaseBackground extends JComponent{
 //            case 'n':  graphics.setColor(ColorProperties.BACKGROUND_N);
 //            default: graphics.setColor(ColorProperties.BACKGROUND_BASE_UNDEF);
 //        }
-        if (bases.equals("a")) {
+        if (bases.equals("A")) {
             graphics.setColor(ColorProperties.BACKGROUND_A);
-        } else if (bases.equals("c")) {
+        } else if (bases.equals("C")) {
             graphics.setColor(ColorProperties.BACKGROUND_C);
-        } else if (bases.equals("g")) {
+        } else if (bases.equals("G")) {
             graphics.setColor(ColorProperties.BACKGROUND_G);
-        } else if (bases.equals("t")) {
+        } else if (bases.equals("T")) {
             graphics.setColor(ColorProperties.BACKGROUND_T);
         } else if (bases.equals("-")) {
             graphics.setColor(ColorProperties.BACKGROUND_READGAP);
-        }else if (bases.equals("n")) {
+        }else if (bases.equals("N")) {
             graphics.setColor(ColorProperties.BACKGROUND_N);
         }else {
             graphics.setColor(ColorProperties.BACKGROUND_BASE_UNDEF);

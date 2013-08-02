@@ -73,7 +73,7 @@ public final class ParserCommonMethods {
 
             if (op.equals("M")) { //check, count and add diffs for deviating Ms
                 bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
-                refBases = refSeq.substring(refPos, refPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
                     if (bases.charAt(j) != refBases.charAt(j)) {
                         ++differences;
@@ -151,7 +151,7 @@ public final class ParserCommonMethods {
             currentCount = Integer.valueOf(num[i - 1]);
             if (op.equals("M")) { //check, count and add diffs for deviating Ms
                 bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
-                refBases = refSeq.substring(refPos, refPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
                     base = bases.charAt(j);
                     if (base != refBases.charAt(j)) {

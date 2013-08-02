@@ -79,7 +79,7 @@ public class ReferenceConnector {
      * @return Fetches the reference sequence of the reference associated with
      * this connector and adds it to the returned PersistantReference. If it was
      * called once, it is kept in memory and does not need to be fetched from
-     * the DB again.
+     * the DB again. The reference sequences stored in the DB are always uppercase.
      */
     public String getRefSequence() {
         String sequence = "";

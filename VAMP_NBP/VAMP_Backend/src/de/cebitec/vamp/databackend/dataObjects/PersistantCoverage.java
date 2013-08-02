@@ -542,6 +542,37 @@ public class PersistantCoverage implements Serializable {
             return 0;
         }
     }
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectFwdMult() {
+        return this.perfectFwdMultCov;
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectFwdNum() {
+        return this.perfectFwdNumCov;
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectRevMult() {
+        return this.perfectRevMultCov;
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectRevNum() {
+        return this.perfectRevNumCov;
+    }
     
     /**
      * @return Get whole best match fwd mult coverage array for the given interval.
@@ -571,6 +602,38 @@ public class PersistantCoverage implements Serializable {
      */   
     public int[] getBestMatchRevNum() {
         return this.bestMatchRevNumCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonFwdMult() {
+        return this.commonFwdMultCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonFwdNum() {
+        return this.commonFwdNumCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonRevMult() {
+        return this.commonRevMultCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonRevNum() {
+        return this.commonRevNumCov;
     }
     
     /**

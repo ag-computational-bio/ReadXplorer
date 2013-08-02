@@ -137,7 +137,7 @@ public class BioJavaParser implements ReferenceParserI {
                     refGenome.setDescription(refGenJob.getDescription());
                     refGenome.setName(refGenJob.getName());
                     refGenome.setTimestamp(refGenJob.getTimestamp());
-                    refGenome.setSequence(seq.seqString());
+                    refGenome.setSequence(seq.seqString().toUpperCase());
 
                     // iterate through all features
                     featIt = seq.getFeatureSet().iterator();

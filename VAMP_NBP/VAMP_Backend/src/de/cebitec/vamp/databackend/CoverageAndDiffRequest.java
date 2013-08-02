@@ -26,7 +26,8 @@ public class CoverageAndDiffRequest extends IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param desiredData Can be any byte value representing a filter flag for
-     * the results. Can be a byte value representing one of the two flags
+     * the results.
+     * @param whichTrackNeeded a byte value representing one of the two flags
      * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
      * double track request or ParameterSetMapping.NORMAL, if this is a ordinary
      * track request.
@@ -34,8 +35,8 @@ public class CoverageAndDiffRequest extends IntervalRequest {
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
-    public CoverageAndDiffRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData, ParametersReadClasses readClassParams) {
-        super(from, to, totalFrom, totalTo, sender, desiredData, readClassParams);
+    public CoverageAndDiffRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams) {
+        super(from, to, totalFrom, totalTo, sender, desiredData, whichTrackNeeded, readClassParams);
     }
     
     /**
@@ -53,13 +54,14 @@ public class CoverageAndDiffRequest extends IntervalRequest {
      * preloading larger data amounts for faster access.
      * @param sender the sending object, that wants to receive the result of the request
      * @param desiredData Can be any byte value representing a filter flag for
-     * the results. Can be a byte value representing one of the two flags
+     * the results.
+     * @param whichTrackNeeded a byte value representing one of the two flags
      * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
      * double track request or ParameterSetMapping.NORMAL, if this is a ordinary
-     * track request.
+     * track request. 
      */
-    public CoverageAndDiffRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData) {
-        super(from, to, totalFrom, totalTo, sender, desiredData);
+    public CoverageAndDiffRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData, byte whichTrackNeeded) {
+        super(from, to, totalFrom, totalTo, sender, desiredData, whichTrackNeeded);
     }
 
     /**
@@ -124,8 +126,8 @@ public class CoverageAndDiffRequest extends IntervalRequest {
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
-    public CoverageAndDiffRequest(int from, int to, ThreadListener sender, byte desiredData, ParametersReadClasses readClassParams) {
-        super(from, to, from, to, sender, desiredData, readClassParams);
+    public CoverageAndDiffRequest(int from, int to, ThreadListener sender, byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams) {
+        super(from, to, from, to, sender, desiredData, whichTrackNeeded, readClassParams);
     }
 
     /**
@@ -140,13 +142,14 @@ public class CoverageAndDiffRequest extends IntervalRequest {
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param desiredData Can be any byte value representing a filter flag for
-     * the results. Can be a byte value representing one of the two flags
+     * the results.
+     * @param whichTrackNeeded a byte value representing one of the two flags
      * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
      * double track request or ParameterSetMapping.NORMAL, if this is a ordinary
      * track request.
      */
-    public CoverageAndDiffRequest(int from, int to, ThreadListener sender, byte desiredData) {
-        super(from, to, from, to, sender, desiredData);
+    public CoverageAndDiffRequest(int from, int to, ThreadListener sender, byte desiredData, byte whichTrackNeeded) {
+        super(from, to, from, to, sender, desiredData, whichTrackNeeded);
     }
 
     /**
