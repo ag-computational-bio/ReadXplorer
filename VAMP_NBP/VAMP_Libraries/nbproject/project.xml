@@ -364,6 +364,7 @@
                 <package>org.apache.commons.discovery.tools</package>
                 <package>org.apache.commons.logging</package>
                 <package>org.apache.commons.logging.impl</package>
+                <package>org.apache.commons.math3.stat.correlation</package>
                 <package>org.biojava.bibliography</package>
                 <package>org.biojava.bio</package>
                 <package>org.biojava.bio.alignment</package>
@@ -667,6 +668,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-discovery-0.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/commons-math3-3.1.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/commons-math3-3.1.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-ext.jar</runtime-relative-path>
