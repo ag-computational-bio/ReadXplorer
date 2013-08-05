@@ -12,6 +12,8 @@ import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -61,7 +63,7 @@ import org.openide.windows.TopComponent;
     "CTL_DeSeqGraficsTopComponent=Create graphics",
     "HINT_DeSeqGraficsTopComponent=This is a DeSeqGrafics window"
 })
-public final class DeSeqGraficsTopComponent extends TopComponent implements Observer {
+public final class DeSeqGraficsTopComponent extends TopComponent implements Observer, ItemListener {
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
@@ -83,6 +85,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
         initComponents();
         setupGrafics();
+        iSymbol.setVisible(false);
     }
 
     /**
@@ -100,6 +103,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         saveButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         messages = new javax.swing.JTextArea();
+        iSymbol = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -107,6 +111,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqGraficsTopComponent.class, "DeSeqGraficsTopComponent.jLabel1.text")); // NOI18N
 
         plotType.setModel(cbm);
+        plotType.addItemListener(this);
 
         org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(DeSeqGraficsTopComponent.class, "DeSeqGraficsTopComponent.plotButton.text")); // NOI18N
         plotButton.addActionListener(new java.awt.event.ActionListener() {
@@ -134,6 +139,10 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         messages.setBorder(null);
         jScrollPane1.setViewportView(messages);
 
+        iSymbol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        iSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/vamp/differentialExpression/plot/i.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(DeSeqGraficsTopComponent.class, "DeSeqGraficsTopComponent.iSymbol.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,9 +153,10 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                     .addComponent(jLabel1)
                     .addComponent(plotType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                    .addComponent(iSymbol, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(plotButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(saveButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(saveButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                 .addContainerGap())
@@ -156,7 +166,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(plotType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -166,8 +176,9 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                         .addComponent(saveButton)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 307, Short.MAX_VALUE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 224, Short.MAX_VALUE)
+                        .addComponent(iSymbol))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -250,6 +261,7 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
         fc.openFileChooser(VampFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_saveButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel iSymbol;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -350,6 +362,16 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                 Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, ex.getMessage(), currentTimestamp);
             }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        DeSeqAnalysisHandler.Plot plotType = (DeSeqAnalysisHandler.Plot) e.getItem();
+        if (plotType == DeSeqAnalysisHandler.Plot.MAplot) {
+            iSymbol.setVisible(true);
+        } else {
+            iSymbol.setVisible(false);
         }
     }
 }
