@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JPopupMenu;
+import javax.swing.MenuElement;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
@@ -51,7 +53,7 @@ public class CreatePlots{
         final XYPlot subplot1 = new XYPlot(normal, domainAxis1, rangeAxis1, renderer1);
         JFreeChart chart = new JFreeChart(subplot1);
         chart.removeLegend();
-        ChartPanel panel = new ChartPanel(chart, true, true, true, true, true);
+        ChartPanel panel = new ChartPanel(chart, true, false, true, true, true);
         panel.setInitialDelay(0);
         panel.setMaximumDrawHeight(1080);
         panel.setMaximumDrawWidth(1920);
@@ -90,7 +92,7 @@ public class CreatePlots{
         negInf.addSeries(neg);
         JFreeChart chart = createCombinedChart(normal, posInf, negInf, xName, yName, toolTip);
         chart.removeLegend();
-        ChartPanel panel = new ChartPanel(chart, true, true, true, true, true);
+        ChartPanel panel = new ChartPanel(chart, true, false, true, true, true);
         panel.setInitialDelay(0);
         panel.setMaximumDrawHeight(1080);
         panel.setMaximumDrawWidth(1920);

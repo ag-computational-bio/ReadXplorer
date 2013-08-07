@@ -27,7 +27,7 @@ public class BaySeq {
      * from using insanely mutch cores on big machines in the CeBiTec Grid
      * infrastructure.
      */
-    private static final int MAX_PROCESSORS = 8;
+    private static final int MAX_PROCESSORS = 6;
 
     public BaySeq() {
     }

@@ -8,7 +8,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
 public final class ChooseVisualPanel extends JPanel {
-    
+
     private ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.usableTools());
 
     /**
@@ -16,15 +16,16 @@ public final class ChooseVisualPanel extends JPanel {
      */
     public ChooseVisualPanel() {
         initComponents();
-        if(!GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()){
+        if (!GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
             jriErrorText.setText("JRI native library can't be found in the PATH.\nPlease add it to the PATH and try again.\nOnly the SimpleTest can be used as long as no GNU R is installed.");
-        }
-        if(!GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()){
-            jriErrorText.setText("GNU R instance is already in use.\nOnly the SimpleTest can be used as long as an other GNU R based test is opened.");
+        } else {
+            if (!GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
+                jriErrorText.setText("GNU R instance is already in use.\nOnly the SimpleTest can be used as long as an other GNU R based test is opened.");
+            }
         }
     }
-    
-    public DeAnalysisHandler.Tool getSelectedTool(){
+
+    public DeAnalysisHandler.Tool getSelectedTool() {
         return (Tool) cbm.getSelectedItem();
     }
 
@@ -32,7 +33,6 @@ public final class ChooseVisualPanel extends JPanel {
     public String getName() {
         return "Choose analysis software";
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
