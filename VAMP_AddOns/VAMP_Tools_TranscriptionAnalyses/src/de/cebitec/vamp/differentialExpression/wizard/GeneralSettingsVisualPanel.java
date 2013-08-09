@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
-import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
