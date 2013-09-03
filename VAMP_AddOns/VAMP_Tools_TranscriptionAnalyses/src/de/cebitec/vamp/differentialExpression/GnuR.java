@@ -286,9 +286,9 @@ public class GnuR extends Rengine {
          * @return true if the needed libraries are included, else false.
          */
         public static boolean isGnuRSetUpCorrect() {
-            String user_dir = System.getProperty("netbeans.user");
-            File r_dir = new File(user_dir + File.separator + "R");
-            return r_dir.exists();
+            System.setProperty("jri.ignore.ule", "yes");
+            isGnuRInstanceFree();
+            return Rengine.jriLoaded;
         }
 
         /**
