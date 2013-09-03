@@ -19,6 +19,7 @@ import java.util.Vector;
 public class ConvertData {
 
     private static final int BAY_SEQ_OFFSET = 3;
+    private static final int CUT_OFF = 30;
 
     public static Map<PersistantFeature, Pair<Double, Double>> ratioABagainstConfidence(ResultDeAnalysis result) {
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
@@ -67,23 +68,26 @@ public class ConvertData {
             Pair<Double, Double> pair = input.get(key);
             Double R = (Double) pair.getFirst();
             Double G = (Double) pair.getSecond();
-            Double M = (Math.log(R) / Math.log(2)) - (Math.log(G) / Math.log(2));
-            Double A;
-            if (R == 0) {
-                A = (Math.log(G) / Math.log(2));
-            } else {
-                if (G == 0) {
-                    A = (Math.log(R) / Math.log(2));
+            if ((R > CUT_OFF) || (G > CUT_OFF)) {
+
+                Double M = (Math.log(R) / Math.log(2)) - (Math.log(G) / Math.log(2));
+                Double A;
+                if (R == 0) {
+                    A = (Math.log(G) / Math.log(2));
                 } else {
-                    A = ((Math.log(R) / Math.log(2)) + (Math.log(G) / Math.log(2))) / 2;
+                    if (G == 0) {
+                        A = (Math.log(R) / Math.log(2));
+                    } else {
+                        A = ((Math.log(R) / Math.log(2)) + (Math.log(G) / Math.log(2))) / 2;
+                    }
                 }
+                //Values have to be added in other order then one would think, because
+                //the A value is shown on the X-Axis and the M value on the Y-Axis. So at
+                //this point the values are in correct order for plotting, meaning that 
+                //the value corresponding to the X-Axis is the first and the one corresponding
+                //to the Y-Axis is the secound one.
+                ret.put(key, new Pair<>(A, M));
             }
-            //Values have to be added in other order then one would think, because
-            //the A value is shown on the X-Axis and the M value on the Y-Axis. So at
-            //this point the values are in correct order for plotting, meaning that 
-            //the value corresponding to the X-Axis is the first and the one corresponding
-            //to the Y-Axis is the secound one.
-            ret.put(key, new Pair<>(A, M));
         }
         return ret;
     }
@@ -98,7 +102,7 @@ public class ConvertData {
                 int index = sampleA[i] + BAY_SEQ_OFFSET;
                 X = X + (Double) row.get(index);
             }
-            X = X /sampleA.length;
+            X = X / sampleA.length;
             Double Y = 0d;
             for (int i = 0; i < sampleB.length; i++) {
                 int index = sampleB[i] + BAY_SEQ_OFFSET;

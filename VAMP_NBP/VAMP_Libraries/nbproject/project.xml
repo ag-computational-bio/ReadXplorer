@@ -538,12 +538,6 @@
                 <package>org.jfree.data.xml</package>
                 <package>org.jfree.data.xy</package>
                 <package>org.jfree.date</package>
-                <package>org.jfree.experimental.chart.demo</package>
-                <package>org.jfree.experimental.chart.plot</package>
-                <package>org.jfree.experimental.chart.renderer.xy</package>
-                <package>org.jfree.experimental.chart.swt</package>
-                <package>org.jfree.experimental.chart.swt.demo</package>
-                <package>org.jfree.experimental.chart.swt.editor</package>
                 <package>org.jfree.experimental.swt</package>
                 <package>org.jfree.io</package>
                 <package>org.jfree.layout</package>
@@ -606,20 +600,8 @@
                 <binary-origin>release/modules/ext/xalan-2.6.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jfreechart-1.0.14-swt.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jfreechart-1.0.14-swt.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/jcommon-1.0.17.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jcommon-1.0.17.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/jfreechart-1.0.14-experimental.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jfreechart-1.0.14-experimental.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
@@ -630,16 +612,16 @@
                 <binary-origin>release/modules/ext/batik-xml.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/jfreechart-1.0.15.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jfreechart-1.0.15.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/biojava-core-1.8.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jxl.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jxl.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/jfreechart-1.0.14.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jfreechart-1.0.14.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-logging-1.0.4.jar</runtime-relative-path>
@@ -678,12 +660,12 @@
                 <binary-origin>release/modules/ext/batik-ext.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/swtgraphics2d.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/swtgraphics2d.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/js.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/js.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/swtgraphics2d.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/swtgraphics2d.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-extension.jar</runtime-relative-path>
@@ -706,12 +688,12 @@
                 <binary-origin>release/modules/ext/batik-anim.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/xerces_2_5_0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/xerces_2_5_0.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/batik-css.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-css.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xerces_2_5_0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xerces_2_5_0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
@@ -758,20 +740,20 @@
                 <binary-origin>release/modules/ext/h2-1.3.170.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/gnujaxp.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/gnujaxp.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/bytecode.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/bytecode.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
+                <runtime-relative-path>ext/gnujaxp.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/gnujaxp.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/junit-4.10.jar</runtime-relative-path>
@@ -780,6 +762,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/batik-awt-util.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-awt-util.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jcommon-1.0.18.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jcommon-1.0.18.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-svg-dom.jar</runtime-relative-path>

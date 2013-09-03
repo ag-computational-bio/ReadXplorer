@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JPopupMenu;
-import javax.swing.MenuElement;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
@@ -32,7 +30,7 @@ import org.jfree.ui.TextAnchor;
  *
  * @author kstaderm
  */
-public class CreatePlots{
+public class CreatePlots {
 
     public synchronized static ChartPanel createPlot(Map<PersistantFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
         XYSeriesCollection normal = new XYSeriesCollection();
@@ -59,6 +57,10 @@ public class CreatePlots{
         panel.setMaximumDrawWidth(1920);
         panel.setMouseWheelEnabled(true);
         panel.setMouseZoomable(true);
+        MouseActions mouseAction = new MouseActions();
+        panel.addChartMouseListener(mouseAction);
+        ChartPanelOverlay overlay = new ChartPanelOverlay(mouseAction);
+        panel.addOverlay(overlay);
         return panel;
     }
 
@@ -98,18 +100,24 @@ public class CreatePlots{
         panel.setMaximumDrawWidth(1920);
         panel.setMouseWheelEnabled(true);
         panel.setMouseZoomable(true);
+        MouseActions mouseAction = new MouseActions();
+        panel.addChartMouseListener(mouseAction);
+        ChartPanelOverlay overlay = new ChartPanelOverlay(mouseAction);
+        panel.addOverlay(overlay);
         return panel;
     }
 
     private synchronized static JFreeChart createCombinedChart(XYSeriesCollection normal,
             XYSeriesCollection posInf, XYSeriesCollection negInf, String xName, String yName, XYToolTipGenerator toolTip) {
 
+        final NumberAxis domainAxis = new NumberAxis(xName);
+        
         // create subplot 1...
         final XYDataset data1 = normal;
         final XYItemRenderer renderer1 = new XYShapeRenderer();
         renderer1.setBaseToolTipGenerator(toolTip);
         final NumberAxis rangeAxis1 = new NumberAxis(yName);
-        final XYPlot subplot1 = new XYPlot(data1, null, rangeAxis1, renderer1);
+        final XYPlot subplot1 = new XYPlot(data1, domainAxis, rangeAxis1, renderer1);
         subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
 
         // create subplot 2...
@@ -126,8 +134,8 @@ public class CreatePlots{
             }
         };
         rangeAxis2.setAutoRangeIncludesZero(false);
-        final XYPlot subplot2 = new XYPlot(data2, null, rangeAxis2, renderer2);
-        subplot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
+        final XYPlot subplot2 = new XYPlot(data2, domainAxis, rangeAxis2, renderer2);
+        subplot2.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
 
         // create subplot 3...
         final XYDataset data3 = posInf;
@@ -143,11 +151,11 @@ public class CreatePlots{
             }
         };
         rangeAxis3.setAutoRangeIncludesZero(false);
-        final XYPlot subplot3 = new XYPlot(data3, null, rangeAxis3, renderer3);
-        subplot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
-
+        final XYPlot subplot3 = new XYPlot(data3, domainAxis, rangeAxis3, renderer3);
+        subplot2.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        
         // parent plot...
-        final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new NumberAxis(xName));
+        final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(domainAxis);
         plot.setGap(0);
 
         // add the subplots...

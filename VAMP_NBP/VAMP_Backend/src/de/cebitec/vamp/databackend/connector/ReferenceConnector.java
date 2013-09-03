@@ -264,12 +264,13 @@ public class ReferenceConnector {
     }
 
     public boolean hasFeatures(List<FeatureType> typeList) {
-        boolean ret = false;
         for (Iterator<FeatureType> it = typeList.iterator(); it.hasNext();) {
             FeatureType featureType = it.next();
-            ret = (ret || hasFeatures(featureType));
+            if(hasFeatures(featureType)){
+                return true;
+            }
         }
-        return ret;
+        return false;
     }
 
     public boolean hasFeatures(FeatureType type) {

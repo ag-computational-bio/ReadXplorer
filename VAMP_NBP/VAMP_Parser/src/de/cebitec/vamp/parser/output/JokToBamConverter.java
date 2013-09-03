@@ -121,6 +121,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                     int stop;
                     String cigar;
                     SAMRecord samRecord;
+                    int counter = 0;
+                    int emtpy = 0;
                     while ((line = br.readLine()) != null) {
                         lineno++;
 
@@ -158,6 +160,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                             
                             // report empty mappings saruman should not be producing anymore
                             if (!ParserCommonMethods.checkReadJok(this, readSeq, readName, refSeq, refSeqLength, start, stop, direction, fileName, lineno)) {
+                                emtpy++;
                                 continue; //continue, and ignore read, if it contains inconsistent information
                             }
 
@@ -205,6 +208,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                         if (++noReads % 1000000 == 0) {
                             this.notifyObservers(noReads + " reads converted...");
                         }
+                        counter++;
                     }
                     bamFileWriter.close();
                 }

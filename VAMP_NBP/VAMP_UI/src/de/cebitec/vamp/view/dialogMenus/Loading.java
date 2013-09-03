@@ -50,7 +50,7 @@ public class Loading extends javax.swing.JPanel implements Observer {
         int y = ((mainFrame.getHeight() - 250) / 2) + mainFrame.getY();
         dia.setLocation(x, y);
         dia.setUndecorated(true);
-        dia.setAlwaysOnTop(true);
+        dia.requestFocus();
         dia.getRootPane().setOpaque(false);
         dia.getContentPane().setBackground(new java.awt.Color(0, 0, 0, 0));
         dia.setBackground(new java.awt.Color(0, 0, 0, 0));

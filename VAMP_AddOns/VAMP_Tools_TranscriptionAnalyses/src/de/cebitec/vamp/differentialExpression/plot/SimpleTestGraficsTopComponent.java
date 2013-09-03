@@ -68,7 +68,6 @@ public final class SimpleTestGraficsTopComponent extends TopComponent implements
     private DeAnalysisHandler analysisHandler;
     private List<ResultDeAnalysis> results;
     private DeAnalysisHandler.Tool usedTool;
-    private MouseActions mouseAction = new MouseActions();
     private ChartPanel chartPanel;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ProgressHandle svgExportProgressHandle;
@@ -79,7 +78,6 @@ public final class SimpleTestGraficsTopComponent extends TopComponent implements
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
         ChartPanel panel = CreatePlots.createInfPlot(createSamplePoints(500), "X", "Y", new ToolTip());
-        panel.addChartMouseListener(mouseAction);
         plotPanel.add(panel);
         plotPanel.updateUI();
 
@@ -241,19 +239,16 @@ public final class SimpleTestGraficsTopComponent extends TopComponent implements
         switch (type) {
             case MA_Plot:
                 chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A", "M", new ToolTip());
-                chartPanel.addChartMouseListener(mouseAction);
                 plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;
             case RatioAB_Confidence:
                 chartPanel = CreatePlots.createPlot(ConvertData.ratioABagainstConfidence(result), "ratioAB", "Confidence", new ToolTip());
-                chartPanel.addChartMouseListener(mouseAction);
                 plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;
             case RatioBA_Confidence:
                 chartPanel = CreatePlots.createPlot(ConvertData.ratioBAagainstConfidence(result), "ratioBA", "Confidence", new ToolTip());
-                chartPanel.addChartMouseListener(mouseAction);
                 plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;

@@ -1,11 +1,11 @@
-package de.cebitec.vamp.differentialExpression.plot;
+package de.cebitec.vamp.plotting;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import de.cebitec.vamp.plotting.PlotDataItem;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import java.awt.Point;
 import java.util.Collection;
 import java.util.Iterator;
 import org.jfree.chart.ChartMouseEvent;
@@ -18,13 +18,19 @@ import org.jfree.data.xy.XYSeriesCollection;
  * @author kstaderm
  */
 public class MouseActions implements ChartMouseListener {
-    
+
     private ReferenceFeatureTopComp refComp;
-    
+    private PlotDataItem selectedItem;
+    private Point selectedPoint;
+
     public MouseActions() {
         refComp = ReferenceFeatureTopComp.findInstance();
     }
-    
+
+    MouseActions(ChartPanelOverlay overlay) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     @Override
     public void chartMouseClicked(ChartMouseEvent cme) {
         if (cme.getEntity() instanceof XYItemEntity) {
@@ -34,13 +40,15 @@ public class MouseActions implements ChartMouseListener {
             int seriesIndex = xyitem.getSeriesIndex();
             PlotDataItem clickedItem = (PlotDataItem) dataset.getSeries(seriesIndex).getDataItem(itemIndex);
             showPosition(clickedItem.getFeature());
+            selectedItem = clickedItem;
+            selectedPoint = cme.getTrigger().getPoint();
         }
     }
-    
+
     @Override
     public void chartMouseMoved(ChartMouseEvent cme) {
     }
-    
+
     private void showPosition(PersistantFeature feature) {
         if (feature != null) {
             int pos = feature.getStart();
@@ -55,5 +63,13 @@ public class MouseActions implements ChartMouseListener {
             }
             refComp.showFeatureDetails(feature);
         }
+    }
+
+    public PlotDataItem getSelectedItem() {
+        return selectedItem;
+    }
+
+    public Point getSelectedPoint() {
+        return selectedPoint;
     }
 }

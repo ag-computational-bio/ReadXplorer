@@ -281,21 +281,24 @@ public class GnuR extends Rengine {
         }
 
         /**
-         * Checks if all the libraries needed to use GNU R are included in the java.library.path.
+         * Checks if R is installed.
+         *
          * @return true if the needed libraries are included, else false.
          */
         public static boolean isGnuRSetUpCorrect() {
-            String libraryPath = System.getProperty("java.library.path");
-            return libraryPath.contains("jri");
+            String user_dir = System.getProperty("netbeans.user");
+            File r_dir = new File(user_dir + File.separator + "R");
+            return r_dir.exists();
         }
 
         /**
-         * Checks if the GNU R instance is available.
-         * This is just an informal check that will not reserve the instance if it
-         * is available. You have to call reserveGnuRinstance() later if you want to do so. Note
-         * that it might be possible that even if you call reserveGnuRinstance() directly 
-         * after calling this method the GNU R instance is reserved in between by
-         * another thread.
+         * Checks if the GNU R instance is available. This is just an informal
+         * check that will not reserve the instance if it is available. You have
+         * to call reserveGnuRinstance() later if you want to do so. Note that
+         * it might be possible that even if you call reserveGnuRinstance()
+         * directly after calling this method the GNU R instance is reserved in
+         * between by another thread.
+         *
          * @return true if the GNU R instance is available, else false.
          */
         public static boolean isGnuRInstanceFree() {

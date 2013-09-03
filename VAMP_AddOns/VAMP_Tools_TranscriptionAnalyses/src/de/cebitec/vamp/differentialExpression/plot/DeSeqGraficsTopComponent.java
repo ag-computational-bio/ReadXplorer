@@ -72,7 +72,6 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
     private boolean SVGCanvasActive;
-    private MouseActions mouseAction = new MouseActions();
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ProgressHandle svgExportProgressHandle;
 
@@ -193,7 +192,6 @@ public final class DeSeqGraficsTopComponent extends TopComponent implements Obse
                 progressHandle.start();
                 progressHandle.switchToIndeterminate();
                 chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A", "M", new ToolTip());
-                chartPanel.addChartMouseListener(mouseAction);
                 if (SVGCanvasActive) {
                     jPanel1.remove(svgCanvas);
                     SVGCanvasActive = false;

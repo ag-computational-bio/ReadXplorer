@@ -79,7 +79,6 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
     private List<Group> groups;
     private ChartPanel chartPanel;
     private boolean SVGCanvasActive;
-    private MouseActions mouseAction = new MouseActions();
     private ProgressHandle svgExportProgressHandle;
 
     public BaySeqGraficsTopComponent() {
@@ -345,7 +344,6 @@ public final class BaySeqGraficsTopComponent extends TopComponent implements Obs
                 chartPanel = CreatePlots.createInfPlot(
                         ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray(new Integer[sampleA.size()]),
                         sampleB.toArray(new Integer[sampleB.size()])), "A", "M", new ToolTip());
-                chartPanel.addChartMouseListener(mouseAction);
                 if (SVGCanvasActive) {
                     jPanel1.remove(svgCanvas);
                     SVGCanvasActive = false;
