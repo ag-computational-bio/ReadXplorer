@@ -28,7 +28,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 final class GnuRPanel extends javax.swing.JPanel implements Observer {
-
+    
     private final GnuROptionsPanelController controller;
     private Preferences pref;
     private Downloader downloader;
@@ -379,7 +379,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             + "consider it more useful to permit linking proprietary applications with the\n"
             + "library.  If this is what you want to do, use the GNU Library General\n"
             + "Public License instead of this License.";
-
+    
     GnuRPanel(GnuROptionsPanelController controller) {
         this.controller = controller;
         initComponents();
@@ -387,25 +387,30 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
         jProgressBar1.setMaximum(100);
         setUpListener();
         String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-        if (os.contains("windows") && !r_dir.exists()) {
-            installButton.setEnabled(true);
-            jProgressBar1.setEnabled(true);
+        if (os.contains("windows")) {
+            if (!r_dir.exists()) {
+                installButton.setEnabled(true);
+                jProgressBar1.setEnabled(true);
+                messages.setText("");
+            } else {
+                messages.setText("GNU R is already installed.");
+            }
         } else {
             messages.setText("Auto installation is only supported under Windows 7 & 8.");
         }
     }
-
+    
     private void setUpListener() {
         cranMirror.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
                 controller.changed();
             }
-
+            
             @Override
             public void keyPressed(KeyEvent e) {
             }
-
+            
             @Override
             public void keyReleased(KeyEvent e) {
             }
@@ -486,8 +491,8 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -516,15 +521,15 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             }
         }
     }//GEN-LAST:event_installButtonActionPerformed
-
+    
     void load() {
         cranMirror.setText(pref.get(Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/"));
     }
-
+    
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
     }
-
+    
     boolean valid() {
         return true;
     }
@@ -549,18 +554,18 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
         Thread th = new Thread(unzip);
         th.start();
     }
-
+    
     private void setPath() {
         String bit = System.getProperty("sun.arch.data.model");
         String r_dll = "";
-
+        
         if (bit.equals("32")) {
             r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "i386";
         }
         if (bit.equals("64")) {
             r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "x64";
         }
-
+        
         try (InputStream jarPath = GnuRPanel.class.getResourceAsStream("/de/cebitec/vamp/options/setPath.ps1")) {
             File to = File.createTempFile("ReadXplorer_", ".ps1");
             to.deleteOnExit();
@@ -576,7 +581,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             Exceptions.printStackTrace(ex);
         }
     }
-
+    
     @Override
     public void update(Object args) {
         if (args instanceof Downloader.Status) {
@@ -616,7 +621,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                     break;
             }
         }
-
+        
         if (args instanceof Unzip.Status) {
             Unzip.Status status = (Unzip.Status) args;
             switch (status) {
@@ -646,6 +651,6 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                     break;
             }
         }
-
+        
     }
 }
