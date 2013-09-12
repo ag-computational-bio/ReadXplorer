@@ -4,12 +4,15 @@ import de.cebitec.vamp.util.Downloader;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.Unzip;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
@@ -28,7 +31,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 final class GnuRPanel extends javax.swing.JPanel implements Observer {
-    
+
     private final GnuROptionsPanelController controller;
     private Preferences pref;
     private Downloader downloader;
@@ -36,6 +39,9 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
     private File zipFile;
     private String user_dir = System.getProperty("netbeans.user");
     private File r_dir = new File(user_dir + File.separator + "R");
+    private static final String SOURCE_URI = "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/R.tar.gz";
+    private static final String R_ZIP = "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/R.zip";
+    private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/";
     private String license = "		    GNU GENERAL PUBLIC LICENSE\n"
             + "		       Version 2, June 1991\n"
             + "\n"
@@ -379,10 +385,11 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             + "consider it more useful to permit linking proprietary applications with the\n"
             + "library.  If this is what you want to do, use the GNU Library General\n"
             + "Public License instead of this License.";
-    
+
     GnuRPanel(GnuROptionsPanelController controller) {
         this.controller = controller;
         initComponents();
+        sourceFileTextField.setText(SOURCE_URI);
         this.pref = NbPreferences.forModule(Object.class);
         jProgressBar1.setMaximum(100);
         setUpListener();
@@ -399,18 +406,18 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             messages.setText("Auto installation is only supported under Windows 7 & 8.");
         }
     }
-    
+
     private void setUpListener() {
         cranMirror.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
                 controller.changed();
             }
-            
+
             @Override
             public void keyPressed(KeyEvent e) {
             }
-            
+
             @Override
             public void keyReleased(KeyEvent e) {
             }
@@ -431,7 +438,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
         jProgressBar1 = new javax.swing.JProgressBar();
         messages = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        sourceFileTextField = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text")); // NOI18N
 
@@ -452,7 +459,14 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel2.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel3.text")); // NOI18N
+        sourceFileTextField.setEditable(false);
+        sourceFileTextField.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.sourceFileTextField.text")); // NOI18N
+        sourceFileTextField.setBorder(null);
+        sourceFileTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                sourceFileTextFieldMouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -462,18 +476,17 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(6, 6, 6))
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(63, 63, 63))
                     .addComponent(cranMirror)
+                    .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(installButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(sourceFileTextField))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -490,10 +503,10 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                 .addGap(11, 11, 11)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sourceFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
                 .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -510,7 +523,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                 try {
                     zipFile = File.createTempFile("ReadXplorer_GNU_R_bundle_", ".zip");
                     zipFile.deleteOnExit();
-                    downloader = new Downloader("http://wwwhomes.uni-bielefeld.de/kstadermann/R.zip", zipFile);
+                    downloader = new Downloader(R_ZIP, zipFile);
                     downloader.registerObserver(this);
                     Thread th = new Thread(downloader);
                     th.start();
@@ -521,15 +534,27 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             }
         }
     }//GEN-LAST:event_installButtonActionPerformed
-    
+
+    private void sourceFileTextFieldMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sourceFileTextFieldMouseReleased
+        if (Desktop.isDesktopSupported()) {
+            Desktop desk = Desktop.getDesktop();
+            try {
+                desk.browse(new URI(SOURCE_URI));
+            } catch (URISyntaxException | IOException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: Could not open URI to GNU R source file.", currentTimestamp);
+            }
+        }
+    }//GEN-LAST:event_sourceFileTextFieldMouseReleased
+
     void load() {
-        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/"));
+        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR));
     }
-    
+
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
     }
-    
+
     boolean valid() {
         return true;
     }
@@ -538,9 +563,9 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
     private javax.swing.JButton installButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JLabel messages;
+    private javax.swing.JTextField sourceFileTextField;
     // End of variables declaration//GEN-END:variables
 
     private void unzipGNUR() {
@@ -554,18 +579,18 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
         Thread th = new Thread(unzip);
         th.start();
     }
-    
+
     private void setPath() {
         String bit = System.getProperty("sun.arch.data.model");
         String r_dll = "";
-        
+
         if (bit.equals("32")) {
             r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "i386";
         }
         if (bit.equals("64")) {
             r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "x64";
         }
-        
+
         try (InputStream jarPath = GnuRPanel.class.getResourceAsStream("/de/cebitec/vamp/options/setPath.ps1")) {
             File to = File.createTempFile("ReadXplorer_", ".ps1");
             to.deleteOnExit();
@@ -581,7 +606,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             Exceptions.printStackTrace(ex);
         }
     }
-    
+
     @Override
     public void update(Object args) {
         if (args instanceof Downloader.Status) {
@@ -621,7 +646,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                     break;
             }
         }
-        
+
         if (args instanceof Unzip.Status) {
             Unzip.Status status = (Unzip.Status) args;
             switch (status) {
@@ -651,6 +676,6 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                     break;
             }
         }
-        
+
     }
 }
