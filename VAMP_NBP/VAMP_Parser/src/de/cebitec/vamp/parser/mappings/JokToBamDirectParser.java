@@ -37,21 +37,6 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
     }
 
     /**
-     * A jok parser, which first reads the jok file, converts it into a bam file
-     * sorted by mapping start position and then prepares the new bam file for
-     * import into the DB as direct access track.
-     * Use this constructor for parsing sequence pair data along with the 
-     * ordinary track data. The bam file has to be sorted by readname for this
-     * classification.
-     * @param seqPairProcessor the specific sequence pair processor for handling
-     *      sequence pair data
-     */
-    public JokToBamDirectParser(SeqPairProcessorI seqPairProcessor) {
-        this();
-        this.bamParser = new SamBamDirectParser(seqPairProcessor);
-    }
-
-    /**
      * Not implemented for this parser implementation, as currently no
      * preprocessing is needed.
      * @param trackJob the trackjob to preprocess
@@ -140,14 +125,6 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
     @Override
     public void update(Object args) {
         this.notifyObservers(args);
-    }
-
-    /**
-     * @return an empty sequence pair processor, since direct access tracks do not need it.
-     */
-    @Override
-    public SeqPairProcessorI getSeqPairProcessor() {
-        return this.bamParser.getSeqPairProcessor();
     }
 
     /**

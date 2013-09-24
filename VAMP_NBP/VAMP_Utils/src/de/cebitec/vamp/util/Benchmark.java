@@ -46,7 +46,7 @@ public class Benchmark {
 
         millis = (int) diff; //milliseconds
 
-        String benchmark = message + "It took ";
+        String benchmark = message;
         if (hours > 0) {
             benchmark = benchmark.concat(hours + " h ");
         }

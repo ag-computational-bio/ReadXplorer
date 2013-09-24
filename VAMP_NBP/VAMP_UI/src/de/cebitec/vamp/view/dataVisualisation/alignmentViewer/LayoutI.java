@@ -9,10 +9,19 @@ import java.util.Iterator;
  */
 public interface LayoutI {
 
+    /**
+     * @return An iterator for the forward layer.
+     */
     public Iterator<LayerI> getForwardIterator();
 
+    /**
+     * @return An iterator for the reverse layer.
+     */
     public Iterator<LayerI> getReverseIterator();
 
+    /**
+     * @return The genome gap manager for this layout.
+     */
     public GenomeGapManager getGenomeGapManager();
 
 }

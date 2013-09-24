@@ -33,13 +33,7 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
      * @throws OutOfMemoryError  
      */
     public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError;
-    
-    /**
-     * @return the sequence pair processor of this parser. It processes and
-     *      contains all necessary information for a sequence pair import.
-     */
-    public SeqPairProcessorI getSeqPairProcessor();
-    
+        
     /**
      * Sets the given stats container to this parser. Then this parser can
      * store statistics.

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -257,75 +258,81 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         try {
             @SuppressWarnings("unchecked")
             Pair<Integer, String> dataTypePair = (Pair<Integer, String>) dataTypeObject;
-            int trackId = dataTypePair.getFirst();
-            String dataType = dataTypePair.getSecond();
+            final int trackId = dataTypePair.getFirst();
+            final String dataType = dataTypePair.getSecond();
 
-            //get track name(s) for tab descriptions
-            String trackNames;
+            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                @Override
+                public void run() {
 
-            if (parametersTss.isPerformTSSAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
+                    //get track name(s) for tab descriptions
+                    String trackNames;
+                    
+                    if (parametersTss.isPerformTSSAnalysis() && dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
 
-                ++finishedCovAnalyses;
+                        ++finishedCovAnalyses;
 
-                //TODO: bp window of neighboring TSS parameter
+                        //TODO: bp window of neighboring TSS parameter
 
-                AnalysisTranscriptionStart analysisTSS = trackToAnalysisMap.get(trackId).getAnalysisTSS();
-                parametersTss = analysisTSS.getParametersTSS(); //if automatic is on, the parameters are different now
-                if (transcriptionStartResultPanel == null) {
-                    transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-                    transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
-                }
+                        AnalysisTranscriptionStart analysisTSS = trackToAnalysisMap.get(trackId).getAnalysisTSS();
+                        parametersTss = analysisTSS.getParametersTSS(); //if automatic is on, the parameters are different now
+                        if (transcriptionStartResultPanel == null) {
+                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
+                            transcriptionStartResultPanel.setReferenceViewer(refViewer);
+                        }
 
-                TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap);
-                tssResult.setParameters(parametersTss);
-                transcriptionStartResultPanel.addTSSs(tssResult);
+                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap);
+                        tssResult.setParameters(parametersTss);
+                        transcriptionStartResultPanel.addResult(tssResult);
 
-                if (finishedCovAnalyses >= tracks.size()) {
-                    trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-                    String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
-                    this.transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
-                }
-            }
-            if (dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
-                ++finishedMappingAnalyses;
-
-                if (parametersOperonDet.isPerformOperonAnalysis()) {
-
-                    if (operonResultPanel == null) {
-                        operonResultPanel = new ResultPanelOperonDetection(parametersOperonDet);
-                        operonResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
+                        if (finishedCovAnalyses >= tracks.size()) {
+                            trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
+                            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
+                            transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
+                        }
                     }
-                    OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
-                            trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
-                    operonDetectionResult.setParameters(parametersOperonDet);
-                    operonResultPanel.addDetectedOperons(operonDetectionResult);
+                    if (dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
+                        ++finishedMappingAnalyses;
 
-                    if (finishedMappingAnalyses >= tracks.size()) {
-                        trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
-                        String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
-                        this.transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
+                        if (parametersOperonDet.isPerformOperonAnalysis()) {
+
+                            if (operonResultPanel == null) {
+                                operonResultPanel = new ResultPanelOperonDetection(parametersOperonDet);
+                                operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+                            }
+                            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
+                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
+                            operonDetectionResult.setParameters(parametersOperonDet);
+                            operonResultPanel.addResult(operonDetectionResult);
+
+                            if (finishedMappingAnalyses >= tracks.size()) {
+                                trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
+                                String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
+                                transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
+                            }
+                        }
+
+                        if (parametersRPKM.isPerformRPKMAnalysis()) {
+                            AnalysisRPKM rpkmAnalysis = trackToAnalysisMap.get(trackId).getAnalysisRPKM();
+                            if (rpkmResultPanel == null) {
+                                rpkmResultPanel = new ResultPanelRPKM();
+                                rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+                            }
+                            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
+                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults());
+                            rpkmAnalysisResult.setParameters(parametersRPKM);
+                            rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
+                            rpkmResultPanel.addResult(rpkmAnalysisResult);
+
+                            if (finishedMappingAnalyses >= tracks.size()) {
+                                trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
+                                String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
+                                transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
+                            }
+                        }
                     }
                 }
-                
-                if (parametersRPKM.isPerformRPKMAnalysis()) {
-                    AnalysisRPKM rpkmAnalysis = trackToAnalysisMap.get(trackId).getAnalysisRPKM();
-                    if (rpkmResultPanel == null) {
-                        rpkmResultPanel = new ResultPanelRPKM();
-                        rpkmResultPanel.setBoundsInfoManager(this.refViewer.getBoundsInformationManager());
-                    }
-                    RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
-                            trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults());
-                    rpkmAnalysisResult.setParameters(parametersRPKM);
-                    rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
-                    rpkmResultPanel.addRPKMvalues(rpkmAnalysisResult);
-
-                    if (finishedMappingAnalyses >= tracks.size()) {
-                        trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
-                        String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
-                        this.transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
-                    }
-                }
-            }
+            });
         } catch (ClassCastException e) {
             //do nothing, we dont handle other data in this class
         }

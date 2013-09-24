@@ -5,12 +5,14 @@
  */
 package de.cebitec.vamp.transcriptionAnalyses;
 
+import de.cebitec.vamp.databackend.ResultTrackAnalysis;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.RPKMvalue;
-import de.cebitec.vamp.util.TableRightClickFilter;
 import de.cebitec.vamp.util.UneditableTableModel;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.analysis.ResultTablePanel;
+import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
@@ -27,14 +29,13 @@ import org.openide.util.Exceptions;
  * 
  * @author -Rolf Hilker-
  */
-public class ResultPanelRPKM extends javax.swing.JPanel {
+public class ResultPanelRPKM extends ResultTablePanel {
     
     private static final long serialVersionUID = 1L;
     
     public static final String RETURNED_FEATURES = "Total number of returned features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
 
-    private BoundsInfoManager bim;
     private RPKMAnalysisResult rpkmCalcResult;
     private HashMap<String, Integer> filterStatisticsMap;
     private ResultHistogramRPKM hist;
@@ -242,59 +243,61 @@ public class ResultPanelRPKM extends javax.swing.JPanel {
         feature = (PersistantFeature) this.rpkmTable.getModel().getValueAt(selectedModel, 0);
         int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
 
-        bim.navigatorBarUpdated(pos);
-    }
-
-    public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
-        this.bim = boundsInformationManager;
+        getBoundsInfoManager().navigatorBarUpdated(pos);
     }
 
     /**
-     * Adds a list of filtered features to this panel.
-     * @param rpkmCalcResultNew 
+     * Adds a list of features with read count and RPKM values to this panel.
+     * @param newResult the new result to add
      */
-    public void addRPKMvalues(RPKMAnalysisResult rpkmCalcResultNew) {
-        final int nbColumns = 8;
+    @Override
+    public void addResult(ResultTrackAnalysis newResult) {
 
-        if (this.rpkmCalcResult == null) {
-            this.rpkmCalcResult = rpkmCalcResultNew;
-            this.filterStatisticsMap.put(FEATURES_TOTAL, rpkmCalcResultNew.getNoGenomeFeatures());
-        } else {
-            this.rpkmCalcResult.getResults().addAll(rpkmCalcResultNew.getResults());
+        if (newResult instanceof RPKMAnalysisResult) {
+            RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
+            final int nbColumns = 8;
+
+            if (this.rpkmCalcResult == null) {
+                this.rpkmCalcResult = rpkmCalcResultNew;
+                this.filterStatisticsMap.put(FEATURES_TOTAL, rpkmCalcResultNew.getNoGenomeFeatures());
+            } else {
+                this.rpkmCalcResult.getResults().addAll(rpkmCalcResultNew.getResults());
+            }
+            DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();
+
+            PersistantFeature feat;
+            for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
+                feat = rpkm.getFeature();
+                Object[] rowData = new Object[nbColumns];
+                rowData[0] = feat;
+                rowData[1] = feat.getType();
+                rowData[2] = feat.isFwdStrandString();
+                rowData[3] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
+                rowData[4] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
+                rowData[5] = feat.getStop() - feat.getStart();
+                rowData[6] = rpkm.getRPKM();
+                rowData[7] = rpkm.getReadCount();
+
+                model.addRow(rowData);
+            }
+
+            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+            this.rpkmTable.setRowSorter(sorter);
+            sorter.setModel(model);
+
+            ParameterSetRPKM rpkmParams = (ParameterSetRPKM) rpkmCalcResult.getParameters();
+            this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class,
+                    "ResultPanelRPKM.parametersLabel.text", rpkmParams.getMinReadCount(), rpkmParams.getMaxReadCount()));
+
+            filterStatisticsMap.put(RETURNED_FEATURES, filterStatisticsMap.get(RETURNED_FEATURES) + rpkmCalcResultNew.getResults().size());
+            rpkmCalcResult.setStatsMap(filterStatisticsMap);
         }
-        DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();        
-
-        PersistantFeature feat;
-        for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
-            feat = rpkm.getFeature();
-            Object[] rowData = new Object[nbColumns];
-            rowData[0] = feat;
-            rowData[1] = feat.getType();
-            rowData[2] = feat.isFwdStrandString();
-            rowData[3] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
-            rowData[4] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
-            rowData[5] = feat.getStop() - feat.getStart();
-            rowData[6] = rpkm.getRPKM();
-            rowData[7] = rpkm.getReadCount();
-
-            model.addRow(rowData);
-        }
-
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-        this.rpkmTable.setRowSorter(sorter);
-        sorter.setModel(model);
-        
-        ParameterSetRPKM rpkmParams = (ParameterSetRPKM) rpkmCalcResult.getParameters();
-        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class,
-                "ResultPanelRPKM.parametersLabel.text", rpkmParams.getMinReadCount(), rpkmParams.getMaxReadCount()));
-        
-        filterStatisticsMap.put(RETURNED_FEATURES, filterStatisticsMap.get(RETURNED_FEATURES) + rpkmCalcResultNew.getResults().size());
-        rpkmCalcResult.setStatsMap(filterStatisticsMap);
     }
     
     /**
      * @return the number of features filtered during the associated analysis
      */
+    @Override
     public int getResultSize() {
         return this.rpkmCalcResult.getResults().size();
     }

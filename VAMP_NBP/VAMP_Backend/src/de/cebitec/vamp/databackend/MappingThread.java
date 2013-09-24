@@ -5,9 +5,11 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.databackend.dataObjects.ReadPairResultPersistant;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.File;
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  * This mapping thread should be used for analyses, but not for visualizing
@@ -41,6 +45,7 @@ public class MappingThread extends RequestThread {
     private Connection con;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private List<PersistantMapping> currentMappings;
+    private Collection<PersistantReadPairGroup> currentSeqPairs;
     private boolean isDbUsed;
     private final PersistantReference refGenome;
     private SamBamFileReader externalDataReader;
@@ -370,6 +375,31 @@ public class MappingThread extends RequestThread {
 
         return mappings;
     }
+    
+    /**
+     * Fetches all sequence pair mappings for the given interval and typeFlag.
+     *
+     * @param request The request for which the data shall be gathered
+     * @return the collection of sequence pair mappings for the given interval
+     * and typeFlag
+     */
+    public Collection<PersistantReadPairGroup> getSeqPairMappings(IntervalRequest request) {
+        HashMap<Long, PersistantReadPairGroup> seqPairs = new HashMap<>();
+        int from = request.getFrom();
+        int to = request.getTo();
+        if (from > 0 && to > 0 && from < to) {
+
+            if (this.isDbUsed) {
+                JOptionPane.showMessageDialog(new JPanel(), "Seq Pair Viewer not available anymore for DB-tracks. Please reimport the data sets!", 
+                        "Function not available!", JOptionPane.ERROR_MESSAGE);
+            } else {
+                return externalDataReader.getSeqPairMappingsFromBam(this.refGenome, request, true);
+            }
+        }
+
+
+        return seqPairs.values();
+    }
 
     @Override
     public void run() {
@@ -383,10 +413,17 @@ public class MappingThread extends RequestThread {
                         this.currentMappings = this.loadMappingsWithDiffs(request);
                     } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
                         this.currentMappings = this.loadMappingsWithoutDiffs(request);
+                    } else if (request.getDesiredData() == Properties.SEQ_PAIRS) {
+                        this.currentSeqPairs = this.getSeqPairMappings(request);
                     } else {
                         this.currentMappings = this.loadMappingsById(request);
                     }
-                    request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                    //switch between ordinary mappings and read pairs
+                    if (request.getDesiredData() != Properties.SEQ_PAIRS) {
+                        request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                    } else {
+                        request.getSender().receiveData(new ReadPairResultPersistant(currentSeqPairs, request.getFrom(), request.getTo()));
+                    }
                 }
 
             } else {

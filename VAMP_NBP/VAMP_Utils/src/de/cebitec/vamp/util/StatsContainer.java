@@ -53,7 +53,7 @@ public class StatsContainer {
         readLengthDistribution = new DiscreteCountingDistribution();
         seqPairSizeDistribution = new DiscreteCountingDistribution();
         readLengthDistribution.setType(Properties.READ_LENGTH_DISTRIBUTION);
-        seqPairSizeDistribution.setType(Properties.SEQ_PAIR_SIZE_DISTRIBUTION);
+        seqPairSizeDistribution.setType(Properties.READ_PAIR_SIZE_DISTRIBUTION);
     }
 
     /**
@@ -150,47 +150,47 @@ public class StatsContainer {
      * @param type the sequence pair type of the stats to increase
      * @param value the value to add to the corresponding stats
      */
-    public void incSeqPairStats(byte type, int value) {
+    public void incSeqPairStats(ReadPairType type, int value) {
         
-        if (type == Properties.TYPE_PERFECT_PAIR || type == Properties.TYPE_PERFECT_UNQ_PAIR) {
+        if (type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);
             this.increaseValue(NO_PERF_PAIRS, value);
-            if (type == Properties.TYPE_PERFECT_UNQ_PAIR) {
+            if (type == ReadPairType.PERFECT_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_PERF_PAIRS, value);
             }
-        } else if (type == Properties.TYPE_DIST_SMALL_PAIR || type == Properties.TYPE_DIST_SMALL_UNQ_PAIR) {
+        } else if (type == ReadPairType.DIST_SMALL_PAIR || type == ReadPairType.DIST_SMALL_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);
             this.increaseValue(NO_SMALL_DIST_PAIRS, value);
-            if (type == Properties.TYPE_DIST_SMALL_UNQ_PAIR) {
+            if (type == ReadPairType.DIST_SMALL_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_SMALL_PAIRS, value);
             }
-        } else if (type == Properties.TYPE_DIST_LARGE_PAIR || type == Properties.TYPE_DIST_LARGE_UNQ_PAIR) {
+        } else if (type == ReadPairType.DIST_LARGE_PAIR || type == ReadPairType.DIST_LARGE_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);
             this.increaseValue(NO_LARGE_DIST_PAIRS, value);
-            if (type == Properties.TYPE_DIST_LARGE_UNQ_PAIR) {
+            if (type == ReadPairType.DIST_LARGE_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_LARGE_PAIRS, value);
             }
-        } else if (type == Properties.TYPE_ORIENT_WRONG_PAIR || type == Properties.TYPE_ORIENT_WRONG_UNQ_PAIR) {
+        } else if (type == ReadPairType.ORIENT_WRONG_PAIR || type == ReadPairType.ORIENT_WRONG_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);
             this.increaseValue(NO_ORIENT_WRONG_PAIRS, value);
-            if (type == Properties.TYPE_ORIENT_WRONG_UNQ_PAIR) {
+            if (type == ReadPairType.ORIENT_WRONG_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_ORIENT_WRONG_PAIRS, value);
             }
-        } else if (type == Properties.TYPE_OR_DIST_SMALL_PAIR || type == Properties.TYPE_OR_DIST_SMALL_UNQ_PAIR) {
+        } else if (type == ReadPairType.OR_DIST_SMALL_PAIR || type == ReadPairType.OR_DIST_SMALL_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);
             this.increaseValue(NO_SMALL_ORIENT_WRONG_PAIRS, value);
-            if (type == Properties.TYPE_OR_DIST_SMALL_PAIR) {
+            if (type == ReadPairType.OR_DIST_SMALL_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, value);
             }
-        } else if (type == Properties.TYPE_OR_DIST_LARGE_PAIR || type == Properties.TYPE_OR_DIST_LARGE_UNQ_PAIR) {
+        } else if (type == ReadPairType.OR_DIST_LARGE_PAIR || type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);
             this.increaseValue(NO_LARGE_ORIENT_WRONG_PAIRS, value);
-            if (type == Properties.TYPE_OR_DIST_LARGE_UNQ_PAIR) {
+            if (type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, value);
             }

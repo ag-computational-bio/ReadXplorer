@@ -11,10 +11,14 @@ public final class SequenceUtils {
     public static final byte STRAND_FWD = 1;
     /** Indicates that something is located on the reverse strand (-1). */
     public static final byte STRAND_REV = -1;
+    /** Indicates that something uses both strands (0).*/
+    public static final byte STRAND_BOTH = 0;
     /** Indicates that something is located on the forward strand (Fwd). */
     public static final String STRAND_FWD_STRING = "Fwd";
     /** Indicates that something is located on the reverse strand (Rev). */
     public static final String STRAND_REV_STRING = "Rev";
+    /** Indicates that something uses both strands (Both).*/
+    public static final String STRAND_BOTH_STRING = "Both";
     
     /** String for tagging positions or anything else as not having a gene with "No gene".*/
     public static final String NO_GENE = "No gene";

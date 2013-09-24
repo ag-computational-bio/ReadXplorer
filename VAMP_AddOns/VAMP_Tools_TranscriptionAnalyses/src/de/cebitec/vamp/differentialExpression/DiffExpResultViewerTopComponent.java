@@ -1,6 +1,5 @@
 package de.cebitec.vamp.differentialExpression;
 
-import de.cebitec.vamp.differentialExpression.plot.DeSeqGraficsTopComponent;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
@@ -8,21 +7,21 @@ import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
-import de.cebitec.vamp.differentialExpression.plot.BaySeqGraficsTopComponent;
-import de.cebitec.vamp.differentialExpression.plot.SimpleTestGraficsTopComponent;
+import de.cebitec.vamp.differentialExpression.plot.BaySeqGraphicsTopComponent;
+import de.cebitec.vamp.differentialExpression.plot.DeSeqGraphicsTopComponent;
+import de.cebitec.vamp.differentialExpression.plot.SimpleTestGraphicsTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.GenerateRowSorter;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.TableRightClickFilter;
 import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -62,7 +61,7 @@ import org.openide.windows.TopComponent;
         preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
-    "CTL_DiffExpResultViewerTopComponent=Differential gene expression analysis - results",
+    "CTL_DiffExpResultViewerTopComponent=Differential Gene Expression Analysis - results",
     "HINT_DiffExpResultViewerTopComponent=This is a Differential Gene Expression Result Window"
 })
 public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
@@ -71,8 +70,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
     private ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
-    private TopComponent GraficsTopComponent;
-    private SimpleTestGraficsTopComponent ptc;
+    private TopComponent graphicsTopComponent;
+    private SimpleTestGraphicsTopComponent ptc;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
@@ -157,40 +156,46 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         return feature;
     }
 
+    /**
+     * Adds the results of a finished diff. gene expr. analysis to the table of 
+     * this top component.
+     */
     private void addResults() {
-        List<ResultDeAnalysis> results = analysisHandler.getResults();
-        List<String> descriptions = new ArrayList<>();
-        for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
-            ResultDeAnalysis currentResult = it.next();
-            Vector colNames = new Vector(currentResult.getColnames());
-            Vector<Vector> tableContents;
-            colNames.remove(0);
-            colNames.add(0, "Feature");
-            tableContents = currentResult.getTableContents();
+        if (analysisHandler.getResults() != null) {
+            List<ResultDeAnalysis> results = analysisHandler.getResults();
+            List<String> descriptions = new ArrayList<>();
+            for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
+                ResultDeAnalysis currentResult = it.next();
+                Vector colNames = new Vector(currentResult.getColnames());
+                Vector<Vector> tableContents;
+                colNames.remove(0);
+                colNames.add(0, "Feature");
+                tableContents = currentResult.getTableContents();
 
-            DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
-            descriptions.add(currentResult.getDescription());
-            tableModels.add(tmpTableModel);
+                DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
+                descriptions.add(currentResult.getDescription());
+                tableModels.add(tmpTableModel);
+            }
+
+            resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
+            DefaultTableModel dtm = tableModels.get(0);
+            topCountsTable.setModel(dtm);
+            TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter(dtm);
+            topCountsTable.setRowSorter(trs);
+            if (usedTool == SimpleTest) {
+                List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
+                trs.setSortKeys(sortKeys);
+                trs.sort();
+            }
+
+            createGraphicsButton.setEnabled(true);
+            saveTableButton.setEnabled(true);
+            showLogButton.setEnabled(true);
+            resultComboBox.setEnabled(true);
+            topCountsTable.setEnabled(true);
+            jLabel1.setEnabled(true);
         }
-
-        resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
-        DefaultTableModel dtm = tableModels.get(0);
-        topCountsTable.setModel(dtm);
-        TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter(dtm);
-        topCountsTable.setRowSorter(trs);
-        if (usedTool == SimpleTest) {
-            List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
-            trs.setSortKeys(sortKeys);
-            trs.sort();
-        }
-
-        createGraphicsButton.setEnabled(true);
-        saveTableButton.setEnabled(true);
-        showLogButton.setEnabled(true);
-        resultComboBox.setEnabled(true);
-        topCountsTable.setEnabled(true);
-        jLabel1.setEnabled(true);
     }
 
     /**
@@ -285,20 +290,20 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private void createGraphicsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraphicsButtonActionPerformed
         switch (usedTool) {
             case DeSeq:
-                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
+                graphicsTopComponent = new DeSeqGraphicsTopComponent(analysisHandler,
                         ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq());
-                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+                analysisHandler.registerObserver((DeSeqGraphicsTopComponent) graphicsTopComponent);
+                graphicsTopComponent.open();
+                graphicsTopComponent.requestActive();
                 break;
             case BaySeq:
-                GraficsTopComponent = new BaySeqGraficsTopComponent(analysisHandler);
-                analysisHandler.registerObserver((BaySeqGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+                graphicsTopComponent = new BaySeqGraphicsTopComponent(analysisHandler);
+                analysisHandler.registerObserver((BaySeqGraphicsTopComponent) graphicsTopComponent);
+                graphicsTopComponent.open();
+                graphicsTopComponent.requestActive();
                 break;
             case SimpleTest:
-                ptc = new SimpleTestGraficsTopComponent(analysisHandler, usedTool);
+                ptc = new SimpleTestGraphicsTopComponent(analysisHandler, usedTool);
                 analysisHandler.registerObserver(ptc);
                 ptc.open();
                 ptc.requestActive();
@@ -351,37 +356,28 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     @Override
     public void update(Object args) {
-        try {
             final AnalysisStatus status = (AnalysisStatus) args;
             final DiffExpResultViewerTopComponent cmp = this;
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    switch (status) {
-                        case RUNNING:
-                            progressHandle.start();
-                            progressHandle.switchToIndeterminate();
-                            break;
-                        case FINISHED:
-                            addResults();
-                            progressHandle.switchToDeterminate(100);
-                            progressHandle.finish();
-                            break;
-                        case ERROR:
-                            progressHandle.switchToDeterminate(0);
-                            progressHandle.finish();
-                            LogTopComponent = new DiffExpLogTopComponent();
-                            LogTopComponent.open();
-                            LogTopComponent.requestActive();
-                            cmp.close();
-                            break;
-                    }
-                }
-            });
-        } catch (InterruptedException | InvocationTargetException ex) {
-            //Exception will occure when the TopComponent Window is closed but
-            //this is not a problem.
-        }
+            
+            switch (status) {
+                case RUNNING:
+                    progressHandle.start();
+                    progressHandle.switchToIndeterminate();
+                    break;
+                case FINISHED:
+                    addResults();
+                    progressHandle.switchToDeterminate(100);
+                    progressHandle.finish();
+                    break;
+                case ERROR:
+                    progressHandle.switchToDeterminate(0);
+                    progressHandle.finish();
+                    LogTopComponent = new DiffExpLogTopComponent();
+                    LogTopComponent.open();
+                    LogTopComponent.requestActive();
+                    cmp.close();
+                    break;
+            }
     }
 
     @Override

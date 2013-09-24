@@ -35,7 +35,6 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM/BAM Read Mappings";
     
-    private SeqPairProcessorI seqPairProcessor;
     private List<Observer> observers;
     private StatsContainer statsContainer;
 
@@ -44,22 +43,8 @@ public class SamBamDirectParser implements MappingParserI, Observer {
      */
     public SamBamDirectParser() {
         this.observers = new ArrayList<>();
-        this.seqPairProcessor = new SeqPairProcessorDummy();
         this.statsContainer = new StatsContainer();
         this.statsContainer.prepareForTrack();
-    }
-    
-    /**
-     * Parser for parsing sam and bam data files for direct access in vamp. 
-     * Use this constructor for parsing sequence pair data along with the 
-     * ordinary track data. The sam/bam file has to be sorted by readname for this
-     * classification.
-     * @param seqPairProcessor the specific sequence pair processor for handling
-     *      sequence pair data
-     */
-    public SamBamDirectParser(SeqPairProcessorI seqPairProcessor) {
-        this();
-        this.seqPairProcessor = seqPairProcessor;
     }
 
     @Override
@@ -247,14 +232,6 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     @Override
     public void update(Object args) {
         this.notifyObservers(args);
-    }
-
-    /**
-     * @return an empty sequence pair processor, since direct access tracks do not need it.
-     */
-    @Override
-    public SeqPairProcessorI getSeqPairProcessor() {
-        return this.seqPairProcessor;
     }
     
     /**

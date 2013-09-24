@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.ReadPairType;
 
 /**
  *
@@ -871,7 +872,7 @@ public class SQLStatements {
             + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
             + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
             + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
-            + FieldNames.SEQ_PAIR_TYPE + " = " + Properties.TYPE_PERFECT_PAIR + " AND "
+            + FieldNames.SEQ_PAIR_TYPE + " = " + ReadPairType.PERFECT_PAIR.getTypeString() + " AND "
             + FieldNames.SEQ_PAIR_MAPPING1_ID + " = " + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID
             + " ) LEFT OUTER JOIN "
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES
@@ -917,7 +918,7 @@ public class SQLStatements {
             + FieldNames.MAPPING_START + "  BETWEEN ? AND ? AND "
             + FieldNames.MAPPING_STOP + " BETWEEN ? AND ? AND "
             + " ( " + FieldNames.MAPPING_TRACK + " = ? OR " + FieldNames.MAPPING_TRACK + " = ?) AND "
-            + FieldNames.SEQ_PAIR_TYPE + " = " + Properties.TYPE_PERFECT_PAIR + " AND "
+            + FieldNames.SEQ_PAIR_TYPE + " = " + ReadPairType.PERFECT_PAIR.getTypeString() + " AND "
             + FieldNames.SEQ_PAIR_MAPPING2_ID + " = " + FieldNames.TABLE_MAPPING + "." + FieldNames.MAPPING_ID
             + " ) LEFT OUTER JOIN "
             + FieldNames.TABLE_SEQ_PAIR_REPLICATES

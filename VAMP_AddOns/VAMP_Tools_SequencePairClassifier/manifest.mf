@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module-Install: de/cebitec/vamp/seqPairClassifier/Installer.class
-OpenIDE-Module: de.cebitec.vamp.seqPairClassifier
-OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/seqPairClassifier/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-

@@ -23,34 +23,6 @@ public class Properties {
     public static final String VAMP_FILECHOOSER_DIRECTORY = "VampFileChooser.Directory";
     public static final String VAMP_DATABASE_DIRECTORY = "Vamp.Database.Directory";
     
-    // Sequence pair properties
-    /** 0 = perfect sequence pair (distance and orientation correct). */
-    public static final byte TYPE_PERFECT_PAIR = 0;
-    /** 1 = distance too large sequence pair. */
-    public static final byte TYPE_DIST_LARGE_PAIR = 1;
-    /** 2 = distance too small sequence pair. */
-    public static final byte TYPE_DIST_SMALL_PAIR = 2;
-    /** 3 = orientation wrong sequence pair (distance is correct). */
-    public static final byte TYPE_ORIENT_WRONG_PAIR = 3;
-    /** 4 = distance too large and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_LARGE_PAIR = 4;
-    /** 5 = distance too small and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_SMALL_PAIR = 5;
-    /** 6 = a single mapping whose partner did not map on the reference. */
-    public static final byte TYPE_UNPAIRED_PAIR = 6;
-    /** 7 = unique perfect sequence pair (distance and orientation correct, both reads only mapped once). */
-    public static final byte TYPE_PERFECT_UNQ_PAIR = 7;
-    /** 8 = unique distance too large sequence pair. */
-    public static final byte TYPE_DIST_LARGE_UNQ_PAIR = 8;
-    /** 9 = unique distance too small sequence pair. */
-    public static final byte TYPE_DIST_SMALL_UNQ_PAIR = 9;
-    /** 10 = unique orientation wrong sequence pair (distance is correct). */
-    public static final byte TYPE_ORIENT_WRONG_UNQ_PAIR = 10;
-    /** 11 = unique distance too large and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_LARGE_UNQ_PAIR = 11;
-    /** 12 = unique distance too small and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_SMALL_UNQ_PAIR = 12;
-    
     //Properties to set different viewers active
     public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
     public static final String PROP_HISTOGRAM_VIEWER = "HistogramViewerActive";
@@ -88,7 +60,7 @@ public class Properties {
     /** Value for read length distribution = 3. */
     public static final byte READ_LENGTH_DISTRIBUTION = 3;
     /** Value for seq pair size distribution = 4. */
-    public static final byte SEQ_PAIR_SIZE_DISTRIBUTION = 4;    
+    public static final byte READ_PAIR_SIZE_DISTRIBUTION = 4;    
     
     /** Type value identifying an object as belonging to a "Start".*/
     public static final byte START = 1;

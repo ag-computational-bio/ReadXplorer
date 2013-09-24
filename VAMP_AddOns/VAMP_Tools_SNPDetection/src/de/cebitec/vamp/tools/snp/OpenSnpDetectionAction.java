@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -185,6 +186,12 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         }
     }
 
+    /**
+     * Actually prepares and shows the SNP detection result.
+     * @param dataTypeObject a pair of an integer and a string = trackId and 
+     * dataType. dataType has to be AnalysesHandler.DATA_TYPE_COVERAGE, if the
+     * SNPs shall be shown
+     */
     @Override
     public void showData(Object dataTypeObject) {
         try {
@@ -198,23 +205,28 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 ++finishedCovAnalyses;
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
-                SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap);
+                final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap);
                 result.setParameters(parametersSNPs);
 
-                if (snpDetectionResultPanel == null) {
-                    snpDetectionResultPanel = new SNP_DetectionResultPanel();
-                    snpDetectionResultPanel.setBoundsInfoManager(this.context.getBoundsInformationManager());
-                }
-                snpDetectionResultPanel.setReferenceGenome(this.context.getReference());
-                snpDetectionResultPanel.addSNPs(result);
+                SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                    @Override
+                    public void run() {
+                        if (snpDetectionResultPanel == null) {
+                            snpDetectionResultPanel = new SNP_DetectionResultPanel();
+                            snpDetectionResultPanel.setBoundsInfoManager(context.getBoundsInformationManager());
+                        }
+                        snpDetectionResultPanel.setReferenceGenome(context.getReference());
+                        snpDetectionResultPanel.addResult(result);
 
-                if (finishedCovAnalyses >= tracks.size()) {
+                        if (finishedCovAnalyses >= tracks.size()) {
 
-                    //get track name(s) for tab descriptions
-                    String trackNames = GeneralUtils.generateConcatenatedString(result.getTrackNameList(), 120);
-                    String panelName = "SNP Detection for " + trackNames + " (" + snpDetectionResultPanel.getSnpDataSize() + " hits)";
-                    this.snpDetectionTopComp.openDetectionTab(panelName, snpDetectionResultPanel);
-                }
+                            //get track name(s) for tab descriptions
+                            String trackNames = GeneralUtils.generateConcatenatedString(result.getTrackNameList(), 120);
+                            String panelName = "SNP Detection for " + trackNames + " (" + snpDetectionResultPanel.getResultSize() + " hits)";
+                            snpDetectionTopComp.openDetectionTab(panelName, snpDetectionResultPanel);
+                        }
+                    }
+                });
             }
 
         } catch (ClassCastException e) {

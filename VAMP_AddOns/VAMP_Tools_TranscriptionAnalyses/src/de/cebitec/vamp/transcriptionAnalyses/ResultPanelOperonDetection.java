@@ -5,13 +5,14 @@ package de.cebitec.vamp.transcriptionAnalyses;
  *
  * Created on 27.01.2012, 14:31:03
  */
+import de.cebitec.vamp.databackend.ResultTrackAnalysis;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.vamp.util.LineWrapCellRenderer;
-import de.cebitec.vamp.util.TableRightClickFilter;
 import de.cebitec.vamp.util.UneditableTableModel;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.analysis.ResultTablePanel;
+import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -32,7 +32,7 @@ import javax.swing.table.TableRowSorter;
  *
  * @author -Rolf Hilker-
  */
-public class ResultPanelOperonDetection extends javax.swing.JPanel {
+public class ResultPanelOperonDetection extends ResultTablePanel {
     
     private static final long serialVersionUID = 1L;
     
@@ -40,7 +40,6 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
     public static final String OPERONS_WITH_OVERLAPPING_READS = "Operons with reads overlapping only one feature edge";
     public static final String OPERONS_WITH_INTERNAL_READS = "Operons with internal reads";
 
-    private BoundsInfoManager bim;
     private OperonDetectionResult operonResult;
     private HashMap<String, Integer> operonDetStats;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
@@ -60,7 +59,7 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(operonDetectionTable, 4, bim);
+                TableUtils.showPosition(operonDetectionTable, 4, getBoundsInfoManager());
             }
         });
     }
@@ -185,122 +184,110 @@ public class ResultPanelOperonDetection extends javax.swing.JPanel {
     /**
      * Adds the data from this OperonDetectionResult to the data already available
      * in this result panel. All statistics etc. are also updated.
-     * @param operonResultNew the result to add
+     * @param newResult the result to add
      */
-    public void addDetectedOperons(final OperonDetectionResult operonResultNew) {
-        final int nbColumns = 10;
-        final List<Operon> operons = new ArrayList<>(operonResultNew.getResults());
+    @Override
+    public void addResult(ResultTrackAnalysis newResult) {
+        if (newResult instanceof OperonDetectionResult) {
+            OperonDetectionResult operonResultNew = (OperonDetectionResult) newResult;
+            final int nbColumns = 10;
+            final List<Operon> operons = new ArrayList<>(operonResultNew.getResults());
 
-        if (this.operonResult == null) {
-            this.operonResult = operonResultNew;
-        } else {
-            this.operonResult.getResults().addAll(operonResultNew.getResults());
-        }
-
-        SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
-            @Override
-            public void run() {
-
-                DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();
-                LineWrapCellRenderer lineWrapCellRenderer = new LineWrapCellRenderer();
-                operonDetectionTable.getColumnModel().getColumn(0).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(1).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(3).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(4).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(5).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(6).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(7).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(8).setCellRenderer(lineWrapCellRenderer);
-                operonDetectionTable.getColumnModel().getColumn(9).setCellRenderer(lineWrapCellRenderer);
-
-                int operonsWithOverlapping = 0;
-                int operonsWithInternal = 0;
-                boolean hasOverlappingReads;
-                boolean hasInternalReads;
-
-                for (Operon operon : operons) {
-                    String annoName1 = "";
-                    String annoName2 = "";
-                    String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString()) + "\n";
-                    String startAnno1 = "";
-                    String startAnno2 = "";
-                    String readsAnno1 = "";
-                    String readsAnno2 = "";
-                    String internalReads = "";
-                    String spanningReads = "";
-                    hasOverlappingReads = false;
-                    hasInternalReads = false;
-
-                    for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
-                        annoName1 += opAdj.getFeature1().toString() + "\n";
-                        annoName2 += opAdj.getFeature2().toString() + "\n";
-                        startAnno1 += opAdj.getFeature1().getStart() + "\n";
-                        startAnno2 += opAdj.getFeature2().getStart() + "\n";
-                        readsAnno1 += opAdj.getReadsFeature1() + "\n";
-                        readsAnno2 += opAdj.getReadsFeature2() + "\n";
-                        internalReads += opAdj.getInternalReads() + "\n";
-                        spanningReads += opAdj.getSpanningReads() + "\n";
-
-                        hasInternalReads = opAdj.getInternalReads() > 0;
-                        hasOverlappingReads = opAdj.getReadsFeature1() > 0 || opAdj.getReadsFeature2() > 0;
-                    }
-                    Object[] rowData = new Object[nbColumns];
-                    rowData[0] = annoName1;
-                    rowData[1] = annoName2;
-                    rowData[2] = operonResultNew.getTrackMap().get(operon.getTrackId());
-                    rowData[3] = strand;
-                    rowData[4] = startAnno1;
-                    rowData[5] = startAnno2;
-                    rowData[6] = readsAnno1;
-                    rowData[7] = readsAnno2;
-                    rowData[8] = internalReads;
-                    rowData[9] = spanningReads;
-                    if (!annoName1.isEmpty() && !annoName2.isEmpty()) {
-                        model.addRow(rowData);
-                    }
-
-                    if (hasOverlappingReads) {
-                        ++operonsWithOverlapping;
-                    }
-                    if (hasInternalReads) {
-                        ++operonsWithInternal;
-                    }
-                }
-
-                TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-                operonDetectionTable.setRowSorter(sorter);
-                sorter.setModel(model);
-                for (int i = 3; i < 8; ++i) {
-                    TableComparatorProvider.setStringComparator(sorter, i);
-                }
-
-                parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-                        "ResultPanelOperonDetection.parametersLabel.text",
-                        ((ParameterSetOperonDet) operonResult.getParameters()).getMinSpanningReads()));
-
-                operonDetStats.put(OPERONS_TOTAL, operonDetStats.get(OPERONS_TOTAL) + operons.size());
-                operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, operonDetStats.get(OPERONS_WITH_OVERLAPPING_READS) + operonsWithOverlapping);
-                operonDetStats.put(OPERONS_WITH_INTERNAL_READS, operonDetStats.get(OPERONS_WITH_INTERNAL_READS) + operonsWithInternal);
-
-                operonResult.setStatsMap(operonDetStats);
-
+            if (this.operonResult == null) {
+                this.operonResult = operonResultNew;
+            } else {
+                this.operonResult.getResults().addAll(operonResultNew.getResults());
             }
-        });
-    }
 
-    /**
-     * Set the bounds info manager needed for updating the currently shown 
-     * position.
-     * @param boundsInformationManager the bounds info manager belonging to this analysis
-     * result
-     */
-    public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
-        this.bim = boundsInformationManager;
+            DefaultTableModel model = (DefaultTableModel) operonDetectionTable.getModel();
+            LineWrapCellRenderer lineWrapCellRenderer = new LineWrapCellRenderer();
+            operonDetectionTable.getColumnModel().getColumn(0).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(1).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(3).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(4).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(5).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(6).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(7).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(8).setCellRenderer(lineWrapCellRenderer);
+            operonDetectionTable.getColumnModel().getColumn(9).setCellRenderer(lineWrapCellRenderer);
+
+            int operonsWithOverlapping = 0;
+            int operonsWithInternal = 0;
+            boolean hasOverlappingReads;
+            boolean hasInternalReads;
+
+            for (Operon operon : operons) {
+                String annoName1 = "";
+                String annoName2 = "";
+                String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString()) + "\n";
+                String startAnno1 = "";
+                String startAnno2 = "";
+                String readsAnno1 = "";
+                String readsAnno2 = "";
+                String internalReads = "";
+                String spanningReads = "";
+                hasOverlappingReads = false;
+                hasInternalReads = false;
+
+                for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
+                    annoName1 += opAdj.getFeature1().toString() + "\n";
+                    annoName2 += opAdj.getFeature2().toString() + "\n";
+                    startAnno1 += opAdj.getFeature1().getStart() + "\n";
+                    startAnno2 += opAdj.getFeature2().getStart() + "\n";
+                    readsAnno1 += opAdj.getReadsFeature1() + "\n";
+                    readsAnno2 += opAdj.getReadsFeature2() + "\n";
+                    internalReads += opAdj.getInternalReads() + "\n";
+                    spanningReads += opAdj.getSpanningReads() + "\n";
+
+                    hasInternalReads = opAdj.getInternalReads() > 0;
+                    hasOverlappingReads = opAdj.getReadsFeature1() > 0 || opAdj.getReadsFeature2() > 0;
+                }
+                Object[] rowData = new Object[nbColumns];
+                rowData[0] = annoName1;
+                rowData[1] = annoName2;
+                rowData[2] = operonResultNew.getTrackMap().get(operon.getTrackId());
+                rowData[3] = strand;
+                rowData[4] = startAnno1;
+                rowData[5] = startAnno2;
+                rowData[6] = readsAnno1;
+                rowData[7] = readsAnno2;
+                rowData[8] = internalReads;
+                rowData[9] = spanningReads;
+                if (!annoName1.isEmpty() && !annoName2.isEmpty()) {
+                    model.addRow(rowData);
+                }
+
+                if (hasOverlappingReads) {
+                    ++operonsWithOverlapping;
+                }
+                if (hasInternalReads) {
+                    ++operonsWithInternal;
+                }
+            }
+
+            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+            operonDetectionTable.setRowSorter(sorter);
+            sorter.setModel(model);
+            for (int i = 3; i < 8; ++i) {
+                TableComparatorProvider.setStringComparator(sorter, i);
+            }
+
+            parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
+                    "ResultPanelOperonDetection.parametersLabel.text",
+                    ((ParameterSetOperonDet) operonResult.getParameters()).getMinSpanningReads()));
+
+            operonDetStats.put(OPERONS_TOTAL, operonDetStats.get(OPERONS_TOTAL) + operons.size());
+            operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, operonDetStats.get(OPERONS_WITH_OVERLAPPING_READS) + operonsWithOverlapping);
+            operonDetStats.put(OPERONS_WITH_INTERNAL_READS, operonDetStats.get(OPERONS_WITH_INTERNAL_READS) + operonsWithInternal);
+
+            operonResult.setStatsMap(operonDetStats);
+        }
     }
     
     /**
      * @return The number of detected operons
      */
+    @Override
     public int getResultSize() {
         return this.operonResult.getResults().size();
     }

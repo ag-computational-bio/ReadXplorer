@@ -14,7 +14,7 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentOptionsPa
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
+import de.cebitec.vamp.view.dataVisualisation.readPairViewer.ReadPairViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.*;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.*;
@@ -242,7 +242,7 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(b);
 
         // create a sequence pair viewer
-        SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGenome, connector);
+        ReadPairViewer viewer = new ReadPairViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
         JPanel seqPairPanelLegend = this.getSeqPairViewerLegend(viewer);

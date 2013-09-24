@@ -1,6 +1,7 @@
 package de.cebitec.vamp.view.login;
 
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,9 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
@@ -260,44 +259,49 @@ public final class LoginVisualPanel extends JPanel {
 }//GEN-LAST:event_dbTypeBoxActionPerformed
 
     private void dbChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbChooseButtonActionPerformed
-        JFileChooser fc = new JFileChooser(NbPreferences.forModule(Object.class).get(Properties.VAMP_DATABASE_DIRECTORY, null));
-        //fc.setFileFilter(new FileNameExtensionFilter("h2", "h2"));
+        VampFileChooser fileChooser = new VampFileChooser(new String[]{"db"}, "db files") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void save(String fileLocation) {
+                //not supported here
+            }
+
+            @Override
+            public void open(String fileLocation) {
+                File file = new File(fileLocation);
+
+                try { //store current directory
+                    NbPreferences.forModule(Object.class).put(Properties.VAMP_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath());
+                } catch (IOException ex) {
+                    // do nothing, path is not stored in properties...
+                }
+
+                if (!file.exists()) {
+                    NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", fileLocation), NotifyDescriptor.WARNING_MESSAGE);
+                    DialogDisplayer.getDefault().notify(nd);
+                }
+                databaseField.setText(file.getAbsolutePath());
+                
+            }
+        };
+        fileChooser.setDirectory(NbPreferences.forModule(Object.class).get(Properties.VAMP_DATABASE_DIRECTORY, null));
         
         Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel.class);
         String db = dbTypeBox.getSelectedItem().toString();
         if (db.equalsIgnoreCase("h2")) {
             String path = prefs2.get(LoginProperties.LOGIN_DATABASE_H2, null);
             if (path != null) {
-                fc.setCurrentDirectory(new File(path));
+                fileChooser.setCurrentDirectory(new File(path));
             }
         } else {
             String path = prefs2.get(LoginProperties.LOGIN_DATABASE_MYSQL, null);
             if (path != null) {
-                fc.setCurrentDirectory(new File(path));
+                fileChooser.setCurrentDirectory(new File(path));
             }
         }
-        File file = null;
         
-        int result = fc.showOpenDialog(this);
-
-        if (result == JFileChooser.APPROVE_OPTION) { //0
-            // file chosen
-            file = fc.getSelectedFile();
-            
-            try { //store current directory
-                NbPreferences.forModule(Object.class).put(Properties.VAMP_DATABASE_DIRECTORY, fc.getCurrentDirectory().getCanonicalPath());
-            } catch (IOException ex) {
-                // do nothing, path is not stored in properties...
-            }
-            
-            if((file==null) || (!file.exists())){
-                String filepath = "";
-                if (file!=null) file.getAbsolutePath();
-                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", filepath), NotifyDescriptor.WARNING_MESSAGE);
-                DialogDisplayer.getDefault().notify(nd);
-            }
-            databaseField.setText(file.getAbsolutePath());
-        }
+        fileChooser.openFileChooser(VampFileChooser.OPEN_DIALOG);
 }//GEN-LAST:event_dbChooseButtonActionPerformed
 
     private void databaseFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_databaseFieldActionPerformed

@@ -76,7 +76,7 @@ public class DeSeqWizardPanelConds implements WizardDescriptor.ValidatingPanel<W
     @Override
     public void validate() throws WizardValidationException {
         if (!getComponent().conditionsComplete()) {
-            throw  new WizardValidationException(null, "Please assigne every track to a condition.", null);
+            throw  new WizardValidationException(null, "Please assign every track to a condition.", null);
         }
     }
 }

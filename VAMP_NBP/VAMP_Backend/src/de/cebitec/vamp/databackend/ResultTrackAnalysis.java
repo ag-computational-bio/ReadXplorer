@@ -87,6 +87,15 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     }
     
     /**
+     * Adds a key value pair to the stats map.
+     * @param key the key of the pair
+     * @param value the value of the pair
+     */
+    public void addStatsToMap(String key, int value) {
+        this.statsMap.put(key, value);
+    }
+    
+    /**
      * Creates a table row for statistic entries by the given identifier
      * @param identifier the identifier of the statistic value
      * @return the list containing the identifier and its statistic value
@@ -98,6 +107,18 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
             row.add(this.getStatsMap().get(identifier));
         }
         return row;
+    }
+
+    /**
+     * Adds the complete content of the internal statistics map to the given
+     * table content (list of object list)
+     * @param statisticsExportData the table content, to which the content of 
+     * the internal statistics map shall be added
+     */
+    public void createStatisticTableRows(List<List<Object>> statisticsExportData) {
+        for (String id : statsMap.keySet()) {
+            statisticsExportData.add(this.createStatisticTableRow(id));
+        }
     }
     
     /**

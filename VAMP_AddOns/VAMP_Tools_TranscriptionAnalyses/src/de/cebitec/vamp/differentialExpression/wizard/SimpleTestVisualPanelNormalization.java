@@ -53,7 +53,7 @@ public final class SimpleTestVisualPanelNormalization extends JPanel {
 
     @Override
     public String getName() {
-        return "Select normalization.";
+        return "Select Normalization";
     }
 
     public void setFeatureList(List<PersistantFeature> features) {

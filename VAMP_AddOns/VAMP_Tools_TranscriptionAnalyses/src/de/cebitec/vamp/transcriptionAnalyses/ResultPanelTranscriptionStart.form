@@ -61,7 +61,7 @@
                 <Column editable="false" title="Correct Feature" type="java.lang.String"/>
                 <Column editable="false" title="Next Upstream Feature" type="java.lang.String"/>
                 <Column editable="false" title="Next Downstream Feature" type="java.lang.String"/>
-                <Column editable="false" title="Unannotated Transcript" type="java.lang.Boolean"/>
+                <Column editable="false" title="Novel Transcript" type="java.lang.Boolean"/>
                 <Column editable="false" title="Transcript Stop" type="java.lang.Integer"/>
               </Table>
             </Property>

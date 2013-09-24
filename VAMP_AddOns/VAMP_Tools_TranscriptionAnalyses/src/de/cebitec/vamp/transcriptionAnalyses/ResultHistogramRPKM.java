@@ -19,6 +19,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javax.swing.JPanel;
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -29,8 +30,9 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 /**
- *
- * @author Martin Tötsches
+ * Class for displaying a histogram of RPKM values.
+ * 
+ * @author Martin Tötsches, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ResultHistogramRPKM extends javax.swing.JPanel implements ComponentListener {
     
@@ -40,10 +42,14 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     private AppPanelTopComponent appPanelTopComponent;
     private JPanel mainPanel;
     private List<RPKMvalue> rpkmValues;
-    private BarChart barChart;
+    private BarChart<String, Number> barChart;
     private BorderPane border;
     private Scene scene;
 
+    /**
+     * Class for displaying a histogram of RPKM values.
+     * @param rpkmValues list of RPKM values to display
+     */
     public ResultHistogramRPKM(List<RPKMvalue> rpkmValues) {
         this.rpkmValues = rpkmValues;
         this.appPanelTopComponent = new AppPanelTopComponent();
@@ -63,6 +69,9 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
         this.appPanelTopComponent.add(mainPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Initializes all javafx components.
+     */
     private void initFxComponents() {
 
         Platform.runLater(new Runnable() {
@@ -82,7 +91,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
                     }
                 }
                 double shift = max / 20;
-                int[] intervals = new int[21];
+                int[] intervals = new int[21]; //intervals of bars that are shown later
                 for (int l = 0; l < intervals.length; l++) {
                     intervals[l] = 0;
                 }
@@ -91,13 +100,13 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
                     int index = (int) Math.floor(value / shift);
                     intervals[index]++;
                 }
-                max = rpkmValues.size() / 21;
+                max = Math.log(rpkmValues.size());
                 NumberAxis lineYAxis = new NumberAxis(0, max, 2);
-                lineYAxis.setLabel("Number of Features");
+                lineYAxis.setLabel("Number of Features (Log scale)");
                 CategoryAxis lineXAxis = new CategoryAxis();
                 lineXAxis.setLabel("RPKM Values");
                 barChart = new BarChart<>(lineXAxis, lineYAxis);
-                XYChart.Series bar = new XYChart.Series<>();
+                XYChart.Series<String, Number> bar = new XYChart.Series<>();
                 bar.setName("RPKM Values");
                 double start = 0.0;
                 /*for (int i = 0; i < rpkmValues.size(); i++) {
@@ -115,38 +124,66 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
                     });
                     bar.getData().add(o);
                 }*/
+                
                 for (int i = 0; i < intervals.length; i++) {
                     int end = (int) (start + shift);
                     String name = (int) start + " - " + end;
-                    XYChart.Data o = getData(intervals[i], name);
-                    bar.getData().add(o);
+                    double logValue = Math.log(intervals[i]);
+                    logValue = logValue == 0 ? 0.1 : logValue;
+                    XYChart.Data<String, Number> entry = new XYChart.Data<String, Number>(name, logValue);
+                    entry.setExtraValue(intervals[i]);
+                    bar.getData().add(entry);
                     start += shift;
                 }
                 barChart.getData().addAll(bar);
+                
+                for (XYChart.Series<String, Number> series : barChart.getData()) {
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        Tooltip.install(data.getNode(), new Tooltip("# features: " + data.getExtraValue().toString()));
+//                        this.addLabelToEntry(data, data.getExtraValue().toString());
+                    }
+                }
+                
                 border.setCenter(barChart);
                 fxPanel.setScene(scene);
                 exportPanel(fxPanel);
                 Platform.setImplicitExit(false);
             }
+
+//            /**
+//             * Adds a label to a data entry of a javafx chart. The label is able
+//             * to reposition and resize, depending on change events of their
+//             * node.
+//             */
+//            private void addLabelToEntry(XYChart.Data<String, Number> entry, String value) {
+//                final Node node = entry.getNode();
+//                final Text dataText = new Text(String.valueOf(value));
+//                node.parentProperty().addListener(new ChangeListener<Parent>() {
+//                    @Override
+//                    public void changed(ObservableValue<? extends Parent> ov, Parent oldParent, Parent parent) {
+//                        Group parentGroup = (Group) parent;
+//                        parentGroup.getChildren().add(dataText);
+//                    }
+//                });
+//
+//                node.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+//                    @Override
+//                    public void changed(ObservableValue<? extends Bounds> ov, Bounds oldBounds, Bounds bounds) {
+//                        dataText.setLayoutX(
+//                                Math.round(bounds.getMinX() + bounds.getWidth() / 2 - dataText.prefWidth(-1) / 2));
+//                        dataText.setLayoutY(
+//                                Math.round(bounds.getMinY() - dataText.prefHeight(-1) * 0.5));
+//                    }
+//                });
+//            }
         });
 
     }
 
-    private XYChart.Data getData(double x, double y) {
-        XYChart.Data data = new XYChart.Data<>();
-        data.setXValue(x);
-        data.setYValue(y);
-        return data;
-    }
-
-    private XYChart.Data getData(double x, String y) {
-        XYChart.Data data = new XYChart.Data<>();
-        data.setYValue(x);
-        data.setXValue(y);
-        return data;
-    }
-
-    public BarChart getBarChart() {
+    /**
+     * @return The complete bar chart of this histogram.
+     */
+    public BarChart<String, Number> getBarChart() {
         return this.barChart;
     }
 
@@ -174,9 +211,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
                     OutputStream file = new FileOutputStream("snapshot.svg");
                     Writer out = new OutputStreamWriter(file, "UTF-8");
                     svgGenerator.stream(out, false);
-                } catch (UnsupportedEncodingException | SVGGraphics2DIOException ex) {
-                    Exceptions.printStackTrace(ex);
-                } catch (FileNotFoundException ex) {
+                } catch (UnsupportedEncodingException | SVGGraphics2DIOException | FileNotFoundException ex) {
                     Exceptions.printStackTrace(ex);
                 }
             }

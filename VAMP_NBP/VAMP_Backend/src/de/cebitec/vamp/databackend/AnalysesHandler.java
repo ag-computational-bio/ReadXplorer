@@ -14,6 +14,7 @@ import de.cebitec.vamp.util.StatsContainer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
@@ -189,10 +190,15 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         }
     }
 
+    /**
+     * ThreadListener method for updating information in this analysis handler.
+     * Updates of GUI componentes are delegated to the Swing dispatch thread.
+     * @param data the data to add to this analysis handler
+     */
     @Override
     public void receiveData(Object data) {
         long finish = System.currentTimeMillis();
-        String benchmark = Benchmark.calculateDuration(start, finish, ". Duration: ");
+        String benchmark = Benchmark.calculateDuration(start, finish, ". Elapsed time: ");
         this.progressHandle.progress(this.queryType + " request "
                 + (nbCarriedOutRequests + 1) + " of " + nbRequests + benchmark, ++nbCarriedOutRequests);
         this.notifyObservers(data);

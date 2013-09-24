@@ -42,9 +42,16 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setName(referenceJob.getName());
             refGenome.setTimestamp(referenceJob.getTimestamp());
             String line;
+            boolean parseData = false;
+            boolean finished = false;
 
             while ((line = in.readLine()) != null) {
-                if (!line.startsWith(">")) {
+                if (line.startsWith(">" + refGenome.getName())) {
+                    parseData = true;
+                    finished = false;
+                } else if (line.startsWith(">")) {
+                    finished = true;
+                } else if (parseData && !finished) {
                     sBuilder.append(line);
                 }
             }

@@ -3,28 +3,33 @@ package de.cebitec.vamp.view.dialogMenus;
 import de.cebitec.vamp.util.Observer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import javafx.scene.paint.Color;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.openide.windows.WindowManager;
 
 /**
+ * The javafx loading icon, which is displayed as long, as the connetion process
+ * to the DB takes.
  *
  * @author Kai
  */
 public class Loading extends javax.swing.JPanel implements Observer {
+    
+    private static final long serialVersionUID = 1L;
 
     private JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
     private JDialog dia;
 
     /**
-     * Creates new form Loading
+     * The javafx loading icon, which is displayed as long, as the connetion
+     * process to the DB takes.
      */
     public Loading() {
         Platform.setImplicitExit(false);
@@ -34,7 +39,11 @@ public class Loading extends javax.swing.JPanel implements Observer {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                initAndShowGUI();
+                try {
+                    initAndShowGUI();
+                } catch(UnsatisfiedLinkError e) {
+                    //do nothing, if javafx has problems
+                }
             }
         });
         initDialog();

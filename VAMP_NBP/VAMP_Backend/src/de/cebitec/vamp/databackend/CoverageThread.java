@@ -6,7 +6,6 @@ import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
-import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -77,21 +76,21 @@ public class CoverageThread extends RequestThread {
     private void singleCoverageThread(long trackID) {
         this.trackID = trackID;
         this.trackID2 = 0;
-        this.currentCov = new CoverageAndDiffResultPersistant(null, null, null, false, 0, 0);
+        this.currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
         this.isDbUsed = this.tracks.get(0).isDbUsed();
     }
 
     private void doubleCoverageThread(long trackID, long trackID2) {
         this.trackID = trackID;
         this.trackID2 = trackID2;
-        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0, true), null, null, false, 0, 0);
+        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0, true), null, null, false);
         this.isDbUsed = this.tracks.get(0).isDbUsed() || this.tracks.get(1).isDbUsed();
     }
 
     private void multipleCoverageThread() {
         this.trackID = 0;
         this.trackID2 = 0;
-        currentCov = new CoverageAndDiffResultPersistant(null, null, null, false, 0, 0);
+        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
         for (PersistantTrack track : this.tracks) {
             if (track.isDbUsed()) {
                 this.isDbUsed = true;
@@ -302,7 +301,7 @@ public class CoverageThread extends RequestThread {
             }
             fetch.close();
             rs.close();
-            result = new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
+            result = new CoverageAndDiffResultPersistant(cov, null, null, false);
             
             
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Needed {0} to calculate Coverage ({1} items)", 
@@ -423,7 +422,7 @@ public class CoverageThread extends RequestThread {
             
         }
         
-        return new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
+        return new CoverageAndDiffResultPersistant(cov, null, null, false);
     }
 
     /**
@@ -510,7 +509,7 @@ public class CoverageThread extends RequestThread {
             }
         }
 
-        return new CoverageAndDiffResultPersistant(cov, null, null, false, from, to);
+        return new CoverageAndDiffResultPersistant(cov, null, null, false);
     }
 
     /**
@@ -639,7 +638,7 @@ public class CoverageThread extends RequestThread {
             }
         }
 
-        return new CoverageAndDiffResultPersistant(null, diffs, gaps, true, from, to);
+        return new CoverageAndDiffResultPersistant(new PersistantCoverage(from, to), diffs, gaps, true);
     }
 
     @Override

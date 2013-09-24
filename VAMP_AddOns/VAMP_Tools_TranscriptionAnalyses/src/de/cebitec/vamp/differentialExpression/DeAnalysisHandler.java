@@ -13,6 +13,7 @@ import de.cebitec.vamp.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.vamp.differentialExpression.GnuR.UnknownGnuRException;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observable;
+import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  * @author kstaderm
@@ -41,7 +43,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
     private Integer refGenomeID;
     private List<ResultDeAnalysis> results;
-    private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
+    private List<de.cebitec.vamp.util.Observer> observerList = new ArrayList<>();
     private File saveFile = null;
     private List<FeatureType> selectedFeatures;
     private Map<Integer, Map<PersistantFeature, Integer>> allCountData = new HashMap<>();
@@ -212,14 +214,14 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     @Override
-    public void registerObserver(de.cebitec.vamp.util.Observer observer) {
-        this.observer.add(observer);
+    public void registerObserver(Observer observer) {
+        this.observerList.add(observer);
     }
 
     @Override
-    public void removeObserver(de.cebitec.vamp.util.Observer observer) {
-        this.observer.remove(observer);
-        if (this.observer.isEmpty()) {
+    public void removeObserver(Observer observer) {
+        this.observerList.remove(observer);
+        if (this.observerList.isEmpty()) {
             endAnalysis();
             this.interrupt();
         }
@@ -227,10 +229,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     @Override
     public void notifyObservers(Object data) {
-        List<de.cebitec.vamp.util.Observer> tmpObserver = new ArrayList<>(observer);
-        for (Iterator<de.cebitec.vamp.util.Observer> it = tmpObserver.iterator(); it.hasNext();) {
-            de.cebitec.vamp.util.Observer currentObserver = it.next();
-            currentObserver.update(data);
+        for (Observer observer : observerList) {
+            observer.update(data);
         }
     }
 
@@ -258,6 +258,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
             }
         }
-        notifyObservers(AnalysisStatus.FINISHED);
+        SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+            @Override
+            public void run() {
+                notifyObservers(AnalysisStatus.FINISHED);
+            }
+        });
     }
 }

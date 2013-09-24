@@ -59,8 +59,10 @@ public final class DeSeqVisualPanel1 extends JPanel {
         jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
         jTextArea1.setColumns(20);
         jTextArea1.setFont(jTextArea1.getFont());
+        jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.setText(org.openide.util.NbBundle.getMessage(DeSeqVisualPanel1.class, "DeSeqVisualPanel1.jTextArea1.text")); // NOI18N
+        jTextArea1.setWrapStyleWord(true);
         jTextArea1.setBorder(null);
         jScrollPane1.setViewportView(jTextArea1);
 

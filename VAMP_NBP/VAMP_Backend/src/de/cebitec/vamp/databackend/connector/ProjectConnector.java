@@ -662,81 +662,7 @@ public class ProjectConnector extends Observable {
     private void lockReferenceDomainTables() {
         this.lockDomainTables(MySQLStatements.LOCK_TABLE_REFERENCE_DOMAIN, "reference");
     }
-
-    /**
-     * Adds all track data to the database which should be stored. Only used 
-     * for database import.
-     * @param track track to add
-     * @param seqPairs true, if this is a sequence pair track, false otherwise
-     * @param onlyPosTable true, if only the position table is to be stored,
-     * false in the ordinary "import track" scenario
-     * @return the track id used in the database
-     * @throws StorageException
-     */
-    public int addTrack(ParsedTrack track, boolean seqPairs) throws StorageException {
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
-
-        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
-            this.lockTrackDomainTables();
-            this.disableTrackDomainIndices();
-        }
-        isLastTrack = track.getParsedMappingContainer().isLastMappingContainer();
-        this.storeTrack(track);
-        this.storeTrackStatistics(track); //needs to be called after storeCoverage
-
-        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
-            this.enableTrackDomainIndices();
-            this.enableReferenceIndices();
-            this.enableSeqPairDomainIndices();
-            this.unlockTables();
-        }
-
-        if (!seqPairs && isLastTrack) {
-            track.clear();
-        }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
-
-        // notify observers about the change of the database
-        this.notifyObserversAbout("addTrack");
-
-        //ensure, that there is no cache for this track
-        ObjectCache.getInstance().deleteFamily("loadCoverage." + track.getID());
-        ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track." + track.getID());
-
-        return track.getID();
-    }
-
-    /**
-     * Method explicitly storing a track in the database. This means all basic
-     * information of a track, which is stored in the track table of the db.
-     * @param track the track whose data is to be stored
-     */
-    private void storeTrack(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        if (track.isFirstTrack() || !track.isStepwise()) {
-            try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
-                insertTrack.setLong(1, track.getID());
-                insertTrack.setLong(2, track.getRefId());
-                insertTrack.setString(3, track.getDescription());
-                insertTrack.setTimestamp(4, track.getTimestamp());
-                if (!track.isDbUsed()) {
-                    insertTrack.setString(5, track.getFile().getAbsolutePath());
-                } else {
-                    insertTrack.setString(5, "");
-                }
-                insertTrack.execute();
-            } catch (SQLException ex) {
-                this.rollbackOnError(this.getClass().getName(), ex);
-            }
-        }
-
-        // notify observers about the change of the database
-        this.notifyObserversAbout("storeTrack");
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
-    }
-
+    
     /**
      * Adds a track to the database with its file path. This means, it is stored
      * as a track for direct file access and adds the persistant track id to the 
@@ -757,6 +683,9 @@ public class ProjectConnector extends Observable {
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
+
+        // notify observers about the change of the database
+        this.notifyObserversAbout("storeTrack");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");        
     }

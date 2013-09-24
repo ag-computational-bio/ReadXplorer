@@ -120,6 +120,8 @@ public enum FeatureType {
     private static final String UNDEFINED_STRING = "unknown";
     private static final String MRNA_STRING = "mRNA";
     private static final String CDS_STRING = "CDS";
+    /** ORF string is only used for input. It cannot be returned. */
+    private static final String ORF_STRING = "ORF";
     private static final String MISC_RNA_STRING = "misc RNA";
     /** misc RNA string with underscore "misc_RNA". */
     private static final String MISC_RNA_STRING_USCORE = "misc_RNA";
@@ -225,6 +227,8 @@ public enum FeatureType {
         } else if (type.equalsIgnoreCase(MRNA_STRING)) {
             featType = MRNA;
         } else if (type.equalsIgnoreCase(CDS_STRING)) {
+            featType = CDS;
+        } else if (type.equalsIgnoreCase(ORF_STRING)) {
             featType = CDS;
         } else if (type.equalsIgnoreCase(MISC_RNA_STRING) || type.equalsIgnoreCase(MISC_RNA_STRING_USCORE)) {
             featType = MISC_RNA;

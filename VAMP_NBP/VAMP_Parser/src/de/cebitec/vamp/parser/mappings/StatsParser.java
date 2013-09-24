@@ -77,11 +77,6 @@ public class StatsParser implements MappingParserI {
     }
 
     @Override
-    public SeqPairProcessorI getSeqPairProcessor() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public String getName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -200,39 +201,47 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 ++finishedCovAnalyses;
 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
-                CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap);
+                final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap);
                 result.setParameters(parameters);
-                result.setFeatureListSize(analysisCoveredFeatures.getNoGenomeFeatures());
+                Map<String, Integer> statsMap = new HashMap<>();
+                statsMap.put(ResultPanelCoveredFeatures.FEATURES_TOTAL, analysisCoveredFeatures.getNoGenomeFeatures());
+                result.setStatsMap(statsMap);
 
-                if (coveredFeaturesResultPanel == null) {
-                    coveredFeaturesResultPanel = new ResultPanelCoveredFeatures();
-                    coveredFeaturesResultPanel.setBoundsInfoManager(this.context.getBoundsInformationManager());
-                }
-                coveredFeaturesResultPanel.addCoveredFeatures(result);
+                SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                    @Override
+                    public void run() {
 
-                if (finishedCovAnalyses >= tracks.size()) {
-                    
-                    //get track name(s) for tab descriptions
-                    String trackNames = "";
-                    if (tracks != null && !tracks.isEmpty()) {
-                        for (PersistantTrack track : tracks) {
-                            trackNames = trackNames.concat(track.getDescription()).concat(" and ");
+                        if (coveredFeaturesResultPanel == null) {
+                            coveredFeaturesResultPanel = new ResultPanelCoveredFeatures();
+                            coveredFeaturesResultPanel.setBoundsInfoManager(context.getBoundsInformationManager());
                         }
-                        trackNames = trackNames.substring(0, trackNames.length() - 5);
-                        if (trackNames.length() > 120) {
-                            trackNames = trackNames.substring(0, 120).concat("...");
+                        coveredFeaturesResultPanel.addCoveredFeatures(result);
+
+                        if (finishedCovAnalyses >= tracks.size()) {
+
+                            //get track name(s) for tab descriptions
+                            String trackNames = "";
+                            if (tracks != null && !tracks.isEmpty()) {
+                                for (PersistantTrack track : tracks) {
+                                    trackNames = trackNames.concat(track.getDescription()).concat(" and ");
+                                }
+                                trackNames = trackNames.substring(0, trackNames.length() - 5);
+                                if (trackNames.length() > 120) {
+                                    trackNames = trackNames.substring(0, 120).concat("...");
+                                }
+                            }
+
+                            String title;
+                            if (parameters.isGetCoveredFeatures()) {
+                                title = "Detected covered features for ";
+                            } else {
+                                title = "Detected uncovered features for ";
+                            }
+                            String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
+                            coveredAnnoAnalysisTopComp.openAnalysisTab(panelName, coveredFeaturesResultPanel);
                         }
                     }
-                    
-                    String title;
-                    if (this.parameters.isGetCoveredFeatures()) {
-                        title = "Detected covered features for ";
-                    } else {
-                        title = "Detected uncovered features for ";
-                    }
-                    String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
-                    this.coveredAnnoAnalysisTopComp.openAnalysisTab(panelName, coveredFeaturesResultPanel);
-                }
+                });
             }
 
         } catch (ClassCastException e) {

@@ -17,9 +17,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import org.openide.util.Exceptions;
 
 /**
  * AbstractViewer ist a superclass for displaying genome related information.
@@ -73,9 +78,19 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
     private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
     private boolean centerScrollBar = false;
+    private BufferedImage loadingIndicator;
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
+        
+        //read loadingIndicator icon from package resources
+        try {
+            InputStream stream = AbstractViewer.class.getResourceAsStream("loading.png");
+            this.loadingIndicator = ImageIO.read(stream);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
         this.excludedFeatureTypes = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
@@ -785,4 +800,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public void setAutomaticCentering(boolean centerScrollBar) {
         this.centerScrollBar = centerScrollBar;
     }
+
+    /**
+     * @return The image to display, if the viewer waits for something.
+     */
+    public BufferedImage getLoadingIndicator() {
+        return loadingIndicator;
+    }
+    
 }

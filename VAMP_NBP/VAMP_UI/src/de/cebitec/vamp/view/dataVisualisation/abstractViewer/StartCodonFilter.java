@@ -1,18 +1,16 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.common.sequencetools.GeneticCode;
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.CodonUtilities;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
 import org.openide.util.NbPreferences;
 
 /**
@@ -38,6 +36,7 @@ public class StartCodonFilter implements RegionFilterI {
     private Pattern[] stopCodons;
     private int frameCurrFeature;
     private int nbGeneticCodes;
+    private GeneticCodeFactory genCodeFactory;
 
     /**
      * Filters for start and stop codons in two ways: First for all available start 
@@ -53,12 +52,8 @@ public class StartCodonFilter implements RegionFilterI {
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
-        try {
-            GeneticCodeFactory.initGeneticCodes();
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        this.nbGeneticCodes = GeneticCodeFactory.getGeneticCodes().size();
+        this.genCodeFactory = GeneticCodeFactory.getDefault();
+        this.nbGeneticCodes = genCodeFactory.getGeneticCodes().size();
 
         this.resetCodons();
 
@@ -247,7 +242,7 @@ public class StartCodonFilter implements RegionFilterI {
         String[] stopCodonsNew = new String[0];
         int codeIndex = Integer.valueOf(pref.get(Properties.GENETIC_CODE_INDEX, "0"));
         if (codeIndex < nbGeneticCodes) {
-            GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+            GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
             startCodonsNew = code.getStartCodons().toArray(startCodonsNew);
             stopCodonsNew = code.getStopCodons().toArray(stopCodonsNew);
         } else {

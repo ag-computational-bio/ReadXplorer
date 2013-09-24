@@ -289,8 +289,13 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         return PREFERRED_ID;
     }
 
+    /**
+     * Sets the corresponding track connector for this detailed viewer.
+     * @param trackConnector the corresponding track connector for this detailed viewer
+     */
     public void setTrackConnector(TrackConnector trackConnector){
         this.trackConnector = trackConnector;
+        setName(NbBundle.getMessage(DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent") + trackConnector.getAssociatedTrackName());
     }
     
     

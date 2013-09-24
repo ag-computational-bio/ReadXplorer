@@ -3,10 +3,12 @@ package de.cebitec.vamp.tools.detailedViewer;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.view.TopComponentHelper;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JList;
 import org.openide.DialogDescriptor;
@@ -29,9 +31,10 @@ public final class OpenDetailedViewer implements ActionListener {
             //Get ViewController from AppPanelTopComponent-Lookup
             ViewController viewCon = parentAppPanel.getLookup().lookup(ViewController.class);
             List<BasePanel> trackPanels = viewCon.getOpenTracks();
+            List<AbstractViewer> openTrackViewers = this.getTrackViewerList(viewCon.getOpenTracks());
 
             if (trackPanels.size() > 1) {
-                JList trackList = new JList(trackPanels.toArray());
+                JList trackList = new JList(openTrackViewers.toArray());
                 DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenDetailedViewer.class, "CTL_OpenDetailedViewer"));
                 dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
                 DialogDisplayer.getDefault().notify(dd);
@@ -49,5 +52,13 @@ public final class OpenDetailedViewer implements ActionListener {
             detailedViewer.setTrackConnector(currentTrackViewer.getTrackCon());
             detailedViewer.open();
         }
+    }
+
+    private List<AbstractViewer> getTrackViewerList(List<BasePanel> openTracks) {
+        List<AbstractViewer> viewerList = new ArrayList<>();
+        for (BasePanel basePanel : openTracks) {
+            viewerList.add(basePanel.getViewer());
+        }
+        return viewerList;
     }
 }

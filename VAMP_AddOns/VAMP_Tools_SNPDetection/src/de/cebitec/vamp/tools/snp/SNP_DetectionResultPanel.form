@@ -75,10 +75,10 @@
                 <Column editable="false" title="Ref Cov" type="java.lang.Integer"/>
                 <Column editable="false" title="Freq" type="java.lang.Integer"/>
                 <Column editable="false" title="Type" type="java.lang.String"/>
-                <Column editable="false" title="Amino SNP" type="java.lang.String"/>
-                <Column editable="false" title="Amino Ref" type="java.lang.String"/>
-                <Column editable="false" title="Triplet SNP" type="java.lang.String"/>
-                <Column editable="false" title="Triplet Ref" type="java.lang.String"/>
+                <Column editable="false" title="AA Ref" type="java.lang.String"/>
+                <Column editable="false" title="AA SNP" type="java.lang.String"/>
+                <Column editable="false" title="Codon Ref" type="java.lang.String"/>
+                <Column editable="false" title="Codon SNP" type="java.lang.String"/>
                 <Column editable="false" title="Effect on AA" type="java.lang.String"/>
                 <Column editable="false" title="Feature" type="java.lang.String"/>
               </Table>
@@ -185,13 +185,6 @@
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title13" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                  </Title>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title14" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
@@ -199,7 +192,7 @@
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title18" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title13" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -207,6 +200,13 @@
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title19" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/tools/snp/Bundle.properties" key="SNP_DetectionResultPanel.snpTable.columnModel.title18" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>

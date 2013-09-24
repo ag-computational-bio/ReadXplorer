@@ -19,7 +19,6 @@ import java.util.List;
 public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCoveredFeatures> implements ExcelExportDataI {
     
     private List<CoveredFeature> results;
-    private int featureListSize;
 
     /**
      * Container for all data belonging to a covered feature detection result.
@@ -34,14 +33,6 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         super(trackMap);
         this.results = results;
         
-    }
-    
-    public void setFeatureListSize(int size) {
-        this.featureListSize = size;
-    }
-    
-    public int getFeatureListSize() {
-        return featureListSize;
     }
 
     /**
@@ -136,11 +127,11 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " feature statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of covered features", coveredFeaturesResultList.size()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of reference features", featureListSize));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelCoveredFeatures.FEATURES_COVERED, coveredFeaturesResultList.size()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+                ResultPanelCoveredFeatures.FEATURES_TOTAL, this.getStatsMap().get(ResultPanelCoveredFeatures.FEATURES_TOTAL)));
 
         coveredFeaturesExport.add(statisticsExportData);
-
 
         return coveredFeaturesExport;
     }

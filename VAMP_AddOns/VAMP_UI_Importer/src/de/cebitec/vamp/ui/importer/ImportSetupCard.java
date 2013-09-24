@@ -2,9 +2,10 @@ package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.parser.ReadPairJobContainer;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
+import de.cebitec.vamp.parser.mappings.ReadPairClassifierI;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import de.cebitec.vamp.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
@@ -42,7 +43,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         initComponents();
         refJobView.addPropertyChangeListener(this.getJobPropListener());
         trackJobView.addPropertyChangeListener(this.getJobPropListener());
-        seqPairTrackJobsView.addPropertyChangeListener(this.getJobPropListener());
+        readPairTrackJobsView.addPropertyChangeListener(this.getJobPropListener());
         trackID = ProjectConnector.getInstance().getLatestTrackId();
     }
 
@@ -81,8 +82,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
         return trackJobView.getJobs();
     }
 
-    public List<SeqPairJobContainer> getSeqPairTrackJobList() {
-        return seqPairTrackJobsView.getJobs();
+    public List<ReadPairJobContainer> getReadPairTrackJobList() {
+        return readPairTrackJobsView.getJobs();
     }
 
     @Override
@@ -102,7 +103,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         refJobView = new de.cebitec.vamp.ui.importer.RefJobView();
         trackJobView = new de.cebitec.vamp.ui.importer.TrackJobView();
-        seqPairTrackJobsView = new de.cebitec.vamp.ui.importer.SeqPairJobView();
+        readPairTrackJobsView = new de.cebitec.vamp.ui.importer.ReadPairJobView();
         addJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
@@ -114,9 +115,9 @@ public class ImportSetupCard extends javax.swing.JPanel {
         jTabbedPane1.addTab("References", refJobView);
         jTabbedPane1.addTab("Tracks", trackJobView);
 
-        final de.cebitec.vamp.parser.mappings.SeqPairClassifierI seqPairCalculator = Lookup.getDefault().lookup(de.cebitec.vamp.parser.mappings.SeqPairClassifierI.class);
-        if (seqPairCalculator != null) {
-            jTabbedPane1.addTab("Read Pair Tracks", seqPairTrackJobsView);
+        final ReadPairClassifierI readPairCalculator = Lookup.getDefault().lookup(ReadPairClassifierI.class);
+        if (readPairCalculator != null) {
+            jTabbedPane1.addTab("Read Pair Tracks", readPairTrackJobsView);
         }
 
         addJob.setText(org.openide.util.NbBundle.getMessage(ImportSetupCard.class, "ImportSetupCard.button.newJob")); // NOI18N
@@ -172,10 +173,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
             if (c instanceof RefJobView) {
                 title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.reference");
                 dialogPane = new NewReferenceDialogPanel();
-            } else if (c instanceof SeqPairJobView) {
-                title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.seqPairTrack");
-                dialogPane = new NewSeqPairTracksDialogPanel();
-                ((NewSeqPairTracksDialogPanel) dialogPane).setReferenceJobs(refJobView.getJobs());
+            } else if (c instanceof ReadPairJobView) {
+                title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.readPairTrack");
+                dialogPane = new NewReadPairTracksDialogPanel();
+                ((NewReadPairTracksDialogPanel) dialogPane).setReferenceJobs(refJobView.getJobs());
             } else if (c instanceof TrackJobView) {
                 title = NbBundle.getMessage(ImportSetupCard.class, "TTL_ImportSetupCard.dialog.title.track");
                 dialogPane = new NewTrackDialogPanel();
@@ -202,12 +203,12 @@ public class ImportSetupCard extends javax.swing.JPanel {
                     NewReferenceDialogPanel nrdp = (NewReferenceDialogPanel) dialogPane;
                     refJobView.add(nrdp.getReferenceJob());
                 
-                } else if (dialogPane instanceof NewSeqPairTracksDialogPanel) {
-                    NewSeqPairTracksDialogPanel seqPairPane = (NewSeqPairTracksDialogPanel) dialogPane;
+                } else if (dialogPane instanceof NewReadPairTracksDialogPanel) {
+                    NewReadPairTracksDialogPanel readPairPane = (NewReadPairTracksDialogPanel) dialogPane;
                     
-                    if (seqPairPane.useMultipleImport()) {
-                        List<File> mappingFiles1 = seqPairPane.getMappingFiles();
-                        List<File> mappingFiles2 = seqPairPane.getMappingFiles2();
+                    if (readPairPane.useMultipleImport()) {
+                        List<File> mappingFiles1 = readPairPane.getMappingFiles();
+                        List<File> mappingFiles2 = readPairPane.getMappingFiles2();
 
                         int largestSize = mappingFiles1.size() > mappingFiles2.size() ? mappingFiles1.size() : mappingFiles2.size();
                         
@@ -220,10 +221,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
                             if (i < mappingFiles2.size()) {
                                 file2 = mappingFiles2.get(i);
                             }
-                            this.addSeqPairJobToList(seqPairPane, file1, file2);
+                            this.addReadPairJobToList(readPairPane, file1, file2);
                         }
                     } else {
-                        this.addSeqPairJobToList(seqPairPane, seqPairPane.getMappingFile1(), seqPairPane.getMappingFile2());
+                        this.addReadPairJobToList(readPairPane, readPairPane.getMappingFile1(), readPairPane.getMappingFile2());
                     }
 
                 } else if (dialogPane instanceof NewTrackDialogPanel) {
@@ -235,23 +236,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
                         trackJob.setIsSorted(newTrackPanel.isFileSorted());
                         trackJobView.add(trackJob);
                     }
-                } else if (dialogPane instanceof NewPositionTableDialog) {
-                    NewPositionTableDialog posTableDialog = (NewPositionTableDialog) dialogPane;
-                    ReferenceJob refJob = posTableDialog.getReferenceJob();
-                    TrackJob parentTrackJob = posTableDialog.getParentTrack();
-                    
-                    TrackJob trackJob = new TrackJob(parentTrackJob.getID(), 
-                            parentTrackJob.isDbUsed(), 
-                            posTableDialog.getMappingFile(), 
-                            "", 
-                            refJob, 
-                            posTableDialog.getCurrentParser(), 
-                            true, 
-                            new Timestamp(System.currentTimeMillis()));
-                    
-                    refJob.registerTrackWithoutRunJob(trackJob);
                 }
-
+                
             }
         } else {
             // do nothing
@@ -269,8 +255,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
             } else {
                 refJobView.remove(job);
             }
-        } else if (c instanceof SeqPairJobView) {
-            seqPairTrackJobsView.remove(seqPairTrackJobsView.getSelectedItem());
+        } else if (c instanceof ReadPairJobView) {
+            readPairTrackJobsView.remove(readPairTrackJobsView.getSelectedItem());
         } else if (c instanceof TrackJobView) {
             trackJobView.remove(trackJobView.getSelectedItem());
         }
@@ -283,8 +269,8 @@ public class ImportSetupCard extends javax.swing.JPanel {
             if (refJobView.IsRowSelected()) {
                 isSelected = true;
             }
-        } else if (c instanceof SeqPairJobView) {
-            if (seqPairTrackJobsView.isRowSelected()) {
+        } else if (c instanceof ReadPairJobView) {
+            if (readPairTrackJobsView.isRowSelected()) {
                 isSelected = true;
             }
         } else if (c instanceof TrackJobView) {
@@ -303,35 +289,35 @@ public class ImportSetupCard extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addJob;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private de.cebitec.vamp.ui.importer.ReadPairJobView readPairTrackJobsView;
     private de.cebitec.vamp.ui.importer.RefJobView refJobView;
     private javax.swing.JButton removeJob;
-    private de.cebitec.vamp.ui.importer.SeqPairJobView seqPairTrackJobsView;
     private de.cebitec.vamp.ui.importer.TrackJobView trackJobView;
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Creates and adds a sequence pair job to the list of sequence pair jobs.
-     * @param seqPairPane 
+     * Creates and adds a read pair job to the list of read pair jobs.
+     * @param readPairPane 
      */
-    private void addSeqPairJobToList(NewSeqPairTracksDialogPanel seqPairPane, File mappingFile1, File mappingFile2) {
+    private void addReadPairJobToList(NewReadPairTracksDialogPanel readPairPane, File mappingFile1, File mappingFile2) {
 
         if (mappingFile1 == null) {
             mappingFile1 = mappingFile2;
             mappingFile2 = null;
         }
         
-        TrackJob trackJob1 = this.createTrackJob(seqPairPane, mappingFile1);
+        TrackJob trackJob1 = this.createTrackJob(readPairPane, mappingFile1);
         TrackJob trackJob2 = null;
         if (mappingFile2 != null) {
-            trackJob2 = this.createTrackJob(seqPairPane, mappingFile2);
+            trackJob2 = this.createTrackJob(readPairPane, mappingFile2);
         }
 
-        this.seqPairTrackJobsView.add(new SeqPairJobContainer(trackJob1, trackJob2,
-                seqPairPane.getDistance(), seqPairPane.getDeviation(), seqPairPane.getOrientation()));
+        this.readPairTrackJobsView.add(new ReadPairJobContainer(trackJob1, trackJob2,
+                readPairPane.getDistance(), readPairPane.getDeviation(), readPairPane.getOrientation()));
     }
     
     /**
-     * Creates a new track job for a sequence pair import.
+     * Creates a new track job for a read pair import.
      * @param importPanel panel with details
      * @param mappingFile mapping file to add to the track job
      * @param useMultipleImport true, if multiple files were selected in the panel

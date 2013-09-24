@@ -18,8 +18,6 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +26,7 @@ import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
-import javax.imageio.ImageIO;
 import javax.swing.JSlider;
-import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 /**
@@ -76,7 +72,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
  //   public static final String PROP_TRACK_CLICKED = "track clicked";
   //  public static final String PROP_TRACK_ENTERED = "track entered";
     private boolean combineTracks;
-    private BufferedImage loadingIndicator;
 
     /**
      * Create a new panel to show coverage information
@@ -90,15 +85,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
             TrackConnector trackCon, boolean combineTracks) {
         super(boundsManager, basePanel, refGen);
-        
-        //read loadingIndicator icon from package resources
-        try { 
-            InputStream stream = TrackViewer.class
-            .getResourceAsStream( "loading.png" );
-            this.loadingIndicator = ImageIO.read( stream ); 
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
         
         this.trackCon = trackCon;
         this.twoTracks = this.trackCon.getAssociatedTrackNames().size() > 1; 
@@ -232,8 +218,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
             g.setColor(fillcolor);
-            if (this.loadingIndicator != null) {
-                g.drawImage(this.loadingIndicator, this.getWidth() - 60 - loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            BufferedImage loadingIndicator = this.getLoadingIndicator();
+            if (loadingIndicator != null) {
+                g.drawImage(loadingIndicator, this.getWidth() - 60 - loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
             }
             //g.fillRect(0, 0, this.getHeight()/4, this.getHeight()/4); //this.getWidth(), this.getHeight()/3);
         }

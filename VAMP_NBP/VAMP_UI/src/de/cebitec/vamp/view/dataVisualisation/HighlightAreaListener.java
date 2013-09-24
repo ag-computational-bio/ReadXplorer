@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.common.sequencetools.GeneticCode;
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -43,7 +43,7 @@ public class HighlightAreaListener extends MouseAdapter {
     private int seqStart;
     private int seqEnd;
     private String refName;
-
+    
     /**
      * @param parentComponent the component the listener is associated to
      * @param baseLineY the baseline of the vie
@@ -60,6 +60,7 @@ public class HighlightAreaListener extends MouseAdapter {
         this.freezeRect = false;
         this.isFwdStrand = true;
         this.specialRegionList = new HashMap<>();
+       // this.feature = parentComponent.getPersistantReference()
     }
 
     @Override
@@ -163,18 +164,21 @@ public class HighlightAreaListener extends MouseAdapter {
             final String header = this.getHeader();
             //add copy option
             popUp.add(menuItemFactory.getCopyItem(selSequence));
+            //add translated copy option
+            popUp.add(menuItemFactory.getCopyTranslatedItem(selSequence));
             //add copy position option
             popUp.add(menuItemFactory.getCopyPositionItem(parentComponent.getCurrentMousePosition()));
             //add center current position option
             popUp.add(menuItemFactory.getJumpToPosItem(this.parentComponent.getBoundsInfoManager(), parentComponent.getCurrentMousePosition()));
             //add store as fasta file option
             popUp.add(menuItemFactory.getStoreFastaItem(selSequence, refName, seqStart, seqEnd));
+            //add store translated sequence as fasta file option
+            popUp.add(menuItemFactory.getStoreTranslatedFastaItem(selSequence, refName, seqStart, seqEnd));
             //add calculate secondary structure option
             final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
             if (rnaFolderControl != null) {
                 popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, selSequence, header));
             }
-
 
             popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
         }
@@ -288,11 +292,14 @@ public class HighlightAreaListener extends MouseAdapter {
             if (this.highlightRect != null) {
                 final String selSequence = this.getMarkedSequence();
                 final String header = this.getHeader();
-                
+               
                 //add copy option
                 popUp.add(menuItemFactory.getCopyItem(selSequence));
+                popUp.add(menuItemFactory.getCopyTranslatedItem(selSequence));
                 //add store as fasta file option
                 popUp.add(menuItemFactory.getStoreFastaItem(selSequence, refName, seqStart, seqEnd));
+                //add store translated sequence as fasta file option
+                popUp.add(menuItemFactory.getStoreTranslatedFastaItem(selSequence, refName, seqStart, seqEnd));
                 //add calculate secondary structure option
                 final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
                 if (rnaFolderControl != null) {
@@ -339,7 +346,8 @@ public class HighlightAreaListener extends MouseAdapter {
      */
     private Region findNextStopPos(int start, PersistantReference reference) {
         
-        GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.SEL_GENETIC_CODE, "1")));
+        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+        GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.SEL_GENETIC_CODE, "1")));
         List<String> stopCodons = code.getStopCodons();
         List<Integer> results = new ArrayList<>();
         

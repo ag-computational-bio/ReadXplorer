@@ -4,15 +4,23 @@ import de.cebitec.vamp.databackend.dataObjects.*;
 import de.cebitec.vamp.parser.mappings.ParserCommonMethods;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.ReadPairType;
 import de.cebitec.vamp.util.SamUtils;
 import de.cebitec.vamp.util.SequenceUtils;
+import java.awt.Dialog;
 import java.io.File;
+import java.nio.BufferUnderflowException;
 import java.util.*;
+import javax.swing.JButton;
 import net.sf.samtools.SAMException;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeIOException;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
 
 /**
  * A SamBamFileReader has different methods to read data from a bam or sam file.
@@ -57,11 +65,32 @@ public class SamBamFileReader implements Observable {
     }
     
     /**
-     * Checks if the index of the bam file is present or creates it.
+     * Checks if the index of the bam file is present or creates it. If it
+     * needs to be created, the gui is blocked by a dialog, which waits for
+     * the finish signal of the index creation.
+     * @return true, if the index already exists, false otherwise
      */
     private void checkIndex() {
         if (!samFileReader.hasIndex()) {
-            samUtils.createIndex(samFileReader, new File(dataFile.getAbsolutePath().concat(Properties.BAM_INDEX_EXT)));
+            final ProgressHandle progressHandle = ProgressHandleFactory.createHandle("BAM index missing, recreating it...");
+            progressHandle.start();
+            
+            final IndexBamNotificationPanel indexPanel = new IndexBamNotificationPanel();
+            final JButton okButton = new JButton("OK");
+            DialogDescriptor dialogDescriptor = new DialogDescriptor(indexPanel, "BAM index missing!", true, new JButton[]{okButton}, okButton, DialogDescriptor.DEFAULT_ALIGN, null, null);
+            Thread indexThread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    samUtils.createIndex(samFileReader, new File(dataFile.getAbsolutePath().concat(Properties.BAM_INDEX_EXT)));
+                    okButton.setEnabled(true);
+                    progressHandle.finish();
+                }
+            });
+            indexThread.start();
+            Dialog indexDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+            okButton.setEnabled(false);
+            indexDialog.setVisible(true); 
         }
     }
 
@@ -147,6 +176,8 @@ public class SamBamFileReader implements Observable {
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
+        } catch (BufferUnderflowException e) {
+            //do nothing
         }
         
         return mappings;
@@ -198,6 +229,8 @@ public class SamBamFileReader implements Observable {
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
+        } catch (BufferUnderflowException e) {
+            //do nothing
         }
         
         return mappings;
@@ -213,10 +246,10 @@ public class SamBamFileReader implements Observable {
      * from the file as well
      * @return the coverage for the given interval
      */
-    public Collection<PersistantSeqPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome,
+    public Collection<PersistantReadPairGroup> getSeqPairMappingsFromBam(PersistantReference refGenome,
             IntervalRequest request, boolean diffsAndGapsNeeded) {
-        HashMap<Long, PersistantSeqPairGroup> seqPairs = new HashMap<>();
-        Collection<PersistantSeqPairGroup> seqPairGroups = new ArrayList<>();
+        HashMap<Long, PersistantReadPairGroup> seqPairs = new HashMap<>();
+        Collection<PersistantReadPairGroup> seqPairGroups = new ArrayList<>();
         
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
@@ -237,14 +270,14 @@ public class SamBamFileReader implements Observable {
             Integer numMappingsForRead;
             Integer pairId;
             Integer pairType;
-            long seqPairId;
-            byte seqPairType;
+            long readPairId;
+            ReadPairType readPairType;
             int mateStart;
             int mateStop;
             boolean bothVisible;
             PersistantMapping mapping;
             PersistantMapping mate;
-            PersistantSeqPairGroup newGroup;
+            PersistantReadPairGroup newGroup;
             int numReplicates = 1;
 
             while (samRecordIterator.hasNext()) {
@@ -278,19 +311,19 @@ public class SamBamFileReader implements Observable {
                         mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, startPos, stop, isFwdStrand);
                         if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new seqPair if not exists
-                            seqPairId = (long) pairId;
-                            seqPairType = Byte.valueOf(pairType.toString());
-                            if (!seqPairs.containsKey(seqPairId)) {
-                                newGroup = new PersistantSeqPairGroup();
-                                newGroup.setSeqPairId(pairId);
-                                seqPairs.put(seqPairId, newGroup);
+                            readPairId = (long) pairId;
+                            readPairType = ReadPairType.getReadPairType(pairType);
+                            if (!seqPairs.containsKey(readPairId)) {
+                                newGroup = new PersistantReadPairGroup();
+                                newGroup.setReadPairId(pairId);
+                                seqPairs.put(readPairId, newGroup);
                             } //TODO: check where ids are needed
                             try {
                                 mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, !record.getMateNegativeStrandFlag());
                             } catch (IllegalStateException e) {
                                 mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, true);
                             } //TODO: get mate data from querried records later
-                            seqPairs.get(seqPairId).addPersistantDirectAccessMapping(mapping, mate, seqPairType, bothVisible);
+                            seqPairs.get(readPairId).addPersistantDirectAccessMapping(mapping, mate, readPairType, bothVisible);
                         }
 
                         if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE) {
@@ -306,6 +339,8 @@ public class SamBamFileReader implements Observable {
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
+        } catch (BufferUnderflowException e) {
+            //do nothing
         }
 
         return seqPairGroups;
@@ -354,7 +389,7 @@ public class SamBamFileReader implements Observable {
         List<PersistantDiff> diffs = new ArrayList<>(); //both empty for read starts
         List<PersistantReferenceGap> gaps = new ArrayList<>();
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false, from, to);
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false);
         try {
             this.checkIndex();
             SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
@@ -383,10 +418,12 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false, from, to);
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
+        } catch (BufferUnderflowException e) {
+            //do nothing
         }
 
         return result;
@@ -423,7 +460,7 @@ public class SamBamFileReader implements Observable {
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
         if (diffsAndGapsNeeded) {
             refSeq = refGenome.getSequence();
         }
@@ -469,11 +506,13 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
             result.setReadStarts(readStarts);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
+        } catch (BufferUnderflowException e) {
+            //do nothing
         }
 
         return result;
@@ -508,7 +547,7 @@ public class SamBamFileReader implements Observable {
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
         if (diffsAndGapsNeeded) {
             refSeq = refGenome.getSequence();
         }
@@ -552,10 +591,12 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded, from, to);
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
+        } catch (BufferUnderflowException e) {
+            //do nothing
         }
 
         return result;

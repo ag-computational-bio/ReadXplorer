@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class MappingResultPersistant extends PersistantResult {
     
+    private static final long serialVersionUID = 1L;
+    
     private List<PersistantMapping> mappings;
 
     /**

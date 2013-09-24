@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class PersistantResult implements Serializable {
+    private static final long serialVersionUID = 1L;
     
     private int lowerBound;
     private int upperBound;

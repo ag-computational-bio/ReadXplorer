@@ -177,7 +177,10 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
             factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, optionBox.isSelected());
         }
     }
-    
+
+    /**
+     * @return The list of currently opened track base panels.
+     */
     public List<BasePanel> getOpenTracks(){
         return currentTracks ;
     }

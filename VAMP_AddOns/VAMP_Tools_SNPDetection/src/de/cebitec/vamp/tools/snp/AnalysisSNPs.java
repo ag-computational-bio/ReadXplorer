@@ -58,7 +58,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistant covAndDiffs = new CoverageAndDiffResultPersistant(null, null, null, true, 0, 0);
+        CoverageAndDiffResultPersistant covAndDiffs = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, true);
 
         if (data.getClass() == covAndDiffs.getClass()) {
             covAndDiffs = (CoverageAndDiffResultPersistant) data;

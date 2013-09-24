@@ -73,7 +73,7 @@ public class DeSeqWizardPanelFit implements WizardDescriptor.ValidatingPanel<Wiz
     @Override
     public void validate() throws WizardValidationException {
         if(!getComponent().allConditionGroupsAssigned()){
-            throw new WizardValidationException(null, "Please assigne all conditional groups to a fitting group.", null);       
+            throw new WizardValidationException(null, "Please assign all conditional groups to a fitting group.", null);       
         }
     }
 }

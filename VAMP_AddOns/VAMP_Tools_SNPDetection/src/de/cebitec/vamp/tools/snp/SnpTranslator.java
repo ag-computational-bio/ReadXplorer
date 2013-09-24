@@ -1,8 +1,8 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.common.sequencetools.AminoAcidProperties;
-import de.cebitec.common.sequencetools.GeneticCode;
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
@@ -13,12 +13,10 @@ import de.cebitec.vamp.util.SequenceComparison;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.util.polyTree.Node;
 import de.cebitec.vamp.util.polyTree.NodeVisitor;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.Preferences;
-import javax.swing.JOptionPane;
 import org.openide.util.NbPreferences;
 
 /**
@@ -76,12 +74,8 @@ public class SnpTranslator {
         this.refLength = reference.getRefLength();
         index = 0;
         this.pref = NbPreferences.forModule(Object.class);
-        try {
-            GeneticCodeFactory.initGeneticCodes();
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf( //init for later use
+        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+        code = genCodeFactory.getGeneticCodeById(Integer.valueOf(
                 pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD_CODE_INDEX)));
     }
     

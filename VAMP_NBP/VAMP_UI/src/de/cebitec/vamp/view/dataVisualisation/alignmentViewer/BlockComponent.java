@@ -75,6 +75,8 @@ public class BlockComponent extends JComponent {
                     final String mappingSequence = getSequence();
                     //add copy option
                     popUp.add(menuItemFactory.getCopyItem(mappingSequence));
+                    //add copy translated sequence option
+                    popUp.add(menuItemFactory.getCopyTranslatedItem(mappingSequence));
                     //add copy position option
                     popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
                     //add center current position option

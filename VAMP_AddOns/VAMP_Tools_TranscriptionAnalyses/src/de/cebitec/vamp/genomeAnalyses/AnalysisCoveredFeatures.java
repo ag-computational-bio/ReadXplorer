@@ -84,7 +84,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistant coverageAndDiffResult = new CoverageAndDiffResultPersistant(null, null, null, true, 0, 0);
+        CoverageAndDiffResultPersistant coverageAndDiffResult = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, true);
         
         if (data.getClass() == coverageAndDiffResult.getClass()) {
             coverageAndDiffResult = (CoverageAndDiffResultPersistant) data;

@@ -1,6 +1,7 @@
 package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.VisualisationUtils;
@@ -42,7 +43,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
             while (!interrupted()) {
 
                 IntervalRequest request = requestQueue.poll();
-                CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(null, null, null, false, 0, 0);
+                CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
                 if (request != null) {
                     if (request.getDesiredData() == Properties.READ_STARTS) {
                         currentCov = this.loadReadStartsAndCoverage(request);

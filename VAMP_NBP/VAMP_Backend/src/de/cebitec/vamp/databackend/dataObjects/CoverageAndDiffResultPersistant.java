@@ -25,18 +25,16 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
     /**
      * Data storage for coverage, diffs and gaps.
      * @param coverage the coverage container to store. If it is not used, you can
-     *      add null or an empty coverage container.
+     *      add an empty coverage container.
      * @param diffs the list of diffs to store, if they are not used, you can add null
      *      or an empty list.
      * @param gaps the list of gaps to store, if they are not use, you can add null
      *      or an empty list
      * @param diffsAndGapsUsed true, if this is a result from querying also diffs and gaps
-     * @param lowerBound the lower bound of the requested interval
-     * @param upperBound the upper bound of the requested interval
      */
     public CoverageAndDiffResultPersistant(PersistantCoverage coverage, List<PersistantDiff> diffs, List<PersistantReferenceGap> gaps, 
-            boolean diffsAndGapsUsed, int lowerBound, int upperBound) {
-        super(lowerBound, upperBound);
+            boolean diffsAndGapsUsed) {
+        super(coverage.getLeftBound(), coverage.getRightBound());
         this.coverage = coverage;
         this.readStarts = null;
         this.diffs = diffs;

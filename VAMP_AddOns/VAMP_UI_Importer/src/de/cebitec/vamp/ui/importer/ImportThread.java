@@ -1,10 +1,12 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readXplorer.readPairClassifier.SamBamDirectReadPairClassifier;
+import de.cebitec.readXplorer.readPairClassifier.SamBamDirectReadPairStatsParser;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
+import de.cebitec.vamp.parser.ReadPairJobContainer;
 import de.cebitec.vamp.parser.ReferenceJob;
-import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.parser.mappings.MappingParserI;
@@ -14,8 +16,6 @@ import de.cebitec.vamp.parser.output.SamBamExtender;
 import de.cebitec.vamp.parser.reference.Filter.FeatureFilter;
 import de.cebitec.vamp.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
-import de.cebitec.vamp.seqPairClassifier.SamBamDirectSeqPairClassifier;
-import de.cebitec.vamp.seqPairClassifier.SamBamDirectSeqPairStatsParser;
 import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observer;
@@ -45,7 +45,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private InputOutput io;
     private List<ReferenceJob> references;
     private List<TrackJob> tracksJobs;
-    private List<SeqPairJobContainer> seqPairJobs;
+    private List<ReadPairJobContainer> seqPairJobs;
 //    private List<TrackJob> posTableJobs;
     private ProgressHandle ph;
     private int workunits;
@@ -59,7 +59,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * @param seqPairJobs sequence pair jobs to import
      * @param posTableJobs position table jobs to import
      */
-    public ImportThread(List<ReferenceJob> refJobs, List<TrackJob> trackJobs, List<SeqPairJobContainer> seqPairJobs) {
+    public ImportThread(List<ReferenceJob> refJobs, List<TrackJob> trackJobs, List<ReadPairJobContainer> seqPairJobs) {
         super();
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(ImportThread.class, "ImportThread.output.name"), false);
         this.tracksJobs = trackJobs;
@@ -116,23 +116,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
     }
-
-    
-//    /**
-//     * Calls the appropriate method for storing a track in the db.
-//     * @param track the track data to store
-//     * @param trackJob the track job belonging to the track
-//     * @param seqPairs true, if this is a sequence pair track, false otherwise
-//     * @param onlyPosTable true, if only the position table should be stored, but not the track
-//     * @throws StorageException 
-//     */
-//    private void storeTrack(ParsedTrack track, TrackJob trackJob, boolean seqPairs, boolean onlyPosTable) throws StorageException {
-//        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
-//
-//        ProjectConnector.getInstance().addTrack(track, seqPairs, onlyPosTable);
-//
-//        Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing track data from source \"{0}\"", trackJob.getFile().getAbsolutePath());
-//    }
 
     /**
      * Processes all reference genome jobs of this import process.
@@ -253,9 +236,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             long finish;
             String msg;
 
-            for (Iterator<SeqPairJobContainer> it = seqPairJobs.iterator(); it.hasNext();) {
+            for (Iterator<ReadPairJobContainer> it = seqPairJobs.iterator(); it.hasNext();) {
                 start = System.currentTimeMillis();
-                SeqPairJobContainer seqPairJobContainer = it.next();
+                ReadPairJobContainer seqPairJobContainer = it.next();
                 ph.progress(workunits++);
 
                 int distance = seqPairJobContainer.getDistance();
@@ -392,7 +375,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 }
 
                                 //extension for both classification and seq pair info
-                                SamBamDirectSeqPairClassifier samBamDirectSeqPairClassifier = new SamBamDirectSeqPairClassifier(
+                                SamBamDirectReadPairClassifier samBamDirectSeqPairClassifier = new SamBamDirectReadPairClassifier(
                                         seqPairJobContainer, referenceSeq, classificationMap);
                                 samBamDirectSeqPairClassifier.registerObserver(this);
                                 samBamDirectSeqPairClassifier.setStatsContainer(statsContainer);
@@ -414,7 +397,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         } else { //else case with 2 already imported tracks is prohibited
                             //we have to calculate the stats
                             ph.progress(workunits++);
-                            SamBamDirectSeqPairStatsParser statsParser = new SamBamDirectSeqPairStatsParser(seqPairJobContainer, referenceSeq, null);
+                            SamBamDirectReadPairStatsParser statsParser = new SamBamDirectReadPairStatsParser(seqPairJobContainer, referenceSeq, null);
                             statsParser.setStatsContainer(statsContainer);
                             try {
                                 statsParser.registerObserver(this);
@@ -599,8 +582,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 mappingParser.registerObserver(this);
                 Object parsingResult = mappingParser.parseInput(trackJob, referenceSeq);
                 mappingParser.removeObserver(this);
-                GeneralUtils.deleteOldWorkFile(lastWorkFile); //since input file is read only!
-                lastWorkFile = trackJob.getFile();
                 ph.progress(workunits++);
                 if (parsingResult instanceof DirectAccessDataContainer) {
                     DirectAccessDataContainer dataContainer = (DirectAccessDataContainer) parsingResult;
@@ -725,7 +706,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 //     * @param description the data set description
 //     * @throws StorageException 
 //     */
-//    private void storeSeqPairs(ParsedSeqPairContainer seqPairContainer, String description) throws StorageException {
+//    private void storeSeqPairs(ParsedReadPairContainer seqPairContainer, String description) throws StorageException {
 //        
 //        this.io.getOut().println("Start storing sequence pair data for track data from source \""+ description +"\"");
 //        ProjectConnector.getInstance().addSeqPairData(seqPairContainer);

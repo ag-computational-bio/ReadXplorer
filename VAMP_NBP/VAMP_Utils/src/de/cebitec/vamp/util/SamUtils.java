@@ -54,7 +54,6 @@ public class SamUtils implements Observable {
      * Generates a BAM index file from an input BAM file.
      * @param reader SAMFileReader for input BAM file
      * @param output  File for output index file
-     *
      * @return true, if the index creation succeeded, false otherwise
      * @author Martha Borkan, rhilker
      */

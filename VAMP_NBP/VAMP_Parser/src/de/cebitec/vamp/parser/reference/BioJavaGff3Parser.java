@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.biojava.bio.BioException;
 import org.biojava.bio.program.gff3.GFF3DocumentHandler;
 import org.biojava.bio.program.gff3.GFF3Parser;
@@ -21,15 +23,17 @@ import org.biojava.bio.program.gff3.GFF3Record;
 import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
 import org.biojava.utils.ParserException;
-import org.openide.util.Exceptions;
 
 /**
- *
+ * A GFF 3 parser for parsing the sequence from a fasta file contained in the
+ * ReferenceJob and the GFF3 annotations from the GFF3 file contained in the
+ * ReferenceJob.
+ * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class BioJavaGff3Parser extends FastaReferenceParser {
     
-    // Fileextension used by Filechooser to choose files to be parsed by this parser
+    // File extension used by Filechooser to choose files to be parsed by this parser
     private static final String[] fileExtension = new String[]{"gff", "gff3"};
     // name of this parser for use in ComboBoxes
     private static final String parserName = "GFF3 file";
@@ -37,6 +41,14 @@ public class BioJavaGff3Parser extends FastaReferenceParser {
     private ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
+    /**
+     * Parses the sequence from a fasta file contained in the ReferenceJob and
+     * the GFF3 annotations from the GFF3 file contained in the ReferenceJob.
+     * @param referenceJob the reference job containing the files
+     * @param filter the feature filter to use (removes undesired features)
+     * @return the parsed reference object with all parsed features
+     * @throws ParsingException 
+     */
     @Override
     public ParsedReference parseReference(final ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         
@@ -177,33 +189,9 @@ public class BioJavaGff3Parser extends FastaReferenceParser {
                 }
             }, new Ontology.Impl("Ontologyname", "name of ontology"));
             
-//            System.out.println("parsing of old gff2");
-//            
-//            gffParser.parse(reader, new GFFDocumentHandler() {
-//
-//                @Override
-//                public void startDocument(String string) {
-//                    System.out.println("Start: " + string);
-//                }
-//
-//                @Override
-//                public void endDocument() {
-//                    System.out.println("end");
-//                }
-//
-//                @Override
-//                public void commentLine(String string) {
-//                    System.out.println("Comment: " + string);
-//                }
-//
-//                @Override
-//                public void recordLine(GFFRecord gffr) {
-//                    System.out.println("record: " + gffr.getStart());
-//                }
-//            });
-            
         } catch (IOException | BioException | ParserException ex) {
-            Exceptions.printStackTrace(ex);
+            JOptionPane.showMessageDialog(new JPanel(), ex.toString(), "Exception", JOptionPane.ERROR_MESSAGE);
+            throw new ParsingException(ex);
         }
 
         return refGenome;

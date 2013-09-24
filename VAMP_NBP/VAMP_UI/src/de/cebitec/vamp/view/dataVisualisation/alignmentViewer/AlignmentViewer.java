@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.swing.JPanel;
 
 /**
  * Viewer to show alignments of reads to the reference.
@@ -31,7 +30,6 @@ import javax.swing.JPanel;
 public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
-    private static int height = 500;
     private TrackConnector trackConnector;
     private LayoutI layout;
     private int blockHeight;
@@ -45,7 +43,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private float percentSandBPerCovUnit;
     private int oldLogLeft;
     private int oldLogRight;
-    boolean needRepaint = false;
+    boolean mappingsLoading = false;
     MappingResultPersistant mappingResult;
     HashMap<Integer, Integer> completeCoverage;
 
@@ -75,7 +73,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public int getMaximalHeight() {
-        return height;
+        return this.getHeight();
     }
 
     @Override
@@ -107,31 +105,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             this.requestData(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
         }
     }
-
-    /*
-     * places the excuse panel if zoom level is too high
-     */
-    private void placeExcusePanel(JPanel p) {
-        // has to be checked for null because, this method may be called upon
-        // initialization of this object (depending on behaviour of AbstractViewer)
-        // BEFORE the panels are initialized!
-        if (p != null) {
-            int tmpWidth = p.getPreferredSize().width;
-            int x = this.getSize().width / 2 - tmpWidth / 2;
-            if (x < 0) {
-                x = 0;
-            }
-
-            int tmpHeight = p.getPreferredSize().height;
-            int y = this.getSize().height / 2 - tmpHeight / 2;
-            if (y < 0) {
-                y = 0;
-            }
-            p.setBounds(x, y, tmpWidth, tmpHeight);
-            this.add(p);
-            this.updateUI();
-        }
-    }
     
     /**
      * Requests new mapping data for the current bounds or shows the mapping 
@@ -139,16 +112,17 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      */
     private void requestData(int from, int to) {
         
-        setCursor(new Cursor(Cursor.WAIT_CURSOR));
         int logLeft = this.getBoundsInfo().getLogLeft();
         int logRight = this.getBoundsInfo().getLogRight();
         if (logLeft != this.oldLogLeft || logRight != this.oldLogRight) {
             
+            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            this.mappingsLoading = true;
             trackConnector.addMappingRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_W_DIFFS));
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
-        } else {
-            showData();
+//        } else {
+//            showData();
         }
     }
     
@@ -163,7 +137,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     public void receiveData(Object data) {
         if (data.getClass().equals(mappingResult.getClass())) {
             this.mappingResult = ((MappingResultPersistant) data);
-            this.needRepaint = true;
             this.showData();
         }
     }
@@ -172,8 +145,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Actually takes care of the drawing of all components of the viewer.
      */
     private void showData() {
-        
-        if (this.needRepaint) {
 
             this.findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
             this.findMaxCoverage(completeCoverage);
@@ -199,9 +170,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             
-            this.needRepaint = false;
+            this.mappingsLoading = false;
             this.repaint();
-        }
     }
 
     /**
@@ -255,12 +225,10 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param layout the layout containing all information about the mappingResult to paint
      */
     private void addBlocks(LayoutI layout) {
-        int layerCounter;
-        int countingStep;
 
         // forward strand
-        layerCounter = 1;
-        countingStep = 1;
+        int layerCounter = 1;
+        int countingStep = 1;
         Iterator<LayerI> it = layout.getForwardIterator();
         while (it.hasNext()) {
             LayerI b = it.next();

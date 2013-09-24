@@ -7,7 +7,7 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.ImportThread;
 import de.cebitec.vamp.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.vamp.ui.importer.ImportWizardOverviewPanel;
-import de.cebitec.vamp.parser.SeqPairJobContainer;
+import de.cebitec.vamp.parser.ReadPairJobContainer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
@@ -60,7 +60,7 @@ public final class ImportWizardAction implements ActionListener {
             List<ReferenceJob> refJobs = (List<ReferenceJob>) wizardDescriptor.getProperty(PROP_REFJOBLIST);
             List<TrackJob> trackJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
              //since sequence pair jobs have their own parser it can be distinguished later
-            List<SeqPairJobContainer> seqPairJobs = (List<SeqPairJobContainer>) wizardDescriptor.getProperty(PROP_SEQPAIRJOBLIST);
+            List<ReadPairJobContainer> seqPairJobs = (List<ReadPairJobContainer>) wizardDescriptor.getProperty(PROP_SEQPAIRJOBLIST);
 
             ImportThread i = new ImportThread(refJobs, trackJobs, seqPairJobs);
             RequestProcessor rp = new RequestProcessor("Import Threads", 2);
