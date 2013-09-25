@@ -511,26 +511,24 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void installButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installButtonActionPerformed
-        int showConfirmDialog = JOptionPane.showConfirmDialog(null, "ReadXplorer will restart after the installation process is finished. Continue?", "Do you accept the license agreement of GNU R?", JOptionPane.YES_NO_OPTION);
+
+        JTextArea textArea = new JTextArea(license);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        scrollPane.setPreferredSize(new Dimension(500, 500));
+        int showConfirmDialog = JOptionPane.showConfirmDialog(null, scrollPane, "Do you accept the license agreement of GNU R?", JOptionPane.YES_NO_OPTION);
         if (showConfirmDialog == 0) {
-            JTextArea textArea = new JTextArea(license);
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            textArea.setLineWrap(true);
-            textArea.setWrapStyleWord(true);
-            scrollPane.setPreferredSize(new Dimension(500, 500));
-            showConfirmDialog = JOptionPane.showConfirmDialog(null, scrollPane, "Do you accept the license agreement of GNU R?", JOptionPane.YES_NO_OPTION);
-            if (showConfirmDialog == 0) {
-                try {
-                    zipFile = File.createTempFile("ReadXplorer_GNU_R_bundle_", ".zip");
-                    zipFile.deleteOnExit();
-                    downloader = new Downloader(R_ZIP, zipFile);
-                    downloader.registerObserver(this);
-                    Thread th = new Thread(downloader);
-                    th.start();
-                } catch (IOException ex) {
-                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not create temporary file.", currentTimestamp);
-                }
+            try {
+                zipFile = File.createTempFile("ReadXplorer_GNU_R_bundle_", ".zip");
+                zipFile.deleteOnExit();
+                downloader = new Downloader(R_ZIP, zipFile);
+                downloader.registerObserver(this);
+                Thread th = new Thread(downloader);
+                th.start();
+            } catch (IOException ex) {
+                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not create temporary file.", currentTimestamp);
             }
         }
     }//GEN-LAST:event_installButtonActionPerformed
@@ -595,7 +593,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
             File to = File.createTempFile("ReadXplorer_", ".ps1");
             to.deleteOnExit();
             Files.copy(jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "RemoteSigned", "-File", to.getAbsolutePath(), "-Directory", r_dll);
+            ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-ExecutionPolicy", "RemoteSigned", "-File", to.getAbsolutePath(), "-Directory", r_dll, "-Rhome", r_dir.getAbsolutePath());
             pb.redirectInput(ProcessBuilder.Redirect.from(new File("NUL")));
             Process start = pb.start();
             start.waitFor();
@@ -662,8 +660,7 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
                     break;
                 case FINISHED:
                     setPath();
-                    LifecycleManager.getDefault().markForRestart();
-                    LifecycleManager.getDefault().exit();
+                    JOptionPane.showMessageDialog(null, "Changes will only take effect after you restart the application");
                     break;
                 case NO_RIGHTS:
                     messages.setText("Can not write to user dir. Please check permissions.");
