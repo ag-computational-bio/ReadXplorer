@@ -4,6 +4,9 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.ERROR;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.FINISHED;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.RUNNING;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
@@ -157,7 +160,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     }
 
     /**
-     * Adds the results of a finished diff. gene expr. analysis to the table of 
+     * Adds the results of a finished diff. gene expr. analysis to the table of
      * this top component.
      */
     private void addResults() {
@@ -356,28 +359,33 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     @Override
     public void update(Object args) {
-            final AnalysisStatus status = (AnalysisStatus) args;
-            final DiffExpResultViewerTopComponent cmp = this;
-            
-            switch (status) {
-                case RUNNING:
-                    progressHandle.start();
-                    progressHandle.switchToIndeterminate();
-                    break;
-                case FINISHED:
-                    addResults();
-                    progressHandle.switchToDeterminate(100);
-                    progressHandle.finish();
-                    break;
-                case ERROR:
-                    progressHandle.switchToDeterminate(0);
-                    progressHandle.finish();
-                    LogTopComponent = new DiffExpLogTopComponent();
-                    LogTopComponent.open();
-                    LogTopComponent.requestActive();
-                    cmp.close();
-                    break;
+        final AnalysisStatus status = (AnalysisStatus) args;
+        final DiffExpResultViewerTopComponent cmp = this;
+        //Might be called from outside of the EDT, so using swing utils
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                switch (status) {
+                    case RUNNING:
+                        progressHandle.start();
+                        progressHandle.switchToIndeterminate();
+                        break;
+                    case FINISHED:
+                        addResults();
+                        progressHandle.switchToDeterminate(100);
+                        progressHandle.finish();
+                        break;
+                    case ERROR:
+                        progressHandle.switchToDeterminate(0);
+                        progressHandle.finish();
+                        LogTopComponent = new DiffExpLogTopComponent();
+                        LogTopComponent.open();
+                        LogTopComponent.requestActive();
+                        cmp.close();
+                        break;
+                }
             }
+        });
     }
 
     @Override

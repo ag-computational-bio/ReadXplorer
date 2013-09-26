@@ -67,8 +67,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         public String toString() {
             return stringRep;
         }
-        
-        public static Tool[] usableTools(){
+
+        public static Tool[] usableTools() {
             if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
                 return Tool.values();
             } else {
@@ -229,8 +229,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     @Override
     public void notifyObservers(Object data) {
-        for (Observer observer : observerList) {
-            observer.update(data);
+        //Copy the observer list to avoid concurrent modification exception
+        List<Observer> tmpObserver = new ArrayList<>(observerList);
+        for (Iterator<Observer> it = tmpObserver.iterator(); it.hasNext();) {
+            Observer currentObserver = it.next();
+            currentObserver.update(data);
         }
     }
 
@@ -257,12 +260,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
             }
+            notifyObservers(AnalysisStatus.FINISHED);
         }
-        SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
-            @Override
-            public void run() {
-                notifyObservers(AnalysisStatus.FINISHED);
-            }
-        });
     }
 }
