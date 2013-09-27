@@ -40,7 +40,7 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
 
     @Override
     public String getName() {
-        return "Data type selection ... ";
+        return "Data type selection";
     }
 
     public boolean isWholeGenomeTrack() {

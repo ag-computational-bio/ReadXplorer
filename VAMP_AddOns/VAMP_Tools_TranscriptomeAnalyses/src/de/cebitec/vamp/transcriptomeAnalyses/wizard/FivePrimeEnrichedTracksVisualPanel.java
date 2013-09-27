@@ -9,16 +9,18 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements ActionListener{
+public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements ActionListener {
 
+//    public static final String PROP_ANALYSIS_TSS = "TSS";
+//    public static final String PROP_ANALYSIS_PROMOTOR = "PROMOTOR";
+//    public static final String PROP_ANALYSIS_ANTISENSE = "ANTISENSE";
+//    public static final String PROP_ANALYSIS_LEADERLESS = "LEADERLESS";
+//    public static final String PROP_ANALYSIS_RBS = "RBS";
     
-    public static final String PROP_ANALYSIS_TSS = "TSS";
-    public static final String PROP_ANALYSIS_PROMOTOR = "PROMOTOR";
-    public static final String PROP_ANALYSIS_ANTISENSE = "ANTISENSE";
-    public static final String PROP_ANALYSIS_LEADERLESS = "LEADERLESS";
-    public static final String PROP_ANALYSIS_RBS = "RBS";
+    public static final String ACTION_COMMAND_TSSCHECKBOX = "tssCheck";
     private String tssDetectionText = "";
     private String motifSearchText = "";
+
     /**
      * Creates new form FivePrimeEnrichedTracksVisualPanel
      */
@@ -30,9 +32,9 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements 
         jTextArea3.setText(motifSearchText);
         jTextArea3.setEditable(false);
         jScrollPane3.setBorder(BorderFactory.createTitledBorder("Motif-search"));
-        
+
         tssCheckBox.addActionListener(this);
-        tssCheckBox.setActionCommand("tssCheck");
+        tssCheckBox.setActionCommand(ACTION_COMMAND_TSSCHECKBOX);
         leaderlessCheckBox.setEnabled(false);
         antisenseCheckBox.setEnabled(false);
     }
@@ -168,11 +170,22 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements 
     private javax.swing.JCheckBox tssCheckBox;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Controls that antisense and leaderless analyses can be selectable only if
+     * tss-analysis is selected.
+     * 
+     * @param e not in use. 
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("tssCheck")) {
-            leaderlessCheckBox.setEnabled(true);
-            antisenseCheckBox.setEnabled(true);
+        if (e.getActionCommand().equals(ACTION_COMMAND_TSSCHECKBOX)) {
+            if (leaderlessCheckBox.isEnabled() == false && antisenseCheckBox.isEnabled() == false) {
+                leaderlessCheckBox.setEnabled(true);
+                antisenseCheckBox.setEnabled(true);
+            } else {
+                leaderlessCheckBox.setEnabled(false);
+                antisenseCheckBox.setEnabled(false);
+            }
         }
     }
 }

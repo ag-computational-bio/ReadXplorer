@@ -63,21 +63,11 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        if (this.component.isTSSSelected()) {
-            wiz.putProperty("TSSanalysis", FivePrimeEnrichedTracksVisualPanel.PROP_ANALYSIS_TSS);
-        }
-        if (this.component.isRBSSelected()) {
-            wiz.putProperty("RBSanalysis", FivePrimeEnrichedTracksVisualPanel.PROP_ANALYSIS_RBS);
-        }
-        if(this.component.isAntisenseSelected()) {
-            wiz.putProperty("ANTAnalysis", FivePrimeEnrichedTracksVisualPanel.PROP_ANALYSIS_ANTISENSE);
-        }
-        if (this.component.isPromotorSelected()) {
-            wiz.putProperty("PROMOTORAnalysis", FivePrimeEnrichedTracksVisualPanel.PROP_ANALYSIS_PROMOTOR);
-        }
-        if (this.component.isLeaderLessSelected()) {
-            wiz.putProperty("LEADERLESSAnalysis", FivePrimeEnrichedTracksVisualPanel.PROP_ANALYSIS_LEADERLESS);
-        }
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, this.component.isTSSSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS, this.component.isRBSSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, this.component.isAntisenseSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS, this.component.isPromotorSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS, this.component.isLeaderLessSelected());
     }
 
     @Override
