@@ -5,6 +5,8 @@
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.dialogMenus.SelectFeatureTypeWizardPanel;
+import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
+import org.openide.util.ChangeSupport;
 
 // Example of invoking this wizard:
 //@ActionID(category = "Tools", id = "de.cebitec.vamp.transcriptomeAnalyses.TranscriptomeAnalysesWizardIterator")
@@ -23,6 +26,9 @@ import org.openide.WizardDescriptor;
 //@ActionReference(path = "Menu/Tools")
 public final class TranscriptomeAnalysisWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor> {
 
+    
+    private static final String PROP_WIZARD_NAME = "TransAnalyses";
+    
     private List<WizardDescriptor.Panel<WizardDescriptor>> initPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> fifePrimeAnalyses;
     private List<WizardDescriptor.Panel<WizardDescriptor>> wholegenomeAnalyses;
@@ -36,31 +42,35 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     private Object dataset;
     private int index;
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
+    private SelectReadClassWizardPanel readClassPanel;
+    private SelectFeatureTypeWizardPanel featTypePanel;
+    private ChangeSupport changeSupport;
 
-    public void TranscriptomeAnalysisWizardIterator() {
+    public TranscriptomeAnalysisWizardIterator() {
+        this.changeSupport = new ChangeSupport(this);
         this.initializePanels();
-        wiz = new WizardDescriptor(this);
-        // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-        // {1} will be replaced by WizardDescriptor.Iterator.name()
-        wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-        wiz.setTitle("Settings");
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
-            Integer genomeID = (Integer) wiz.getProperty("genomeID");            
-            
-//            FifeEnrichedDataAnalysesHandler handler = new FifeEnrichedDataAnalysesHandler(selectedTracks.get(0), genomeID, parametersetTSS);
-//             Hier beginnt die SOUCE wenn auf FINISCH gecklickt wird!
-            // 1. parse Feature information
-//            handler.start();
-            // 2. parse Mapping information
-            // . Simmulation der Daten!
-//            Simmulations simmulations = new Simmulations(index);
-        }
+//        wiz = new WizardDescriptor(this);
+//        // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
+//        // {1} will be replaced by WizardDescriptor.Iterator.name()
+//        wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
+//        wiz.setTitle("Settings");
+//        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+//            List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+//            Integer genomeID = (Integer) wiz.getProperty("genomeID");
+//
+////            FifeEnrichedDataAnalysesHandler handler = new FifeEnrichedDataAnalysesHandler(selectedTracks.get(0), genomeID, parametersetTSS);
+////             Hier beginnt die SOUCE wenn auf FINISCH gecklickt wird!
+//            // 1. parse Feature information
+////            handler.start();
+//            // 2. parse Mapping information
+//            // . Simmulation der Daten!
+////            Simmulations simmulations = new Simmulations(index);
+//        }
     }
 
     private void initializePanels() {
         if (allPanels == null) {
-            allPanels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
+            allPanels = new ArrayList<>();
             allPanels.add(new DataSetChoicePanel());// 0
             allPanels.add(new WholeGenomeTracksPanel()); // 1
             allPanels.add(new FivePrimeEnrichedTracksPanel()); // 2
@@ -71,6 +81,12 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             allPanels.add(new AntisenseDetectionParamsPanel()); // 7
             allPanels.add(new NewRegionDetectionParamsPanel()); // 8
             allPanels.add(new OperonsDetectionParamsPanel()); // 9
+            
+            readClassPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
+            allPanels.add(readClassPanel); // 10
+            featTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
+            allPanels.add(featTypePanel); // 11
+            
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
                 Component c = allPanels.get(i).getComponent();
@@ -259,20 +275,44 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     @Override
     public void removeChangeListener(ChangeListener l) {
     }
-    
+
     /**
-     * @param wiz the wizard, in which this wizard iterator is contained.
-     * If it is not set, no properties can be stored, thus it always has to be
-     * set.
+     * @param usingADBTrack true, if the wizard is running on a track stored
+     * completely in the DB, false otherwise.
+     */
+    public void setUsingDBTrack(boolean containsDBTrack) {
+        this.readClassPanel.getComponent().setUsingDBTrack(containsDBTrack);
+    }
+
+    /**
+     * @param wiz the wizard, in which this wizard iterator is contained. If it
+     * is not set, no properties can be stored, thus it always has to be set.
      */
     public void setWiz(WizardDescriptor wiz) {
         this.wiz = wiz;
     }
-    
+
     /**
      * @return the wizard, in which this wizard iterator is contained.
      */
     public WizardDescriptor getWiz() {
         return wiz;
+    }
+    
+    /**
+     * @return The dynamically generated property name for the read class 
+     * selection for this wizard. Can be used to obtain the corresponding
+     * read class parameters.
+     */
+    public String getReadClassPropForWiz() {
+        return this.readClassPanel.getPropReadClassParams();
+    }
+    
+    /**
+     * @return The property string for the selected feature type list for the
+     * corresponding wizard.
+     */
+    public String getPropSelectedFeatTypes() {
+        return this.featTypePanel.getPropSelectedFeatTypes();
     }
 }

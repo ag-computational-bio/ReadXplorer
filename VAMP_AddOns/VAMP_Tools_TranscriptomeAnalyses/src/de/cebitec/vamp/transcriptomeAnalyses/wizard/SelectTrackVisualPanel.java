@@ -27,7 +27,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
      * Creates new form SelectTrackVisualPanel
      */
     public SelectTrackVisualPanel() {
-        this.trackListModel = new DefaultListModel<PersistantTrack>();
+        this.trackListModel = new DefaultListModel<>();
         ProjectConnector con = ProjectConnector.getInstance();
         references = con.getGenomes();
         initComponents();

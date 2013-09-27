@@ -5,17 +5,20 @@
 package de.cebitec.vamp.transcriptomeAnalyses;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.transcriptomeAnalyses.wizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -34,6 +37,8 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private final ReferenceViewer refViewer;
     private List<PersistantTrack> tracks;
     private Map<Integer, PersistantTrack> trackMap;
+    private String readClassPropString;
+    private String selFeatureTypesPropString;
     
     private int referenceId;
     
@@ -71,5 +76,32 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
      * Initializes the setup wizard for the transcription analyses.
      */
     private void runWizardAndTranscriptionAnalysis() {
+        @SuppressWarnings("unchecked")
+        TranscriptomeAnalysisWizardIterator transWizardIterator = new TranscriptomeAnalysisWizardIterator();
+        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
+        transWizardIterator.setUsingDBTrack(containsDBTrack);
+        this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
+        this.selFeatureTypesPropString = transWizardIterator.getPropSelectedFeatTypes();
+        WizardDescriptor wiz = new WizardDescriptor(transWizardIterator);
+        transWizardIterator.setWiz(wiz);
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat(new MessageFormat("{0}"));
+        wiz.setTitle(NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "TTL_TransAnalysesWizardTitle"));
+
+        //action to perform after successfully finishing the wizard
+        boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
+        if (!cancelled) {
+            this.startTranscriptomeAnalyses(wiz);
+        }
+    }
+    
+    /**
+     * Starts the transcription analyses.
+     *
+     * @param wiz the wizard containing the transcription analyses parameters
+     */
+    @SuppressWarnings("unchecked")
+    private void startTranscriptomeAnalyses(WizardDescriptor wiz) {
+        System.out.println("Start transcriptome analyses now!");
     }
 }
