@@ -4,6 +4,9 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses;
 
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.FeatureType;
 import java.util.ArrayList;
@@ -15,18 +18,33 @@ import java.util.List;
  * @author jritter
  */
 public class GenomeFeatureParser {
+    
+    private TrackConnector trackConnector;
     private final int[] region2Exclude;
     private final HashMap<Integer, List<Integer>> forwardCDSs;
     private final HashMap<Integer, List<Integer>> reverseCDSs;
     private final HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private ReferenceConnector refConnector;
+    private int refSeqLength;
+    private List<PersistantFeature> genomeFeatures;
 
-    public GenomeFeatureParser(List<PersistantFeature> features, int length) {
-        this.region2Exclude = new int[length];
-        this.forwardCDSs = new HashMap<Integer, List<Integer>>();
-        this.reverseCDSs = new HashMap<Integer, List<Integer>>();
-        this.allRegionsInHash = getGenomeFeaturesInHash(features);
+    /**
+     * Constructor for Genome-feature parser. Produces different needed data structures for further analyses.
+     * 
+     * @param trackConnector 
+     */
+    public GenomeFeatureParser(TrackConnector trackConnector) {
+        this.trackConnector = trackConnector;
+        this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
+        this.refSeqLength = trackConnector.getRefSequenceLength();
+        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);
         
-        parseFeatureInformation(features);
+        this.region2Exclude = new int[this.refSeqLength];
+        this.forwardCDSs = new HashMap<>();
+        this.reverseCDSs = new HashMap<>();
+        this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
+        
+        parseFeatureInformation(this.genomeFeatures);
     }
 
     public int[] getRegion2Exclude() {
@@ -47,10 +65,12 @@ public class GenomeFeatureParser {
     
     
     
-    /*
-     * This method creates an array with the length of the genome. All rRNA's and tRNA's 
-     * will get an 1 an the position from start to stop belonging to the feature.
+    /**
+     * Parse the genome features for further procedures in tanscriptome analyses.
+     * This method creates an array with the length of the genome and contains entries 1 => region (Feature)
+     * to exclude. All rRNA's and tRNA's will get an 1 an the position from start to stop belonging to the feature.
      * 
+     * @param genomeFeatures 
      */
     private void parseFeatureInformation(List<PersistantFeature> genomeFeatures) {
         //at first we need connection to the reference (Projectconnector->ReferenceConnector)
@@ -98,7 +118,7 @@ public class GenomeFeatureParser {
                 if (this.forwardCDSs.get(i + start - 1) != null) {
                     this.forwardCDSs.get(i + start - 1).add(feature.getId());
                 } else {
-                    ArrayList<Integer> tmp = new ArrayList<Integer>();
+                    ArrayList<Integer> tmp = new ArrayList<>();
                     tmp.add(feature.getId());
                     this.forwardCDSs.put(i + start - 1, tmp);
                 }
@@ -108,7 +128,7 @@ public class GenomeFeatureParser {
                 if (this.reverseCDSs.get(i + stop - 1) != null) {
                     this.reverseCDSs.get(i + stop - 1).add(feature.getId());
                 } else {
-                    ArrayList<Integer> tmp = new ArrayList<Integer>();
+                    ArrayList<Integer> tmp = new ArrayList<>();
                     tmp.add(feature.getId());
                     this.reverseCDSs.put(i + stop - 1, tmp);
                 }
@@ -165,7 +185,7 @@ public class GenomeFeatureParser {
      * @return a HashMap<FeatureID, Feature> with all genome features in it.
      */
     private HashMap<Integer, PersistantFeature> getGenomeFeaturesInHash(List<PersistantFeature> genomeFeatures) {
-        HashMap<Integer, PersistantFeature> regions = new HashMap<Integer, PersistantFeature>();
+        HashMap<Integer, PersistantFeature> regions = new HashMap<>();
 
         for (PersistantFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
@@ -173,4 +193,22 @@ public class GenomeFeatureParser {
 
         return regions;
     }
+
+    public TrackConnector getTrackConnector() {
+        return trackConnector;
+    }
+
+    public ReferenceConnector getRefConnector() {
+        return refConnector;
+    }
+
+    public int getRefSeqLength() {
+        return refSeqLength;
+    }
+
+    public List<PersistantFeature> getGenomeFeatures() {
+        return genomeFeatures;
+    }
+    
+    
 }

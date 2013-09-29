@@ -4,26 +4,13 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.ReferenceConnector;
-import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public final class DataSetChoiceVisualPanel extends JPanel implements ActionListener {
 
-    public static final String PROP_DATASET = "dataset";
-    public static final String PROP_DATASET_WHOLEGENOME = "wholegenome";
-    public static final String PROP_DATASET_FIFEPRIME = "fifeprime";
     private String choosenDataSet = null;
 
     /**
@@ -33,9 +20,9 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
         initComponents();
 
         wholeGenomeTrackCheckBox.addActionListener(this);
-        wholeGenomeTrackCheckBox.setActionCommand(PROP_DATASET_WHOLEGENOME);
+        wholeGenomeTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET);
         fiveEnrichedTrackCheckBox.addActionListener(this);
-        fiveEnrichedTrackCheckBox.setActionCommand(PROP_DATASET_FIFEPRIME);
+        fiveEnrichedTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
     }
 
     @Override
@@ -136,26 +123,16 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals(PROP_DATASET_WHOLEGENOME)) {
+        if (e.getActionCommand().equals(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET)) {
             if (((JCheckBox) e.getSource()).isSelected()) {
                 fiveEnrichedTrackCheckBox.setSelected(false);
-                setChoosenDataSet(PROP_DATASET_WHOLEGENOME);
             }
         }
 
-        if (e.getActionCommand().equals(PROP_DATASET_FIFEPRIME)) {
+        if (e.getActionCommand().equals(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET)) {
             if (((JCheckBox) e.getSource()).isSelected()) {
                 wholeGenomeTrackCheckBox.setSelected(false);
-                setChoosenDataSet(PROP_DATASET_FIFEPRIME);
             }
         }
-    }
-
-    public String getChoosenDataSet() {
-        return choosenDataSet;
-    }
-
-    public void setChoosenDataSet(String choosenDataSet) {
-        this.choosenDataSet = choosenDataSet;
     }
 }

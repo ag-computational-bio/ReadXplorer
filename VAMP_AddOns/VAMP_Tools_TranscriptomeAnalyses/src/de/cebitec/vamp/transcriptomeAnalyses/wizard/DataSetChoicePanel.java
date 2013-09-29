@@ -55,7 +55,9 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty("dataSet", getComponent().getChoosenDataSet());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET, getComponent().isFifeEnrichedTrack());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET, getComponent().isWholeGenomeTrack());
+                
     }
 
 

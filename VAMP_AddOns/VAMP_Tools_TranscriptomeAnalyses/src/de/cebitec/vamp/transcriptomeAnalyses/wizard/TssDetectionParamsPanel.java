@@ -62,9 +62,9 @@ public class TssDetectionParamsPanel implements WizardDescriptor.Panel<WizardDes
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty("fraction", component.getFraction());
-        wiz.putProperty("ratio", component.getRatio());
-        wiz.putProperty("upstream", component.getUpstrteam());
-        wiz.putProperty("downstream", component.getDownstream());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO, component.getRatio());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream());
     }
 }
