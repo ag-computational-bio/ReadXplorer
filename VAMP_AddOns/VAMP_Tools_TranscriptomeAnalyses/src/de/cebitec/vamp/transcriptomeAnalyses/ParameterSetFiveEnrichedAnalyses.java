@@ -16,6 +16,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     private boolean performLeaderlessAnalysis;
     private boolean performAntisenseAnalysis;
     private Double fraction;
+    private Integer ratio;
     private Integer upstreamRegion, downstreamRegion;
 
     /**
@@ -25,13 +26,14 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
      * @param performAntisenseAnalysis
      * @param fraction 
      */
-    public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performLeaderlessAnalysis, boolean performAntisenseAnalysis, Double fraction, Integer upstream, Integer downstream) {
+    public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performLeaderlessAnalysis, boolean performAntisenseAnalysis, Double fraction, Integer ratio, Integer upstream, Integer downstream) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.performLeaderlessAnalysis = performLeaderlessAnalysis;
         this.performAntisenseAnalysis = performAntisenseAnalysis;
         this.fraction = fraction;
         this.upstreamRegion = upstream;
         this.downstreamRegion = downstream;
+        this.ratio = ratio;
         
     }
 
@@ -73,6 +75,10 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
 
     public int getDownstreamRegion() {
         return downstreamRegion;
+    }
+
+    public Integer getRatio() {
+        return ratio;
     }
     
     

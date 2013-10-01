@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 
 public final class TssDetectionParamsVisualPanel extends JPanel {
 
-    private double fraction, ratio;
+    private double fraction;
+    private int ratio;
     private int upstream, downstream;
     /**
      * Creates new form TssDetectionParamsVisualPanel
@@ -26,8 +27,8 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         return Double.valueOf(fractionTextField.getText());
     }
     
-    public Double getRatio () {
-        return Double.valueOf(rationValueTextField.getText());
+    public Integer getRatio () {
+        return Integer.valueOf(rationValueTextField.getText());
     }
             
     public Integer getUpstrteam () {

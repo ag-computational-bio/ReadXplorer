@@ -49,7 +49,7 @@ public final class LoginWizardAction implements ActionListener {
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            final Loading loading = new Loading();
+//            final Loading loading = new Loading();
             // log out before logging into another database
             //            if (loggedIn){
             //                LogoutAction logoutAction = Utilities.actionsGlobalContext().lookup(LogoutAction.class);
@@ -82,7 +82,7 @@ public final class LoginWizardAction implements ActionListener {
                         nd.setTitle(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.sqlError"));
                         DialogDisplayer.getDefault().notify(nd);
                     }
-                    loading.finished();
+//                    loading.finished();
                 }
             });
             connectThread.start();

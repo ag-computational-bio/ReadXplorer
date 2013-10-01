@@ -189,4 +189,16 @@ public class TranscriptionStart extends TrackResultEntry {
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
+    
+    @Override
+    public String toString() {
+        
+        if(isFwdStrand) {
+        return this.pos+"\t"+"fwd\t"+ this.readStarts+"\t"+this.relCount+"\t"+ this.beforeCounts+"\t"+this.detectedGene.getFeatureName()+"\t"+ this.offset+"\t"+ this.dist2start+"\t"+ this.dist2stop+"\t"+ this.nextGene+"\t"+ this.nextOffset+"\t"+ this.sequence+"\t"+ 0;
+    
+        } else {
+            return this.pos+"\t"+"rev\t"+ this.readStarts+"\t"+this.relCount+"\t"+ this.beforeCounts+"\t"+this.detectedGene.getFeatureName()+"\t"+ this.offset+"\t"+ this.dist2start+"\t"+ this.dist2stop+"\t"+ this.nextGene+"\t"+ this.nextOffset+"\t"+ this.sequence+"\t"+ 0;
+    
+        }
+    }    
 }

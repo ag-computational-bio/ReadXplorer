@@ -224,6 +224,7 @@
                 <package>javax.xml.transform.dom</package>
                 <package>javax.xml.transform.sax</package>
                 <package>javax.xml.transform.stream</package>
+                <package>jsc.distributions</package>
                 <package>junit.extensions</package>
                 <package>junit.framework</package>
                 <package>junit.runner</package>
@@ -725,6 +726,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jsc.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jsc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/REngine.jar</runtime-relative-path>

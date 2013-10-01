@@ -64,9 +64,9 @@ public class Statistics implements Observer{
         this.allRegionsInHash = allRegionsInHash;
         this.region2Exclude = region2Exclude;
         this.mappings = new ArrayList<>();
+        this.putativeOperonAdjacenciesFWD = new HashMap<>();
+        this.putativeOperonAdjacenciesREV = new HashMap<>();
         
-//        parseMappings(forwardCDSs, reverseCDSs, allRegionsInHash, region2Exclude);
-//        this.bg = (int) calculateBackgroundCutoff(fraction, refSeqLength);
     }
 
     /**
@@ -121,7 +121,7 @@ public class Statistics implements Observer{
                     for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{fwd}}[$sstart..$sstop];
                         this.fwdCoverage[i]++;
                     }
-                    if (forwardCDSs.get(start) != null && forwardCDSs.get(stop) != null) {
+                    if (forwardCDSs.containsKey(Integer.valueOf(start)) && forwardCDSs.containsKey(Integer.valueOf(stop))) {
                         for (int featureIDfwd1 : forwardCDSs.get(start)) {
                             for (int featureIDfwd2 : forwardCDSs.get(stop)) {
                                 if (featureIDfwd1 != featureIDfwd2) {
@@ -143,7 +143,7 @@ public class Statistics implements Observer{
                         this.revCoverage[i]++;
                     }
 
-                    if (reverseCDSs.get(stop) != null && reverseCDSs.get(start) != null) {
+                    if (reverseCDSs.containsKey(Integer.valueOf(stop)) && reverseCDSs.containsKey(Integer.valueOf(start))) {
                         for (int featureIDrev1 : reverseCDSs.get(stop)) {
                             for (int featureIDrev2 : reverseCDSs.get(start)) {
                                 if (featureIDrev1 != featureIDrev2) {
@@ -225,6 +225,12 @@ public class Statistics implements Observer{
         jsc.distributions.Normal normal = new Normal(mean, standardDiviation);
 
         inverseCdf = normal.inverseCdf(1 - (fraction / 1000));
+        
+//    warn "Background cutoff is calculated to be $bg, but is manually set to $opt_f...\n";
+//    $bg = $opt_f;
+//    warn "Background cutoff is calculated to be $bg...\n";
+//    warn "Average and variance: $mean...\n";
+        
         return inverseCdf;
 
     }

@@ -4,7 +4,6 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses;
 
-import de.cebitec.vamp.databackend.ParameterSetI;
 import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
@@ -18,15 +17,10 @@ import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.io.FileNotFoundException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.openide.util.Exceptions;
 
@@ -36,21 +30,16 @@ import org.openide.util.Exceptions;
  */
 public class FifeEnrichedDataAnalysesHandler extends Thread implements Observable, DataVisualisationI {
 
-    private ReferenceConnector referenceConnector;
     private TrackConnector trackConnector;
-    private int genomeSize;
-    private List<PersistantFeature> genomeFeatures;
     private PersistantTrack selectedTrack;
     private List<PersistantMapping> mappings;
     private Integer refGenomeID;
-    private ResultsOfTranskriptomeAnalyses results;
     private double fraction;
-    private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<de.cebitec.vamp.util.Observer>();
+    private List<de.cebitec.vamp.util.Observer> observer = new ArrayList<>();
     private int[] region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private Statistics stats;
     private double backgroundCutoff;
-    TssDetection tssDetection;
     ParameterSetFiveEnrichedAnalyses paramerters;
     private GenomeFeatureParser featureParser;
     /**
@@ -65,20 +54,11 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.refGenomeID = refGenomeID;
         this.fraction = parameterset.getFraction();
         this.paramerters = parameterset;
-
-
     }
 
     private void startAnalysis() throws FileNotFoundException {
-//        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the choosen transcriptome analyses.", currentTimestamp);
-//        this.referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(this.refGenomeID);
-//        this.genomeSize = this.referenceConnector.getRefGenome().getSequence().length();
-//        this.genomeFeatures = this.referenceConnector.getFeaturesForClosedInterval(0, this.genomeSize);
-
 
         // Initiation of important structures
-//        this.featureParser = new GenomeFeatureParser(this.trackConnector);
         this.region2Exclude = this.featureParser.getRegion2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getReverseCDSs();
@@ -134,7 +114,7 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
 
     @Override
     public void notifyObservers(Object data) {
-        List<de.cebitec.vamp.util.Observer> tmpObserver = new ArrayList<de.cebitec.vamp.util.Observer>(observer);
+        List<de.cebitec.vamp.util.Observer> tmpObserver = new ArrayList<>(observer);
         for (Iterator<de.cebitec.vamp.util.Observer> it = tmpObserver.iterator(); it.hasNext();) {
             de.cebitec.vamp.util.Observer currentObserver = it.next();
             currentObserver.update(data);
@@ -150,12 +130,12 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
         System.out.println("BackgroundCutoff: " + backgroundCutoff);
 
         this.stats.initMappingsStatistics();
-//        if (paramerters.isPerformTSSAnalysis()) {
-//            TssDetection tssDetection = new TssDetection(this.referenceConnector.getRefGenome().getSequence());
-//            tssDetection.runningTSSDetection(this.genomeSize, forwardCDSs, reverseCDSs,
-//                    allRegionsInHash, this.stats.getForward(), this.stats.getReverse(),
-//                    this.fraction, this.stats.getMm(), this.backgroundCutoff, this.paramerters.getUpstreamRegion(), this.paramerters.getDownstreamRegion());
-//        }
+        if (paramerters.isPerformTSSAnalysis()) {
+            TssDetection tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence());
+            tssDetection.runningTSSDetection(this.featureParser.getRefSeqLength(), this.forwardCDSs, this.reverseCDSs,
+                    this.allRegionsInHash, this.stats.getForward(), this.stats.getReverse(),
+                    this.paramerters.getRatio(), this.stats.getMm(), this.backgroundCutoff, this.paramerters.getUpstreamRegion(), this.paramerters.getDownstreamRegion());
+        }
 
 
 
@@ -165,6 +145,8 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
         if (paramerters.isPerformAntisenseAnalysis()) {
             // Not yet implemented
         }
+        
+        
         notifyObservers(AnalysisStatus.FINISHED);
     }
 

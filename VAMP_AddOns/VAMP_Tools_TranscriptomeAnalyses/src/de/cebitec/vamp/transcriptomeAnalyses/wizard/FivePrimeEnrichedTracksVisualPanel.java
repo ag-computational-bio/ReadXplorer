@@ -11,15 +11,10 @@ import javax.swing.JPanel;
 
 public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements ActionListener {
 
-//    public static final String PROP_ANALYSIS_TSS = "TSS";
-//    public static final String PROP_ANALYSIS_PROMOTOR = "PROMOTOR";
-//    public static final String PROP_ANALYSIS_ANTISENSE = "ANTISENSE";
-//    public static final String PROP_ANALYSIS_LEADERLESS = "LEADERLESS";
-//    public static final String PROP_ANALYSIS_RBS = "RBS";
-    
     public static final String ACTION_COMMAND_TSSCHECKBOX = "tssCheck";
-    private String tssDetectionText = "";
-    private String motifSearchText = "";
+    private String tssDetectionText = "Leaderless and antisense detection is based on the transcriptional start site detection (TSS). That is why "
+            + "you have to choose at least TSS-detection. ...";
+    private String motifSearchText = "Motif seatch can be provide, if there are transcriptional start site known.";
 
     /**
      * Creates new form FivePrimeEnrichedTracksVisualPanel

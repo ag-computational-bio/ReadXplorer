@@ -55,10 +55,10 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
     private double backgroundCutoff;
     FifeEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
     ParameterSetFiveEnrichedAnalyses parameterSetFiveprime;
-    
     private boolean performFivePrimeAnalyses, performTSSAnalysis, performLeaderless, performAntisense, performRBSDetection, performPromotorDetectin;
     private double fraction;
-    private int upstream, downstream;
+    private int ratio, upstream, downstream;
+
     public StartTranscriptomeAnalysesAction(ReferenceViewer reference) {
         this.refViewer = reference;
         this.referenceId = this.refViewer.getReference().getId();
@@ -129,14 +129,28 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
                 continue;
             }
 
-            
             performFivePrimeAnalyses = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
             if (performFivePrimeAnalyses) {
+                this.ratio = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO);
                 fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
                 upstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM);
                 downstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM);
-                    }
-            parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(performTSSAnalysis, false, false, fraction, upstream, downstream);
+                performLeaderless = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS);
+                performTSSAnalysis = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS);
+                performAntisense = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS);
+                performPromotorDetectin = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS);
+                performRBSDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS);
+                System.out.println(ratio);
+                System.out.println(fraction);
+                System.out.println(upstream);
+                System.out.println(downstream);
+                System.out.println(performLeaderless);
+                System.out.println(performTSSAnalysis);
+                System.out.println(performAntisense);
+                System.out.println(performPromotorDetectin);
+                System.out.println(performRBSDetection);
+            }
+            parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(performTSSAnalysis, performLeaderless, performAntisense, fraction, ratio, upstream, downstream);
             // Here we parse the genome
             // 1. getting region2Exclude 
             // forwardCDSs and reverseCDSs 
@@ -144,9 +158,9 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
             // allRegionsInHash => Key Feature id, Value is the featuer 
             double fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
             featureParser = new GenomeFeatureParser(connector);
-            
+
             fifePrimeAnalysesHandler = new FifeEnrichedDataAnalysesHandler(featureParser, track, referenceId, parameterSetFiveprime);
-            fifePrimeAnalysesHandler.run();
+            fifePrimeAnalysesHandler.start();
         }
     }
 
@@ -154,7 +168,6 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
     public void showData(Object data) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     public static enum AnalysisStatus {
 

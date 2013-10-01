@@ -63,11 +63,11 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, this.component.isTSSSelected());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS, this.component.isRBSSelected());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, this.component.isAntisenseSelected());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS, this.component.isPromotorSelected());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS, this.component.isLeaderLessSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, (boolean) this.component.isTSSSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS, (boolean) this.component.isRBSSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, (boolean) this.component.isAntisenseSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS, (boolean) this.component.isPromotorSelected());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS, (boolean) this.component.isLeaderLessSelected());
     }
 
     @Override
