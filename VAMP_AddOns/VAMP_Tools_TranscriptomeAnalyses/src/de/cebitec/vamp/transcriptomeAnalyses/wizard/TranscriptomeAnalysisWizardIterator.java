@@ -66,23 +66,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     public TranscriptomeAnalysisWizardIterator() {
         this.changeSupport = new ChangeSupport(this);
         this.initializePanels();
-//        wiz = new WizardDescriptor(this);
-//        // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-//        // {1} will be replaced by WizardDescriptor.Iterator.name()
-//        wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-//        wiz.setTitle("Settings");
-//        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-//            List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
-//            Integer genomeID = (Integer) wiz.getProperty("genomeID");
-//
-////            FifeEnrichedDataAnalysesHandler handler = new FifeEnrichedDataAnalysesHandler(selectedTracks.get(0), genomeID, parametersetTSS);
-////             Hier beginnt die SOUCE wenn auf FINISCH gecklickt wird!
-//            // 1. parse Feature information
-////            handler.start();
-//            // 2. parse Mapping information
-//            // . Simmulation der Daten!
-////            Simmulations simmulations = new Simmulations(index);
-//        }
     }
 
     private void initializePanels() {
@@ -108,7 +91,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             for (int i = 0; i < allPanels.size(); i++) {
                 Component c = allPanels.get(i).getComponent();
                 // Default step name to component name of panel.
-                steps[i] = c.getName();
+//                steps[i] = c.getName();
                 if (c instanceof JComponent) { // assume Swing components
                     JComponent jc = (JComponent) c;
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
@@ -116,7 +99,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
                     jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
+//                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
                 }
             }
 
@@ -194,77 +177,77 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
         }
 
         if (index == 1) { //whole genome dataset
-            String[] contentData = null;
+//            String[] contentData = null;
 
             if ((boolean) wiz.getProperty(PROP_FIVEPRIME_DATASET)) {
                 this.currentPanels = this.fivePrimeAnalyses;
-                contentData = this.fivePrimeIndex;
+//                contentData = this.fivePrimeIndex;
             }
 
             if ((boolean) wiz.getProperty(PROP_WHOLEGENOME_DATASET)) {
                 this.currentPanels = this.wholegenomeAnalyses;
-                contentData = this.wholeGenomeIndex;
+//                contentData = this.wholeGenomeIndex;
             }
 
-            if (contentData != null) {
-                wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
-            }
+//            if (contentData != null) {
+//                wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
+//            }
         }
 
 
         if (index == 2 && (boolean) wiz.getProperty(PROP_FIVEPRIME_DATASET)) { // we are in fifeprime analyses   
-            List<String> contentData = new ArrayList<>();
-            contentData.add(allPanels.get(10).getComponent().getName());
-            contentData.add(allPanels.get(0).getComponent().getName());
-            contentData.add(allPanels.get(2).getComponent().getName());
+//            List<String> contentData = new ArrayList<>();
+//            contentData.add(allPanels.get(10).getComponent().getName());
+//            contentData.add(allPanels.get(0).getComponent().getName());
+//            contentData.add(allPanels.get(2).getComponent().getName());
             if ((boolean) wiz.getProperty(PROP_TSS_ANALYSIS)) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(3));
-                contentData.add(allPanels.get(3).getComponent().getName());
+//                contentData.add(allPanels.get(3).getComponent().getName());
             }
             if ((boolean) wiz.getProperty(PROP_RBS_ANALYSIS)) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(4));
-                contentData.add(allPanels.get(4).getComponent().getName());
+//                contentCntData.add(allPanels.get(4).getComponent().getName());
             }
             if ((boolean) wiz.getProperty(PROP_PROMOTOR_ANALYSIS)) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(5));
-                contentData.add(allPanels.get(5).getComponent().getName());
+//                contentData.add(allPanels.get(5).getComponent().getName());
             }
             if ((boolean) wiz.getProperty(PROP_LEADERLESS_ANALYSIS)) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(6));
-                contentData.add(allPanels.get(6).getComponent().getName());
+//                contentData.add(allPanels.get(6).getComponent().getName());
             }
             if ((boolean) wiz.getProperty(PROP_ANTISENSE_ANALYSIS)) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(7));
-                contentData.add(allPanels.get(7).getComponent().getName());
+//                contentData.add(allPanels.get(7).getComponent().getName());
             }
 
             this.currentPanels = this.fivePrimeSelectedAnalyses;
-            if (!contentData.isEmpty()) {
-                wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
-            }
+//            if (!contentData.isEmpty()) {
+//                wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
+//            }
         }
 
         if (index == 2 && (boolean) wiz.getProperty(PROP_WHOLEGENOME_DATASET)) { // we are in wholegenome analyses
-            List<String> contentData = new ArrayList<>();
-            contentData.add(allPanels.get(10).getComponent().getName());
-            contentData.add(allPanels.get(0).getComponent().getName());
-            contentData.add(allPanels.get(1).getComponent().getName());
+//            List<String> contentData = new ArrayList<>();
+//            contentData.add(allPanels.get(10).getComponent().getName());
+//            contentData.add(allPanels.get(0).getComponent().getName());
+//            contentData.add(allPanels.get(1).getComponent().getName());
             if (wiz.getProperty("novel") == null) {
                 wholeGenomeSelectedAnayses.add(this.allPanels.get(8));
-                contentData.add(allPanels.get(8).getComponent().getName());
+//                contentData.add(allPanels.get(8).getComponent().getName());
             }
             if (wiz.getProperty("operon") != null) {
                 wholeGenomeSelectedAnayses.add(this.allPanels.get(9));
-                contentData.add(allPanels.get(9).getComponent().getName());
+//                contentData.add(allPanels.get(9).getComponent().getName());
             }
 
 //            wholeGenomeSelectedAnayses.add(allPanels.get(10));
 //            contentData.add(allPanels.get(10).getComponent().getName());
 
             this.currentPanels = this.wholeGenomeSelectedAnayses;
-            if (!contentData.isEmpty()) {
-                wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
-            }
+//            if (!contentData.isEmpty()) {
+//                wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
+//            }
         }
 
 
@@ -280,7 +263,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
         String[] contentData = null;
         if (index == 1) {
             currentPanels = initPanels;
-            contentData = initPanelsIndex;
+//            contentData = initPanelsIndex;
             if (contentData != null) {
                 wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
             }

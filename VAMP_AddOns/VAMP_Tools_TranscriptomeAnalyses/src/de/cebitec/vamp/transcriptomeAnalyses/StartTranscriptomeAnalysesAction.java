@@ -4,15 +4,12 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses;
 
-import de.cebitec.vamp.databackend.AnalysesHandler;
-import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.transcriptomeAnalyses.wizard.TranscriptomeAnalysisWizardIterator;
-import de.cebitec.vamp.util.Observable;
-import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.Properties;
+import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
@@ -20,12 +17,11 @@ import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -34,6 +30,8 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 @ActionID(
         category = "Tools",
@@ -45,23 +43,29 @@ import org.openide.util.NbBundle.Messages;
 public final class StartTranscriptomeAnalysesAction implements ActionListener, DataVisualisationI {
 
     private final ReferenceViewer refViewer;
+    private int finishedAnalyses = 0;
     private List<PersistantTrack> tracks;
-    private Map<Integer, PersistantTrack> trackMap;
+    private HashMap<Integer, PersistantTrack> trackMap;
     private String readClassPropString;
     private String selFeatureTypesPropString;
     private GenomeFeatureParser featureParser;
-    private Statistics stats;
     private int referenceId;
-    private double backgroundCutoff;
+   
     FifeEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
     ParameterSetFiveEnrichedAnalyses parameterSetFiveprime;
     private boolean performFivePrimeAnalyses, performTSSAnalysis, performLeaderless, performAntisense, performRBSDetection, performPromotorDetectin;
     private double fraction;
     private int ratio, upstream, downstream;
+    
+    private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
+    private HashMap<Integer, AnalysesContainer> trackToAnalysisMap;
 
     public StartTranscriptomeAnalysesAction(ReferenceViewer reference) {
         this.refViewer = reference;
         this.referenceId = this.refViewer.getReference().getId();
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponent.PREFERRED_ID);
+        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponent) findTopComponent;
+        this.trackToAnalysisMap = new HashMap<>();
     }
 
     @Override
@@ -77,7 +81,8 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
             for (PersistantTrack track : otp.getSelectedTracks()) {
                 this.trackMap.put(track.getId(), track);
             }
-
+            
+            this.transcAnalysesTopComp.open();
             this.runWizardAndTranscriptionAnalysis();
 
         } else {
@@ -159,14 +164,93 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
             double fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
             featureParser = new GenomeFeatureParser(connector);
 
-            fifePrimeAnalysesHandler = new FifeEnrichedDataAnalysesHandler(featureParser, track, referenceId, parameterSetFiveprime);
+            fifePrimeAnalysesHandler = new FifeEnrichedDataAnalysesHandler(featureParser, track, referenceId, parameterSetFiveprime, this.refViewer, this.transcAnalysesTopComp, this.trackMap);
             fifePrimeAnalysesHandler.start();
+            
+//            trackToAnalysisMap.put(track.getId(), new AnalysesContainer(fifePrimeAnalysesHandler.getTssDetection(), fifePrimeAnalysesHandler.getOperonDetection()));
         }
     }
 
     @Override
     public void showData(Object data) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+//        System.out.println("We are in Show data of StartTranscriptomeAnalysesAction!");
+//        try {
+//            @SuppressWarnings("unchecked")
+//            Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
+//            final int trackId = dataTypePair.getFirst();
+//            final String dataType = dataTypePair.getSecond();
+//
+//            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+//                @Override
+//                public void run() {
+//
+//                    //get track name(s) for tab descriptions
+//                    String trackNames;
+//                    
+//                    if (parameterSetFiveprime.isPerformTSSAnalysis()) {
+//
+//                        ++finishedAnalyses;
+//                        TssDetection analysisTSS = trackToAnalysisMap.get(trackId).getAnalysisTSS();
+//                        if (transcriptionStartResultPanel == null) {
+//                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
+//                            transcriptionStartResultPanel.setReferenceViewer(refViewer);
+//                        }
+//
+//                        TSSDetectionResults tssResult = new TSSDetectionResults(analysisTSS.getResults(), trackMap);
+//                        transcriptionStartResultPanel.addResult(tssResult);
+//
+//                        if (finishedAnalyses >= tracks.size()) {
+//                            trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
+//                            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
+//                            transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
+//                        }
+//                    }
+//                    if (dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
+//                        ++finishedMappingAnalyses;
+//
+//                        if (parametersOperonDet.isPerformOperonAnalysis()) {
+//
+//                            if (operonResultPanel == null) {
+//                                operonResultPanel = new ResultPanelOperonDetection(parametersOperonDet);
+//                                operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+//                            }
+//                            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
+//                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
+//                            operonDetectionResult.setParameters(parametersOperonDet);
+//                            operonResultPanel.addResult(operonDetectionResult);
+//
+//                            if (finishedMappingAnalyses >= tracks.size()) {
+//                                trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
+//                                String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
+//                                transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
+//                            }
+//                        }
+//
+//                        if (parametersRPKM.isPerformRPKMAnalysis()) {
+//                            AnalysisRPKM rpkmAnalysis = trackToAnalysisMap.get(trackId).getAnalysisRPKM();
+//                            if (rpkmResultPanel == null) {
+//                                rpkmResultPanel = new ResultPanelRPKM();
+//                                rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+//                            }
+//                            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
+//                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults());
+//                            rpkmAnalysisResult.setParameters(parametersRPKM);
+//                            rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
+//                            rpkmResultPanel.addResult(rpkmAnalysisResult);
+//
+//                            if (finishedMappingAnalyses >= tracks.size()) {
+//                                trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
+//                                String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
+//                                transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
+//                            }
+//                        }
+//                    }
+//                }
+//            });
+//        } catch (ClassCastException e) {
+//            //do nothing, we dont handle other data in this class
+//        }
     }
 
     public static enum AnalysisStatus {
