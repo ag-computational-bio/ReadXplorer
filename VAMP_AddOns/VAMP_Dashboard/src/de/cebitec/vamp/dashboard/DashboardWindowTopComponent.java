@@ -49,7 +49,7 @@ autostore = false)
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = true)
 @ActionID(category = "Tools", id = "de.cebitec.vamp.dashboard.DashboardWindowTopComponent")
-@ActionReference(path = "Menu/Tools" /*, position = 333 */)
+@ActionReference(path = "Menu/Tools", position = 1)
 @TopComponent.OpenActionRegistration(
     displayName = "#CTL_DashboardWindowAction",
 preferredID = "DashboardWindowTopComponent")

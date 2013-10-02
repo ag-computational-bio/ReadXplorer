@@ -14,7 +14,6 @@ import de.cebitec.vamp.util.StatsContainer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.SwingUtilities;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
@@ -205,9 +204,9 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
         //when the last request is finished signalize the parent to collect the data
         if (this.nbCarriedOutRequests >= this.nbRequests) {
+            this.progressHandle.finish();
             this.parent.showData(new Pair<>(trackConnector.getTrackID(), this.queryType));
             this.nbCarriedOutRequests = 0;
-            this.progressHandle.finish();
         }
     }
 

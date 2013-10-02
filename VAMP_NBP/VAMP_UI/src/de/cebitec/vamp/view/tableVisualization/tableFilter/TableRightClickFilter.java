@@ -142,7 +142,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     @Override
     public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            lastTable = ((JTable) ((JTableHeader) e.getSource()).getTable());
+            lastTable = ((JTableHeader) e.getSource()).getTable();
             lastSelectedColumn = lastTable.columnAtPoint(e.getPoint());
             if (lastTable.getModel().getRowCount() > 0) {
                 Object testValue = lastTable.getModel().getValueAt(0, lastSelectedColumn);

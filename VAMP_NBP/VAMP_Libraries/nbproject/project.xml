@@ -27,145 +27,6 @@
                 <package>com.mysql.jdbc.log</package>
                 <package>com.mysql.jdbc.profiler</package>
                 <package>com.mysql.jdbc.util</package>
-                <package>com.sun.browser.plugin</package>
-                <package>com.sun.deploy.uitoolkit.impl.fx</package>
-                <package>com.sun.deploy.uitoolkit.impl.fx.ui</package>
-                <package>com.sun.deploy.uitoolkit.impl.fx.ui.resources</package>
-                <package>com.sun.glass.events</package>
-                <package>com.sun.glass.ui</package>
-                <package>com.sun.glass.ui.delegate</package>
-                <package>com.sun.glass.ui.gtk</package>
-                <package>com.sun.glass.ui.mac</package>
-                <package>com.sun.glass.ui.win</package>
-                <package>com.sun.glass.ui.x11</package>
-                <package>com.sun.glass.utils</package>
-                <package>com.sun.javafx</package>
-                <package>com.sun.javafx.animation</package>
-                <package>com.sun.javafx.animation.transition</package>
-                <package>com.sun.javafx.applet</package>
-                <package>com.sun.javafx.application</package>
-                <package>com.sun.javafx.beans</package>
-                <package>com.sun.javafx.beans.annotations</package>
-                <package>com.sun.javafx.beans.event</package>
-                <package>com.sun.javafx.binding</package>
-                <package>com.sun.javafx.charts</package>
-                <package>com.sun.javafx.collections</package>
-                <package>com.sun.javafx.collections.annotations</package>
-                <package>com.sun.javafx.collections.transformation</package>
-                <package>com.sun.javafx.css</package>
-                <package>com.sun.javafx.css.converters</package>
-                <package>com.sun.javafx.css.parser</package>
-                <package>com.sun.javafx.cursor</package>
-                <package>com.sun.javafx.effect</package>
-                <package>com.sun.javafx.embed</package>
-                <package>com.sun.javafx.event</package>
-                <package>com.sun.javafx.font</package>
-                <package>com.sun.javafx.fxml</package>
-                <package>com.sun.javafx.fxml.builder</package>
-                <package>com.sun.javafx.fxml.expression</package>
-                <package>com.sun.javafx.geom</package>
-                <package>com.sun.javafx.geom.transform</package>
-                <package>com.sun.javafx.iio</package>
-                <package>com.sun.javafx.iio.bmp</package>
-                <package>com.sun.javafx.iio.common</package>
-                <package>com.sun.javafx.iio.gif</package>
-                <package>com.sun.javafx.iio.jpeg</package>
-                <package>com.sun.javafx.iio.png</package>
-                <package>com.sun.javafx.image</package>
-                <package>com.sun.javafx.image.impl</package>
-                <package>com.sun.javafx.jmx</package>
-                <package>com.sun.javafx.logging</package>
-                <package>com.sun.javafx.menu</package>
-                <package>com.sun.javafx.perf</package>
-                <package>com.sun.javafx.property</package>
-                <package>com.sun.javafx.property.adapter</package>
-                <package>com.sun.javafx.robot</package>
-                <package>com.sun.javafx.robot.impl</package>
-                <package>com.sun.javafx.runtime</package>
-                <package>com.sun.javafx.runtime.async</package>
-                <package>com.sun.javafx.runtime.eula</package>
-                <package>com.sun.javafx.scene</package>
-                <package>com.sun.javafx.scene.control</package>
-                <package>com.sun.javafx.scene.control.behavior</package>
-                <package>com.sun.javafx.scene.control.skin</package>
-                <package>com.sun.javafx.scene.control.skin.resources</package>
-                <package>com.sun.javafx.scene.input</package>
-                <package>com.sun.javafx.scene.layout.region</package>
-                <package>com.sun.javafx.scene.paint</package>
-                <package>com.sun.javafx.scene.shape</package>
-                <package>com.sun.javafx.scene.text</package>
-                <package>com.sun.javafx.scene.transform</package>
-                <package>com.sun.javafx.scene.traversal</package>
-                <package>com.sun.javafx.scene.web</package>
-                <package>com.sun.javafx.scene.web.behavior</package>
-                <package>com.sun.javafx.scene.web.skin</package>
-                <package>com.sun.javafx.sg</package>
-                <package>com.sun.javafx.sg.prism</package>
-                <package>com.sun.javafx.stage</package>
-                <package>com.sun.javafx.tk</package>
-                <package>com.sun.javafx.tk.desktop</package>
-                <package>com.sun.javafx.tk.quantum</package>
-                <package>com.sun.javafx.util</package>
-                <package>com.sun.media.jfxmedia</package>
-                <package>com.sun.media.jfxmedia.control</package>
-                <package>com.sun.media.jfxmedia.effects</package>
-                <package>com.sun.media.jfxmedia.events</package>
-                <package>com.sun.media.jfxmedia.locator</package>
-                <package>com.sun.media.jfxmedia.logging</package>
-                <package>com.sun.media.jfxmedia.track</package>
-                <package>com.sun.media.jfxmediaimpl</package>
-                <package>com.sun.media.jfxmediaimpl.platform</package>
-                <package>com.sun.media.jfxmediaimpl.platform.gstreamer</package>
-                <package>com.sun.media.jfxmediaimpl.platform.java</package>
-                <package>com.sun.media.jfxmediaimpl.platform.osx</package>
-                <package>com.sun.openpisces</package>
-                <package>com.sun.prism</package>
-                <package>com.sun.prism.camera</package>
-                <package>com.sun.prism.image</package>
-                <package>com.sun.prism.impl</package>
-                <package>com.sun.prism.impl.packrect</package>
-                <package>com.sun.prism.impl.paint</package>
-                <package>com.sun.prism.impl.ps</package>
-                <package>com.sun.prism.impl.shape</package>
-                <package>com.sun.prism.j2d</package>
-                <package>com.sun.prism.j2d.paint</package>
-                <package>com.sun.prism.paint</package>
-                <package>com.sun.prism.ps</package>
-                <package>com.sun.prism.render</package>
-                <package>com.sun.prism.shader</package>
-                <package>com.sun.prism.shape</package>
-                <package>com.sun.prism.tkal</package>
-                <package>com.sun.prism.util.tess</package>
-                <package>com.sun.prism.util.tess.impl.tess</package>
-                <package>com.sun.scenario</package>
-                <package>com.sun.scenario.animation</package>
-                <package>com.sun.scenario.animation.shared</package>
-                <package>com.sun.scenario.effect</package>
-                <package>com.sun.scenario.effect.impl</package>
-                <package>com.sun.scenario.effect.impl.hw</package>
-                <package>com.sun.scenario.effect.impl.prism</package>
-                <package>com.sun.scenario.effect.impl.prism.ps</package>
-                <package>com.sun.scenario.effect.impl.prism.sw</package>
-                <package>com.sun.scenario.effect.impl.state</package>
-                <package>com.sun.scenario.effect.impl.sw</package>
-                <package>com.sun.scenario.effect.impl.sw.java</package>
-                <package>com.sun.scenario.effect.impl.sw.sse</package>
-                <package>com.sun.scenario.effect.light</package>
-                <package>com.sun.t2k</package>
-                <package>com.sun.webpane.perf</package>
-                <package>com.sun.webpane.platform</package>
-                <package>com.sun.webpane.platform.event</package>
-                <package>com.sun.webpane.platform.graphics</package>
-                <package>com.sun.webpane.sg</package>
-                <package>com.sun.webpane.sg.prism</package>
-                <package>com.sun.webpane.sg.prism.theme</package>
-                <package>com.sun.webpane.sg.theme</package>
-                <package>com.sun.webpane.webkit</package>
-                <package>com.sun.webpane.webkit.dom</package>
-                <package>com.sun.webpane.webkit.network</package>
-                <package>com.sun.webpane.webkit.network.about</package>
-                <package>com.sun.webpane.webkit.network.data</package>
-                <package>com.sun.webpane.webkit.unicode</package>
                 <package>de.cebitec.common.sequencetools.features</package>
                 <package>de.cebitec.common.sequencetools.geneticcode</package>
                 <package>de.cebitec.common.sequencetools.intervals</package>
@@ -202,6 +63,10 @@
                 <package>javafx.stage</package>
                 <package>javafx.util</package>
                 <package>javafx.util.converter</package>
+                <package>javax.servlet</package>
+                <package>javax.servlet.http</package>
+                <package>javax.servlet.jsp</package>
+                <package>javax.servlet.jsp.tagext</package>
                 <package>javax.wsdl</package>
                 <package>javax.wsdl.extensions</package>
                 <package>javax.wsdl.extensions.http</package>
@@ -365,8 +230,69 @@
                 <package>org.apache.commons.discovery.resource.classes</package>
                 <package>org.apache.commons.discovery.resource.names</package>
                 <package>org.apache.commons.discovery.tools</package>
+                <package>org.apache.commons.io</package>
+                <package>org.apache.commons.io.output</package>
+                <package>org.apache.commons.lang3</package>
+                <package>org.apache.commons.lang3.builder</package>
+                <package>org.apache.commons.lang3.concurrent</package>
+                <package>org.apache.commons.lang3.event</package>
+                <package>org.apache.commons.lang3.exception</package>
+                <package>org.apache.commons.lang3.math</package>
+                <package>org.apache.commons.lang3.mutable</package>
+                <package>org.apache.commons.lang3.reflect</package>
+                <package>org.apache.commons.lang3.text</package>
+                <package>org.apache.commons.lang3.text.translate</package>
+                <package>org.apache.commons.lang3.time</package>
+                <package>org.apache.commons.lang3.tuple</package>
                 <package>org.apache.commons.logging</package>
                 <package>org.apache.commons.logging.impl</package>
+                <package>org.apache.commons.math3</package>
+                <package>org.apache.commons.math3.analysis</package>
+                <package>org.apache.commons.math3.analysis.differentiation</package>
+                <package>org.apache.commons.math3.analysis.function</package>
+                <package>org.apache.commons.math3.analysis.integration</package>
+                <package>org.apache.commons.math3.analysis.integration.gauss</package>
+                <package>org.apache.commons.math3.analysis.interpolation</package>
+                <package>org.apache.commons.math3.analysis.polynomials</package>
+                <package>org.apache.commons.math3.analysis.solvers</package>
+                <package>org.apache.commons.math3.complex</package>
+                <package>org.apache.commons.math3.dfp</package>
+                <package>org.apache.commons.math3.distribution</package>
+                <package>org.apache.commons.math3.exception</package>
+                <package>org.apache.commons.math3.exception.util</package>
+                <package>org.apache.commons.math3.filter</package>
+                <package>org.apache.commons.math3.fitting</package>
+                <package>org.apache.commons.math3.fraction</package>
+                <package>org.apache.commons.math3.genetics</package>
+                <package>org.apache.commons.math3.geometry</package>
+                <package>org.apache.commons.math3.geometry.euclidean.oned</package>
+                <package>org.apache.commons.math3.geometry.euclidean.threed</package>
+                <package>org.apache.commons.math3.geometry.euclidean.twod</package>
+                <package>org.apache.commons.math3.geometry.partitioning</package>
+                <package>org.apache.commons.math3.geometry.partitioning.utilities</package>
+                <package>org.apache.commons.math3.linear</package>
+                <package>org.apache.commons.math3.ode</package>
+                <package>org.apache.commons.math3.ode.events</package>
+                <package>org.apache.commons.math3.ode.nonstiff</package>
+                <package>org.apache.commons.math3.ode.sampling</package>
+                <package>org.apache.commons.math3.optim</package>
+                <package>org.apache.commons.math3.optim.linear</package>
+                <package>org.apache.commons.math3.optim.nonlinear.scalar</package>
+                <package>org.apache.commons.math3.optim.nonlinear.scalar.gradient</package>
+                <package>org.apache.commons.math3.optim.nonlinear.scalar.noderiv</package>
+                <package>org.apache.commons.math3.optim.nonlinear.vector</package>
+                <package>org.apache.commons.math3.optim.nonlinear.vector.jacobian</package>
+                <package>org.apache.commons.math3.optim.univariate</package>
+                <package>org.apache.commons.math3.optimization</package>
+                <package>org.apache.commons.math3.optimization.direct</package>
+                <package>org.apache.commons.math3.optimization.fitting</package>
+                <package>org.apache.commons.math3.optimization.general</package>
+                <package>org.apache.commons.math3.optimization.linear</package>
+                <package>org.apache.commons.math3.optimization.univariate</package>
+                <package>org.apache.commons.math3.random</package>
+                <package>org.apache.commons.math3.special</package>
+                <package>org.apache.commons.math3.stat</package>
+                <package>org.apache.commons.math3.stat.clustering</package>
                 <package>org.apache.commons.math3.stat.correlation</package>
                 <package>org.biojava.bibliography</package>
                 <package>org.biojava.bio</package>
@@ -639,6 +565,10 @@
                 <binary-origin>release/modules/ext/axis.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/jfxrt.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jfxrt.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/batik-dom.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-dom.jar</binary-origin>
             </class-path-extension>
@@ -649,10 +579,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/batik-gui-util.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-gui-util.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/jfxrt.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jfxrt.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>

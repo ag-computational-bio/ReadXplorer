@@ -55,11 +55,6 @@
                 <attr name="url" bundlevalue="de.cebitec.vamp.view.Bundle#de_cebitec_vamp_view_update_center"/>
             </file>
         </folder>
-        <folder name="JavaHelp">
-            <file name="view-helpset.xml" url="view-helpset.xml">
-                <attr name="position" intvalue="3324"/>
-            </file>
-        </folder>
     </folder>
     <folder name="Toolbars">
         <folder name="File_hidden"/>
