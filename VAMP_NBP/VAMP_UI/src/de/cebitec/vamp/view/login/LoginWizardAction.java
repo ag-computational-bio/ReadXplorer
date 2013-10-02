@@ -3,7 +3,7 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.dialogMenus.Loading;
+import de.cebitec.vamp.view.dialogMenus.LoadingDialog;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -13,9 +13,11 @@ import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
@@ -49,13 +51,7 @@ public final class LoginWizardAction implements ActionListener {
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            final Loading loading = new Loading();
-            // log out before logging into another database
-            //            if (loggedIn){
-            //                LogoutAction logoutAction = Utilities.actionsGlobalContext().lookup(LogoutAction.class);
-            //                LogoutAction logoutAction = Lookups.forPath("Actions/File/").lookup(LogoutAction.class);
-            //                logoutAction.actionPerformed(null);
-            //            }
+            final LoadingDialog loading = new LoadingDialog(WindowManager.getDefault().getMainWindow());
 
             final Map<String, Object> loginProps = wizardDescriptor.getProperties();
             //add database path to main window title
@@ -82,7 +78,12 @@ public final class LoginWizardAction implements ActionListener {
                         nd.setTitle(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.sqlError"));
                         DialogDisplayer.getDefault().notify(nd);
                     }
-                    loading.finished();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            loading.finished();
+                        }
+                    });
                 }
             });
             connectThread.start();
