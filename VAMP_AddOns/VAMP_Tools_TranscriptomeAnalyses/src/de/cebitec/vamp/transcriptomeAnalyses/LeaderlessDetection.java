@@ -8,6 +8,6 @@ package de.cebitec.vamp.transcriptomeAnalyses;
  *
  * @author jritter
  */
-public class WholeGenomeDataAnalysisHandler {
+public class LeaderlessDetection {
     
 }

@@ -5,14 +5,11 @@
 package de.cebitec.vamp.transcriptomeAnalyses;
 
 import de.cebitec.vamp.databackend.ParametersReadClasses;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.transcriptomeAnalyses.datastructure.ResultsOfTranskriptomeAnalyses;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Pair;
@@ -24,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.util.Exceptions;
@@ -170,7 +166,9 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
             final int trackId = dataTypePair.getFirst();
             final String dataType = dataTypePair.getSecond();
 
-            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+            SwingUtilities.invokeLater(new Runnable() { 
+                private Statistics stats = this.stats;
+//because it is not called from the swing dispatch thread
                 @Override
                 public void run() {
 
@@ -185,7 +183,7 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
                             transcriptionStartResultPanel.setReferenceViewer(refViewer);
                         }
                         
-                        TSSDetectionResults tssResult = new TSSDetectionResults(analysisTSS.getResults(), getTrackMap());
+                        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, analysisTSS.getResults(), getTrackMap());
                         transcriptionStartResultPanel.addResult(tssResult);
 
                             trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);

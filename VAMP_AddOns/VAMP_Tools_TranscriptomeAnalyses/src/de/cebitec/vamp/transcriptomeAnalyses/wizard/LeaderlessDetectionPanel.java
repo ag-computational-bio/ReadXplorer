@@ -14,16 +14,16 @@ public class LeaderlessDetectionPanel implements WizardDescriptor.Panel<WizardDe
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private LeaderlessDetectionVisualPanel component;
+    private LeaderlessDetectionParamsVisualPanel component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public LeaderlessDetectionVisualPanel getComponent() {
+    public LeaderlessDetectionParamsVisualPanel getComponent() {
         if (component == null) {
-            component = new LeaderlessDetectionVisualPanel();
+            component = new LeaderlessDetectionParamsVisualPanel();
         }
         return component;
     }

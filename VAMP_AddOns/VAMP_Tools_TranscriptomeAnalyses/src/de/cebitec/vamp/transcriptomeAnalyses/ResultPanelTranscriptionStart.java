@@ -12,9 +12,6 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.transcriptomeAnalyses.datastructure.TranscriptionStart;
-//import de.cebitec.vamp.transcriptionAnalyses.dataStructures.DetectedFeatures;
-//import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TransStartUnannotated;
-//import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.vamp.util.SequenceUtils;
 import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.analysis.ResultTablePanel;
@@ -46,11 +43,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private static final long serialVersionUID = 1L;
     public static final String TSS_TOTAL = "Total number of detected TSSs";
     public static final String TSS_CORRECT = "Correct TSS";
-    public static final String TSS_UPSTREAM = "TSS with upstream feature";
-    public static final String TSS_DOWNSTREAM = "TSS with downstream feature";
     public static final String TSS_FWD = "TSS on fwd strand";
     public static final String TSS_REV = "TSS on rev strand";
-    public static final String TSS_NOVEL = "Novel Transcripts";
+    public static final String MAPPINGS_MILLION = "Mappings per Million";
+    public static final String MAPPINGS_MEAN_LENGTH = "Mean of Mappings length";
+    public static final String MAPPINGS_COUNT = "Mappings count";
     public static final int UNUSED_STATISTICS_VALUE = -1;
     private BoundsInfoManager boundsInfoManager;
     private List<String> promotorRegions;
@@ -84,11 +81,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         statisticsMap = new HashMap<>();
         statisticsMap.put(TSS_TOTAL, 0);
         statisticsMap.put(TSS_CORRECT, 0);
-        statisticsMap.put(TSS_UPSTREAM, 0);
-        statisticsMap.put(TSS_DOWNSTREAM, 0);
         statisticsMap.put(TSS_FWD, 0);
         statisticsMap.put(TSS_REV, 0);
-        statisticsMap.put(TSS_NOVEL, 0);
+        statisticsMap.put(MAPPINGS_COUNT, 0);
+        statisticsMap.put(MAPPINGS_MEAN_LENGTH, 0);
+        statisticsMap.put(MAPPINGS_MILLION, 0);
     }
 
     /**
@@ -268,11 +265,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 @Override
                 public void run() {
 
-                    final int nbColumns = 11;
+                    final int nbColumns = 21;
 
                     int noCorrectStarts = 0;
                     int noUpstreamFeature = 0;
-                    int noDownstreamFeature = 0;
                     int noFwdFeatures = 0;
                     int noRevFeatures = 0;
                     int noUnannotatedTranscripts = 0;
@@ -295,28 +291,30 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
                         Object[] rowData = new Object[nbColumns];
                         rowData[0] = tSS.getPos();
-                        rowData[1] = tssResultNew.getTrackMap().get(tSS.getTrackId());
-                        rowData[2] = strand;
-//                        rowData[3] = tSS.getReadStartsAtPos();
-//                        rowData[4] = tSS.getCoverageIncrease();
-//                        rowData[5] = tSS.getPercentIncrease();
+//                        rowData[1] = tSS.getTrackId();
+                        rowData[1] = strand;
+                        rowData[2] = tSS.getReadStarts();
+                        rowData[3] = tSS.getRelCount();
+//                        rowData[4] = tSS.getCountsBeforeStart()[9];
+                        rowData[5] = tSS.getCountsBeforeStart()[8];
+                        rowData[6] = tSS.getCountsBeforeStart()[7];
+                        rowData[7] = tSS.getCountsBeforeStart()[6];
+                        rowData[8] = tSS.getCountsBeforeStart()[5];
+                        rowData[9] = tSS.getCountsBeforeStart()[4];
+                        rowData[10] = tSS.getCountsBeforeStart()[3];
+                        rowData[11] = tSS.getCountsBeforeStart()[2];
+                        rowData[12] = tSS.getCountsBeforeStart()[1];
+                        rowData[13] = tSS.getCountsBeforeStart()[0];
 
-//                        detFeatures = tSS.getDetFeatures();
+                        feature = tSS.getDetectedGene();
 //                        feature = detFeatures.getCorrectStartFeature();
-//                        if (feature != null) {
-//                            rowData[6] = feature.toString();
-//                            ++noCorrectStarts;
-//                        } else {
-//                            rowData[6] = "-";
-//                        }
-//                        feature = detFeatures.getUpstreamFeature();
-//                        if (feature != null) {
-//                            rowData[7] = feature.toString();
-//                            ++noUpstreamFeature;
-//                        } else {
-//                            rowData[7] = "-";
-//                        }
-//                        feature = detFeatures.getDownstreamFeature();
+                        if (feature != null) {
+                            rowData[14] = feature.toString();
+                            ++noCorrectStarts;
+                        } else {
+                            rowData[14] = "-";
+                        }
+//                        feature = tss.;
 //                        if (feature != null) {
 //                            rowData[8] = feature.toString();
 //                            ++noDownstreamFeature;
@@ -331,24 +329,25 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 //                            ++noUnannotatedTranscripts;
 //                        } else {
 //                        }
+                        
+                        rowData[15] = tSS.getOffset();
+                        rowData[16] = tSS.getDist2start();
+                        rowData[17] = tSS.getDist2stop();
+                        rowData[18] = tSS.getNextGene().toString();
+                        rowData[19] = tSS.getNextOffset();
                         model.addRow(rowData);
                     }
 
                     //create statistics
 
-//                    ParameterSetTSS tssParameters = (ParameterSetTSS) tssResult.getParameters();
-//                    statisticsMap.put(TSS_TOTAL, statisticsMap.get(TSS_TOTAL) + tsss.size());
-//                    statisticsMap.put(TSS_CORRECT, statisticsMap.get(TSS_CORRECT) + noCorrectStarts);
-//                    statisticsMap.put(TSS_UPSTREAM, statisticsMap.get(TSS_UPSTREAM) + noUpstreamFeature);
-//                    statisticsMap.put(TSS_DOWNSTREAM, statisticsMap.get(TSS_DOWNSTREAM) + noDownstreamFeature);
-//                    statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_FWD) + noFwdFeatures);
-//                    statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
-//                    if (tssParameters.isPerformUnannotatedTranscriptDet()) {
-//                        statisticsMap.put(TSS_NOVEL, statisticsMap.get(TSS_NOVEL) + noUnannotatedTranscripts);
-//                    } else {
-//                        statisticsMap.put(TSS_NOVEL, ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE);
-//                    }
-//                    tssResultNew.setStatsMap(statisticsMap);
+                    ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
+                    statisticsMap.put(TSS_TOTAL, statisticsMap.get(TSS_TOTAL) + tsss.size());
+                    statisticsMap.put(TSS_CORRECT, statisticsMap.get(TSS_CORRECT) + noCorrectStarts);
+                    statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_FWD) + noFwdFeatures);
+                    statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
+//                    statisticsMap.put(MAPPINGS_COUNT, (Integer) (statisticsMap.get(MAPPINGS_COUNT) + tssResultNew.getStats().getMc()));
+                    
+                    tssResultNew.setStatsMap(statisticsMap);
 
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                     tSSTable.setRowSorter(sorter);

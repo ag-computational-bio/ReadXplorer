@@ -20,10 +20,12 @@ import java.util.Map;
 public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnrichedAnalyses>{ 
 
     private List<TranscriptionStart> results;
+    private Statistics stats;
     
-    public TSSDetectionResults(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap) {
+    public TSSDetectionResults(Statistics stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap) {
         super(trackMap);
         this.results = results;
+        this.stats = stats;
     }
 
     @Override
@@ -146,21 +148,11 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_TOTAL)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CORRECT, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_CORRECT)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_UPSTREAM, 
-                getStatsMap().get(ResultPanelTranscriptionStart.TSS_UPSTREAM)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_DOWNSTREAM, 
-                getStatsMap().get(ResultPanelTranscriptionStart.TSS_DOWNSTREAM)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FWD, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_FWD)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_REV, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_REV)));
         
-        int noUnannotatedTrans = this.getStatsMap().get(ResultPanelTranscriptionStart.TSS_NOVEL);
-        String unannotatedTransValue = noUnannotatedTrans
-                == ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE ? "-" : String.valueOf(noUnannotatedTrans);
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_NOVEL, 
-                unannotatedTransValue));
-
         tSSExport.add(statisticsExportData);
         
         return tSSExport;
@@ -172,6 +164,10 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
 
     public void setResults(List<TranscriptionStart> results) {
         this.results = results;
+    }
+
+    public Statistics getStats() {
+        return stats;
     }
     
     

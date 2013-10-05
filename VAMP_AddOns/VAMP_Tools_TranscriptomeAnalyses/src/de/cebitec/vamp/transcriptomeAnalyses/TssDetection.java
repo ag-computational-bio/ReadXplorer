@@ -109,7 +109,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         }
                     }
                     //this.referenceSequence.substring(i-up+1, up+down)
-                    TranscriptionStart tss = new TranscriptionStart(i+1, true, forward[i+1], rel_count, beforeCountsFwd, feature, j, dist2start, dist2stop, allRegionsInHash.get(forwardCDSs.get(i + j + l - end).get(0)), l, null, 0);
+                    TranscriptionStart tss = new TranscriptionStart(i, true, forward[i], rel_count, beforeCountsFwd, feature, j, dist2start, dist2stop, allRegionsInHash.get(forwardCDSs.get(i + j + l - end).get(0)), l, null, 0);
                     detectedTSS.add(tss);
                     System.out.println(tss.toString());
                 }
@@ -155,7 +155,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                     }
 //                    String seq = this.referenceSequence.substring(i-down, up+down);
 //                    String reversedSeq = new StringBuffer(seq).reverse().toString();
-                    TranscriptionStart tss = new TranscriptionStart(i+1, false, reverse[i+1], rel_count, beforeCountRev, feature, j, dist2start, dist2stop, allRegionsInHash.get(reverseCDSs.get(end + i - j - l).get(0)), l, null, 0);
+                    TranscriptionStart tss = new TranscriptionStart(i, false, reverse[i], rel_count, beforeCountRev, feature, j, dist2start, dist2stop, allRegionsInHash.get(reverseCDSs.get(end + i - j - l).get(0)), l, null, 0);
                     detectedTSS.add(tss);
                     System.out.println(tss.toString());
                 }

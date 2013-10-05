@@ -6,13 +6,16 @@ package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 public final class DataSetChoiceVisualPanel extends JPanel implements ActionListener {
 
-    private String choosenDataSet = null;
 
+    private final String fiveprimeText = "";
+    private final String wholeTranscriptText = "";
+    
     /**
      * Creates new form DataSetChoiceVisualPanel
      */
@@ -23,6 +26,13 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
         wholeGenomeTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET);
         fiveEnrichedTrackCheckBox.addActionListener(this);
         fiveEnrichedTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
+        
+        fivePrimeTextArea.setEditable(false);
+        fivePrimeTextArea.setBorder(BorderFactory.createTitledBorder("5'-Enriched RNA-Seq data set"));
+        fivePrimeTextArea.setText(fiveprimeText);
+        wholeTranscriptTextArea.setEditable(false);
+        wholeTranscriptTextArea.setBorder(BorderFactory.createTitledBorder("Whole transcript RNA-Seq data set"));
+        wholeTranscriptTextArea.setText(wholeTranscriptText);
     }
 
     @Override
@@ -47,23 +57,23 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        fivePrimeTextArea = new javax.swing.JTextArea();
         wholeGenomeTrackCheckBox = new javax.swing.JCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        wholeTranscriptTextArea = new javax.swing.JTextArea();
         fiveEnrichedTrackCheckBox = new javax.swing.JCheckBox();
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jTextArea1.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.jTextArea1.text")); // NOI18N
-        jScrollPane1.setViewportView(jTextArea1);
+        fivePrimeTextArea.setColumns(20);
+        fivePrimeTextArea.setRows(5);
+        fivePrimeTextArea.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.fivePrimeTextArea.text")); // NOI18N
+        jScrollPane1.setViewportView(fivePrimeTextArea);
 
         org.openide.awt.Mnemonics.setLocalizedText(wholeGenomeTrackCheckBox, org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.wholeGenomeTrackCheckBox.text")); // NOI18N
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jTextArea2.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.jTextArea2.text")); // NOI18N
-        jScrollPane2.setViewportView(jTextArea2);
+        wholeTranscriptTextArea.setColumns(20);
+        wholeTranscriptTextArea.setRows(5);
+        wholeTranscriptTextArea.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.wholeTranscriptTextArea.text")); // NOI18N
+        jScrollPane2.setViewportView(wholeTranscriptTextArea);
 
         org.openide.awt.Mnemonics.setLocalizedText(fiveEnrichedTrackCheckBox, org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.fiveEnrichedTrackCheckBox.text")); // NOI18N
         fiveEnrichedTrackCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -114,11 +124,11 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
     }//GEN-LAST:event_fiveEnrichedTrackCheckBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox fiveEnrichedTrackCheckBox;
+    private javax.swing.JTextArea fivePrimeTextArea;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
     private javax.swing.JCheckBox wholeGenomeTrackCheckBox;
+    private javax.swing.JTextArea wholeTranscriptTextArea;
     // End of variables declaration//GEN-END:variables
 
     @Override

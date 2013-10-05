@@ -10,8 +10,8 @@ import de.cebitec.vamp.databackend.ParameterSetI;
  *
  * @author jritter
  */
-public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<ParameterSetFiveEnrichedAnalyses>{
-    
+public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<ParameterSetFiveEnrichedAnalyses> {
+
     private boolean performTSSAnalysis;
     private boolean performLeaderlessAnalysis;
     private boolean performAntisenseAnalysis;
@@ -21,10 +21,11 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
 
     /**
      * Data storage for all parameters associated with a transcription analysis.
+     *
      * @param performTSSAnalysis
      * @param performLeaderlessAnalysis
      * @param performAntisenseAnalysis
-     * @param fraction 
+     * @param fraction
      */
     public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performLeaderlessAnalysis, boolean performAntisenseAnalysis, Double fraction, Integer ratio, Integer upstream, Integer downstream) {
         this.performTSSAnalysis = performTSSAnalysis;
@@ -34,7 +35,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         this.upstreamRegion = upstream;
         this.downstreamRegion = downstream;
         this.ratio = ratio;
-        
+
     }
 
     public boolean isPerformTSSAnalysis() {
@@ -80,6 +81,4 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     public Integer getRatio() {
         return ratio;
     }
-    
-    
 }
