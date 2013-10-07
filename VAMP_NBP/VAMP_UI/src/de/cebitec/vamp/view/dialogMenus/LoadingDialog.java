@@ -1,21 +1,33 @@
 package de.cebitec.vamp.view.dialogMenus;
 
 import java.awt.Frame;
+import java.awt.IllegalComponentStateException;
 
 /**
+ * Displays a large loading progress bar.
  *
  * @author kstaderm
  */
 public class LoadingDialog extends javax.swing.JDialog {
+    private static final long serialVersionUID = 1L;
     
     private Frame parent;
 
     /**
-     * Creates new form LoadingDialog
+     * Displays a large loading progress bar.
+     * @param parent the parent, which shall be blocked during the loading 
+     * process.
      */
-    public LoadingDialog(java.awt.Frame parent) {
+    public LoadingDialog(Frame parent) {
         super(parent, false);
-        this.parent=parent;
+        this.parent = parent;
+        this.showLoadingIcon();
+    }
+
+    /**
+     * Displays a large loading progress bar.
+     */
+    private void showLoadingIcon() {
         parent.setEnabled(false);
         this.setUndecorated(true);
         initComponents();
@@ -25,10 +37,18 @@ public class LoadingDialog extends javax.swing.JDialog {
         this.requestFocus();
         this.getRootPane().setOpaque(false);
         this.getContentPane().setBackground(new java.awt.Color(0, 0, 0, 0));
-        this.setBackground(new java.awt.Color(0, 0, 0, 0));
+        try {
+            this.setBackground(new java.awt.Color(0, 0, 0, 0));
+        } catch (UnsupportedOperationException | IllegalComponentStateException e) {
+            //do nothing, just ignore command
+        }
         this.setVisible(true);
     }
 
+    /**
+     * Call this method, when the parent can be enabled again and the loading
+     * is finished.
+     */
     public void finished() {
         parent.setEnabled(true);
         this.dispose();

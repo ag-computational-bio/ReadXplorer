@@ -71,7 +71,7 @@ public class ScreenshotUtils {
                                     svgGenerator.stream(out, false);
                                     out.close();
                                 } catch (IOException ex) {
-                                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", ex.getMessage()),
+                                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", ex.toString()),
                                             NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.FailHeader"), JOptionPane.ERROR_MESSAGE);
                                 }
 
@@ -101,6 +101,9 @@ public class ScreenshotUtils {
         } catch (OutOfMemoryError e) {
             JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.OOMErrorMsg"),
                     NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.OOMErrorHeader"), JOptionPane.ERROR_MESSAGE);
+        } catch (RuntimeException e) {
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", e.toString()),
+                    NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.FailHeader"), JOptionPane.ERROR_MESSAGE);
         }
         System.gc();
     }
