@@ -1,6 +1,7 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.event.ContainerEvent;
@@ -29,7 +30,7 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionReference(path = "Menu/Window", position = 950)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_SNP_DetectionAction",
 preferredID = "SNP_DetectionTopComponent")
-public final class SNP_DetectionTopComponent extends TopComponent {
+public final class SNP_DetectionTopComponent extends TopComponentExtended {
 
     private static final long serialVersionUID = 1L;
     private static SNP_DetectionTopComponent instance;

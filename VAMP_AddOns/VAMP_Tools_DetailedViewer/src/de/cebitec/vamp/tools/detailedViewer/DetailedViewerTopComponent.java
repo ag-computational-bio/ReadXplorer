@@ -2,6 +2,7 @@ package de.cebitec.vamp.tools.detailedViewer;
 
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
@@ -21,7 +22,7 @@ import org.openide.windows.WindowManager;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.detailedViewer//DetailedViewer//EN", autostore = false)
-public final class DetailedViewerTopComponent extends TopComponent {
+public final class DetailedViewerTopComponent extends TopComponentExtended {
 
     private static DetailedViewerTopComponent instance;
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,7 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JPanel;
@@ -35,7 +36,7 @@ preferredID = "FeatureCoverageAnalysisTopComponent")
     "CTL_CoveredFeaturesAnalysisTopComponent=Feature Coverage Analysis Window",
     "HINT_CoveredFeaturesAnalysisTopComponent=This is a Feature Coverage Analysis window"
 })
-public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
+public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExtended {
     
     public static final String PREFERRED_ID = "FeatureCoverageAnalysisTopComponent";
     private static final long serialVersionUID = 1L;

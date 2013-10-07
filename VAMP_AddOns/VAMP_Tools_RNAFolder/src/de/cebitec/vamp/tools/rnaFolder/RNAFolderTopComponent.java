@@ -3,6 +3,7 @@ package de.cebitec.vamp.tools.rnaFolder;
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.MoviePane;
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.actions.Export;
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -18,7 +19,7 @@ import org.openide.windows.WindowManager;
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.rnaFolder//RNAFolder//EN",
 autostore = false)
-public final class RNAFolderTopComponent extends TopComponent {
+public final class RNAFolderTopComponent extends TopComponentExtended {
 
     private static RNAFolderTopComponent instance;
     /** path to the icon used by the component and its open action */

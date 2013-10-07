@@ -6,6 +6,7 @@ package de.cebitec.vamp.tools.snp454;
 
 import de.cebitec.vamp.databackend.dataObjects.Snp454;
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
 import java.awt.event.ContainerEvent;
@@ -15,12 +16,12 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
@@ -35,7 +36,7 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_SNP_Detection454Action",
 preferredID = "SNP_Detection454TopComponent")
-public final class SNP_Detection454TopComponent extends TopComponent {
+public final class SNP_Detection454TopComponent extends TopComponentExtended {
     
     private static final long serialVersionUID = 1L;
     private static SNP_Detection454TopComponent instance;

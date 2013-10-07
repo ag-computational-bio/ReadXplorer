@@ -6,6 +6,7 @@ import de.cebitec.vamp.api.cookies.CloseTrackCookie;
 import de.cebitec.vamp.api.cookies.OpenTrackCookie;
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.util.VisualisationUtils;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
@@ -15,7 +16,6 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -53,7 +53,7 @@ import org.w3c.dom.Document;
  * reference and track viewers.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.view//AppPanel//EN", autostore = false)
-public final class AppPanelTopComponent extends TopComponent implements ApplicationFrameI {
+public final class AppPanelTopComponent extends TopComponentExtended implements ApplicationFrameI {
 
     private static AppPanelTopComponent instance;
     /**
@@ -141,8 +141,7 @@ public final class AppPanelTopComponent extends TopComponent implements Applicat
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.showSaveDialog(null);
-            File shot = chooser.getSelectedFile();
-            OutputStream file = new FileOutputStream(shot);
+            OutputStream file = new FileOutputStream(chooser.getSelectedFile());
             Writer out = new OutputStreamWriter(file, "UTF-8");
             svgGenerator.stream(out, false);
         } catch (UnsupportedEncodingException | SVGGraphics2DIOException | FileNotFoundException ex) {

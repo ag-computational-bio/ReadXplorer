@@ -14,6 +14,7 @@ import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -66,7 +67,7 @@ import org.openide.windows.TopComponent;
     "CTL_BaySeqGraphicsTopComponent=Create graphics",
     "HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
 })
-public final class BaySeqGraphicsTopComponent extends TopComponent implements Observer, ItemListener {
+public final class BaySeqGraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
     private static final long serialVersionUID = 1L;
 
     private BaySeqAnalysisHandler baySeqAnalysisHandler;

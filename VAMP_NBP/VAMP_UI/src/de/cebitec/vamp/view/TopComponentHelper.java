@@ -1,5 +1,6 @@
 package de.cebitec.vamp.view;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import org.openide.windows.TopComponent;
@@ -34,6 +35,15 @@ public class TopComponentHelper {
             }
         }
         return desiredTopComp;
+    }
+    
+    /**
+     * @return The array of all currently opened TopComponents.
+     */
+    public static TopComponent[] getAllOpenedTopComponents() {
+        Set<TopComponent> topComps = WindowManager.getDefault().getRegistry().getOpened();
+        TopComponent[] topCompArray = new TopComponent[topComps.size()];
+        return topComps.toArray(topCompArray);
     }
     
 }

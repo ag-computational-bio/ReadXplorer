@@ -2,10 +2,10 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
@@ -40,7 +39,7 @@ preferredID = "DiffExpLogTopComponent")
     "CTL_DiffExpLogTopComponent=Differential Gene Expression Analysis Log",
     "HINT_DiffExpLogTopComponent=Shows the log for the last run of the differential gene expression analysis."
 })
-public final class DiffExpLogTopComponent extends TopComponent implements Observer {
+public final class DiffExpLogTopComponent extends TopComponentExtended implements Observer {
 
     private DeAnalysisHandler analysisHandler = null;
 

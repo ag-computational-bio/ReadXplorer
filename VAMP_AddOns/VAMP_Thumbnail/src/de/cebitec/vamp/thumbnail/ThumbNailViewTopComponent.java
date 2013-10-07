@@ -1,5 +1,6 @@
 package de.cebitec.vamp.thumbnail;
 
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,7 +19,7 @@ import org.openide.windows.WindowManager;
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.thumbnail//ThumbNailView//EN",
 autostore = false)
-public final class ThumbNailViewTopComponent extends TopComponent implements MouseListener {
+public final class ThumbNailViewTopComponent extends TopComponentExtended implements MouseListener {
     
     private static final long serialVersionUID = 1L;
 

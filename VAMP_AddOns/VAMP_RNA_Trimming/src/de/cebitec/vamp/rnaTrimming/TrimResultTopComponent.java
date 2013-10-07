@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.rnaTrimming;
 
 import de.cebitec.vamp.correlationAnalysis.*;
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.logging.Logger;
@@ -39,7 +36,7 @@ preferredID = "TrimResultTopComponent")
     "CTL_TrimResultTopComponent=Trim unmapped RNA reads",
     "HINT_TrimResultTopComponent="
 })
-public final class TrimResultTopComponent extends TopComponent {
+public final class TrimResultTopComponent extends TopComponentExtended {
     
     private static TrimResultTopComponent instance;
     private static final String PREFERRED_ID = "TrimResultTopComponent";
@@ -166,6 +163,4 @@ public final class TrimResultTopComponent extends TopComponent {
         resultTabs.setTabComponentAt(resultTabs.getTabCount() - 1, new TabWithCloseX(resultTabs));
         return resultView;
     }
-    
-    
 }
