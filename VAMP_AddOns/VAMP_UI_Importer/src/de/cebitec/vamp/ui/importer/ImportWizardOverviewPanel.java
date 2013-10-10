@@ -61,7 +61,7 @@ public class ImportWizardOverviewPanel implements WizardDescriptor.Panel<WizardD
         // load jobs to be imported
         List<ReferenceJob> refJobs = (List<ReferenceJob>) settings.getProperty(ImportWizardAction.PROP_REFJOBLIST);
         List<TrackJob> trackJobs = (List<TrackJob>) settings.getProperty(ImportWizardAction.PROP_TRACKJOBLIST);
-        List<ReadPairJobContainer> seqPairJobs = (List<ReadPairJobContainer>) settings.getProperty(ImportWizardAction.PROP_SEQPAIRJOBLIST);
+        List<ReadPairJobContainer> seqPairJobs = (List<ReadPairJobContainer>) settings.getProperty(ImportWizardAction.PROP_READPAIRJOBLIST);
         
         importOverviewCard.showOverview(refJobs, trackJobs, seqPairJobs);
     }
