@@ -62,7 +62,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
         if (allPanels == null) {
             allPanels = new ArrayList<>();
             allPanels.add(new DataSetChoicePanel());// 0
-            allPanels.add(new WholeGenomeTracksPanel()); // 1
+            allPanels.add(new WholeTranscriptTracksPanel()); // 1
             allPanels.add(new FivePrimeEnrichedTracksPanel()); // 2
             allPanels.add(new TssDetectionParamsPanel()); // 3
             allPanels.add(new RbsDetectionParamsPanel()); // 4

@@ -1,0 +1,78 @@
+############TODO############
+||  jritter               ||
+|| MA thesis              ||
+############################
+
+##TSS Detection##
+    - Inputs:
+        * Soll der User die wahl haben, wie die outputTabelle auszusehen hat?
+            Default (Christian), Neu (Armin)
+    - Outputs (Output von CR mit mehr Inhalt / Daten aus GenBank füllen):
+        * WIe genau soll der neue Output aussehen?
+        * Soll der alte (default) output die counts an den 10 stellen vor dem TSS 
+            behalten?
+        * Was möchte man in der Output Tabelle verändern können? Bzw. was will man 
+            per Checkboxen checken (ob leaderless oder antisense) ...
+            o	Ergebnisse sollten direkt in VAMP darstellbar sein, um z.B. einfacher die TSS zu kontrollieren.
+                	hierbei sollte man für eine bessere Übersicht mit Reitern arbeiten oder einschränken können, 
+                        welche der Ergebnisse sofort in VAMP angezeigt werden und welche man bei Bedarf dazu holt 
+                        oder nur direkt als Excel exportiert haben möchte
+
+    - Algorithmus:
+        * Gene to coresponding TSS korrekt zuweisen!
+        * Static Regions, brauchen eine solche File dazu
+
+    - Probleme: 
+        * Zuweisung von Gene und nextGene klappt noch nicht 100%ig
+        * TSS zu tRNA werden gefunden, das ist aber nicht gewollt, oder?
+
+
+    - Wizard
+        - bei Antisense nur ein Bild des einfachsten Falls einfuegen.
+        - Bei Leaderless nur ein Bild und die Beschreibung einfuegen.
+        - Die Textareas sind aber im Grunde OK.
+
+##OPERON Detection##
+    - Brauchen zum Testen eine Whole transcript data set
+
+##NOVEL REGIONS Detection##
+    - Brauchen zum Testen eine Whole transcript data set
+
+##RPKM/logRPKM##
+
+##Durchgeführte Analysen speicherbar und wieder aufrufbar machen##
+    - Das kann man genau so mit einer Action innitialisiere...
+        Action -> Load Analyses -> FileChooser -> CSV oder EXCEL Format laden 
+            -> Inhalt soll in die TopComponent, falss schon offen, geladen werde,
+                sonst eine neue aufmachen... 
+    - Man muss nur klären wie diese File aussehen darf.
+    - Write ist schon vorhanden in de.cebitec.vamp.exporter.excel using jxl import
+        -> Read an existing Excel Spreadsheet (Damit werden wir das lesen von bereits
+            durchgeführten Analysen in eine Tabelle) realisieren.
+
+##LEADERLESS Detection
+    - o	Potentielle Leaderless-Gene identifizieren und Starts ggfs. korrigieren, 
+        z.B. indem man eine Gruppe bildet TSS-TLS <= 7,
+        hierzu wären Checkboxen in der Ausgabeliste sinnvoll
+
+
+##MOTIF SEARCHER##
+    - Integration of Improbizer oder BioProspector
+        Viktor fragen, wie sie so etwas lösen würden ...
+
+
+##MA-thesis writing##
+    -Latex anpassen
+
+Introduction:
+    - RNA Seq
+    - ReadXplorer
+    - About TSS, RBS, Leaderless, Antisense
+
+Practical Part:
+
+
+Besprechung mit Armin am 16.10.2013
+
+    - OUTOUT:
+        - die erforderlichen zusaetzlichen Informationen siehe Email mit snap shot

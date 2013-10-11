@@ -16,8 +16,6 @@ public class TranscriptionStart extends TrackResultEntry {
     private boolean isFwdStrand;
     private int readStarts;
     private double relCount;
-    private int[] countsBeforeStart = new int[10];
-//    private DetectedFeatures detFeatures;
     private PersistantFeature detectedGene;
     private int offset;
     private int dist2start, dist2stop;
@@ -25,9 +23,7 @@ public class TranscriptionStart extends TrackResultEntry {
     private int nextOffset;
     private String sequence;
     private int[] beforeCounts;
-//    fdata = forward[i] + ";" + rel_count + ";" + before + feature.getFeatureName() + ";" + j;
-//    fdata += ";" + dist2start + ";" + dist2stop;
-//    fdata += ";" + forwardCDSs.get(i + j + l - end).get(0) + ";" + l;
+    private boolean leaderless, cdsShift, putativeUnannotated;
 
     /**
      * Data structure for storing a gene start.
@@ -67,7 +63,7 @@ public class TranscriptionStart extends TrackResultEntry {
      * @param sequence
      * @param trackId
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, int trackId) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, int trackId) {
         super(trackId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
@@ -81,6 +77,9 @@ public class TranscriptionStart extends TrackResultEntry {
         this.nextOffset = nextOffset;
         this.sequence = sequence;
         this.beforeCounts = before;
+        this.leaderless = leaderless;
+        this.cdsShift = cdsShift;
+        this.putativeUnannotated = putativeUnannotated;
     }
 
     public int[] getBeforeCounts() {
@@ -126,12 +125,16 @@ public class TranscriptionStart extends TrackResultEntry {
         this.relCount = relCount;
     }
 
-    public int[] getCountsBeforeStart() {
-        return countsBeforeStart;
+    public boolean isLeaderless() {
+        return leaderless;
     }
 
-    public void setCountsBeforeStart(int[] countsBeforeStart) {
-        this.countsBeforeStart = countsBeforeStart;
+    public boolean isCdsShift() {
+        return cdsShift;
+    }
+
+    public boolean isPutativeUnannotated() {
+        return putativeUnannotated;
     }
 
     public PersistantFeature getDetectedGene() {
@@ -189,16 +192,16 @@ public class TranscriptionStart extends TrackResultEntry {
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
-    
+
     @Override
     public String toString() {
-        
-        if(isFwdStrand) {
-        return this.pos+"\t"+"fwd\t"+ this.readStarts+"\t"+this.relCount+"\t"+ this.beforeCounts+"\t"+this.detectedGene.getFeatureName()+"\t"+ this.offset+"\t"+ this.dist2start+"\t"+ this.dist2stop+"\t"+ this.nextGene+"\t"+ this.nextOffset+"\t"+ this.sequence+"\t"+ 0;
-    
+
+        if (isFwdStrand) {
+            return this.pos + "\t" + "fwd\t" + this.readStarts + "\t" + this.relCount + "\t" + this.beforeCounts + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
+
         } else {
-            return this.pos+"\t"+"rev\t"+ this.readStarts+"\t"+this.relCount+"\t"+ this.beforeCounts+"\t"+this.detectedGene.getFeatureName()+"\t"+ this.offset+"\t"+ this.dist2start+"\t"+ this.dist2stop+"\t"+ this.nextGene+"\t"+ this.nextOffset+"\t"+ this.sequence+"\t"+ 0;
-    
+            return this.pos + "\t" + "rev\t" + this.readStarts + "\t" + this.relCount + "\t" + this.beforeCounts + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
+
         }
-    }    
+    }
 }

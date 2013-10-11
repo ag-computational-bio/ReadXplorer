@@ -143,7 +143,7 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
         if (paramerters.isPerformTSSAnalysis()) {
             tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence());
             tssDetection.runningTSSDetection(this.featureParser.getRefSeqLength(), this.forwardCDSs, this.reverseCDSs,
-                    this.allRegionsInHash, this.stats.getForward(), this.stats.getReverse(),
+                    this.allRegionsInHash, this.stats.getForward(), this.stats.getReverse(), this.stats.getFwdCoverage(), this.stats.getRevCoverage(),
                     this.paramerters.getRatio(), this.stats.getMm(), this.backgroundCutoff, this.paramerters.getUpstreamRegion(), this.paramerters.getDownstreamRegion());
         }
 

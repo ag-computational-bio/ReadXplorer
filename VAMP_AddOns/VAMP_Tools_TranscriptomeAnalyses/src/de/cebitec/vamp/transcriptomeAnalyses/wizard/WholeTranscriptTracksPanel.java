@@ -9,22 +9,22 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class WholeGenomeTracksPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private WholeGenomeTracksVisualPanel component;
+    private WholeTranscriptTracksVisualPanel component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public WholeGenomeTracksVisualPanel getComponent() {
+    public WholeTranscriptTracksVisualPanel getComponent() {
         if (component == null) {
-            component = new WholeGenomeTracksVisualPanel();
+            component = new WholeTranscriptTracksVisualPanel();
         }
         return component;
     }
@@ -64,13 +64,13 @@ public class WholeGenomeTracksPanel implements WizardDescriptor.ValidatingPanel<
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         if (this.component.isRPKM()) {
-            wiz.putProperty("rpkm", WholeGenomeTracksVisualPanel.PROP_ANALYSIS_RPKM);
+            wiz.putProperty("rpkm", WholeTranscriptTracksVisualPanel.PROP_ANALYSIS_RPKM);
         }
         if (this.component.isNewRegions()) {
-            wiz.putProperty("novel", WholeGenomeTracksVisualPanel.PROP_ANALYSIS_NOVELREGION);
+            wiz.putProperty("novel", WholeTranscriptTracksVisualPanel.PROP_ANALYSIS_NOVELREGION);
         }
         if (this.component.isOperonDetection()) {
-            wiz.putProperty("operon", WholeGenomeTracksVisualPanel.PROP_ANALYSIS_OPERON);
+            wiz.putProperty("operon", WholeTranscriptTracksVisualPanel.PROP_ANALYSIS_OPERON);
         }
     }
 

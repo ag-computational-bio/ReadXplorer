@@ -6,15 +6,15 @@ package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
 import javax.swing.JPanel;
 
-public final class WholeGenomeTracksVisualPanel extends JPanel {
+public final class WholeTranscriptTracksVisualPanel extends JPanel {
     public static final String PROP_ANALYSIS_RPKM  ="rpkm";
     public static final String PROP_ANALYSIS_NOVELREGION = "novel";
     public static final String PROP_ANALYSIS_OPERON = "operon";
 
     /**
-     * Creates new form WholeGenomeTracksVisualPanel
+     * Creates new form WholeTranscriptTracksVisualPanel
      */
-    public WholeGenomeTracksVisualPanel() {
+    public WholeTranscriptTracksVisualPanel() {
         initComponents();
     }
 
@@ -54,16 +54,16 @@ public final class WholeGenomeTracksVisualPanel extends JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
 
-        org.openide.awt.Mnemonics.setLocalizedText(rpkmCheckBox, org.openide.util.NbBundle.getMessage(WholeGenomeTracksVisualPanel.class, "WholeGenomeTracksVisualPanel.rpkmCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(rpkmCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.rpkmCheckBox.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(newRegionsCheckBox, org.openide.util.NbBundle.getMessage(WholeGenomeTracksVisualPanel.class, "WholeGenomeTracksVisualPanel.newRegionsCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(newRegionsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.newRegionsCheckBox.text")); // NOI18N
         newRegionsCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newRegionsCheckBoxActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(operonsCheckBox, org.openide.util.NbBundle.getMessage(WholeGenomeTracksVisualPanel.class, "WholeGenomeTracksVisualPanel.operonsCheckBox.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(operonsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.operonsCheckBox.text")); // NOI18N
         operonsCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 operonsCheckBoxActionPerformed(evt);

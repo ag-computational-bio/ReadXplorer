@@ -18,11 +18,11 @@ import jsc.distributions.Normal;
 
 /**
  * This class contains all of the statistics calculations and simulations.
- * 
- * 
+ *
+ *
  * @author jritter
  */
-public class Statistics implements Observer{
+public class Statistics implements Observer {
 
     private int bg;
     List<PersistantMapping> mappings;
@@ -32,14 +32,17 @@ public class Statistics implements Observer{
      * basetotal are counted bases in all mappings together
      */
     private int totalCount, uniqueCounts, basetotal;
+    /**
+     * Key: Start position of mapping, Value: List of mappingIDs
+     */
+    private HashMap<Integer, List<Long>> mappingsOnRrnAndTrna;
     private double mml, mm, mc;
     /*
      * arrays used to store the positions of regionsccounts
      * */
     private int[] forward, reverse;
     private int[] fwdCoverage, revCoverage;
-    
-         private int[] region2Exclude;
+    private int[] region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     /**
      * Key: featureID , Value: PersistantFeature
@@ -66,34 +69,37 @@ public class Statistics implements Observer{
         this.mappings = new ArrayList<>();
         this.putativeOperonAdjacenciesFWD = new HashMap<>();
         this.putativeOperonAdjacenciesREV = new HashMap<>();
-        
+        this.mappingsOnRrnAndTrna = new HashMap<>();
     }
 
     /**
-     * 
+     *
      */
     public void initMappingsStatistics() {
         this.mml = basetotal / totalCount;
-        this.mm = uniqueCounts/1000000;
-        this.mc = basetotal/1000000;
+        this.mm = uniqueCounts / 1000000;
+        this.mc = basetotal / 1000000;
     }
-    
+
     /**
-     * Parses all mappings of one Track. Generates a forward and reverse 
-     * CDS mapping Arrays, where the information of the covered features 
-     * is stored. It also counts all unique mappings and the total base count of 
-     * the mappings. By the way it cunstructs a List with OperonAdjacencies for 
+     * Parses all mappings of one Track. Generates a forward and reverse CDS
+     * mapping Arrays, where the information of the covered features is stored.
+     * It also counts all unique mappings and the total base count of the
+     * mappings. By the way it cunstructs a List with OperonAdjacencies for
      * further analyses.
-     * 
+     *
      * @param mappings List of PersistenMappings.
-     * @param forwardCDSs List of Lists, whereby the intern List a list of the 
-     *          featureIDs of features in forward direction is, that occure on thatPosition.
-     * @param reverseCDSs List of Lists, whereby the intern List a list of the 
-     *          featureIDs of features in forward direction is, that occure on thatPosition.
-     * @param allRegionsInHash is a hashMap of Features, whereby the Key the FeatureID of Feature value is.
+     * @param forwardCDSs List of Lists, whereby the intern List a list of the
+     * featureIDs of features in forward direction is, that occure on
+     * thatPosition.
+     * @param reverseCDSs List of Lists, whereby the intern List a list of the
+     * featureIDs of features in forward direction is, that occure on
+     * thatPosition.
+     * @param allRegionsInHash is a hashMap of Features, whereby the Key the
+     * FeatureID of Feature value is.
      * @param refSeqLength Length of the reference genome.
-     * @param region2Exclude int[] in genomesize length. 1 on position i means, 
-     *          that on these position a feature occur which we want to exclude.
+     * @param region2Exclude int[] in genomesize length. 1 on position i means,
+     * that on these position a feature occur which we want to exclude.
      */
     public void parseMappings(List<PersistantMapping> mappings) {
 
@@ -103,6 +109,8 @@ public class Statistics implements Observer{
             this.totalCount++;
             int start = mapping.getStart();
             int stop = mapping.getStop();
+            long id = mapping.getId();
+            
             boolean directionFWD = mapping.isFwdStrand();
 
             if (start < stop) {
@@ -114,6 +122,26 @@ public class Statistics implements Observer{
                 if (region2Exclude[start] == 0 || region2Exclude[stop] == 0) {
                     this.basetotal += stop - start + 1;
                 }
+                
+                // Hash is in preparation for mappings which covers a r or t RNA 
+                // this hashmap needed for excluding TSSs of a r or t RNA
+                if (region2Exclude[start] != 0 || region2Exclude[stop] != 0) {
+                    int pos;
+                    if(region2Exclude[start] != 0) {
+                        pos = start;
+                    } else {
+                        pos = stop;
+                    }
+                    if(mappingsOnRrnAndTrna.containsKey(pos)) {
+                        mappingsOnRrnAndTrna.get(pos).add(id);
+                    } else {
+                        List<Long> list = new ArrayList<>();
+                        list.add(id);
+                        mappingsOnRrnAndTrna.put(pos, list);
+                    }
+                }
+                
+                
                 //	# sum up the total coverage at each positions
                 //	# (this is needed for extending genes later)
                 if (directionFWD) {
@@ -209,28 +237,29 @@ public class Statistics implements Observer{
     }
 
     /**
-     * Calculates the inverse of the normal distribution. The mean is count of  
-     * unique mappings divided by the length of the reference * 2. The variance is 
-     * equals mean.
-     * 
-     * @param fraction Fraction needed for calculation of allowed false pasitives.
+     * Calculates the inverse of the normal distribution. The mean is count of
+     * unique mappings divided by the length of the reference * 2. The variance
+     * is equals mean.
+     *
+     * @param fraction Fraction needed for calculation of allowed false
+     * pasitives.
      * @param refSeqLength length of reference genome.
-     * @return 
+     * @return
      */
     public double calculateBackgroundCutoff(double fraction, int refSeqLength) {
 //        int length = refSeqLength * 2;
-        double mean= (double) this.uniqueCounts/refSeqLength;
+        double mean = (double) this.uniqueCounts / refSeqLength;
         double standardDiviation = Math.sqrt(mean);
         double inverseCdf = 0;
         jsc.distributions.Normal normal = new Normal(mean, standardDiviation);
 
         inverseCdf = normal.inverseCdf(1 - (fraction / 1000));
-        
+
 //    warn "Background cutoff is calculated to be $bg, but is manually set to $opt_f...\n";
 //    $bg = $opt_f;
 //    warn "Background cutoff is calculated to be $bg...\n";
 //    warn "Average and variance: $mean...\n";
-        
+
         return inverseCdf;
 
     }
@@ -329,5 +358,10 @@ public class Statistics implements Observer{
     public double getMc() {
         return mc;
     }
+
+    public HashMap<Integer, List<Long>> getMappingsOnRrnAndTrna() {
+        return mappingsOnRrnAndTrna;
+    }
+    
     
 }

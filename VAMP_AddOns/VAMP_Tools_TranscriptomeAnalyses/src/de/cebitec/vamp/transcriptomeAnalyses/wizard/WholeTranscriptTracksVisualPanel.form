@@ -88,14 +88,14 @@
     <Component class="javax.swing.JCheckBox" name="rpkmCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="WholeGenomeTracksVisualPanel.rpkmCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="WholeTranscriptTracksVisualPanel.rpkmCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="newRegionsCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="WholeGenomeTracksVisualPanel.newRegionsCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="WholeTranscriptTracksVisualPanel.newRegionsCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -105,7 +105,7 @@
     <Component class="javax.swing.JCheckBox" name="operonsCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="WholeGenomeTracksVisualPanel.operonsCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="WholeTranscriptTracksVisualPanel.operonsCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>

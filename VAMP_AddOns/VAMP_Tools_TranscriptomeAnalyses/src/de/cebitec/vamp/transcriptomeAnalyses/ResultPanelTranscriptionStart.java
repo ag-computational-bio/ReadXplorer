@@ -35,8 +35,10 @@ import javax.swing.table.TableRowSorter;
 /**
  * This panel is capable of showing a table with transcription start sites and
  * contains an export button, which exports the data into an excel file.
+ * Additionally it has now an import button, which imports an excel file and 
+ * visualize the data to a JPanel.
  *
- * @author -Rolf Hilker-
+ * @author -Rolf Hilker-, -jritter-
  */
 public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
@@ -102,20 +104,21 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         exportButton = new javax.swing.JButton();
         parametersLabel = new javax.swing.JLabel();
         statisticsButton = new javax.swing.JButton();
+        importButton = new javax.swing.JButton();
 
         tSSTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Position", "Direction", "Count", "Rel. count", "-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "Gene", "offset", "dist2start", "dist2stop", "Next Gene", "Next offste", "Sequence"
+                "Position", "Direction", "Count", "Rel. count", "-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "Gene", "offset", "dist2start", "dist2stop", "Next Gene", "Next offste", "Sequence", "Leaderless"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -148,6 +151,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         tSSTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title18")); // NOI18N
         tSSTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title19")); // NOI18N
         tSSTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title20")); // NOI18N
+        tSSTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title21")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -165,17 +169,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
             }
         });
 
+        importButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.importButton.text")); // NOI18N
+        importButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(parametersLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(statisticsButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(exportButton))
-            .addComponent(tssScrollPane)
+            .addComponent(tssScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 888, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -185,7 +198,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exportButton)
                     .addComponent(parametersLabel)
-                    .addComponent(statisticsButton)))
+                    .addComponent(statisticsButton)
+                    .addComponent(importButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -222,8 +236,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
         JOptionPane.showMessageDialog(this, new TssDetectionStatsPanel(statisticsMap), "TSS Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
+
+    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_importButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
+    private javax.swing.JButton importButton;
     private javax.swing.JLabel parametersLabel;
     private javax.swing.JButton statisticsButton;
     private javax.swing.JTable tSSTable;
@@ -265,7 +285,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 @Override
                 public void run() {
 
-                    final int nbColumns = 21;
+                    final int nbColumns = 22;
 
                     int noCorrectStarts = 0;
                     int noUpstreamFeature = 0;
@@ -295,16 +315,16 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         rowData[1] = strand;
                         rowData[2] = tSS.getReadStarts();
                         rowData[3] = tSS.getRelCount();
-//                        rowData[4] = tSS.getCountsBeforeStart()[9];
-                        rowData[5] = tSS.getCountsBeforeStart()[8];
-                        rowData[6] = tSS.getCountsBeforeStart()[7];
-                        rowData[7] = tSS.getCountsBeforeStart()[6];
-                        rowData[8] = tSS.getCountsBeforeStart()[5];
-                        rowData[9] = tSS.getCountsBeforeStart()[4];
-                        rowData[10] = tSS.getCountsBeforeStart()[3];
-                        rowData[11] = tSS.getCountsBeforeStart()[2];
-                        rowData[12] = tSS.getCountsBeforeStart()[1];
-                        rowData[13] = tSS.getCountsBeforeStart()[0];
+                        rowData[4] = tSS.getBeforeCounts()[9];
+                        rowData[5] = tSS.getBeforeCounts()[8];
+                        rowData[6] = tSS.getBeforeCounts()[7];
+                        rowData[7] = tSS.getBeforeCounts()[6];
+                        rowData[8] = tSS.getBeforeCounts()[5];
+                        rowData[9] = tSS.getBeforeCounts()[4];
+                        rowData[10] = tSS.getBeforeCounts()[3];
+                        rowData[11] = tSS.getBeforeCounts()[2];
+                        rowData[12] = tSS.getBeforeCounts()[1];
+                        rowData[13] = tSS.getBeforeCounts()[0];
 
                         feature = tSS.getDetectedGene();
 //                        feature = detFeatures.getCorrectStartFeature();
@@ -333,8 +353,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         rowData[15] = tSS.getOffset();
                         rowData[16] = tSS.getDist2start();
                         rowData[17] = tSS.getDist2stop();
+                        if(tSS.getNextGene() != null) {
                         rowData[18] = tSS.getNextGene().toString();
+                        } else {
+                            rowData[18] = "-";
+                        }
                         rowData[19] = tSS.getNextOffset();
+                        rowData[20] = tSS.getSequence();
+                        rowData[21] = tSS.isLeaderless();
                         model.addRow(rowData);
                     }
 

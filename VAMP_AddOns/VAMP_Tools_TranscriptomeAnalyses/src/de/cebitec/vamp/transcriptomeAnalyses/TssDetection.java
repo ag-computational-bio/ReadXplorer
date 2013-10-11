@@ -23,30 +23,33 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     }
 
     /**
-     * Running the transcription start site detection. 
-     * 
-     * @param refSeqLength Length of the reference genome.
+     * Running the transcription start site detection.
+     *
+     * @param length Length of the reference genome.
      * @param forwardCDSs CDS information for forward regions in genome.
      * @param reverseCDSs CDS information for reverse regions in genome.
-     * @param allRegionsInHash HashMap with all featureIDs and associated features.
-     * @param forward Array with startsite count information for forward mapping positions.
-     * @param reverse Array with startsite count information for reverse mapping positions.
-     * @param ratio User given ratio for minimum increase of start counts from pos to pos + 1.
+     * @param allRegionsInHash HashMap with all featureIDs and associated
+     * features.
+     * @param forward Array with startsite count information for forward mapping
+     * positions.
+     * @param reverse Array with startsite count information for reverse mapping
+     * positions.
+     * @param ratio User given ratio for minimum increase of start counts from
+     * pos to pos + 1.
      * @param mm Mappings per Million.
      * @param bg Background cutoff
-     * @param up Number of bases for sequence in upstream direction beginning from TSS.
-     * @param down Number of bases for sequence in downstream direction beginning from TSS.
+     * @param up Number of bases for sequence in upstream direction beginning
+     * from TSS.
+     * @param down Number of bases for sequence in downstream direction
+     * beginning from TSS.
      */
-    public void runningTSSDetection(int refSeqLength, HashMap<Integer, List<Integer>> forwardCDSs, 
-            HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, 
-                    PersistantFeature> allRegionsInHash, int[] forward, int[] reverse,
-                    int ratio, double mm, double bg, int up, int down) {
+    public void runningTSSDetection(int length, HashMap<Integer, List<Integer>> forwardCDSs,
+            HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash, int[] forward, int[] reverse, int[] fwdCov, int[] revCov,
+            int ratio, double mm, double bg, int up, int down) {
 
 //# now do the actual summations and adjust the gene length 
 //# (this is currently done intrinsically, a method to "import"
 //# gene starts from a 5'-end enriched set has yet to be implemented)
-
-        int length = refSeqLength;
 
         for (int i = 0; i < length; i++) {
 
@@ -57,109 +60,241 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                 int f_ratio = (forward[i] + 1) / f_before;
                 int r_ratio = (reverse[i] + 1) / r_before;
 
-                String fdata;
-                String rdata;
 
                 if (f_ratio >= ratio) {
-                    int j = 0;
+
+                    int offset = 0;
                     int end = 0;
 
-                    // TO DO: Also check the next gene!!!
-                    // it can be, that the List on pos i+j-end isnt initiated => null!
-                    while (!forwardCDSs.containsKey(i + j - end)) { // as long as there is no featureID
-                        if ((i + j) > length) {
+                    // counting the offset as long as there is no featureID
+                    while (!forwardCDSs.containsKey(i + offset - end)) {
+                        if ((i + offset) > length) {
                             end = length;
                         }
-                        j++;
+                        offset++;
                     }
 
-                    // for the 10 Positions before feature-start
-                    String before = "";
+                    // the 10 count Positions before mapping starts
                     int[] beforeCountsFwd = new int[10];
-
                     for (int k = 0; k > 9; k++) {
-                        int count = forward[i - k];
-                        before += count+";";
+                        int count = fwdCov[i - (k + 1)];
                         beforeCountsFwd[k] = count;
                     }
 
                     double rel_count = forward[i] / mm;
 
                     // TODO: here we have with forwardCDSs.get(i + j - end).get(0) the feature ID, now we have to get the name
-                    PersistantFeature feature = allRegionsInHash.get(forwardCDSs.get(i + j - end).get(0));
-                    fdata = forward[i] + ";" + rel_count + ";" + before + feature.getFeatureName() + ";" + j;
+                    PersistantFeature feature = allRegionsInHash.get(forwardCDSs.get(i + offset - end).get(0));
                     int dist2start = 0;
                     int dist2stop = 0;
-                    int l = 0;
-                    if (j == 0) {
+                    boolean leaderless = false;
+                    boolean cdsShift = false;
+                    boolean putativeUnannotated = false;
+                    boolean isFwd = true;
+                    int startSubSeq = i - up;
+                    int stopSubSeq = i + down;
+                    int nextOffset = 0;
+
+
+                    // We have 4 possible cases here
+                    // 1. Offset is 0 which means, that the TSS is a Leaderless (<=7bp downstream from feature start)  TSS 
+                    // or 
+                    // 2. TSS is an internal (>7bp downstream from feature start) TSS
+                    // 3. Offset is < 7bp which is maybe a leaderless upstream
+                    // 4. Offset is > 500bp, which maybe is a TSS for unannotated Transcript which have 
+                    // to be blasted
+                    // 
+                    if (offset == 0) {
                         dist2start = i - feature.getStart();
                         dist2stop = feature.getStop() - i;
-                        fdata += ";" + dist2start + ";" + dist2stop;
-                        
-                        if (dist2start != 0) {
-                            // here we want to find the next gene because the startsite and Gene start are the same.
-                            while (forwardCDSs.get(i + j + l - end) == null && (forwardCDSs.get(i + j - end).get(0) != forwardCDSs.get(i + j + l - end).get(0))) { 
-                                
-                                if ((i + j + l) > length) {
-                                    end = length;
-                                }
-                                l++;
+
+                        // check if leaderless (downstream)
+                        if (dist2start < 7) {
+                            leaderless = true;
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
+                            detectedTSS.add(tss);
+                        }
+
+                        if (dist2start > 7 && dist2stop < 500) { // internal mapping or TSS for nextGene
+                            // here we want to find the next gene because the startsite is inbetween a gene which is not a leaderles gene
+                            int currentFeatureID = feature.getId();
+                            PersistantFeature nextFeature = allRegionsInHash.get(currentFeatureID + 1);
+                            nextOffset = nextFeature.getStart() - i;
+                            
+                            if (nextOffset < 500) {
+                                // putative the corresponding gene for TSS
+                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, null, offset, dist2start, dist2stop, nextFeature, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
+                                detectedTSS.add(tss);
                             }
-                            fdata += ";" + allRegionsInHash.get(forwardCDSs.get(i + j + l - end).get(0)) + ";" + l;
+                            // TODO not yet needed!
+//                            else {
+//                                // TSS for putative unannotated TSS 
+//                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, null, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, true, 1);
+//                                detectedTSS.add(tss);
+//                            }
+                        }
+                    } else {
+
+                        // leaderless in upstream direction
+                        if (offset < 7) {
+                            leaderless = true;
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
+                            detectedTSS.add(tss);
+                        } else {
+                            if(offset < 500) {
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
+                            detectedTSS.add(tss);
+                            } else {
+                                // TODO maybe unannotated!
+                            }
                         }
                     }
-                    //this.referenceSequence.substring(i-up+1, up+down)
-                    TranscriptionStart tss = new TranscriptionStart(i, true, forward[i], rel_count, beforeCountsFwd, feature, j, dist2start, dist2stop, allRegionsInHash.get(forwardCDSs.get(i + j + l - end).get(0)), l, null, 0);
-                    detectedTSS.add(tss);
-                    System.out.println(tss.toString());
                 }
+
 
                 if (r_ratio >= ratio) {
-                    int j = 0;
+
+                    int offset = 0;
                     int end = 0;
-                    while (!reverseCDSs.containsKey(end + i - j)) {
-                        if ((i - j) == 0) {
+
+                    // counting the offset as long as there is no featureID
+                    while (!reverseCDSs.containsKey(end + i - offset)) {
+                        if ((i - offset) == 0) {
                             end = length;
                         }
-                        j++;
+                        offset++;
                     }
-                    String before = "";
+
                     int[] beforeCountRev = new int[10];
                     for (int k = 0; k > 9; k++) {
-                        int count = reverse[i + k];
-                        before += count + ";";
+                        int count = revCov[i + k + 1];
                         beforeCountRev[k] = count;
                     }
+
                     double rel_count = reverse[i] / mm;
 
-                    PersistantFeature feature = allRegionsInHash.get(reverseCDSs.get(end + i - j).get(0));
-                    rdata = reverse[i] + ";" + rel_count + ";" + before + feature.getFeatureName() + ";" + j;
+                    PersistantFeature feature = allRegionsInHash.get(reverseCDSs.get(end + i - offset).get(0));
                     int dist2start = 0;
                     int dist2stop = 0;
-                    int l = 0;
-                    if (j == 0) {
-                       dist2start = feature.getStart() - i;
-                        dist2stop = i - feature.getStop();
-                        rdata += ";" + dist2start + ";" + dist2stop;
-                        if (dist2start != 0) {
-                            
-                            // TODO: not clear, if reverseCDSs.get(end + i - j - l).get(0) have to be  == 0 or != 0
-                            while (reverseCDSs.get(end + i - j - l) == null && (reverseCDSs.get(end + i - j).get(0) != reverseCDSs.get(end + i - j - l).get(0))) {
-                                if ((i - j - l) == 0) {
-                                    end = length;
-                                }
-                                l++;
+                    boolean leaderless = false;
+                    boolean cdsShift = false;
+                    boolean putativeUnannotated = false;
+                    boolean isFwd = false;
+                    int startSubSeq = i - down;
+                    int stopSubSeq = i + up;
+                    int nextOffset = 0;
+
+                    if (offset == 0) {
+                        dist2start = feature.getStop() - i;
+                        dist2stop = i - feature.getStart();
+
+                        // check if leaderless (downstream)
+                        if (dist2start < 7) {
+                            leaderless = true;
+//                            if (leaderless && (leaderlessInitSeqDown.equals("GTG") || leaderlessInitSeqDown.equals("CTG") || leaderlessInitSeqDown.equals("TTG"))) {
+//                                cdsShift = true;
+//                            }
+                            String reversedSeq = new StringBuffer(getSubSeq(false, startSubSeq, stopSubSeq)).reverse().toString();
+                            String revComplement = ReverseComplement(reversedSeq);
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                            detectedTSS.add(tss);
+                        }
+
+                        if (dist2start > 7) {
+
+                            int currentFeatureID = feature.getId();
+                            PersistantFeature nextFeature = allRegionsInHash.get(currentFeatureID - 1);
+                            nextOffset = i - nextFeature.getStop();
+
+                            if (nextOffset < 500) {
+                                // puttative nextgene
+                                String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
+                                String revComplement = ReverseComplement(reversedSeq);
+                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                                detectedTSS.add(tss);
+                            } 
+                            // TODO not yet needed!
+//                            else {
+//                                // puttative Unannotated 
+//                                String reversedSeq = new StringBuffer(getSubSeq(false, startSubSeq, stopSubSeq)).reverse().toString();
+//                                String revComplement = ReverseComplement(reversedSeq);
+//                                TranscriptionStart tss = new TranscriptionStart(i, false, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, false, 1);
+//                                detectedTSS.add(tss);
+//                            }
+                        }
+
+                    } else {
+                        if (offset < 7) {
+                            // Leaderless TSS upstream
+                            leaderless = true;
+//                            if (leaderless && (leaderlessInitSeqDown.equals("GTG") || leaderlessInitSeqDown.equals("CTG") || leaderlessInitSeqDown.equals("TTG"))) {
+//                                cdsShift = true;
+//                            }
+                            String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
+                            String revComplement = ReverseComplement(reversedSeq);
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                            detectedTSS.add(tss);
+                        } else {
+                            // "normal" TSS
+                            if(offset < 500) {
+                            String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
+                            String revComplement = ReverseComplement(reversedSeq);
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                            detectedTSS.add(tss);
+                            } else {
+                                // TODO maybe unannotated!
                             }
-                            rdata += ";" + allRegionsInHash.get(reverseCDSs.get(end + i - j - l).get(0)) + ";" + l;
                         }
                     }
-//                    String seq = this.referenceSequence.substring(i-down, up+down);
-//                    String reversedSeq = new StringBuffer(seq).reverse().toString();
-                    TranscriptionStart tss = new TranscriptionStart(i, false, reverse[i], rel_count, beforeCountRev, feature, j, dist2start, dist2stop, allRegionsInHash.get(reverseCDSs.get(end + i - j - l).get(0)), l, null, 0);
-                    detectedTSS.add(tss);
-                    System.out.println(tss.toString());
+
                 }
             }
+        }
+    }
+
+    private String ReverseComplement(String seq) {
+        char BASE_A = 'A';
+        char BASE_C = 'C';
+        char BASE_G = 'G';
+        char BASE_T = 'T';
+        String a = "A";
+        String c = "C";
+        String g = "G";
+        String t = "T";
+        String compliment = "";
+
+        for (int i = 0; i < seq.length(); i++) {
+            if (BASE_A == seq.charAt(i)) {
+                compliment = compliment.concat(t);
+            } else if (BASE_C == (seq.charAt(i))) {
+                compliment = compliment.concat(g);
+
+            } else if (BASE_G == seq.charAt(i)) {
+                compliment = compliment.concat(c);
+
+            } else if (BASE_T == seq.charAt(i)) {
+                compliment = compliment.concat(a);
+            }
+        }
+
+        return compliment;
+
+    }
+
+    private String getSubSeq(boolean isFwd, int start, int stop) {
+        if (isFwd) {
+            String seq = "";
+            if (start > 0 && stop < referenceSequence.length()) {
+                seq = this.referenceSequence.substring(start, stop);
+            }
+            return seq;
+        } else {
+            String seq = "";
+            if (start > 0 && stop < referenceSequence.length()) {
+                seq = this.referenceSequence.substring(start, stop);
+            }
+            String reversedSeq = new StringBuffer(seq).reverse().toString();
+            return reversedSeq;
         }
     }
 

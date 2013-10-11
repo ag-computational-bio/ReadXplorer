@@ -36,7 +36,7 @@ import org.openide.windows.WindowManager;
         displayName = "#CTL_StartTranscriptomeAnalysesAction")
 @ActionReference(path = "Menu/Tools", position = 112)
 @Messages("CTL_StartTranscriptomeAnalysesAction=Start Transcriptome Analyses")
-public final class StartTranscriptomeAnalysesAction implements ActionListener, DataVisualisationI {
+public final class StartTranscriptomeAnalysesAction implements ActionListener{
 
     private final ReferenceViewer refViewer;
     private int finishedAnalyses = 0;
@@ -165,90 +165,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener, D
             fifePrimeAnalysesHandler = new FifeEnrichedDataAnalysesHandler(featureParser, track, referenceId, parameterSetFiveprime, this.refViewer, this.transcAnalysesTopComp, this.trackMap);
             fifePrimeAnalysesHandler.start();
             
-//            trackToAnalysisMap.put(track.getId(), new AnalysesContainer(fifePrimeAnalysesHandler.getTssDetection(), fifePrimeAnalysesHandler.getOperonDetection()));
         }
-    }
-
-    @Override
-    public void showData(Object data) {
-        
-//        System.out.println("We are in Show data of StartTranscriptomeAnalysesAction!");
-//        try {
-//            @SuppressWarnings("unchecked")
-//            Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
-//            final int trackId = dataTypePair.getFirst();
-//            final String dataType = dataTypePair.getSecond();
-//
-//            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
-//                @Override
-//                public void run() {
-//
-//                    //get track name(s) for tab descriptions
-//                    String trackNames;
-//                    
-//                    if (parameterSetFiveprime.isPerformTSSAnalysis()) {
-//
-//                        ++finishedAnalyses;
-//                        TssDetection analysisTSS = trackToAnalysisMap.get(trackId).getAnalysisTSS();
-//                        if (transcriptionStartResultPanel == null) {
-//                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-//                            transcriptionStartResultPanel.setReferenceViewer(refViewer);
-//                        }
-//
-//                        TSSDetectionResults tssResult = new TSSDetectionResults(analysisTSS.getResults(), trackMap);
-//                        transcriptionStartResultPanel.addResult(tssResult);
-//
-//                        if (finishedAnalyses >= tracks.size()) {
-//                            trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-//                            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
-//                            transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
-//                        }
-//                    }
-//                    if (dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
-//                        ++finishedMappingAnalyses;
-//
-//                        if (parametersOperonDet.isPerformOperonAnalysis()) {
-//
-//                            if (operonResultPanel == null) {
-//                                operonResultPanel = new ResultPanelOperonDetection(parametersOperonDet);
-//                                operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
-//                            }
-//                            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
-//                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
-//                            operonDetectionResult.setParameters(parametersOperonDet);
-//                            operonResultPanel.addResult(operonDetectionResult);
-//
-//                            if (finishedMappingAnalyses >= tracks.size()) {
-//                                trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
-//                                String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
-//                                transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
-//                            }
-//                        }
-//
-//                        if (parametersRPKM.isPerformRPKMAnalysis()) {
-//                            AnalysisRPKM rpkmAnalysis = trackToAnalysisMap.get(trackId).getAnalysisRPKM();
-//                            if (rpkmResultPanel == null) {
-//                                rpkmResultPanel = new ResultPanelRPKM();
-//                                rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
-//                            }
-//                            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
-//                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults());
-//                            rpkmAnalysisResult.setParameters(parametersRPKM);
-//                            rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
-//                            rpkmResultPanel.addResult(rpkmAnalysisResult);
-//
-//                            if (finishedMappingAnalyses >= tracks.size()) {
-//                                trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
-//                                String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
-//                                transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-//        } catch (ClassCastException e) {
-//            //do nothing, we dont handle other data in this class
-//        }
     }
 
     public static enum AnalysisStatus {
