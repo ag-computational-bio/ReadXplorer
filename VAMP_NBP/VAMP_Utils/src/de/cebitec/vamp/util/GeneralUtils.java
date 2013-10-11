@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml3;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 
 /**
@@ -284,7 +284,7 @@ public class GeneralUtils {
     }
     
     public static String escapeHtml(String s) {
-        return escapeHtml3(s);
+        return StringEscapeUtils.escapeHtml3(s);
     }
     
 }

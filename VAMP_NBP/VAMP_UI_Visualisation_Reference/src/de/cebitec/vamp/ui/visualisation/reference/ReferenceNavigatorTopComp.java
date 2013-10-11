@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -15,7 +16,7 @@ import org.openide.windows.WindowManager;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false)
-public final class ReferenceNavigatorTopComp extends TopComponent implements LookupListener{
+public final class ReferenceNavigatorTopComp extends TopComponentExtended implements LookupListener{
 
     private static final long serialVersionUID = 1L;
 

@@ -19,6 +19,7 @@ import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.GenerateRowSorter;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.UneditableTableModel;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.awt.event.ItemEvent;
@@ -67,7 +68,7 @@ import org.openide.windows.TopComponent;
     "CTL_DiffExpResultViewerTopComponent=Differential Gene Expression Analysis - results",
     "HINT_DiffExpResultViewerTopComponent=This is a Differential Gene Expression Result Window"
 })
-public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
+public final class DiffExpResultViewerTopComponent extends TopComponentExtended implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
     private TableModel tm;

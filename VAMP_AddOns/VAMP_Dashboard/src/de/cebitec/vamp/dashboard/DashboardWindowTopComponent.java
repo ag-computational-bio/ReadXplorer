@@ -7,6 +7,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.util.VisualisationUtils;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.EventQueue;
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ autostore = false)
 persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "editor", openAtStartup = true)
 @ActionID(category = "Tools", id = "de.cebitec.vamp.dashboard.DashboardWindowTopComponent")
-@ActionReference(path = "Menu/Tools" /*, position = 333 */)
+@ActionReference(path = "Menu/Tools", position = 1)
 @TopComponent.OpenActionRegistration(
     displayName = "#CTL_DashboardWindowAction",
 preferredID = "DashboardWindowTopComponent")
@@ -58,7 +59,7 @@ preferredID = "DashboardWindowTopComponent")
     "CTL_DashboardWindowTopComponent=Dashboard",
     "HINT_DashboardWindowTopComponent=This is a DashboardWindow window"
 })
-public final class DashboardWindowTopComponent extends TopComponent implements ExplorerManager.Provider {
+public final class DashboardWindowTopComponent extends TopComponentExtended implements ExplorerManager.Provider {
     
     private static final long serialVersionUID = 1L;
     

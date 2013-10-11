@@ -1,5 +1,6 @@
 package de.cebitec.vamp.ui.visualisation.track;
 
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.MouseEvent;
@@ -18,7 +19,7 @@ import org.openide.windows.WindowManager;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.track//TrackStatistics//EN", autostore = false)
-public final class TrackStatisticsTopComponent extends TopComponent implements LookupListener{
+public final class TrackStatisticsTopComponent extends TopComponentExtended implements LookupListener{
 
     private static final long serialVersionUID = 1L;
 

@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JPanel;
@@ -34,7 +35,7 @@ import org.openide.windows.WindowManager;
     "CTL_CoverageAnalysisTopComponent=Coverage Analysis Window",
     "HINT_CoverageAnalysisTopComponent=This is a Coverage Analysis Result window"
 })
-public final class CoverageAnalysisTopComponent extends TopComponent {
+public final class CoverageAnalysisTopComponent extends TopComponentExtended {
 
     public static final String PREFERRED_ID = "CoverageAnalysisTopComponent";
     private static final long serialVersionUID = 1L;

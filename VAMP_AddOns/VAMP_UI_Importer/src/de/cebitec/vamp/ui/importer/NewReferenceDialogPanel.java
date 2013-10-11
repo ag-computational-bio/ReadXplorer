@@ -382,13 +382,13 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
             this.fileLabel.setText("Fasta file:");
 
             if (currentParser instanceof BioJavaGff2Parser) {
-                this.fileGffLabel.setText("GFF2");
+                this.fileGffLabel.setText(NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGff2Label.text"));
                 this.fileGffChooserButton.setToolTipText(NbBundle.getMessage(NewReferenceDialogPanel.class,
                         "NewReferenceDialogPanel.fileGffChooserButton.toolTipTextGFF2"));
             } else if (currentParser instanceof BioJavaGff3Parser) {
-            this.fileGffLabel.setText("GFF3");
+            this.fileGffLabel.setText(NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGff3Label.text"));
             this.fileGffChooserButton.setToolTipText(NbBundle.getMessage(NewReferenceDialogPanel.class, 
-                    "NewReferenceDialogPanel.fileGffChooserButton.toolTipTextGFF3"));
+                    "NewReferenceDialogPanel.fileGffChooserButton.toolTipTextGff3"));
             }
         } else {
             this.fileGffChooserButton.setVisible(false);

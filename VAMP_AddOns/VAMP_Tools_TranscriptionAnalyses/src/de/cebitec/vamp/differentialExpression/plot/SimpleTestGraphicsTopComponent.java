@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -61,7 +62,8 @@ import org.openide.util.NbBundle.Messages;
     "CTL_PlotTopComponent=Create graphics",
     "HINT_PlotTopComponent=This is a differential expression plot window"
 })
-public final class SimpleTestGraphicsTopComponent extends TopComponent implements Observer {
+public final class SimpleTestGraphicsTopComponent extends TopComponentExtended implements Observer {
+    private static final long serialVersionUID = 1L;
 
     private DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>(PlotTypes.values());
     private DefaultComboBoxModel<String> cbmDataSet;

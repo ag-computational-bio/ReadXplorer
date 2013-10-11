@@ -98,6 +98,6 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
         // store job to import
         settings.putProperty(ImportWizardAction.PROP_REFJOBLIST, component.getRefJobList());
         settings.putProperty(ImportWizardAction.PROP_TRACKJOBLIST, component.getTrackJobList());
-//        settings.putProperty(ImportWizardAction.PROP_SEQPAIRJOBLIST, component.getReadPairTrackJobList());
+        settings.putProperty(ImportWizardAction.PROP_READPAIRJOBLIST, component.getReadPairTrackJobList());
     }
 }

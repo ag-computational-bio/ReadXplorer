@@ -3,7 +3,7 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.dialogMenus.Loading;
+import de.cebitec.vamp.view.dialogMenus.LoadingDialog;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -13,10 +13,13 @@ import java.text.MessageFormat;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
 /**
@@ -24,10 +27,15 @@ import org.openide.windows.WindowManager;
  *
  * @author ddoppmeier, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
+@Messages({
+    "# {0} - error message", 
+    "LoginWizardAction_ErrorMsg=An error occured during opening of the DB: {0}", 
+    "LoginWizardAction_ErrorHeader=Loading Error"})
 public final class LoginWizardAction implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
+    private LoadingDialog loading;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -49,43 +57,43 @@ public final class LoginWizardAction implements ActionListener {
         dialog.toFront();
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-//            final Loading loading = new Loading();
-            // log out before logging into another database
-            //            if (loggedIn){
-            //                LogoutAction logoutAction = Utilities.actionsGlobalContext().lookup(LogoutAction.class);
-            //                LogoutAction logoutAction = Lookups.forPath("Actions/File/").lookup(LogoutAction.class);
-            //                logoutAction.actionPerformed(null);
-            //            }
+            try {
+                this.loading = new LoadingDialog(WindowManager.getDefault().getMainWindow());
 
-            final Map<String, Object> loginProps = wizardDescriptor.getProperties();
-            //add database path to main window title
-            JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
-            mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
-            Thread connectThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        ProjectConnector.getInstance().connect(
-                                (String) loginProps.get(LoginWizardPanel.PROP_ADAPTER),
-                                (String) loginProps.get(LoginWizardPanel.PROP_DATABASE),
-                                (String) loginProps.get(LoginWizardPanel.PROP_HOST),
-                                (String) loginProps.get(LoginWizardPanel.PROP_USER),
-                                (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
-                        cl.add(new LoginCookie() {
-                            @Override
-                            public boolean isLoggedIn() {
-                                return true;
-                            }
-                        });
-                    } catch (SQLException ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-                        nd.setTitle(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.sqlError"));
-                        DialogDisplayer.getDefault().notify(nd);
+                final Map<String, Object> loginProps = wizardDescriptor.getProperties();
+                //add database path to main window title
+                JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
+                mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
+                Thread connectThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            ProjectConnector.getInstance().connect(
+                                    (String) loginProps.get(LoginWizardPanel.PROP_ADAPTER),
+                                    (String) loginProps.get(LoginWizardPanel.PROP_DATABASE),
+                                    (String) loginProps.get(LoginWizardPanel.PROP_HOST),
+                                    (String) loginProps.get(LoginWizardPanel.PROP_USER),
+                                    (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
+                            cl.add(new LoginCookie() {
+                                @Override
+                                public boolean isLoggedIn() {
+                                    return true;
+                                }
+                            });
+                        } catch (SQLException ex) {
+                            NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                            nd.setTitle(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.sqlError"));
+                            DialogDisplayer.getDefault().notify(nd);
+                        }
+                        SwingUtilities.invokeLater(new LoadingRunnable());
                     }
-//                    loading.finished();
-                }
-            });
-            connectThread.start();
+                });
+                connectThread.start();
+            } catch (Exception ex) {
+                SwingUtilities.invokeLater(new LoadingRunnable());
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), Bundle.LoginWizardAction_ErrorMsg(ex.toString()),
+                        Bundle.LoginWizardAction_ErrorHeader(), JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -122,5 +130,17 @@ public final class LoginWizardAction implements ActionListener {
             }
         }
         return panels;
+    }
+    
+    /**
+     * Runnable for ending the loading dialog after connection to the DB is 
+     * established.
+     */
+    private class LoadingRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            loading.finished();
+        }
     }
 }

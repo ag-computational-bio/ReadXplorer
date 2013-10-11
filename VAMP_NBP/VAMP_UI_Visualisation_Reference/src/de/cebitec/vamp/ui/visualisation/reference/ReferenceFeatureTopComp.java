@@ -3,6 +3,7 @@ package de.cebitec.vamp.ui.visualisation.reference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.polyTree.Node;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
@@ -24,7 +25,7 @@ import org.openide.windows.WindowManager;
  * reference feature.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceFeature//EN", autostore = false)
-public final class ReferenceFeatureTopComp extends TopComponent implements LookupListener {
+public final class ReferenceFeatureTopComp extends TopComponentExtended implements LookupListener {
 
     private static ReferenceFeatureTopComp instance;
     private static final long serialVersionUID = 1L;

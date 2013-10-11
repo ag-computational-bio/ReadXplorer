@@ -4,13 +4,14 @@ import de.cebitec.vamp.differentialExpression.DeAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.vamp.differentialExpression.GnuR;
 import de.cebitec.vamp.differentialExpression.ResultDeAnalysis;
-import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.plotting.ChartExporter;
 import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FAILED;
 import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.FINISHED;
 import static de.cebitec.vamp.plotting.ChartExporter.ChartExportStatus.RUNNING;
+import de.cebitec.vamp.plotting.CreatePlots;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -63,7 +64,7 @@ import org.openide.windows.TopComponent;
     "CTL_DeSeqGraphicsTopComponent=Create graphics",
     "HINT_DeSeqGraphicsTopComponent=This is a DESeq graphics window"
 })
-public final class DeSeqGraphicsTopComponent extends TopComponent implements Observer, ItemListener {
+public final class DeSeqGraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
