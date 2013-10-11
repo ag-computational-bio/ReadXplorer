@@ -115,16 +115,18 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             detectedTSS.add(tss);
                         }
 
-                        if (dist2start > 7 && dist2stop < 500) { // internal mapping or TSS for nextGene
+                        if (dist2start > 7) { // internal mapping or TSS for nextGene
                             // here we want to find the next gene because the startsite is inbetween a gene which is not a leaderles gene
                             int currentFeatureID = feature.getId();
                             PersistantFeature nextFeature = allRegionsInHash.get(currentFeatureID + 1);
                             nextOffset = nextFeature.getStart() - i;
-                            
+
                             if (nextOffset < 500) {
                                 // putative the corresponding gene for TSS
-                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, null, offset, dist2start, dist2stop, nextFeature, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
-                                detectedTSS.add(tss);
+                                if (nextFeature.isFwdStrand()) {
+                                    TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, null, offset, dist2start, dist2stop, nextFeature, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
+                                    detectedTSS.add(tss);
+                                }
                             }
                             // TODO not yet needed!
 //                            else {
@@ -141,9 +143,9 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
                             detectedTSS.add(tss);
                         } else {
-                            if(offset < 500) {
-                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
-                            detectedTSS.add(tss);
+                            if (offset < 500) {
+                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[i], rel_count, beforeCountsFwd, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, putativeUnannotated, 1);
+                                detectedTSS.add(tss);
                             } else {
                                 // TODO maybe unannotated!
                             }
@@ -196,7 +198,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 //                            }
                             String reversedSeq = new StringBuffer(getSubSeq(false, startSubSeq, stopSubSeq)).reverse().toString();
                             String revComplement = ReverseComplement(reversedSeq);
-                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
                             detectedTSS.add(tss);
                         }
 
@@ -208,11 +210,13 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
                             if (nextOffset < 500) {
                                 // puttative nextgene
-                                String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
-                                String revComplement = ReverseComplement(reversedSeq);
-                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
-                                detectedTSS.add(tss);
-                            } 
+                                if (!nextFeature.isFwdStrand()) {
+                                    String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
+                                    String revComplement = ReverseComplement(reversedSeq);
+                                    TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, null, offset, dist2start, dist2stop, nextFeature, nextOffset, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                                    detectedTSS.add(tss);
+                                }
+                            }
                             // TODO not yet needed!
 //                            else {
 //                                // puttative Unannotated 
@@ -232,15 +236,15 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 //                            }
                             String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
                             String revComplement = ReverseComplement(reversedSeq);
-                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
                             detectedTSS.add(tss);
                         } else {
                             // "normal" TSS
-                            if(offset < 500) {
-                            String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
-                            String revComplement = ReverseComplement(reversedSeq);
-                            TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, 0, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
-                            detectedTSS.add(tss);
+                            if (offset < 500) {
+                                String reversedSeq = new StringBuffer(getSubSeq(isFwd, startSubSeq, stopSubSeq)).reverse().toString();
+                                String revComplement = ReverseComplement(reversedSeq);
+                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[i], rel_count, beforeCountRev, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, putativeUnannotated, 1);
+                                detectedTSS.add(tss);
                             } else {
                                 // TODO maybe unannotated!
                             }
