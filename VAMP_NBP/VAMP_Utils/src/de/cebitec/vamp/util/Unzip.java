@@ -9,9 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.openide.util.Exceptions;
 
 /**
+ * Utility class for unzipping a file.
  *
  * @author kstaderm
  */
@@ -31,12 +31,19 @@ public class Unzip implements Runnable, Observable {
     }
     
     public static class NoDirectoryException extends Exception {
+        private static final long serialVersionUID = 1L;
         
         public NoDirectoryException() {
             super("The destination file must be a directory!");
         }
     }
     
+    /**
+     * Utility class for unzipping a file.
+     * @param zip zip file
+     * @param to target file for the unzip process
+     * @throws de.cebitec.vamp.util.Unzip.NoDirectoryException 
+     */
     public Unzip(File zip, File to) throws NoDirectoryException {
         this.zip = zip;
         if (to.isDirectory()) {

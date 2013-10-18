@@ -29,8 +29,8 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap) {
-        super(trackMap);
+    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, boolean combineTracks) {
+        super(trackMap, combineTracks);
         this.results = results;
         
     }
@@ -91,7 +91,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             List<Object> coveredFeatureRow = new ArrayList<>();
             feature = coveredFeature.getCoveredFeature();
             coveredFeatureRow.add(feature.toString());
-            coveredFeatureRow.add(this.getTrackMap().get(coveredFeature.getTrackId()));
+            coveredFeatureRow.add(this.getTrackEntry(coveredFeature.getTrackId(), true));
             coveredFeatureRow.add(feature.isFwdStrandString());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());

@@ -1,6 +1,6 @@
 package de.cebitec.vamp.view.dataVisualisation.histogramViewer;
 
-import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
+import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.*;
@@ -216,7 +216,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         if (cov != null && cov.coversBounds(lowerBound, upperBound)) {
             this.coverageLoaded = true;
             //we need to load the diffs seperately for tracks completely stored in the db
-            this.diffsLoaded = trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS, Properties.NORMAL));
+            this.diffsLoaded = trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, this, true, Properties.DIFFS, Properties.NORMAL));
             if (this.diffsLoaded) {
                 this.setupData();
             }
@@ -224,8 +224,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.coverageLoaded = false;
             this.diffsLoaded = false;
-            trackConnector.addCoverageRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this));
-            trackConnector.addDiffRequest(new CoverageAndDiffRequest(from, to, totalFrom, totalTo, this, Properties.DIFFS, Properties.NORMAL));
+            trackConnector.addCoverageRequest(new IntervalRequest(from, to, totalFrom, totalTo, this, true));
+            trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, this, true, Properties.DIFFS, Properties.NORMAL));
         }
     }
 

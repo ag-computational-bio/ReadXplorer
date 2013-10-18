@@ -1,6 +1,9 @@
 package de.cebitec.vamp.api.objects;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -25,8 +28,8 @@ public abstract class JobPanel extends JPanel implements NewJobDialogI {
     public abstract boolean isRequiredInfoSet();
     
     /**
-     * @return a document listener calling {@link isRequiredInfoSet()} in all
-     * relevant actions
+     * @return A document listener calling {@link isRequiredInfoSet()} in all
+     * its actions.
      */
     public DocumentListener createDocumentListener() {
         return new DocumentListener() {
@@ -48,7 +51,7 @@ public abstract class JobPanel extends JPanel implements NewJobDialogI {
     }
     
     /**
-     * @return a lsit selection listener calling {@link isRequiredInfoSet()} in 
+     * @return a list selection listener calling {@link isRequiredInfoSet()} in 
      * its valueChanged action
      */
     public ListSelectionListener createListSelectionListener() {
@@ -59,5 +62,57 @@ public abstract class JobPanel extends JPanel implements NewJobDialogI {
             }
         };
     }
+    
+    /**
+     * 
+     * @param table the table to which this listener is added to determine row
+     * and column of the MouseEvent
+     * @param column the column to which this listener listens
+     * @return A MouseAdapter calling {@link isRequiredInfoSet()} on the given
+     * column in its mouseClicked action.
+     */
+    public MouseAdapter createMouseClickListener(final JTable table, final int column) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent evt) {
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
+                if (row >= 0 && col == column) {
+                    isRequiredInfoSet();
+                }
+            }
+        };
+    }
+    
+//    /**
+//     * @return A cell editor listener calling {@link isRequiredInfoSet()} in all
+//     * its actions.
+//     */
+//    public TableModelListener createTableModelListener() {
+//        return new TableModelListener() {
+//            @Override
+//            public void tableChanged(TableModelEvent e) {
+//                isRequiredInfoSet();
+//            }
+//        };
+//    }
+//
+//    /**
+//     * @return A cell editor listener calling {@link isRequiredInfoSet()} in all
+//     * its actions.
+//     */
+//    public CellEditorListener createCellEditorListener() {
+//        return new CellEditorListener() {
+//            @Override
+//            public void editingStopped(ChangeEvent e) {
+//                isRequiredInfoSet();
+//            }
+//
+//            @Override
+//            public void editingCanceled(ChangeEvent e) {
+//                isRequiredInfoSet();
+//            }
+//        };
+//    }
     
 }

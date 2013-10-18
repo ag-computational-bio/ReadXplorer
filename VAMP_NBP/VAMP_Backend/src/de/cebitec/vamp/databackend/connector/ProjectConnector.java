@@ -72,9 +72,6 @@ public class ProjectConnector extends Observable {
      */
     private void cleanUp() {
         Iterator<Integer> trackConIt = trackConnectors.keySet().iterator();
-        while (trackConIt.hasNext()) {
-            trackConnectors.get(trackConIt.next()).close();
-        }
         trackConnectors.clear();
         refConnectors.clear();
     }

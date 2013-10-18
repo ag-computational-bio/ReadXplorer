@@ -11,9 +11,7 @@ import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -24,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -62,6 +59,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private ParameterSetTSS parametersTss;
     private ParameterSetOperonDet parametersOperonDet;
     private ParameterSetRPKM parametersRPKM;
+    private boolean combineTracks;
     private Map<Integer, PersistantTrack> trackMap;
     private Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
@@ -83,8 +81,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private boolean autoOperonParamEstimation = false;
     private int minSpanningReads = 0;
     private String readClassPropString;
-    private Set<FeatureType> selFeatureTypes = new HashSet<>();
-    private String selFeatureTypesPropString;
+    private Set<FeatureType> selRPKMFeatureTypes = new HashSet<>();
+    private Set<FeatureType> selOperonFeatureTypes = new HashSet<>();
+    private String selRPKMFeatureTypesPropString;
+    private String selOperonFeatureTypesPropString;
+    private String combineTracksPropString;
 
     /**
      * Action for opening a new transcription analyses frame. It opens a track
@@ -109,27 +110,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      */
     @Override
     public void actionPerformed(ActionEvent ev) {
-        OpenTrackPanelList otp = new OpenTrackPanelList(referenceId);
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTrackList"));
-        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        openRefGenDialog.setVisible(true);
-
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-            this.tracks = otp.getSelectedTracks();
-            this.trackMap = new HashMap<>();
-            for (PersistantTrack track : otp.getSelectedTracks()) {
-                this.trackMap.put(track.getId(), track);
-            }
-
-            this.transcAnalysesTopComp.open();
-            this.runWizardAndTranscriptionAnalysis();
-
-        } else {
-            String msg = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
-                    "No track selected. To start a transcription analysis at least one track has to be selected.");
-            String title = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfoTitle", "Info");
-            JOptionPane.showMessageDialog(this.refViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
+        this.runWizardAndTranscriptionAnalysis();
     }
 
     /**
@@ -137,11 +118,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      */
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings("unchecked")
-        TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator();
-        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
-        transWizardIterator.setUsingDBTrack(containsDBTrack);
+        TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator(referenceId);
         this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
-        this.selFeatureTypesPropString = transWizardIterator.getPropSelectedFeatTypes();
+        this.selOperonFeatureTypesPropString = transWizardIterator.getPropSelectedOperonFeatTypes();
+        this.selRPKMFeatureTypesPropString = transWizardIterator.getPropSelectedRPKMFeatTypes();
+        this.combineTracksPropString = transWizardIterator.getCombineTracksPropForWiz();
         WizardDescriptor wiz = new WizardDescriptor(transWizardIterator);
         transWizardIterator.setWiz(wiz);
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -150,12 +131,22 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            this.startTransciptionAnalyses(wiz);
-        } else {
-            if (!this.transcAnalysesTopComp.hasComponents()) {
-                this.transcAnalysesTopComp.close();
+        List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
+        if (!cancelled && !selectedTracks.isEmpty()) {
+            this.tracks = selectedTracks;
+            this.trackMap = new HashMap<>();
+            for (PersistantTrack track : this.tracks) {
+                this.trackMap.put(track.getId(), track);
             }
+
+            this.transcAnalysesTopComp.open();
+            this.startTransciptionAnalyses(wiz);
+
+        } else if (selectedTracks.isEmpty()) {
+            String msg = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
+                    "No track selected. To start a transcription analysis at least one track has to be selected.");
+            String title = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfoTitle", "Info");
+            JOptionPane.showMessageDialog(this.refViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -173,6 +164,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         performRPKMAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS);
         
         ParametersReadClasses readClassesParams = (ParametersReadClasses) wiz.getProperty(readClassPropString);
+        this.combineTracks = (boolean) wiz.getProperty(combineTracksPropString);
 
         if (performTSSAnalysis) { //set values depending on the selected analysis functions (avoiding null pointers)
             autoTssParamEstimation = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS);
@@ -186,65 +178,88 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         if (performOperonAnalysis) {
             autoOperonParamEstimation = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS);
             minSpanningReads = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_SPANNING_READS);
+            selOperonFeatureTypes = (Set<FeatureType>) wiz.getProperty(selOperonFeatureTypesPropString);
         }
         if (performRPKMAnalysis) {
             minNumberReads = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_NUMBER_READS);
             maxNumberReads = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_NUMBER_READS);
-            selFeatureTypes = (Set<FeatureType>) wiz.getProperty(selFeatureTypesPropString);
+            selRPKMFeatureTypes = (Set<FeatureType>) wiz.getProperty(selRPKMFeatureTypesPropString);
         }
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                 minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov, readClassesParams);
-        parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation);
-        parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selFeatureTypes);
+        parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes);
+        parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes);
 
 
         TrackConnector connector;
-        for (PersistantTrack track : this.tracks) {
-            AnalysisTranscriptionStart analysisTSS = null;
-            AnalysisOperon analysisOperon = null;
-            AnalysisRPKM analysisRPKM = null;
-            
+        if (!combineTracks) {
+            for (PersistantTrack track : this.tracks) {
+
+                try {
+                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    continue;
+                }
+                
+                //every track has its own analysis handlers
+                this.createAnalysis(connector, readClassesParams);
+            }
+        } else {
             try {
-                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                this.createAnalysis(connector, readClassesParams); //every track has its own analysis handlers
+                
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
                 JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
-                continue;
             }
 
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams); //every track has its own analysis handlers
-            AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams);
-
-            if (parametersTss.isPerformTSSAnalysis()) {
-
-                if (parametersTss.isPerformUnannotatedTranscriptDet()) {
-                    analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss);
-                } else {
-                    analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss);
-                }
-                covAnalysisHandler.registerObserver(analysisTSS);
-                covAnalysisHandler.setCoverageNeeded(true);
-                covAnalysisHandler.setDesiredData(Properties.READ_STARTS);
-            }
-            if (parametersOperonDet.isPerformOperonAnalysis()) {
-                analysisOperon = new AnalysisOperon(connector, parametersOperonDet.getMinSpanningReads(), parametersOperonDet.isAutoOperonParamEstimation());
-
-                mappingAnalysisHandler.registerObserver(analysisOperon);
-                mappingAnalysisHandler.setMappingsNeeded(true);
-            }
-            if (parametersRPKM.isPerformRPKMAnalysis()) {
-                analysisRPKM = new AnalysisRPKM(connector, parametersRPKM);
-                
-                mappingAnalysisHandler.registerObserver(analysisRPKM);
-                mappingAnalysisHandler.setMappingsNeeded(true);
-            }
-
-            trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisTSS, analysisOperon, analysisRPKM));
-            covAnalysisHandler.startAnalysis();
-            mappingAnalysisHandler.startAnalysis();
         }
+    }
+    
+    /**
+     * Creates the analysis for a TrackConnector.
+     * @param connector the connector
+     * @param readClassesParams the read class parameters
+     */
+    private void createAnalysis(TrackConnector connector, ParametersReadClasses readClassesParams) {
+        AnalysisTranscriptionStart analysisTSS = null;
+        AnalysisOperon analysisOperon = null;
+        AnalysisRPKM analysisRPKM = null;
+
+        AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams); 
+        AnalysesHandler mappingAnalysisHandler = connector.createAnalysisHandler(this,
+                NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams);
+
+        if (parametersTss.isPerformTSSAnalysis()) {
+
+            if (parametersTss.isPerformUnannotatedTranscriptDet()) {
+                analysisTSS = new AnalysisUnannotatedTransStart(connector, parametersTss);
+            } else {
+                analysisTSS = new AnalysisTranscriptionStart(connector, parametersTss);
+            }
+            covAnalysisHandler.registerObserver(analysisTSS);
+            covAnalysisHandler.setCoverageNeeded(true);
+            covAnalysisHandler.setDesiredData(Properties.READ_STARTS);
+        }
+        if (parametersOperonDet.isPerformOperonAnalysis()) {
+            analysisOperon = new AnalysisOperon(connector, parametersOperonDet);
+
+            mappingAnalysisHandler.registerObserver(analysisOperon);
+            mappingAnalysisHandler.setMappingsNeeded(true);
+        }
+        if (parametersRPKM.isPerformRPKMAnalysis()) {
+            analysisRPKM = new AnalysisRPKM(connector, parametersRPKM);
+
+            mappingAnalysisHandler.registerObserver(analysisRPKM);
+            mappingAnalysisHandler.setMappingsNeeded(true);
+        }
+
+        trackToAnalysisMap.put(connector.getTrackID(), new AnalysisContainer(analysisTSS, analysisOperon, analysisRPKM));
+        covAnalysisHandler.startAnalysis();
+        mappingAnalysisHandler.startAnalysis();
     }
 
     /**
@@ -281,11 +296,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                             transcriptionStartResultPanel.setReferenceViewer(refViewer);
                         }
 
-                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap);
+                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, combineTracks);
                         tssResult.setParameters(parametersTss);
                         transcriptionStartResultPanel.addResult(tssResult);
 
-                        if (finishedCovAnalyses >= tracks.size()) {
+                        if (finishedCovAnalyses >= tracks.size() || combineTracks) {
                             trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
                             String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
                             transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
@@ -301,11 +316,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults());
+                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), combineTracks);
                             operonDetectionResult.setParameters(parametersOperonDet);
                             operonResultPanel.addResult(operonDetectionResult);
 
-                            if (finishedMappingAnalyses >= tracks.size()) {
+                            if (finishedMappingAnalyses >= tracks.size() || combineTracks) {
                                 trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
                                 String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
@@ -319,12 +334,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults());
+                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), combineTracks);
                             rpkmAnalysisResult.setParameters(parametersRPKM);
                             rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
                             rpkmResultPanel.addResult(rpkmAnalysisResult);
 
-                            if (finishedMappingAnalyses >= tracks.size()) {
+                            if (finishedMappingAnalyses >= tracks.size() || combineTracks) {
                                 trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
                                 String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);

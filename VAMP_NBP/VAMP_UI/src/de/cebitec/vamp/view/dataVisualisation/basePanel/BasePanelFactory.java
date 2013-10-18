@@ -237,7 +237,7 @@ public class BasePanelFactory {
      * tracks
      * @return A viewer for sequence pair data
      */
-    public BasePanel getSeqPairBasePanel(TrackConnector connector) {
+    public BasePanel getReadPairBasePanel(TrackConnector connector) {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 

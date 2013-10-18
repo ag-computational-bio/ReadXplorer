@@ -66,7 +66,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         coverageAnalysisPane = new javax.swing.JScrollPane();
         coverageAnalysisTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
-        statistiksButton = new javax.swing.JButton();
+        statisticsButton = new javax.swing.JButton();
         parametersLabel = new javax.swing.JLabel();
 
         coverageAnalysisTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -74,7 +74,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Track", "Strand", "Start", "Stopp", "Length", "Mean Coverage"
+                "Track", "Strand", "Start", "Stop", "Length", "Mean Coverage"
             }
         ) {
             Class[] types = new Class [] {
@@ -107,10 +107,10 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
             }
         });
 
-        statistiksButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.statistiksButton.text_1")); // NOI18N
-        statistiksButton.addActionListener(new java.awt.event.ActionListener() {
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.statisticsButton.text_1")); // NOI18N
+        statisticsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                statistiksButtonActionPerformed(evt);
+                statisticsButtonActionPerformed(evt);
             }
         });
 
@@ -125,7 +125,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(parametersLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(statistiksButton)
+                .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton)
                 .addContainerGap())
@@ -137,7 +137,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exportButton)
-                    .addComponent(statistiksButton)
+                    .addComponent(statisticsButton)
                     .addComponent(parametersLabel))
                 .addContainerGap())
         );
@@ -147,15 +147,15 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.coverageAnalysisResult);
     }//GEN-LAST:event_exportButtonActionPerformed
 
-    private void statistiksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statistiksButtonActionPerformed
+    private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
         JOptionPane.showMessageDialog(this, new CoverageAnalysisStatsPanel(coverageStatisticsMap), "Coverage Analysis Statistics", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_statistiksButtonActionPerformed
+    }//GEN-LAST:event_statisticsButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane coverageAnalysisPane;
     private javax.swing.JTable coverageAnalysisTable;
     private javax.swing.JButton exportButton;
     private javax.swing.JLabel parametersLabel;
-    private javax.swing.JButton statistiksButton;
+    private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
@@ -174,10 +174,17 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
             this.coverageAnalysisResult.getResults().getCoverageIntervals().addAll(coverageAnalysisResultNew.getResults().getCoverageIntervals()); 
             this.coverageAnalysisResult.getResults().getCoverageIntervalsRev().addAll(coverageAnalysisResultNew.getResults().getCoverageIntervalsRev());
         }
+        
+        this.createTableEntries(coverageAnalysisResult.getResults().getCoverageIntervals());
+        this.createTableEntries(coverageAnalysisResult.getResults().getCoverageIntervalsRev());
+    }
 
+    /**
+     * Prepares the results stored in this panel for output in the gui.
+     * @param intervalList list to create the entries for
+     */
+    private void createTableEntries(List<CoverageInterval> intervalList) {
         final int nbColumns = 6;
-        final List<CoverageInterval> intervalList = coverageAnalysisResult.getResults().getCoverageIntervals();
-        intervalList.addAll(coverageAnalysisResult.getResults().getCoverageIntervalsRev());
 
         DefaultTableModel model = (DefaultTableModel) coverageAnalysisTable.getModel();
         int meanIntervalLength = 0;
@@ -185,7 +192,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
         for (CoverageInterval interval : intervalList) {
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = coverageAnalysisResult.getTrackMap().get(interval.getTrackId());
+            rowData[0] = coverageAnalysisResult.getTrackEntry(interval.getTrackId(), false);
             rowData[1] = interval.getStrandString();
             rowData[2] = interval.isFwdStrand() ? interval.getStart() : interval.getStop();
             rowData[3] = interval.isFwdStrand() ? interval.getStop() : interval.getStart();
@@ -196,15 +203,17 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
             model.addRow(rowData);
         }
-        
-        meanIntervalLength /= intervalList.size();
-        meanIntervalLength = coverageStatisticsMap.get(MEAN_INTERVAL_LENGTH) > 0 ? meanIntervalLength / 2 : meanIntervalLength;
-        meanIntervalCoverage /= intervalList.size();
-        meanIntervalCoverage = coverageStatisticsMap.get(MEAN_INTERVAL_COVERAGE) > 0 ? meanIntervalCoverage / 2 : meanIntervalCoverage;
 
-        coverageStatisticsMap.put(NUMBER_INTERVALS, coverageStatisticsMap.get(NUMBER_INTERVALS) + intervalList.size());
-        coverageStatisticsMap.put(MEAN_INTERVAL_LENGTH, meanIntervalLength);
-        coverageStatisticsMap.put(MEAN_INTERVAL_COVERAGE, meanIntervalCoverage);
+        if (intervalList.size() > 0) {
+            meanIntervalLength /= intervalList.size();
+            meanIntervalLength = coverageStatisticsMap.get(MEAN_INTERVAL_LENGTH) > 0 ? meanIntervalLength / 2 : meanIntervalLength;
+            meanIntervalCoverage /= intervalList.size();
+            meanIntervalCoverage = coverageStatisticsMap.get(MEAN_INTERVAL_COVERAGE) > 0 ? meanIntervalCoverage / 2 : meanIntervalCoverage;
+
+            coverageStatisticsMap.put(NUMBER_INTERVALS, coverageStatisticsMap.get(NUMBER_INTERVALS) + intervalList.size());
+            coverageStatisticsMap.put(MEAN_INTERVAL_LENGTH, meanIntervalLength);
+            coverageStatisticsMap.put(MEAN_INTERVAL_COVERAGE, meanIntervalCoverage);
+        }
         coverageAnalysisResult.setStatsMap(coverageStatisticsMap);
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(); //set a sorter for the table
@@ -224,7 +233,6 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      * associated analysis.
      */
     public int getResultSize() {
-        return  this.coverageAnalysisResult.getResults().getCoverageIntervals().size() + 
-                this.coverageAnalysisResult.getResults().getCoverageIntervalsRev().size();
+        return  coverageStatisticsMap.get(NUMBER_INTERVALS);
     }
 }

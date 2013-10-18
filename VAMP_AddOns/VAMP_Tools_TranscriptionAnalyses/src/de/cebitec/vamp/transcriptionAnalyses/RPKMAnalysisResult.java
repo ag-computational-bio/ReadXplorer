@@ -30,9 +30,11 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * @param trackMap the map of track ids to the PersistantTrack used for this
      * analysis
      * @param rpkmResults The result list of RPKM values and read counts
+     * @param combineTracks true, if the tracks in the list are combined, false
+     * otherwise 
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults) {
-        super(trackMap);
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, boolean combineTracks) {
+        super(trackMap, combineTracks);
         this.rpkmResults = rpkmResults;
     }
     
@@ -58,8 +60,8 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
         List<String> dataColumnDescriptions = new ArrayList<>();
 
         dataColumnDescriptions.add("Feature");
-        dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Feature Type");
+        dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Start");
         dataColumnDescriptions.add("Stop");
         dataColumnDescriptions.add("Length");
@@ -89,8 +91,8 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
 
             feat = rpkmValue.getFeature();
             rpkmRow.add(feat);
-            rpkmRow.add(this.getTrackMap().get(rpkmValue.getTrackId()));
             rpkmRow.add(feat.getType());
+            rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
             rpkmRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
             rpkmRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
             rpkmRow.add(feat.getStop() - feat.getStart());

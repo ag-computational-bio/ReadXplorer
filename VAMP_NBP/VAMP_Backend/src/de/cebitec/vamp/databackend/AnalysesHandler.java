@@ -102,12 +102,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
             while (to < this.refSeqLength) {
-                if (diffsAndGapsNeeded) {
-                    trackConnector.addCoverageAnalysisRequest(new CoverageAndDiffRequest(from, to, this, readClassParams));
-                } else {
-                    trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
-                }
-
+                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, diffsAndGapsNeeded, desiredData, readClassParams));
 
                 from = to + 1;
                 to += stepSize;
@@ -115,11 +110,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
             //calc last interval until genomeSize
             to = this.refSeqLength;
-            if (diffsAndGapsNeeded) {
-                trackConnector.addCoverageAnalysisRequest(new CoverageAndDiffRequest(from, to, this, readClassParams));
-            } else {
-                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
-            }
+            trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, diffsAndGapsNeeded, desiredData, readClassParams));
 
 
         } else if (this.mappingsNeeded) {
@@ -150,6 +141,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 int from = numUnneededMappings;
                 int to = numInterestingMappings - numUnneededMappings > stepSize
                         ? numUnneededMappings + stepSize : numInterestingMappings;
+                desiredData = Properties.MAPPINGS_DB_BY_ID;
 
                 int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
                 this.nbMappingRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest;
@@ -159,30 +151,29 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
                 while (to < numInterestingMappings) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
                     from = to + 1;
                     to += stepSize;
                 }
 
                 //calc last interval until genomeSize
                 to = numInterestingMappings;
-                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
             } else {
-                this.desiredData = Properties.REDUCED_MAPPINGS == desiredData ? desiredData : Properties.MAPPINGS_WO_DIFFS;
                 this.nbRequests = this.refSeqLength / stepSize + 1;
                 this.progressHandle.switchToDeterminate(this.nbRequests);
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
                 int from = 0;
                 int to = stepSize;
                 while (to < this.refSeqLength) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
                     from = to + 1;
                     to += stepSize;
                 }
 
                 //calc last interval until genomeSize
                 to = this.refSeqLength;
-                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, desiredData, readClassParams));
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
             }
         } else {
             this.progressHandle.finish();

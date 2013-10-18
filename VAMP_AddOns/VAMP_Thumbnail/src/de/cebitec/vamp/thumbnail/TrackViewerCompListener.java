@@ -26,6 +26,6 @@ public class TrackViewerCompListener extends ComponentAdapter {
         int startFeature = currentFeature.getStart();
         int stopFeature = currentFeature.getStop();
         ThumbnailCoverageListener covListener = new ThumbnailCoverageListener(trackV);
-        trackV.getTrackCon().addCoverageRequest(new IntervalRequest(startFeature, stopFeature, covListener));
+        trackV.getTrackCon().addCoverageRequest(new IntervalRequest(startFeature, stopFeature, covListener, false));
     }
 }

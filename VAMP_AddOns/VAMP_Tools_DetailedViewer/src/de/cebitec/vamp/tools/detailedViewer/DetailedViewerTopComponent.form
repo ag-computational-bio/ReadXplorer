@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.4" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.4" maxVersion="1.7">
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -31,7 +31,7 @@
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
                       <Component id="histogramButton" alignment="0" max="32767" attributes="1"/>
                       <Component id="alignmentButton" alignment="0" max="32767" attributes="1"/>
-                      <Component id="sequencePairButton" alignment="0" max="32767" attributes="1"/>
+                      <Component id="readPairButton" alignment="0" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace pref="74" max="32767" attributes="0"/>
               </Group>
@@ -49,7 +49,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="alignmentButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="sequencePairButton" min="-2" max="-2" attributes="0"/>
+                  <Component id="readPairButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="colorHistogramBox" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace pref="171" max="32767" attributes="0"/>
@@ -97,14 +97,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="colorHistogramBoxActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="sequencePairButton">
+        <Component class="javax.swing.JButton" name="readPairButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.sequencePairButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/vamp/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.readPairButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sequencePairButtonActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="readPairButtonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

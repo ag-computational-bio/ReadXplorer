@@ -17,17 +17,20 @@ import org.openide.util.NbPreferences;
 public class SelectFeatureTypeVisualPanel extends JobPanel {
     
     private static final long serialVersionUID = 1L;
-    private final String wizardName;
+    private static final String PANEL_NAME = "Feature Type Selection";
+    private final String analysisName;
+    private String displayName;
 
     /**
      * A visual wizard job panel. It offers to select feature types of
      * annotations for any further processing.
-     * @param wizardName wizardName the name of the wizard using this wizard
-     * panel. It will be used to store the selected settings for this wizard
+     * @param analysisName The name of the analysis using this panel
+     * panel. It will be used to store the selected settings for this pane
      * under a unique identifier.
      */
-    public SelectFeatureTypeVisualPanel(String wizardName) {
-        this.wizardName = wizardName;
+    public SelectFeatureTypeVisualPanel(String analysisName) {
+        this.analysisName = analysisName;
+        this.displayName = PANEL_NAME;
         this.initComponents();
         this.featureList.addListSelectionListener(this.createListSelectionListener());
         this.updateListSelection();
@@ -86,11 +89,31 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
         return featureList.getSelectedValuesList();
     }
 
+    /**
+     * @return The displayName + "Feature Type Selection".
+     */
     @Override
     public String getName() {
-        return "Feature Type Selection";
+        return displayName;
+    }
+    
+    /**
+     * Sets the display name of this panel. 
+     * @param showDisplayName True, if the display name shall be included in the
+     * title, false if only the plain panel name shall be shown
+     */
+    public void showDisplayName(boolean showDisplayName) {
+        if (showDisplayName) {
+            this.displayName = this.analysisName + " " + PANEL_NAME;
+        } else {
+            this.displayName = PANEL_NAME;
+        }
+        
     }
 
+    /**
+     * @return True, if at least one feature type is selected, false otherwise
+     */
     @Override
     public boolean isRequiredInfoSet() {
         boolean requiredInfoSet = !this.featureList.getSelectedValuesList().isEmpty();
@@ -105,7 +128,7 @@ public class SelectFeatureTypeVisualPanel extends JobPanel {
      */
     private void updateListSelection() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        String featuresString = pref.get(wizardName + SelectFeatureTypeWizardPanel.PROP_SELECTED_FEAT_TYPES, "Gene,CDS");
+        String featuresString = pref.get(analysisName + SelectFeatureTypeWizardPanel.PROP_SELECTED_FEAT_TYPES, "Gene,CDS");
         String[] featuresArray = featuresString.split(",");
         
         List<FeatureType> selectedFeatTypes = new ArrayList<>();

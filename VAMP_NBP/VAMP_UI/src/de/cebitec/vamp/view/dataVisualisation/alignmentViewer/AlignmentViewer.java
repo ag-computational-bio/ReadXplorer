@@ -7,7 +7,6 @@ import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.ColorProperties;
-import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -102,7 +101,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         // at least sufficient horizontal zoom level to show bases
 
         if (isInDrawingMode()) { //request the data to show, receiveData method calls draw methods
-            this.requestData(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
+             this.requestData(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
         }
     }
     
@@ -118,11 +117,11 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.mappingsLoading = true;
-            trackConnector.addMappingRequest(new IntervalRequest(from, to, this, Properties.MAPPINGS_W_DIFFS));
+            this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this, true));
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
-//        } else {
-//            showData();
+        } else { //needed when e.g. mapping classes are deselected
+            showData();
         }
     }
     
@@ -206,7 +205,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param coverage  coverage hashmap of positions for current interval
      */
     private void findMaxCoverage(HashMap<Integer, Integer> coverage) {
-        this.maxCoverageInInterval = Integer.MIN_VALUE;
+        this.maxCoverageInInterval = 0;
 
         int coverageAtPos;
         for (Integer position : coverage.keySet()) {
@@ -344,6 +343,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         if (biggerStrandCoverage > biggestCoverage) {
             biggestCoverage = biggerStrandCoverage * 2; //to cover both halves
         }
+        biggestCoverage = biggestCoverage <= 0 ? 1 : biggestCoverage;
         int newHeight = (int) (this.layerHeight * biggestCoverage * 1.5); //1.5 = factor for possible empty spacings between alignments
         final int spacer = 120;
         this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));

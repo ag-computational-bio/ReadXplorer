@@ -12,7 +12,6 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.databackend.dataObjects.Snp;
 import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
@@ -268,7 +267,6 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             final int snpDataSize = 20;
             List<SnpI> snps = this.snpData.getSnpList();
             Collections.sort(snps);
-            Map<Integer, PersistantTrack> trackNames = this.snpData.getTrackMap();
             DefaultTableModel model = (DefaultTableModel) snpTable.getModel();
 
             //get all features from the reference to determine amino acid 
@@ -297,7 +295,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                 rowData = new Object[snpDataSize];
                 rowData[0] = snp.getPosition();
                 rowData[1] = snp.getGapOrderIndex();
-                rowData[2] = trackNames.get(snp.getTrackId());
+                rowData[2] = snpData.getTrackEntry(snp.getTrackId(), false);
                 rowData[3] = snp.getBase().toUpperCase();
                 rowData[4] = snp.getRefBase();
                 rowData[5] = snp.getARate();

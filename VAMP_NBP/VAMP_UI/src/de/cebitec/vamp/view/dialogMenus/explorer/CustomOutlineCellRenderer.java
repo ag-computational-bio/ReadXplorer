@@ -1,8 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package de.cebitec.vamp.dashboard;
+package de.cebitec.vamp.view.dialogMenus.explorer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +18,8 @@ import org.openide.util.Exceptions;
  * the cells of an outline view. It uses the <@link PropertyTextRenderer/> of
  * the property if any was set.
  * From: http://jnkjava.wordpress.com/2011/11/28/recipe-7-how-do-i-decorate-a-read-only-outlineview/
+ * 
+ * @author Evgeny Anisiforov
  */
 public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
 
@@ -29,6 +27,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
      * Gray Color for the odd lines in the view.
      */
     private static final Color VERY_LIGHT_GRAY = new Color(236, 236, 236);
+    private static final long serialVersionUID = 1L;
     /**
      * Center the content of the cells displaying text.
      */
@@ -52,9 +51,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
         if (value instanceof Property) {
             try {
                 valueToDisplay = ((Property) value).getValue();
-            } catch (IllegalAccessException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (InvocationTargetException ex) {
+            } catch (IllegalAccessException | InvocationTargetException ex) {
                 Exceptions.printStackTrace(ex);
             }
         }

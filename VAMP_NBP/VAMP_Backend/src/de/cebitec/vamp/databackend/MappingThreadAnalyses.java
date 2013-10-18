@@ -20,11 +20,10 @@ public class MappingThreadAnalyses extends MappingThread {
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * database or a file.
-     *
-     * @param track the track for which this mapping thread is created
+     * @param tracks the list of tracks for which this mapping thread is created
      */
-    public MappingThreadAnalyses(PersistantTrack track) {
-        super(track);
+    public MappingThreadAnalyses(List<PersistantTrack> tracks) {
+        super(tracks);
     }
 
     @Override
@@ -35,14 +34,12 @@ public class MappingThreadAnalyses extends MappingThread {
             IntervalRequest request = requestQueue.poll();
             List<PersistantMapping> currentMappings;
             if (request != null) {
-                if (request.getDesiredData() == Properties.MAPPINGS_W_DIFFS) {
-                    currentMappings = this.loadMappingsWithDiffs(request);
-                } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
-                    currentMappings = this.loadMappingsWithoutDiffs(request);
+                if (request.getDesiredData() == Properties.MAPPINGS_DB_BY_ID) {
+                    currentMappings = this.loadMappingsById(request);
                 } else if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
                     currentMappings = this.loadReducedMappings(request);
                 } else {
-                    currentMappings = this.loadMappingsById(request);
+                    currentMappings = this.loadMappings(request);
                 }
                 request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
 

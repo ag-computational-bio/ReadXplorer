@@ -21,7 +21,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="parametersLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="statistiksButton" min="-2" max="-2" attributes="0"/>
+              <Component id="statisticsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -35,7 +35,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="exportButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="statistiksButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="statisticsButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="parametersLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -58,7 +58,7 @@
                 <Column editable="false" title="Track" type="java.lang.Object"/>
                 <Column editable="false" title="Strand" type="java.lang.String"/>
                 <Column editable="false" title="Start" type="java.lang.Integer"/>
-                <Column editable="false" title="Stopp" type="java.lang.Integer"/>
+                <Column editable="false" title="Stop" type="java.lang.Integer"/>
                 <Column editable="false" title="Length" type="java.lang.Integer"/>
                 <Column editable="false" title="Mean Coverage" type="java.lang.Integer"/>
               </Table>
@@ -129,14 +129,14 @@
         <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JButton" name="statistiksButton">
+    <Component class="javax.swing.JButton" name="statisticsButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readXplorer/coverageAnalysis/Bundle.properties" key="ResultPanelCoverageAnalysis.statistiksButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/coverageAnalysis/Bundle.properties" key="ResultPanelCoverageAnalysis.statisticsButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="statistiksButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="statisticsButtonActionPerformed"/>
       </Events>
       <AuxValues>
         <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="false"/>

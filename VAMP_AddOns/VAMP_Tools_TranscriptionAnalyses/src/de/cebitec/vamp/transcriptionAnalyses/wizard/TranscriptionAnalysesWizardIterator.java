@@ -1,5 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses.wizard;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.Component;
@@ -41,8 +43,8 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     // }
     
     public static final String PROP_TSS_ANALYSIS = "tssAnalysis";
-    public static final String PROP_OPERON_ANALYSIS = "operon";
-    public static final String PROP_RPKM_ANALYSIS = "rpkm";
+    public static final String PROP_OPERON_ANALYSIS = "Operon";
+    public static final String PROP_RPKM_ANALYSIS = "RPKM";
     public static final String PROP_UNANNOTATED_TRANSCRIPT_DET = "unannotatedTranscriptDetection";
     public static final String PROP_AUTO_TSS_PARAMS = "automaticsTSSParameterEstimation";
     public static final String PROP_AUTO_OPERON_PARAMS = "automaticOperonParameterEstimation";
@@ -56,11 +58,13 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";
     
     private static final String PROP_WIZARD_NAME = "TransAnalyses";
+    private static final String FINISH_MSG = "Press 'Finish' to start";
+    
     private int index;
     private ChangeSupport changeSupport;
     private WizardDescriptor wiz;
     private String[] steps;
-    private static final String FINISH_MSG = "Press 'Finish' to start";
+    private int referenceId;
     
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> currentPanels;
@@ -69,8 +73,10 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     private TransAnalysesTSSWizardPanel tSSPanel = new TransAnalysesTSSWizardPanel();
     private TransAnalysesOperonWizardPanel operonPanel = new TransAnalysesOperonWizardPanel();
     private TransAnalysesRPKMWizardPanel rpkmPanel = new TransAnalysesRPKMWizardPanel();
+    private OpenTracksWizardPanel openTracksPanel;
     private SelectReadClassWizardPanel readClassPanel;
-    private SelectFeatureTypeWizardPanel featTypePanel;
+    private SelectFeatureTypeWizardPanel featTypeRPKMPanel;
+    private SelectFeatureTypeWizardPanel featTypeOperonPanel;
     
     private Map<WizardDescriptor.Panel<WizardDescriptor>, Integer> panelToStepMap = new HashMap<>();
     
@@ -79,7 +85,8 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
      * Wizard page iterator for a transcription analyses wizard. In order to use
      * it correctly, the wizard, in which this iterator is used has to be set.
      */
-    public TranscriptionAnalysesWizardIterator() {
+    public TranscriptionAnalysesWizardIterator(int referenceId) {
+        this.referenceId = referenceId;
         this.changeSupport = new ChangeSupport(this);
         this.initializePanels();
     }
@@ -91,26 +98,35 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
         if (allPanels == null) {
             allPanels = new ArrayList<>();
     
+            openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
             selectionPanel = new TransAnalysesSelectionWizardPanel();
             readClassPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
             tSSPanel = new TransAnalysesTSSWizardPanel();
             operonPanel = new TransAnalysesOperonWizardPanel();
             rpkmPanel = new TransAnalysesRPKMWizardPanel();
-            featTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
+            featTypeRPKMPanel = new SelectFeatureTypeWizardPanel(PROP_RPKM_ANALYSIS);
+            featTypeOperonPanel = new SelectFeatureTypeWizardPanel(PROP_OPERON_ANALYSIS);
+            openTracksPanel.setReadClassVisualPanel(readClassPanel.getComponent());
+            featTypeOperonPanel.getComponent().showDisplayName(true);
+            featTypeRPKMPanel.getComponent().showDisplayName(true);
 
+            allPanels.add(openTracksPanel);
             allPanels.add(selectionPanel);
             allPanels.add(readClassPanel);
             allPanels.add(tSSPanel);
             allPanels.add(operonPanel);
+            allPanels.add(featTypeOperonPanel);
             allPanels.add(rpkmPanel);
-            allPanels.add(featTypePanel);
+            allPanels.add(featTypeRPKMPanel);
             
-            this.panelToStepMap.put(selectionPanel, 0);
-            this.panelToStepMap.put(readClassPanel, 1);
-            this.panelToStepMap.put(tSSPanel, 2);
-            this.panelToStepMap.put(operonPanel, 3);
-            this.panelToStepMap.put(rpkmPanel, 4);
-            this.panelToStepMap.put(featTypePanel, 5);
+            this.panelToStepMap.put(openTracksPanel, 0);
+            this.panelToStepMap.put(selectionPanel, 1);
+            this.panelToStepMap.put(readClassPanel, 2);
+            this.panelToStepMap.put(tSSPanel, 3);
+            this.panelToStepMap.put(operonPanel, 4);
+            this.panelToStepMap.put(featTypeOperonPanel, 5);
+            this.panelToStepMap.put(rpkmPanel, 6);
+            this.panelToStepMap.put(featTypeRPKMPanel, 7);
 
             this.steps = new String[allPanels.size() + 1];
             for (int i = 0; i < allPanels.size(); i++) {
@@ -128,9 +144,10 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             steps[steps.length - 1] = FINISH_MSG;
             
             String[] initiallyShownSteps = new String[]{steps[0], steps[1], "...", steps[steps.length - 1]};
-            selectionPanel.getComponent().putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, initiallyShownSteps);
+            openTracksPanel.getComponent().putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, initiallyShownSteps);
             
             currentPanels = new ArrayList<>();
+            currentPanels.add(openTracksPanel);
             currentPanels.add(selectionPanel);
             currentPanels.add(readClassPanel);
         }
@@ -162,11 +179,12 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
 
     @Override
     public void nextPanel() {
-        if (index == 0) {
+        if (index == 1) {
             this.updatePanelList(selectionPanel.getComponent().isTSSAnalysisSelected(), tSSPanel);
             this.updatePanelList(selectionPanel.getComponent().isOperonAnalysisSelected(), operonPanel);
+            this.updatePanelList(selectionPanel.getComponent().isOperonAnalysisSelected(), featTypeOperonPanel);
             this.updatePanelList(selectionPanel.getComponent().isRPKMAnalysisSelected(), rpkmPanel);
-            this.updatePanelList(selectionPanel.getComponent().isRPKMAnalysisSelected(), featTypePanel);
+            this.updatePanelList(selectionPanel.getComponent().isRPKMAnalysisSelected(), featTypeRPKMPanel);
             
             String[] newStepArray = new String[0];
             List<String> newSteps = new ArrayList<>();
@@ -263,10 +281,34 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     
     /**
      * @return The property string for the selected feature type list for the
-     * corresponding wizard.
+     * corresponding RPKM analysis.
      */
-    public String getPropSelectedFeatTypes() {
-        return this.featTypePanel.getPropSelectedFeatTypes();
+    public String getPropSelectedRPKMFeatTypes() {
+        return this.featTypeRPKMPanel.getPropSelectedFeatTypes();
+    }
+    
+    /**
+     * @return The property string for the selected feature type list for the
+     * corresponding operon detection.
+     */
+    public String getPropSelectedOperonFeatTypes() {
+        return this.featTypeOperonPanel.getPropSelectedFeatTypes();
+    }
+
+    /**
+     * @return The dynamically generated property name for the combine tracks
+     * selection for this wizard. Can be used to obtain the corresponding 
+     * boolean if the tracks shall be combined.
+     */
+    public String getCombineTracksPropForWiz() {
+        return this.openTracksPanel.getPropCombineTracks();
+    }
+    
+    /**
+     * @return The list of track selected in this wizard.
+     */
+    public List<PersistantTrack> getSelectedTracks() {
+        return this.openTracksPanel.getComponent().getSelectedTracks();
     }
 
 }

@@ -265,9 +265,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      */
     private BasePanel createTrackPanel(PersistantTrack track, ViewController controller, CheckBoxActionListener cbListener) {
         BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
-        BasePanel b = new BasePanel(boundsManager, controller);
-        b.setName(track.getDescription());
-        controller.addMousePositionListener(b);
+        BasePanel basePanel = new BasePanel(boundsManager, controller);
+        basePanel.setName(track.getDescription());
+        controller.addMousePositionListener(basePanel);
 
         // create track viewer
         MultiTrackConnector tc;
@@ -279,7 +279,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             return null;
         }
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
+        final TrackViewer trackV = new TrackViewer(boundsManager, basePanel, controller.getCurrentRefGen(), tc, false);
         trackV.setName(track.getDescription());
         trackV.setUseMinimalIntervalLength(false);
         trackV.setIsPanModeOn(false);
@@ -295,34 +295,16 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         //Set initial Slider-value based on Coverage if autoSlider is true
-        if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(new IntervalRequest(
-                    currentFeature.getStart(), currentFeature.getStop(), null));
-            int max = 0;
-            int cnt = 0;
-            int avg = 0;
-            for (Integer object : cov.values()) {
-                cnt++;
-                max += object;
-            }
-            if (cnt > 0) {
-                avg = max / cnt;
-            }
-            if (avg > 1000) {
-                slider.setValue(avg / 100);
-            } else {
-                slider.setValue(avg / 30);
-            }
-        }
+        trackV.setAutomaticScaling(autoSlider);
 
-        b.setViewer(trackV, slider);
-        b.setTitlePanel(this.getTitlePanel(track.getDescription(), cbListener));
+        basePanel.setViewer(trackV, slider);
+        basePanel.setTitlePanel(this.getTitlePanel(track.getDescription(), cbListener));
 
-        //Größe ändern
-        b.setMinimumSize(new Dimension(200, 150));
-        b.setPreferredSize(new Dimension(200, 150));
+        //adapt size
+        basePanel.setMinimumSize(new Dimension(200, 150));
+        basePanel.setPreferredSize(new Dimension(200, 150));
         
-        return b;
+        return basePanel;
     }
 
     /**

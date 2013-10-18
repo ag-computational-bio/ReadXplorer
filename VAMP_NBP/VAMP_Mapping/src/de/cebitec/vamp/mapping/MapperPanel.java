@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.mapping;
 
 import de.cebitec.vamp.mapping.api.MappingApi;
@@ -21,6 +17,7 @@ import org.openide.util.NbPreferences;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 final class MapperPanel extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     private final MapperOptionsPanelController controller;
     private Preferences pref;

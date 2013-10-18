@@ -60,7 +60,10 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExten
             @Override
             public void componentRemoved(ContainerEvent e) {
                 if (coveredFeaturesTabbedPane.getTabCount() == 0) {
-                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
+                    TopComponent topComp = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
+                    if (topComp != null) {
+                        topComp.close();
+                    }
                 }
             }
         });

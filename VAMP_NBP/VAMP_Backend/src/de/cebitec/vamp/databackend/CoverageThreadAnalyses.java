@@ -18,8 +18,6 @@ import javax.swing.JOptionPane;
  * @author -Rolf Hilker-
  */
 public class CoverageThreadAnalyses extends CoverageThread {
-
-    private long trackID2;
     
     /**
      * Thread for retrieving the coverage for a list of tracks either from the
@@ -30,10 +28,6 @@ public class CoverageThreadAnalyses extends CoverageThread {
      */
     public CoverageThreadAnalyses(List<PersistantTrack> tracks, boolean combineTracks) {
         super(tracks, combineTracks);
-        
-        if (tracks.size() == 2) {
-            this.trackID2 = tracks.get(1).getId();
-        }
     }
 
     @Override
@@ -46,15 +40,17 @@ public class CoverageThreadAnalyses extends CoverageThread {
                 CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
                 if (request != null) {
                     if (request.getDesiredData() == Properties.READ_STARTS) {
-                        currentCov = this.loadReadStartsAndCoverage(request);
+                        if (this.getTrackId() != 0) { //single coverage request
+                            currentCov = this.loadReadStartsAndCoverageMultiple(request);
+                        } else { //combine multiple tracks request
+                            currentCov = this.loadReadStartsAndCoverageMultiple(request);
+                        }
                     } else
                     if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo())) {
-                        if (trackID2 != 0) {
+                        if (this.getTrackId2() != 0) {
                             currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
-                        } else {
-                            if (request.getWhichTrackNeeded() == Properties.NORMAL) {
-                                currentCov = this.loadCoverage(request);
-                            }
+                        } else if (this.getTrackId() != 0 || this.canQueryCoverage()) {
+                            currentCov = this.loadCoverageMultiple(request);
                         }
                     }
                     request.getSender().receiveData(currentCov);

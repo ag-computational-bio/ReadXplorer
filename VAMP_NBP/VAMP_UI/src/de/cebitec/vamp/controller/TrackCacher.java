@@ -1,7 +1,7 @@
 package de.cebitec.vamp.controller;
 
 
-import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
+import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ObjectCache;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
@@ -74,7 +74,7 @@ public final class TrackCacher {
                 }
 
                 
-                tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, tl));
+                tc.addCoverageRequest(new IntervalRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, tl, false));
 
 
                 currentStep++;

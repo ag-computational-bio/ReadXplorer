@@ -52,9 +52,9 @@ public final class CorrelationAnalysisAction implements ActionListener {
     public void actionPerformed(ActionEvent ev) {
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        TrackListPanel tlp = new TrackListPanel(this.context.getReference().getId());
-        tlp.setSelectAmount(2);
-        panels.add(tlp);
+        TrackListPanel trackPanel = new TrackListPanel(this.context.getReference().getId());
+        trackPanel.getComponent().setSelectAmount(2);
+        panels.add(trackPanel);
         panels.add(new ParameterSelectionPanel());
         panels.add(new OverviewPanel());
         WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));

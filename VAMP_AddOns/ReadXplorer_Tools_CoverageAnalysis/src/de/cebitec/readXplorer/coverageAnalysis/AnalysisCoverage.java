@@ -65,14 +65,14 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
     private void processResult(CoverageAndDiffResultPersistant coverageResult) {
         
         /**
-         * 1. check tempIntervalList for overlap with current coverage 2. store
-         * the one or both (fwd, rev) overlapping intervals in tempVariables 3.
-         * call iteration method with novel interval object or overlapping
+         * Algorithm:
+         * 1. check tempIntervalList for overlap with current coverage 
+         * 2. store the one or both (fwd, rev) overlapping intervals for start and for stop of the current coverage in tempVariables 
+         * 3. call iteration method with novel interval object or overlapping
          * object (only one method for iteration is needed per strand then)
-         *
-         * 3. iterate over coverage array (either fwd or reverse) 4. if coverage
-         * drops below (or is higher than) threshold - add interval 5. if
-         * opposite case: just continue checking the current coverage
+         * 4. iterate over coverage array (either fwd or reverse) 
+         * 5. if coverage drops below (or is higher than) threshold - add interval 
+         * 5. if opposite case: just continue checking the current coverage
          */
         
         if (intervalContainer == null) { //initialize result, if it was not used yet
@@ -100,8 +100,10 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
         /* check temp intervals at first, which might be elongated by the
          * new result */
         byte strandFwdOrBoth = this.parameters.isSumCoverageOfBothStrands() ? SequenceUtils.STRAND_BOTH : SequenceUtils.STRAND_FWD;
-        CoverageInterval overlappingIntervalSumOrFwd = new CoverageInterval(connector.getTrackID(), strandFwdOrBoth);
-        CoverageInterval overlappingIntervalRev = new CoverageInterval(connector.getTrackID(), strandFwdOrBoth);
+        CoverageInterval overlapIntervalSumOrFwdStart = new CoverageInterval(connector.getTrackID(), strandFwdOrBoth);
+        CoverageInterval overlapIntervalRevStart = new CoverageInterval(connector.getTrackID(), SequenceUtils.STRAND_REV);
+        CoverageInterval overlapIntervalSumOrFwdEnd = new CoverageInterval(connector.getTrackID(), strandFwdOrBoth);
+        CoverageInterval overlapIntervalRevEnd = new CoverageInterval(connector.getTrackID(), SequenceUtils.STRAND_REV);
         CoverageInterval currentTempInterval;
         int startPos = coverageResult.getLowerBound();
         for (int i = 0; i < tempIntervals.size(); i++) {
@@ -110,16 +112,25 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
                 if (    currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
                      || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
 
-                    overlappingIntervalSumOrFwd = tempIntervals.get(i);
+                    overlapIntervalSumOrFwdStart = tempIntervals.get(i);
                 } else {
-                    overlappingIntervalRev = tempIntervals.get(i);
+                    overlapIntervalRevStart = tempIntervals.get(i);
+                }
+            }
+            if (coverageResult.getUpperBound() + 1 == currentTempInterval.getStart()) {
+                if (currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
+                        || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
+
+                    overlapIntervalSumOrFwdEnd = tempIntervals.get(i);
+                } else {
+                    overlapIntervalRevEnd = tempIntervals.get(i);
                 }
             }
         }
         
-        this.calculateIntervals(overlappingIntervalSumOrFwd, coverageArraySumOrFwd, strandFwdOrBoth, coverageResult.getLowerBound(), intervalsSumOrFwd);
+        this.calculateIntervals(overlapIntervalSumOrFwdStart, overlapIntervalSumOrFwdEnd, coverageArraySumOrFwd, strandFwdOrBoth, coverageResult.getLowerBound(), intervalsSumOrFwd);
         if (!this.parameters.isSumCoverageOfBothStrands()) {
-            this.calculateIntervals(overlappingIntervalRev, coverageArrayRev, SequenceUtils.STRAND_REV, coverageResult.getLowerBound(), intervalsRev);
+            this.calculateIntervals(overlapIntervalRevStart, overlapIntervalRevEnd, coverageArrayRev, SequenceUtils.STRAND_REV, coverageResult.getLowerBound(), intervalsRev);
         }
         
         intervalContainer.setIntervalsSumOrFwd(intervalsSumOrFwd);
@@ -138,21 +149,25 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
      * @param intervalListToAddTo the interval list, to which detected intervals 
      * shall be added
      */
-    private void calculateIntervals(CoverageInterval currentInterval, int[] coverageArray, byte strand, 
+    private void calculateIntervals(CoverageInterval currentInterval, CoverageInterval tempEndInterval, int[] coverageArray, byte strand, 
             int refIntervalStart, List<CoverageInterval> intervalListToAddTo) {
         
         int summedCoverage = 0;
         boolean isInInterval = false;
         int startPos = currentInterval.getStart();
-        boolean isCoverageOk = coverageArray[0] <= parameters.getMinCoverageCount() && parameters.isDetectCoveredIntervals() ||
-                               coverageArray[0] > parameters.getMinCoverageCount() && !parameters.isDetectCoveredIntervals();
+        boolean addToTempIntervals = false;
+        boolean isCoverageOk = coverageArray.length > 0 &&
+                              (coverageArray[0] >= parameters.getMinCoverageCount() && parameters.isDetectCoveredIntervals() ||
+                               coverageArray[0] < parameters.getMinCoverageCount() && !parameters.isDetectCoveredIntervals());
         
         // if possible overlap interval does not overlap, because start coverage of current coverageArray is too low (high)
-        if (startPos > 0 && coverageArray.length > 0 && isCoverageOk) {
+        if (startPos > 0 && !isCoverageOk) {
             intervalListToAddTo.add(currentInterval);
             tempIntervals.remove(currentInterval);
             currentInterval = new CoverageInterval(connector.getTrackID(), strand);
             startPos = currentInterval.getStart();
+        } else if (startPos < 0 && isCoverageOk) {
+            addToTempIntervals = true; //an interval possibly overlapping the left boundary of the interval, needs to be stored in temp intervals
         }
         
         for (int i = 0; i < coverageArray.length; i++) {
@@ -170,13 +185,25 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
                 
                 //when reaching the end of the coverage array: add a possible overlap interval
                 if ((i + 1) >= coverageArray.length) {
-                    //add possible overlap interval to tempList
-                    this.storeInterval(currentInterval, startPos, refIntervalStart + i, summedCoverage, tempIntervals);
+                    //add possible overlap interval to tempList or update the given temp overlap interval
+                    if (tempEndInterval.getStart() > 0) {
+                        tempEndInterval.setStart(startPos);
+                        if (currentInterval.getStart() > 0) {
+                            this.tempIntervals.remove(currentInterval);
+                        }
+                    } else {
+                        this.storeInterval(currentInterval, startPos, refIntervalStart + i, summedCoverage, tempIntervals);
+                    }
                     //no reinitialization of currentInterval needed, since we are at the end of the data package
                 }
             } else { 
-                if (isInInterval) { //check if this is the first position which is below (over) given threshold   
-                    this.storeInterval(currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, intervalListToAddTo);
+                if (isInInterval) { //check if this is the first position which is below (over) given threshold
+                    if (addToTempIntervals) { //i - 1, because current position does not satisfy the preliminaries anymore
+                        this.storeInterval(currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, tempIntervals);
+                        addToTempIntervals = false;
+                    } else {
+                        this.storeInterval(currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, intervalListToAddTo);
+                    }
                     //reinitialize currentInterval for next interval
                     currentInterval = new CoverageInterval(connector.getTrackID(), strand);
                     startPos = currentInterval.getStart();

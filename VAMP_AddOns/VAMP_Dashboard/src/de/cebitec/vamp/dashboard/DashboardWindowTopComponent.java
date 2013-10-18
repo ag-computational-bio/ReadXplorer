@@ -8,6 +8,7 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.TopComponentExtended;
+import de.cebitec.vamp.view.dialogMenus.explorer.CustomOutlineCellRenderer;
 import java.awt.EventQueue;
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
@@ -132,21 +133,20 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
                 final Map<PersistantReference, List<PersistantTrack>> genomesAndTracks =
                         ProjectConnector.getInstance().getGenomesAndTracks();
 
-                Node rootNode = new AbstractNode(new Children.Keys() {
+                Node rootNode = new AbstractNode(new Children.Keys<PersistantReference>() {
                     @Override
-                    protected Node[] createNodes(Object t) {
-                        PersistantReference genome = (PersistantReference) t;
+                    protected Node[] createNodes(PersistantReference genome) {
                         try {
                             List<PersistantTrack> tracks = genomesAndTracks.get(genome);
 
                             if (tracks != null) {
-                                List<Item> trackItems = new ArrayList<>();
+                                List<DBItem> trackItems = new ArrayList<>();
                                 for (PersistantTrack track : tracks) {
-                                    trackItems.add(new Item(track));
+                                    trackItems.add(new DBItem(track));
                                 }
-                                return new Node[]{new ItemNode(new Item(genome), new ItemChildren(trackItems))};
+                                return new Node[]{new DBItemNode(new DBItem(genome), new DBItemChildren(trackItems))};
                             } else {
-                                return new Node[]{new ItemNode(new Item(genome))};
+                                return new Node[]{new DBItemNode(new DBItem(genome))};
                             }
                         } catch (IntrospectionException ex) {
                             Exceptions.printStackTrace(ex);
@@ -271,34 +271,15 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         ov.setDefaultActionAllowed(false);
         //using the name of the property 
         //followed by the text to be displayed in the column header: 
-        ov.setPropertyColumns("description", "Description", "timestamp", "Import Date", "mark", "Mark for action");
+        ov.setPropertyColumns("description", "Description", "timestamp", "Import Date", "selected", "Mark for action");
         //Hide the root node, since we only care about the children: 
         ov.getOutline().setRootVisible(false); //Add the OutlineView to the TopComponent: 
         ov.getOutline().setDefaultRenderer(Node.Property.class, new CustomOutlineCellRenderer());
         explorerPanel.add(ov);
     }
     
-    /** 
-     * Iterates through all given nodes and their children and returns only 
-     * those with getMark() = true.
-     */
-    private static List<Node> getAllMarkedNodes(List<Node> nodes) {
-        ArrayList<Node> selectedNodes = new ArrayList<>(); 
-        for(Node n : nodes) {
-            ItemNode node = (ItemNode) n;
-            Item item = node.getData();
-            if (item.getMark()) {
-                //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Node "+item.getTitle()+" is selected!");
-                selectedNodes.add(n);
-            }
-            List<Node> markedChildren = Arrays.asList(n.getChildren().getNodes());
-            selectedNodes.addAll(getAllMarkedNodes(markedChildren));
-        }
-        return selectedNodes;
-    }
-    
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-        List<Node> selectedNodes = getAllMarkedNodes(Arrays.asList(em.getRootContext().getChildren().getNodes()));
+        List<Node> selectedNodes = DBItemNode.getAllMarkedNodes(Arrays.asList(em.getRootContext().getChildren().getNodes()));
             
         //scan all selected nodes and save them to a map of the form:
         // GenomeID -> List<ReferenceID>
@@ -306,9 +287,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         
         HashMap<Long,HashSet<Long>> genomesAndTracksToOpen = new HashMap<>();
         for(Node n : selectedNodes) {
-            ItemNode node = (ItemNode) n;
-            Item item = node.getData();
-            if (item.getKind()==Item.Kind.GENOME) {
+            DBItemNode node = (DBItemNode) n;
+            DBItem item = (DBItem) node.getData();
+            if (item.getChild() == DBItem.Child.GENOME) {
                 if (!genomesAndTracksToOpen.containsKey(item.getID())) {
                     genomesAndTracksToOpen.put(item.getID(), new HashSet<Long>()); 
                 }

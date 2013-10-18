@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.samtools.util.RuntimeIOException;
 
 /**
  * A track connector for a single track. It handles all data requests for this track.
@@ -35,8 +34,7 @@ public class TrackConnector {
     private MappingThreadAnalyses mappingThreadAnalyses; 
     private Connection con;
     public static int FIXED_INTERVAL_LENGTH = 1000;
-    private final PersistantReference refGenome;
-    private SamBamFileReader externalDataReader;
+    private PersistantReference refGenome;
 
     /**
      * A track connector for a single track. It handles all data requests for this track.
@@ -47,17 +45,7 @@ public class TrackConnector {
     protected TrackConnector(PersistantTrack track, String adapter) throws FileNotFoundException {
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
-        this.trackID = track.getId();
-        this.adapter = adapter;
-        this.con = ProjectConnector.getInstance().getConnection();
-        
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
-                this.associatedTracks.get(0).getRefGenID());
-        this.refGenome = refConnector.getRefGenome();
-        this.refSeqLength = this.refGenome.getRefLength();
-        this.openBAM();
-
-        this.startDataThreads(false);
+        this.initTrackConnector(track.getId(), false, adapter);
     }
 
     /**
@@ -73,17 +61,27 @@ public class TrackConnector {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
         }
-        //TODO: create MultipleTrackConnector with some special methods, but extending the track connector
-        this.trackID = id; //TODO: trackabhängig gucken ob db benutzt oder nicht (double/multitrack)
         this.associatedTracks = tracks;
+        this.initTrackConnector(id, combineTracks, adapter);
+    }
+    
+    /**
+     * Initializes all essential fields of the TrackConnector.
+     * @param trackId the track id to use
+     * @param combineTracks true, if the data of these tracks is to be combined,
+     * false if it should be kept separated
+     * @param adapter the database adapter type (mysql or h2)
+     */
+    private void initTrackConnector(int trackId, boolean combineTracks, String adapter) {
+        this.trackID = trackId;
         this.adapter = adapter;
         this.con = ProjectConnector.getInstance().getConnection();
+
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGenome();
         this.refSeqLength = this.refGenome.getRefLength();
-        this.openBAM();
-        
+
         this.startDataThreads(combineTracks);
     }
     
@@ -106,8 +104,8 @@ public class TrackConnector {
         this.coverageThread = new CoverageThread(this.associatedTracks, combineTracks);
         this.diffThread = new CoverageThread(this.associatedTracks, combineTracks);
         this.coverageThreadAnalyses = new CoverageThreadAnalyses(this.associatedTracks, combineTracks);
-        this.mappingThread = new MappingThread(this.associatedTracks.get(0));
-        this.mappingThreadAnalyses = new MappingThreadAnalyses(this.associatedTracks.get(0));
+        this.mappingThread = new MappingThread(this.associatedTracks);
+        this.mappingThreadAnalyses = new MappingThreadAnalyses(this.associatedTracks);
         this.coverageThread.start();
         this.diffThread.start();
         this.coverageThreadAnalyses.start();
@@ -151,7 +149,7 @@ public class TrackConnector {
      * @return request unneeded: true, if this is a direct access track, false, if the request had to be carried out
      */
     public boolean addDiffRequest(IntervalRequest request) {
-        if (request instanceof CoverageAndDiffRequest && this.associatedTracks.get(0).isDbUsed()) {
+        if (request.isDiffsAndGapsNeeded() && this.associatedTracks.get(0).isDbUsed()) {
             this.diffThread.addRequest(request);
             return false;
         }
@@ -187,15 +185,25 @@ public class TrackConnector {
     }
     
     /**
-     * @return The complete statistics for a track.
+     * Convenience method for getTrackStats(wantedTrackId).
+     * @return The complete statistics for the main track of this connector.
      */
     public StatsContainer getTrackStats() {
+        return this.getTrackStats(trackID);
+    }
+    
+    /**
+     * 
+     * @param wantedTrackId the id of the track, whose statistics are needed.
+     * @return The complete statistics for the track specified by the given id.
+     */
+    public StatsContainer getTrackStats(int wantedTrackId) {
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
         statsContainer.prepareForSeqPairTrack();
-        
+
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_STATS_FOR_TRACK)) {
-            fetch.setInt(1, trackID);
+            fetch.setInt(1, wantedTrackId);
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS));
@@ -225,9 +233,9 @@ public class TrackConnector {
                 statsContainer.increaseValue(StatsContainer.COVERAGE_BM_GENOME, rs.getInt(FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME));
                 statsContainer.increaseValue(StatsContainer.COVERAGE_COMPLETE_GENOME, rs.getInt(FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME));
                 statsContainer.increaseValue(StatsContainer.COVERAGE_PERFECT_GENOME, rs.getInt(FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME));
-            }                
+            }
             rs.close();
-            
+
         } catch (SQLException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, e);
         }
@@ -281,39 +289,6 @@ public class TrackConnector {
     public double getPercentRefGenNErrorCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_NUM, con, trackID);
         return absValue / refSeqLength * 100;
-    }
-
-    /**
-     * Fetches the common coverage information from the db for a given interval.
-     * @param request request containing the needed interval
-     * @return a map of the position to the common coverage value at that position
-     */
-    public HashMap<Integer, Integer> getCoverageInfosOfTrack(IntervalRequest request) {
-        PreparedStatement fetch;
-        HashMap<Integer, Integer> positionMap = new HashMap<>();
-        int coverage;
-        int position;
-        int from = request.getFrom();
-        int to = request.getTo();
-        if (from < to && from > 0 && to > 0) {
-            try {
-
-                fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_TRACK);
-
-                fetch.setLong(1, trackID);
-                fetch.setLong(2, from);
-                fetch.setLong(3, to);
-                ResultSet rs = fetch.executeQuery();
-                while (rs.next()) {
-                    position = rs.getInt(FieldNames.COVERAGE_POSITION);
-                    coverage = rs.getInt(FieldNames.COVERAGE_N_MULT);
-                    positionMap.put(position, coverage);
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return positionMap;
     }
 
 //    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq,
@@ -520,7 +495,7 @@ public class TrackConnector {
     /**
      * @return True, if this is a sequence pair track, false otherwise.
      */
-    public boolean isSeqPairTrack() {
+    public boolean isReadPairTrack() {
         return this.getSeqPairToTrackID() != 0;
     }
 
@@ -713,28 +688,6 @@ public class TrackConnector {
     public AnalysesHandler createAnalysisHandler(DataVisualisationI visualizer, String handlerTitle, 
             ParametersReadClasses readClassParams) {
         return new AnalysesHandler(this, visualizer, handlerTitle, readClassParams);
-    }
-
-    private void openBAM() throws FileNotFoundException {
-        if (!this.associatedTracks.get(0).getFilePath().isEmpty()) {
-            try {
-                File file = new File(this.associatedTracks.get(0).getFilePath());
-                this.externalDataReader = new SamBamFileReader(file, this.trackID);
-            } catch (RuntimeIOException e) {
-                throw new FileNotFoundException(e.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Releases resources which are not needed after closing the track connector.
-     */
-    public void close() {
-        this.mappingThread.close();
-        this.mappingThreadAnalyses.close();
-        if (this.externalDataReader != null) {
-            this.externalDataReader.close();
-        }
     }
 
     public File getTrackPath() {

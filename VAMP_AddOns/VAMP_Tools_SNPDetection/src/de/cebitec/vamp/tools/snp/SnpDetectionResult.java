@@ -29,8 +29,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * @param snpList list of snps of the analysis
      * @param trackNames hashmap of track ids to track names used in the analysis
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames) {
-        super(trackNames);
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames, boolean combineTracks) {
+        super(trackNames, combineTracks);
         this.snpList = snpList;
     }
     
@@ -68,7 +68,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             
             snpExport.add(snp.getPosition());
             snpExport.add(snp.getGapOrderIndex());
-            snpExport.add(this.getTrackMap().get(snp.getTrackId()));
+            snpExport.add(this.getTrackEntry(snp.getTrackId(), true));
             snpExport.add(snp.getBase());
             snpExport.add(snp.getRefBase());
             snpExport.add(snp.getARate());

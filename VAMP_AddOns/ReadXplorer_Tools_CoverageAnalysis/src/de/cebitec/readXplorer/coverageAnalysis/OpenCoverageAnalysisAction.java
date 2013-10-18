@@ -8,10 +8,10 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksVisualPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -57,8 +56,10 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
     private int referenceId;
     private List<PersistantTrack> tracks;
     private Map<Integer, AnalysisCoverage> trackToAnalysisMap;
-    ParameterSetCoverageAnalysis parameters;
+    private ParameterSetCoverageAnalysis parameters;
+    private boolean combineTracks;
     private SelectReadClassWizardPanel readClassWizPanel;
+    private OpenTracksWizardPanel openTracksPanel;
     private CoverageAnalysisTopComponent coveredAnnoAnalysisTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
     private int finishedCovAnalyses = 0;
@@ -83,34 +84,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
      */
     @Override
     public void actionPerformed(ActionEvent ev) {
-        OpenTrackPanelList otp = new OpenTrackPanelList(referenceId);
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(OpenCoverageAnalysisAction.class, "CTL_OpenTrackList"));
-        Dialog selectTracksDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        selectTracksDialog.setVisible(true);
-
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-            this.tracks = otp.getSelectedTracks();
-            this.trackMap = new HashMap<>();
-            this.trackToAnalysisMap = new HashMap<>();
-            this.finishedCovAnalyses = 0;
-            this.coverageAnalysisResultPanel = null;
-            for (PersistantTrack track : otp.getSelectedTracks()) {
-                this.trackMap.put(track.getId(), track);
-            }
-
-            if (this.coveredAnnoAnalysisTopComp == null) {
-                this.coveredAnnoAnalysisTopComp = (CoverageAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoverageAnalysisTopComponent");
-            }
-            this.coveredAnnoAnalysisTopComp.open();
-
-            this.runWizarAndCoverageAnnoAnalysis();
-
-        } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
-            String msg = NbBundle.getMessage(OpenCoverageAnalysisAction.class, "CTL_OpenCoverageDetectionInfoTitle",
-                    "No track selected. To start a coverage analysis at least one track has to be selected.");
-            String title = NbBundle.getMessage(OpenCoverageAnalysisAction.class, "CTL_OpenCoverageDetectionInfo", "Info");
-            JOptionPane.showMessageDialog(this.context, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
+        this.runWizarAndCoverageAnnoAnalysis();
     }
 
     /**
@@ -120,7 +94,10 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
     private void runWizarAndCoverageAnnoAnalysis() {
 
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
+        this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
+        panels.add(openTracksPanel);
         panels.add(new CoverageAnalysisWizardPanel());
         panels.add(readClassWizPanel);
         WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
@@ -130,12 +107,22 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            this.startCoverageDetection(wiz);
-        } else {
-            if (!this.coveredAnnoAnalysisTopComp.hasComponents()) {
-                this.coveredAnnoAnalysisTopComp.close();
+        List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
+        if (!cancelled && !selectedTracks.isEmpty()) {
+            this.tracks = selectedTracks;
+            this.trackMap = new HashMap<>();
+            this.trackToAnalysisMap = new HashMap<>();
+            this.finishedCovAnalyses = 0;
+            this.coverageAnalysisResultPanel = null;
+            for (PersistantTrack track : this.tracks) {
+                this.trackMap.put(track.getId(), track);
             }
+
+            if (this.coveredAnnoAnalysisTopComp == null) {
+                this.coveredAnnoAnalysisTopComp = (CoverageAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoverageAnalysisTopComponent");
+            }
+            this.coveredAnnoAnalysisTopComp.open();
+            this.startCoverageDetection(wiz);
         }
     }
 
@@ -149,27 +136,47 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
         boolean isSumCoverage = (boolean) wiz.getProperty(CoverageAnalysisWizardPanel.SUM_COVERAGE);
         boolean detectCoveredIntervals = (boolean) wiz.getProperty(CoverageAnalysisWizardPanel.COVERED_INTERVALS);
         ParametersReadClasses readClassesParams = (ParametersReadClasses) wiz.getProperty(readClassWizPanel.getPropReadClassParams());
+        this.combineTracks = (boolean) wiz.getProperty(openTracksPanel.getPropCombineTracks());
 
         parameters = new ParameterSetCoverageAnalysis(minCoverageCount, isSumCoverage, detectCoveredIntervals, readClassesParams);
 
         TrackConnector connector;
-        for (PersistantTrack track : this.tracks) {
+        if (!combineTracks) {
+            for (PersistantTrack track : this.tracks) {
+                try {
+                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    continue;
+                }
+
+                this.createAnalysis(connector, readClassesParams);
+            }
+        } else {
             try {
-                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                this.createAnalysis(connector, readClassesParams);
+                
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
                 JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
-                continue;
             }
-
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenCoverageAnalysisAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams); //every track has its own analysis handler
-
-            AnalysisCoverage analysisCoverage = new AnalysisCoverage(connector, parameters);
-            covAnalysisHandler.registerObserver(analysisCoverage);
-            covAnalysisHandler.setCoverageNeeded(true);
-            trackToAnalysisMap.put(track.getId(), analysisCoverage);
-            covAnalysisHandler.startAnalysis();
         }
+    }
+    
+    /**
+     * Creates the analysis for a TrackConnector.
+     * @param connector the connector
+     * @param readClassesParams the read class parameters
+     */
+    private void createAnalysis(TrackConnector connector, ParametersReadClasses readClassesParams) {
+        AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                NbBundle.getMessage(OpenCoverageAnalysisAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams);
+
+        AnalysisCoverage analysisCoverage = new AnalysisCoverage(connector, parameters);
+        covAnalysisHandler.registerObserver(analysisCoverage);
+        covAnalysisHandler.setCoverageNeeded(true);
+        trackToAnalysisMap.put(connector.getTrackID(), analysisCoverage);
+        covAnalysisHandler.startAnalysis();
     }
 
     /**
@@ -192,7 +199,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
                 AnalysisCoverage analysisCoverage = trackToAnalysisMap.get(trackId);
                 analysisCoverage.finishAnalysis();
-                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap);
+                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, combineTracks);
            
                 result.setParameters(parameters);
                 
@@ -206,8 +213,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
                         }
                         coverageAnalysisResultPanel.addCoverageAnalysis(result);
 
-                        if (finishedCovAnalyses >= tracks.size()) {
-
+                        if (finishedCovAnalyses >= tracks.size() || combineTracks) {
+                            
                             //get track name(s) for tab descriptions
                             String trackNames = "";
                             if (tracks != null && !tracks.isEmpty()) {

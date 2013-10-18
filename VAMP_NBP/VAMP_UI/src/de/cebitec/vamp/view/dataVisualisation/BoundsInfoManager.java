@@ -28,7 +28,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     public void addBoundsListener(LogicalBoundsListener a) {
         boundListeners.add(a);
-        if (a.isPaintingAreaAviable()) {
+        if (a.isPaintingAreaAvailable()) {
             a.updateLogicalBounds(computeBounds(a.getPaintingAreaDimension()));
         }
     }
@@ -53,7 +53,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     private void updateLogicalListeners() {
         for (LogicalBoundsListener a : boundListeners) {
-            if (a.isPaintingAreaAviable()) {
+            if (a.isPaintingAreaAvailable()) {
                 a.updateLogicalBounds(computeBounds(a.getPaintingAreaDimension()));
             }
         }
@@ -68,7 +68,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     public void getUpdatedBoundsInfo(LogicalBoundsListener a) {
 
-        if (a.isPaintingAreaAviable()) {
+        if (a.isPaintingAreaAvailable()) {
             a.updateLogicalBounds(computeBounds(a.getPaintingAreaDimension()));
         }
     }

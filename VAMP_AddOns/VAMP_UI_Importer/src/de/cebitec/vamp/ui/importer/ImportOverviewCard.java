@@ -1,7 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
-import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.ReadPairJobContainer;
+import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +45,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         }
         
         if(!seqPairJobList.isEmpty()){
-            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.seqPairs") + ":\n");
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.readPairs") + ":\n");
             for(Iterator<ReadPairJobContainer> it = seqPairJobList.iterator(); it.hasNext(); ){
                 ReadPairJobContainer seqPairCont = it.next();
                 String file2Name = seqPairCont.getTrackJob2() != null ? seqPairCont.getTrackJob2().getFile().getAbsolutePath() : "-";

@@ -21,17 +21,17 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
      * component from this class, just use getComponent().
      */
     private SelectFeatureTypeVisualPanel component;
-    private final String wizardName;
+    private final String analysisName;
 
     /**
      * Wizard panel for showing and handling the selection of feature types.
-     * @param wizardName the name of the wizard using this wizard panel. It will
-     * be used to store the selected settings for this wizard under a unique
-     * identifier.
+     * @param analysisName the name of the analysis using this wizard panel. It
+     * will be used to store the selected settings for this wizard panel under a
+     * unique identifier.
      */
-    public SelectFeatureTypeWizardPanel(String wizardName) {
+    public SelectFeatureTypeWizardPanel(String analysisName) {
         super("Please select at least one feature type to continue.");
-        this.wizardName = wizardName;
+        this.analysisName = analysisName;
     }
 
     // Get the visual component for the panel. In this template, the component
@@ -41,7 +41,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public SelectFeatureTypeVisualPanel getComponent() {
         if (component == null) {
-            component = new SelectFeatureTypeVisualPanel(wizardName);
+            component = new SelectFeatureTypeVisualPanel(analysisName);
         }
         return component;
     }
@@ -73,7 +73,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
      * corresponding wizard.
      */
     public String getPropSelectedFeatTypes() {
-        return this.wizardName + PROP_SELECTED_FEAT_TYPES;
+        return this.analysisName + PROP_SELECTED_FEAT_TYPES;
     }
     
 }

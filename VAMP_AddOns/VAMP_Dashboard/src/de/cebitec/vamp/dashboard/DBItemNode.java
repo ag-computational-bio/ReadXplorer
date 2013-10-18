@@ -1,38 +1,45 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.dashboard;
 
+import de.cebitec.vamp.view.dialogMenus.explorer.StandardNode;
 import java.beans.IntrospectionException;
 import javax.swing.Action;
-import org.openide.nodes.BeanNode;
-import org.openide.nodes.Children;
-import org.openide.util.Lookup;
 
 /**
+ * A DBItemNode represents a BeanNode of a DBItem, which is designed for a track 
+ * or a genome.
  *
  * @author jeff
  */
-public class ItemNode extends BeanNode {
-    
-    private Item item;
-    
-    public ItemNode(Item bean, ItemChildren children) throws IntrospectionException {
+public class DBItemNode extends StandardNode {
+        
+    /**
+     * A DBItemNode represents a BeanNode of a DBItem, which is designed for a
+     * track or a genome.
+     * @param bean the DBItem to associate with this node
+     * @param children the children of the given <cc>bean</cc>
+     * @throws IntrospectionException 
+     */
+    public DBItemNode(DBItem bean, DBItemChildren children) throws IntrospectionException {
         super(bean, children);
         setDisplayName(bean.getTitle());
         setShortDescription(bean.getDescription());
         setIconBaseWithExtension("de/cebitec/vamp/ui/visualisation/refOpen.png");
     }
     
-    public ItemNode(Item bean) throws IntrospectionException {
+    /**
+     * A DBItemNode represents a BeanNode of a DBItem, which is designed for a
+     * track or a genome.
+     * @param bean the DBItem to associate with this node
+     * @throws IntrospectionException
+     */
+    public DBItemNode(DBItem bean) throws IntrospectionException {
         super(bean);
         setDisplayName(bean.getTitle());
         setShortDescription(bean.getDescription());
         setIconBaseWithExtension("de/cebitec/vamp/ui/visualisation/trackOpen.png");
         
         
-    //public ItemNode(Item bean, Children children, Lookup lkp) throws IntrospectionException {
+    //public DBItemNode(DBItem bean, Children children, Lookup lkp) throws IntrospectionException {
         /*if (children==null) {
             super(bean);
         }
@@ -47,14 +54,17 @@ public class ItemNode extends BeanNode {
         
     }
     
+    @Override
     public boolean canCut() {
         return true;
     }
     
+    @Override
     public boolean canDestroy() {
         return true;
     }
     
+    @Override
     public Action[] getActions(boolean popup) {
         return new Action[] {
             /*SystemAction.get( CopyAction.class ),
@@ -62,10 +72,5 @@ public class ItemNode extends BeanNode {
             null,
             SystemAction.get( DeleteAction.class ) */
         };
-    }
-
-    public Item getData() {
-        return (Item) this.getBean();
-    }
-    
+    }    
 }

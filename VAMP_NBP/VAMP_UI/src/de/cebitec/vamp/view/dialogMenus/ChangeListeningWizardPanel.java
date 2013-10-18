@@ -23,7 +23,7 @@ public abstract class ChangeListeningWizardPanel implements WizardDescriptor.Pan
     
     private ChangeSupport changeSupport;
     private boolean isValidated = true;
-    private final String errorMsg;
+    private String errorMsg;
 
     /**
      * A wizard panel which is able to listen to changes with a property change
@@ -103,5 +103,12 @@ public abstract class ChangeListeningWizardPanel implements WizardDescriptor.Pan
 
     @Override
     public abstract void storeSettings(WizardDescriptor settings);
+    
+    /**
+     * @param errorMsg The new error message to display, if something is wrong.
+     */
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
     
 }

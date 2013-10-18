@@ -1,6 +1,7 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.databackend.ParameterSetI;
+import de.cebitec.vamp.databackend.ParametersFeatureTypes;
 import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.util.FeatureType;
 import java.util.Set;
@@ -10,14 +11,13 @@ import java.util.Set;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCoveredFeatures> {
+public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implements ParameterSetI<ParameterSetCoveredFeatures> {
     
     private int minCoveredPercent;
     private int minCoverageCount;
     private boolean whateverStrand;
     private boolean getCoveredFeatures;
     private ParametersReadClasses readClassesParams;
-    private Set<FeatureType> selFeatureTypes;
 
     /**
      * Data storage for all parameters associated with filtering features.
@@ -39,12 +39,12 @@ public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCo
      */
     public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, boolean whateverStrand,
             boolean getCoveredFeatures, ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes) {
+        super(selectedFeatureTypes);
         this.minCoveredPercent = minCoveredPercent;
         this.minCoverageCount = minCoverageCount;
         this.whateverStrand = whateverStrand;
         this.getCoveredFeatures = getCoveredFeatures;
         this.readClassesParams = readClassesParams;
-        this.selFeatureTypes = selectedFeatureTypes;
     }
 
     /**
@@ -113,8 +113,8 @@ public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCo
      */
     public void setGetCoveredFeatures(boolean getCoveredFeatures) {
         this.getCoveredFeatures = getCoveredFeatures;
-    }
-
+    }  
+    
     /**
      * @return The parameter set for the used read classes for this analysis
      * instance.
@@ -122,14 +122,4 @@ public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCo
     public ParametersReadClasses getReadClassesParams() {
         return readClassesParams;
     }
-
-    /**
-     * @return The set of selected feature types to use for this analysis
-     * instance.
-     */
-    public Set<FeatureType> getSelectedFeatureTypes() {
-        return selFeatureTypes;
-    }
-    
-    
 }

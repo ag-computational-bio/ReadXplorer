@@ -16,85 +16,85 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * View for showing all sequence pair jobs ready for import.
+ * View for showing all read pair jobs ready for import.
  *
  * @author Rolf Hilker
  */
 public class ReadPairJobView extends javax.swing.JPanel implements ListSelectionListener {
 
     public final static long serialVersionUID = 774342377;
-    private List<ReadPairJobContainer> seqPairJobContainerList;
+    private List<ReadPairJobContainer> readPairJobContainerList;
     private boolean hasJobs;
 
-    /** View for showing all sequence pair jobs ready for import. */
+    /** View for showing all read pair jobs ready for import. */
     public ReadPairJobView() {
-        seqPairJobContainerList = new ArrayList<>();
+        readPairJobContainerList = new ArrayList<>();
         initComponents();
     }
 
     /**
-     * @return the selected seq pair job
+     * @return the selected read pair job
      */
     public ReadPairJobContainer getSelectedItem() {
-        return seqPairJobContainerList.get(seqPairJobTable.getSelectedRow());
+        return readPairJobContainerList.get(readPairJobTable.getSelectedRow());
     }
 
     /**
-     * Add a new sequence pair job to the table view.
-     * @param seqPairJobContainer the container with the job to add
-     * @return the updated seq pair job table
+     * Add a new readuence pair job to the table view.
+     * @param readPairJobContainer the container with the job to add
+     * @return the updated read pair job table
      */
-    public JTable add(ReadPairJobContainer seqPairJobContainer){
-        DefaultTableModel model = (DefaultTableModel) seqPairJobTable.getModel();
+    public JTable add(ReadPairJobContainer readPairJobContainer){
+        DefaultTableModel model = (DefaultTableModel) readPairJobTable.getModel();
         
         String orientation = "fr";
-        TrackJob trackJob = seqPairJobContainer.getTrackJob1();
-        if (     seqPairJobContainer.getOrientation() == 1){ orientation = "rf"; }
-        else if (seqPairJobContainer.getOrientation() == 2){ orientation = "ff/rr"; }
-        String file2Name = seqPairJobContainer.getTrackJob2() != null 
-                ? seqPairJobContainer.getTrackJob2().getFile().getName() : "-";
+        TrackJob trackJob = readPairJobContainer.getTrackJob1();
+        if (     readPairJobContainer.getOrientation() == 1){ orientation = "rf"; }
+        else if (readPairJobContainer.getOrientation() == 2){ orientation = "ff/rr"; }
+        String file2Name = readPairJobContainer.getTrackJob2() != null 
+                ? readPairJobContainer.getTrackJob2().getFile().getName() : "-";
        
         model.addRow(new Object[] {
                 trackJob.getFile().getName(),
                 file2Name,
                 trackJob.getDescription(),
                 trackJob.getRefGen().getDescription(), 
-                seqPairJobContainer.getDistance(),
-                seqPairJobContainer.getDeviation(), 
+                readPairJobContainer.getDistance(),
+                readPairJobContainer.getDeviation(), 
                 orientation,
                 trackJob.isAlreadyImported()});
         
-        this.seqPairJobContainerList.add(seqPairJobContainer);
+        this.readPairJobContainerList.add(readPairJobContainer);
 
         if (!hasJobs){
             hasJobs = true;
             firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
         }
-        return seqPairJobTable;
+        return readPairJobTable;
     }
 
     /**
-     * Removes the selected sequence pair job.
-     * @param seqPairJobContainer the container of the seq pair job to remove
+     * Removes the selected readuence pair job.
+     * @param readPairJobContainer the container of the read pair job to remove
      */
-    public void remove(ReadPairJobContainer seqPairJobContainer){
-        int index = seqPairJobContainerList.indexOf(seqPairJobContainer);
-        seqPairJobContainerList.remove(seqPairJobContainer);
+    public void remove(ReadPairJobContainer readPairJobContainer){
+        int index = readPairJobContainerList.indexOf(readPairJobContainer);
+        readPairJobContainerList.remove(readPairJobContainer);
 
-        DefaultTableModel model = (DefaultTableModel) seqPairJobTable.getModel();
+        DefaultTableModel model = (DefaultTableModel) readPairJobTable.getModel();
         model.removeRow(index);
 
-        if (seqPairJobContainerList.isEmpty()){
+        if (readPairJobContainerList.isEmpty()){
             hasJobs = false;
             firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
         }
     }
 
     /**
-     * @return the list of sequence pair jobs
+     * @return the list of readuence pair jobs
      */
     public List<ReadPairJobContainer> getJobs(){
-        return seqPairJobContainerList;
+        return readPairJobContainerList;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class ReadPairJobView extends javax.swing.JPanel implements ListSelection
     }
 
     public boolean isRowSelected(){
-        ListSelectionModel model = seqPairJobTable.getSelectionModel();
+        ListSelectionModel model = readPairJobTable.getSelectionModel();
         return !model.isSelectionEmpty();
     }
 
@@ -122,10 +122,10 @@ public class ReadPairJobView extends javax.swing.JPanel implements ListSelection
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        seqPairJobTable = new javax.swing.JTable();
-        seqPairJobTable.getSelectionModel().addListSelectionListener(this);
+        readPairJobTable = new javax.swing.JTable();
+        readPairJobTable.getSelectionModel().addListSelectionListener(this);
 
-        seqPairJobTable.setModel(new javax.swing.table.DefaultTableModel(
+        readPairJobTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -148,16 +148,16 @@ public class ReadPairJobView extends javax.swing.JPanel implements ListSelection
                 return canEdit [columnIndex];
             }
         });
-        seqPairJobTable.setFillsViewportHeight(true);
-        jScrollPane1.setViewportView(seqPairJobTable);
-        seqPairJobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.seqPairJobTable.columnModel.title0")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title6")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title1")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title2")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title3")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title4")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title5")); // NOI18N
-        seqPairJobTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.seqPairJobTable.columnModel.title7")); // NOI18N
+        readPairJobTable.setFillsViewportHeight(true);
+        jScrollPane1.setViewportView(readPairJobTable);
+        readPairJobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.readPairJobTable.columnModel.title0")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title6")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title1")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title2")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title3")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title4")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title5")); // NOI18N
+        readPairJobTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.readPairJobTable.columnModel.title7")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -172,7 +172,7 @@ public class ReadPairJobView extends javax.swing.JPanel implements ListSelection
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable seqPairJobTable;
+    private javax.swing.JTable readPairJobTable;
     // End of variables declaration//GEN-END:variables
 
 

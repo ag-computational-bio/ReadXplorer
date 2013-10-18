@@ -67,7 +67,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         PersistantFeature feature;
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
-            if (analysisParams.getSelectedFeatureTypes().contains(feature.getType())) {
+            if (analysisParams.getSelFeatureTypes().contains(feature.getType())) {
                 this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
             } else {
                 removeList.add(i);

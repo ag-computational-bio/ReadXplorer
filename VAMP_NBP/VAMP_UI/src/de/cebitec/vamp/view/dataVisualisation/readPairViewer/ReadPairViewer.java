@@ -135,7 +135,8 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses(!excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR),
                 !excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR), !excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING), false);
-        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this, Properties.SEQ_PAIRS, Byte.valueOf("0"), readClassParams));
+        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this, false, 
+                Properties.READ_PAIRS, Byte.valueOf("0"), readClassParams));
         this.oldLogLeft = from;
         this.oldLogRight = to;
     }

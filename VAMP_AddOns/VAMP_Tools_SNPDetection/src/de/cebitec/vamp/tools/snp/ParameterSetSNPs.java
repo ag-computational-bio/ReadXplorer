@@ -1,6 +1,7 @@
 package de.cebitec.vamp.tools.snp;
 
 import de.cebitec.vamp.databackend.ParameterSetI;
+import de.cebitec.vamp.databackend.ParametersFeatureTypes;
 import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.util.FeatureType;
 import java.util.Set;
@@ -10,11 +11,10 @@ import java.util.Set;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-class ParameterSetSNPs implements ParameterSetI<ParameterSetSNPs> {
+class ParameterSetSNPs extends ParametersFeatureTypes implements ParameterSetI<ParameterSetSNPs> {
     private int minMismatchBases;
     private int minPercentage;
     private final boolean useMainBase;
-    private Set<FeatureType> selFeatureTypes;
     private ParametersReadClasses readClassParams;
 
     /**
@@ -31,10 +31,10 @@ class ParameterSetSNPs implements ParameterSetI<ParameterSetSNPs> {
      * belong to the selected mapping classes.
      */
     public ParameterSetSNPs(int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
+        super(selFeatureTypes);
         this.minMismatchBases = minMismatchBases;
         this.minPercentage = minPercentage;
         this.useMainBase = useMainBase;
-        this.selFeatureTypes = selFeatureTypes;
         this.readClassParams = readClassParams;
     }
 
@@ -58,18 +58,6 @@ class ParameterSetSNPs implements ParameterSetI<ParameterSetSNPs> {
 
     public void setMinPercentage(int minPercentage) {
         this.minPercentage = minPercentage;
-    }
-
-    /**
-     * @return list of seletect feature types to use for the 
-     * snp translation.
-     */
-    public Set<FeatureType> getSelFeatureTypes() {
-        return selFeatureTypes;
-    }
-
-    public void setSelFeatureTypes(Set<FeatureType> selFeatureTypes) {
-        this.selFeatureTypes = selFeatureTypes;
     }
 
     /**

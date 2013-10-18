@@ -9,11 +9,8 @@ public class CorrelatedInterval {
     private CorrelationAnalysisProcessor.StrandDirection direction;
     
     private int from; 
-    
     private int to;
-    
     private double correlation;
-    
     private double minPeakCoverage;
     
     public CorrelatedInterval(CorrelationAnalysisProcessor.StrandDirection direction,

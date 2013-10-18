@@ -10,11 +10,11 @@ import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksVisualPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import de.cebitec.vamp.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -63,10 +62,12 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
     private List<PersistantTrack> tracks;
     private Map<Integer, PersistantTrack> trackMap;
     private SNP_DetectionTopComponent snpDetectionTopComp;
+    private OpenTracksWizardPanel openTracksPanel;
     private SelectReadClassWizardPanel readClassWizPanel;
     private SelectFeatureTypeWizardPanel featureTypePanel;
     private Set<FeatureType> selFeatureTypes;
     private ParameterSetSNPs parametersSNPs;
+    private boolean combineTracks;
     private Map<Integer, AnalysisSNPs> trackToAnalysisMap;
     
     private int finishedCovAnalyses = 0;
@@ -94,30 +95,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         this.trackToAnalysisMap = new HashMap<>();
         
         //show track list
-        OpenTrackPanelList otp = new OpenTrackPanelList(referenceId);
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(OpenSnpDetectionAction.class, "CTL_OpenTrackList"));
-        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        openRefGenDialog.setVisible(true);
-
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-            this.tracks = new ArrayList<>();
-            this.trackMap = new HashMap<>();
-            this.tracks = otp.getSelectedTracks();
-            for (PersistantTrack track : otp.getSelectedTracks()) {
-                this.trackMap.put(track.getId(), track);
-            }
-            
-            this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
-            this.snpDetectionTopComp.open();
-            this.runWizardAndSnpDetection();
-
-        } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
-            String msg = NbBundle.getMessage(OpenSnpDetectionAction.class, "CTL_OpenSNPDetectionInfo", 
-                    "No track selected. To start a SNP detection at least one track has to be selected.");
-            String title = NbBundle.getMessage(OpenSnpDetectionAction.class, "CTL_OpenSNPDetectionInfoTitle", "Info");
-            JOptionPane.showMessageDialog(this.context, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
-
+        this.runWizardAndSnpDetection();
     }
     
     /**
@@ -129,10 +107,11 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
         this.featureTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
-        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
-        this.readClassWizPanel.getComponent().setUsingDBTrack(containsDBTrack);
+        this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
+        panels.add(openTracksPanel);
         panels.add(new SNPWizardPanel());
         panels.add(readClassWizPanel);
         panels.add(featureTypePanel);
@@ -144,12 +123,18 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            this.startSNPDetection(wiz);
-        } else {
-            if (!this.snpDetectionTopComp.hasComponents()) {
-                this.snpDetectionTopComp.close();
+        List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
+        if (!cancelled && !selectedTracks.isEmpty()) {
+            this.tracks = new ArrayList<>();
+            this.trackMap = new HashMap<>();
+            this.tracks = selectedTracks;
+            for (PersistantTrack track : this.tracks) {
+                this.trackMap.put(track.getId(), track);
             }
+
+            this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
+            this.snpDetectionTopComp.open();
+            this.startSNPDetection(wiz);
         }
     }
     
@@ -164,26 +149,47 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         boolean useMainBase = (boolean) wiz.getProperty(SNPWizardPanel.PROP_USE_MAIN_BASE);
         this.selFeatureTypes = (Set<FeatureType>) wiz.getProperty(featureTypePanel.getPropSelectedFeatTypes());
         ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(readClassWizPanel.getPropReadClassParams());
+        this.combineTracks = (boolean) wiz.getProperty(openTracksPanel.getPropCombineTracks());
         
         this.parametersSNPs = new ParameterSetSNPs(minVaryingBases, minPercentage, useMainBase, selFeatureTypes, readClassParams);
         TrackConnector connector;
-        for (PersistantTrack track : tracks) {
+        if (!combineTracks) {
+            for (PersistantTrack track : tracks) {
+                try {
+                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The SNP analysis will be cancelled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    continue;
+                }
+                
+                 //every track has its own analysis handlers
+                this.createAnalysis(connector, readClassParams);
+            }
+        } else {
             try {
-                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                this.createAnalysis(connector, readClassParams);
+                
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
                 JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The SNP analysis will be cancelled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
-                continue;
             }
-            
-            AnalysesHandler snpAnalysisHandler = connector.createAnalysisHandler(this,
-                    NbBundle.getMessage(OpenSnpDetectionAction.class, "MSG_AnalysesWorker.progress.name"), readClassParams); //every track has its own analysis handlers
-            AnalysisSNPs analysisSNPs = new AnalysisSNPs(connector, parametersSNPs);
-            snpAnalysisHandler.registerObserver(analysisSNPs);
-            snpAnalysisHandler.setCoverageNeeded(true);
-            snpAnalysisHandler.setDiffsAndGapsNeeded(true);
-            trackToAnalysisMap.put(track.getId(), analysisSNPs);
-            snpAnalysisHandler.startAnalysis();
         }
+    }
+    
+    /**
+     * Creates the analysis for a TrackConnector.
+     * @param connector the connector
+     * @param readClassesParams the read class parameters
+     */
+    private void createAnalysis(TrackConnector connector, ParametersReadClasses readClassParams) {
+        AnalysesHandler snpAnalysisHandler = connector.createAnalysisHandler(this,
+                NbBundle.getMessage(OpenSnpDetectionAction.class, "MSG_AnalysesWorker.progress.name"), readClassParams);
+        AnalysisSNPs analysisSNPs = new AnalysisSNPs(connector, parametersSNPs);
+        snpAnalysisHandler.registerObserver(analysisSNPs);
+        snpAnalysisHandler.setCoverageNeeded(true);
+        snpAnalysisHandler.setDiffsAndGapsNeeded(true);
+        trackToAnalysisMap.put(connector.getTrackID(), analysisSNPs);
+        snpAnalysisHandler.startAnalysis();
     }
 
     /**
@@ -205,7 +211,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 ++finishedCovAnalyses;
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
-                final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap);
+                final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap, combineTracks);
                 result.setParameters(parametersSNPs);
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
@@ -218,7 +224,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                         snpDetectionResultPanel.setReferenceGenome(context.getReference());
                         snpDetectionResultPanel.addResult(result);
 
-                        if (finishedCovAnalyses >= tracks.size()) {
+                        if (finishedCovAnalyses >= tracks.size() || combineTracks) {
 
                             //get track name(s) for tab descriptions
                             String trackNames = GeneralUtils.generateConcatenatedString(result.getTrackNameList(), 120);

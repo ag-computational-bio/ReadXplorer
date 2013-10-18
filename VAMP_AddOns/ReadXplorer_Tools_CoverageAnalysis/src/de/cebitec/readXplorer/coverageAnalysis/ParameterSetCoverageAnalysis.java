@@ -100,7 +100,7 @@ public class ParameterSetCoverageAnalysis implements ParameterSetI<ParameterSetC
      * be detected, <tt>false</tt>, if the uncovered intervals of the reference
      * shall be detected
      */
-    boolean isDetectCoveredIntervals() {
+    public boolean isDetectCoveredIntervals() {
         return this.detectCoveredIntervals;
     }
 }

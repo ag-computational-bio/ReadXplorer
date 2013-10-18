@@ -72,7 +72,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private JPanel options;
     private boolean hasOptions;
     private List<FeatureType> excludedFeatureTypes;
-    private boolean pAInfoIsAviable = false;
+    private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
@@ -188,7 +188,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     private void adjustPaintingAreaInfo() {
         if (this.getHeight() > 0 && this.getWidth() > 0) {
-            pAInfoIsAviable = true;
+            pAInfoIsAvailable = true;
             paintingAreaInfo.setForwardHigh(verticalMargin);
             paintingAreaInfo.setReverseHigh(this.getHeight() - 1 - verticalMargin);
             paintingAreaInfo.setPhyLeft(horizontalMargin);
@@ -213,7 +213,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 paintingAreaInfo.setReverseLow(this.getSize().height / 2 + 1);
             }
         } else {
-            pAInfoIsAviable = false;
+            pAInfoIsAvailable = false;
         }
     }
 
@@ -386,7 +386,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * Compute the space that is currently assigned for one base of the genome
      */
     private void calcBaseWidth() {
-        if (pAInfoIsAviable) {
+        if (pAInfoIsAvailable) {
             basewidth = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
     }
@@ -478,7 +478,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * current width of this panel
      */
     private void recalcCorrelationFactor() {
-        if (pAInfoIsAviable) {
+        if (pAInfoIsAvailable) {
             correlationFactor = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
     }
@@ -641,17 +641,22 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * @return the current dimension of this panel
+     * @return The size of the area, that is used for drawing. Logical bounds
+     * depend on the available size of each listener.
      */
     @Override
     public Dimension getPaintingAreaDimension() {
-        return pAInfoIsAviable ? new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight()) : null;
+        return pAInfoIsAvailable ? new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight()) : null;
 
     }
 
+    /**
+     * @return true, if the PaintingArea has coordinates to calculate bounds,
+     * false otherwise.
+     */
     @Override
-    public boolean isPaintingAreaAviable() {
-        return pAInfoIsAviable;
+    public boolean isPaintingAreaAvailable() {
+        return pAInfoIsAvailable;
     }
 
     public PaintingAreaInfo getPaintingAreaInfo() {

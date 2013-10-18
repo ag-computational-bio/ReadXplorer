@@ -250,7 +250,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
                         Object[] rowData = new Object[nbColumns];
                         rowData[0] = tSS.getPos();
-                        rowData[1] = tssResultNew.getTrackMap().get(tSS.getTrackId());
+                        rowData[1] = tssResultNew.getTrackEntry(tSS.getTrackId(), false);
                         rowData[2] = strand;
                         rowData[3] = tSS.getReadStartsAtPos();
                         rowData[4] = tSS.getCoverageIncrease();

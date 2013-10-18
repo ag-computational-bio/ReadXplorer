@@ -12,7 +12,6 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.analysis.ResultTablePanel;
 import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
-import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
@@ -44,8 +43,8 @@ public class ResultPanelRPKM extends ResultTablePanel {
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     
     /**
-     * Panel showing a result of an analysis filtering for features with a
-     * min and max certain readcount.
+     * Panel showing a result of an analysis filtering for features with a min
+     * and max certain readcount.
      */
     public ResultPanelRPKM() {
         initComponents();
@@ -102,14 +101,14 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
             },
             new String [] {
-                "Feature", "Feature Type", "Strand", "Start", "Stop", "Length", "RPKM", "Read Count"
+                "Feature", "Feature Type", "Track", "Strand", "Start", "Stop", "Length", "RPKM", "Read Count"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Long.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Long.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -123,12 +122,13 @@ public class ResultPanelRPKM extends ResultTablePanel {
         jScrollPane1.setViewportView(rpkmTable);
         rpkmTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title0")); // NOI18N
         rpkmTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title5")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title4")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title7")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title3")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title6")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title8")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title4")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title7")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title3")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title6")); // NOI18N
 
         exitHistogramButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exitHistogramButton.text")); // NOI18N
         exitHistogramButton.addActionListener(new java.awt.event.ActionListener() {
@@ -255,7 +255,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
         if (newResult instanceof RPKMAnalysisResult) {
             RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
-            final int nbColumns = 8;
+            final int nbColumns = 9;
 
             if (this.rpkmCalcResult == null) {
                 this.rpkmCalcResult = rpkmCalcResultNew;
@@ -271,12 +271,13 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 Object[] rowData = new Object[nbColumns];
                 rowData[0] = feat;
                 rowData[1] = feat.getType();
-                rowData[2] = feat.isFwdStrandString();
-                rowData[3] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
-                rowData[4] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
-                rowData[5] = feat.getStop() - feat.getStart();
-                rowData[6] = rpkm.getRPKM();
-                rowData[7] = rpkm.getReadCount();
+                rowData[2] = this.rpkmCalcResult.getTrackEntry(rpkm.getTrackId(), false);
+                rowData[3] = feat.isFwdStrandString();
+                rowData[4] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
+                rowData[5] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
+                rowData[6] = feat.getStop() - feat.getStart();
+                rowData[7] = rpkm.getRPKM();
+                rowData[8] = rpkm.getReadCount();
 
                 model.addRow(rowData);
             }

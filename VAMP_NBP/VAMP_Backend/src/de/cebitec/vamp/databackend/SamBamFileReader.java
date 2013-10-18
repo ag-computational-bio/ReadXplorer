@@ -186,10 +186,11 @@ public class SamBamFileReader implements Observable {
     /**
      * Retrieves the reduced mappings from the given interval from the sam or
      * bam file set for this data reader and the reference sequence with the
-     * given name.
+     * given name. Diffs and gaps are never included.
      * @param refGenome reference genome used in the bam file
      * @param request the request to carry out
-     * @return the reduced mappings for the given interval
+     * @return the reduced mappings for the given interval.  Diffs and gaps are 
+     * never included.
      */
     public Collection<PersistantMapping> getReducedMappingsFromBam(PersistantReference refGenome, IntervalRequest request) {
         int from = request.getTotalFrom();
@@ -528,8 +529,7 @@ public class SamBamFileReader implements Observable {
      * otherwise
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, IntervalRequest request,
-            boolean diffsAndGapsNeeded) {
+    public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, IntervalRequest request) {
         
         byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
@@ -547,8 +547,8 @@ public class SamBamFileReader implements Observable {
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
-        if (diffsAndGapsNeeded) {
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request.isDiffsAndGapsNeeded());
+        if (request.isDiffsAndGapsNeeded()) {
             refSeq = refGenome.getSequence();
         }
         try {
@@ -579,7 +579,7 @@ public class SamBamFileReader implements Observable {
                         this.increaseCoverage(request, numMappingsForRead, classification, trackNeeded, 
                                 isFwdStrand, startPos, stop, coverage);
 
-                        if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE && 
+                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE && 
                                 request.getReadClassParams().isClassificationAllowed(classification)) {
                             diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
                                     startPos, isFwdStrand, 1, record.getReadString(),
@@ -591,7 +591,7 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request.isDiffsAndGapsNeeded());
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);

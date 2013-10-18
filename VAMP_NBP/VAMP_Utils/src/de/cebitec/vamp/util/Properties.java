@@ -31,7 +31,7 @@ public class Properties {
     
     public static final byte NONE = -1;
     public static final byte BOTH = 0;
-    public static final byte SEQ_PAIRS = 1;
+    public static final byte READ_PAIRS = 1;
     public static final byte SINGLE_MAPPINGS = 2;
     
     /** Standard value, if all data is needed (0).*/
@@ -44,8 +44,8 @@ public class Properties {
     public static final byte COMPLETE_COVERAGE = 3;
     /** Value for diffs (5). */
     public static final byte DIFFS = 5;
-    /** Value for mappings with diffs (6). */
-    public static final byte MAPPINGS_W_DIFFS = 6;
+    /** Value for mappings sorted by id (6). */
+    public static final byte MAPPINGS_DB_BY_ID = 6;
     /** Value for mappings without diffs (7). */
     public static final byte MAPPINGS_WO_DIFFS = 7;
     /** kasterm: Value for all reduced mappings*/

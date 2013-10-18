@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -196,7 +195,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             Object[] rowData = new Object[nbColumns];
             feature = coveredFeature.getCoveredFeature();
             rowData[0] = feature;
-            rowData[1] = coveredFeaturesResultNew.getTrackMap().get(coveredFeature.getTrackId());
+            rowData[1] = coveredFeaturesResultNew.getTrackEntry(coveredFeature.getTrackId(), false);
             rowData[2] = feature.isFwdStrandString();
             rowData[3] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
             rowData[4] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();

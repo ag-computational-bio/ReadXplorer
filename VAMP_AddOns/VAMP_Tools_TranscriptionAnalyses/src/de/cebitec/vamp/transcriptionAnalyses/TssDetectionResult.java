@@ -29,9 +29,10 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * result.
      * @param results the results of the TSS detection
      * @param trackList the list of tracks, for which the TSS detection was carried out
+     * @param combineTracks true, if the tracks are combined, false otherwise 
      */
-    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList) {//, PersistantTrack currentTrack) {
-        super(trackList);
+    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList, boolean combineTracks) {//, PersistantTrack currentTrack) {
+        super(trackList, combineTracks);
         this.results = results;
     }
 
@@ -110,7 +111,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             List<Object> tssRow = new ArrayList<>();
             
             tssRow.add(tss.getPos());
-            tssRow.add(this.getTrackMap().get(tss.getTrackId()));
+            tssRow.add(this.getTrackEntry(tss.getTrackId(), true));
             tssRow.add(tss.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
             tssRow.add(tss.getReadStartsAtPos());
             tssRow.add(tss.getCoverageIncrease());

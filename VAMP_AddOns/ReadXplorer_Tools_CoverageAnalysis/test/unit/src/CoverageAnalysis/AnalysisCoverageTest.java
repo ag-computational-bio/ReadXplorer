@@ -1,8 +1,8 @@
 package CoverageAnalysis;
 
-import de.cebitec.readXplorer.coverageAnalysis.ParameterSetCoverageAnalysis;
 import de.cebitec.readXplorer.coverageAnalysis.AnalysisCoverage;
 import de.cebitec.readXplorer.coverageAnalysis.CoverageInterval;
+import de.cebitec.readXplorer.coverageAnalysis.ParameterSetCoverageAnalysis;
 import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
@@ -67,13 +67,15 @@ public class AnalysisCoverageTest {
             int size3 = 60000;
             PersistantCoverage coverage = new PersistantCoverage(1, size);
             PersistantCoverage coverage2 = new PersistantCoverage(size + 1, size2);
+            PersistantCoverage coverage4 = new PersistantCoverage(size + 1, size2);
             PersistantCoverage coverage3 = new PersistantCoverage(size2 + 1, size3);
             
             int[] covValues = {0, 4, 5, 6, 100, 3, 100, 2, 100, 5};
             //Result both strands = 2000-14000 = interval1, 16-20000 = interval2
             //Result = 4000-10000 = interval1, 12000-14000 = interval2, 16-20000 = interval3
             int[] covValues2 = {5, 2, 3, 100, 2, 1, 0, 4, 10, 5};
-            int[] covValues3 = {0, 2, 3, 100, 2, 1, 0, 4, 10, 5};
+            int[] covValues3 = {5, 2, 3, 100, 2, 1, 0, 4, 10, 5};
+            int[] covValues4 = {5, 5, 5, 100, 4, 4, 4, 4, 10, 5};
             
             int[] perfArrayFwd = this.generateArray(covValues, size);
             int[] perfArrayRev = this.generateArray(covValues, size);
@@ -95,6 +97,13 @@ public class AnalysisCoverageTest {
             int[] bmArrayRev3 = this.generateArray(covValues3, size);
             int[] commonArrayFwd3 = this.generateArray(covValues3, size);
             int[] commonArrayRev3 = this.generateArray(covValues3, size);
+            
+            int[] perfArrayFwd4 = this.generateArray(covValues4, size);
+            int[] perfArrayRev4 = this.generateArray(covValues4, size);
+            int[] bmArrayFwd4 = this.generateArray(covValues4, size);
+            int[] bmArrayRev4 = this.generateArray(covValues4, size);
+            int[] commonArrayFwd4 = this.generateArray(covValues4, size);
+            int[] commonArrayRev4 = this.generateArray(covValues4, size);
             
             coverage.setPerfectFwdMult(perfArrayFwd);
             coverage.setPerfectRevMult(perfArrayRev);
@@ -120,16 +129,45 @@ public class AnalysisCoverageTest {
             coverage3.setCommonRevMult(commonArrayRev3);
             CoverageAndDiffResultPersistant coverageResult3 = new CoverageAndDiffResultPersistant(coverage3, null, null, false);
             
+            coverage4.setPerfectFwdMult(perfArrayFwd4);
+            coverage4.setPerfectRevMult(perfArrayRev4);
+            coverage4.setBestMatchFwdMult(bmArrayFwd4);
+            coverage4.setBestMatchRevMult(bmArrayRev4);
+            coverage4.setCommonFwdMult(commonArrayFwd4);
+            coverage4.setCommonRevMult(commonArrayRev4);
+            CoverageAndDiffResultPersistant coverageResult4 = new CoverageAndDiffResultPersistant(coverage4, null, null, false);
+            
+            //standard order
 //            instanceSumPerfect.update(coverageResult);
 //            instanceSumPerfect.update(coverageResult2);
 //            instanceSumPerfect.update(coverageResult3);
+            
+            //reverse order
+//            instanceSumPerfect.update(coverageResult);
+//            instanceSumPerfect.update(coverageResult2);
+//            instanceSumPerfect.update(coverageResult3);
+//            
 //            instanceSumPerfect.finishAnalysis();
 //            List<CoverageInterval> intervals = instanceSumPerfect.getResults().getCoverageIntervals();
 //            for (CoverageInterval interval : intervals) {
 //                System.out.println("start: " + interval.getStart() + ", stop: " + interval.getStop());
 //            }
+            
+            //standard order
 //            Assert.assertTrue(intervals.get(0).getStart() == 2001);
 //            Assert.assertTrue(intervals.get(0).getStop() == 14000);
+//            Assert.assertTrue(intervals.get(1).getStart() == 16001);
+//            Assert.assertTrue(intervals.get(1).getStop() == 22000);
+//            Assert.assertTrue(intervals.get(0).getStart() == 2000);
+//            Assert.assertTrue(intervals.get(0).getStop() == 10000);
+//            Assert.assertTrue(intervals.get(1).getStart() == 12000);
+//            Assert.assertTrue(intervals.get(1).getStop() == 14000);
+//            Assert.assertTrue(intervals.get(2).getStart() == 16000);
+//            Assert.assertTrue(intervals.get(2).getStart() == 20000);
+            
+            //reverse order
+//            Assert.assertTrue(intervals.get(2).getStart() == 2001);
+//            Assert.assertTrue(intervals.get(2).getStop() == 14000);
 //            Assert.assertTrue(intervals.get(1).getStart() == 16001);
 //            Assert.assertTrue(intervals.get(1).getStop() == 22000);
 //            Assert.assertTrue(intervals.get(0).getStart() == 2000);

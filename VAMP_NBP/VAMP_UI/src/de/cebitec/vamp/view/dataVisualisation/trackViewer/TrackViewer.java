@@ -424,7 +424,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 getBoundsInfo().getLogLeft(), 
                 getBoundsInfo().getLogRight(), 
                 totalFrom ,
-                totalTo , this));
+                totalTo , this, false));
     }
 
     @Override
@@ -434,7 +434,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.cov = covResult.getCoverage();
             this.cov.setHighestCoverage(0);
             this.trackInfo.setCoverage(this.cov);
-                   
+
             if (this.cov.isTwoTracks() && !this.combineTracks) {
                 this.createCoveragePathsDiffOfTwoTracks();
             } else {
@@ -739,12 +739,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     /**
      * Method to be called when the vertical zoom level of this track viewer was
      * changed, thus the coverage paths have to be recalculated according to the 
-     * new zoom level. 
+     * new zoom level. A scaleFactor of 1 means a 1:1 translation of coverage to 
+     * pixels. A value smaller than 1 is adjusted to 1.
      * @param value the new vertical zoom slider value
      */
     public void verticalZoomLevelUpdated(int value) {
-        this.scaleFactor = Math.round(Math.pow(value, 2) / 10);
-        this.scaleFactor = (this.scaleFactor < 1 ? 1 : this.scaleFactor);
+        this.scaleFactor = value < 1 ? 1 : value;
  
         if (this.cov != null) {
             if (this.cov.isTwoTracks() && !this.combineTracks) {
@@ -773,6 +773,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * coverage values.
      */
     private void computeScaleStep() {
+        //A scaleFactor of 1 means a 1:1 translation of coverage to pixels.
         int visibleCoverage = (int) (this.getPaintingAreaInfo().getAvailableForwardHeight() * this.scaleFactor);
 
         if (visibleCoverage <= 10) {
@@ -808,17 +809,24 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Automatically detects the most suitable scaling value to fit the coverage
      * to the track viewer.
      * This Method transforms highest coverage to slider value, where the slider 
-     * values range from 1-200.
+     * values range from 1-200. A scaleFactor of 1 means a 1:1 translation of 
+     * coverage to pixels. A larger scaleFactor means, that the coverage is
+     * shrinked to fit the available painting area.
      */
     private void computeAutomaticScaling() {
         if (this.automaticScaling && this.cov != null && this.verticalSlider != null) {
-            
-            this.scaleFactor = Math.round(this.cov.getHighestCoverage() / 140.0) + 1;
+            double oldScaleFactor = this.scaleFactor;
+            double availablePixels = this.getPaintingAreaInfo().getAvailableForwardHeight();
+            this.scaleFactor = Math.ceil(this.cov.getHighestCoverage() / availablePixels);
             this.scaleFactor = this.scaleFactor < 1 ? 1.0 : this.scaleFactor;
-            this.scaleFactor = this.scaleFactor > 140000.0 ? this.verticalSlider.getMaximum() : this.scaleFactor;
+            this.scaleFactor = this.scaleFactor > this.verticalSlider.getMaximum() ? this.verticalSlider.getMaximum() : this.scaleFactor;
 
             //set the inverse of the value set in verticalZoomLevelUpdated
-            this.verticalSlider.setValue((int) Math.round(Math.sqrt(this.scaleFactor * 10)));
+            this.verticalSlider.setValue((int) ((this.scaleFactor)));
+            if (oldScaleFactor != this.scaleFactor) {
+                this.createCoveragePaths();
+                this.repaint();
+            }
         }
     }
 

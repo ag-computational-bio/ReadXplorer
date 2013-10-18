@@ -19,8 +19,8 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     private CoverageIntervalContainer results;
 
-    public CoverageAnalysisResult(CoverageIntervalContainer results, HashMap<Integer, PersistantTrack> trackMap) {
-        super(trackMap);
+    public CoverageAnalysisResult(CoverageIntervalContainer results, HashMap<Integer, PersistantTrack> trackMap, boolean combineTracks) {
+        super(trackMap, combineTracks);
         this.results = results;
     }
 
@@ -119,7 +119,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
     private void fillTableRow(List<CoverageInterval> coverageList, List<List<Object>> coveredFeaturesResultList) {
         for (CoverageInterval interval : coverageList) {
             List<Object> coveredIntervalRow = new ArrayList<>();
-            coveredIntervalRow.add(this.getTrackMap().get(interval.getTrackId()));
+            coveredIntervalRow.add(this.getTrackEntry(interval.getTrackId(), true));
             coveredIntervalRow.add(interval.getStrandString());
             coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStart() : interval.getStop());
             coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStop() : interval.getStart());

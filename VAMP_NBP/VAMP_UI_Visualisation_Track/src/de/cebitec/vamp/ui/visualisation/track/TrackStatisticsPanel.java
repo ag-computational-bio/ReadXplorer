@@ -343,7 +343,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
             public void run() {
                 boolean recalculated = false;
                 boolean recalcSeqPair = false;
-                boolean isSeqPairTrack = trackCon.isSeqPairTrack();
+                boolean isSeqPairTrack = trackCon.isReadPairTrack();
                 
                 seqPairPanel.setVisible(isSeqPairTrack);
                 numSeqPairsLabel.setVisible(isSeqPairTrack);

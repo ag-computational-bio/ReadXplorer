@@ -20,6 +20,7 @@ public class IntervalRequest {
     private byte whichTrackNeeded;
     private byte desiredData;
     private final ParametersReadClasses readClassParams;
+    private boolean diffsAndGapsNeeded;
 
     /**
      * An interval request can be any request for any interval data. It is
@@ -34,6 +35,8 @@ public class IntervalRequest {
      * preloading larger data amounts for faster access.
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in 
+     * the result, false otherwise
      * @param desiredData Can be any byte value representing a filter flag for
      * the results e.g. Properties.READ_STARTS.
      * @param whichTrackNeeded A byte value representing one of the two flags
@@ -45,7 +48,7 @@ public class IntervalRequest {
      * mapped reads shall be used, or all reads.
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
-            byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams) {
+            boolean diffsAndGapsNeeded, byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams) {
         this.from = from;
         this.to = to;
         this.totalFrom = totalFrom;
@@ -54,6 +57,7 @@ public class IntervalRequest {
         this.desiredData = desiredData;
         this.whichTrackNeeded = whichTrackNeeded;
         this.readClassParams = readClassParams;
+        this.diffsAndGapsNeeded = diffsAndGapsNeeded;
     }
     
     /**
@@ -69,14 +73,18 @@ public class IntervalRequest {
      * preloading larger data amounts for faster access.
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      * @param desiredData Can be any byte value representing a filter flag for
      * the results. Can be a byte value representing one of the two flags
      * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
      * double track request or Properties.NORMAL, if this is an ordinary
      * track request.
+     * @param trackNeeded  
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, byte desiredData, byte trackNeeded) {
-        this(from, to, totalFrom, totalTo, sender, desiredData, trackNeeded, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
+            boolean diffsAndGapsNeeded, byte desiredData, byte trackNeeded) {
+        this(from, to, totalFrom, totalTo, sender, diffsAndGapsNeeded, desiredData, trackNeeded, new ParametersReadClasses());
     }
     
     /**
@@ -92,12 +100,15 @@ public class IntervalRequest {
      * preloading larger data amounts for faster access.
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      * @param readClassParams A parameter set which contains all parameters
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads. 
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, ParametersReadClasses readClassParams) {
-        this(from, to, totalFrom, totalTo, sender, Properties.NORMAL, Properties.NORMAL, readClassParams);
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
+            boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams) {
+        this(from, to, totalFrom, totalTo, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -113,9 +124,11 @@ public class IntervalRequest {
      * preloading larger data amounts for faster access.
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender) {
-        this(from, to, totalFrom, totalTo, sender, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, boolean diffsAndGapsNeeded) {
+        this(from, to, totalFrom, totalTo, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
     }    
     
     /**
@@ -127,14 +140,16 @@ public class IntervalRequest {
      * @param to stop position of the coverage request
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      * @param desiredData Can be any byte value representing a filter flag for
      * the results.
      * @param readClassParams A parameter set which contains all parameters
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, byte desiredData, ParametersReadClasses readClassParams) {
-        this(from, to, from, to, sender, desiredData, Properties.NORMAL, readClassParams);
+    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData, ParametersReadClasses readClassParams) {
+        this(from, to, from, to, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -146,11 +161,13 @@ public class IntervalRequest {
      * @param to stop position of the coverage request
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      * @param desiredData Can be any byte value representing a filter flag for
      * the results.
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, byte desiredData) {
-        this(from, to, from, to, sender, desiredData, Properties.NORMAL, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData) {
+        this(from, to, from, to, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, new ParametersReadClasses());
     }
     
     /**
@@ -162,12 +179,14 @@ public class IntervalRequest {
      * @param to stop position of the coverage request
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      * @param readClassParams A parameter set which contains all parameters
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads. 
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, ParametersReadClasses readClassParams) {
-        this(from, to, from, to, sender, Properties.NORMAL, Properties.NORMAL, readClassParams);
+    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams) {
+        this(from, to, from, to, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -179,9 +198,11 @@ public class IntervalRequest {
      * @param to stop position of the coverage request
      * @param sender the sending object, that wants to receive the result of the
      * request
+     * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
+     * the result, false otherwise
      */
-    public IntervalRequest(int from, int to, ThreadListener sender) {
-        this(from, to, from, to, sender, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded) {
+        this(from, to, from, to, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
     }
 
     /**
@@ -246,6 +267,14 @@ public class IntervalRequest {
      */
     public ParametersReadClasses getReadClassParams() {
         return readClassParams;
+    }
+
+    /**
+     * @return true, if diffs and gaps shall be included in the result, false
+     * otherwise
+     */
+    public boolean isDiffsAndGapsNeeded() {
+        return this.diffsAndGapsNeeded;
     }
     
 }

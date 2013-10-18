@@ -1,7 +1,7 @@
 package de.cebitec.vamp.correlationAnalysis;
 
 import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
-import de.cebitec.vamp.databackend.CoverageAndDiffRequest;
+import de.cebitec.vamp.databackend.IntervalRequest;
 import de.cebitec.vamp.databackend.ThreadListener;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
@@ -101,7 +101,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             }
             trackNamesList.put(track.getId(), track);
         }
-        this.analysisResult = new CorrelationResult(this.correlationsList, trackNamesList);
+        this.analysisResult = new CorrelationResult(this.correlationsList, trackNamesList, false);
         HashMap<String,Object> params = new HashMap<>();
         params.put("CorrelationCoefficient", cc);
         params.put("intervalLength", intervalLength);
@@ -209,40 +209,36 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
             //compute correlation
             //TODO: multiple tracks, not only two
-            if (this.currentPosition<maximumCoveredPosition-this.intervalLength) {
-                int to = currentPosition+this.intervalLength;
+            if (this.currentPosition < maximumCoveredPosition - this.intervalLength) {
+                int to = currentPosition + this.intervalLength;
                 double[] x = copyCoverage(this.resultList.get(0), direction, currentPosition, to);
                 double[] y = copyCoverage(this.resultList.get(1), direction, currentPosition, to);
                 double peakCov1 = this.getPeakCoverageFromArray(x);
                 double peakCov2 = this.getPeakCoverageFromArray(y);
-                
-                if ((peakCov1>=this.minPeakCoverage) && 
-                        (peakCov2>=this.minPeakCoverage)) {
-                    
+
+                if ((peakCov1 >= this.minPeakCoverage) && (peakCov2 >= this.minPeakCoverage)) {
+
                     double correlation = 0;
                     if (this.correlationCoefficient.equals(CorrelationCoefficient.PEARSON)) {
                         correlation = new PearsonsCorrelation().correlation(x, y);
-                    }
-                    else if (this.correlationCoefficient.equals(CorrelationCoefficient.SPEARMAN)) {
+                    } else if (this.correlationCoefficient.equals(CorrelationCoefficient.SPEARMAN)) {
                         correlation = new SpearmansCorrelation().correlation(x, y);
                     }
                     double minCorr = ((double) this.minCorrelation) / 100.0;
 
-                    if ((correlation>minCorr) || (correlation<(minCorr*(-1)))) {
-                        this.showMsg("correlation of interval ["+this.currentPosition+"-"+to+"] is "+correlation+" on "+direction );
+                    if ((correlation > minCorr) || (correlation < (minCorr * (-1)))) {
+                        this.showMsg("correlation of interval [" + this.currentPosition + "-" + to + "] is " + correlation + " on " + direction);
                         CorrelatedInterval resultLine = new CorrelatedInterval(direction, this.currentPosition, to, correlation,
                                 Math.min(peakCov1, peakCov2));
                         this.correlationsList.add(resultLine);
                         this.resultView.addData(resultLine);
                     }
-                    
+
+                } else {
+                    this.showMsg("ignore correlation of interval [" + this.currentPosition + "-" + to
+                            + "] is because min coverage is " + peakCov1 + " and " + peakCov2);
                 }
-                else {
-                    this.showMsg("ignore correlation of interval ["+this.currentPosition+"-"+to
-                            +"] is because min coverage is "+peakCov1+" and "+peakCov2 );
-                        
-                }
-                this.currentPosition = to+1;
+                this.currentPosition = to + 1;
             }
         }
         
@@ -250,7 +246,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         if (this.currentPosition<this.rightBound-this.intervalLength) { 
             ph.progress(this.currentPosition);
             if (canceled) { this.finish(); }
-            else {requestNextStep(); }
+            else { requestNextStep(); }
         }
         else {
             
@@ -260,7 +256,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                 this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "REV"));
                 
                 //compute again from the beginning with another strang direction
-                this.currentPosition=1;
+                this.currentPosition = 1;
                 requestNextStep();
             }
             else {
@@ -302,7 +298,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
 
         for (TrackConnector tc : this.trackConnectorList) {
-            tc.addCoverageRequest(new CoverageAndDiffRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, this));
+            tc.addCoverageRequest(new IntervalRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, this, true));
         }
     }
     

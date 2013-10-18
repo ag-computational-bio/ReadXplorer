@@ -14,9 +14,7 @@ import de.cebitec.vamp.util.polyTree.Node;
 import de.cebitec.vamp.util.polyTree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,7 +34,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     private double geneExonLength;
     private double noFeatureReads;
     private final ParameterSetRPKM parametersRPKM;
-    private Map<FeatureType, Integer> featureCountMap;
+//    private Map<FeatureType, Integer> featureCountMap; //can be used, if counts for single feature types are needed
     private int noSelectedFeatures;
     
     public AnalysisRPKM(TrackConnector trackConnector, ParameterSetRPKM parametersRPKM) {
@@ -45,6 +43,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         this.featureReadCount = new HashMap<>();
         this.lastMappingIdx = 0;
         this.parametersRPKM = parametersRPKM;
+        this.genomeFeatures = new ArrayList<>();
         this.initDatastructures();
     }
     
@@ -54,18 +53,19 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         this.refSeqLength = this.trackConnector.getRefSequenceLength();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);  
-        PersistantFeature.Utils.addParentFeatures(genomeFeatures);
+        List<PersistantFeature> allGenomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);  
+        PersistantFeature.Utils.addParentFeatures(allGenomeFeatures);
         
-        this.featureCountMap = this.fillInFeatureTypes();
+//        this.featureCountMap = this.fillInFeatureTypes();
         
-        for (PersistantFeature feature : this.genomeFeatures) {
+        for (PersistantFeature feature : allGenomeFeatures) {
             this.featureReadCount.put(feature.getId(), new RPKMvalue(feature, 0, 0, trackConnector.getTrackID()));
             if (parametersRPKM.getSelFeatureTypes().contains(feature.getType())) {
-                featureCountMap.put(feature.getType(), featureCountMap.get(feature.getType()) + 1);
+                this.genomeFeatures.add(feature);
+//                featureCountMap.put(feature.getType(), featureCountMap.get(feature.getType()) + 1);
             }
         }
-        this.calcNoGenomeFeatures();
+        this.noSelectedFeatures = this.genomeFeatures.size();
     }
     
     @Override
@@ -78,15 +78,12 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished
             this.calculateRPKMvalues();
-//            for (RPKMvalue rpkm : rpkmValues) {
-//                if (rpkm.getRPKM() != 0) {
-//                System.out.println("Feature: " + rpkm.getFeature().getFeatureName());
-//                System.out.println("RPKM: " + rpkm.getRPKM());
-//                }
-//            }
         }
     }
 
+    /**
+     * @return The list of RPKM values for all selected feature types.
+     */
     @Override
     public List<RPKMvalue> getResults() {
         return this.rpkmValues;
@@ -229,29 +226,29 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         });
     }
 
-    /**
-     * @return Creates a mapping of each feature type to an integer.
-     */
-    private Map<FeatureType, Integer> fillInFeatureTypes() {
-        Map<FeatureType, Integer> featureTypeMap = new HashMap<>();
-        FeatureType[] allFeatTypes = FeatureType.values();
-        for (int i = 0; i < allFeatTypes.length; ++i) {
-            featureTypeMap.put(allFeatTypes[i], 0);
-        }
-        return featureTypeMap;
-    }
-    
-    /**
-     * Calculates the number of selected genome features of the analyzed reference
-     * genome.
-     */
-    public void calcNoGenomeFeatures() {        
-        Iterator<FeatureType> featIt = this.featureCountMap.keySet().iterator();
-        this.noSelectedFeatures = 0;
-        while (featIt.hasNext()) {
-            this.noSelectedFeatures += this.featureCountMap.get(featIt.next());
-        }
-    }
+//    /**
+//     * @return Creates a mapping of each feature type to an integer.
+//     */
+//    private Map<FeatureType, Integer> fillInFeatureTypes() {
+//        Map<FeatureType, Integer> featureTypeMap = new HashMap<>();
+//        FeatureType[] allFeatTypes = FeatureType.values();
+//        for (int i = 0; i < allFeatTypes.length; ++i) {
+//            featureTypeMap.put(allFeatTypes[i], 0);
+//        }
+//        return featureTypeMap;
+//    }
+//    
+//    /**
+//     * Calculates the number of selected genome features of the analyzed reference
+//     * genome.
+//     */
+//    public void calcNoGenomeFeatures() {        
+//        Iterator<FeatureType> featIt = this.featureCountMap.keySet().iterator();
+//        this.noSelectedFeatures = 0;
+//        while (featIt.hasNext()) {
+//            this.noSelectedFeatures += this.featureCountMap.get(featIt.next());
+//        }
+//    }
     
     /**
      * @return the number of selected genome features of the analyzed reference
