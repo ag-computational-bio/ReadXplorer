@@ -4,9 +4,11 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
+import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbPreferences;
 
 public class LeaderlessDetectionPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
@@ -15,6 +17,12 @@ public class LeaderlessDetectionPanel implements WizardDescriptor.Panel<WizardDe
      * component from this class, just use getComponent().
      */
     private LeaderlessDetectionParamsVisualPanel component;
+    private final String wizardName;
+
+    public LeaderlessDetectionPanel(String wizardName) {
+        this.wizardName = wizardName;
+    }
+    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -23,7 +31,7 @@ public class LeaderlessDetectionPanel implements WizardDescriptor.Panel<WizardDe
     @Override
     public LeaderlessDetectionParamsVisualPanel getComponent() {
         if (component == null) {
-            component = new LeaderlessDetectionParamsVisualPanel();
+            component = new LeaderlessDetectionParamsVisualPanel(this.wizardName);
         }
         return component;
     }
@@ -62,5 +70,14 @@ public class LeaderlessDetectionPanel implements WizardDescriptor.Panel<WizardDe
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, component.getLimitationOfLeaderless());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_CDSSHIFT, component.isCDSShiftChoosen());
+        storePrefs();
+    }
+    
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_CDSSHIFT, component.isCDSShiftChoosen());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, component.getLimitationOfLeaderless().toString());
     }
 }

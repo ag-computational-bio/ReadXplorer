@@ -16,15 +16,15 @@
 //        
 //    }
 //    
-//    
-//    
-//     private void runningNewRegionsDetection(int refSeqLength, HashMap<Integer, 
+//     private void runningNewRegionsDetection(int length, HashMap<Integer, 
 //             List<Integer>> forwardCDSs, HashMap<Integer, List<Integer>> reverseCDSs, 
 //             HashMap<Integer, PersistantFeature> allRegionsInHash, int[] fwdCoverage, 
-//             int[] revCoverage, int i, int[] forward, int[] reverse, int ratio, 
-//             int mm, boolean opt_T, int bg, int up, int down) {
-//        
-//        int length = refSeqLength;
+//             int[] revCoverage, int[] forward, int[] reverse, int ratio, 
+//             int mm, int bg, int up, int down) {
+//         
+//         for (int i = 0; i < length; i++) {
+//             
+//         
 //        int fwdcount = forward[i];
 ////    # for the reverse side, we have to come "from the right"
 ////    # to avoid code duplication, @reverse is searched backwards
@@ -138,8 +138,8 @@
 //			    if ($cds_forward[$start][0] || $cds_forward[$pos][0]) {
 //                                site = "cis-antisense";
 //                            }
-//			    unless ($new_regs{rev}{$flag} > 1) {
-//                            push(@{$new_regs{out}{$start}}, "$pos\t-\t$rev\t$site") ;
+//			    unless ($new_regs{rev}{flag} > 1) {
+//                            push(@{$new_regs{out}{start}}, "$pos\t-\t$rev\t$site") ;
 //                        }
 //			}
 //		    }
@@ -166,4 +166,5 @@
 //	}
 //    }
 //     }
-////}
+//}
+//}

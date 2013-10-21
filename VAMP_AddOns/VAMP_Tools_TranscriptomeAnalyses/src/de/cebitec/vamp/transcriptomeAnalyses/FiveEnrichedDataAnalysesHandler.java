@@ -10,6 +10,7 @@ import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.transcriptomeAnalyses.datastructure.TranscriptionStart;
 import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Pair;
@@ -29,7 +30,7 @@ import org.openide.util.Exceptions;
  *
  * @author jritter
  */
-public class FifeEnrichedDataAnalysesHandler extends Thread implements Observable, DataVisualisationI {
+public class FiveEnrichedDataAnalysesHandler extends Thread implements Observable, DataVisualisationI {
 
     private TrackConnector trackConnector;
     private PersistantTrack selectedTrack;
@@ -41,26 +42,26 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private Statistics stats;
     private double backgroundCutoff;
-    private ParameterSetFiveEnrichedAnalyses paramerters;
+    private ParameterSetFiveEnrichedAnalyses parameters;
     private GenomeFeatureParser featureParser;
     private TssDetection tssDetection;
     private OperonDetection operonDetection;
-     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
-     private final ReferenceViewer refViewer;
-     private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
-     private HashMap<Integer, PersistantTrack> trackMap;
+    private ResultPanelTranscriptionStart transcriptionStartResultPanel;
+    private final ReferenceViewer refViewer;
+    private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
+    private HashMap<Integer, PersistantTrack> trackMap;
     /**
      * Key: featureID , Value: PersistantFeature
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
 
-    public FifeEnrichedDataAnalysesHandler(GenomeFeatureParser featureParser, PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public FiveEnrichedDataAnalysesHandler(GenomeFeatureParser featureParser, PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
 
         this.featureParser = featureParser;
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refGenomeID;
         this.fraction = parameterset.getFraction();
-        this.paramerters = parameterset;
+        this.parameters = parameterset;
         this.refViewer = refViewer;
         this.transcAnalysesTopComp = transcAnalysesTopComp;
         this.trackMap = trackMap;
@@ -77,7 +78,7 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
 
         // geting Mappings and calculate statistics on mappings.
         try {
-            trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
+            this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
             this.stats = new Statistics(featureParser.getRefSeqLength(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             de.cebitec.vamp.databackend.AnalysesHandler handler = new de.cebitec.vamp.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                     + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
@@ -133,63 +134,64 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
 
     @Override
     public void showData(Object data) {
+        Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
+        final int trackId = dataTypePair.getFirst();
+        final String dataType = dataTypePair.getSecond();
+
         this.mappings = this.stats.getMappings();
         this.stats.parseMappings(this.mappings);
-        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.paramerters.getFraction(), this.featureParser.getRefSeqLength());
+        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction(), this.featureParser.getRefSeqLength());
+        this.stats.setBg(this.backgroundCutoff);
 
         System.out.println("BackgroundCutoff: " + backgroundCutoff);
 
         this.stats.initMappingsStatistics();
-        if (paramerters.isPerformTSSAnalysis()) {
-            tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence());
+        if (parameters.isPerformTSSAnalysis()) {
+            tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence(), trackId);
             tssDetection.runningTSSDetection(this.featureParser.getRefSeqLength(), this.forwardCDSs, this.reverseCDSs,
-                    this.allRegionsInHash, this.stats.getForward(), this.stats.getReverse(), this.stats.getFwdCoverage(), this.stats.getRevCoverage(),
-                    this.paramerters.getRatio(), this.stats.getMm(), this.backgroundCutoff, this.paramerters.getUpstreamRegion(), this.paramerters.getDownstreamRegion());
+                    this.allRegionsInHash, this.stats, this.parameters);
         }
 
-
-
-        if (paramerters.isPerformLeaderlessAnalysis()) {
-            // TODO Not yet implemented
-        }
-        if (paramerters.isPerformAntisenseAnalysis()) {
-            // Not yet implemented
+        if (parameters.isPerformAntisenseAnalysis()) {
+            List<TranscriptionStart> tssList = this.tssDetection.getResults();
+            for (TranscriptionStart transcriptionStart : tssList) {
+                
+            }
         }
 
 
         notifyObservers(AnalysisStatus.FINISHED);
 
-        System.out.println("We are in Show data of StartTranscriptomeAnalysesAction!");
-        try {
-            @SuppressWarnings("unchecked")
-            Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
-            final int trackId = dataTypePair.getFirst();
-            final String dataType = dataTypePair.getSecond();
+//        try {
+//            @SuppressWarnings("unchecked")
+//            Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
+//            final int trackId = dataTypePair.getFirst();
+//            final String dataType = dataTypePair.getSecond();
 
-            SwingUtilities.invokeLater(new Runnable() { 
-                private Statistics stats = this.stats;
+//            SwingUtilities.invokeLater(new Runnable() { 
+//                private Statistics stats = this.stats;
 //because it is not called from the swing dispatch thread
-                @Override
-                public void run() {
+//                @Override
+//                public void run() {
 
-                    //get track name(s) for tab descriptions
-                    String trackNames;
-                    
-                    if (paramerters.isPerformTSSAnalysis()) {
+        //get track name(s) for tab descriptions
+        String trackNames;
 
-                        TssDetection analysisTSS = getTssDetection();
-                        if (transcriptionStartResultPanel == null) {
-                            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-                            transcriptionStartResultPanel.setReferenceViewer(refViewer);
-                        }
-                        
-                        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, analysisTSS.getResults(), getTrackMap());
-                        transcriptionStartResultPanel.addResult(tssResult);
+        if (parameters.isPerformTSSAnalysis()) {
 
-                            trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-                            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
-                            transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
-                    }
+            TssDetection analysisTSS = getTssDetection();
+            if (transcriptionStartResultPanel == null) {
+                transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
+                transcriptionStartResultPanel.setReferenceViewer(refViewer);
+            }
+
+            TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, analysisTSS.getResults(), getTrackMap());
+            transcriptionStartResultPanel.addResult(tssResult);
+
+            trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
+            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
+            transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
+        }
 //                    if (dataType.equals(AnalysesHandler.DATA_TYPE_MAPPINGS)) {
 //                        ++finishedMappingAnalyses;
 //
@@ -230,12 +232,12 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
 //                            }
 //                        }
 //                    }
-                }
-            });
-        } catch (ClassCastException e) {
-            //do nothing, we dont handle other data in this class
-        }
-     
+//                }
+//            });
+//        } catch (ClassCastException e) {
+//            //do nothing, we dont handle other data in this class
+//        }
+
     }
 
     public HashMap<Integer, List<Integer>> getForwardCDSs() {
@@ -261,6 +263,4 @@ public class FifeEnrichedDataAnalysesHandler extends Thread implements Observabl
     public HashMap<Integer, PersistantTrack> getTrackMap() {
         return trackMap;
     }
-    
-    
 }

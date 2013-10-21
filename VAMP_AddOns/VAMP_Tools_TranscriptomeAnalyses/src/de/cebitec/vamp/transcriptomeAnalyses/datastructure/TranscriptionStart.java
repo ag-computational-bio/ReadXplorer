@@ -24,6 +24,7 @@ public class TranscriptionStart extends TrackResultEntry {
     private String sequence;
     private int[] beforeCounts;
     private boolean leaderless, cdsShift, putativeUnannotated;
+    String detectedFeatStart, detectedFeatStop;
 
     /**
      * Data structure for storing a gene start.
@@ -63,7 +64,7 @@ public class TranscriptionStart extends TrackResultEntry {
      * @param sequence
      * @param trackId
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, int trackId) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, String detectedFeatStart, String detectedFeatStop, int trackId) {
         super(trackId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
@@ -80,6 +81,8 @@ public class TranscriptionStart extends TrackResultEntry {
         this.leaderless = leaderless;
         this.cdsShift = cdsShift;
         this.putativeUnannotated = putativeUnannotated;
+        this.detectedFeatStart = detectedFeatStart;
+        this.detectedFeatStop = detectedFeatStop;
     }
 
     public int[] getBeforeCounts() {
@@ -192,6 +195,16 @@ public class TranscriptionStart extends TrackResultEntry {
     public void setSequence(String sequence) {
         this.sequence = sequence;
     }
+
+    public String getDetectedFeatStart() {
+        return detectedFeatStart;
+    }
+
+    public String getDetectedFeatStop() {
+        return detectedFeatStop;
+    }
+    
+    
 
     @Override
     public String toString() {

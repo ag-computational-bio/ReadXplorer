@@ -5,6 +5,7 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses;
 
+import com.sun.media.sound.ModelAbstractChannelMixer;
 import de.cebitec.vamp.databackend.ResultTrackAnalysis;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
@@ -20,6 +21,8 @@ import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -35,7 +39,7 @@ import javax.swing.table.TableRowSorter;
 /**
  * This panel is capable of showing a table with transcription start sites and
  * contains an export button, which exports the data into an excel file.
- * Additionally it has now an import button, which imports an excel file and 
+ * Additionally it has now an import button, which imports an excel file and
  * visualize the data to a JPanel.
  *
  * @author -Rolf Hilker-, -jritter-
@@ -102,23 +106,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         tssScrollPane = new javax.swing.JScrollPane();
         tSSTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
-        parametersLabel = new javax.swing.JLabel();
         statisticsButton = new javax.swing.JButton();
         importButton = new javax.swing.JButton();
+        backGroundThresholdLabel = new javax.swing.JLabel();
+        MappingsPerMillionLabel = new javax.swing.JLabel();
+        mappingMeanLengthLabel = new javax.swing.JLabel();
+        mappingCoverageLabel = new javax.swing.JLabel();
 
         tSSTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Position", "Direction", "Count", "Rel. count", "-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "Gene", "offset", "dist2start", "dist2stop", "Next Gene", "Next offste", "Sequence", "Leaderless"
+                "Position", "Direction", "Count", "Rel. count", "-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "Gene", "offset", "dist2start", "dist2stop", "Next Gene", "Next offste", "Sequence", "Leaderless", "gene start", "gene stop", "length in bp", "Frame", "gene product", "start codon sequence", "stop codon sequence", "track IDl"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, true, false, false, false, false, false, true, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -127,6 +134,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tSSTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tSSTableMouseClicked(evt);
             }
         });
         tssScrollPane.setViewportView(tSSTable);
@@ -152,6 +164,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         tSSTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title19")); // NOI18N
         tSSTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title20")); // NOI18N
         tSSTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title21")); // NOI18N
+        tSSTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title22")); // NOI18N
+        tSSTable.getColumnModel().getColumn(23).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23")); // NOI18N
+        tSSTable.getColumnModel().getColumn(24).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title24")); // NOI18N
+        tSSTable.getColumnModel().getColumn(25).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title25")); // NOI18N
+        tSSTable.getColumnModel().getColumn(26).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title26")); // NOI18N
+        tSSTable.getColumnModel().getColumn(27).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title27")); // NOI18N
+        tSSTable.getColumnModel().getColumn(28).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title28")); // NOI18N
+        tSSTable.getColumnModel().getColumn(29).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title29_1")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -159,8 +179,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 exportButtonActionPerformed(evt);
             }
         });
-
-        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.parametersLabel.text")); // NOI18N
 
         statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.statisticsButton.text")); // NOI18N
         statisticsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -176,19 +194,33 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
             }
         });
 
+        backGroundThresholdLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.backGroundThresholdLabel.text")); // NOI18N
+
+        MappingsPerMillionLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.MappingsPerMillionLabel.text")); // NOI18N
+
+        mappingMeanLengthLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.mappingMeanLengthLabel.text")); // NOI18N
+
+        mappingCoverageLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.mappingCoverageLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 522, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(backGroundThresholdLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(MappingsPerMillionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(mappingMeanLengthLabel)
+                .addGap(18, 18, 18)
+                .addComponent(mappingCoverageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(importButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(exportButton))
-            .addComponent(tssScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 888, Short.MAX_VALUE)
+            .addComponent(tssScrollPane)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,9 +229,12 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exportButton)
-                    .addComponent(parametersLabel)
                     .addComponent(statisticsButton)
-                    .addComponent(importButton)))
+                    .addComponent(importButton)
+                    .addComponent(backGroundThresholdLabel)
+                    .addComponent(MappingsPerMillionLabel)
+                    .addComponent(mappingMeanLengthLabel)
+                    .addComponent(mappingCoverageLabel)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -241,15 +276,25 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_importButtonActionPerformed
 
+    private void tSSTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tSSTableMouseClicked
+        // TODO add your handling code here:
+        
+        if(evt.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+            
+        }
+    }//GEN-LAST:event_tSSTableMouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel MappingsPerMillionLabel;
+    private javax.swing.JLabel backGroundThresholdLabel;
     private javax.swing.JButton exportButton;
     private javax.swing.JButton importButton;
-    private javax.swing.JLabel parametersLabel;
+    private javax.swing.JLabel mappingCoverageLabel;
+    private javax.swing.JLabel mappingMeanLengthLabel;
     private javax.swing.JButton statisticsButton;
     private javax.swing.JTable tSSTable;
     private javax.swing.JScrollPane tssScrollPane;
     // End of variables declaration//GEN-END:variables
-
 
     /**
      * Set the reference viewer needed for updating the currently shown position
@@ -276,64 +321,62 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
             final TSSDetectionResults tssResultNew = (TSSDetectionResults) newResult;
             final List<TranscriptionStart> tsss = new ArrayList<>(tssResultNew.getResults());
 
+//            this.parametersLabel.setText("calculated background threshold: "+tssResultNew.getStats().getBg());
             if (tssResult == null) {
                 tssResult = tssResultNew;
             } else {
                 tssResult.getResults().addAll(tssResultNew.getResults());
             }
-            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
-                @Override
-                public void run() {
 
-                    final int nbColumns = 22;
+            final int nbColumns = 30;
 
-                    int noCorrectStarts = 0;
-                    int noUpstreamFeature = 0;
-                    int noFwdFeatures = 0;
-                    int noRevFeatures = 0;
-                    int noUnannotatedTranscripts = 0;
+            int noCorrectStarts = 0;
+            int noUpstreamFeature = 0;
+            int noFwdFeatures = 0;
+            int noRevFeatures = 0;
+            int noUnannotatedTranscripts = 0;
 
-                    DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
-                    String strand;
+            final DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
+            String strand;
 //                    DetectedFeatures detFeatures;
-                    PersistantFeature feature;
+            PersistantFeature feature;
 //                    TransStartUnannotated tSSU;
 
-                    for (TranscriptionStart tSS : tsss) {
+            for (TranscriptionStart tSS : tsss) {
 
-                        if (tSS.isFwdStrand()) {
-                            strand = SequenceUtils.STRAND_FWD_STRING;
-                            ++noFwdFeatures;
-                        } else {
-                            strand = SequenceUtils.STRAND_REV_STRING;
-                            ++noRevFeatures;
-                        }
+                if (tSS.isFwdStrand()) {
+                    strand = SequenceUtils.STRAND_FWD_STRING;
+                    ++noFwdFeatures;
+                } else {
+                    strand = SequenceUtils.STRAND_REV_STRING;
+                    ++noRevFeatures;
+                }
 
-                        Object[] rowData = new Object[nbColumns];
-                        rowData[0] = tSS.getPos();
+                final Object[] rowData = new Object[nbColumns];
+                rowData[0] = tSS.getPos();
 //                        rowData[1] = tSS.getTrackId();
-                        rowData[1] = strand;
-                        rowData[2] = tSS.getReadStarts();
-                        rowData[3] = tSS.getRelCount();
-                        rowData[4] = tSS.getBeforeCounts()[9];
-                        rowData[5] = tSS.getBeforeCounts()[8];
-                        rowData[6] = tSS.getBeforeCounts()[7];
-                        rowData[7] = tSS.getBeforeCounts()[6];
-                        rowData[8] = tSS.getBeforeCounts()[5];
-                        rowData[9] = tSS.getBeforeCounts()[4];
-                        rowData[10] = tSS.getBeforeCounts()[3];
-                        rowData[11] = tSS.getBeforeCounts()[2];
-                        rowData[12] = tSS.getBeforeCounts()[1];
-                        rowData[13] = tSS.getBeforeCounts()[0];
+                rowData[1] = strand;
+                rowData[2] = tSS.getReadStarts();
+                rowData[3] = tSS.getRelCount();
+                rowData[4] = tSS.getBeforeCounts()[9];
+                rowData[5] = tSS.getBeforeCounts()[8];
+                rowData[6] = tSS.getBeforeCounts()[7];
+                rowData[7] = tSS.getBeforeCounts()[6];
+                rowData[8] = tSS.getBeforeCounts()[5];
+                rowData[9] = tSS.getBeforeCounts()[4];
+                rowData[10] = tSS.getBeforeCounts()[3];
+                rowData[11] = tSS.getBeforeCounts()[2];
+                rowData[12] = tSS.getBeforeCounts()[1];
+                rowData[13] = tSS.getBeforeCounts()[0];
 
-                        feature = tSS.getDetectedGene();
+                feature = tSS.getDetectedGene();
 //                        feature = detFeatures.getCorrectStartFeature();
-                        if (feature != null) {
-                            rowData[14] = feature.toString();
-                            ++noCorrectStarts;
-                        } else {
-                            rowData[14] = "-";
-                        }
+                if (feature != null) {
+                    rowData[14] = feature.toString();
+                    ++noCorrectStarts;
+                } else {
+                    rowData[14] = "-";
+                }
 //                        feature = tss.;
 //                        if (feature != null) {
 //                            rowData[8] = feature.toString();
@@ -349,45 +392,91 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 //                            ++noUnannotatedTranscripts;
 //                        } else {
 //                        }
-                        
-                        rowData[15] = tSS.getOffset();
-                        rowData[16] = tSS.getDist2start();
-                        rowData[17] = tSS.getDist2stop();
-                        if(tSS.getNextGene() != null) {
-                        rowData[18] = tSS.getNextGene().toString();
-                        } else {
-                            rowData[18] = "-";
-                        }
-                        rowData[19] = tSS.getNextOffset();
-                        rowData[20] = tSS.getSequence();
-                        rowData[21] = tSS.isLeaderless();
+
+                rowData[15] = tSS.getOffset();
+                rowData[16] = tSS.getDist2start();
+                rowData[17] = tSS.getDist2stop();
+                if (tSS.getNextGene() != null) {
+                    rowData[18] = tSS.getNextGene().toString();
+                } else {
+                    rowData[18] = "-";
+                }
+                rowData[19] = tSS.getNextOffset();
+                rowData[20] = tSS.getSequence();
+
+                rowData[21] = tSS.isLeaderless();
+
+                // additionally informations about detected gene
+                if (feature != null) {
+                    rowData[22] = feature.getStart();
+                    rowData[23] = feature.getStop();
+                    rowData[24] = feature.getStop() - feature.getStart();
+                    rowData[25] = feature.getFrame();
+                    rowData[26] = feature.getProduct();
+                } else {
+                    rowData[22] = tSS.getNextGene().getStart();
+                    rowData[23] = tSS.getNextGene().getStop();
+                    rowData[24] = tSS.getNextGene().getStop() - tSS.getNextGene().getStart();
+                    rowData[25] = tSS.getNextGene().getFrame();
+                    rowData[26] = tSS.getNextGene().getProduct();
+                }
+
+                rowData[27] = tSS.getDetectedFeatStart();
+                rowData[28] = tSS.getDetectedFeatStop();
+                rowData[29] = tSS.getTrackId();
+                SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                    @Override
+                    public void run() {
                         model.addRow(rowData);
                     }
+                });
+            }
 
-                    //create statistics
-
-                    ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
-                    statisticsMap.put(TSS_TOTAL, statisticsMap.get(TSS_TOTAL) + tsss.size());
-                    statisticsMap.put(TSS_CORRECT, statisticsMap.get(TSS_CORRECT) + noCorrectStarts);
-                    statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_FWD) + noFwdFeatures);
-                    statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
-//                    statisticsMap.put(MAPPINGS_COUNT, (Integer) (statisticsMap.get(MAPPINGS_COUNT) + tssResultNew.getStats().getMc()));
+           
+            model.addTableModelListener(new javax.swing.event.TableModelListener() {
+                @Override
+                public void tableChanged(TableModelEvent e) {
+                    e.getType();
                     
-                    tssResultNew.setStatsMap(statisticsMap);
+                    model.fireTableRowsDeleted(tSSTable.getSelectedRow(), tSSTable.getSelectedColumn());
+                }
+            });
 
-                    TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-                    tSSTable.setRowSorter(sorter);
-                    sorter.setModel(model);
-                    TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+            //create statistics
 
+            ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
+            statisticsMap.put(TSS_TOTAL, statisticsMap.get(TSS_TOTAL) + tsss.size());
+            statisticsMap.put(TSS_CORRECT, statisticsMap.get(TSS_CORRECT) + noCorrectStarts);
+            statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_FWD) + noFwdFeatures);
+            statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
+//                    statisticsMap.put(MAPPINGS_COUNT, (Integer) (statisticsMap.get(MAPPINGS_COUNT) + tssResultNew.getStats().getMc()));
+
+            tssResultNew.setStatsMap(statisticsMap);
+
+            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+            tSSTable.setRowSorter(sorter);
+            sorter.setModel(model);
+            TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+
+            setStatisticLabels(tssResult.getStats());
 //                    String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
 //                    parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
 //                            "ResultPanelTranscriptionStart.parametersLabel.text", tssParameters.getMinNoReadStarts(), tssParameters.getMinPercentIncrease(),
 //                            tssParameters.getMaxLowCovReadStarts(), tssParameters.getMinLowCovReadStarts(), unannotatedTranscriptDet,
 //                            tssParameters.getMinTranscriptExtensionCov()));
 
-                }
-            });
+
         }
+    }
+
+    /**
+     *
+     * @param statistics
+     */
+    private void setStatisticLabels(final Statistics statistics) {
+        this.MappingsPerMillionLabel.setText("Mappins per Million Reads: " + statistics.getMm());
+        this.backGroundThresholdLabel.setText("Background Threshold: " + statistics.getBg());
+        this.mappingMeanLengthLabel.setText("Mean mapping length: " + statistics.getMml());
+        this.mappingCoverageLabel.setText("Mappins coverage: " + statistics.getMc());
     }
 }

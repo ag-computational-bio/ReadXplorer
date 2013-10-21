@@ -17,13 +17,13 @@ import java.util.Map;
  *
  * @author jritter
  */
-public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnrichedAnalyses>{ 
+public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnrichedAnalyses> {
 
     private List<TranscriptionStart> results;
     private Statistics stats;
-    
+
     public TSSDetectionResults(Statistics stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap) {
-        super(trackMap);
+        super(trackMap,false);
         this.results = results;
         this.stats = stats;
     }
@@ -40,9 +40,9 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     public List<List<String>> dataColumnDescriptions() {
         List<List<String>> allSheetDescriptions = new ArrayList<>();
         List<String> dataColumnDescriptions = new ArrayList<>();
-        
+
         dataColumnDescriptions.add("Position");
-        dataColumnDescriptions.add("Cunt");
+        dataColumnDescriptions.add("Count");
         dataColumnDescriptions.add("Rel. count");
         dataColumnDescriptions.add("-10");
         dataColumnDescriptions.add("-9");
@@ -62,7 +62,16 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         dataColumnDescriptions.add("Next offset");
         dataColumnDescriptions.add("Sequence");
         dataColumnDescriptions.add("Strand");
-        
+        dataColumnDescriptions.add("Leaderless");
+        dataColumnDescriptions.add("Gene start");
+        dataColumnDescriptions.add("Gene stop");
+        dataColumnDescriptions.add("Gene length in bp");
+        dataColumnDescriptions.add("Frame");
+        dataColumnDescriptions.add("Gene product");
+        dataColumnDescriptions.add("Start codon");
+        dataColumnDescriptions.add("Stop codon");
+        dataColumnDescriptions.add("Track ID");
+
         allSheetDescriptions.add(dataColumnDescriptions);
 
         //add tss detection statistic sheet header
@@ -70,7 +79,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         statisticColumnDescriptions.add("Transcription Start Site Detection Parameter and Statistics Table");
 
         allSheetDescriptions.add(statisticColumnDescriptions);
-        
+
         return allSheetDescriptions;
     }
 
@@ -78,20 +87,18 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> tSSExport = new ArrayList<>();
         List<List<Object>> tSSResults = new ArrayList<>();
-        
-        for (int i = 0; i < results.size(); ++i) {      
+
+        for (int i = 0; i < results.size(); ++i) {
             TranscriptionStart tss = results.get(i);
             List<Object> tssRow = new ArrayList<>();
-            
-//            tssRow.add(this.getTrackMap().get(tss.getTrackId()));
-            
+
             tssRow.add(tss.getPos());
             tssRow.add(tss.getReadStarts());
             tssRow.add(tss.getRelCount());
-                for (int c : tss.getBeforeCounts()) {
-                    tssRow.add((Integer) c);
-                }
-            
+            for (int c : tss.getBeforeCounts()) {
+                tssRow.add((Integer) c);
+            }
+
             tssRow.add(tss.getDetectedGene());
             tssRow.add(tss.getOffset());
             tssRow.add(tss.getDist2start());
@@ -99,32 +106,41 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             tssRow.add(tss.getNextGene());
             tssRow.add(tss.getNextOffset());
             tssRow.add(tss.getSequence());
-            
-//            if (tss instanceof TransStartUnannotated) {
-//                TransStartUnannotated unannoStart = (TransStartUnannotated) tss;
-//                tssRow.add("yes");
-//                tssRow.add(unannoStart.getDetectedStop());
-//            } else {
-//                tssRow.add("-");
-//                tssRow.add("-");
-//            }
-           
-//            tssRow.add(promotorRegions.get(i));
             tssRow.add(tss.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
+            tssRow.add(tss.isLeaderless());
+
+            // additionally informations about detected gene
+            if (tss.getDetectedGene() != null) {
+                tssRow.add(tss.getDetectedGene().getStart());
+                tssRow.add(tss.getDetectedGene().getStop());
+                tssRow.add(tss.getDetectedGene().getStop() - tss.getDetectedGene().getStart());
+                tssRow.add(tss.getDetectedGene().getFrame());
+                tssRow.add(tss.getDetectedGene().getProduct());
+            } else {
+                tssRow.add(tss.getNextGene().getStart());
+                tssRow.add(tss.getNextGene().getStop());
+                tssRow.add(tss.getNextGene().getStop() - tss.getNextGene().getStart());
+                tssRow.add(tss.getNextGene().getFrame());
+                tssRow.add(tss.getNextGene().getProduct());
+            }
+
+            tssRow.add(tss.getDetectedFeatStart());
+            tssRow.add(tss.getDetectedFeatStop());
+            tssRow.add(tss.getTrackId());
             tSSResults.add(tssRow);
         }
-        
+
         tSSExport.add(tSSResults);
-        
-        
+
+
         //create statistics sheet
         ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
-                "Transcription start site detection statistics for tracks:", 
+                "Transcription start site detection statistics for tracks:",
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
-        
+
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Transcription start site detection parameters:"));
@@ -140,21 +156,21 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
 //                tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no"));
 //        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum transcript extension coverage:", 
 //                tssParameters.getMinTranscriptExtensionCov()));
-        
+
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Transcription start site statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_TOTAL, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_TOTAL,
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_TOTAL)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CORRECT, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CORRECT,
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_CORRECT)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FWD, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FWD,
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_FWD)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_REV, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_REV,
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_REV)));
-        
+
         tSSExport.add(statisticsExportData);
-        
+
         return tSSExport;
     }
 
@@ -169,7 +185,4 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     public Statistics getStats() {
         return stats;
     }
-    
-    
-    
 }

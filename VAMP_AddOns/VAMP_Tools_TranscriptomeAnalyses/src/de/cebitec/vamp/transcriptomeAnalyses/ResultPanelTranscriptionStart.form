@@ -17,15 +17,21 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Component id="parametersLabel" min="-2" pref="522" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="backGroundThresholdLabel" pref="122" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="MappingsPerMillionLabel" min="-2" pref="155" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="mappingMeanLengthLabel" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="mappingCoverageLabel" min="-2" pref="151" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="statisticsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="importButton" min="-2" pref="77" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="tssScrollPane" pref="888" max="32767" attributes="0"/>
+          <Component id="tssScrollPane" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -35,9 +41,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="exportButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="parametersLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="statisticsButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="importButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="backGroundThresholdLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="MappingsPerMillionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="mappingMeanLengthLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="mappingCoverageLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -54,7 +63,7 @@
         <Component class="javax.swing.JTable" name="tSSTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="22" rowCount="0">
+              <Table columnCount="30" rowCount="0">
                 <Column editable="false" title="Position" type="java.lang.Integer"/>
                 <Column editable="false" title="Direction" type="java.lang.String"/>
                 <Column editable="false" title="Count" type="java.lang.Integer"/>
@@ -70,13 +79,21 @@
                 <Column editable="false" title="-2" type="java.lang.Integer"/>
                 <Column editable="false" title="-1" type="java.lang.Integer"/>
                 <Column editable="true" title="Gene" type="java.lang.String"/>
-                <Column editable="true" title="offset" type="java.lang.Integer"/>
-                <Column editable="true" title="dist2start" type="java.lang.Integer"/>
-                <Column editable="true" title="dist2stop" type="java.lang.Integer"/>
-                <Column editable="true" title="Next Gene" type="java.lang.String"/>
-                <Column editable="true" title="Next offste" type="java.lang.Integer"/>
-                <Column editable="true" title="Sequence" type="java.lang.String"/>
+                <Column editable="false" title="offset" type="java.lang.Integer"/>
+                <Column editable="false" title="dist2start" type="java.lang.Integer"/>
+                <Column editable="false" title="dist2stop" type="java.lang.Integer"/>
+                <Column editable="false" title="Next Gene" type="java.lang.String"/>
+                <Column editable="false" title="Next offste" type="java.lang.Integer"/>
+                <Column editable="false" title="Sequence" type="java.lang.String"/>
                 <Column editable="true" title="Leaderless" type="java.lang.Boolean"/>
+                <Column editable="false" title="gene start" type="java.lang.Integer"/>
+                <Column editable="false" title="gene stop" type="java.lang.Integer"/>
+                <Column editable="false" title="length in bp" type="java.lang.Integer"/>
+                <Column editable="false" title="Frame" type="java.lang.Integer"/>
+                <Column editable="false" title="gene product" type="java.lang.String"/>
+                <Column editable="true" title="start codon sequence" type="java.lang.String"/>
+                <Column editable="true" title="stop codon sequence" type="java.lang.String"/>
+                <Column editable="true" title="track IDl" type="java.lang.Integer"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -235,12 +252,71 @@
                   <Editor/>
                   <Renderer/>
                 </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title22" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title23" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title24" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title25" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title26" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title27" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title28" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title29_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
               </TableColumnModel>
             </Property>
             <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tSSTableMouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -253,13 +329,6 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportButtonActionPerformed"/>
       </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="parametersLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.parametersLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="statisticsButton">
       <Properties>
@@ -280,6 +349,34 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="importButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="backGroundThresholdLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.backGroundThresholdLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="MappingsPerMillionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.MappingsPerMillionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="mappingMeanLengthLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.mappingMeanLengthLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="mappingCoverageLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelTranscriptionStart.mappingCoverageLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

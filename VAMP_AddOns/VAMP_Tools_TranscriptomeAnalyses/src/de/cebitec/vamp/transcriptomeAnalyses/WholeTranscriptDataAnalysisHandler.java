@@ -40,7 +40,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private Statistics stats;
     private double backgroundCutoff;
-    private ParameterSetFiveEnrichedAnalyses paramerters;
+    private ParameterSetWholeTranscriptAnalyses paramerters;
     private GenomeFeatureParser featureParser;
     private TssDetection tssDetection;
     private OperonDetection operonDetection;
@@ -53,7 +53,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
 
-    public WholeTranscriptDataAnalysisHandler(GenomeFeatureParser featureParser, PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public WholeTranscriptDataAnalysisHandler(GenomeFeatureParser featureParser, PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
         this.featureParser = featureParser;
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refGenomeID;
@@ -83,7 +83,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             handler.startAnalysis();
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
             JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
-            notifyObservers(FifeEnrichedDataAnalysesHandler.AnalysisStatus.ERROR);
+            notifyObservers(FiveEnrichedDataAnalysesHandler.AnalysisStatus.ERROR);
             this.interrupt();
         }
     }
@@ -103,7 +103,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     @Override
     public void run() {
-        notifyObservers(FifeEnrichedDataAnalysesHandler.AnalysisStatus.RUNNING);
+        notifyObservers(FiveEnrichedDataAnalysesHandler.AnalysisStatus.RUNNING);
         try {
             startAnalysis();
         } catch (FileNotFoundException ex) {

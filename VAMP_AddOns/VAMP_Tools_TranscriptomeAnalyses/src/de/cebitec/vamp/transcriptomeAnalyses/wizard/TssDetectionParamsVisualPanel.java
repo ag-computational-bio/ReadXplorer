@@ -4,18 +4,22 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
+import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
+import java.util.prefs.Preferences;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 public final class TssDetectionParamsVisualPanel extends JPanel {
 
-    private double fraction;
-    private int ratio;
-    private int upstream, downstream;
+    private final String wizardName;
+    
     /**
      * Creates new form TssDetectionParamsVisualPanel
      */
-    public TssDetectionParamsVisualPanel() {
+    public TssDetectionParamsVisualPanel(String wizardName) {
         initComponents();
+        this.wizardName = wizardName;
+        this.updateCheckBoxes();
     }
 
     @Override
@@ -23,22 +27,49 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         return "Parameters for TSS-detection";
     }
 
-    public Double getFraction () {
+    public Double getFraction() {
         return Double.valueOf(fractionTextField.getText());
     }
-    
-    public Integer getRatio () {
+
+    public Integer getRatio() {
         return Integer.valueOf(rationValueTextField.getText());
     }
-            
-    public Integer getUpstrteam () {
+
+    public Integer getUpstrteam() {
         return Integer.valueOf(upstreamRegionTextField.getText());
     }
-    
-    public Integer getDownstream () {
+
+    public Integer getDownstream() {
         return Integer.valueOf(downstreamRegionTextField.getText());
     }
+
+    public boolean isExcludeInternalTSS() {
+        return exclusionOfInternalTSSChcekbox.isSelected();
+    }
+
+    public int getExcludeTssDistance() {
+        return Integer.valueOf(limitationOfDistanceToGeneTF.getText());
+    }
     
+    public int getKeepingInternalTssDistance() {
+        return Integer.valueOf(keepInternalTssDistanceTF.getText());
+    }
+    
+    /**
+     * Updates the checkboxes for the read classes with the globally stored
+     * settings for this wizard. If no settings were stored, the default
+     * configuration is chosen.
+     */
+    private void updateCheckBoxes() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        fractionTextField.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_Fraction, "0.05"));
+        upstreamRegionTextField.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, "60"));
+        downstreamRegionTextField.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, "2"));
+        rationValueTextField.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RATIO, "5"));
+        limitationOfDistanceToGeneTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, "500"));
+        keepInternalTssDistanceTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, "100"));
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -63,6 +94,12 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         downstreamTextPane = new javax.swing.JTextPane();
         jScrollPane4 = new javax.swing.JScrollPane();
         ratioTextPane = new javax.swing.JTextPane();
+        jLabel5 = new javax.swing.JLabel();
+        exclusionOfInternalTSSChcekbox = new javax.swing.JCheckBox();
+        jLabel9 = new javax.swing.JLabel();
+        limitationOfDistanceToGeneTF = new javax.swing.JTextField();
+        keepInternalTSSLabel = new javax.swing.JLabel();
+        keepInternalTssDistanceTF = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.jLabel1.text")); // NOI18N
 
@@ -93,6 +130,28 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
 
         jScrollPane4.setViewportView(ratioTextPane);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.jLabel5.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(exclusionOfInternalTSSChcekbox, org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.exclusionOfInternalTSSChcekbox.text")); // NOI18N
+        exclusionOfInternalTSSChcekbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exclusionOfInternalTSSChcekboxActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.jLabel9.text")); // NOI18N
+
+        limitationOfDistanceToGeneTF.setText(org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.limitationOfDistanceToGeneTF.text")); // NOI18N
+        limitationOfDistanceToGeneTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                limitationOfDistanceToGeneTFActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(keepInternalTSSLabel, org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.keepInternalTSSLabel.text")); // NOI18N
+
+        keepInternalTssDistanceTF.setText(org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.keepInternalTssDistanceTF.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -100,28 +159,48 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(fractionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(upstreamRegionTextField)
-                    .addComponent(downstreamRegionTextField)
-                    .addComponent(rationValueTextField))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(fractionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                            .addComponent(upstreamRegionTextField)
+                            .addComponent(downstreamRegionTextField)
+                            .addComponent(rationValueTextField)))
+                    .addComponent(exclusionOfInternalTSSChcekbox))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jScrollPane3)
-                    .addComponent(jScrollPane4))
-                .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1)
+                            .addComponent(jScrollPane2)
+                            .addComponent(jScrollPane3)
+                            .addComponent(jScrollPane4))
+                        .addGap(8, 8, 8))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(keepInternalTSSLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(keepInternalTssDistanceTF, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(limitationOfDistanceToGeneTF, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel5)
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel1)
@@ -129,8 +208,9 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(upstreamRegionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(upstreamRegionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,7 +224,16 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
                         .addComponent(jLabel4)
                         .addComponent(rationValueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(limitationOfDistanceToGeneTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(keepInternalTSSLabel)
+                    .addComponent(keepInternalTssDistanceTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(exclusionOfInternalTSSChcekbox))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -152,19 +241,40 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_upstreamRegionTextFieldActionPerformed
 
+    private void exclusionOfInternalTSSChcekboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exclusionOfInternalTSSChcekboxActionPerformed
+        // TODO add your handling code here:
+        if (keepInternalTSSLabel.isEnabled() && keepInternalTssDistanceTF.isEnabled()) {
+            keepInternalTssDistanceTF.setEnabled(false);
+            keepInternalTSSLabel.setEnabled(false);
+        } else {
+            keepInternalTssDistanceTF.setEnabled(true);
+            keepInternalTSSLabel.setEnabled(true);
+        }
+
+    }//GEN-LAST:event_exclusionOfInternalTSSChcekboxActionPerformed
+
+    private void limitationOfDistanceToGeneTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitationOfDistanceToGeneTFActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_limitationOfDistanceToGeneTFActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField downstreamRegionTextField;
     private javax.swing.JTextPane downstreamTextPane;
+    private javax.swing.JCheckBox exclusionOfInternalTSSChcekbox;
     private javax.swing.JTextField fractionTextField;
     private javax.swing.JTextPane fractionTextPane;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JLabel keepInternalTSSLabel;
+    private javax.swing.JTextField keepInternalTssDistanceTF;
+    private javax.swing.JTextField limitationOfDistanceToGeneTF;
     private javax.swing.JTextPane ratioTextPane;
     private javax.swing.JTextField rationValueTextField;
     private javax.swing.JTextField upstreamRegionTextField;

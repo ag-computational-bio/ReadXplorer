@@ -4,7 +4,10 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
+import java.util.prefs.Preferences;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -12,16 +15,39 @@ import javax.swing.JPanel;
  */
 public class LeaderlessDetectionParamsVisualPanel extends JPanel {
 
+    
+    private final String wizardName;
     /**
      * Creates new form LeaderlessDetectionParamsVisualPanel
      */
-    public LeaderlessDetectionParamsVisualPanel() {
+    public LeaderlessDetectionParamsVisualPanel(String wizardName) {
+        this.wizardName = wizardName;
         initComponents();
+        updateCheckBoxes();
+        this.explanationTextPane.setBorder(BorderFactory.createTitledBorder("Leaderless explanation"));
+        this.explanationTextPane.setEditable(false);
+        this.leaderlessCDSshiftJLabel.setBorder(BorderFactory.createTitledBorder("Leaderless Transcript with CDS shift"));
+        this.leaderlessJLabel.setBorder(BorderFactory.createTitledBorder("Leaderless Transcript"));
     }
     
     @Override
     public String getName() {
         return "Parameters for leaderless gene detection";
+    }
+    
+    public boolean isCDSShiftChoosen() {
+        return cdsShiftCheckbox.isSelected();
+    }
+    
+    public Integer getLimitationOfLeaderless() {
+        return Integer.valueOf(leaderlessLimitTF.getText());
+    }
+    
+    private void updateCheckBoxes() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        this.cdsShiftCheckbox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_CDSSHIFT, false));
+        this.leaderlessLimitTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, "7"));
+        
     }
 
     /**
@@ -34,46 +60,102 @@ public class LeaderlessDetectionParamsVisualPanel extends JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        leaderlessLimitTF = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         explanationTextPane = new javax.swing.JTextPane();
+        cdsShiftCheckbox = new javax.swing.JCheckBox();
+        leaderlessJLabel = new javax.swing.JLabel();
+        leaderlessCDSshiftJLabel = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JSeparator();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(LeaderlessDetectionParamsVisualPanel.class, "LeaderlessDetectionParamsVisualPanel.jLabel1.text")); // NOI18N
 
-        jTextField1.setText(org.openide.util.NbBundle.getMessage(LeaderlessDetectionParamsVisualPanel.class, "LeaderlessDetectionParamsVisualPanel.jTextField1.text")); // NOI18N
+        leaderlessLimitTF.setText(org.openide.util.NbBundle.getMessage(LeaderlessDetectionParamsVisualPanel.class, "LeaderlessDetectionParamsVisualPanel.leaderlessLimitTF.text")); // NOI18N
+        leaderlessLimitTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                leaderlessLimitTFActionPerformed(evt);
+            }
+        });
 
         jScrollPane1.setViewportView(explanationTextPane);
+
+        org.openide.awt.Mnemonics.setLocalizedText(cdsShiftCheckbox, org.openide.util.NbBundle.getMessage(LeaderlessDetectionParamsVisualPanel.class, "LeaderlessDetectionParamsVisualPanel.cdsShiftCheckbox.text")); // NOI18N
+
+        leaderlessJLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/leaderless_200h.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(leaderlessJLabel, org.openide.util.NbBundle.getMessage(LeaderlessDetectionParamsVisualPanel.class, "LeaderlessDetectionParamsVisualPanel.leaderlessJLabel.text")); // NOI18N
+
+        leaderlessCDSshiftJLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/leaderlessWithCDSshift_200h.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(leaderlessCDSshiftJLabel, org.openide.util.NbBundle.getMessage(LeaderlessDetectionParamsVisualPanel.class, "LeaderlessDetectionParamsVisualPanel.leaderlessCDSshiftJLabel.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSeparator1))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cdsShiftCheckbox)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(leaderlessLimitTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(leaderlessJLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(leaderlessCDSshiftJLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 9, Short.MAX_VALUE)))
+                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 200, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(leaderlessLimitTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(cdsShiftCheckbox)))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24)
+                .addComponent(leaderlessJLabel)
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24)
+                .addComponent(leaderlessCDSshiftJLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void leaderlessLimitTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leaderlessLimitTFActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_leaderlessLimitTFActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox cdsShiftCheckbox;
     private javax.swing.JTextPane explanationTextPane;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel leaderlessCDSshiftJLabel;
+    private javax.swing.JLabel leaderlessJLabel;
+    private javax.swing.JTextField leaderlessLimitTF;
     // End of variables declaration//GEN-END:variables
 }

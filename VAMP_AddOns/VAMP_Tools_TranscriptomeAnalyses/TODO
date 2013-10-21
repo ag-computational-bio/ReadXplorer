@@ -5,8 +5,9 @@
 
 ##TSS Detection##
     - Inputs:
-        * Soll der User die wahl haben, wie die outputTabelle auszusehen hat?
-            Default (Christian), Neu (Armin)
+        => Interne TSS excuden
+        => zuweit vom Gen liegende TSS (>500bp) excluden
+        => leaderless ab wie vielen bp is es eins und wann nicht mehr
     - Outputs (Output von CR mit mehr Inhalt / Daten aus GenBank füllen):
         * WIe genau soll der neue Output aussehen?
         * Soll der alte (default) output die counts an den 10 stellen vor dem TSS 
@@ -23,8 +24,6 @@
         * Static Regions, brauchen eine solche File dazu
 
     - Probleme: 
-        * Zuweisung von Gene und nextGene klappt noch nicht 100%ig
-        * TSS zu tRNA werden gefunden, das ist aber nicht gewollt, oder?
 
 
     - Wizard
@@ -33,10 +32,8 @@
         - Die Textareas sind aber im Grunde OK.
 
 ##OPERON Detection##
-    - Brauchen zum Testen eine Whole transcript data set
 
 ##NOVEL REGIONS Detection##
-    - Brauchen zum Testen eine Whole transcript data set
 
 ##RPKM/logRPKM##
 
@@ -72,7 +69,38 @@ Introduction:
 Practical Part:
 
 
-Besprechung mit Armin am 16.10.2013
 
-    - OUTOUT:
-        - die erforderlichen zusaetzlichen Informationen siehe Email mit snap shot
+
+Analysen für Armin:
+
+Ratio: 7
+Leaderless 7
+interne raus
+TSS mit > 500bp raus
+
+=> 1664 hits Cmm_M
+
+=> 1992 hits Cmm_T
+
+Ratio 4
+
+=> Cmm_M 2625 hits
+
+=> Cmm_T 3080 hits
+
+Das Problem ist aber, dass TSS mehrmals vorkommen, da die Mappings nicht alle an einer
+Position beginnen. Hier müsste man sich überlegen, ob man dann nicht den TSS nimmt, der die meisten
+Counts hat.
+
+Zweites Problem sind überlappende Features zwischen zwei Frames. Problem ist, dass das Frame nicht gesetzt ist.
+
+TODO für die Woche 14.10 - 21.10
+
+- die beiden oberen Probleme lösen!
+- Analysen für Armin vorbereiten.
+- ist ein CDS-shift vorhanden oder nicht
+- Export-Tabelle erweitern
+- Operon detection und detection of New Regions voran treiben
+- RPKM berechnung voran treiben!
+
+- Die Frage ist, braucht man eig noch die masking Region?

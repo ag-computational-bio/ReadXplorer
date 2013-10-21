@@ -6,33 +6,38 @@ package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 public final class DataSetChoiceVisualPanel extends JPanel implements ActionListener {
 
 
     private final String fiveprimeText = "";
     private final String wholeTranscriptText = "";
+    private final String wizardName;
     
     /**
      * Creates new form DataSetChoiceVisualPanel
      */
-    public DataSetChoiceVisualPanel() {
+    public DataSetChoiceVisualPanel(String wizardName) {
         initComponents();
 
-        wholeGenomeTrackCheckBox.addActionListener(this);
-        wholeGenomeTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET);
+        this.wizardName = wizardName;
+        updateCheckBoxes();
+        wholeTranscriptomeTrackCheckBox.addActionListener(this);
+        wholeTranscriptomeTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET);
         fiveEnrichedTrackCheckBox.addActionListener(this);
         fiveEnrichedTrackCheckBox.setActionCommand(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
         
+        wholeTranscriptTA.setEditable(false);
+        wholeTranscriptTA.setBorder(BorderFactory.createTitledBorder("Whole transcript RNA-Seq data set"));
+        wholeTranscriptTA.setText(fiveprimeText);
         fivePrimeTextArea.setEditable(false);
         fivePrimeTextArea.setBorder(BorderFactory.createTitledBorder("5'-Enriched RNA-Seq data set"));
-        fivePrimeTextArea.setText(fiveprimeText);
-        wholeTranscriptTextArea.setEditable(false);
-        wholeTranscriptTextArea.setBorder(BorderFactory.createTitledBorder("Whole transcript RNA-Seq data set"));
-        wholeTranscriptTextArea.setText(wholeTranscriptText);
+        fivePrimeTextArea.setText(wholeTranscriptText);
     }
 
     @Override
@@ -41,13 +46,24 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
     }
 
     public boolean isWholeGenomeTrack() {
-        return this.wholeGenomeTrackCheckBox.isSelected();
+        return this.wholeTranscriptomeTrackCheckBox.isSelected();
     }
 
-    public boolean isFifeEnrichedTrack() {
+    public boolean isFiveEnrichedTrack() {
         return this.fiveEnrichedTrackCheckBox.isSelected();
     }
 
+    /**
+     * Updates the checkboxes for the read classes with the globally stored
+     * settings for this wizard. If no settings were stored, the default
+     * configuration is chosen.
+     */
+    private void updateCheckBoxes() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        this.wholeTranscriptomeTrackCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET, false));
+        this.fiveEnrichedTrackCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET, false));
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,23 +73,23 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        fivePrimeTextArea = new javax.swing.JTextArea();
-        wholeGenomeTrackCheckBox = new javax.swing.JCheckBox();
+        wholeTranscriptTA = new javax.swing.JTextArea();
+        wholeTranscriptomeTrackCheckBox = new javax.swing.JCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
-        wholeTranscriptTextArea = new javax.swing.JTextArea();
+        fivePrimeTextArea = new javax.swing.JTextArea();
         fiveEnrichedTrackCheckBox = new javax.swing.JCheckBox();
+
+        wholeTranscriptTA.setColumns(20);
+        wholeTranscriptTA.setRows(5);
+        wholeTranscriptTA.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.wholeTranscriptTA.text")); // NOI18N
+        jScrollPane1.setViewportView(wholeTranscriptTA);
+
+        org.openide.awt.Mnemonics.setLocalizedText(wholeTranscriptomeTrackCheckBox, org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.wholeTranscriptomeTrackCheckBox.text")); // NOI18N
 
         fivePrimeTextArea.setColumns(20);
         fivePrimeTextArea.setRows(5);
         fivePrimeTextArea.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.fivePrimeTextArea.text")); // NOI18N
-        jScrollPane1.setViewportView(fivePrimeTextArea);
-
-        org.openide.awt.Mnemonics.setLocalizedText(wholeGenomeTrackCheckBox, org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.wholeGenomeTrackCheckBox.text")); // NOI18N
-
-        wholeTranscriptTextArea.setColumns(20);
-        wholeTranscriptTextArea.setRows(5);
-        wholeTranscriptTextArea.setText(org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.wholeTranscriptTextArea.text")); // NOI18N
-        jScrollPane2.setViewportView(wholeTranscriptTextArea);
+        jScrollPane2.setViewportView(fivePrimeTextArea);
 
         org.openide.awt.Mnemonics.setLocalizedText(fiveEnrichedTrackCheckBox, org.openide.util.NbBundle.getMessage(DataSetChoiceVisualPanel.class, "DataSetChoiceVisualPanel.fiveEnrichedTrackCheckBox.text")); // NOI18N
         fiveEnrichedTrackCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -92,7 +108,7 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(131, 131, 131)
-                                .addComponent(wholeGenomeTrackCheckBox))
+                                .addComponent(wholeTranscriptomeTrackCheckBox))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(134, 134, 134)
                                 .addComponent(fiveEnrichedTrackCheckBox)))
@@ -110,7 +126,7 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(wholeGenomeTrackCheckBox)
+                .addComponent(wholeTranscriptomeTrackCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -127,8 +143,8 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
     private javax.swing.JTextArea fivePrimeTextArea;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JCheckBox wholeGenomeTrackCheckBox;
-    private javax.swing.JTextArea wholeTranscriptTextArea;
+    private javax.swing.JTextArea wholeTranscriptTA;
+    private javax.swing.JCheckBox wholeTranscriptomeTrackCheckBox;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -141,7 +157,7 @@ public final class DataSetChoiceVisualPanel extends JPanel implements ActionList
 
         if (e.getActionCommand().equals(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET)) {
             if (((JCheckBox) e.getSource()).isSelected()) {
-                wholeGenomeTrackCheckBox.setSelected(false);
+                wholeTranscriptomeTrackCheckBox.setSelected(false);
             }
         }
     }

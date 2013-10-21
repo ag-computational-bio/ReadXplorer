@@ -24,7 +24,7 @@ import jsc.distributions.Normal;
  */
 public class Statistics implements Observer {
 
-    private int bg;
+    private double bg;
     List<PersistantMapping> mappings;
     /*
      * uniqueCounts are just counted mappings in font of CDSs
@@ -290,8 +290,8 @@ public class Statistics implements Observer {
         }
     }
 
-    public int getBg() {
-        return bg;
+    public double getBg() {
+        return this.bg;
     }
 
     public int[] getForward() {
@@ -361,6 +361,10 @@ public class Statistics implements Observer {
 
     public HashMap<Integer, List<Long>> getMappingsOnRrnAndTrna() {
         return mappingsOnRrnAndTrna;
+    }
+
+    public void setBg(double bg) {
+        this.bg = bg;
     }
     
     

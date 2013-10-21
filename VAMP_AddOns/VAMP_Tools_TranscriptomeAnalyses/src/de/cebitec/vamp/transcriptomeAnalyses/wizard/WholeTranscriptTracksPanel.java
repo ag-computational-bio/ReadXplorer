@@ -4,10 +4,12 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
+import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbPreferences;
 
 public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
@@ -16,6 +18,13 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
      * component from this class, just use getComponent().
      */
     private WholeTranscriptTracksVisualPanel component;
+    private final String wizardName;
+
+    public WholeTranscriptTracksPanel(String wizardName) {
+        this.wizardName = wizardName;
+    }
+    
+    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -24,7 +33,7 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
     @Override
     public WholeTranscriptTracksVisualPanel getComponent() {
         if (component == null) {
-            component = new WholeTranscriptTracksVisualPanel();
+            component = new WholeTranscriptTracksVisualPanel(this.wizardName);
         }
         return component;
     }
@@ -63,21 +72,25 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        if (this.component.isRPKM()) {
-            wiz.putProperty("rpkm", WholeTranscriptTracksVisualPanel.PROP_ANALYSIS_RPKM);
-        }
-        if (this.component.isNewRegions()) {
-            wiz.putProperty("novel", WholeTranscriptTracksVisualPanel.PROP_ANALYSIS_NOVELREGION);
-        }
-        if (this.component.isOperonDetection()) {
-            wiz.putProperty("operon", WholeTranscriptTracksVisualPanel.PROP_ANALYSIS_OPERON);
-        }
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, (boolean) component.isLogRPKM());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, (boolean) component.isNormalRPKM());
+            storePrefs();
+    }
+    
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isLogRPKM());
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, component.isNewRegions());
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, component.isOperonDetection());
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, component.isNormalRPKM());
     }
 
     @Override
     public void validate() throws WizardValidationException {
         
-        if (!this.component.isRPKM() && !this.component.isOperonDetection() && !this.component.isNewRegions()) {
+        if (!this.component.isLogRPKM() && !this.component.isOperonDetection() && !this.component.isNewRegions() && !this.component.isNormalRPKM()) {
             throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
         }
     }

@@ -62,5 +62,6 @@ public class OperonsDetectionParamsPanel implements WizardDescriptor.Panel<Wizar
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, (double) component.getFraction());
     }
 }

@@ -4,6 +4,8 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.Component;
@@ -31,11 +33,19 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     public static final String PROP_NOVEL_ANALYSIS = "novel";
     public static final String PROP_OPERON_ANALYSIS = "operon";
     public static final String PROP_RPKM_ANALYSIS = "rpkm";
+    public static final String PROP_LOGRPKM_ANALYSIS = "logRpkm";
     // TSS, Leaderless, Antisense - detection params
     public static final String PROP_Fraction = "fraction";
     public static final String PROP_UPSTREAM = "upstream";
     public static final String PROP_DOWNSTREAM = "downstream";
     public static final String PROP_RATIO = "ratio";
+    public static final String PROP_EXCLUDE_INTERNAL_TSS = "excludeInternalTss";
+    public static final String PROP_EXCLUDE_TSS_DISTANCE = "excludeTssDistance";
+    public static final String PROP_LEADERLESS_LIMIT = "leaderlessLimit";
+    public static final String PROP_LEADERLESS_CDSSHIFT = "cdsShiftChoosen";
+    public static final String PROP_NORMAL_RPKM_ANALYSIS = "normalRPKMs";
+    public static final String PROP_KEEPINTERNAL_DISTANCE = "keepingInternalDistance";
+    
     // Wizard descriptors
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> initPanels;
@@ -51,9 +61,12 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     private int index;
     private SelectReadClassWizardPanel readClassPanel;
     private SelectFeatureTypeWizardPanel featTypePanel;
+    private OpenTracksWizardPanel openTracksPanel;
     private ChangeSupport changeSupport;
+    private int referenceId;
 
-    public TranscriptomeAnalysisWizardIterator() {
+    public TranscriptomeAnalysisWizardIterator(int referenceId) {
+        this.referenceId = referenceId;
         this.changeSupport = new ChangeSupport(this);
         this.initializePanels();
     }
@@ -61,13 +74,13 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     private void initializePanels() {
         if (allPanels == null) {
             allPanels = new ArrayList<>();
-            allPanels.add(new DataSetChoicePanel());// 0
-            allPanels.add(new WholeTranscriptTracksPanel()); // 1
-            allPanels.add(new FivePrimeEnrichedTracksPanel()); // 2
-            allPanels.add(new TssDetectionParamsPanel()); // 3
+            allPanels.add(new DataSetChoicePanel(PROP_WIZARD_NAME));// 0
+            allPanels.add(new WholeTranscriptTracksPanel(PROP_WIZARD_NAME)); // 1
+            allPanels.add(new FivePrimeEnrichedTracksPanel(PROP_WIZARD_NAME)); // 2
+            allPanels.add(new TssDetectionParamsPanel(PROP_WIZARD_NAME)); // 3
             allPanels.add(new RbsDetectionParamsPanel()); // 4
             allPanels.add(new PromotorDetectionParamPanel()); // 5
-            allPanels.add(new LeaderlessDetectionPanel()); // 6
+            allPanels.add(new LeaderlessDetectionPanel(PROP_WIZARD_NAME)); // 6
             allPanels.add(new AntisenseDetectionParamsPanel()); // 7
             allPanels.add(new NewRegionDetectionParamsPanel()); // 8
             allPanels.add(new OperonsDetectionParamsPanel()); // 9
@@ -76,6 +89,8 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             allPanels.add(readClassPanel); // 10
             featTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
             allPanels.add(featTypePanel); // 11
+            openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId); 
+            allPanels.add(openTracksPanel); // 12
 
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
@@ -96,32 +111,36 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
 
 
             initPanels = new ArrayList<>();
+            initPanels.add(this.allPanels.get(12));
             initPanels.add(this.allPanels.get(10));
             initPanels.add(this.allPanels.get(0));
             initPanels.add(this.allPanels.get(1));
 
-            initPanelsIndex = new String[]{steps[11], steps[0], "..."};
+            initPanelsIndex = new String[]{steps[12], steps[11], steps[0], "..."};
 
 
             fivePrimeAnalyses = new ArrayList<>();
+            fivePrimeAnalyses.add(this.allPanels.get(12));
             fivePrimeAnalyses.add(this.allPanels.get(10));
             fivePrimeAnalyses.add(this.allPanels.get(0));
             fivePrimeAnalyses.add(this.allPanels.get(2));
             fivePrimeAnalyses.add(this.allPanels.get(3));
 
 
-            fivePrimeIndex = new String[]{steps[11], steps[0], steps[2], "..."};
+            fivePrimeIndex = new String[]{steps[12], steps[11], steps[0], steps[2], "..."};
 
             wholegenomeAnalyses = new ArrayList<>();
+            wholegenomeAnalyses.add(this.allPanels.get(12));
             wholegenomeAnalyses.add(this.allPanels.get(10));
             wholegenomeAnalyses.add(this.allPanels.get(0));
             wholegenomeAnalyses.add(this.allPanels.get(1));
             wholegenomeAnalyses.add(this.allPanels.get(8));
 
 
-            wholeGenomeIndex = new String[]{steps[11], steps[0], steps[1], "..."};
+            wholeGenomeIndex = new String[]{steps[12],steps[11], steps[0], steps[1], "..."};
 
             fivePrimeSelectedAnalyses = new ArrayList<>();
+            fivePrimeSelectedAnalyses.add(this.allPanels.get(12));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(10));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(0));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(2));
@@ -129,6 +148,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
 
 
             wholeGenomeSelectedAnayses = new ArrayList<>();
+            wholeGenomeSelectedAnayses.add(this.allPanels.get(12));
             wholeGenomeSelectedAnayses.add(this.allPanels.get(10));
             wholeGenomeSelectedAnayses.add(this.allPanels.get(0));
             wholeGenomeSelectedAnayses.add(this.allPanels.get(1));
@@ -171,7 +191,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             throw new NoSuchElementException();
         }
 
-        if (index == 1) { //whole genome dataset
+        if (index == 2) { //whole genome dataset
             String[] contentData = initPanelsIndex;
 
             if ((boolean) wiz.getProperty(PROP_FIVEPRIME_DATASET)) {
@@ -190,7 +210,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
         }
 
 
-        if (index == 2 && (boolean) wiz.getProperty(PROP_FIVEPRIME_DATASET)) { // we are in fifeprime analyses   
+        if (index == 3 && (boolean) wiz.getProperty(PROP_FIVEPRIME_DATASET)) { // we are in fifeprime analyses   
             List<String> contentData = new ArrayList<>();
             contentData.add(allPanels.get(10).getComponent().getName());
             contentData.add(allPanels.get(0).getComponent().getName());
@@ -222,7 +242,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             }
         }
 
-        if (index == 2 && (boolean) wiz.getProperty(PROP_WHOLEGENOME_DATASET)) { // we are in wholegenome analyses
+        if (index == 3 && (boolean) wiz.getProperty(PROP_WHOLEGENOME_DATASET)) { // we are in wholegenome analyses
             List<String> contentData = new ArrayList<>();
             contentData.add(allPanels.get(10).getComponent().getName());
             contentData.add(allPanels.get(0).getComponent().getName());
@@ -314,5 +334,12 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
      */
     public String getPropSelectedFeatTypes() {
         return this.featTypePanel.getPropSelectedFeatTypes();
+    }
+    
+    /**
+     * @return The list of track selected in this wizard.
+     */
+    public List<PersistantTrack> getSelectedTracks() {
+        return this.openTracksPanel.getComponent().getSelectedTracks();
     }
 }

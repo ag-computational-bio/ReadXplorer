@@ -18,6 +18,8 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     private Double fraction;
     private Integer ratio;
     private Integer upstreamRegion, downstreamRegion;
+    private Integer leaderlessLimit, exclusionOfTSSDistance, keepingInternalTssDistance;
+    private boolean exclusionOfInternalTSS, cdsShiftDetection;
 
     /**
      * Data storage for all parameters associated with a transcription analysis.
@@ -27,7 +29,9 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
      * @param performAntisenseAnalysis
      * @param fraction
      */
-    public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performLeaderlessAnalysis, boolean performAntisenseAnalysis, Double fraction, Integer ratio, Integer upstream, Integer downstream) {
+    public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performLeaderlessAnalysis, boolean performAntisenseAnalysis, Double fraction, Integer ratio, Integer upstream, Integer downstream,
+            boolean excludeInternalTSS, Integer distanceForExcludionOfTss, 
+            Integer leaderlessLimit, boolean cdsShiftDetection, int keepInternalDistance) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.performLeaderlessAnalysis = performLeaderlessAnalysis;
         this.performAntisenseAnalysis = performAntisenseAnalysis;
@@ -35,6 +39,11 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         this.upstreamRegion = upstream;
         this.downstreamRegion = downstream;
         this.ratio = ratio;
+        this.leaderlessLimit = leaderlessLimit;
+        this.cdsShiftDetection = cdsShiftDetection;
+        this.exclusionOfInternalTSS = excludeInternalTSS;
+        this.exclusionOfTSSDistance = distanceForExcludionOfTss;
+        this.keepingInternalTssDistance = keepInternalDistance;
 
     }
 
@@ -81,4 +90,26 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     public Integer getRatio() {
         return ratio;
     }
+
+    public Integer getLeaderlessLimit() {
+        return leaderlessLimit;
+    }
+
+    public Integer getExclusionOfTSSDistance() {
+        return exclusionOfTSSDistance;
+    }
+
+    public boolean isExclusionOfInternalTSS() {
+        return exclusionOfInternalTSS;
+    }
+
+    public boolean isCdsShiftDetection() {
+        return cdsShiftDetection;
+    }
+
+    public Integer getKeepingInternalTssDistance() {
+        return keepingInternalTssDistance;
+    }
+    
+    
 }

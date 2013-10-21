@@ -4,9 +4,11 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
+import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbPreferences;
 
 public class TssDetectionParamsPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
@@ -15,7 +17,12 @@ public class TssDetectionParamsPanel implements WizardDescriptor.Panel<WizardDes
      * component from this class, just use getComponent().
      */
     private TssDetectionParamsVisualPanel component;
+    private final String wizardName;
 
+    public TssDetectionParamsPanel(String wizardName) {
+        this.wizardName = wizardName;
+    }
+    
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
@@ -23,7 +30,7 @@ public class TssDetectionParamsPanel implements WizardDescriptor.Panel<WizardDes
     @Override
     public TssDetectionParamsVisualPanel getComponent() {
         if (component == null) {
-            component = new TssDetectionParamsVisualPanel();
+            component = new TssDetectionParamsVisualPanel(wizardName);
         }
         return component;
     }
@@ -66,5 +73,26 @@ public class TssDetectionParamsPanel implements WizardDescriptor.Panel<WizardDes
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO, (int) component.getRatio());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS, component.isExcludeInternalTSS());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
+        storePrefs();
+    }
+    
+    /**
+     * Stores the selected read classes for this specific wizard for later use,
+     * also after restarting the software.
+     * @param readClassParams The parameters to store
+     */
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RATIO, component.getRatio().toString());
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS, component.isExcludeInternalTSS());
+        pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
+        pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
     }
 }

@@ -6,8 +6,10 @@ package de.cebitec.vamp.transcriptomeAnalyses.wizard;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements ActionListener {
 
@@ -15,12 +17,15 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements 
     private String tssDetectionText = "Leaderless and antisense detection is based on the transcriptional start site detection (TSS). That is why "
             + "you have to choose at least TSS-detection. ...";
     private String motifSearchText = "Motif seatch can be provide, if there are transcriptional start site known.";
-
+    private final String wizardName;
+    
     /**
      * Creates new form FivePrimeEnrichedTracksVisualPanel
      */
-    public FivePrimeEnrichedTracksVisualPanel() {
+    public FivePrimeEnrichedTracksVisualPanel(String wizardName) {
         initComponents();
+        updateCheckBoxes();
+        this.wizardName = wizardName;
         jScrollPane1.setBorder(BorderFactory.createTitledBorder("TSS-detection"));
         jTextArea1.setEditable(false);
         jTextArea1.setText(tssDetectionText);
@@ -57,6 +62,21 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel implements 
 
     public boolean isLeaderLessSelected() {
         return leaderlessCheckBox.isSelected();
+    }
+    
+        /**
+     * Updates the checkboxes for the read classes with the globally stored
+     * settings for this wizard. If no settings were stored, the default
+     * configuration is chosen.
+     */
+    private void updateCheckBoxes() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        this.tssCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, false));
+        this.leaderlessCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS, false));
+        this.antisenseCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, false));
+        this.rbsCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS, false));
+        this.promotorCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS, false));
+                
     }
 
     /**

@@ -98,11 +98,10 @@ public class GenomeFeatureParser {
         //at first we need connection to the reference (Projectconnector->ReferenceConnector)
         // Vamp has already all information we need here
 
-        int start, stop;
+        int start, stop, id;
         boolean isFwd;
         String featureName;
         FeatureType type;
-        int id;
 
         for (PersistantFeature feature : genomeFeatures) {
 
@@ -126,15 +125,18 @@ public class GenomeFeatureParser {
             }
 
             // store the regions in arrays of arrays (allows for overlapping regions)
-            createCDSsStrandInformation(id, start, stop, isFwd);
+            if (!type.equals(FeatureType.RRNA) && !type.equals(FeatureType.TRNA)) {
+                createCDSsStrandInformation(id, start, stop, isFwd);
+            }
         }
     }
 
     /**
      * This method fills a Map of Lists. If there is a feature on Position i,
-     * than the list is mapped to that position. The List contains the feature ids corrisponding 
-     * to that Position. Each list can containing max. three different feature ids because of the three reading frames 
-     * for the forward and reverse direction.
+     * than the list is mapped to that position. The List contains the feature
+     * ids corrisponding to that Position. Each list can containing max. three
+     * different feature ids because of the three reading frames for the forward
+     * and reverse direction.
      *
      * @param featureID Persistant feature id.
      * @param start Startposition of feature.
@@ -213,6 +215,7 @@ public class GenomeFeatureParser {
 
         for (PersistantFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
+            System.out.println("FeatureID: "+ gf.getId() + "\tFeatureName: "+gf.getFeatureName());
         }
 
         return regions;

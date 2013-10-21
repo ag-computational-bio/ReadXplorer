@@ -9,7 +9,6 @@ import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.transcriptomeAnalyses.wizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -36,7 +35,7 @@ import org.openide.windows.WindowManager;
         displayName = "#CTL_StartTranscriptomeAnalysesAction")
 @ActionReference(path = "Menu/Tools", position = 112)
 @Messages("CTL_StartTranscriptomeAnalysesAction=Start Transcriptome Analyses")
-public final class StartTranscriptomeAnalysesAction implements ActionListener{
+public final class StartTranscriptomeAnalysesAction implements ActionListener {
 
     private final ReferenceViewer refViewer;
     private int finishedAnalyses = 0;
@@ -46,15 +45,15 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener{
     private String selFeatureTypesPropString;
     private GenomeFeatureParser featureParser;
     private int referenceId;
-   
-    private FifeEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
+    private FiveEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
     private WholeTranscriptDataAnalysisHandler wholeTranscriptAnalysesHandler;
     private ParameterSetFiveEnrichedAnalyses parameterSetFiveprime;
     private ParameterSetWholeTranscriptAnalyses parameterSetWholeTranscripts;
-    private boolean performFivePrimeAnalyses, performTSSAnalysis, performLeaderless, performAntisense, performRBSDetection, performPromotorDetectin;
+    private boolean performFivePrimeAnalyses, performTSSAnalysis, performLeaderless, performAntisense, performRBSDetection, performPromotorDetection;
+    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, normalRPKMs, logRPKMs;
     private double fraction;
-    private int ratio, upstream, downstream;
-    
+    private boolean cdsShift, excludeInternalTss;
+    private int ratio, upstream, downstream, leaderlessDistance, excludeTSSDistance, keepingInternalTssDistance;
     private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
     private HashMap<Integer, AnalysesContainer> trackToAnalysisMap;
 
@@ -68,27 +67,11 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        OpenTrackPanelList otp = new OpenTrackPanelList(referenceId);
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "CTL_OpenTrackList"));
-        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        openRefGenDialog.setVisible(true);
 
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-            this.tracks = otp.getSelectedTracks();
-            this.trackMap = new HashMap<>();
-            for (PersistantTrack track : otp.getSelectedTracks()) {
-                this.trackMap.put(track.getId(), track);
-            }
-            
-            this.transcAnalysesTopComp.open();
-            this.runWizardAndTranscriptionAnalysis();
 
-        } else {
-            String msg = NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
-                    "No track selected. To start a transcription analysis at least one track has to be selected.");
-            String title = NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfoTitle", "Info");
-            JOptionPane.showMessageDialog(this.refViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
+        this.runWizardAndTranscriptionAnalysis();
+
+
     }
 
     /**
@@ -96,11 +79,13 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener{
      */
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings("unchecked")
-        TranscriptomeAnalysisWizardIterator transWizardIterator = new TranscriptomeAnalysisWizardIterator();
-        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
-        transWizardIterator.setUsingDBTrack(containsDBTrack);
+        TranscriptomeAnalysisWizardIterator transWizardIterator = new TranscriptomeAnalysisWizardIterator(this.referenceId);
+//        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
+//        transWizardIterator.setUsingDBTrack(containsDBTrack);
         this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
         this.selFeatureTypesPropString = transWizardIterator.getPropSelectedFeatTypes();
+
+
         WizardDescriptor wiz = new WizardDescriptor(transWizardIterator);
         transWizardIterator.setWiz(wiz);
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -109,9 +94,26 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener{
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
+        List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
+        if (!cancelled && !selectedTracks.isEmpty()) {
+            this.tracks = selectedTracks;
+            this.trackMap = new HashMap<>();
+            for (PersistantTrack track : this.tracks) {
+                this.trackMap.put(track.getId(), track);
+            }
+
+            this.transcAnalysesTopComp.open();
             this.startTranscriptomeAnalyses(wiz);
+
+        } else {
+            String msg = NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
+                    "No track selected. To start a transcription analysis at least one track has to be selected.");
+            String title = NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfoTitle", "Info");
+            JOptionPane.showMessageDialog(this.refViewer, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
+
+
+
     }
 
     /**
@@ -132,39 +134,64 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener{
                 continue;
             }
 
-            performFivePrimeAnalyses = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
-            if (performFivePrimeAnalyses) {
-                this.ratio = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO);
-                fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
-                upstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM);
-                downstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM);
-                performLeaderless = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS);
-                performTSSAnalysis = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS);
-                performAntisense = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS);
-                performPromotorDetectin = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS);
-                performRBSDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS);
-                System.out.println(ratio);
-                System.out.println(fraction);
-                System.out.println(upstream);
-                System.out.println(downstream);
-                System.out.println(performLeaderless);
-                System.out.println(performTSSAnalysis);
-                System.out.println(performAntisense);
-                System.out.println(performPromotorDetectin);
-                System.out.println(performRBSDetection);
-            }
-            parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(performTSSAnalysis, performLeaderless, performAntisense, fraction, ratio, upstream, downstream);
             // Here we parse the genome
             // 1. getting region2Exclude 
             // forwardCDSs and reverseCDSs 
             // => Feature IDs on Position i in genome 3 strands in each direction are maximum.
             // allRegionsInHash => Key Feature id, Value is the featuer 
-            double fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
-            featureParser = new GenomeFeatureParser(connector);
+            this.featureParser = new GenomeFeatureParser(connector);
 
-            fifePrimeAnalysesHandler = new FifeEnrichedDataAnalysesHandler(featureParser, track, referenceId, parameterSetFiveprime, this.refViewer, this.transcAnalysesTopComp, this.trackMap);
-            fifePrimeAnalysesHandler.start();
-            
+            this.performFivePrimeAnalyses = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
+            this.performWholeTrascriptomeAnalyses = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET);
+            if (performFivePrimeAnalyses) {
+                this.ratio = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO);
+                this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
+                this.upstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM);
+                this.downstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM);
+                this.performLeaderless = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS);
+                this.performTSSAnalysis = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS);
+                this.performAntisense = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS);
+                this.performPromotorDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS);
+                this.performRBSDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS);
+                this.excludeInternalTss = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS);
+                this.excludeTSSDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE);
+                this.leaderlessDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT);
+                this.cdsShift = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_CDSSHIFT);
+                this.keepingInternalTssDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE);
+                this.parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(this.performTSSAnalysis,
+                        this.performLeaderless, this.performAntisense, this.fraction, this.ratio, this.upstream,
+                        this.downstream, this.excludeInternalTss, this.excludeTSSDistance, this.leaderlessDistance, this.cdsShift, this.keepingInternalTssDistance);
+
+                // start five prime transcripts analyses handler
+                this.fifePrimeAnalysesHandler = new FiveEnrichedDataAnalysesHandler(
+                        this.featureParser, track, this.referenceId,
+                        this.parameterSetFiveprime, this.refViewer,
+                        this.transcAnalysesTopComp, this.trackMap);
+                this.fifePrimeAnalysesHandler.start();
+            }
+
+            if (this.performWholeTrascriptomeAnalyses) {
+                // get needed params
+                this.performOperonDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS);
+                this.performNovelRegionDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS);
+                this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
+                this.normalRPKMs = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS);
+                this.logRPKMs = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS);
+                this.parameterSetWholeTranscripts = new ParameterSetWholeTranscriptAnalyses(this.performWholeTrascriptomeAnalyses,
+                        this.performOperonDetection, this.performNovelRegionDetection,
+                        this.normalRPKMs, this.logRPKMs, this.fraction);
+                // start whole transcript analyses handler
+                this.wholeTranscriptAnalysesHandler = new WholeTranscriptDataAnalysisHandler(
+                        this.featureParser, track, this.referenceId,
+                        this.parameterSetWholeTranscripts, this.refViewer,
+                        this.transcAnalysesTopComp, this.trackMap);
+
+                this.wholeTranscriptAnalysesHandler.start();
+
+            }
+
+
+
         }
     }
 
