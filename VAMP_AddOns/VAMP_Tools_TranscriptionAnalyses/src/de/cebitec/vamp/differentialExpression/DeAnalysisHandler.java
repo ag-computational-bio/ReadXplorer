@@ -103,7 +103,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
-        genomeSize = referenceConnector.getRefGenome().getSequence().length();
+        genomeSize = referenceConnector.getRefGenome().getRefLength();
         persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, selectedFeatures);
         List<AnalysesHandler> allHandler = new ArrayList<>();
         for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {

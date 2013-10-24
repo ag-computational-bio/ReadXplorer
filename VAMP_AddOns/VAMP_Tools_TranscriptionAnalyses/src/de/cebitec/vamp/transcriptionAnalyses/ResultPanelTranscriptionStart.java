@@ -356,7 +356,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         
         //get the promotor region for each TSS
         int promotorStart;
-        int refSeqLength = ref.getSequence().length();
+        int refSeqLength = ref.getRefLength();
         for (TranscriptionStart tSS : this.tssResult.getResults()) {
             if (tSS.isFwdStrand()) {
                 promotorStart = tSS.getPos() - 70;

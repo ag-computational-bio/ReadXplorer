@@ -57,7 +57,7 @@ public class SimpleTestWizardPanelNormalization implements WizardDescriptor.Vali
         int id = (int) wiz.getProperty("genomeID");
         List<FeatureType> usedFeatures = (List<FeatureType>) wiz.getProperty("featureType");
         ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(id);
-        int genomeSize = referenceConnector.getRefGenome().getSequence().length();
+        int genomeSize = referenceConnector.getRefGenome().getRefLength();
         List<PersistantFeature> persFeatures = referenceConnector.getFeaturesForRegion(1, genomeSize, usedFeatures);
         getComponent().setFeatureList(persFeatures);
     }

@@ -413,7 +413,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size(); ++i) {
+            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size()-1; ++i) {
                 feature = this.genomeFeatures.get(i);
                 start = feature.getStop();
 
