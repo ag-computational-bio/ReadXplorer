@@ -190,7 +190,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         //get standard codes and add to tableD
         String codonsConcat;
         for (GeneticCode genCode : genCodes){
-            codonsConcat = "<html><b>(Starts: ";
+            codonsConcat = "<html>ID " + genCode.getId() + ": <b>(Starts: ";
             for (String codon : genCode.getStartCodons()){
                 codonsConcat = codonsConcat.concat(codon).concat(", ");
             }

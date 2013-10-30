@@ -24,7 +24,6 @@ import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
@@ -56,7 +55,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     public static final String SNPS_DELETIONS = "Deletions";
     
     private static final long serialVersionUID = 1L;
-    private SnpDetectionResult snpData;
+    private SnpDetectionResult completeSnpData;
+    private Map<String, Integer> snpStatsMap;
     private PersistantReference reference;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     
@@ -212,11 +212,11 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", snpData);
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", completeSnpData);
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
-        SNP_Phylogeny sp = new SNP_Phylogeny(snpData);
+        SNP_Phylogeny sp = new SNP_Phylogeny(completeSnpData);
     }//GEN-LAST:event_alignmentButtonActionPerformed
 
     private void alignmentButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButton1ActionPerformed
@@ -224,7 +224,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     }//GEN-LAST:event_alignmentButton1ActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpData.getStatsMap()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.completeSnpData.getStatsMap()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
 
@@ -247,25 +247,43 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     public void addResult(ResultTrackAnalysis newResult) {
         
         if (newResult instanceof SnpDetectionResult) {
-            snpData = (SnpDetectionResult) newResult;
+            SnpDetectionResult snpData = (SnpDetectionResult) newResult;
+            
+            // if first result: initialize data structures and stats
+            if (this.completeSnpData == null) {
+                this.completeSnpData = snpData;
+                this.snpStatsMap = snpData.getStatsMap();
+                snpStatsMap.put(SNPS_TOTAL, 0);
+                snpStatsMap.put(SNPS_INTERGENEIC, 0);
+                snpStatsMap.put(SNPS_SYNONYMOUS, 0);
+                snpStatsMap.put(SNPS_CHEMIC_NEUTRAL, 0);
+                snpStatsMap.put(SNPS_CHEMIC_DIFF, 0);
+                snpStatsMap.put(SNPS_STOPS, 0);
+                snpStatsMap.put(SNPS_AA_INSERTIONS, 0);
+                snpStatsMap.put(SNPS_AA_DELETIONS, 0);
+                snpStatsMap.put(SNPS_SUBSTITUTIONS, 0);
+                snpStatsMap.put(SNPS_INSERTIONS, 0);
+                snpStatsMap.put(SNPS_DELETIONS, 0);
+            } else {
+                this.completeSnpData.getSnpList().addAll(snpData.getSnpList());
+            }
 
             //snp effect statistics
-            int noIntergenicSnps = 0;
-            int noSynonymousSnps = 0;
-            int noMissenseSnps = 0;
-            int noChemicallyNeutralSnps = 0;
-            int noStopMutations = 0;
-            int noAAInsertions = 0;
-            int noAADeletions = 0;
+            int noIntergenicSnps = snpStatsMap.get(SNPS_INTERGENEIC);
+            int noSynonymousSnps = snpStatsMap.get(SNPS_SYNONYMOUS);
+            int noChemicallyDiffSnps = snpStatsMap.get(SNPS_CHEMIC_DIFF);
+            int noChemicallyNeutralSnps = snpStatsMap.get(SNPS_CHEMIC_NEUTRAL);
+            int noStopMutations = snpStatsMap.get(SNPS_STOPS);
+            int noAAInsertions = snpStatsMap.get(SNPS_AA_INSERTIONS);
+            int noAADeletions = snpStatsMap.get(SNPS_AA_DELETIONS);
 
             //snp type statistics
-            int noSubstitutions = 0;
-            int noInsertions = 0;
-            int noDeletions = 0;
-
+            int noSubstitutions = snpStatsMap.get(SNPS_SUBSTITUTIONS);
+            int noInsertions = snpStatsMap.get(SNPS_INSERTIONS);
+            int noDeletions = snpStatsMap.get(SNPS_DELETIONS);
 
             final int snpDataSize = 20;
-            List<SnpI> snps = this.snpData.getSnpList();
+            List<SnpI> snps = snpData.getSnpList();
             Collections.sort(snps);
             DefaultTableModel model = (DefaultTableModel) snpTable.getModel();
 
@@ -345,7 +363,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                         ++noIntergenicSnps;
 
                     } else if (effect.contains("E")) {
-                        ++noMissenseSnps;
+                        ++noChemicallyDiffSnps;
                         if (aminosSnp.contains("*")) {
                             ++noStopMutations;
                         }
@@ -413,13 +431,11 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             sorter.setModel(model);
             TableComparatorProvider.setPersistantTrackComparator(sorter, 2);
 
-            Map<String, Integer> snpStatsMap = new HashMap<>();
-
-            snpStatsMap.put(SNPS_TOTAL, this.snpData.getSnpList().size());
+            snpStatsMap.put(SNPS_TOTAL, this.completeSnpData.getSnpList().size());
             snpStatsMap.put(SNPS_INTERGENEIC, noIntergenicSnps);
             snpStatsMap.put(SNPS_SYNONYMOUS, noSynonymousSnps);
             snpStatsMap.put(SNPS_CHEMIC_NEUTRAL, noChemicallyNeutralSnps);
-            snpStatsMap.put(SNPS_CHEMIC_DIFF, noMissenseSnps);
+            snpStatsMap.put(SNPS_CHEMIC_DIFF, noChemicallyDiffSnps);
             snpStatsMap.put(SNPS_STOPS, noStopMutations);
             snpStatsMap.put(SNPS_AA_INSERTIONS, noAAInsertions);
             snpStatsMap.put(SNPS_AA_DELETIONS, noAADeletions);
@@ -427,7 +443,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             snpStatsMap.put(SNPS_INSERTIONS, noInsertions);
             snpStatsMap.put(SNPS_DELETIONS, noDeletions);
 
-            this.snpData.setStatsMap(snpStatsMap);
+            this.completeSnpData.setStatsMap(snpStatsMap);
 
             ParameterSetSNPs params = (ParameterSetSNPs) snpData.getParameters();
             String useMainBaseString = params.isUseMainBase() ? "yes" : "no";
@@ -466,6 +482,6 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
      */
     @Override
     public int getResultSize() {
-        return this.snpData.getSnpList().size();
+        return this.completeSnpData.getStatsMap().get(SNPS_TOTAL);
     }
 }

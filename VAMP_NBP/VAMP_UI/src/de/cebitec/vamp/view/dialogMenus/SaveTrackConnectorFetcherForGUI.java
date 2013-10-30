@@ -1,11 +1,12 @@
 package de.cebitec.vamp.view.dialogMenus;
 
+import de.cebitec.vamp.databackend.SamBamFileReader;
 import de.cebitec.vamp.databackend.connector.MultiTrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.StorageException;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
+import static de.cebitec.vamp.view.dialogMenus.Bundle.*;
 import de.cebitec.vamp.view.login.LoginProperties;
 import java.awt.Dialog;
 import java.io.File;
@@ -18,16 +19,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
+import net.sf.samtools.util.RuntimeIOException;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import org.openide.util.NbBundle;
+import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
 /**
  * A class for GUI Components to safely fetch a TrackConnector.
  *
- * @author kstaderm
+ * @author kstaderm, rhilker
  */
+@Messages({ "TITLE_FileReset=Reset track file path",
+            "MSG_FileReset=If you do not reset the track file location, it cannot be opened",
+            "MSG_FileReset_StorageError=An error occured during storage of the new file path. Please try again" })
 public class SaveTrackConnectorFetcherForGUI {
 
     /**
@@ -167,13 +172,18 @@ public class SaveTrackConnectorFetcherForGUI {
         if (newTrackFile.exists()) {
             newTrack = new PersistantTrack(track.getId(),
                     newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
-                    track.getRefGenID(), track.getSeqPairId());
+                    track.getRefGenID(), track.getReadPairId());
             try {
-                connector.resetTrackPath(newTrack);
-            } catch (StorageException ex) {
-                String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.StorageError");
-                String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
-                JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                SamBamFileReader reader = new SamBamFileReader(newTrackFile, track.getId());
+                try {
+                    connector.resetTrackPath(newTrack);
+                } catch (StorageException ex) {
+                    String msg = MSG_FileReset_StorageError();
+                    String title = TITLE_FileReset();
+                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (RuntimeIOException e) {
+                //nothing to do, we return a null track
             }
         }
         return newTrack;
@@ -198,27 +208,32 @@ public class SaveTrackConnectorFetcherForGUI {
         Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         resetFileDialog.setVisible(true);
 
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
-            try {
-                newTrack = new PersistantTrack(track.getId(),
-                        resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
-                        track.getRefGenID(), track.getSeqPairId());
-                connector.resetTrackPath(newTrack);
-                try {
-                    TrackConnector trackConnector = connector.getTrackConnector(newTrack);
-                } catch (FileNotFoundException ex) {
-                    String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.Error");
-                    String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
-                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION))  {
+            if (resetPanel.getNewFileLocation() != null) {
+                File selectedFile = new File(resetPanel.getNewFileLocation());
+                if (selectedFile.exists() && selectedFile.isFile()) {
+                    try {
+                        newTrack = new PersistantTrack(track.getId(),
+                                resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
+                                track.getRefGenID(), track.getReadPairId());
+                        connector.resetTrackPath(newTrack);
+                        try {
+                            TrackConnector trackConnector = connector.getTrackConnector(newTrack);
+                        } catch (FileNotFoundException ex) {
+                            String msg = MSG_FileReset();
+                            String title = TITLE_FileReset();
+                            JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (StorageException ex) {
+                        String msg = MSG_FileReset_StorageError();
+                        String title = TITLE_FileReset();
+                        JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
-            } catch (StorageException ex) {
-                String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset.StorageError");
-                String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
-                JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
-            String msg = NbBundle.getMessage(BasePanelFactory.class, "MSG_BasePanelFactory_FileReset");
-            String title = NbBundle.getMessage(BasePanelFactory.class, "TITLE_BasePanelFactory_FileReset");
+            String msg = MSG_FileReset();
+            String title = TITLE_FileReset();
             JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
         }
         return newTrack;

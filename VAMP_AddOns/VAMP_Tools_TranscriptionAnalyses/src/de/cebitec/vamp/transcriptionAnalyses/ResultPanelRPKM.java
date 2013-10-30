@@ -37,7 +37,6 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
     private RPKMAnalysisResult rpkmCalcResult;
     private HashMap<String, Integer> filterStatisticsMap;
-    private ResultHistogramRPKM hist;
     private PersistantFeature feature;
     private boolean statistics = false;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
@@ -71,21 +70,12 @@ public class ResultPanelRPKM extends ResultTablePanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        snapshotButton = new javax.swing.JButton();
         parametersLabel = new javax.swing.JLabel();
         histogramButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         rpkmTable = new javax.swing.JTable();
-        exitHistogramButton = new javax.swing.JButton();
         exportButton = new javax.swing.JButton();
         statisticsButton = new javax.swing.JButton();
-
-        snapshotButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.snapshotButton.text")); // NOI18N
-        snapshotButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                snapshotButtonActionPerformed(evt);
-            }
-        });
 
         parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.parametersLabel.text")); // NOI18N
 
@@ -130,13 +120,6 @@ public class ResultPanelRPKM extends ResultTablePanel {
         rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title3")); // NOI18N
         rpkmTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title6")); // NOI18N
 
-        exitHistogramButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exitHistogramButton.text")); // NOI18N
-        exitHistogramButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitHistogramButtonActionPerformed(evt);
-            }
-        });
-
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -157,14 +140,10 @@ public class ResultPanelRPKM extends ResultTablePanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(parametersLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 230, Short.MAX_VALUE)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exitHistogramButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(histogramButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(snapshotButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton))
             .addComponent(jScrollPane1)
@@ -175,44 +154,22 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(snapshotButton)
                     .addComponent(histogramButton)
                     .addComponent(parametersLabel)
-                    .addComponent(exitHistogramButton)
                     .addComponent(exportButton)
                     .addComponent(statisticsButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void snapshotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_snapshotButtonActionPerformed
-        //FilteredFeaturesColumns filteredFeaturesData = new FilteredFeaturesColumns(this.rpkmValues);
-        //ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", filteredFeaturesData);
-        if (statistics) {
-            this.hist.takeSnapshot();
-        } else {
-            try {
-                hist = new ResultHistogramRPKM(this.rpkmCalcResult.getResults());
-                this.statistics = true;
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            this.hist.takeSnapshot();
-        }
-    }//GEN-LAST:event_snapshotButtonActionPerformed
-
     private void histogramButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramButtonActionPerformed
         if (!statistics) {
             try {
-                hist = new ResultHistogramRPKM(this.rpkmCalcResult.getResults());
+                ResultHistogramRPKM hist = new ResultHistogramRPKM(this.rpkmCalcResult.getResults());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
         }
     }//GEN-LAST:event_histogramButtonActionPerformed
-
-    private void exitHistogramButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitHistogramButtonActionPerformed
-        hist.close();
-    }//GEN-LAST:event_exitHistogramButtonActionPerformed
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", rpkmCalcResult);
@@ -223,13 +180,11 @@ public class ResultPanelRPKM extends ResultTablePanel {
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton exitHistogramButton;
     private javax.swing.JButton exportButton;
     private javax.swing.JButton histogramButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel parametersLabel;
     private javax.swing.JTable rpkmTable;
-    private javax.swing.JButton snapshotButton;
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 

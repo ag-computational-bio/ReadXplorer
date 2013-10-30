@@ -30,7 +30,8 @@ import org.w3c.dom.Document;
 public class ScreenshotUtils {
     
     /**
-     * Creates an SVG screenshot of an arbitrary <cc>Container</cc>.
+     * Creates an SVG screenshot of an arbitrary <cc>Container</cc> and opens
+     * a save dialog to store the svg somewhere.
      * @param container the <cc>Container</cc>, for which a screenshot shall be 
      * stored
      */

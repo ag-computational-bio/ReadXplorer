@@ -22,31 +22,11 @@ public class ConvertData {
     private static final int CUT_OFF = 30;
 
     public static Map<PersistantFeature, Pair<Double, Double>> ratioABagainstConfidence(ResultDeAnalysis result) {
-        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
-        Vector resultTable = result.getTableContents();
-        for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
-            Vector row = it.next();
-            PersistantFeature key = (PersistantFeature) row.get(0);
-            Double X = (Double) row.get(7);
-            Double Y = (Double) row.get(9);
-            Pair<Double, Double> values = new Pair<>(X, Y);
-            ret.put(key, values);
-        }
-        return ret;
+        return createDataPairForFeature(result.getTableContents(), 0, 7, 9);
     }
 
     public static Map<PersistantFeature, Pair<Double, Double>> ratioBAagainstConfidence(ResultDeAnalysis result) {
-        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
-        Vector resultTable = result.getTableContents();
-        for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
-            Vector row = it.next();
-            PersistantFeature key = (PersistantFeature) row.get(0);
-            Double X = (Double) row.get(8);
-            Double Y = (Double) row.get(9);
-            Pair<Double, Double> values = new Pair<>(X, Y);
-            ret.put(key, values);
-        }
-        return ret;
+        return createDataPairForFeature(result.getTableContents(), 0, 8, 9);
     }
 
     public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool, Integer[] sampleA, Integer[] sampleB) {
@@ -56,18 +36,18 @@ public class ConvertData {
                 input = convertBaySeqResults(result.getTableContents(), sampleA, sampleB);
                 break;
             case DeSeq:
-                input = convertDESeqResults(result.getTableContents());
+                input = createDataPairForFeature(result.getTableContents(), 0, 2, 3);
                 break;
             case SimpleTest:
-                input = convertSimpleTestResults(result.getTableContents());
+                input = createDataPairForFeature(result.getTableContents(), 0, 3, 5);
                 break;
         }
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         for (Iterator<PersistantFeature> it = input.keySet().iterator(); it.hasNext();) {
             PersistantFeature key = it.next();
             Pair<Double, Double> pair = input.get(key);
-            Double R = (Double) pair.getFirst();
-            Double G = (Double) pair.getSecond();
+            Double R = pair.getFirst();
+            Double G = pair.getSecond();
             if ((R > CUT_OFF) || (G > CUT_OFF)) {
 
                 Double M = (Math.log(R) / Math.log(2)) - (Math.log(G) / Math.log(2));
@@ -85,7 +65,7 @@ public class ConvertData {
                 //the A value is shown on the X-Axis and the M value on the Y-Axis. So at
                 //this point the values are in correct order for plotting, meaning that 
                 //the value corresponding to the X-Axis is the first and the one corresponding
-                //to the Y-Axis is the secound one.
+                //to the Y-Axis is the second one.
                 ret.put(key, new Pair<>(A, M));
             }
         }
@@ -100,42 +80,39 @@ public class ConvertData {
             Double X = 0d;
             for (int i = 0; i < sampleA.length; i++) {
                 int index = sampleA[i] + BAY_SEQ_OFFSET;
-                X = X + (Double) row.get(index);
+                X += (Double) row.get(index);
             }
-            X = X / sampleA.length;
+            X /= sampleA.length;
             Double Y = 0d;
             for (int i = 0; i < sampleB.length; i++) {
                 int index = sampleB[i] + BAY_SEQ_OFFSET;
-                Y = Y + (Double) row.get(index);
+                Y += (Double) row.get(index);
             }
-            Y = Y / sampleB.length;
+            Y /= sampleB.length;
             Pair<Double, Double> values = new Pair<>(X, Y);
             ret.put(key, values);
         }
         return ret;
     }
-
-    private static Map<PersistantFeature, Pair<Double, Double>> convertDESeqResults(Vector<Vector> resultTable) {
+    
+    /**
+     * Creates a map of the PersistantFeatures in the resultTable to a pair of
+     * Double values. E.g. this method can be used to get a data point
+     * associated to the genomic features.
+     * @param resultTable the table to iterate through
+     * @param columnFeature the column, in which the PersistantFeatures are stored
+     * @param column1 the column of the x value of the data point associated with a PersistantFeature
+     * @param column2 the column of the y value of the data point associated with a PersistantFeature
+     * @return 
+     */
+    private static Map<PersistantFeature, Pair<Double, Double>> createDataPairForFeature(Vector<Vector> resultTable, int columnFeature, int column1, int column2) {
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
         for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
             Vector row = it.next();
-            PersistantFeature key = (PersistantFeature) row.get(0);
-            Double X = (Double) row.get(2);
-            Double Y = (Double) row.get(3);
-            Pair<Double, Double> values = new Pair<>(X, Y);
-            ret.put(key, values);
-        }
-        return ret;
-    }
-
-    private static Map<PersistantFeature, Pair<Double, Double>> convertSimpleTestResults(Vector<Vector> resultTable) {
-        Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
-        for (Iterator<Vector> it = resultTable.iterator(); it.hasNext();) {
-            Vector row = it.next();
-            PersistantFeature key = (PersistantFeature) row.get(0);
-            Double X = (Double) row.get(3);
-            Double Y = (Double) row.get(5);
-            Pair<Double, Double> values = new Pair<>(X, Y);
+            PersistantFeature key = (PersistantFeature) row.get(columnFeature);
+            Double x = (Double) row.get(column1);
+            Double y = (Double) row.get(column2);
+            Pair<Double, Double> values = new Pair<>(x, y);
             ret.put(key, values);
         }
         return ret;

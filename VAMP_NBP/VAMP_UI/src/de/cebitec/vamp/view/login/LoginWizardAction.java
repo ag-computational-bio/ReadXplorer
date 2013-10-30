@@ -36,6 +36,7 @@ public final class LoginWizardAction implements ActionListener {
     private static final long serialVersionUID = 1L;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
     private LoadingDialog loading;
+    private LoginWizardPanel loginPanel;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -103,10 +104,11 @@ public final class LoginWizardAction implements ActionListener {
      */
     @SuppressWarnings("unchecked")
     private WizardDescriptor.Panel<WizardDescriptor>[] getPanels() {
+        if (this.loginPanel == null) {
+            this.loginPanel = new LoginWizardPanel();
+        }
         if (panels == null) {
-            panels = new WizardDescriptor.Panel[]{
-                new LoginWizardPanel()
-            };
+            panels = new WizardDescriptor.Panel[]{ this.loginPanel };
             String[] steps = new String[panels.length];
             for (int i = 0; i < panels.length; i++) {
                 Component c = panels[i].getComponent();
@@ -130,6 +132,17 @@ public final class LoginWizardAction implements ActionListener {
             }
         }
         return panels;
+    }
+
+    /**
+     * Updates the choose button text.
+     * @param chooseButtonText
+     */
+    public void setChooseButtonText(String chooseButtonText) {
+        if (this.loginPanel == null) {
+            this.loginPanel = new LoginWizardPanel();
+        }
+        ((LoginVisualPanel) this.loginPanel.getComponent()).setChooseButtonText(chooseButtonText);
     }
     
     /**

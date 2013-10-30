@@ -18,6 +18,30 @@ public class TableUtils {
     }
     
     /**
+     * Transforms the selected row index in the table view to the selected 
+     * index of the underlying table model (in case the results are sorted, 
+     * they can be different). If the transformation is not possible, it returns
+     * -1
+     * @param table the table for which the selected model row is needed
+     * @return The selected model row index or -1, if the index is out of 
+     * bounds or cannot be calculated
+     */
+    public static int getSelectedModelRow(JTable table) {
+        int wantedModelIdx = -1;
+        DefaultListSelectionModel model = (DefaultListSelectionModel) table.getSelectionModel();
+        int selectedView = model.getLeadSelectionIndex();
+
+        if (table.getModel().getRowCount() > selectedView && selectedView >= 0) {
+            int selectedModelIdx = table.convertRowIndexToModel(selectedView);
+
+            if (table.getModel().getRowCount() > selectedModelIdx) {
+                wantedModelIdx = selectedModelIdx;
+            }
+        }
+        return wantedModelIdx;
+    }
+    
+    /**
      * Updates the navigator bar of all viewers to the given position, which
      * might be in String or Integer format or updates the viewers to the start
      * position of a selected PersistantFeature with respect to the strand on
@@ -27,23 +51,14 @@ public class TableUtils {
      * @param bim the bounds information manager which should be updated
      */
     public static void showPosition(JTable table, int featureColumnIndex, BoundsInfoManager bim) {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) table.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-
-        if (table.getModel().getRowCount() > selectedView && selectedView >= 0) {
-            int selectedModel = table.convertRowIndexToModel(selectedView);
-
-            if (table.getModel().getRowCount() > selectedModel) {
-                Object value = table.getModel().getValueAt(selectedModel, featureColumnIndex);
-
+        int selectedModelRow = TableUtils.getSelectedModelRow(table);
+        if (selectedModelRow > -1) {
+                Object value = table.getModel().getValueAt(selectedModelRow, featureColumnIndex);
                 
                 if (value instanceof PersistantFeature) {
                     PersistantFeature feature = (PersistantFeature) value;
-
-                    if (feature != null) {
-                        int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-                        bim.navigatorBarUpdated(pos);
-                    }
+                    int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+                    bim.navigatorBarUpdated(pos);
                     
                 } else if (value instanceof Integer) {
                     bim.navigatorBarUpdated((Integer) value);
@@ -59,6 +74,5 @@ public class TableUtils {
                 }
             }
         }
-    }
     
 }

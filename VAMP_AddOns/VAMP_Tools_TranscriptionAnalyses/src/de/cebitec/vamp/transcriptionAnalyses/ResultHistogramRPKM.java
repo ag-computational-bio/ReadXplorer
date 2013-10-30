@@ -5,12 +5,6 @@ import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -22,12 +16,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javax.swing.JPanel;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.svggen.SVGGraphics2DIOException;
-import org.openide.util.Exceptions;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 /**
  * Class for displaying a histogram of RPKM values.
@@ -39,7 +27,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     private static final long serialVersionUID = 1L;
 
     private JFXPanel fxPanel;
-    private AppPanelTopComponent appPanelTopComponent;
+    private AppPanelTopComponent appPanelTopComponent; //TODO: Create new TopComp for this histogram
     private JPanel mainPanel;
     private List<RPKMvalue> rpkmValues;
     private BarChart<String, Number> barChart;
@@ -185,37 +173,6 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
      */
     public BarChart<String, Number> getBarChart() {
         return this.barChart;
-    }
-
-    public void takeSnapshot() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                /*WritableImage image = barChart.snapshot(new SnapshotParameters(), null);
-                JFileChooser chooser = new JFileChooser();
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                chooser.showSaveDialog(null);
-                File file = chooser.getSelectedFile();
-                try {
-                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-                } catch (IOException e) {
-                    // TODO: handle exception here
-                }*/
-                
-                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-                String svgNS = "http://www.w3.org/2000/svg";
-                Document document = domImpl.createDocument(svgNS, "svg", null);
-                SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-                appPanelTopComponent.paint(svgGenerator);
-                try {
-                    OutputStream file = new FileOutputStream("snapshot.svg");
-                    Writer out = new OutputStreamWriter(file, "UTF-8");
-                    svgGenerator.stream(out, false);
-                } catch (UnsupportedEncodingException | SVGGraphics2DIOException | FileNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            }
-        });
     }
     
     private void exportPanel(JFXPanel fxPanel) {

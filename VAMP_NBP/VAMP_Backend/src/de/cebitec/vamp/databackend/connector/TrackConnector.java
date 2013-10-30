@@ -72,7 +72,13 @@ public class TrackConnector {
      * false if it should be kept separated
      * @param adapter the database adapter type (mysql or h2)
      */
-    private void initTrackConnector(int trackId, boolean combineTracks, String adapter) {
+    private void initTrackConnector(int trackId, boolean combineTracks, String adapter) throws FileNotFoundException {
+        for (PersistantTrack track : associatedTracks) {
+            if (!new File(track.getFilePath()).exists() && !track.isDbUsed()) {
+                throw new FileNotFoundException(track.getFilePath());
+            }
+        }
+        
         this.trackID = trackId;
         this.adapter = adapter;
         this.con = ProjectConnector.getInstance().getConnection();

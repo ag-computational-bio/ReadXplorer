@@ -153,6 +153,9 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
         return this.selectedTracks;
     }
     
+    /**
+     * Stores all seleceted tracks in the internal selectedTracks list.
+     */
     public void storeSelectedTracks() {
         List<PersistantTrack> trackList = new ArrayList<>();
         List<Node> markedNodes = this.getAllMarkedNodes();
@@ -169,16 +172,40 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
     public List<Node> getAllMarkedNodes() {
         List<Node> nodeList = Arrays.asList(explorerManager.getRootContext().getChildren().getNodes());
         nodeList = StandardNode.getAllMarkedNodes(nodeList);
-        nodeList.addAll(Arrays.asList(explorerManager.getSelectedNodes()));
-        return nodeList;
+//        nodeList.addAll(Arrays.asList(explorerManager.getSelectedNodes()));
+//        Set<Node> uniqueNodes = new HashSet<>(nodeList); //ensures, that each track only occurs once!
+        return nodeList; //new ArrayList<>(uniqueNodes)
     }
 
     @Override
     public boolean isRequiredInfoSet() {
+        this.checkSelectedRowBoxes();
+        
         boolean requiredInfoSet = this.getAllMarkedNodes().size() > 0;
         if (requiredInfoSet) { this.storeSelectedTracks(); }
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, requiredInfoSet);
         return requiredInfoSet;
+    }
+
+    /**
+     * Checks the boxes of all currently selected nodes in the explorer.
+     */
+    private void checkSelectedRowBoxes() {
+        Node[] selectedNodes = explorerManager.getSelectedNodes();
+        for (int i = 0; i < selectedNodes.length; ++i) {
+            if (selectedNodes[i] instanceof TrackNode) {
+                StandardItem item = ((TrackNode) selectedNodes[i]).getData();
+                if (item instanceof TrackItem) {
+                    TrackItem trackItem = (TrackItem) item;
+                    if (!selectedTracks.contains(trackItem.getTrack())) {
+                        if (!item.getSelected()) {
+                            item.setSelected(true);
+                        }
+                    }
+                }
+            }
+        }
+        outlineView.repaint();
     }
 
     /**

@@ -40,11 +40,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
                 CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
                 if (request != null) {
                     if (request.getDesiredData() == Properties.READ_STARTS) {
-                        if (this.getTrackId() != 0) { //single coverage request
-                            currentCov = this.loadReadStartsAndCoverageMultiple(request);
-                        } else { //combine multiple tracks request
-                            currentCov = this.loadReadStartsAndCoverageMultiple(request);
-                        }
+                        currentCov = this.loadReadStartsAndCoverageMultiple(request);
                     } else
                     if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo())) {
                         if (this.getTrackId2() != 0) {

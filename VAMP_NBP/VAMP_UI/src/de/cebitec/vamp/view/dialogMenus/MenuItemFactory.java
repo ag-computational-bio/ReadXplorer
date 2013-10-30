@@ -228,7 +228,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     public JMenuItem getStoreFastaForCdsItem(final List<String> sequencesToStore, final List<Region> regions,
             final String referenceName){
 
-        JMenuItem storeFastaCdsItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFastaCDS"));
+        JMenuItem storeFastaCdsItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFastaORF"));
         storeFastaCdsItem.addActionListener(new ActionListener() {
 
             @Override

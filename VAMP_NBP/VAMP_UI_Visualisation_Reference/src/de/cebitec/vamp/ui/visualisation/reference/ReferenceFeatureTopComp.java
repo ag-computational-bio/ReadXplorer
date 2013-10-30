@@ -6,11 +6,13 @@ import de.cebitec.vamp.util.polyTree.Node;
 import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
+import javax.swing.JTable;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
@@ -416,5 +418,22 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
        }
        return featureVect;
    }
+    
+    /**
+     * Displays the feature associated wit the currently selected table row in
+     * this feature window.
+     * @param table the table whose selected feature shall be shown
+     * @param featureColumnIndex the index of the feature column in the table
+     */
+    public void showTableFeature(JTable table, int featureColumnIndex) {
+        int selectedModelRow = TableUtils.getSelectedModelRow(table);
+        if (selectedModelRow > -1) {
+            Object value = table.getModel().getValueAt(selectedModelRow, featureColumnIndex);
+
+            if (value instanceof PersistantFeature) {
+                this.showFeatureDetails((PersistantFeature) value);
+            }
+        }
+    }
 
 }

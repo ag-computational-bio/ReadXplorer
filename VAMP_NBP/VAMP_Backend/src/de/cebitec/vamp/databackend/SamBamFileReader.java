@@ -492,8 +492,13 @@ public class SamBamFileReader implements Observable {
                         
                         this.increaseCoverage(request, numMappingsForRead, classification, 
                                 trackNeeded, isFwdStrand, startPos, stop, coverage);
-                        this.increaseCoverage(request, numMappingsForRead, classification, 
-                                trackNeeded, isFwdStrand, startPos, startPos, readStarts);
+                        if (isFwdStrand) {
+                            this.increaseCoverage(request, numMappingsForRead, classification, 
+                                    trackNeeded, isFwdStrand, startPos, startPos, readStarts);
+                        } else {
+                            this.increaseCoverage(request, numMappingsForRead, classification,
+                                    trackNeeded, isFwdStrand, stop, stop, readStarts);
+                        }
 
                         if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE
                                 && request.getReadClassParams().isClassificationAllowed(classification)) {

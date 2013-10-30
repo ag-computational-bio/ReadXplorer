@@ -9,7 +9,11 @@ import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dialogMenus.explorer.CustomOutlineCellRenderer;
+import de.cebitec.vamp.view.dialogMenus.explorer.StandardItem;
+import de.cebitec.vamp.view.login.LoginWizardAction;
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +62,9 @@ preferredID = "DashboardWindowTopComponent")
 @Messages({
     "CTL_DashboardWindowAction=Dashboard",
     "CTL_DashboardWindowTopComponent=Dashboard",
-    "HINT_DashboardWindowTopComponent=This is a DashboardWindow window"
+    "HINT_DashboardWindowTopComponent=This is a DashboardWindow window", 
+    "DashboardWindowTopComponent_openDBButton_loggedOut=Open existing database", 
+    "DashboardWindowTopComponent_openDBButton_loggedIn=Close this and open another database",
 })
 public final class DashboardWindowTopComponent extends TopComponentExtended implements ExplorerManager.Provider {
     
@@ -66,12 +72,14 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
     
     private ExplorerManager em = new ExplorerManager();
     private OutlineView ov;
+    private Map<Long, HashSet<Long>> genomesAndTracksToOpen;
     
     /**
      * DashboardWindowTopComponent, which displays the ReadXplorer Dashboard
      * displaying all references and track data sets in an explorer.
      */
     public DashboardWindowTopComponent() {
+        this.genomesAndTracksToOpen = new HashMap<>();
         initComponents();
         this.initAdditionalComponents();
         setName(Bundle.CTL_DashboardWindowTopComponent());
@@ -125,10 +133,12 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
             quickstartLabel.setVisible(true);
             explorerSplitPane.setVisible(false);
             openButton.setVisible(false);
+            openDBButton.setText(Bundle.DashboardWindowTopComponent_openDBButton_loggedOut());
         } else {
             quickstartLabel.setVisible(false);
             explorerSplitPane.setVisible(true);
             openButton.setVisible(true);
+            openDBButton.setText(Bundle.DashboardWindowTopComponent_openDBButton_loggedIn());
             try {
                 final Map<PersistantReference, List<PersistantTrack>> genomesAndTracks =
                         ProjectConnector.getInstance().getGenomesAndTracks();
@@ -177,6 +187,55 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         this.repaint();
     }
     
+    /**
+     * Updates the list of genomes and tracks to open depending on the checked
+     * items in the list if nodes.
+     */
+    private void updateOpenList() {
+        genomesAndTracksToOpen = new HashMap<>();
+        List<Node> selectedNodes = DBItemNode.getAllMarkedNodes(Arrays.asList(em.getRootContext().getChildren().getNodes()));
+
+        //scan all selected nodes and save them to a map of the form:
+        // GenomeID -> List<ReferenceID>
+//        selectedNodes.addAll(Arrays.asList(em.getSelectedNodes()));
+        
+        for (Node n : selectedNodes) {
+            DBItem item = this.getItemForNode(n);
+            if (item != null) {
+                if (item.getChild() == DBItem.Child.GENOME) {
+                    if (!genomesAndTracksToOpen.containsKey(item.getID())) {
+                        genomesAndTracksToOpen.put(item.getID(), new HashSet<Long>());
+                    }
+                } else {
+                    if (!genomesAndTracksToOpen.containsKey(item.getRefID())) {
+                        genomesAndTracksToOpen.put(item.getRefID(), new HashSet<Long>());
+                        DBItem parentItem = this.getItemForNode(n.getParentNode());
+                        if (parentItem != null) {
+                            parentItem.setSelected(Boolean.TRUE);
+                        }
+                    }
+                    genomesAndTracksToOpen.get(item.getRefID()).add(item.getID());
+                }
+            }
+        }
+    }
+    
+    /**
+     * @param n the node to check
+     * @return The DBItem for the given node, if it contains a DBItem, if not,
+     * null is returned
+     */
+    private DBItem getItemForNode(Node n) {
+        DBItem item = null;
+        if (n instanceof DBItemNode) {
+            StandardItem standardItem = ((DBItemNode) n).getData();
+            if (standardItem instanceof DBItem) {
+                item = (DBItem) standardItem;
+            }
+        }
+        return item;
+    }
+    
     @Override 
     public ExplorerManager getExplorerManager() { 
         return em; 
@@ -195,6 +254,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         explorerPanel = new javax.swing.JPanel();
         buttonPanel = new javax.swing.JPanel();
         openButton = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        openDBButton = new javax.swing.JButton();
+        createDBButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(quickstartLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.quickstartLabel.text")); // NOI18N
 
@@ -226,26 +288,66 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
             buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(buttonPanelLayout.createSequentialGroup()
                 .addComponent(openButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 130, Short.MAX_VALUE))
+                .addGap(0, 164, Short.MAX_VALUE))
         );
 
         explorerSplitPane.setRightComponent(buttonPanel);
+
+        org.openide.awt.Mnemonics.setLocalizedText(openDBButton, Bundle.DashboardWindowTopComponent_openDBButton_loggedOut());
+        openDBButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openDBButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(createDBButton, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.createDBButton.text")); // NOI18N
+        createDBButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createDBButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(openDBButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(createDBButton)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(createDBButton, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                    .addComponent(openDBButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(quickstartLabel)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(explorerSplitPane, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(explorerSplitPane)
+            .addComponent(quickstartLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
                 .addComponent(quickstartLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
+                .addComponent(explorerSplitPane)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -255,13 +357,13 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
     private void initAdditionalComponents() {
 
         String sText = "<html><img src=\"" + DashboardWindowTopComponent.class.getResource("splash.png") + "\" /><h2>ReadXplorer - "
-                + "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open\") <br/> "
+                + "Visualization and Analysis of Mapped Sequences: Quick Start</h2> <p>1. Open/Create a database (\"File -> Open/Create Database\") <br/> "
                 + "2. Import a reference genome (\"File -> Import data\") <br /> 3. Import a track (\"File -> Import data\")<br /> 4. Explore "
                 + "your reference genome and tracks (via Dashboard, toolbar buttons or \"Visualisation\" menu) <br />5. Run an analysis on your data (via "
                 + "toolbar buttons or \"Tools\" menu)</p></html>";
         quickstartLabel.setText(sText);
 
-        Border paddingBorder = BorderFactory.createEmptyBorder(100, 100, 100, 100);
+        Border paddingBorder = BorderFactory.createEmptyBorder(50, 100, 100, 100);
         quickstartLabel.setBorder(BorderFactory.createCompoundBorder(paddingBorder, paddingBorder));
 
         //Create the outline view showing the explorer
@@ -275,32 +377,48 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         //Hide the root node, since we only care about the children: 
         ov.getOutline().setRootVisible(false); //Add the OutlineView to the TopComponent: 
         ov.getOutline().setDefaultRenderer(Node.Property.class, new CustomOutlineCellRenderer());
+        ov.getOutline().addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                this.checkSelectedRowBoxes();
+                updateOpenList();
+            }
+            
+            /**
+             * Checks the boxes of all currently selected nodes in the explorer.
+             */
+            private void checkSelectedRowBoxes() {
+                Node[] selectedNodes = em.getSelectedNodes();
+                for (int i = 0; i < selectedNodes.length; ++i) {
+                    DBItem dbItem = getItemForNode(selectedNodes[i]);
+                    if (dbItem != null) {
+                        if (dbItem.getChild() == DBItem.Child.GENOME) {
+                            if (!genomesAndTracksToOpen.containsKey(dbItem.getID())) {
+                                dbItem.setSelected(true);
+                            }
+                        } else {
+                            if (!genomesAndTracksToOpen.containsKey(dbItem.getRefID())) {
+                                dbItem.setSelected(true);
+                            } else if (!genomesAndTracksToOpen.get(dbItem.getRefID()).contains(dbItem.getID())) {
+                                dbItem.setSelected(true);
+                            }
+                        }
+                    }
+                }
+                ov.repaint();
+            }
+        });
         explorerPanel.add(ov);
     }
     
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-        List<Node> selectedNodes = DBItemNode.getAllMarkedNodes(Arrays.asList(em.getRootContext().getChildren().getNodes()));
             
         //scan all selected nodes and save them to a map of the form:
         // GenomeID -> List<ReferenceID>
-        selectedNodes.addAll(Arrays.asList(em.getSelectedNodes()));
+//        selectedNodes.addAll(Arrays.asList(em.getSelectedNodes()));
         
-        HashMap<Long,HashSet<Long>> genomesAndTracksToOpen = new HashMap<>();
-        for(Node n : selectedNodes) {
-            DBItemNode node = (DBItemNode) n;
-            DBItem item = (DBItem) node.getData();
-            if (item.getChild() == DBItem.Child.GENOME) {
-                if (!genomesAndTracksToOpen.containsKey(item.getID())) {
-                    genomesAndTracksToOpen.put(item.getID(), new HashSet<Long>()); 
-                }
-            } else {
-                if (!genomesAndTracksToOpen.containsKey(item.getRefID())) {
-                    genomesAndTracksToOpen.put(item.getRefID(), new HashSet<Long>());
-                }
-                genomesAndTracksToOpen.get(item.getRefID()).add(item.getID());
-            }
-        }
-        
+        this.updateOpenList();
         
         Map<PersistantReference, List<PersistantTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
         
@@ -334,11 +452,24 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         
     }//GEN-LAST:event_openButtonActionPerformed
 
+    @Messages({"ChooseDB=Choose database"})
+    private void openDBButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDBButtonActionPerformed
+        this.openLoginAction(Bundle.ChooseDB(), evt);
+    }//GEN-LAST:event_openDBButtonActionPerformed
+
+    @Messages({"CreateDB=Create database at"})
+    private void createDBButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createDBButtonActionPerformed
+        this.openLoginAction(Bundle.CreateDB(), evt);
+    }//GEN-LAST:event_createDBButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonPanel;
+    private javax.swing.JButton createDBButton;
     private javax.swing.JPanel explorerPanel;
     private javax.swing.JSplitPane explorerSplitPane;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton openButton;
+    private javax.swing.JButton openDBButton;
     private javax.swing.JLabel quickstartLabel;
     // End of variables declaration//GEN-END:variables
     
@@ -362,5 +493,17 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
+    }
+    
+    /**
+     * Opens the login action for a ReadXplorer DB with the appropriate 
+     * chooseButtonText.
+     * @param chooseButtonText the text to display on the open DB button
+     * @param evt the event which is forwarded to the login action
+     */
+    private void openLoginAction(String chooseButtonText, java.awt.event.ActionEvent evt) {
+        LoginWizardAction loginAction = new LoginWizardAction();
+        loginAction.setChooseButtonText(chooseButtonText);
+        loginAction.actionPerformed(evt);
     }
 }

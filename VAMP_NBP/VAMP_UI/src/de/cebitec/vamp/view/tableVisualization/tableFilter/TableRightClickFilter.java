@@ -34,10 +34,10 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
      */
     private E originalTableModel = null;
     private int lastSelectedColumn;
-    private JMenuItem numberColumnLower;
-    private JMenuItem numberColumnHigher;
-    private JMenuItem stringColumn;
-    private JMenuItem reset;
+    private JMenuItem numberColumnLowerItem;
+    private JMenuItem numberColumnHigherItem;
+    private JMenuItem stringColumnItem;
+    private JMenuItem resetItem;
     private Class<E> classType;
 
     /**
@@ -57,7 +57,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
      * not the filter will not know that there is a new original TableModel.
      */
     public void resetOriginalTableModel() {
-        reset.setEnabled(false);
+        resetItem.setEnabled(false);
         originalTableModel = null;
     }
 
@@ -65,8 +65,8 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
      * Initializes the filter.
      */
     private void init() {
-        numberColumnLower = new JMenuItem("Remove values smaller than...");
-        numberColumnLower.addActionListener(new ActionListener() {
+        numberColumnLowerItem = new JMenuItem("Remove values smaller than...");
+        numberColumnLowerItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String input = openPopUp("Remove values smaller than: ");
@@ -83,10 +83,10 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                 }
             }
         });
-        popup.add(numberColumnLower);
+        popup.add(numberColumnLowerItem);
 
-        numberColumnHigher = new JMenuItem("Remove values larger than...");
-        numberColumnHigher.addActionListener(new ActionListener() {
+        numberColumnHigherItem = new JMenuItem("Remove values larger than...");
+        numberColumnHigherItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String input = openPopUp("Remove values larger than: ");
@@ -103,10 +103,10 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                 }
             }
         });
-        popup.add(numberColumnHigher);
+        popup.add(numberColumnHigherItem);
 
-        stringColumn = new JMenuItem("Set pattern filter");
-        stringColumn.addActionListener(new ActionListener() {
+        stringColumnItem = new JMenuItem("Set pattern filter");
+        stringColumnItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String input = openPopUp("Only show rows with this pattern: ");
@@ -121,22 +121,22 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                 }
             }
         });
-        popup.add(stringColumn);
+        popup.add(stringColumnItem);
 
-        reset = new JMenuItem("Reset all filters");
-        reset.addActionListener(new ActionListener() {
+        resetItem = new JMenuItem("Reset all filters");
+        resetItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setNewTableModel(originalTableModel);
                 resetOriginalTableModel();
             }
         });
-        popup.add(reset);
+        popup.add(resetItem);
 
-        numberColumnLower.setEnabled(false);
-        numberColumnHigher.setEnabled(false);
-        stringColumn.setEnabled(false);
-        reset.setEnabled(false);
+        numberColumnLowerItem.setEnabled(false);
+        numberColumnHigherItem.setEnabled(false);
+        stringColumnItem.setEnabled(false);
+        resetItem.setEnabled(false);
     }
 
     @Override
@@ -147,14 +147,14 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
             if (lastTable.getModel().getRowCount() > 0) {
                 Object testValue = lastTable.getModel().getValueAt(0, lastSelectedColumn);
                 if (testValue instanceof Number) {
-                    numberColumnLower.setEnabled(true);
-                    numberColumnHigher.setEnabled(true);
-                    stringColumn.setEnabled(false);
+                    numberColumnLowerItem.setEnabled(true);
+                    numberColumnHigherItem.setEnabled(true);
+                    stringColumnItem.setEnabled(false);
                 }
                 if (testValue instanceof String) {
-                    numberColumnLower.setEnabled(false);
-                    numberColumnHigher.setEnabled(false);
-                    stringColumn.setEnabled(true);
+                    numberColumnLowerItem.setEnabled(false);
+                    numberColumnHigherItem.setEnabled(false);
+                    stringColumnItem.setEnabled(true);
                 }
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
@@ -171,7 +171,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                 tmpModel.addRow(row);
             }
             this.originalTableModel = tmpModel;
-            reset.setEnabled(true);
+            resetItem.setEnabled(true);
         }
         lastTable.setModel(newTableModel);
         lastTable.setRowSorter(GenerateRowSorter.createRowSorter(newTableModel));

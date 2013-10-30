@@ -354,7 +354,7 @@ public class HighlightAreaListener extends MouseAdapter {
         int searchStart = isFwdStrand ? start + 3 : start - 3;
         PatternFilter patternFilter = new PatternFilter(searchStart, reference.getRefLength(), reference);
         for (String stop : stopCodons) {
-            patternFilter.setPattern(stop.toLowerCase());
+            patternFilter.setPattern(stop.toUpperCase());
             int stopPos = patternFilter.findNextOccurrenceOnStrand(isFwdStrand);
             results.add(stopPos);
         }

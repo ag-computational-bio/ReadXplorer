@@ -142,7 +142,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             this.transcAnalysesTopComp.open();
             this.startTransciptionAnalyses(wiz);
 
-        } else if (selectedTracks.isEmpty()) {
+        } else if (selectedTracks.isEmpty() && !cancelled) {
             String msg = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfo",
                     "No track selected. To start a transcription analysis at least one track has to be selected.");
             String title = NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTranscriptionAnalysesInfoTitle", "Info");

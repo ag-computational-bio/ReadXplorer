@@ -2,7 +2,6 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.ERROR;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.FINISHED;
@@ -21,11 +20,10 @@ import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,10 +31,11 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -98,66 +97,34 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
         topCountsTable.getTableHeader().addMouseListener(rktm);
-        topCountsTable.addMouseListener(new MouseListener() {
+        topCountsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    showPosition();
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
+            public void valueChanged(ListSelectionEvent e) {
+                showPosition();
             }
         });
     }
 
+    /**
+     * Updates the position in all available bounds info managers to the 
+     * reference position of the currently selected genomic feature.
+     */
     private void showPosition() {
-        PersistantFeature feature = getFeatureFromTable();
-        if (feature != null) {
-            int pos = feature.getStart();
-            Collection<ViewController> viewControllers;
-            viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-            for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
-                ViewController tmpVCon = it.next();
-                BoundsInfoManager bm = tmpVCon.getBoundsManager();
-                if (bm != null) {
-                    bm.navigatorBarUpdated(pos);
-                }
+        Collection<ViewController> viewControllers =
+                (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+        /*
+         * TODO: can lead to error, if references have different length and pos is out of bounds in one.
+         * Come up with global concept for position update in all opened references. But after multichromosome
+         * support is implemented - it may change some requirements...
+         */
+        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
+            ViewController tmpVCon = it.next();
+            BoundsInfoManager bm = tmpVCon.getBoundsManager(); 
+            if (bm != null) {
+                TableUtils.showPosition(topCountsTable, 0, bm);
             }
-            refComp.showFeatureDetails(feature);
         }
-    }
-
-    private PersistantFeature getFeatureFromTable() {
-        PersistantFeature feature = null;
-        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
-        switch (usedTool) {
-            case DeSeq:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
-                break;
-            case BaySeq:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
-                break;
-            case SimpleTest:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
-                break;
-        }
-        return feature;
+        refComp.showTableFeature(topCountsTable, 0);
     }
 
     /**

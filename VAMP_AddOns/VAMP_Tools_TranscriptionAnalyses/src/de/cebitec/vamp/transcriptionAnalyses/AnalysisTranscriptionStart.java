@@ -344,7 +344,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int start;
         boolean fstFittingFeature = true;
         if (isFwdStrand) {
-            for (int i = this.lastFeatureIdxGenStartsFwd; i < this.genomeFeatures.size()-1; ++i) {
+            for (int i = this.lastFeatureIdxGenStartsFwd; i < this.genomeFeatures.size(); ++i) {
                 feature = this.genomeFeatures.get(i);
                 start = feature.getStart();
 
@@ -392,7 +392,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                          * except the current feature is a CDS feature and no gene feature is present for
                          * that gene, starting earlier.
                          */
-                        if (feature.getType() == FeatureType.CDS && 
+                        if (feature.getType() == FeatureType.CDS && i+1 < genomeFeatures.size() &&
                                 feature.getStart() == this.genomeFeatures.get(i+1).getStart() &&
                                 this.genomeFeatures.get(i+1).getType() == FeatureType.GENE) {
                             detectedFeatures.setDownstreamFeature(this.genomeFeatures.get(i+1));
@@ -413,7 +413,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size()-1; ++i) {
+            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size(); ++i) {
                 feature = this.genomeFeatures.get(i);
                 start = feature.getStop();
 
@@ -453,7 +453,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     } else if (start > tssPos && feature.getStart() < tssPos) {
                         //store next upstream feature, translation start is further in gene
                         
-                        if (    feature.getType() == FeatureType.CDS && 
+                        if (    feature.getType() == FeatureType.CDS && i+1 < genomeFeatures.size() && 
                                 this.genomeFeatures.get(i+1).getType() == FeatureType.GENE &&
                                 this.genomeFeatures.get(i+1).getStart() <= feature.getStart()) {
                             detectedFeatures.setUpstreamFeature(this.genomeFeatures.get(i+1));
@@ -499,7 +499,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 lastDetectedStart = this.detectedStarts.get(--index);
             }
             
-            if (lastDetectedStart.getPos() + 19 >= tss.getPos() && lastDetectedStart.isFwdStrand() == tss.isFwdStrand()) {
+            if (lastDetectedStart.getPos() + 1 >= tss.getPos() && lastDetectedStart.isFwdStrand() == tss.isFwdStrand()) {
                 int noReadStartsLastStart = lastDetectedStart.getReadStartsAtPos();
                 int noReadStartsTSS = tss.getReadStartsAtPos();
                 

@@ -337,4 +337,12 @@ public final class LoginVisualPanel extends JPanel {
         dbChooseButton.setVisible(true);
         databaseField.setText(defaultdatabaseh2);
     }
+    
+    /**
+     * Updates the choose button text.
+     * @param chooseButtonText 
+     */
+    public void setChooseButtonText(String chooseButtonText) {
+        this.dbChooseButton.setText(chooseButtonText);
+    }
 }

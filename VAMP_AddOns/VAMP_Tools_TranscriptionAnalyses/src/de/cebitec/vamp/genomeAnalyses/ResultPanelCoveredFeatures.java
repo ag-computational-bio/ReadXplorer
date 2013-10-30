@@ -7,6 +7,7 @@ package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.UneditableTableModel;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.tableVisualization.TableUtils;
@@ -40,6 +41,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private CoveredFeatureResult coveredFeaturesResult;
     private Map<String, Integer> coveredStatisticsMap;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private ReferenceFeatureTopComp refFeatureComp;
     
     
     /**
@@ -51,6 +53,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         initComponents();
         this.coveredFeaturesTable.getTableHeader().addMouseListener(tableFilter);
         this.coveredStatisticsMap = new HashMap<>();
+        this.refFeatureComp = ReferenceFeatureTopComp.findInstance();
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.coveredFeaturesTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -58,6 +61,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 TableUtils.showPosition(coveredFeaturesTable, 0, bim);
+                refFeatureComp.showTableFeature(coveredFeaturesTable, 0);
             }
         });
     }

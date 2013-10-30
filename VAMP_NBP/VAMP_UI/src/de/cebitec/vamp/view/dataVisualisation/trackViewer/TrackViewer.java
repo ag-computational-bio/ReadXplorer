@@ -744,7 +744,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param value the new vertical zoom slider value
      */
     public void verticalZoomLevelUpdated(int value) {
-        this.scaleFactor = value < 1 ? 1 : value;
+        this.scaleFactor = value < 1 ? 1 : Math.pow(value, 2);
  
         if (this.cov != null) {
             if (this.cov.isTwoTracks() && !this.combineTracks) {
@@ -800,8 +800,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.scaleLineStep = 7500;
         } else if (visibleCoverage <= 65000) {
             this.scaleLineStep = 10000;
-        } else {
+        } else if (visibleCoverage <= 200000) {
             this.scaleLineStep = 20000;
+        } else if (visibleCoverage <= 500000) {
+            this.scaleLineStep = 50000;
+        } else if (visibleCoverage <= 1000000) {
+            this.scaleLineStep = 100000;
+        } else {
+            this.scaleLineStep = 300000;
         }
     }
     
@@ -819,10 +825,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             double availablePixels = this.getPaintingAreaInfo().getAvailableForwardHeight();
             this.scaleFactor = Math.ceil(this.cov.getHighestCoverage() / availablePixels);
             this.scaleFactor = this.scaleFactor < 1 ? 1.0 : this.scaleFactor;
-            this.scaleFactor = this.scaleFactor > this.verticalSlider.getMaximum() ? this.verticalSlider.getMaximum() : this.scaleFactor;
 
             //set the inverse of the value set in verticalZoomLevelUpdated
-            this.verticalSlider.setValue((int) ((this.scaleFactor)));
+            this.verticalSlider.setValue((int) (Math.ceil(Math.sqrt(this.scaleFactor))));
             if (oldScaleFactor != this.scaleFactor) {
                 this.createCoveragePaths();
                 this.repaint();

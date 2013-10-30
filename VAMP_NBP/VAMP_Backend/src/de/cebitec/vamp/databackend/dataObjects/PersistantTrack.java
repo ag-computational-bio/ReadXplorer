@@ -73,7 +73,7 @@ public class PersistantTrack {
     /**
      * @return The id of this paired data track.
      */
-    public int getSeqPairId() {
+    public int getReadPairId() {
         return seqPairId;
     }
     
@@ -120,7 +120,7 @@ public class PersistantTrack {
                     && (otrack.getId() == this.id)
                     && (otrack.getFilePath().equals(this.path))
                     && (otrack.getRefGenID() == this.refGenID)
-                    && (otrack.getSeqPairId() == this.seqPairId));
+                    && (otrack.getReadPairId() == this.seqPairId));
         }
         else { return super.equals(o); }
     }
