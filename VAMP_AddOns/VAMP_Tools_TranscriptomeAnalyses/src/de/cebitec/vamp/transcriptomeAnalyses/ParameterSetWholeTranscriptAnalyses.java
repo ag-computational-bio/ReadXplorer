@@ -12,15 +12,14 @@ import de.cebitec.vamp.databackend.ParameterSetI;
  */
 class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetWholeTranscriptAnalyses> {
     
-    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, normalRPKMs, logRPKMs;
+    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRPKMs;
     private double fraction;
 
-    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean normalRPKMs, boolean logRPKMs, double fraction) {
+    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, double fraction) {
         this.performWholeTrascriptomeAnalyses = performWholeTrascriptomeAnalyses;
         this.performOperonDetection = performOperonDetection;
         this.performNovelRegionDetection = performNovelRegionDetection;
-        this.normalRPKMs = normalRPKMs;
-        this.logRPKMs = logRPKMs;
+        this.performRPKMs = rPKMs;
         this.fraction = fraction;
     }
 
@@ -48,20 +47,12 @@ class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetW
         this.performNovelRegionDetection = performNovelRegionDetection;
     }
 
-    public boolean isNormalRPKMs() {
-        return normalRPKMs;
+    public boolean isPerformingRPKMs() {
+        return performRPKMs;
     }
 
-    public void setNormalRPKMs(boolean normalRPKMs) {
-        this.normalRPKMs = normalRPKMs;
-    }
-
-    public boolean isLogRPKMs() {
-        return logRPKMs;
-    }
-
-    public void setLogRPKMs(boolean logRPKMs) {
-        this.logRPKMs = logRPKMs;
+    public void setPerformingRPKMs(boolean rPKMs) {
+        this.performRPKMs = rPKMs;
     }
 
     public double getFraction() {
@@ -71,6 +62,4 @@ class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetW
     public void setFraction(double fraction) {
         this.fraction = fraction;
     }
-    
-    
 }

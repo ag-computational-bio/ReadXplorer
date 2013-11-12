@@ -45,7 +45,7 @@ public class GenomeFeatureParser {
         this.reverseCDSs = new HashMap<>();
         this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
 
-        parseFeatureInformation(this.genomeFeatures);
+//        parseFeatureInformation(this.genomeFeatures);
     }
 
     /**
@@ -94,7 +94,7 @@ public class GenomeFeatureParser {
      *
      * @param genomeFeatures
      */
-    private void parseFeatureInformation(List<PersistantFeature> genomeFeatures) {
+    public void parseFeatureInformation(List<PersistantFeature> genomeFeatures) {
         //at first we need connection to the reference (Projectconnector->ReferenceConnector)
         // Vamp has already all information we need here
 
@@ -215,7 +215,6 @@ public class GenomeFeatureParser {
 
         for (PersistantFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
-            System.out.println("FeatureID: "+ gf.getId() + "\tFeatureName: "+gf.getFeatureName());
         }
 
         return regions;

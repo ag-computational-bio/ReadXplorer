@@ -5,6 +5,7 @@
 package de.cebitec.vamp.transcriptomeAnalyses;
 
 import de.cebitec.vamp.databackend.ResultTrackAnalysis;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.transcriptomeAnalyses.datastructure.TranscriptionStart;
 import de.cebitec.vamp.util.GeneralUtils;
@@ -110,18 +111,21 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             tssRow.add(tss.isLeaderless());
 
             // additionally informations about detected gene
+            PersistantFeature detectedGene = tss.getDetectedGene();
+            PersistantFeature nextGene = tss.getNextGene();
+                    
             if (tss.getDetectedGene() != null) {
-                tssRow.add(tss.getDetectedGene().getStart());
-                tssRow.add(tss.getDetectedGene().getStop());
-                tssRow.add(tss.getDetectedGene().getStop() - tss.getDetectedGene().getStart());
-                tssRow.add(tss.getDetectedGene().getFrame());
-                tssRow.add(tss.getDetectedGene().getProduct());
+                tssRow.add(detectedGene.isFwdStrand() ? detectedGene.getStart() : detectedGene.getStop());
+                tssRow.add(detectedGene.isFwdStrand() ? detectedGene.getStop() : detectedGene.getStart());
+                tssRow.add(detectedGene.getStop() - detectedGene.getStart());
+                tssRow.add(detectedGene.getFrame());
+                tssRow.add(detectedGene.getProduct());
             } else {
-                tssRow.add(tss.getNextGene().getStart());
-                tssRow.add(tss.getNextGene().getStop());
-                tssRow.add(tss.getNextGene().getStop() - tss.getNextGene().getStart());
-                tssRow.add(tss.getNextGene().getFrame());
-                tssRow.add(tss.getNextGene().getProduct());
+                tssRow.add(nextGene.isFwdStrand() ? nextGene.getStart() : nextGene.getStop());
+                tssRow.add(nextGene.isFwdStrand() ? nextGene.getStop() : nextGene.getStart());
+                tssRow.add(nextGene.getStop() - nextGene.getStart());
+                tssRow.add(nextGene.getFrame());
+                tssRow.add(nextGene.getProduct());
             }
 
             tssRow.add(tss.getDetectedFeatStart());

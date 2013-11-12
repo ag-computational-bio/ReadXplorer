@@ -13,13 +13,12 @@ import de.cebitec.vamp.databackend.ParameterSetI;
 public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<ParameterSetFiveEnrichedAnalyses> {
 
     private boolean performTSSAnalysis;
-    private boolean performLeaderlessAnalysis;
     private boolean performAntisenseAnalysis;
     private Double fraction;
     private Integer ratio;
     private Integer upstreamRegion, downstreamRegion;
     private Integer leaderlessLimit, exclusionOfTSSDistance, keepingInternalTssDistance;
-    private boolean exclusionOfInternalTSS, cdsShiftDetection;
+    private boolean exclusionOfInternalTSS, cdsShiftDetection, performPutativeUnAnnotated;
 
     /**
      * Data storage for all parameters associated with a transcription analysis.
@@ -29,11 +28,10 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
      * @param performAntisenseAnalysis
      * @param fraction
      */
-    public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performLeaderlessAnalysis, boolean performAntisenseAnalysis, Double fraction, Integer ratio, Integer upstream, Integer downstream,
+    public ParameterSetFiveEnrichedAnalyses(boolean performTSSAnalysis, boolean performAntisenseAnalysis, boolean performPutativeUnAnnotatedAnalysis, Double fraction, Integer ratio, Integer upstream, Integer downstream,
             boolean excludeInternalTSS, Integer distanceForExcludionOfTss, 
             Integer leaderlessLimit, boolean cdsShiftDetection, int keepInternalDistance) {
         this.performTSSAnalysis = performTSSAnalysis;
-        this.performLeaderlessAnalysis = performLeaderlessAnalysis;
         this.performAntisenseAnalysis = performAntisenseAnalysis;
         this.fraction = fraction;
         this.upstreamRegion = upstream;
@@ -44,6 +42,8 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         this.exclusionOfInternalTSS = excludeInternalTSS;
         this.exclusionOfTSSDistance = distanceForExcludionOfTss;
         this.keepingInternalTssDistance = keepInternalDistance;
+        this.performPutativeUnAnnotated = performPutativeUnAnnotatedAnalysis;
+            
 
     }
 
@@ -53,14 +53,6 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
 
     public void setPerformTSSAnalysis(boolean performTSSAnalysis) {
         this.performTSSAnalysis = performTSSAnalysis;
-    }
-
-    public boolean isPerformLeaderlessAnalysis() {
-        return performLeaderlessAnalysis;
-    }
-
-    public void setPerformLeaderlessAnalysis(boolean performLeaderlessAnalysis) {
-        this.performLeaderlessAnalysis = performLeaderlessAnalysis;
     }
 
     public boolean isPerformAntisenseAnalysis() {
@@ -110,6 +102,9 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     public Integer getKeepingInternalTssDistance() {
         return keepingInternalTssDistance;
     }
-    
-    
+
+    boolean isPerformUnAnnotatedRegionsAnalysis() {
+        return this.performPutativeUnAnnotated;
+    }
+
 }

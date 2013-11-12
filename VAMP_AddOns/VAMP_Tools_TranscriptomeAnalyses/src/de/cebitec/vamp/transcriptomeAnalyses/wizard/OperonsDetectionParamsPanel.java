@@ -15,6 +15,13 @@ public class OperonsDetectionParamsPanel implements WizardDescriptor.Panel<Wizar
      * component from this class, just use getComponent().
      */
     private OperonsDetectionParamsVisualPanel component;
+    private final String wizardName;
+
+    public OperonsDetectionParamsPanel(String wizardName) {
+        this.wizardName = wizardName;
+    }
+    
+    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -23,7 +30,7 @@ public class OperonsDetectionParamsPanel implements WizardDescriptor.Panel<Wizar
     @Override
     public OperonsDetectionParamsVisualPanel getComponent() {
         if (component == null) {
-            component = new OperonsDetectionParamsVisualPanel();
+            component = new OperonsDetectionParamsVisualPanel(this.wizardName);
         }
         return component;
     }

@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import jsc.distributions.Normal;
 
 /**
@@ -51,7 +50,7 @@ public class Statistics implements Observer {
     /**
      * Key, FeatureID of the first Feature,
      */
-    private Map<Integer, OperonAdjacency> putativeOperonAdjacenciesFWD, putativeOperonAdjacenciesREV;
+    private HashMap<Integer, OperonAdjacency> putativeOperonAdjacenciesFWD, putativeOperonAdjacenciesREV;
 
     public Statistics(int refSeqLength, double fraction, HashMap<Integer, List<Integer>> forwardCDSs, HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash, int[] region2Exclude) {
 
@@ -310,11 +309,11 @@ public class Statistics implements Observer {
         return revCoverage;
     }
 
-    public Map<Integer, OperonAdjacency> getPutativeOperonAdjacenciesFWD() {
+    public HashMap<Integer, OperonAdjacency> getPutativeOperonAdjacenciesFWD() {
         return putativeOperonAdjacenciesFWD;
     }
 
-    public Map<Integer, OperonAdjacency> getPutativeOperonAdjacenciesREV() {
+    public HashMap<Integer, OperonAdjacency> getPutativeOperonAdjacenciesREV() {
         return putativeOperonAdjacenciesREV;
     }
 
@@ -366,6 +365,4 @@ public class Statistics implements Observer {
     public void setBg(double bg) {
         this.bg = bg;
     }
-    
-    
 }

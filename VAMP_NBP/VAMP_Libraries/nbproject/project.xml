@@ -720,6 +720,10 @@
                 <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/VectorGraphics2D-0.9.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/VectorGraphics2D-0.9.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/pdf-transcoder.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/pdf-transcoder.jar</binary-origin>
             </class-path-extension>
@@ -740,6 +744,10 @@
                 <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/gral-core-0.9.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/gral-core-0.9.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/jsc.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jsc.jar</binary-origin>
             </class-path-extension>
@@ -758,6 +766,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/h2-1.3.170.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/h2-1.3.170.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/gral-examples-0.9.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/gral-examples-0.9.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/bytecode.jar</runtime-relative-path>

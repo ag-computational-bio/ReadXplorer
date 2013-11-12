@@ -15,6 +15,13 @@ public class NewRegionDetectionParamsPanel implements WizardDescriptor.Panel<Wiz
      * component from this class, just use getComponent().
      */
     private NewRegionDetectionParamsVisualPanel component;
+    private final String wizardName;
+
+    public NewRegionDetectionParamsPanel(String wizardName) {
+        this.wizardName = wizardName;
+    }
+    
+    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -23,7 +30,7 @@ public class NewRegionDetectionParamsPanel implements WizardDescriptor.Panel<Wiz
     @Override
     public NewRegionDetectionParamsVisualPanel getComponent() {
         if (component == null) {
-            component = new NewRegionDetectionParamsVisualPanel();
+            component = new NewRegionDetectionParamsVisualPanel(this.wizardName);
         }
         return component;
     }
@@ -62,5 +69,6 @@ public class NewRegionDetectionParamsPanel implements WizardDescriptor.Panel<Wiz
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
+         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, (double) component.getFraction());
     }
 }

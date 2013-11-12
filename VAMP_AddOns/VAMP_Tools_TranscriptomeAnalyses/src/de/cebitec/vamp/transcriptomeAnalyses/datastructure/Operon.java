@@ -2,18 +2,19 @@ package de.cebitec.vamp.transcriptomeAnalyses.datastructure;
 
 import de.cebitec.vamp.databackend.dataObjects.TrackResultEntry;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author MKD, rhilker
- * 
- * Data structure for storing operons. Operons consist of a list of OperonAdjacencies, since
- * each operon can contain more than two genes.
+ *
+ * Data structure for storing operons. Operons consist of a list of
+ * OperonAdjacencies, since each operon can contain more than two genes.
  */
 public class Operon extends TrackResultEntry {
-    
+
     private List<OperonAdjacency> operonAdjacencies;
-   
+
     public Operon(int trackId) {
         super(trackId);
         this.operonAdjacencies = new ArrayList<>();
@@ -27,12 +28,13 @@ public class Operon extends TrackResultEntry {
     }
 
     /**
-     * @param operon the operon adjacencies to associate with this operon object.
+     * @param operon the operon adjacencies to associate with this operon
+     * object.
      */
     public void setOperonAdjacencies(List<OperonAdjacency> newOperonAdjacencys) {
-         this.operonAdjacencies = newOperonAdjacencys;
+        this.operonAdjacencies = newOperonAdjacencys;
     }
-    
+
     /**
      * Remove all operon adjacencies associated with this operon object.
      */
@@ -42,17 +44,35 @@ public class Operon extends TrackResultEntry {
 
     /**
      * Adds the operon adjacency to the list of OperonAdjacencies.
-     * @param operonAdjacency 
+     *
+     * @param operonAdjacency
      */
     public void addOperonAdjacency(OperonAdjacency operonAdjacency) {
         this.operonAdjacencies.add(operonAdjacency);
     }
-    
+
     /**
      * Adds the operon adjacencies to the end of the list of OperonAdjacencies.
-     * @param operonAdjacencies 
+     *
+     * @param operonAdjacencies
      */
     public void addAllOperonAdjacencies(List<OperonAdjacency> operonAdjacencies) {
         this.operonAdjacencies.addAll(operonAdjacencies);
+    }
+
+    public String toOperonString() {
+        String operon = "";
+
+        for (Iterator<OperonAdjacency> it = operonAdjacencies.iterator(); it.hasNext();) {
+            OperonAdjacency operonAdjacency = it.next();
+
+            if (it.hasNext()) {
+                operon += "-" + operonAdjacency.getFeature1().toString();
+            } else {
+                operon += "-" + operonAdjacency.getFeature1().toString() + "-" + operonAdjacency.getFeature2().toString();
+            }
+        }
+
+        return operon;
     }
 }

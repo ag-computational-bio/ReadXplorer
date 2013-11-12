@@ -15,6 +15,13 @@ public class AntisenseDetectionParamsPanel implements WizardDescriptor.Panel<Wiz
      * component from this class, just use getComponent().
      */
     private AntisenseDetectionParamsVisualPanel component;
+    private final String wizardName;
+
+    public AntisenseDetectionParamsPanel(String wizardName) {
+        this.wizardName = wizardName;
+    }
+    
+    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -23,7 +30,7 @@ public class AntisenseDetectionParamsPanel implements WizardDescriptor.Panel<Wiz
     @Override
     public AntisenseDetectionParamsVisualPanel getComponent() {
         if (component == null) {
-            component = new AntisenseDetectionParamsVisualPanel();
+            component = new AntisenseDetectionParamsVisualPanel(this.wizardName);
         }
         return component;
     }

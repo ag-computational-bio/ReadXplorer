@@ -13,32 +13,25 @@ import java.util.List;
  * @author jritter
  */
 public class OperonDetection {
-    
-        /**
-     * The List contains the featureID of the first and second feature. The
-     * Integer represents the count mappings are span over this Operon.
-     */
-    private List<Operon> fwdOperons, revOperons;
-
-    public OperonDetection(TrackConnector tc, HashMap<Integer, OperonAdjacency> putativeFwdOperonAdj, HashMap<Integer, OperonAdjacency> putativeRevOperonAdj, int bg) {
-        
-        this.fwdOperons = concatOperonAdjacenciesToOperons(putativeFwdOperonAdj, tc, bg);
-        this.revOperons = concatOperonAdjacenciesToOperons(putativeRevOperonAdj, tc, bg);
+     
+    public OperonDetection() {
     }
     
     
-      /**
+    /**
      * Creating Operon Data.
-     *
+     * 
      * @param putativeOperonAdjacencies
-     * @return a List of Operons.
+     * @param trackConnector Trackconnector.
+     * @param bg Background Threshold.
+     * @return a List of Operon.
      */
-    private List<Operon> concatOperonAdjacenciesToOperons(HashMap<Integer, OperonAdjacency> putativeOperonAdjacencies, TrackConnector trackConnector, int bg) {
+    public List<Operon> concatOperonAdjacenciesToOperons(HashMap<Integer, OperonAdjacency> putativeOperonAdjacencies, TrackConnector trackConnector, double bg) {
         Integer[] sortedStartingFeatureIDs = new Integer[putativeOperonAdjacencies.keySet().size()];
         putativeOperonAdjacencies.keySet().toArray(sortedStartingFeatureIDs);
 
         List<Operon> operons = new ArrayList<Operon>();
-        List<OperonAdjacency> operonAdjacencies = new ArrayList<OperonAdjacency>();
+        List<OperonAdjacency> operonAdjacencies = new ArrayList<>();
         int lastAnnoId = 0;
         Operon op;
         PersistantFeature feature1;

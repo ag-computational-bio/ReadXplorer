@@ -4,13 +4,15 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses;
 
-import com.sun.glass.events.WheelEvent;
+import de.cebitec.readxplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.transcriptomeAnalyses.datastructure.Operon;
+import de.cebitec.vamp.util.GeneralUtils;
 import de.cebitec.vamp.util.Observable;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.Properties;
@@ -40,10 +42,11 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private Statistics stats;
     private double backgroundCutoff;
-    private ParameterSetWholeTranscriptAnalyses paramerters;
+    private ParameterSetWholeTranscriptAnalyses parameters;
     private GenomeFeatureParser featureParser;
-    private TssDetection tssDetection;
+    private RPKMValuesCalculation rpkmCalculation;
     private OperonDetection operonDetection;
+    private NewRegionDetection newRegionDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
@@ -52,19 +55,30 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
      * Key: featureID , Value: PersistantFeature
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private ResultPanelRPKM rpkmResultPanel;
+    private NovelRegionResultPanel novelRegionResult;
+    private ResultPanelOperonDetection operonResultPanel;
 
-    public WholeTranscriptDataAnalysisHandler(GenomeFeatureParser featureParser, PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
-        this.featureParser = featureParser;
+    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refGenomeID;
         this.fraction = parameterset.getFraction();
-        this.paramerters = parameterset;
+        this.parameters = parameterset;
         this.refViewer = refViewer;
         this.transcAnalysesTopComp = transcAnalysesTopComp;
         this.trackMap = trackMap;
     }
 
     private void startAnalysis() throws FileNotFoundException {
+
+        TrackConnector connector = null;
+        try {
+            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
+        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+        }
+        this.featureParser = new GenomeFeatureParser(connector);
+        this.featureParser.parseFeatureInformation(featureParser.getGenomeFeatures());
 
         this.region2Exclude = this.featureParser.getRegion2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
@@ -83,7 +97,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             handler.startAnalysis();
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
             JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
-            notifyObservers(FiveEnrichedDataAnalysesHandler.AnalysisStatus.ERROR);
+            notifyObservers(AnalysisStatus.ERROR);
             this.interrupt();
         }
     }
@@ -103,17 +117,12 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     @Override
     public void run() {
-        notifyObservers(FiveEnrichedDataAnalysesHandler.AnalysisStatus.RUNNING);
+        notifyObservers(AnalysisStatus.RUNNING);
         try {
             startAnalysis();
         } catch (FileNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }
-    }
-
-    public static enum AnalysisStatus {
-
-        RUNNING, FINISHED, ERROR;
     }
 
     @Override
@@ -129,7 +138,76 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     public void showData(Object data) {
         this.mappings = this.stats.getMappings();
         this.stats.parseMappings(this.mappings);
-        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.paramerters.getFraction(), this.featureParser.getRefSeqLength());
+        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction(), this.featureParser.getRefSeqLength());
+        this.stats.setBg(this.backgroundCutoff);
 
+
+        this.stats.initMappingsStatistics();
+        if (parameters.isPerformingRPKMs()) {
+            rpkmCalculation = new RPKMValuesCalculation(this.allRegionsInHash, this.stats);
+            rpkmCalculation.calculationExpressionValues();
+
+            String trackNames;
+
+            if (rpkmResultPanel == null) {
+                rpkmResultPanel = new ResultPanelRPKM();
+                rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+            }
+
+            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), false);
+            rpkmResultPanel.addResult(rpkmAnalysisResult);
+            trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
+            String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
+            transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
+        }
+
+        if (parameters.isPerformNovelRegionDetection()) {
+            newRegionDetection = new NewRegionDetection();
+            newRegionDetection.runningNewRegionsDetection(featureParser.getRefSeqLength(), forwardCDSs, 
+                    reverseCDSs, allRegionsInHash, this.stats.getFwdCoverage(), this.stats.getRevCoverage(), 
+                    this.stats.getForward(), this.stats.getReverse(), this.stats.getMm(), this.stats.getBg());
+            
+            String trackNames;
+
+            if (novelRegionResult == null) {
+                novelRegionResult = new NovelRegionResultPanel();
+                novelRegionResult.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+            }
+
+            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), false);
+            novelRegionResult.addResult(newRegionResult);
+            trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
+            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
+            transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
+            
+        }
+
+        if (parameters.isPerformOperonDetection()) {
+            /**
+             * The List contains the featureID of the first and second feature.
+             * The Integer represents the count mappings are span over this
+             * Operon.
+             */
+            List<Operon> fwdOperons, revOperons;
+            operonDetection = new OperonDetection();
+            fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), this.trackConnector, stats.getBg());
+            revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.trackConnector, this.stats.getBg());
+            List<Operon> detectedOpeons = new ArrayList<>(fwdOperons);
+            detectedOpeons.addAll(revOperons);
+            String trackNames;
+
+            if (operonResultPanel == null) {
+                operonResultPanel = new ResultPanelOperonDetection(parameters);
+                operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+            }
+
+            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap, detectedOpeons, false);
+            operonResultPanel.addResult(operonDetectionResult);
+            trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
+            String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
+            transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
+        }
+
+        notifyObservers(AnalysisStatus.FINISHED);
     }
 }

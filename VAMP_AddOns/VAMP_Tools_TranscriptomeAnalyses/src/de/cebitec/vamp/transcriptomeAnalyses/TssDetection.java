@@ -52,7 +52,6 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         int ratio = parameters.getRatio();
         int up = parameters.getUpstreamRegion();
         int down = parameters.getDownstreamRegion();
-        boolean isLeaderlessDetection = parameters.isPerformLeaderlessAnalysis();
         int leaderlessRestirction = parameters.getLeaderlessLimit();
         boolean isExclusionOfInternalTss = parameters.isExclusionOfInternalTSS();
         Integer distanceForExcludingTss = parameters.getExclusionOfTSSDistance();
@@ -123,7 +122,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         dist2stop = feature.getStop() - i;
 
                         // check if leaderless (downstream)
-                        if (dist2start < leaderlessRestirction && isLeaderlessDetection) {
+                        if (dist2start < leaderlessRestirction) {
                             leaderless = true;
                             startCodon = getSubSeq(isFwd, feature.getStart() - 1, feature.getStart() + 2);
                             stopCodon = getSubSeq(isFwd, feature.getStop() - 3, feature.getStop());
@@ -165,7 +164,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                     } else {
 
                         // leaderless in upstream direction
-                        if (offset < leaderlessRestirction && isLeaderlessDetection) {
+                        if (offset < leaderlessRestirction) {
                             leaderless = true;
                             startCodon = getSubSeq(isFwd, feature.getStart() - 1, feature.getStart() + 2);
                             stopCodon = getSubSeq(isFwd, feature.getStop() - 3, feature.getStop());
@@ -228,7 +227,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         dist2stop = i - feature.getStart();
 
                         // check if leaderless (downstream)
-                        if (dist2start < leaderlessRestirction && isLeaderlessDetection) {
+                        if (dist2start < leaderlessRestirction) {
                             leaderless = true;
 //                            if (leaderless && (leaderlessInitSeqDown.equals("GTG") || leaderlessInitSeqDown.equals("CTG") || leaderlessInitSeqDown.equals("TTG"))) {
 //                                cdsShift = true;
@@ -282,7 +281,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         }
 
                     } else {
-                        if (offset < leaderlessRestirction && isLeaderlessDetection) {
+                        if (offset < leaderlessRestirction) {
                             // Leaderless TSS upstream
                             leaderless = true;
 //                            if (leaderless && (leaderlessInitSeqDown.equals("GTG") || leaderlessInitSeqDown.equals("CTG") || leaderlessInitSeqDown.equals("TTG"))) {

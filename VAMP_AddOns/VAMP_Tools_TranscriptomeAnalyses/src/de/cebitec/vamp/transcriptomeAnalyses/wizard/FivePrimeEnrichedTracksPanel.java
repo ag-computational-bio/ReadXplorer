@@ -9,7 +9,6 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
 public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
@@ -72,25 +71,21 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, (boolean) this.component.isTSSSelected());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS, (boolean) this.component.isRBSSelected());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, (boolean) this.component.isAntisenseSelected());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS, (boolean) this.component.isPromotorSelected());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS, (boolean) this.component.isLeaderLessSelected());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PUTATIVE_UNANNOTATED, (boolean) this.component.isPutativeUnAnnoSelected());
         storePrefs();
     }
 
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, this.component.isTSSSelected());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_RBS_ANALYSIS, this.component.isRBSSelected());
         pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, this.component.isAntisenseSelected());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS, this.component.isPromotorSelected());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS, this.component.isLeaderLessSelected());
+        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_PUTATIVE_UNANNOTATED, this.component.isPutativeUnAnnoSelected());
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (!this.component.isAntisenseSelected() && !this.component.isLeaderLessSelected() && !this.component.isPromotorSelected() && !this.component.isRBSSelected() && !this.component.isTSSSelected()) {
+        if (!this.component.isAntisenseSelected() && !this.component.isPutativeUnAnnoSelected() && !this.component.isTSSSelected()) {
             throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
         }
     }
